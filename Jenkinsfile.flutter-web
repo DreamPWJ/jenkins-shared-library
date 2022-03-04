@@ -82,15 +82,15 @@ webSharedLibrary(map)
 
 /*
 
-antai_life_manager_flutter_web
+panweiji_life_manager_flutter_web
 乐享生活管理端Flutter For Web项目❤️
 JSON_PARAMS
 {
-   "REPO_URL" : "https://github.com/DreamPWJ/antai-mobile/antai_life_manager.git" ,
+   "REPO_URL" : "https://github.com/DreamPWJ/panweiji-mobile/panweiji_life_manager.git" ,
    "BRANCH_NAME" : "dev" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "antai-life-manager" ,
-   "SHELL_PARAMS" : "antai-life-manager flutter-web 8017 80 sit",
+   "PROJECT_NAME" : "panweiji-life-manager" ,
+   "SHELL_PARAMS" : "panweiji-life-manager flutter-web 8017 80 sit",
    "IS_STATIC_RESOURCE" : true
 }
 

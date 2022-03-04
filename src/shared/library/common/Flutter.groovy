@@ -241,7 +241,7 @@ class Flutter implements Serializable {
      */
     static def setPubspecGitAccount(ctx) {
         try {
-            //仓库直接添加授权用户和密码示例 http://panweiji:panweiji666@git.panweiji.top/antai-mobile/flutter-jpush.git
+            //仓库直接添加授权用户和密码示例 http://panweiji:panweiji666@git.panweiji.com/panweiji-mobile/flutter-jpush.git
             def yamlFile = "${ctx.env.WORKSPACE}/pubspec.yaml"
             def pubspecData = ctx.readYaml file: yamlFile
             def httpGitUrl = "https://github.com/DreamPWJ/" // 可动态传入Git Http仓库地址

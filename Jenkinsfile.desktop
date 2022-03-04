@@ -65,7 +65,7 @@ test_flutter_desktop
 JSON_PARAMS:
 {
     "PROJECT_TYPE" : "2",
-    "REPO_URL" : "https://github.com/DreamPWJ/antai-mobile/antai_life_manager.git",
+    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-mobile/panweiji_life_manager.git",
     "DEFAULT_GIT_BRANCH" : "dev",
     "PROJECT_CHINESE_NAME" : "乐享服务"
 }

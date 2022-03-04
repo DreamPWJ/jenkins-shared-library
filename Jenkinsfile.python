@@ -41,7 +41,7 @@ map.put('docker_repo_credentials_id', '9a7c8e37-cb19-4e5c-a7a0-635517b1eb74')
 // docker镜像仓库注册地址
 map.put('docker_repo_registry', 'registry.cn-qingdao.aliyuncs.com')
 // docker仓库命名空间名称
-map.put('docker_repo_namespace', 'antai-coffee')
+map.put('docker_repo_namespace', 'panweiji-coffee')
 
 // 项目标签或项目简称
 map.put('project_tag', ' ')

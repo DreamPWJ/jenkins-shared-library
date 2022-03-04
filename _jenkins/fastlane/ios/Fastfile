@@ -272,7 +272,7 @@ platform :ios do
     )
 =end
     # 证书管理  注意match新创建证书会导致已存在的证书会被撤销失效
-    # match(git_url: "http://panweiji:Antaikeji666@git.antaikeji.top/health/certificates",
+    # match(git_url: "http://panweiji:panweijikeji666@git.panweijikeji.com/health/certificates",
     #       git_branch: "master",
     #       type: "adhoc", # appstore
     #       app_identifier: #{APP_IDENTIFIER}, #若同工程下有多个,则用["bundleId1","bundleId2"]

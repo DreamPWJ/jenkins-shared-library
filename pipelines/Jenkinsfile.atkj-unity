@@ -58,7 +58,7 @@ map.put('apple_team_id', "C45WYAFLWA")
 
 // App Store Connect API相关信息
 map.put('apple_store_connect_api_key_id', "BNL32GR27G")
-map.put('apple_store_connect_api_issuer_id', "a0cae47e-ca4b-4503-a967-4282302c0c5a")
+map.put('apple_store_connect_api_issuer_id', "")
 map.put('apple_store_connect_api_key_file_path', "/Library/AuthKey_BNL32GR27G.p8")
 
 // iOS审核信息

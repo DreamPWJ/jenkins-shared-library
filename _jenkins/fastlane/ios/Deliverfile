@@ -15,7 +15,7 @@ copyright "© #{Time.now.year} 山东乐享信息技术有限公司"
 
 # 技术支持网址
 support_url({
-              'zh-Hans' => "http://www.antaikeji.top"
+              'zh-Hans' => "http://www.panweijikeji.com"
             })
 
 # App名称

@@ -43,7 +43,7 @@ map.put('git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
 map.put('ding_talk_credentials_id', '0d24aab8-f1ec-44eb-8e4f-71de9ecd25d5') // 支持多个群通知 逗号,分割 不要空格
 
 // Android应用商店渠道号
-map.put('android_store_identify', "atkj\nhuawei\nxiaomi\noppo\nvivo\nsansumg\nmeizu")
+map.put('android_store_identify', "lexiang\nhuawei\nxiaomi\noppo\nvivo\nsansumg\nmeizu")
 
 // Android应用商店自动化审核上架
 map.put('huawei_app_gallery_client_id', "")
@@ -131,12 +131,12 @@ JSON_PARAMS:
     "CUSTOM_ANDROID_FLAVOR" : "anjia,jinhua,bona,kaifeng,xingyu,huaxin"
 }
 
-antai-ai-payment-machine
+panweiji-ai-payment-machine
 安家缴费一体机Android端
 JSON_PARAMS:
 {
     "PROJECT_TYPE" : "1",
-    "REPO_URL" : "https://github.com/DreamPWJ/smart-property/antai-ai-payment-machine.git",
+    "REPO_URL" : "https://github.com/DreamPWJ/smart-property/panweiji-ai-payment-machine.git",
 }
 ANDROID_APP_INFO:
 {
@@ -150,11 +150,11 @@ an-plus-ios-app
 JSON_PARAMS:
 {
     "PROJECT_TYPE" : "2",
-    "REPO_URL" : "https://github.com/DreamPWJ/antai-mobile/antai-mobile-ios.git",
+    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-mobile/panweiji-mobile-ios.git",
     "DEFAULT_GIT_BRANCH" : "developer",
     "CUSTOM_IOS_BUILD_TYPE" : "Test,PreRelease",
-    "IOS_APP_IDENTIFIER" : "com.antai.property.store",
-    "IOS_PROJECT_LEVEL_DIR" : "AntaiApp"
+    "IOS_APP_IDENTIFIER" : "com.panweiji.property.store",
+    "IOS_PROJECT_LEVEL_DIR" : "panweijiApp"
 }
 IOS_APP_REVIEW_INFO:
 {
@@ -167,10 +167,10 @@ an-plus-ios-mapp
 JSON_PARAMS:
 {
     "PROJECT_TYPE" : "2",
-    "REPO_URL" : "https://github.com/DreamPWJ/antai-mobile/ios-anhomemanager.git",
+    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-mobile/ios-anhomemanager.git",
     "DEFAULT_GIT_BRANCH" : "dev",
-    "IOS_APP_IDENTIFIER" : "com.antai.propertyservice.store",
-    "IOS_PROJECT_LEVEL_DIR" : "AntaiApp"
+    "IOS_APP_IDENTIFIER" : "com.panweiji.propertyservice.store",
+    "IOS_PROJECT_LEVEL_DIR" : "panweijiApp"
 }
 IOS_APP_REVIEW_INFO:
 {
@@ -185,10 +185,10 @@ JSON_PARAMS:
     "PROJECT_TYPE" : "2",
     "REPO_URL" : "https://github.com/DreamPWJ/anjia-jinhua/anjia-jinhua-ios.git",
     "DEFAULT_GIT_BRANCH" : "dev",
-    "IOS_APP_IDENTIFIER" : "Antai.com.saasAnjiaJinHua",
+    "IOS_APP_IDENTIFIER" : "panweiji.com.saasAnjiaJinHua",
     "IOS_PROJECT_LEVEL_DIR" : "saasAnjiaJinHua",
     "IOS_MULTI_TARGET_NAMES" : "anjia,jinhua",
-    "IOS_MULTI_TARGET_PARAMS" : "Antai.com.saasAnjiaAtkjNew~saasAntaikeji,Antai.com.saasAnjiaJinHua~saasAnjiaJinHua"
+    "IOS_MULTI_TARGET_PARAMS" : "panweiji.com.saasAnjialexiangNew~saaspanweijikeji,panweiji.com.saasAnjiaJinHua~saasAnjiaJinHua"
 }
 IOS_APP_REVIEW_INFO:
 {
@@ -203,10 +203,10 @@ JSON_PARAMS:
     "PROJECT_TYPE" : "2",
     "REPO_URL" : "https://github.com/DreamPWJ/anjia-jinhua/anjia-jinhua-ios-manager.git",
     "DEFAULT_GIT_BRANCH" : "dev",
-    "IOS_APP_IDENTIFIER" : "Antai.com.saasMangerJinHua",
+    "IOS_APP_IDENTIFIER" : "panweiji.com.saasMangerJinHua",
     "IOS_PROJECT_LEVEL_DIR" : "saasMangerJinHua",
     "IOS_MULTI_TARGET_NAMES" : "anjia,jinhua",
-    "IOS_MULTI_TARGET_PARAMS" : "Antai.com.saasMangerAtkj~saasMangerAntaikeji,Antai.com.saasMangerJinHua~saasMangerJinHua"
+    "IOS_MULTI_TARGET_PARAMS" : "panweiji.com.saasMangerlexiang~saasMangerpanweijikeji,panweiji.com.saasMangerJinHua~saasMangerJinHua"
 }
 IOS_APP_REVIEW_INFO:
 {
@@ -219,9 +219,9 @@ an-plus-saas-ios-app
 JSON_PARAMS:
 {
     "PROJECT_TYPE" : "2",
-    "REPO_URL" : "https://github.com/DreamPWJ/anjia-saas-atkj/anjia-ios-sass.git",
-    "IOS_APP_IDENTIFIER" : "Antai.com.saasAnjiaAtkjNew",
-    "IOS_PROJECT_LEVEL_DIR" : "saasAnjiaAtkj"
+    "REPO_URL" : "https://github.com/DreamPWJ/anjia-saas-lexiang/anjia-ios-sass.git",
+    "IOS_APP_IDENTIFIER" : "panweiji.com.saasAnjialexiangNew",
+    "IOS_PROJECT_LEVEL_DIR" : "saasAnjialexiang"
 }
 IOS_APP_REVIEW_INFO:
 {
@@ -234,9 +234,9 @@ an-plus-saas-ios-mapp
 JSON_PARAMS:
 {
     "PROJECT_TYPE" : "2",
-    "REPO_URL" : "https://github.com/DreamPWJ/anjia-saas-atkj/atkj-ios-sass-manager.git",
-    "IOS_APP_IDENTIFIER" : "Antai.com.saasMangerAtkj",
-    "IOS_PROJECT_LEVEL_DIR" : "saasMangerAtkj"
+    "REPO_URL" : "https://github.com/DreamPWJ/anjia-saas-lexiang/lexiang-ios-sass-manager.git",
+    "IOS_APP_IDENTIFIER" : "panweiji.com.saasMangerlexiang",
+    "IOS_PROJECT_LEVEL_DIR" : "saasMangerlexiang"
 }
 IOS_APP_REVIEW_INFO:
 {

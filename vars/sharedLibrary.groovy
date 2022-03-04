@@ -1209,7 +1209,7 @@ def integrationTesting() {
     // 先动态传入数据库名称部署集成测试应用 启动测试完成 再重新部署业务应用
     try {
         // 结合YApi接口管理做自动化测试
-        def yapiUrl = "http://yapi.antaikeji.top"
+        def yapiUrl = "http://yapi.panweijikeji.com"
         def testUrl = "${yapiUrl}/api/open/run_auto_test?${AUTO_TEST_PARAM}"
         // 执行接口测试
         def content = HttpRequest.get(this, "${testUrl}")

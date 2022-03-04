@@ -97,11 +97,11 @@ test-ios-app
 JSON_PARAMS:
 {
     "PROJECT_TYPE" : "2",
-    "REPO_URL" : "https://github.com/DreamPWJ/antai-mobile/ios-anhomemanager.git",
+    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-mobile/ios-anhomemanager.git",
     "DEFAULT_GIT_BRANCH" : "dev",
     "CUSTOM_IOS_BUILD_TYPE" : "Test,PreRelease",
-    "IOS_APP_IDENTIFIER" : "com.antai.propertyservice.store",
-    "IOS_PROJECT_LEVEL_DIR" : "AntaiApp"
+    "IOS_APP_IDENTIFIER" : "com.panweiji.propertyservice.store",
+    "IOS_PROJECT_LEVEL_DIR" : "panweijiApp"
 }
 IOS_APP_REVIEW_INFO:
 {

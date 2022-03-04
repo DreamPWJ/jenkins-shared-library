@@ -9,7 +9,7 @@ const argv = yargs.argv;
  * @author 潘维吉
  * @description 集成App Store Connect API实现自动化操作流程  自定义Apple Store审核状态变更自动通知
  * 终端执行命令如下
- node app-store-connect-api.js --appIdentifier='com.antai.propertyservice.store' --appVersion='1.0.0' --apiKeyId='RK28R5AN27' --privateKey="/Library/AuthKey_RK28R5AN27.p8" --issuerId='69a6de8d-bf99-47e3-e053-5b8c7c11a4d1' --phone='18863302302'
+ node app-store-connect-api.js --appIdentifier='com.panweiji.propertyservice.store' --appVersion='1.0.0' --apiKeyId='RK28R5AN27' --privateKey="/Library/AuthKey_RK28R5AN27.p8" --issuerId='69a6de8d-bf99-47e3-e053-5b8c7c11a4d1' --phone='18863302302'
  * 官方文档: https://developer.apple.com/documentation/appstoreconnectapi
  * jwt生成: https://www.npmjs.com/package/jsonwebtoken
  */
@@ -22,7 +22,7 @@ let appId = ""  // 应用Id
 let appName = ""  // 应用名称
 let appStoreState = "" // App Store应用状态
 
-//let appIdentifier = "com.antai.propertyservice.store"  // 应用唯一Id
+//let appIdentifier = "com.panweiji.propertyservice.store"  // 应用唯一Id
 //let appVersion = "1.0.0"  // 应用版本
 //let phone = "18863302302" // 发布人手机号 用于审核状态变更@通知
 

@@ -86,7 +86,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', 'property-sales-antai')
+map.put('maven_one_level', 'property-sales-panweiji')
 // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
 map.put('maven_setting_xml', ' ')
 
@@ -105,7 +105,7 @@ JSON_PARAMS
    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-iot/backend-monorepo.git" ,
    "BRANCH_NAME" : "master" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "property-sales-antai-app" ,
+   "PROJECT_NAME" : "property-sales-panweiji-app" ,
    "SHELL_PARAMS" : "property-sales app 8096 8080 prod ",
    "IS_ROLL_DEPLOY" : true
 }
@@ -117,7 +117,7 @@ JSON_PARAMS
    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-iot/backend-monorepo.git" ,
    "BRANCH_NAME" : "master" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "property-sales-antai-mapp" ,
+   "PROJECT_NAME" : "property-sales-panweiji-mapp" ,
    "SHELL_PARAMS" : "property-sales mapp 8095 8081 prod ",
    "IS_BLUE_GREEN_DEPLOY" : true
 }
@@ -129,7 +129,7 @@ JSON_PARAMS
    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-iot/backend-monorepo.git" ,
    "BRANCH_NAME" : "master" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "property-sales-antai-admin" ,
+   "PROJECT_NAME" : "property-sales-panweiji-admin" ,
    "SHELL_PARAMS" : "property-sales admin 8088 8085 prod ",
    "IS_BLUE_GREEN_DEPLOY" : true
 }
@@ -141,7 +141,7 @@ JSON_PARAMS
    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-iot/backend-monorepo.git" ,
    "BRANCH_NAME" : "master" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "property-sales-antai-admin-operate" ,
+   "PROJECT_NAME" : "property-sales-panweiji-admin-operate" ,
    "SHELL_PARAMS" : "property-sales admin-operate 8089 8086 prod "
 }
 
@@ -152,7 +152,7 @@ JSON_PARAMS
     "REPO_URL" : "https://github.com/DreamPWJ/panweiji-iot/backend-monorepo.git" ,
     "BRANCH_NAME" : "master" ,
     "PROJECT_TYPE" : "2" ,
-    "PROJECT_NAME" : "property-sales-antai-job" ,
+    "PROJECT_NAME" : "property-sales-panweiji-job" ,
     "SHELL_PARAMS" : "property-sales job 8067 8065 prod 8167 8267"
 }
 
@@ -163,7 +163,7 @@ JSON_PARAMS
     "REPO_URL" : "https://github.com/DreamPWJ/panweiji-iot/backend-monorepo.git" ,
     "BRANCH_NAME" : "master" ,
     "PROJECT_TYPE" : "2" ,
-    "PROJECT_NAME" : "property-sales-antai-message" ,
+    "PROJECT_NAME" : "property-sales-panweiji-message" ,
     "SHELL_PARAMS" : "property-sales message 8063 8060 prod"
 }
 
@@ -176,7 +176,7 @@ JSON_PARAMS
     "BRANCH_NAME" : "master" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "property-sales-admin,property-sales-operation" ,
-    "SHELL_PARAMS" : "property-sales-antai admin-web 8016 80 prod,property-sales-antai admin-operation 8017 80 prod" ,
+    "SHELL_PARAMS" : "property-sales-panweiji admin-web 8016 80 prod,property-sales-panweiji admin-operation 8017 80 prod" ,
     "NPM_RUN_PARAMS" : "build:prod,build:prod" ,
     "IS_MONO_REPO": true
 }

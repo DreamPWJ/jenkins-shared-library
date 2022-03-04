@@ -43,7 +43,7 @@ map.put('git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
 map.put('ding_talk_credentials_id', '0d24aab8-f1ec-44eb-8e4f-71de9ecd25d5') // 支持多个群通知 逗号,分割 不要空格
 
 // Android应用商店渠道号
-map.put('android_store_identify', "atkj\nhuawei\nxiaomi\noppo\nvivo\nsansumg\nmeizu")
+map.put('android_store_identify', "lexiang\nhuawei\nxiaomi\noppo\nvivo\nsansumg\nmeizu")
 
 // Android应用商店自动化审核上架
 map.put('huawei_app_gallery_client_id', "")
@@ -51,8 +51,8 @@ map.put('huawei_app_gallery_client_secret', "")
 map.put('xiaomi_market_user_name', "406798106@qq.com")
 
 // Apple Store相关信息
-map.put('apple_id', "antaikeji666@163.com")
-map.put('apple_password', "Antaikeji2021")
+map.put('apple_id', "panweijikeji666@163.com")
+map.put('apple_password', "panweijikeji2021")
 map.put('apple_team_id', "C45WYAFLWA")
 
 // App Store Connect API相关信息
@@ -72,7 +72,7 @@ appSharedLibrary(map)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// https://github.com/DreamPWJ/jenkins-shared-library.git  Jenkinsfile.atkj-mobile
+// https://github.com/DreamPWJ/jenkins-shared-library.git  Jenkinsfile.lexiang-mobile
 
 /*
 
@@ -86,10 +86,10 @@ JSON_PARAMS:
     "PROJECT_TYPE" : "2",
     "REPO_URL" : "https://github.com/DreamPWJ/anjia-jinhua/anjia-jinhua-ios.git",
     "DEFAULT_GIT_BRANCH" : "dev",
-    "IOS_APP_IDENTIFIER" : "Antai.com.saasAnjiaJinHua",
+    "IOS_APP_IDENTIFIER" : "panweiji.com.saasAnjiaJinHua",
     "IOS_PROJECT_LEVEL_DIR" : "saasAnjiaJinHua",
     "IOS_MULTI_TARGET_NAMES" : "bona,kaifeng,xingyu,huaxin",
-    "IOS_MULTI_TARGET_PARAMS" : "AnTaiKeji.com.saasAnjiaBoNa~saasAnjiaBoNa,AnTaiKeji.com.saasAnjiaKaiFeng~saasAnjiaKaiFeng,AnTaiKeji.com.saasAnjiaXingYu~saasAnjiaXingYu,AnTaiKeji.com.saasAnjiaHuaXin~saasAnjiaHuaXin"
+    "IOS_MULTI_TARGET_PARAMS" : "panweijiKeji.com.saasAnjiaBoNa~saasAnjiaBoNa,panweijiKeji.com.saasAnjiaKaiFeng~saasAnjiaKaiFeng,panweijiKeji.com.saasAnjiaXingYu~saasAnjiaXingYu,panweijiKeji.com.saasAnjiaHuaXin~saasAnjiaHuaXin"
 }
 IOS_APP_REVIEW_INFO:
 {
@@ -104,10 +104,10 @@ JSON_PARAMS:
     "PROJECT_TYPE" : "2",
     "REPO_URL" : "https://github.com/DreamPWJ/anjia-jinhua/anjia-jinhua-ios-manager.git",
     "DEFAULT_GIT_BRANCH" : "dev",
-    "IOS_APP_IDENTIFIER" : "Antai.com.saasMangerJinHua",
+    "IOS_APP_IDENTIFIER" : "panweiji.com.saasMangerJinHua",
     "IOS_PROJECT_LEVEL_DIR" : "saasMangerJinHua",
     "IOS_MULTI_TARGET_NAMES" : "bona,kaifeng,xingyu,huaxin",
-    "IOS_MULTI_TARGET_PARAMS" : "AnTaiKeji.com.saasMangerBoNa~saasMangerBoNa,AnTaiKeji.com.saasMangerKaiFengNew~saasMangerKaiFeng,AnTaiKeji.com.saasMangerXingYu~saasMangerXingYu,AnTaiKeji.com.saasMangerHuaXin~saasMangerHuaXin"
+    "IOS_MULTI_TARGET_PARAMS" : "panweijiKeji.com.saasMangerBoNa~saasMangerBoNa,panweijiKeji.com.saasMangerKaiFengNew~saasMangerKaiFeng,panweijiKeji.com.saasMangerXingYu~saasMangerXingYu,panweijiKeji.com.saasMangerHuaXin~saasMangerHuaXin"
 }
 IOS_APP_REVIEW_INFO:
 {

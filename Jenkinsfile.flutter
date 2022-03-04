@@ -77,15 +77,15 @@ appSharedLibrary(map)
 
 /*
 
-antai_life_manager_flutter_app
+panweiji_life_manager_flutter_app
 乐享生活管理端Flutter APP流水线 ✈️
 JSON_PARAMS:
 {
     "PROJECT_TYPE" : "3",
-    "REPO_URL" : "https://github.com/DreamPWJ/antai-mobile/antai_life_manager.git",
+    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-mobile/panweiji_life_manager.git",
     "DEFAULT_GIT_BRANCH" : "dev",
     "BUILD_SYSTEM_TYPES" : "Android,iOS",
-    "IOS_APP_IDENTIFIER" : "com.antai.propertyservice.store.flutter",
+    "IOS_APP_IDENTIFIER" : "com.panweiji.propertyservice.store.flutter",
     "IOS_SCHEME_NAME": "Runner",
     "COCOAPODS_VERSION": "1.11.2"
 }

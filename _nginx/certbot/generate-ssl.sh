@@ -26,7 +26,7 @@ echo "生成域名相关的SSL证书"
 # certbot certonly
 
 # 签发泛域名证书 Let's Encrypt 是单域绑定， 虽然支持多域名，但是不支持泛域绑定生成的也不受信任, 需要DNS校验 !!!
-# certbot certonly --agree-tos --manual --preferred-challenges dns-01 --email 406798106@qq.com -d panweiji.top -d *.panweiji.top  \
+# certbot certonly --agree-tos --manual --preferred-challenges dns-01 --email 406798106@qq.com -d panweiji.com -d *.panweiji.com  \
 # --server https://acme-v02.api.letsencrypt.org/directory
 
 # 命令方式开始制作证书  -n 非交互式 --agree-tos 同意服务协议  --staging 测试模式限制更松 不是正式证书
@@ -49,8 +49,8 @@ certbot certonly -a certbot-dns-aliyun:dns-aliyun \
   --certbot-dns-aliyun:dns-aliyun-credentials /my/credentials.ini \
   --certbot-dns-aliyun:dns-aliyun-propagation-seconds 60 \
   --email 406798106@qq.com \
-  -d coffee-app-api.panweiji.top
- # -d "*.panweiji.top"
+  -d coffee-app-api.panweiji.com
+ # -d "*.panweiji.com"
 
 echo "查看生成的SSL证书"
 # certbot certificates

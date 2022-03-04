@@ -105,7 +105,7 @@ vue-frontend-monorepo
 Vue大前端统一的单体式仓库❤️
 JSON_PARAMS
 {
-    "REPO_URL" : "https://github.com/DreamPWJ/antaikeji/vue-frontend-monorepo.git" ,
+    "REPO_URL" : "https://github.com/DreamPWJ/panweijikeji/vue-frontend-monorepo.git" ,
     "BRANCH_NAME" : "dev" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "property-sales-manage,vue-demo" ,
