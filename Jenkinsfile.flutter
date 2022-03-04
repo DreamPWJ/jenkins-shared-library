@@ -47,25 +47,25 @@ map.put('ding_talk_credentials_id', '0d24aab8-f1ec-44eb-8e4f-71de9ecd25d5') // �
 map.put('android_store_identify', "lexiang\nhuawei\nxiaomi\noppo\nvivo\nsansumg\nmeizu")
 
 // Android应用商店自动化审核上架
-map.put('huawei_app_gallery_client_id', "584688991383585984")
-map.put('huawei_app_gallery_client_secret', "5A8DB0038D055A2A6FB7454885381E54FC6EBB38DE18734C07C739408671A8FB")
-map.put('xiaomi_market_user_name', "775363390@qq.com")
+map.put('huawei_app_gallery_client_id', "")
+map.put('huawei_app_gallery_client_secret', "")
+map.put('xiaomi_market_user_name', "406798106@qq.com")
 
 // Apple Store相关信息
-map.put('apple_id', "at_xt2016@163.com")
-map.put('apple_password', "Antaijituan2019")
+map.put('apple_id', "panweiji@163.com")
+map.put('apple_password', "panweiji2022")
 map.put('apple_team_id', "KTURYE6Q79")
 
 // App Store Connect API相关信息
 map.put('apple_store_connect_api_key_id', "RK28R5AN27")
-map.put('apple_store_connect_api_issuer_id', "69a6de8d-bf99-47e3-e053-5b8c7c11a4d1")
+map.put('apple_store_connect_api_issuer_id', "")
 map.put('apple_store_connect_api_key_file_path', "/Library/AuthKey_RK28R5AN27.p8")
 
 // iOS审核信息
-map.put('ios_review_first_name', "高")
-map.put('ios_review_last_name', "洋")
-map.put('ios_review_phone_number', "+86 15063309617")
-map.put('ios_review_email_address', "525407426@qq.com")
+map.put('ios_review_first_name', "潘")
+map.put('ios_review_last_name', "维吉")
+map.put('ios_review_phone_number', "+86 18863302302")
+map.put('ios_review_email_address', "406798106@qq.com")
 
 // 调用核心通用Pipeline
 appSharedLibrary(map)

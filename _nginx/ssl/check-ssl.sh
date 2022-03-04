@@ -2,7 +2,7 @@
 # Author: 潘维吉
 # Description: 通过域名获取证书的过期时间 检测ssl有效期并提醒
 
-DING_TALK_URL='https://oapi.dingtalk.com/robot/send?access_token=7e0a34d57be41808ab02b1955ed2f19d64d1fbd95e521331eff8cfe16e05b861'
+DING_TALK_URL='https://oapi.dingtalk.com/robot/send?access_token='
 KEY_WORD='乐享科技'
 
 # 脚本所在目录即脚本名称
