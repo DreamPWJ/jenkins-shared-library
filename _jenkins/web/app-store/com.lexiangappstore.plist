@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- Label唯一的标识 -->
+  <key>Label</key>
+  <string>com.lexiangappstore.plist</string>
+  <!-- 指定要运行的脚本 -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/AppStore/app-store.sh</string>
+  </array>
+	<!-- 运行间隔 与StartCalenderInterval使用其一 单位为秒 -->
+	<key>StartInterval</key>
+    <integer>600</integer>
+<!-- 标准输出文件 -->
+<key>StandardOutPath</key>
+<string>/Users/AppStore/run.log</string>
+<!-- 标准错误输出文件，错误日志 -->
+<key>StandardErrorPath</key>
+<string>/Users/AppStore/run.err</string>
+</dict>
+</plist>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><root>
+    <License id="Terms">
+        <MachineBindings>
+            <Binding Key="1" Value="576562626572264761624c65526f7578"/>
+            <Binding Key="2" Value="576562626572264761624c65526f7578"/>
+        </MachineBindings>
+        <MachineID Value="D7nTUnjNAmtsUMcnoyrqkgIbYdM="/>
+        <SerialHash Value="8136f4fc46185fa8e58bdd82dea0c2f489e3b2bb"/>
+        <Features>
+            <Feature Value="33"/>
+            <Feature Value="1"/>
+            <Feature Value="12"/>
+            <Feature Value="2"/>
+            <Feature Value="24"/>
+            <Feature Value="3"/>
+            <Feature Value="36"/>
+            <Feature Value="17"/>
+            <Feature Value="19"/>
+            <Feature Value="62"/>
+        </Features>
+        <DeveloperData Value="AQAAAEY0LTJRNU0tTUdaQi03VUdXLVdDTUMtM1VZQg=="/>
+        <SerialMasked Value="F4-2Q5M-MGZB-7UGW-WCMC-XXXX"/>
+        <StartDate Value="2021-07-05T00:00:00"/>
+        <UpdateDate Value="2021-07-08T01:48:55"/>
+        <InitialActivationDate Value="2021-07-05T00:35:53"/>
+        <LicenseVersion Value="6.x"/>
+        <ClientProvidedVersion Value="2020.3.13f1"/>
+        <AlwaysOnline Value="false"/>
+        <Entitlements>
+            <Entitlement Ns="unity_editor" Tag="UnityPersonal" Type="EDITOR" ValidTo="9999-12-31T00:00:00"/>
+            <Entitlement Ns="unity_editor" Tag="DarkSkin" Type="EDITOR_FEATURE" ValidTo="9999-12-31T00:00:00"/>
+        </Entitlements>
+    </License>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><Reference URI="#Terms"><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><DigestValue>gJ5fDFLA/kfJw8FdWxMfUs+O4uY=</DigestValue></Reference></SignedInfo><SignatureValue>Jnka0yp+2DWy2ueftCApXhdWcvF0cXcSneh02pI0tR9G0lVJjLAQBiqkZY4D7nR+84MjQM1l8FkP
+xrwr3HTfm1yamLh3zwdcNctEPeoc1z/70D4ZqE+0ezHCftCdw7h5wmCd+1uEk1nj86gP670107TC
+4R3l0Eai3TFi5XE/4AkHL7lMV9nDSpRmgo3YVh9l7gHgt4+0tVsHHYe1PDrRDKAclyMEnvfb+60R
+tLHtLMqWrquBmuqw8iViph1xbW2nEw2Nkx1Zlqgjd4AFEoiWZ27IdhUxYa1YiZe/QPFwrwNIVeWr
+6e3aiwifqRpkQsH8YXV+7/1mI+5bUeYa0zLexA==</SignatureValue></Signature></root>

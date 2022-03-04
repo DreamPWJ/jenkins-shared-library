@@ -1,0 +1,18 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: webhook-receiver
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 5m
+  group_by: [alertname]
+  routes:
+    - receiver: webhook-receiver
+      group_wait: 10s
+
+receivers:
+  - name: webhook-receiver
+    webhook_configs:
+      - url: http://172.31.88.89:8060/dingtalk/webhook1/send
+        send_resolved: true

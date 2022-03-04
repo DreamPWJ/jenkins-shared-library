@@ -1,0 +1,119 @@
+#version: '3.7'： 表示使用第三代语法来构建 docker-compose.yml 文件
+version: '3.7'
+#启动命令 cd /tmp && docker-compose  up -d
+#在docker-compose.yml中定义变量，引用在外部同目录.env文件中进行变量定义
+#Docker Embedded DNS服务，docker-compose默认采用隔离的network(将compose中的service都放入一组自定义的bridge network)，所以docker-compose中的容器就可以通过制定name的方式互相发现对方
+#services: 用来表示 compose 需要启动的服务，服务分别为：mysql 、nginx 、redis、rabbitmq、app等
+services:
+  mysql:
+    #镜像容器名称
+    image: mysql:${MYSQL_TAG}
+    container_name: mysql
+    restart: always
+    #表示对外开放的端口
+    ports:
+      - "3306:3306"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /my/mysql/data:/var/lib/mysql
+      - /my/mysql/mysql.cnf:/etc/mysql/conf.d/my.cnf
+      # 基础镜像会在初始化(仅首次运行)时按文件名顺序执行 /docker-entrypoint-initdb.d 下的 .sql .sh等文件
+      - /my/mysql/init/init.sql:/docker-entrypoint-initdb.d/1-init.sql
+    #environment: 此节点下的信息会当作环境变量传入容器，此示例中 mysql 服务配置了数据库、密码和权限信息
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    # --default-authentication-plugin=mysql_native_password设置协议认证方式 8.x默认密码加密方式：caching_sha2_password 现在很多客户端工具还不支持这种加密认证方式
+    command: [ "--group_concat_max_len=102400","--max_connections=2000", "--lower_case_table_names=1" ]
+
+  proxy-nginx:
+    #镜像容器名称
+    image: nginx:latest
+    container_name: proxy-nginx
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    #加载本地同级目录下的配置文件或ssl证书到容器目标地址下
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /my/nginx:/usr/share/nginx/html:ro
+      - /my/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - /my/nginx/ssl:/etc/nginx/ssl
+    #启动nginx
+    command: [ 'nginx', '-g', 'daemon off;' ]
+
+  redis:
+    #镜像容器名称
+    image: redis:latest
+    container_name: redis
+    restart: always
+    #表示对外开放的端口
+    ports:
+      - "6379:6379"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /my/redis/data:/data
+    command: redis-server --appendonly yes --requirepass ${PASSWORD}
+
+  rabbitmq:
+    #镜像容器名称
+    image: rabbitmq:management
+    container_name: rabbitmq
+    restart: always
+    #表示对外开放的端口
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /my/rabbitmq:/var/lib/rabbitmq
+    #environment: 此节点下的信息会当作环境变量传入容器
+    environment:
+      - RABBITMQ_DEFAULT_USER=root
+      - RABBITMQ_DEFAULT_PASS=${PASSWORD}
+
+  app:
+    #镜像容器名称
+    image: app
+    container_name: app
+    restart: always
+    #build使用指定目录下的 Dockerfile和部署文件构建了当前镜像 &定义别名，再进行引用
+    build: &app-build
+      context: ./${PROJECT_NAME}-app
+      dockerfile: ${DOCKERFILE_PATH}
+      args:
+        PROJECT_NAME: ${PROJECT_NAME}-app
+        EXPOSE_PORT: 8080
+    # 运行环境变量程序可以获取 类似 docker run -e  VARIABLE=VALUE ... 的效果
+    environment:
+      - PROJECT_NAME=${PROJECT_NAME}-app
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - JAVA_OPTS=-Xmx1G -Xms1G
+    #表示对外开放的端口
+    ports:
+      - 8080:8080
+    #可以配置依赖服务，表示需要先启动 depends_on 下面的服务后，再启动本服务
+    depends_on:
+      - mysql
+      - proxy-nginx
+      - redis
+      - rabbitmq
+
+  app-slave:
+    image: app-slave
+    container_name: app-slave
+    restart: always
+    build:
+      <<: *app-build
+    environment:
+      - PROJECT_NAME=${PROJECT_NAME}-app-slave
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - JAVA_OPTS=-Xmx1G -Xms1G
+    ports:
+      - 8081:8080
+    volumes:
+      - /tmp/wait-for-start.sh:/wait-for-start.sh
+    # 覆盖 Dockerfile中的启动命令
+    entrypoint: ./wait-for-start.sh app:8080 -t 15 --strict -- java -Djava.security.egd=file:/dev/./urandom -jar server.jar

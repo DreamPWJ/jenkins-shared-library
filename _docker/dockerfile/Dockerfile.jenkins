@@ -1,0 +1,12 @@
+# Author: 潘维吉
+# Version 1.0.0
+# Description: 自定义定制jenkins镜像 满足特殊需求
+
+FROM jenkins/jenkins:lts-jdk11
+
+USER root
+RUN apt-get update \
+      &&  apt-get install -y libtinfo5
+     # &&  apt-get install -y docker.io
+
+# docker build -t my/jenkins:lts-jdk11  -f /my/Dockerfile.jenkins . --no-cache

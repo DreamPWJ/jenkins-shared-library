@@ -1,0 +1,4 @@
+# Pipeline内使用示例 Map map = readYaml file: "yaml.yaml"   ${map.node}
+# def data = libraryResource('yaml.yaml')  Map map = readYaml text: data
+type: java
+node: master

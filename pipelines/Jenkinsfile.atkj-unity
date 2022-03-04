@@ -1,0 +1,92 @@
+#!groovy
+@Library('jenkins-shared-library@dev') _
+
+/**
+ * @author 潘维吉
+ * @description 核心Pipeline代码 针对Unity项目CI/CD的脚本
+ * 注意 本文件在Git位置和名称不能随便改动 配置在jenkins里
+ */
+// Pipeline需要安装的插件
+
+// 根据不同环境项目配置不同参数
+def map = [:]
+
+// 保持构建的最大个数
+map.put('build_num_keep', 1)
+
+// 默认要构建的Git分支
+map.put('default_git_branch', 'master')
+
+// 是否非正式环境设置App的icon图标徽章 易于区分环境和版本
+map.put('is_icon_add_badge', false)
+// 是否Pipeline内脚本钉钉通知  总开关
+map.put('is_ding_notice', false)
+// 是否通知变更记录
+map.put('is_notice_change_log', false)
+// 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
+map.put('is_git_tag', false)
+
+// 项目标签或项目简称
+map.put('project_tag', ' ')
+
+// 分发平台账号
+map.put('pgyer_api_key', "a06ee74d4063eb58b7fed20e7fde6306")
+
+// jenkins分布式构建节点名称
+map.put('jenkins_node', 'linux')
+
+// 构建环境变量
+map.put('jdk', '8')
+
+// 相关信任标识
+map.put('ci_git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
+map.put('git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
+map.put('ding_talk_credentials_id', '0d24aab8-f1ec-44eb-8e4f-71de9ecd25d5') // 支持多个群通知 逗号,分割 不要空格
+
+// Android应用商店渠道号
+map.put('android_store_identify', "lexiang\nhuawei\nxiaomi\noppo\nvivo\nsansumg\nmeizu")
+
+// Android应用商店自动化审核上架
+map.put('huawei_app_gallery_client_id', "584688991383585984")
+map.put('huawei_app_gallery_client_secret', "5A8DB0038D055A2A6FB7454885381E54FC6EBB38DE18734C07C739408671A8FB")
+map.put('xiaomi_market_user_name', "775363390@qq.com")
+
+// Apple Store相关信息
+map.put('apple_id', "panweiji666@163.com")
+map.put('apple_password', "panweiji2021")
+map.put('apple_team_id', "C45WYAFLWA")
+
+// App Store Connect API相关信息
+map.put('apple_store_connect_api_key_id', "BNL32GR27G")
+map.put('apple_store_connect_api_issuer_id', "a0cae47e-ca4b-4503-a967-4282302c0c5a")
+map.put('apple_store_connect_api_key_file_path', "/Library/AuthKey_BNL32GR27G.p8")
+
+// iOS审核信息
+map.put('ios_review_first_name', "高")
+map.put('ios_review_last_name', "洋")
+map.put('ios_review_phone_number', "+86 15063309617")
+map.put('ios_review_email_address', "525407426@qq.com")
+
+// 调用核心通用Pipeline
+appSharedLibrary(map)
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// https://github.com/DreamPWJ/jenkins-shared-library.git  Jenkinsfile.lexiang-unity
+
+/*
+
+boat-attack-unity
+赛艇比赛Unity游戏  🏆
+JSON_PARAMS:
+{
+    "PROJECT_TYPE" : "5",
+    "REPO_URL" : "https://gitee.com/dang050/BoatAttack.git",
+    "BUILD_SYSTEM_TYPES" : "Android,iOS",
+    "IOS_APP_IDENTIFIER" : "com.unity.boatattackpanweiji",
+    "IOS_PROJECT_LEVEL_DIR": "",
+    "IOS_SCHEME_NAME": "Unity-iPhone"
+}
+
+*/

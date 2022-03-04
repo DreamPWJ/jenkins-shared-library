@@ -1,0 +1,3 @@
+{
+  "Pipeline内使用示例": "def jsonData = libraryResource 'json.json'"
+}

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: an-plus-business-deployment
+  labels:
+    app: an-plus-business-deployment
+
+spec:
+  replicas: 2                   # Deployment Spec对象的一个属性，用于定义我们需要运行几个Pod
+  strategy:
+    type: RollingUpdate         # RollingUpdate策略将保证实现零停机时间部署
+  template:
+    metadata:
+      labels:
+        app: an-plus-business   # Service中的selector通过这个信息匹配Pod
+      spec:
+        containers:
+          - name: hello-k8s
+            image: bigwhite/hello-kubernetes-demo:v0.1
+            restartPolicy: Always
+            imagePullPolicy: IfNotPresent
+            ports:
+              - containerPort: 8080
+
+
+# 创建Deployment
+# kubectl create -f business-deployment.yaml
+# 已存在的Deployment修改生效
+# kubectl apply -f business-deployment.yaml
+# 查看deployment
+# kubectl get deployments
+# 查看运行状态
+# kubectl rollout status deployment/business-deployment
+# 快速回滚到上个版本
+# kubectl rollout undo deployment/business-deployment

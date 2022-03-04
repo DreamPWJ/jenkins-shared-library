@@ -1,0 +1,57 @@
+# 使用docker-compose.yaml脚本启动ELK服务
+# ELK中各个服务的作用
+# Elasticsearch:用于存储收集到的日志信息；
+# Logstash:用于收集日志，SpringBoot应用整合了Logstash以后会把日志发送给Logstash,Logstash再把日志转发给Elasticsearch；
+# Kibana:通过Web端的可视化界面来查看日志
+
+#启动命令 cd /my && docker-compose  -f docker-compose.elk.yaml up -d
+version: '3.7'
+services:
+  elasticsearch:
+    image: elasticsearch:7.5.1
+    container_name: elasticsearch
+    restart: always
+    environment:
+      - "cluster.name=elasticsearch" #设置集群名称为elasticsearch
+      - "discovery.type=single-node" #以单一节点模式启动
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" #设置使用jvm内存大小
+      # volumes:
+      # - /my/elasticsearch/plugins:/usr/share/elasticsearch/plugins #插件文件挂载
+      # - /my/elasticsearch/data:/usr/share/elasticsearch/data #数据文件挂载
+    ports:
+      - 9200:9200
+    networks:
+      - elk
+
+  logstash:
+    image: logstash:7.5.1
+    container_name: logstash
+    restart: always
+    volumes:
+      - /my/logstash/logstash-springboot.conf:/usr/share/logstash/pipeline/logstash.conf #挂载logstash的配置文件
+    depends_on:
+      - elasticsearch #kibana在elasticsearch启动之后再启动
+    links:
+      - elasticsearch:es #可以用es这个域名访问elasticsearch服务
+    ports:
+      - 4560:4560
+    networks:
+      - elk
+
+  kibana:
+    image: kibana:7.5.1
+    container_name: kibana
+    restart: always
+    links:
+      - elasticsearch:es #可以用es这个域名访问elasticsearch服务
+    depends_on:
+      - elasticsearch #kibana在elasticsearch启动之后再启动
+    environment:
+      - "elasticsearch.hosts=http://es:9200" #设置访问elasticsearch的地址
+    ports:
+      - 5601:5601
+    networks:
+      - elk
+
+networks:
+  elk:

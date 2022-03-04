@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: an-plus-base-prod
+  labels:
+    app: an-plus-base-prod    # 指定 label，便于检索
+
+spec:
+  containers:
+    - name: mysql
+      image: mysql:8
+      restartPolicy: Always
+      imagePullPolicy: IfNotPresent
+      ports:
+        - containerPort: 3306
+      env:
+        - name: MYSQL_DATABASE
+          value: health
+        - name: MYSQL_ROOT_PASSWOR
+          value: panweiji2019
+      args: [ "--group_concat_max_len=102400","--max_connections=2000","--lower_case_table_names=1" ]
+
+    - name: nginx
+      image: nginx
+      restartPolicy: Always
+      imagePullPolicy: IfNotPresent
+      ports:
+        - containerPort: 80
+
+
+# 创建Pod
+# kubectl create  -f base-pod.yaml
+# 查看pod
+# kubectl get pods
+# 查看pod日志
+# kubectl logs -f pod名称
+# 进入Pod的内部容器
+# kubectl exec -it pod名称 bash

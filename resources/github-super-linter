@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+
+projectRoot=$(
+  a="/$0"
+  a=${a%/*}
+  a=${a:-.}
+  a=${a#/}/
+  cd "$a/.." || return
+  pwd
+)
+
+# Run [GitHub Super-Linter](https://github.com/github/super-linter/blob/master/docs/run-linter-locally.md) locally to lint code
+# docker pull github/super-linter:latest
+# 传递RUN_LOCAL标志以绕过一些 GitHub 操作检查，以及本地代码库的映射  /tmp/lint以便 linter 可以获取代码
+docker run -e RUN_LOCAL=true -e VALIDATE_GROOVY=true -e VALIDATE_BASH=true "$@" -v "$projectRoot"/:/tmp/lint github/super-linter

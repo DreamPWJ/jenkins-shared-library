@@ -1,0 +1,86 @@
+#!groovy
+@Library('jenkins-shared-library@dev') _
+
+/**
+ * @author 潘维吉
+ * @description 核心Pipeline代码 针对小程序项目CI/CD的脚本
+ * 注意 本文件在Git位置和名称不能随便改动 配置在jenkins里
+ */
+// Pipeline需要安装的插件
+
+// 根据不同环境项目配置不同参数
+def map = [:]
+
+// 保持构建的最大个数
+map.put('build_num_keep', 1)
+
+// 默认要构建的Git分支
+map.put('default_git_branch', 'master')
+
+// 是否Pipeline内脚本钉钉通知  总开关
+map.put('is_ding_notice', false)
+// 是否通知变更记录
+map.put('is_notice_change_log', false)
+// 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
+map.put('is_git_tag', false)
+
+// 项目标签或项目简称
+map.put('project_tag', ' ')
+
+// jenkins分布式构建节点名称
+map.put('jenkins_node', 'macos-test')
+
+// 构建环境变量
+map.put('nodejs', 'Node14')
+
+// 相关信任标识
+map.put('ci_git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
+map.put('git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
+map.put('ding_talk_credentials_id', 'ba0ebec7-73ad-4a26-af8b-d15c470b1328')
+
+
+// 调用核心通用Pipeline
+miniSharedLibrary(map)
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// https://github.com/DreamPWJ/jenkins-shared-library.git  Jenkinsfile.mini
+
+/*
+test-wx-mini
+测试微信小程序流水线
+JSON_PARAMS:
+{
+  "PROJECT_TYPE" : "1",
+  "REPO_URL" : "https://github.com/DreamPWJ/smart-health.git",
+  "DEFAULT_GIT_BRANCH" : "dev",
+  "IS_MINI_NATIVE_NEED_NPM" : true,
+  "PROJECT_CHINESE_NAME" : "测试"
+}
+
+test-taro-mini
+测试Taro跨平台小程序流水线 🚴🏻‍♀️
+JSON_PARAMS:
+{
+  "PROJECT_TYPE" : "2",
+  "REPO_URL" : "https://github.com/DreamPWJ/health-mini.git",
+  "DEFAULT_GIT_BRANCH" : "dev",
+  "NPM_RUN_PARAMS" : "test:weapp",
+  "NPM_BUILD_DIRECTORY" : "dist",
+  "PROJECT_CHINESE_NAME" : "Taro测试"
+}
+
+test-monorepo-mini
+测试Monorepo小程序流水线
+JSON_PARAMS:
+{
+  "PROJECT_TYPE" : "1",
+  "REPO_URL" : "https://github.com/DreamPWJ/panweiji/panweiji-mini.git",
+  "DEFAULT_GIT_BRANCH" : "dev",
+  "PROJECT_CHINESE_NAME" : "Monorepo测试",
+  "IS_MONO_REPO" : true,
+  "IS_MINI_NATIVE_NEED_NPM" : true,
+  "PROJECT_NAME" : "property-sales"
+}
+*/

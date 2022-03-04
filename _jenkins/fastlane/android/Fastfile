@@ -1,0 +1,216 @@
+# Author: 潘维吉
+# Description: 自定义核心Fastlane配置文件 实现原生Android全自动CI/CD流水线
+
+import "../GeneralFastfile"
+
+default_platform(:android)
+
+# apk安装包路径
+APK_PATH = ""
+
+platform :android do
+
+  #在执行lane之前只执行一次
+  before_all do |lane, options|
+
+    # 确保运行快速通道时fastlane工具是最新的
+    # update_fastlane
+    # 如果有未提交的git更改，则会引发异常
+    # sure_git_status_clean
+    # 安装所有插件和更新所有插件
+    # sh "fastlane install_plugins"
+    # sh "fastlane update_plugins"
+
+  end
+
+  desc "自动化测试"
+  lane :test do
+    puts "\033[32m开始自动化单元测试\033[0m\n"
+    gradle(task: "test")
+  end
+
+  desc "Android打包"
+  lane :package do |options|
+    puts "\033[32m开始Android打包APK\033[0m\n"
+
+    if options[:packaging_type].include?('Release')
+
+    else
+      if options[:is_aab]
+
+      end
+    end
+
+=begin
+    channelName = options[:channel]
+    if channelName.nil?
+      channelName = "official"
+    end
+=end
+
+    # 清除之前的编译
+    gradle(
+      task: 'clean'
+    )
+
+    # 根据需要调整build_type和flavor参数，以便为您的设置构建正确的APK
+    # flavor: ""
+    # tasks: ["assembleDebug", "bundleDebug"]
+
+    gradle(
+      task: options[:is_aab] ? 'bundle' : 'assemble', # aab格式用bundle、apk格式用assemble
+      build_type: options[:packaging_type], # 构建类型Debug/Release 也可自定义环境类型
+      flags: "--no-daemon", # 要传递给 gradle 命令的所有参数标志 --no-daemon解决jenkins并发执行会将gradle杀掉
+    )
+
+    if options[:is_aab]
+      APK_PATH = Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+      puts "\033[32mAAB包路径: #{APK_PATH}\033[0m\n"
+    else
+      APK_PATH = Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+      puts "\033[32mAPK包路径: #{APK_PATH}\033[0m\n"
+    end
+
+    # apk包重命名
+    # NEW_APK_NAME "#{APK_PATH}".split('/')[-1]
+    # sh("mv #{APK_PATH} #{APK_PATH}/#{NEW_APK_NAME}")
+
+    #adb命令 可获取APK相关信息
+=begin
+    adb(
+      command: "shell ls"
+    )
+=end
+
+  end
+
+  desc "自动提审上架华为App Gallery应用商店"
+  lane :huawei_app_gallery do |options|
+    puts "\033[32m开始自动上传华为App Gallery应用商店🚀\033[0m\n"
+    # github地址: https://github.com/shr3jn/fastlane-plugin-huawei_appgallery_connect
+    # fastlane add_plugin huawei_appgallery_connect 与 gem 'fastlane-plugin-huawei_appgallery_connect'
+=begin
+    Dir.chdir("app/build/outputs/apk/") do
+
+    end
+=end
+    # 当前版本变更记录存储文件名称
+    current_changelog_file = "CURRENT_VERSION_CHANGELOG.md"
+    sh("cd .. && echo '" + options[:release_note] + "' > " + current_changelog_file)
+
+    huawei_appgallery_connect(
+      client_id: ENV['HUAWEI_APP_GALLERY_CLIENT_ID'], # 注意设置团队模式的API连接才生效
+      client_secret: ENV['HUAWEI_APP_GALLERY_CLIENT_SECRET'], # 设置地址: AppGallery Connect API 创建
+      app_id: options[:app_id], # 应用id
+      apk_path: options[:apk_path], # 应用包路径
+      submit_for_review: true, # 是否提交审核
+      is_aab: options[:is_aab], # 是否aab新格式
+      changelog_path: current_changelog_file, # 应用日志备注 "Fastlane自动化发布 #{Time.now.strftime("%Y-%m-%d %H:%M")"
+    # release time to release app on specific date
+    # release_time: "2020-12-25T07:05:15+0000", # 默认审核通过立即上架
+    # privacy_policy_url: "https://example.com",
+    # For phase wise release: set these parameters
+    # phase_wise_release: true,
+    # phase_release_description: options[:release_note]
+    )
+
+  end
+
+  desc "获取华为App Gallery商店应用信息"
+  lane :get_huawei_app_info do |options|
+    app_info = huawei_appgallery_connect_get_app_info(
+      client_id: ENV['HUAWEI_APP_GALLERY_CLIENT_ID'],
+      client_secret: ENV['HUAWEI_APP_GALLERY_CLIENT_SECRET'],
+      app_id: options[:app_id] # 应用id
+    )
+    # 判断应用是否已经提交审核成功（releaseState为4）
+    p app_info
+  end
+
+  desc "自动提审上架小米应用商店"
+  lane :xiaomi_market do |options|
+    puts "\033[32m开始自动上传小米应用商店🚀\033[0m\n"
+    # github地址: https://github.com/istobran/fastlane-plugin-xiaomi_devupload
+    # fastlane add_plugin xiaomi_devupload  与 gem 'fastlane-plugin-xiaomi_devupload'
+      xiaomi_devupload(
+        request_data: {
+          :userName => options[:user_name], # 用户名，在小米开发者站登录的邮箱
+          :synchroType => 1, # 更新类型：0=新增，1=更新包，2=内容更新
+          :appInfo => {
+            :appName => options[:app_name], # 应用名称
+            :packageName => options[:package_name], # 应用包名
+            :updateDesc => options[:desc], # 更新信息
+          },
+        },
+        apk_path: options[:apk_path], # Apk包，更新类型为新增和更新时必传 默认GRADLE_APK_OUTPUT_PATH
+        # 在小米开放平台具体应用的自动化上传入口内获取 现阶段每个应用都唯一的证书和私钥
+        public_key_path: File.expand_path('xiaomi.'+options[:package_name]+'.cer'), # 公钥文件路径 fastlane目录下
+        private_key: options[:private_key] # 私钥字符串
+      )
+  end
+
+  desc "自动提审上架谷歌Play Store应用商店"
+  lane :google_play_store do |options|
+    # 文档地址: https://docs.fastlane.tools/actions/upload_to_play_store/
+    puts "\033[32m开始自动上传谷歌Play Store应用商店\033[0m\n"
+    upload_to_play_store
+  end
+
+  desc "新格式aab包转成统一的apk包"
+  lane :aab_to_apk do |options|
+    # 因为aab包不能直接安装 所以转换成apk方便安装
+    # github地址: https://github.com/MartinGonzalez/fastlane-plugin-bundletool/
+    # fastlane add_plugin bundletool  与  gem 'fastlane-plugin-bundletool'
+    bundletool(
+      #bundletool_version: '1.8.0',
+      aab_path: options[:aab_path],
+      apk_output_path: options[:apk_output_path],
+      verbose: true
+    )
+  end
+
+=begin
+  desc "谷歌Firebase Test Lab自动化测试"
+  lane :firebase_test_lab_for_android do |options|
+  # github地址: https://github.com/cats-oss/fastlane-plugin-firebase_test_lab_android
+  # fastlane add_plugin firebase_test_lab_android   与  gem 'fastlane-plugin-firebase_test_lab_android'
+  # 上传 Firebase Test Lab 自动化测试
+  firebase_test_lab_android(
+    project_id: "composite-watch-331806",                           # Your Firebase project name.
+    gcloud_service_key_file: "fastlane/client-secret.json",         # File path containing the gcloud auth key.
+    # gcloud_components_channel: "beta",                            # If you use gcloud component channel option (alpha/beta).
+    type: "robo",                                                   # Optional: Test type (robo/instrumentation).
+    devices: [                                                      # Devices
+      {
+        model: "Nexus6P",
+        version: "23",
+        locale: "ja_JP",
+        orientation: "portrait"
+      },
+      {
+        model: "Pixel3",
+        version: "28"
+      }
+    ],
+    app_apk: "app-debug.apk",                                       # The path for your android app apk.
+    # app_test_apk: "app-test.apk",                                 # The path for your android instrumentation test apk.
+    # use_orchestrator: false,                                      # If you use orchestrator when set instrumentation test.
+    console_log_file_name: "fastlane/console_output.log",
+    timeout: "60s",
+    firebase_test_lab_results_bucket: "firebase_test_bucket"  # If you want to naming bucket of GCS
+    # firebase_test_lab_results_dir: "firebase_test_dir",      # If you want to naming results of GCS. (Maybe don't need it.)
+  end
+=end
+
+  after_all do |lane|
+    # 在MacOS 通知栏发送通知
+    # notification(subtitle: "Android打包成功", message: "成功部署新Android应用程序")
+  end
+
+  #在执行任意环境报错都会中止并执行一次
+  error do |lane, exception|
+    UI.message(exception.message)
+    puts "\033[40;31m Fastlane报错信息: " + exception.message + "\033[0m\n"
+  end
+
+end

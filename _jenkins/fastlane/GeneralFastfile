@@ -1,0 +1,174 @@
+# Author: 潘维吉
+# Description: 自定义通用Fastlane配置文件 其他特定Fastlane导入复用
+# 本地文件导入使用 import "../GeneralFastfile"
+# 远程git导入使用
+# import_from_git(url: 'https://github.com/fastlane/fastlane', branch: "master",)
+# import_from_git(url: 'git@github.com:MyAwesomeRepo/MyAwesomeFastlaneStandardSetup.git', path: 'fastlane/Fastfile')
+# 自定义action导入方式
+# actions_path '../custom_actions_folder/'
+
+#fastlane_require 'app-info'
+# sudo gem install json
+require 'json'
+
+desc "获取APP版本号"
+lane :app_version do |options|
+  puts "\033[32m根据代码获取APP版本号\033[0m\n"
+  if options[:type] == 'android'
+    # 关于fastlane add_plugin versioning_android 地址 https://github.com/beplus/fastlane-plugin-versioning_android
+    # 关于fastlane add_plugin android_versioning 如果需要支持flavor多渠道和语义化版本设置 查看 https://github.com/otkmnb2783/fastlane-plugin-android_versioning
+    # 允许直接从build.gradle轻松获取/设置versionCode，并versionName在你的Android项目
+    flavor = options[:flavor]
+    if flavor.nil?
+      app_version = android_get_version_name(gradle_file: options[:gradle_config_path]).gsub(/,/, "") # app/build.gradle or config.gradle
+    else
+      # 多productFlavors获取版本号支持
+      app_version = get_version_name(app_project_dir: '**/app', flavor: flavor)
+    end
+  elsif options[:type] == 'ios'
+    app_version = get_version_number(target: ENV['SCHEME'])
+  end
+  puts "#{app_version}"
+  out_info_file = options[:out_info_file]
+  sh ("rm -f #{out_info_file}")
+  File.write("#{out_info_file}", "#{app_version}")
+end
+
+desc "上传分发Fir平台"
+lane :fir do |options|
+  puts "\033[32m开始上传分发Fir平台\033[0m\n"
+  # 文档地址: https://github.com/FIRHQ/fastlane-plugin-fir_cli
+  # fastlane-plugin-fir_cli
+  # fastlane add_plugin fir_cli
+  # 多个参数 可以使用逗号(,)分离
+  fir_cli api_token: "5aa5e4c59912c46f095d547b091d96a8",
+          specify_file_path: options[:file_path],
+          changelog: options[:changelog]
+end
+
+=begin
+desc "获取App信息"
+lane :get_app_info do |options|
+  puts "\033[32m获取App信息\033[0m\n"
+
+  #文档地址: https://github.com/icyleaf/fastlane-plugin-app_info
+  #fastlane-plugin-app_info
+  #bundle exec fastlane add_plugin app_info
+
+  if options[:type] == 'android'
+    app_info(file: options[:file_path])
+
+    app_info_json = JSON.parse(ENV['APP_INFO'])
+
+    app_name = app_info_json['Name'] # 应用名称
+    app_version = app_info_json['ReleaseVersion'] # 版本号
+    app_size = app_info_json['Size'] # 包大小
+    app_build_version = app_info_json['BuildVersion'] # 构建号
+    app_identifier = app_info_json['Identifier'] # app唯一标识
+    app_os = app_info_json['OS'] # app系统
+
+  elsif options[:type] == 'ios'
+    # Info.plist内key定义 https://developer.apple.com/documentation/bundleresources/information_property_list/bundle_configuration
+
+    app_name = get_ipa_info_plist_value(ipa: options[:file_path], key: "CFBundleDisplayName")
+    app_version = get_ipa_info_plist_value(ipa: options[:file_path], key: "CFBundleShortVersionString")
+    app_size = sh("cd .. && ls -lh " + options[:file_path] + " | awk '{print $5}'")
+    app_build_version = get_ipa_info_plist_value(ipa: options[:file_path], key: "CFBundleVersion")
+    app_identifier = get_ipa_info_plist_value(ipa: options[:file_path], key: "CFBundleIdentifier")
+    app_os = "iOS"
+
+  end
+
+  out_info_file = options[:out_info_file]
+  sh ("rm -f #{out_info_file}")
+  app_info = "#{app_name},#{app_version},#{app_size},#{app_build_version},#{app_identifier},#{app_os}"
+  # Fastlane与Jenkins数据通信 使用存到文件再读取文件的方式
+  File.write("#{out_info_file}", "#{app_info}")
+
+end
+=end
+
+=begin
+desc "设置App的Icon图标徽章 易于区分环境和版本"
+lane :set_icon_badge do |options|
+  puts "\033[32m开始设置App的icon图标徽章\033[0m\n"
+  # 文档地址: https://github.com/HazAT/badge    https://shields.io/
+  # fastlane-plugin-badge 先初始化依赖 sudo gem install badge  imagemagick  librsvg  graphicsmagick
+  # fastlane add_plugin badge && badge --help
+  add_badge(shield: options[:type] + "-" + options[:version] + "_" + options[:build_num] + "-blueviolet",
+            shield_parameters: "colorA=orange&style=flat-square", shield_io_timeout: 5,
+            shield_scale: "0.72", shield_gravity: "South", shield_geometry: "+0+50%",
+            dark: false, no_badge: true, verbose: true,
+            glob: options[:glob]) # "/app/src/*/res/*/*ic_launcher*.{png,PNG}" "/**/*.appiconset/*.{png,PNG}"
+end
+=end
+
+=begin
+desc "自动上传包到Bugly平台"
+lane :upload_bugly do |options|
+  puts "\033[32m开始上传包到Bugly平台\033[0m\n"
+  upload_app_to_bugly(
+    file_path: "filepath",
+    app_key: "appkey",
+    app_id: "appid",
+    pid: "pid",  #应用平台标识, 用于区分产品平台 Android:1 iOS:2
+    title: "title",
+    desc: "description",
+    secret: "secret",
+    users: "users",
+    password: "password",
+    download_limit: 999
+  )
+end
+=end
+
+=begin
+desc "上传远程服务器"
+lane :upload_remote_server do |options|
+  puts "\033[32m开始上传远程服务器\033[0m\n"
+  scp(
+    host: "172.0.0.1",
+    username: "root",
+    upload: {
+      src: "/my/app.jar",
+      dst: "/tmp/"
+    }
+  )
+end
+=end
+
+=begin
+desc "将IPA/APK上传阿里云OSS平台并返回下载链接或二维码"
+lane :ali_yun_oss do |options|
+  puts "\033[32m开始将IPA或APK上传阿里云OSS平台\033[0m\n"
+  # 文档地址: https://github.com/woodtengfei/fastlane-plugin-alioss
+  # fastlane-plugin-alioss
+  # fastlane add_plugin alioss
+  # 上传App到阿里云oss服务器
+  alioss(
+    endpoint: "oss-xxx.aliyuncs.com", # 您的站点
+    access_key_id: "xxxxxx", # 您的id
+    access_key_secret: "xxxxxx", # 您的秘钥
+    bucket_name: "app-archive", # 存放app文件的目录，自行创建
+    app_name: "app/" + options[:project_name], # 在bucket_name下面创建app目录，app下面可以分不同的项目 项目下自动创建Android和iOS目录以及访问主页和二维码
+    # 有endpoint就有下载链接 原始链接是：https://#{bucket_name}.#{endpoint} -> https://app-test.oss-xxx.aliyuncs.com/
+    # 为了好记，命名的链接 -> https://dl.app.com/
+    # 设置download_domain后，会生成：https://app.com/app/project_name/index.html 把这个链接变成二维码，即可实现扫码下载
+    download_domain: "https://app.com/",
+    update_description: options[:description],
+    ipa: options[:ipa_path],
+    apk: options[:apk_path]
+  )
+end
+=end
+
+#上传蒲公英 fastlane add_plugin pgyer
+#puts "上传蒲公英"
+#pgyer(api_key: ENV['PGYER_API_KEY'], user_key: ENV['PGYER_USR_KEY'], install_type: "1", update_description: "Release By Fastlane")
+
+#hockeyapp国外版分发平台 无需身份证
+
+# curl请求并返回响应结果
+# app_upload_response = `curl -u #{browserstackKey} -X POST 'https://api-cloud.browserstack.com/app-automate/xcuitest/test-suite' -F 'file=@../browserstack/derivedData/Build/Products/Debug-iphoneos/#{testSchemeName}.zip'`
+# jsonResponse = JSON.parse(app_upload_response)
+# browserstackTestURL = jsonResponse["test_url"]

@@ -1,0 +1,452 @@
+# Author: 潘维吉
+# Description: 自定义核心Fastlane配置文件 实现原生iOS全自动CI/CD流水线
+# cd *.xcodeproj工程目录 && fastlane beta
+
+import "../GeneralFastfile"
+
+default_platform(:ios)
+
+#声明变量  定义全局参数 大写开头为常数,小写、_开头为变量,$开头为全局变量(直接用#访问)
+APP_IDENTIFIER = ENV['APP_IDENTIFIER']
+APPLE_ID = ENV['APPLE_ID']
+TEAM_ID = ENV['TEAM_ID']
+SCHEME = ENV['SCHEME']
+XC_WORKSPACE = ENV['XC_WORKSPACE']
+XC_PROJECT = ENV['XC_PROJECT']
+APP_INFO_PLIST_PATH = ENV['APP_INFO_PLIST_PATH']
+OUTPUT_DIRECTORY = ENV['OUTPUT_DIRECTORY']
+
+#IPA_TIME = Time.now.strftime("%Y-%m-%d_%H:%M")
+# ipa安装包路径
+IPA_PATH = ""
+# 证书和签名文件归档目录
+SIGN_ARCHIVE_DIR = "./archive/sign"
+
+platform :ios do
+
+  #在执行lane之前只执行一次
+  before_all do |lane, options|
+
+    #判断是否是ci环境
+    # Make sure we have certs and provisioning profiles
+    if is_ci
+      puts "I'm a CI"
+      #实现更轻松的Jenkins集成
+      setup_jenkins
+      # If running on CI, uses a separate keychain
+      # setup_keychain_for_ci(signing_type: options[:sign_type])
+    else
+      say "I'm a Human"
+      # If running on a user's machine, uses the default keychain
+      # setup_keychain(signing_type: options[:sign_type])
+    end
+
+    # App Store Connect API 是新的用于管理应用程序的元数据，价格和可用性，配置和更正式的公共API 使用API密钥来生成JWT访问
+    # 过去，fastlane一直使用带有用户名和密码的Apple ID来通过基于cookie的Web会话进行身份验证
+    # 好处：1. 无需2FA两步认证 2. 更好的性能 3. 记录的API 4. 更高的可靠性
+    # 文档: http://docs.fastlane.tools/app-store-connect-api/  获取地址: https://appstoreconnect.apple.com/access/api
+    key_file_path = ENV['HOME'] + ENV['CONNECT_API_KEY_FILE_PATH'] # p8文件路径
+    app_store_connect_api_key(
+      key_id: ENV['CONNECT_API_KEY_ID'],
+      issuer_id: ENV['CONNECT_API_ISSUER_ID'],
+      key_filepath: key_file_path, # 一个p8文件，最好保存在服务器上，不要泄漏
+      duration: 1200, # 会话时长，以秒为单位，最大为1200
+      in_house: false, # 如果团队是Enterprise或不是Enterprise
+    )
+
+    # 获取代码内的版本号
+    APP_VERSION = get_version_number(target: "#{SCHEME}")
+    # APP_BUILD_VERSION = get_build_number(xcodeproj: "#{XC_PROJECT}")
+    # puts "#{APP_VERSION}"
+    # puts "#{APP_BUILD_VERSION}"
+    # 自定义版本号
+    customVersion = options[:version_num]
+    # .nil? 和 .empty? 是ruby的方法。 .blank? 是rails(安装sudo gem install rails && rails -v)的方法 .blank? 相当于同时满足 .nil? 和 .empty?
+    unless customVersion.nil? || customVersion.empty?
+      puts "\033[32m自定义设置iOS APP版本号: \033[0m" + customVersion
+      APP_VERSION = customVersion # 不从代码内获取的情况
+    end
+    # 确保运行快速通道时fastlane工具是最新的
+    # update_fastlane
+    # 如果有未提交的git更改，则会引发异常
+    # sure_git_status_clean
+    # 安装所有插件和更新所有插件
+    # sh "fastlane install_plugins"
+    # sh "fastlane update_plugins"
+    # 具体安装指定版本的xcode和动态选择Xcode版本
+    # (version: "12.5")
+    # xcversion(version: "~> 12.5")
+
+    # 使用环境变量提供这个密码给fastlane，解决双重认证生成的特殊密码
+    #ENV["FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"] = "iire-nvtq-ywlv-shah"
+    #options参数 fastlane beta key:value key2:value2
+    #value = options[:key]
+
+  end
+
+  desc "iOS打包"
+  lane :package do |options|
+    PACKAGING_TYPE = options[:packaging_type]
+    EXPORT_METHOD = options[:sign_type] # development、ad-hoc
+
+    # 定义包名
+    IPA_NAME = "#{SCHEME}-" + "v#{APP_VERSION}-" + "#{PACKAGING_TYPE}-#{EXPORT_METHOD}" + "-#{Time.now.strftime("%Y-%m-%d_%H:%M")}" + ".ipa"
+
+    increment_version_number(
+      #bump_type: "patch", # Automatically increment patch version number
+      version_number: "#{APP_VERSION}", # specify specific version number (optional, omitting it increments patch version number)
+      xcodeproj: "./#{XC_PROJECT}" # (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
+    )
+
+    if options[:sign_type] == 'development'
+
+      puts "\033[33m自动从苹果平台下载更新development p12证书和mobileprovision文件 自动签名配置环境\033[0m"
+      get_certificates(
+        development: true,
+        output_path: "#{SIGN_ARCHIVE_DIR}", # 指定输出的文件夹地址
+        # keychain_path: ENV['HOME'] + "/Library/Keychains/login.keychain-db",
+        keychain_password: ENV['MACOS_USER_PASSWORD'] # 第一次在新Mac上访问证书时需要。对于登录/默认钥匙串，macOS 帐户密码
+      )
+      get_provisioning_profile(
+        development: true,
+        #force: true, # 每次都更新
+        output_path: "#{SIGN_ARCHIVE_DIR}", # 指定输出的文件夹地址
+        filename: "#{APP_IDENTIFIER}.#{EXPORT_METHOD}.mobileprovision"
+      )
+
+      # 构建打包
+      packaging(configuration: "#{PACKAGING_TYPE}") # Release、Debug
+    elsif options[:sign_type] == 'ad-hoc'
+
+      puts "\033[33m自动从苹果平台下载更新ad-hoc p12证书和mobileprovision文件 自动签名配置环境\033[0m"
+      get_certificates(
+        output_path: "#{SIGN_ARCHIVE_DIR}", # 指定输出的文件夹地址
+        keychain_password: ENV['MACOS_USER_PASSWORD'] # 第一次在新Mac上访问证书时需要。对于登录/默认钥匙串，macOS 帐户密码
+      )
+      get_provisioning_profile(
+        adhoc: true, # 是否为 AdHoc 证书（设为 false 或不写默认为 AppStore 证书）
+        force: true, # 每次都更新 同步所有设备信息到mobileprovision文件
+        output_path: "#{SIGN_ARCHIVE_DIR}", # 指定输出的文件夹地址
+        filename: "#{APP_IDENTIFIER}.#{EXPORT_METHOD}.mobileprovision"
+      )
+
+      # 构建打包
+      packaging(configuration: "#{PACKAGING_TYPE}") # Release、Debug
+    elsif options[:sign_type] == 'app-store'
+
+      puts "\033[33m自动从苹果平台下载更新app-store p12证书和mobileprovision文件 自动签名配置环境\033[0m"
+      get_certificates
+      get_provisioning_profile(
+        #force: true, # 每次都更新
+        output_path: "#{SIGN_ARCHIVE_DIR}", # 指定输出的文件夹地址
+        filename: "#{APP_IDENTIFIER}.#{EXPORT_METHOD}.mobileprovision"
+      )
+
+      # 构建审核上架前可以先对比本地版本是否高于线上版本
+
+      # 将值设置为项目的Info.plist
+=begin
+      if (options[:version_num])
+        set_info_plist_value(path: "#{APP_INFO_PLIST_PATH}", key: "CFBundleShortVersionString", value: options[:version_num])
+        APP_VERSION = options[:version_num]
+      end
+=end
+
+      # 设置构建号 根据线上版本自动递增
+      increment_build_number(
+        build_number: latest_testflight_build_number.to_f + 1, # specify specific build number (optional, omitting it increments by one)
+        xcodeproj: "./#{XC_PROJECT}" # (optional, you must specify the path to your main Xcode project if it is not in the project root directory)
+      )
+      # 构建打包
+      packaging(configuration: "#{PACKAGING_TYPE}") # Release、Debug
+
+    else
+      puts "\033[33miOS打包签名方式不正确 ❌\033[0m"
+    end
+  end
+
+  desc "构建打包方法"
+  private_lane :packaging do |option|
+    # 开始打包之前的执行任务
+    package_before_do()
+
+    puts "\033[32m开始iOS打包IPA\033[0m\n"
+    puts "#{APP_IDENTIFIER}"
+
+    #打包gym
+    IPA_PATH = build_app(
+      workspace: "#{XC_WORKSPACE}", #指定.xcworkspace文件的路径(使用cocopods方式  pod install后生成.xcworkspace目录)
+      scheme: "#{SCHEME}", #指定打的哪个scheme 多Target打包需要指定具体关联的scheme  Make sure it's marked as Shared
+      clean: true, # "#{EXPORT_METHOD == "app-store" ? true : false }", #打包前是否清除之前的编译
+      configuration: option[:configuration], #指定构建App的配置  Release、Debug、自定义 默认为Release
+      export_method: "#{EXPORT_METHOD}", #打包方法 app-store, ad-hoc, development, enterprise, package 默认app-store
+      output_directory: "#{OUTPUT_DIRECTORY}", #输出目录 默认为当前文件夹
+      output_name: "#{IPA_NAME}", #输出名称 应包含文件扩展名
+      include_symbols: true, #是否包含调试符号
+      include_bitcode: true, #是否开启bitcode
+      silent: true, #是否隐藏打包时不需要的信息
+      xcargs: 'DEBUG_INFORMATION_FORMAT="dwarf-with-dsym"', #附加一些参数传递给xcodebuild  DWARF可以提高编译速度
+      export_xcargs: "-allowProvisioningUpdates", #访问钥匙串 allowProvisioningUpdates来控制自动更新管理Provisoning Profile签名证书
+      export_team_id: "#{TEAM_ID}", #有时需要在导出 ipa 文件时指定团队ID
+      # skip_codesigning: true, #是否无需代码签名即可构建
+      # sdk: "iOS 15.0",         #在构建项目时，使用SDK作为基础SDK的名称或路径
+      # codesigning_identity: "iPhone Distribution: SunApps GmbH", #要使用的代码签名标识的名称。它必须和名字完全匹配
+      # xcodebuild -help 查看-exportOptionsPlist参数项
+      export_options: {
+        #  provisioningProfiles: {
+        #    "#{APP_IDENTIFIER}" => "#{SIGN_ARCHIVE_DIR}/#{APP_IDENTIFIER}.#{EXPORT_METHOD}.mobileprovision"
+        #  },
+        # signingStyle: "manual", #签名方式 manual手动签名 默认automatic自动签名
+        # thinning: "<none>",  #是否瘦身
+      }
+    )
+
+    puts "\033[32mIPA包路径: #{IPA_PATH}\033[0m\n"
+
+    #打开ipa的存放文件夹
+    #system "open ./#{OUTPUT_DIRECTORY}"
+
+  end
+
+  desc "App Store审核上架"
+  lane :app_store do |options|
+    # App Store审核上架之前的执行任务
+    app_store_before_do()
+
+    puts "\033[32m开始自动提交App Store审核上架\033[0m\n"
+
+    upload_to_app_store(
+      ipa: options[:ipa], # ipa包路径
+      app_version: "#{APP_VERSION}", # 版本号
+      submit_for_review: options[:submit_for_review], # 是否自动提交审核
+      automatic_release: options[:automatic_release], # 是否审核通过后立刻上架发布
+      force: true, # 设置true 会跳过预览页面 直接上架 全自动CI服务需要true
+      skip_metadata: false, # 是否跳过上传元数据 true时候release_notes无效
+      metadata_path: nil,
+      skip_screenshots: true, # 是否跳过上传截图
+      skip_binary_upload: false, # 是否跳过上传ipa或pkg到App Store Connect
+      run_precheck_before_submit: true, # 是否在提交到app review之前运行precheck 审核规则检测 以避免被拒绝
+      precheck_include_in_app_purchases: false, # 是否预先检查应用内购买
+      reject_if_possible: true, # 拒绝先前提交的构建（如果处于可能的状态）
+      skip_app_version_update: false, # 不要创建或更新正在准备提交的应用程序版本
+      overwrite_screenshots: false, # 在上传新的截图之前，请先清除所有先前上传的截图
+      phased_release: false, # 是否启用iTC的分阶段发布功能 灰度发布
+      # App Store应用发布变更日志
+      release_notes: {
+        'default' => options[:release_note],
+        'zh-Hans' => options[:release_note] # "Fastlane自动化发布 #{Time.now.strftime("%Y-%m-%d %H:%M")}"
+        #'en-US' => "Release By Fastlane",
+      },
+      # App Store 应用审核小组的联系信息 app审核信息
+      app_review_information: {
+        first_name: options[:first_name],
+        last_name: options[:last_name],
+        phone_number: options[:phone_number],
+        email_address: options[:email_address],
+        demo_user: options[:demo_user], # App测试审核账号
+        demo_password: options[:demo_password], # App测试审核密码
+        notes: ""
+      }
+    )
+
+  end
+
+  desc "打包之前要执行的任务"
+  private_lane :package_before_do do |options|
+
+=begin
+    #执行 pod install
+    cocoapods(
+      clean_install: false,
+      repo_update: true,
+    # podfile: "./CustomPodfile"
+    )
+=end
+
+    # 将证书从输入文件导入钥匙串
+=begin
+    import_certificate(
+      certificate_path: "#{SIGN_ARCHIVE_DIR}/XNT8SK8MB.cer", # .cer或.p12
+      certificate_password: ENV["MACOS_USER_PASSWORD"] || "default",
+      keychain_path: ENV['HOME'] + "/Library/Keychains/login.keychain",
+    )
+=end
+    # 证书管理  注意match新创建证书会导致已存在的证书会被撤销失效
+    # match(git_url: "http://panweiji:Antaikeji666@git.antaikeji.top/health/certificates",
+    #       git_branch: "master",
+    #       type: "adhoc", # appstore
+    #       app_identifier: #{APP_IDENTIFIER}, #若同工程下有多个,则用["bundleId1","bundleId2"]
+    #       readonly: true
+    # )
+    # sync_code_signing(type:"appstore", readonly: is_ci)
+
+    #自动创建管理iOS代码签名证书 将确保你在本地计算机上安装了有效的证书及其私钥
+    #cert
+    #sigh是用来创建、更新、下载、修复Provisioning Profile的工具 每次运行时创建新的配置文件 确保你在本地安装了与证书相匹配的有效配置文件
+    #sigh(adhoc: true, force: true,
+    #    cert_id: "xxxxxx", #选择哪个发布证书配置
+    #    filename: "debug.mobileprovision" #下载的描述文件名字，同名就会自动覆盖
+    # )
+
+    # 重新创建不共享的Xcode项目方案
+    # recreate_schemes(project: "#{XC_PROJECT}")
+
+    # 配置Xcode的Codesigning选项
+    update_code_signing_settings(
+      use_automatic_signing: true, # 开启自动签名
+      path: "#{XC_PROJECT}"
+    )
+
+    # 更新Xcode开发团队ID
+    update_project_team(
+      teamid: "#{TEAM_ID}",
+      path: "#{XC_PROJECT}",
+      targets: "#{SCHEME}" # 要更新的目标的名称
+    )
+
+    # 自动在Apple Developer Portal创建BundleIdentifier
+    # App Store Connect API方式暂时不支持produce行为   Apple ID方式部分支持
+=begin
+    produce(
+      username: "#{APPLE_ID}",
+      app_identifier: "#{APP_IDENTIFIER}",
+      skip_itc: true # 跳过在 App Store Connect 上创建应用程序
+    )
+=end
+    # 更新BundleIdentifier
+    # set_info_plist_value(path: "Info.plist", key: "CFBundleIdentifier", value: APP_IDENTIFIER)
+=begin
+    update_app_identifier(
+      xcodeproj: "#{XC_PROJECT}", # Optional path to xcodeproj, will use the first .xcodeproj if not set
+      plist_path: "Info.plist", # Path to info plist file, relative to xcodeproj
+      app_identifier: "#{APP_IDENTIFIER}" # The App Identifier
+    )
+=end
+
+    # 替换Xcode工程内的 provisioning 文件
+=begin
+    update_project_provisioning(
+      xcodeproj: "#{XC_PROJECT}",
+      target_filter: ".*Unity.*", # matches name or type of a target
+      profile: "#{SIGN_ARCHIVE_DIR}/#{APP_IDENTIFIER}.#{EXPORT_METHOD}.mobileprovision", # optional if you use sigh
+      build_configuration: "#{PACKAGING_TYPE}",
+      code_signing_identity: "#{EXPORT_METHOD == "app-store" || EXPORT_METHOD == "ad-hoc" ? "iPhone Distribution" : "Apple Development: jiaru Yin (7326H3B9LC)" }"
+    )
+=end
+
+    # 解锁已存在的keychain，并添加到keychain钥匙串搜索列表中
+    unlock_keychain(
+      path: ENV['HOME'] + "/Library/Keychains/login.keychain",
+      password: ENV['MACOS_USER_PASSWORD']
+    )
+
+  end
+
+  desc "App Store审核上架之前要执行的任务"
+  private_lane :app_store_before_do do |options|
+
+    #创建产品信息到iTunes Connect(iTC)或者Apple Developer Center(ADC)
+    # produce(
+    #   app_name: "#{APP_NAME}",
+    #   app_identifier: "#{APP_IDENTIFIER}",
+    #   language: 'zh-Hans',
+    #   app_version: '1.0.0',
+    #   sku: "#{APP_IDENTIFIER}"
+    #     # Optional 、 App services can be enabled during app creation
+    #     enable_services: {
+    #       access_wifi: "on",
+    #       apple_pay: "on",
+    #       associated_domains: "on",
+    #       push_notification: "on",
+    #      }
+    # )
+
+    # Apple宣布，从 2020 年 12 月 8 日起，App Store 将开始显示有关应用隐私惯例的详细信息
+    # App Store上传应用程序隐私详细信息
+=begin
+    upload_app_privacy_details_to_app_store(
+      username: "#{APPLE_ID}",
+      team_name: "Your Team Name",
+      app_identifier: "#{APP_IDENTIFIER}",
+      json_path: "fastlane/app_privacy_details.json"
+    )
+=end
+
+    # 注意sh命令获取的结果字符串存在换行问题
+    #IPA_FULL_PATH = sh("cd .. && find $PWD/#{OUTPUT_DIRECTORY}/*.ipa")
+    #IPA_FULL_NAME = sh("cd .. && cd #{OUTPUT_DIRECTORY} && find *.ipa")
+
+    # 预检测审核上架条件和规则
+    # precheck(include_in_app_purchases: false)
+
+  end
+
+  desc "清空iOS构建产物"
+  lane :clean_build_artifact do
+    #iOS打包前清空构建产物 减少磁盘空间
+    clean_build_artifacts # Deletes files created as result of running gym, cert, sigh or download_dsyms
+    clear_derived_data # Deletes the Xcode Derived Data
+  end
+
+  desc "代码质量扫描"
+  lane :code_lint do
+    puts "\033[32m开始代码质量扫描\033[0m\n"
+    swiftlint(
+      output_file: "sonar-reports/sonar-swiftlint.txt",
+      ignore_exit_status: true
+    )
+    sonar
+  end
+
+  desc "自动化测试"
+  lane :test do
+    puts "\033[32m开始自动化测试\033[0m\n"
+    # scan(scheme: "#{SCHEME}")
+    scan(
+      clean: true,
+      #devices: ["iPhone 6s","iPhone X"],
+      workspace: "#{XC_WORKSPACE}",
+      scheme: "#{SCHEME}",
+      code_coverage: true,
+      output_directory: "./test_output",
+      output_types: "html,junit"
+    )
+    slather(
+      cobertura_xml: true,
+      proj: "#{XC_PROJECT}",
+      workspace: "#{XC_WORKSPACE}",
+      output_directory: "./test_output",
+      scheme: "#{SCHEME}",
+      jenkins: true,
+      ignore: [array_of_docs_to_ignore]
+    )
+  end
+
+  desc "Git上传完后加载所有的线上证书和配置文件"
+  lane :match_all do
+    sh "fastlane match development --readonly"
+    sh "fastlane match adhoc --readonly"
+    sh "fastlane match appstore --readonly"
+  end
+
+  after_all do |lane|
+    # 在MacOS 通知栏发送通知
+    # notification(subtitle: "iOS打包成功", message: "成功部署新iOS应用程序")
+  end
+
+  #在执行任意环境报错都会中止并执行一次
+  error do |lane, exception|
+    UI.message(exception.message)
+    puts "\033[40;31m Fastlane报错信息: " + exception.message + "\033[0m\n"
+    # 版本号或构建号与线上冲突 exception.message包含 A relationship value is not acceptable for the current resource state
+    # 自动修复mobileprovision打包签名文件 自动修复所有现有的已过期或无效的配置文件 需要两步验证
+    # p12证书和mobileprovision文件关系对应错乱没有匹配上会导致报错如下关键字:
+    # error: No profiles for 'id' were found: Xcode couldn't find any iOS App Development provisioning profiles matching
+    # sh "fastlane sigh repair" # 修复mobileprovision文件文档：https://docs.fastlane.tools/actions/sigh/
+    # 清空构建产物
+    # clean_build_artifact()
+    # error: Provisioning profile "iOS Team Provisioning Profile: *" doesn't support or include
+    # sh " cd " + ENV['HOME'] + "/Library/MobileDevice/Provisioning Profiles && pwd && rm -f *.mobileprovision "
+  end
+
+end

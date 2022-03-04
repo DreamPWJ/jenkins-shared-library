@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: an-plus-business-service
+  labels:
+    app: an-plus-business-service
+
+spec:
+  type: LoadBalancer                   # 规格类型，选择LoadBalancer是因为我们要实现Pod之间的负载均衡
+  selector:
+    app: an-plus-business              # 通过Pod的labels指定Pod 建立关联
+  ports:
+    - port: 8080                       # 指定Service接收请求的端口
+      protocol: TCP                    # 定义通信协议
+      targetPort: 8080                 # 请求转发的端口
+
+
+# 创建Service
+# kubectl create -f business-service.yaml
+# 查看Service的状态
+# kubectl get svc
+# 查看Service的详细信息
+# kubectl describe svc/business-service

@@ -1,0 +1,11 @@
+groups:
+  - name: CPU报警规则
+    rules:
+      - alert: CPU使用率告警
+        expr: 100 - (avg by (instance)(irate(node_cpu_seconds_total{mode="idle"}[1m]) )) * 100 > 90
+        for: 1m
+        labels:
+          user: prometheus
+          severity: warning
+        annotations:
+          description: "服务器: CPU使用超过90%！(当前值: {{ $value }}%)"

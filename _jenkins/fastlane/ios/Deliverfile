@@ -1,0 +1,127 @@
+# The Deliverfile allows you to store various App Store Connect metadata
+# For more information, check out the docs
+# https://docs.fastlane.tools/actions/deliver/
+
+# Deliver官方文档: https://docs.fastlane.tools/actions/deliver/
+# App Store Connect官方文档: https://github.com/fastlane/fastlane/blob/master/spaceship/docs/AppStoreConnect.md
+
+################################# 基本信息 #########################################
+
+app_identifier ENV['APP_IDENTIFIER'] # The bundle identifier of your app
+username ENV['APPLE_ID'] # your Apple ID user
+
+# 版权声明
+copyright "© #{Time.now.year} 山东乐享信息技术有限公司"
+
+# 技术支持网址
+support_url({
+              'zh-Hans' => "http://www.antaikeji.top"
+            })
+
+# App名称
+# name({
+# 'zh-Hans' => "App名称"
+# })
+
+# 副标题
+# subtitle(
+#   'zh-Hans' => "副标题"
+# )
+
+# App价格
+# price_tier 0
+
+################################# 提交审核信息 #########################################
+
+# 提交审核信息: 加密 、广告、合规性规范、IDFA设置等
+submission_information({
+                         add_id_info_limits_tracking: true,
+                         add_id_info_serves_ads: true,
+                         add_id_info_tracks_action: true,
+                         add_id_info_tracks_install: true,
+                         add_id_info_uses_idfa: true,
+                         export_compliance_platform: 'ios',
+                         export_compliance_compliance_required: false,
+                         export_compliance_encryption_updated: false,
+                         export_compliance_app_type: nil,
+                         export_compliance_uses_encryption: false,
+                         export_compliance_is_exempt: false,
+                         export_compliance_contains_third_party_cryptography: false,
+                         export_compliance_contains_proprietary_cryptography: false,
+                         export_compliance_available_on_french_store: false
+                       })
+#content_rights_has_rights: true,
+#content_rights_contains_third_party_content: true,
+
+# 应用审核小组的联系信息 app 审核信息
+# app_review_information(
+#   first_name: "潘",
+#   last_name: "维吉",
+#   phone_number: "+86 18863302302",
+#   email_address: "406798106@qq.com",
+#   demo_user: "18863302302",
+#   demo_password: "123456",
+#   notes: ""
+# )
+
+################################## 关键字 描述等信息 ###################################
+
+# 支持语言
+# supportedLanguages = {
+#   "cmn-Hans" => "zh-Hans"
+# }
+
+# 搜索关键字
+# keywords(
+#  "zh-Hans" => "FastLane"
+# )
+
+# 营销网址
+# marketing_url({
+#                 'zh-Hans' => "https://baidu.com"
+#               })
+
+# 隐私政策网址
+# privacy_url({
+#               'zh-Hans' => "https://baidu.com"
+#             })
+
+# 本地化宣传文本信息介绍
+# promotional_text(
+#  "zh-Hans" => "本地化宣传文本信息介绍",
+# )
+
+# app描述信息
+# description({
+#  'zh-Hans' => "APP的描述信息,用于APP功能的描述和介绍不能少于10个字符"
+# })
+
+# 版本描述
+# release_notes({
+#  'zh-Hans' => "这是第一个版本哦"
+# })
+
+###################################  类别配置 ###################################
+
+# 参考网站https://docs.fastlane.tools/actions/upload_to_app_store/#reference
+# 设置 App 的类别.这里可以设置一个主要类别,一个次要类别.
+
+# 主要类别 不能是默认的主要 必选 否则无法提交审核
+# primary_category "MZGenre.Lifestyle"
+# 主要类别第一个子类别 无
+# primary_first_sub_category
+# 主要类别第二个子类别 无
+# primary_second_sub_category
+
+# 要设置的次要类别
+# secondary_category "MZGenre.Utilities"
+# 设置的次要第一个子类别 无
+# secondary_first_sub_category
+# 设置的次要第二个子类别 无
+# secondary_second_sub_category
+
+################################## 分级 ########################################
+
+# 年龄分级配置
+# app_rating_config_path "./fastlane/metadata/itunes_rating_config.json"
+
