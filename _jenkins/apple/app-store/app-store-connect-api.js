@@ -88,16 +88,18 @@ axios.get(`https://api.appstoreconnect.apple.com/v1/apps?filter[bundleId]=${appI
             }
         }
     ).then(res => {
-        console.log("/appInfos接口响应结果: " + JSON.stringify(res.data));
+        //console.log("/appInfos接口响应结果: " + JSON.stringify(res.data));
+        // 上架后存在两个结果顺序是 1.线上的状态 2. 审核预发布的状态 根据需要是否倒序
         let appInfosData = res.data.data.reverse() // 反转数组中元素的顺序
         appStoreState = appInfosData[0].attributes.appStoreState
-        console.log("标识id: " + appId);
+        console.log("当前时间: " + (new Date(+new Date() + 8 * 3600 * 1000)).toISOString().replace(/T/, ' ').replace(/\..+/, ''));
+        console.log("应用标识id: " + appId);
         console.log("应用名称: " + appName);
         console.log("应用版本: " + appVersion);
         // App Store审核状态列表如下
         // READY_FOR_SALE、PENDING_APPLE_RELEASE、PENDING_DEVELOPER_RELEASE、WAITING_FOR_REVIEW、IN_REVIEW、PREPARE_FOR_SUBMISSION、DEVELOPER_REMOVED_FROM_SALE
         // DEVELOPER_REJECTED、REJECTED、METADATA_REJECTED、INVALID_BINARY、UNRESOLVED_ISSUES、REMOVED_FROM_SALE
-        console.log("审核状态: " + appStoreState);
+        console.log("App Store审核状态: " + appStoreState);
         // 以下几种状态才进行通知
         if (appStoreState === "IN_REVIEW" || appStoreState === "PENDING_DEVELOPER_RELEASE" || appStoreState === "READY_FOR_SALE"
             || appStoreState.includes("REJECTED") || appStoreState.includes("INVALID")) {
