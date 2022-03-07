@@ -5,4 +5,4 @@ nav:
 
 # 帮助
 
-帮助文档
+使用标准的Jenkins Pipeline共享库实现

@@ -10,7 +10,7 @@ hero:
 features:
   - icon: https://gw.alipayobjects.com/zos/bmw-prod/881dc458-f20b-407b-947a-95104b5ec82b/k79dm8ih_w144_h144.png
     title: 强大
-    desc: 集大成者, 支持单仓多包MonoRepo、蓝绿滚动分布式部署、自动扩缩容、镜像仓库、一键回滚、App Store与Android应用市场和小程序平台自动提审上架、丰富钉钉通知等
+    desc: 集大成者, 支持单仓多包MonoRepo、蓝绿滚动分布式部署、自动扩缩容、镜像仓库、一键回滚、App Store与Android应用市场和小程序平台自动提审上架、丰富钉钉通知与发布日志等
   - icon: https://gw.alipayobjects.com/zos/bmw-prod/d60657df-0822-4631-9d7c-e7a869c2f21c/k79dmz3q_w126_h126.png
     title: 易用
     desc: 简单易用, 动态参数化配置让您一分钟搞定CI/CD流水线, 代码共享使迭代配置维护更简单, 全Docker化与大量的自动化脚本使您无需人工配置搭建环境等

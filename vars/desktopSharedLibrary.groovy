@@ -661,7 +661,7 @@ def installDependencies() {
  */
 def windowsBuild() {
     if ("${PROJECT_TYPE}".toInteger() == GlobalVars.electron) {
-        packageSuffixName = "exe"
+        packageSuffixName = "exe" // Windows新安装格式msix
         multiSystemBuild()
     }
 }
@@ -816,7 +816,7 @@ def genQRCode() {
  * 上传PC应用市场
  */
 def uploadPCMarket(map) {
-    // Windows华为AppGallery Connect支持PC端应用市场 exe格式: https://developer.huawei.com/consumer/cn/doc/development/app/agc-help-pcapp-0000001146516651
+    // Windows应用发布到Microsoft Store市场: https://developer.microsoft.com/zh-cn/microsoft-store/ 或华为AppGallery Connect支持PC端应用市场 exe格式: https://developer.huawei.com/consumer/cn/doc/development/app/agc-help-pcapp-0000001146516651
     // MacOS应用发布到App Store市场:  https://developer.apple.com/app-store/submitting/
     // Linux应用发布到Snap Store市场: https://snapcraft.io/
 

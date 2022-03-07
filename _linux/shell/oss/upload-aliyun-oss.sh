@@ -1,6 +1,6 @@
 #!/bin/bash
 # Author: 潘维吉
-# Description:  上传阿里云OSS
+# Description:  Shell脚本方式上传阿里云OSS
 
 echo "使用getopts的方式进行shell参数传递"
 while getopts ":a:b:c:d:z:" opt; do
