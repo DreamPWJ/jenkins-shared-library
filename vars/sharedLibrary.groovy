@@ -1589,9 +1589,9 @@ def genQRCode() {
  * 制品仓库版本管理 如Maven、Npm、Docker等以及通用仓库版本上传 支持大型项目复杂依赖关系
  */
 def productsWarehouse(map) {
-    //  1. Maven仓库  2. Npm仓库 3. Docker仓库  4. 通用OSS仓库
+    //  1. Maven与Gradle仓库  2. Npm仓库  3. Docker镜像仓库  4. 通用OSS仓库
 
-    // Maven制品仓库
+    // Maven与Gradle制品仓库
     // Maven.uploadWarehouse(this)
 
     // Npm制品仓库

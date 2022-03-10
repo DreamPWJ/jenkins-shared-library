@@ -210,7 +210,7 @@ platform :android do
   #在执行任意环境报错都会中止并执行一次
   error do |lane, exception|
     UI.message(exception.message)
-    puts "\033[40;31m Fastlane报错信息: " + exception.message + "\033[0m\n"
+    puts "\033[40;31m 👉 Fastlane异常报错信息: " + exception.message + "\033[0m\n"
   end
 
 end

@@ -965,7 +965,7 @@ def replaceiOSFastlaneEnvFile(Map map, String appIdentifier, String schemeName, 
             def plistFileName = "Info"
             // iOS多Target打包
             if (params.IOS_MULTI_TARGET && params.IOS_MULTI_TARGET != GlobalVars.defaultValue) {
-                println("iOS多Target打包名称: " + params.IOS_MULTI_TARGET)
+                println("👉 iOS多Target打包名称: " + params.IOS_MULTI_TARGET)
                 def targetArray = "${IOS_MULTI_TARGET_NAMES}".replaceAll("\n", ",").split(",") as ArrayList
                 def targetIndex = targetArray.indexOf(params.IOS_MULTI_TARGET)
                 def targetParamsArray = "${IOS_MULTI_TARGET_PARAMS}".split(",") as ArrayList

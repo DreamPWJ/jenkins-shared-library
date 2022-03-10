@@ -92,6 +92,7 @@ platform :ios do
     # 定义包名
     IPA_NAME = "#{SCHEME}-" + "v#{APP_VERSION}-" + "#{PACKAGING_TYPE}-#{EXPORT_METHOD}" + "-#{Time.now.strftime("%Y-%m-%d_%H:%M")}" + ".ipa"
 
+    # 设置应用版本号
     increment_version_number(
       #bump_type: "patch", # Automatically increment patch version number
       version_number: "#{APP_VERSION}", # specify specific version number (optional, omitting it increments patch version number)
@@ -100,7 +101,7 @@ platform :ios do
 
     if options[:sign_type] == 'development'
 
-      puts "\033[33m自动从苹果平台下载更新development p12证书和mobileprovision文件 自动签名配置环境\033[0m"
+      puts "\033[33m自动从苹果开发者平台下载更新development签名类型的p12证书和mobileprovision文件 自动签名配置环境\033[0m"
       get_certificates(
         development: true,
         output_path: "#{SIGN_ARCHIVE_DIR}", # 指定输出的文件夹地址
@@ -118,7 +119,7 @@ platform :ios do
       packaging(configuration: "#{PACKAGING_TYPE}") # Release、Debug
     elsif options[:sign_type] == 'ad-hoc'
 
-      puts "\033[33m自动从苹果平台下载更新ad-hoc p12证书和mobileprovision文件 自动签名配置环境\033[0m"
+      puts "\033[33m自动从苹果开发者平台下载更新ad-hoc签名类型的p12证书和mobileprovision文件 自动签名配置环境\033[0m"
       get_certificates(
         output_path: "#{SIGN_ARCHIVE_DIR}", # 指定输出的文件夹地址
         keychain_password: ENV['MACOS_USER_PASSWORD'] # 第一次在新Mac上访问证书时需要。对于登录/默认钥匙串，macOS 帐户密码
@@ -134,7 +135,7 @@ platform :ios do
       packaging(configuration: "#{PACKAGING_TYPE}") # Release、Debug
     elsif options[:sign_type] == 'app-store'
 
-      puts "\033[33m自动从苹果平台下载更新app-store p12证书和mobileprovision文件 自动签名配置环境\033[0m"
+      puts "\033[33m自动从苹果开发者平台下载更新app-store签名类型的p12证书和mobileprovision文件 自动签名配置环境\033[0m"
       get_certificates
       get_provisioning_profile(
         #force: true, # 每次都更新
@@ -437,7 +438,7 @@ platform :ios do
   #在执行任意环境报错都会中止并执行一次
   error do |lane, exception|
     UI.message(exception.message)
-    puts "\033[40;31m Fastlane报错信息: " + exception.message + "\033[0m\n"
+    puts "\033[40;31m 👉 Fastlane异常报错信息: " + exception.message + "\033[0m\n"
     # 版本号或构建号与线上冲突 exception.message包含 A relationship value is not acceptable for the current resource state
     # 自动修复mobileprovision打包签名文件 自动修复所有现有的已过期或无效的配置文件 需要两步验证
     # p12证书和mobileprovision文件关系对应错乱没有匹配上会导致报错如下关键字:

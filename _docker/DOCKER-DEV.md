@@ -20,8 +20,8 @@ docker pull mysql
 #### GROUP_CONCAT函数可拼接某个字段值成字符串 默认的分隔符是"," 默认最大长度为1024字节超过则会被截断 （-1为最大值或根据实际需求设置长度） 
 #### convert(数据,char) CONCAT解决乱码
 
-#### CREATE USER IF NOT EXISTS 'health'@'%' IDENTIFIED WITH MYSQL_NATIVE_PASSWORD BY 'panweiji2020' ; GRANT all privileges ON *
-.* TO 'health'@'%' ; flush privileges;
+#### CREATE USER IF NOT EXISTS 'health'@'%' IDENTIFIED WITH MYSQL_NATIVE_PASSWORD BY 'panweiji2020' ;
+#### GRANT all privileges ON *.* TO 'health'@'%' ; flush privileges;
 
 sudo docker run -d --restart=always -p 3306:3306 --name mysql \
 -e MYSQL_DATABASE=design -e MYSQL_ROOT_PASSWORD=panweiji2020 -v /etc/localtime:/etc/localtime:ro -v /my/mysql/data:
@@ -43,13 +43,11 @@ docker run -d --restart=always -p 27017:27017 \
 mongo
 
 #### 从Docker Hub里拉取Jenkins镜像最新LTS版来部署
-docker pull jenkins/jenkins:lts-centos
-docker pull jenkins/jenkins:lts-jdk11
 docker pull jenkins/jenkins:lts
 
 #### 添加挂载映射本地数据卷权限 sudo chown -R 1000:1000 /my/jenkins  将宿主机的docker命令挂载到容器中
 #### JDK11需要Oracle商业授权 JDK11配置使用jenkins/jenkins:jdk11镜像 使用openJDK
-sudo docker run -d --restart=always -p 8000:8080 -p 50000:50000 -u root -e JAVA_OPTS=-Duser.timezone=Asia/Shanghai \
+sudo docker run -d --restart=always -p 8000:8080 -p 50000:50000 -u root -m 4096m -e JAVA_OPTS=-Duser.timezone=Asia/Shanghai \
 -v /etc/localtime:/etc/localtime:ro -v $(which bash):/bin/bash  \
 -v $(which docker):/usr/bin/docker -v /var/run/docker.sock:/var/run/docker.sock \
 -v /my/jenkins:/var/jenkins_home -v /my/jenkins/ssh:/root/.ssh  \

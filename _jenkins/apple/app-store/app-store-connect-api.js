@@ -89,7 +89,7 @@ axios.get(`https://api.appstoreconnect.apple.com/v1/apps?filter[bundleId]=${appI
         }
     ).then(res => {
         //console.log("/appInfos接口响应结果: " + JSON.stringify(res.data));
-        // 上架后存在两个结果顺序是 1.线上的状态 2. 审核预发布的状态 根据需要是否倒序
+        // 上架后存在两个结果顺序是 1. 线上的状态 2. 审核预发布的状态 根据需要是否倒序
         let appInfosData = res.data.data.reverse() // 反转数组中元素的顺序
         appStoreState = appInfosData[0].attributes.appStoreState
         console.log("当前时间: " + (new Date(+new Date() + 8 * 3600 * 1000)).toISOString().replace(/T/, ' ').replace(/\..+/, ''));
@@ -186,7 +186,6 @@ function sendDingNotice() {
         // 钉钉文档地址: https://open.dingtalk.com/document/robots/custom-robot-access
         try {
             console.log("钉钉群通知");
-            // 7e0a34d57be41808ab02b1955ed2f19d64d1fbd95e521331eff8cfe16e05b861
             axios.post('https://oapi.dingtalk.com/robot/send?access_token=ac8c99031afc2d0973bfd4c15b7f80e66a1b4dc11a5371236723b35476276b3a', {
                 msgtype: "actionCard",
                 actionCard: {
