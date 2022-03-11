@@ -110,7 +110,7 @@ axios.get(`https://api.appstoreconnect.apple.com/v1/apps?filter[bundleId]=${appI
             console.log("App Store应用主页: https://apps.apple.com/cn/app/apple-store/id" + appId);
             let deleteFileName = systemHome + "/AppStore/app-store.sh"
             if (fs.existsSync(deleteFileName)) {
-                console.log("上架成功后删除具体的执行任务");
+                console.log("App Store上架成功后删除具体的执行任务");
                 // 同时支持多个并行Apple Store审核状态通知  清除定时任务的具体Job
                 // shell 获得字符串所在行数及位置
                 let num;

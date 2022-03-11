@@ -50,12 +50,12 @@ map.put('huawei_app_gallery_client_id', "")
 map.put('huawei_app_gallery_client_secret', "")
 map.put('xiaomi_market_user_name', "406798106@qq.com")
 
-// Apple Store相关信息
+// Apple Store相关信息 支持不同的Apple Store账号配置
 map.put('apple_id', "panweijikeji666@163.com")
 map.put('apple_password', "panweijikeji2021")
 map.put('apple_team_id', "C45WYAFLWA")
 
-// App Store Connect API相关信息
+// App Store Connect API相关信息  获取地址: https://appstoreconnect.apple.com/access/api
 map.put('apple_store_connect_api_key_id', "BNL32GR27G")
 map.put('apple_store_connect_api_issuer_id', "a0cae47e-ca4b-4503-a967-4282302c0c5a")
 map.put('apple_store_connect_api_key_file_path', "/Library/AuthKey_BNL32GR27G.p8")

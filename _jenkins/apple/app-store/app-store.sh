@@ -1,7 +1,7 @@
 #!/bin/sh
-
 # Node环境变量
 export PATH="$PATH:/usr/local/bin"
+
 # Mac中的定时任务利器 launchctl
 
 # node $HOME/AppStore/app-store-connect-api.js --appIdentifier='com.panweiji.propertyservice.store' --appVersion='1.0.0' --apiKeyId='RK28R5AN27' --privateKey="/Library/AuthKey_RK28R5AN27.p8" --issuerId='69a6de8d-bf99-47e3-e053-5b8c7c11a4d1' --phone='18863302302'

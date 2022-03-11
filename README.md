@@ -23,7 +23,7 @@
 - Web技术项目类型 1. Npm生态与静态Web项目 2. Flutter For Web 3. React Native For Web 4. Unity For Web 5. WebAssembly
   ![avatar](./docs/images/web.png)
 
-### 多端CI/CD共享库流水线已支持的范围
+### 多端CI/CD共享库流水线已支持的范围 基于Jenkins Pipeline共享库实现
 
 - 移动端: Android、iOS、Flutter、React Native
 - 小程序: 原生与跨端小程序
@@ -44,7 +44,8 @@
 
 ### 工程目录
 
-- .ci目录 部署相关脚本和配置
+- .ci目录 容器部署相关脚本和配置
+- pipelines目录 流水线配置文件入口
 - resources目录 非Groovy文件存储 通过外部库中的libraryResource步骤加载任意文件 文件会当做字符串加载
 - src目录 Pipeline流水线通用类、工具类和常量等封装
 - vars目录 不同端共享核心Pipeline工作流和文档
@@ -55,10 +56,6 @@
 - Jenkins Pipeline、Groovy
 - Docker、Shell、Node、C#、Playwright
 - Fastlane、Ruby
-
-### DevOps最佳实战
-
-- [DevOps分与合](https://help.coding.net/docs/best-practices/devops-inside.html)
 
 ### 核心贡献者
 

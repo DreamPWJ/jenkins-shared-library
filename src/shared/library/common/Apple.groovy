@@ -76,6 +76,19 @@ class Apple implements Serializable {
                             ctx.sh "npm i -D yargs"
                         }
                     }
+
+                    // 去掉Shell文件中文件中的换行符
+                    // cat test.sh|tr -s '\n'
+                    /*   new_shell=$(cat test.sh|tr -s '\n') &&
+                         cat <<EOF >test.sh
+                         $new_shell
+                         EOF */
+                    /*   ctx.sh """ new_shell=\$(cat ${operationDir}/${executeFileName}|tr -s '\\n') &&
+                            cat <<EOF >${operationDir}/${executeFileName}
+                            ${new_shell}
+                            EOF
+                            """*/
+
                     // ruby ${operationDir}/spaceship.rb "${ctx.iosAppIdentifier}" "${map.apple_store_connect_api_key_id}" "${map.apple_store_connect_api_issuer_id}" "${map.apple_store_connect_api_key_file_path}" "${ctx.BUILD_USER_MOBILE}"
                     ctx.sh """
 echo '
