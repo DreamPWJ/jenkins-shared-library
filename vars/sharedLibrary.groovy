@@ -1206,9 +1206,14 @@ def healthCheck(params = '') { // 可选参数
  * 集成测试
  */
 def integrationTesting() {
-    // 先动态传入数据库名称部署集成测试应用 启动测试完成 再重新部署业务应用
+    // 可先动态传入数据库名称部署集成测试应用 启动测试完成销毁 再重新部署业务应用
     try {
-        // 结合YApi接口管理做自动化测试
+        // 创建JMeter性能报告
+        Tests.createJMeterReport(this)
+        // 创建冒烟测试报告
+        Tests.createSmokeReport(this)
+
+        // 结合YApi接口管理做自动化API测试
         def yapiUrl = "http://yapi.panweijikeji.com"
         def testUrl = "${yapiUrl}/api/open/run_auto_test?${AUTO_TEST_PARAM}"
         // 执行接口测试
@@ -1231,7 +1236,7 @@ def integrationTesting() {
  * 蓝绿部署
  */
 def blueGreenDeploy() {
-    // 蓝绿部署:  好处是只用一个主单点服务资源实现不间断提供服务
+    // 蓝绿部署: 好处是只用一个主单点服务资源实现部署过程中不间断提供服务
     // 1、先启动部署一个临时服务将流量切到蓝服务器上  2、再部署真正提供服务的绿服务器  3、部署完绿服务器,销毁蓝服务器,将流量切回到绿服务器
     // 镜像容器名称
     dockerContainerName = "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}-${SHELL_ENV_MODE}"
@@ -1314,11 +1319,11 @@ def blueGreenDeploy() {
  * 滚动部署
  */
 def scrollToDeploy() {
-    // 负载均衡和滚动更新worker应用服务
+    // 主从架构与双主架构等  负载均衡和滚动更新worker应用服务
     if ("${IS_SAME_SERVER}" == 'false') {   // 不同服务器滚动部署
         def machineNum = 1
         if (remote_worker_ips.isEmpty()) {
-            error("多机滚动部署, 请先在相关的Jenkinsfile配置从服务器ip数组remote_worker_ips参数 ❌")
+            error("多机滚动部署, 请先在相关的Jenkinsfile.x文件配置其它服务器ip数组remote_worker_ips参数 ❌")
         }
         // 循环串行执行多机分布式部署
         remote_worker_ips.each { ip ->

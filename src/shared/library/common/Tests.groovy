@@ -4,7 +4,7 @@ package shared.library.common
  * @author 潘维吉
  * @date 2021/8/10 13:22
  * @email 406798106@qq.com
- * @description 测试服务
+ * @description 各种测试相关
  */
 class Tests implements Serializable {
 
@@ -21,6 +21,20 @@ class Tests implements Serializable {
      */
     static def createJUnitReport(ctx) {
         ctx.junit('test-output/junit.xml')
+    }
+
+    /**
+     * 创建JMeter性能报告
+     */
+    static def createJMeterReport(ctx) {
+        // 参考文档: https://www.jenkins.io/doc/book/using/using-jmeter-with-jenkins/
+    }
+
+    /**
+     * 创建冒烟测试报告
+     */
+    static def createSmokeReport(ctx) {
+
     }
 
     /**

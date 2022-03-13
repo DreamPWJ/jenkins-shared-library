@@ -12,6 +12,7 @@ class Jenkins implements Serializable {
      * 自动触发
      */
     static def trigger(ctx, jenkinsUrl, deployJobName, token, params) {
+        // 远程访问Open API文档: https://www.jenkins.io/doc/book/using/remote-access-api/
         // WORKSPACE returns working directory which is /var/lib/jenkins/jobs/FOLDER/...
         def folder = ctx.WORKSPACE.split('/')[5]
         // http://jenkins.domain.com/generic-webhook-trigger/invoke?token=jenkins-app
