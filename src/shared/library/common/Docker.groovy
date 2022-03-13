@@ -11,6 +11,7 @@ import shared.library.GlobalVars
  */
 class Docker implements Serializable {
 
+    // 镜像标签  也可自定义版本标签用于无需重复构建相同的镜像, 做到复用镜像CD持续部署到多环境中
     static def imageTag = "latest"
 
     /**

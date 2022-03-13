@@ -1,6 +1,6 @@
 ---
 hero:
-  title: 全自动化跨端DevOps流水线
+  title: 云原生跨端DevOps流水线
   desc: 愿景 All In One 强大、灵活、易用、跨端
   actions:
     - text: GitHub源码

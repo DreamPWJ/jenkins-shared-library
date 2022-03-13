@@ -912,6 +912,7 @@ def scrollToDeploy() {
         if (remote_worker_ips.isEmpty()) {
             error("多机滚动部署, 请先在相关的Jenkinsfile配置从服务器ip数组remote_worker_ips参数 ❌")
         }
+        // 循环串行执行多机分布式部署
         remote_worker_ips.each { ip ->
             println ip
             remote.host = ip
