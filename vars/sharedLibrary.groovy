@@ -1188,9 +1188,9 @@ def healthCheck(params = '') { // 可选参数
         // 钉钉失败通知
         dingNotice(1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
         // 打印应用服务启动失败日志 方便快速排查错误
-        Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动日志开始 START 👇 ------------", "red")
+        Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志开始 START 👇 ------------", "red")
         sh " ssh  ${remote.user}@${remote.host} 'docker logs ${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}-${SHELL_ENV_MODE}' "
-        Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动日志结束 END 👆 ------------", "red")
+        Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志结束 END 👆 ------------", "red")
         if ("${IS_ROLL_DEPLOY}" == 'true' || "${IS_BLUE_GREEN_DEPLOY}" == 'true') {
             println '分布式部署情况, 服务启动失败, 自动中止取消job, 防止继续部署导致其他应用服务挂掉 。'
             IS_ROLL_DEPLOY = false
@@ -1691,7 +1691,7 @@ def deployMultiEnv() {
  */
 def dingNotice(int type, msg = '', atMobiles = '') {
     if ("${params.IS_DING_NOTICE}" == 'true') { // 是否钉钉通知
-        println("钉钉通知")
+        println("钉钉通知: " + params.NOTIFIER_PHONES)
         // 格式化持续时间
         def durationTimeString = "${currentBuild.durationString.replace(' and counting', '').replace('sec', 's')}".replace(' ', '')
         def notifierPhone = params.NOTIFIER_PHONES.split("-")[1].trim()

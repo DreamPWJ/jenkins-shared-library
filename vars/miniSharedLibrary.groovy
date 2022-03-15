@@ -768,8 +768,8 @@ def submitAuthorization() {
         }
     } catch (e) {
         isSubmitAuditSucceed = false
-        println(e.getMessage())
         println("自动提审授权登录失败  ❌")
+        println(e.getMessage())
     }
     // input message: "是否在钉钉中扫码微信二维码完成登录？", ok: "完成"
 }
@@ -835,6 +835,7 @@ def gitTagLog() {
  */
 def dingNotice(int type, msg = '', atMobiles = '') {
     if ("${params.IS_DING_NOTICE}" == 'true') { // 是否钉钉通知
+        println("钉钉通知: " + params.NOTIFIER_PHONES)
         def durationTimeString = "${currentBuild.durationString.replace(' and counting', '').replace('sec', 's')}".replace(' ', '')
         def codeUrl = "" // 二维码url
         def buildTypeMsg = ""  // 构建版本类型

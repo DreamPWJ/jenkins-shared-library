@@ -1800,6 +1800,7 @@ def gitTagLog(map) {
  */
 def dingNotice(int type, msg = '', atMobiles = '') {
     if ("${params.IS_DING_NOTICE}" == 'true') { // 是否钉钉通知
+        println("钉钉通知: " + params.NOTIFIER_PHONES)
         def rollbackTag = ""
         if (params.GIT_TAG != GlobalVars.noGit) {
             rollbackTag = "**Git Tag构建版本: ${params.GIT_TAG}**" // Git Tag版本添加标识

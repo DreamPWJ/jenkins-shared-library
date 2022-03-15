@@ -18,7 +18,7 @@ class PlayWright implements Serializable {
             // 判断服务器是是否安装playwright环境
             ctx.sh "playwright --version"
         } catch (error) {
-            ctx.sh "npm i -D playwright"
+            ctx.sh "npm i -D playwright@1.19.2" // 固定版本号防止新版有兼容性问题和每次需要下载新的Chromium版本等问题
             ctx.sh "npm i -D yargs"
             // ctx.sh "npm i -D @playwright/test"
             ctx.sh "pip3 install playwright"
