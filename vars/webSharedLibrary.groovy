@@ -204,7 +204,7 @@ def call(String type = 'web', Map map) {
                            }*/
                     }
                     steps {
-                        // 只显示当前stage失败  而不是整个流水线失败
+                        // 只显示当前阶段stage失败  而整个流水线构建显示成功
                         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                             script {
                                 codeQualityAnalysis()

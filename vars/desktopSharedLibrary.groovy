@@ -129,7 +129,7 @@ def call(String type = 'desktop', Map map) {
                 stage('代码质量') {
                     when { expression { return false } }
                     steps {
-                        // 只显示当前stage失败  而不是整个流水线失败
+                        // 只显示当前阶段stage失败  而整个流水线构建显示成功
                         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                             script {
                                 echo "代码质量, 可打通项目管理系统自动提交bug指派任务"

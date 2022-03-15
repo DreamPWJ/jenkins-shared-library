@@ -128,7 +128,7 @@ def call(String type = 'wx-mini', Map map) {
                 stage('代码质量') {
                     when { expression { return false } }
                     steps {
-                        // 只显示当前stage失败  而不是整个流水线失败
+                        // 只显示当前阶段stage失败  而整个流水线构建显示成功
                         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                             script {
                                 echo "代码质量, 可打通项目管理平台自动提交bug指派任务"
@@ -142,8 +142,8 @@ def call(String type = 'wx-mini', Map map) {
                     when { expression { return false } }
                     steps {
                         script {
-                            // Appium自动录制 生成回归和冒烟等测试脚本
-                            echo "Appium自动化测试"
+                            // Appium或Playwright自动录制 生成回归和冒烟等测试脚本
+                            echo "Appium或Playwright自动化测试"
                         }
                     }
                 }
@@ -225,15 +225,18 @@ def call(String type = 'wx-mini', Map map) {
                         }
                     }
                     steps {
-                        //  script {
-                        parallel( // 步骤内并发执行
-                                '提审': {
-                                    submitAudit()
-                                },
-                                '授权': {
-                                    submitAuthorization()
-                                })
-                        // }
+                        // 只显示当前阶段stage失败  而整个流水线构建显示成功
+                        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                            //  script {
+                            parallel( // 步骤内并发执行
+                                    '提审': {
+                                        submitAudit()
+                                    },
+                                    '授权': {
+                                        submitAuthorization()
+                                    })
+                            // }
+                        }
                     }
                 }
 
@@ -713,8 +716,9 @@ def submitAudit() {
         }
     } catch (e) {
         isSubmitAuditSucceed = false
-        println(e.getMessage())
         println("自动提交审核失败  ❌")
+        println(e.getMessage())
+        sh "exit 1"
     }
 }
 
@@ -770,6 +774,7 @@ def submitAuthorization() {
         isSubmitAuditSucceed = false
         println("自动提审授权登录失败  ❌")
         println(e.getMessage())
+        sh "exit 1"
     }
     // input message: "是否在钉钉中扫码微信二维码完成登录？", ok: "完成"
 }
@@ -858,7 +863,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
             case Constants.RELEASE_TYPE:
                 codeUrl = "${MINI_CODE_URL}"
                 buildTypeMsg = "正式版"
-                buildNoticeMsg = "${isSubmitAuditSucceed == true ? "${submitAuditMsg}" : "请去公众平台提交审核 ⚠️"}"
+                buildNoticeMsg = "${isSubmitAuditSucceed == true ? "${submitAuditMsg}" : "请去小程序平台手动提审(自动提审失败) ❌️"}"
                 break
         }
 
@@ -881,6 +886,12 @@ def dingNotice(int type, msg = '', atMobiles = '') {
             def notifierPhone = params.NOTIFIER_PHONES.split("-")[1].trim()
             if (notifierPhone == "oneself") { // 通知自己
                 notifierPhone = "${BUILD_USER_MOBILE}"
+            }
+            switch (params.BUILD_TYPE) {
+                case Constants.RELEASE_TYPE:
+                    // 正式版自动提审失败后通知构建人员及时处理
+                    notifierPhone = "${isSubmitAuditSucceed == true ? "" : "${BUILD_USER_MOBILE}"}"
+                    break
             }
             dingtalk(
                     robot: "${DING_TALK_CREDENTIALS_ID}",

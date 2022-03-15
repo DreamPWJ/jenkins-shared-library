@@ -152,7 +152,7 @@ def call(String type = 'android-ios', Map map) {
                 stage('代码质量') {
                     when { expression { return false } }
                     steps {
-                        // 只显示当前stage失败  而不是整个流水线失败
+                        // 只显示当前阶段stage失败  而整个流水线构建显示成功
                         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                             script {
                                 echo "代码质量, 可打通项目管理平台自动提交bug指派任务"
@@ -380,9 +380,12 @@ def call(String type = 'android-ios', Map map) {
                         }
                     }
                     steps {
-                        script {
-                            echo "上传Android应用市场"
-                            uploadAndroidMarket(map)
+                        // 只显示当前阶段stage失败  而整个流水线构建显示成功
+                        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                            script {
+                                echo "上传Android应用市场"
+                                uploadAndroidMarket(map)
+                            }
                         }
                     }
                 }
@@ -1652,6 +1655,7 @@ def uploadAndroidMarket(map) {
             println("自动提审上架华为应用商店失败 ❌")
             println(" 🚨 请先确保在华为App Gallery商店创建应用并在Jenkins配置应用的huaweiAppGalleryAppId参数、版本号正确与线上无在审核的版本, 查看具体错误日志分析原因")
             println(e.getMessage())
+            sh "exit 1"
         }
     } else if (params.ANDROID_STORE_IDENTIFY == "xiaomi" || !"${map.android_store_identify}".contains(params.ANDROID_STORE_IDENTIFY)) {
         try {
@@ -1667,6 +1671,7 @@ def uploadAndroidMarket(map) {
             println("自动提审上架小米应用商店失败 ❌")
             println(" 🚨 请先确保在小米商店创建应用并在Jenkins配置应用的xiaomiMarketPrivateKey参数和cer证书、版本号正确与线上无在审核的版本, 查看具体错误日志分析原因")
             println(e.getMessage())
+            sh "exit 1"
         }
     }
 }
