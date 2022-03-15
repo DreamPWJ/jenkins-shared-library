@@ -887,12 +887,16 @@ def dingNotice(int type, msg = '', atMobiles = '') {
             if (notifierPhone == "oneself") { // 通知自己
                 notifierPhone = "${BUILD_USER_MOBILE}"
             }
-            switch (params.BUILD_TYPE) {
-                case Constants.RELEASE_TYPE:
-                    // 正式版自动提审失败后通知构建人员及时处理
-                    notifierPhone = "${isSubmitAuditSucceed == true ? "" : "${BUILD_USER_MOBILE}"}"
-                    break
+
+            if ("${params.IS_AUTO_SUBMIT_FOR_REVIEW}" == 'true') {
+                switch (params.BUILD_TYPE) {
+                    case Constants.RELEASE_TYPE:
+                        // 正式版自动提审失败后通知构建人员及时处理
+                        notifierPhone = "${isSubmitAuditSucceed == true ? "" : "${BUILD_USER_MOBILE}"}"
+                        break
+                }
             }
+
             dingtalk(
                     robot: "${DING_TALK_CREDENTIALS_ID}",
                     type: 'ACTION_CARD',
