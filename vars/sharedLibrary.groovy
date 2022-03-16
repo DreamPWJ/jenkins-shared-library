@@ -59,7 +59,7 @@ def call(String type = 'web-java', Map map) {
             }
 
             triggers {
-                //根据代码提交记录自动触发CI/CD流水线 在代码库设置WebHooks连接后生效: http://jenkins.domain.com/generic-webhook-trigger/invoke?token=jenkins
+                // 根据提交代码自动触发CI/CD流水线 在代码库设置WebHooks连接后生效: http://jenkins.domain.com/generic-webhook-trigger/invoke?token=jenkins
                 GenericTrigger(
                         genericVariables: [
                                 [key: 'project_git_http_url', value: '$.project.git_http_url'],
@@ -68,8 +68,8 @@ def call(String type = 'web-java', Map map) {
                                 [key: 'git_user_name', value: '$.user_name'],
                                 [key: 'git_user_email', value: '$.user_email'],
                                 [key: 'git_event_name', value: '$.event_name'],
-                                //[key: 'commits', value: '$.commits'],
-                                //[key: 'changed_files', value: '$.commits[*].[\'modified\',\'added\',\'removed\'][*]'],
+                                [key: 'commits', value: '$.commits'],
+                                [key: 'changed_files', value: '$.commits[*].[\'modified\',\'added\',\'removed\'][*]'],
                         ],
                         token: "jenkins", // 唯一标识 env.JOB_NAME
                         causeString: ' Triggered on $ref',
@@ -79,6 +79,7 @@ def call(String type = 'web-java', Map map) {
                         regexpFilterText: '$project_git_http_url_$ref_$git_message',
                         // WebHooks触发后 正则匹配规则: 先匹配Job配置Git仓库确定项目, 根据jenkins job配置的分支匹配, 再匹配最新一次Git提交记录是否含有release发布关键字
                         // 如果是多模块项目再去匹配部署的模块 对于开发者只需要关心触发自动发布Git提交规范即可 如单模块: release 多模块: release(app)
+                        // 针对monorepo单仓多包仓库 可根据changed_files变量中变更文件所在的项目匹配自动触发构建具体的分支
                         regexpFilterExpression: '^(' + "${REPO_URL}" + ')' +
                                 '_(refs/heads/' + "${BRANCH_NAME}" + ')' +
                                 '_(release)' + "${PROJECT_TYPE.toInteger() == GlobalVars.backEnd ? '\\(' + "${SHELL_PROJECT_TYPE}" + '\\)' : ''}" + '.*$'

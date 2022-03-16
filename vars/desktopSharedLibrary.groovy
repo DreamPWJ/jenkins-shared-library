@@ -45,7 +45,7 @@ def call(String type = 'desktop', Map map) {
             }
 
             triggers {
-                //根据代码提交记录自动触发CI/CD流水线 在代码库设置WebHooks连接后生效: http://jenkins.domain.com/generic-webhook-trigger/invoke?token=jenkins-desktop
+                // 根据提交代码自动触发CI/CD流水线 在代码库设置WebHooks连接后生效: http://jenkins.domain.com/generic-webhook-trigger/invoke?token=jenkins-desktop
                 GenericTrigger(
                         genericVariables: [
                                 [key: 'project_git_http_url', value: '$.project.git_http_url'],
@@ -54,6 +54,8 @@ def call(String type = 'desktop', Map map) {
                                 [key: 'git_user_name', value: '$.user_name'],
                                 [key: 'git_user_email', value: '$.user_email'],
                                 [key: 'git_event_name', value: '$.event_name'],
+                                [key: 'commits', value: '$.commits'],
+                                [key: 'changed_files', value: '$.commits[*].[\'modified\',\'added\',\'removed\'][*]'],
                         ],
                         token: "jenkins-desktop", // 唯一标识 env.JOB_NAME
                         causeString: 'Triggered on $ref',

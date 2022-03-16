@@ -50,7 +50,7 @@ def call(String type = 'wx-mini', Map map) {
             }
 
             triggers {
-                //根据代码提交记录自动触发CI/CD流水线 在代码库设置WebHooks连接后生效: http://jenkins.domain.com/generic-webhook-trigger/invoke?token=jenkins-mini
+                // 根据提交代码自动触发CI/CD流水线 在代码库设置WebHooks连接后生效: http://jenkins.domain.com/generic-webhook-trigger/invoke?token=jenkins-mini
                 GenericTrigger(
                         genericVariables: [
                                 [key: 'project_git_http_url', value: '$.project.git_http_url'],
@@ -59,6 +59,8 @@ def call(String type = 'wx-mini', Map map) {
                                 [key: 'git_user_name', value: '$.user_name'],
                                 [key: 'git_user_email', value: '$.user_email'],
                                 [key: 'git_event_name', value: '$.event_name'],
+                                [key: 'commits', value: '$.commits'],
+                                [key: 'changed_files', value: '$.commits[*].[\'modified\',\'added\',\'removed\'][*]'],
                         ],
                         token: "jenkins-mini", // 唯一标识 env.JOB_NAME
                         causeString: 'Triggered on $ref',
@@ -67,6 +69,7 @@ def call(String type = 'wx-mini', Map map) {
                         silentResponse: false,
                         regexpFilterText: '$project_git_http_url_$git_message',
                         // 自动触发提交记录的分支作为构建代码
+                        // 针对monorepo单仓多包仓库 可根据changed_files变量中变更文件所在的项目匹配自动触发构建具体的分支
                         regexpFilterExpression: '^(' + "${REPO_URL}" + ')' +
                                 '_(release).*$'
                 )
@@ -704,11 +707,11 @@ def previewImageUpload() {
  * 提交审核
  */
 def submitAudit() {
-    // 微信小程序CI不提供自动审核和发布等功能
+    // 微信小程序官方CI暂不提供自动审核和发布等功能
     // Puppeteer或Playwright基于UI操作的服务，主要提供获取体验码、送审、发布服务
     // 自动化审核提交
     try {
-        timeout(time: 10, unit: 'MINUTES') {
+        timeout(time: 20, unit: 'MINUTES') { // 下载playwright支持的浏览器下载比较耗时
             PlayWright.miniPlatform(this)
             isSubmitAuditSucceed = true // 自动提审是否成功
             submitAuditMsg = "小程序自动提交审核成功 ✅ "
