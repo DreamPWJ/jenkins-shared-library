@@ -1,6 +1,7 @@
 package shared.library.common
 
 import shared.library.Utils
+import shared.library.common.Git
 
 /**
  * @author 潘维吉
@@ -23,7 +24,7 @@ class Web implements Serializable {
         try {
             ctx.sh "yarn --version"
         } catch (error) {
-            ctx.sh "npm install -g yarn"
+            ctx.sh "npm install -g yarn" // 动态配置或固定yarn版本号 防止版本变化兼容性问题
         }
         // yarn镜像源
         // ctx.sh "yarn config set registry https://registry.npm.taobao.org"
@@ -54,10 +55,12 @@ class Web implements Serializable {
             }
 
             ctx.println("执行Monorepo仓库构建 🏗️  ")
-            // 全部下载依赖 更通用  lerna bootstrap没有新依赖的情况每次构建会导致流水线时间和资源浪费 后面考虑让用户决定是否重新下载依赖
-            ctx.sh "lerna bootstrap"
-            // lerna bootstrap指定作用域 加速下载依赖  --scope 限制 lerna bootstrap 在哪些包起作用 包的package.json文件中名称
-            // ctx.sh "lerna bootstrap --include-dependents --include-dependencies --scope ${ctx.PROJECT_NAME}"
+            if (Git.isExistsChangeFile(ctx)) { // 自动判断是否需要下载依赖 可新增动态参数用于强制下载依赖情况
+                // 全部下载依赖 更通用 bootstrap不仅是下载依赖资源 还建立多包之间的依赖软链
+                ctx.sh "lerna bootstrap"
+                // lerna bootstrap指定作用域 加速下载依赖  --scope 限制 lerna bootstrap 在哪些包起作用 包的package.json文件中名称
+                // ctx.sh "lerna bootstrap --include-dependents --include-dependencies --scope ${ctx.PROJECT_NAME}"
+            }
             // 执行基础通用包编译和自定义脚本处理工作  会有无效的包被编译 后期优化
             ctx.sh "npm run build:all"
             // 定位到具体业务包执行构建打包命令

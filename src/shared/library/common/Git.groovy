@@ -1,5 +1,7 @@
 package shared.library.common
 
+import shared.library.common.Jenkins
+
 /**
  * @author 潘维吉
  * @date 2021/4/25 13:22
@@ -20,7 +22,7 @@ class Git implements Serializable {
                 }
                 def userPassWordUrl = " http://${ctx.GIT_USERNAME}:${ctx.ENCODED_GIT_PASSWORD}" +
                         "@${ctx.REPO_URL.toString().replace("http://", "").replace("https://", "")} "
-               // 先从远程下载最新代码  防止推送的时候冲突
+                // 先从远程下载最新代码  防止推送的时候冲突
                 ctx.sh("""
                    git config --global user.email "406798106@qq.com"
                    git config --global user.name ${ctx.GIT_USERNAME}
@@ -34,8 +36,24 @@ class Git implements Serializable {
                    """)
             }
         } catch (error) {
-            println error.getMessage()
             println "Git提交文件到远程失败 ❌ "
+            println error.getMessage()
+        }
+    }
+
+    /**
+     * git变更记录中是否存在指定的文件
+     * 可用于判断各端依赖文件是否变化, 只有变化后才重新下载依赖, 减少CI无效资源和时间的浪费
+     */
+    static boolean isExistsChangeFile(ctx, fileName = "package.json") {
+        def changedFiles = Jenkins.getChangedFilesList(ctx)
+        def isContains = changedFiles.findAll { a ->
+            changedFiles.any { a.contains(fileName) }
+        }
+        if (changedFiles && isContains) { // 包含存在指定文件  考虑第一次下载的情况
+            return true
+        } else {
+            return false
         }
     }
 

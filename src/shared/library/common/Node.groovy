@@ -24,7 +24,7 @@ class Node implements Serializable {
     }
 
     /**
-     * Node环境设置镜像
+     * Node环境设置镜像并初始化包管理工具 如yarn、pnpm
      */
     static def setMirror(ctx) {
         // 每次流水线执行都将执行 会产生无效的浪费  后面优化一下
@@ -32,15 +32,16 @@ class Node implements Serializable {
         try {
             ctx.sh "yarn --version"
         } catch (error) {
-            ctx.sh "npm install -g yarn"
+            ctx.sh "npm install -g yarn" // 动态配置或固定yarn版本号 防止版本变化兼容性问题
         }
+        // ctx.sh "npm install -g pnpm"
         ctx.sh "npm config set registry https://registry.npm.taobao.org"
         ctx.sh "yarn config set registry https://registry.npm.taobao.org"
         ctx.sh "npm config set sass_binary_site https://npm.taobao.org/mirrors/node-sass/"
     }
 
     /**
-     * Node环境设置Electron镜像
+     * Node环境设置Electron镜像并初始化包管理工具 如yarn、pnpm
      */
     static def setElectronMirror(ctx) {
         // 每次流水线执行都将执行 会产生无效的浪费  后面优化一下
@@ -48,7 +49,7 @@ class Node implements Serializable {
         try {
             ctx.sh "yarn --version"
         } catch (error) {
-            ctx.sh "npm install -g yarn"
+            ctx.sh "npm install -g yarn"  // 动态配置或固定yarn版本号 防止版本变化兼容性问题
         }
         ctx.sh "npm config set registry https://registry.npm.taobao.org"
         ctx.sh "yarn config set registry https://registry.npm.taobao.org"
@@ -94,7 +95,7 @@ class Node implements Serializable {
      */
     static def uploadWarehouse(ctx) {
         // 设置为代理仓库
-        ctx.sh "npm config set registry=https://packages.aliyun.com/5f7fc93c303526528584811d/npm/npm-registry/"
+        ctx.sh "npm config set registry=https://packages.aliyun.com/npm/npm-registry/"
         // 登陆 npm 仓库
         ctx.sh "npm login"
         // 推送

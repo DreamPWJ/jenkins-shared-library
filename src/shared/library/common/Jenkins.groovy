@@ -9,6 +9,21 @@ package shared.library.common
 class Jenkins implements Serializable {
 
     /**
+     * 获取当前构建的Git变更文件集合
+     */
+    static def getChangedFilesList(ctx) {
+       def changedFiles = []
+        for (changeLogSet in ctx.currentBuild.changeSets) {
+            for (entry in changeLogSet.getItems()) { // 对于检测到的更改中的每个提交
+                for (file in entry.getAffectedFiles()) {
+                    changedFiles.add(file.getPath()) // 将更改的文件添加到列表
+                }
+            }
+        }
+        return changedFiles
+    }
+
+    /**
      * 自动触发
      */
     static def trigger(ctx, jenkinsUrl, deployJobName, token, params) {
