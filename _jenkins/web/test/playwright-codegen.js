@@ -15,10 +15,11 @@ const {expect} = require('@playwright/test');
     // Open new page
     const page = await context.newPage();
 
-    // Go to https://mp.weixin.qq.com/
-    await page.goto('https://mp.weixin.qq.com/');
+    // 跳转页面 waitUntil确保页面加载完成后再走下一步
+    await page.goto('https://mp.weixin.qq.com/', {
+        waitUntil: 'networkidle'
+    });
 
-    await page.waitForTimeout(3000) // 等待多少秒 确保页面图片加载完成
     // 位置截图
     /*    await page.screenshot({
             path: 'mini-playwright-screenshot.png',
