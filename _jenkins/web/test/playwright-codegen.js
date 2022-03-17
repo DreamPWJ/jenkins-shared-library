@@ -15,7 +15,7 @@ const {expect} = require('@playwright/test');
     // Open new page
     const page = await context.newPage();
 
-    // 跳转页面 waitUntil确保页面加载完成后再走下一步
+    // 跳转页面 waitUntil确保页面加载完成后再执行下一步
     await page.goto('https://mp.weixin.qq.com/', {
         waitUntil: 'networkidle'
     });

@@ -734,7 +734,7 @@ def submitAuthorization() {
         sh "rm -f ${screenshotFile}"
 
         // 延迟等待登录授权二维码图片生成
-        sleep(time: 10, unit: "SECONDS")
+        sleep(time: 6, unit: "SECONDS")
         // waitUntil比retry更适合等待任务 反复运行它的身体，直到它返回true。如果返回false，请稍等片刻，然后重试
         // initialRecurrencePeriod设置重试之间的初始等待时间 默认为 250 毫秒 每次失败都会将尝试之间的延迟减慢至最多 15 秒
         waitUntil(initialRecurrencePeriod: 250) {

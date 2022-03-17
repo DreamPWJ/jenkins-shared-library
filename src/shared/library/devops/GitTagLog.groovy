@@ -29,7 +29,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                 // 打版本tag  删除本地已存在tag
                 if (Utils.getShEchoResult(this, "git tag").toString().contains(tagVersion)) {
                     sh "git tag -d ${tagVersion}"
-                    // 删除远程tag
+                    // 删除远程tag 重新设置相同的新tag
                     sh "git push ${userPassWordUrl} :refs/tags/${tagVersion}"
                     // 删除所有本地标签
                     //sh "git tag -l | xargs git tag -d"
@@ -48,9 +48,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                 if (fileExists("${changeLogFileName}")) {
                     changeLogFile = readFile(file: "${changeLogFileName}")
                 }
-                // 重复变更日志和无新增和修复记录 补丁小版本记录 不自动生成发布日志(存在新版本未被记录的情况) 频繁发布情况可以考虑按天打tag和记录 防止tag数量杂乱
-                // 注意虽然不再重复打tag和生成变更记录  但是其他地方显示的版本号(如钉钉和jenkins描述)已增加 导致版本号无法对应  未来优化处理
-                //if (!changeLogFile.contains(gitChangeLog)) {
+                //if (!changeLogFile.contains(gitChangeLog)) {  // 重复变更日志和无新增和修复记录 补丁小版本记录 不自动生成发布日志(存在新版本未被记录的情况) 频繁发布情况可以考虑按天打tag和记录 防止tag数量杂乱
                 writeFile file: "${changeLogFileName}", text: "## ${tagVersion}\n`${Utils.formatDate()}`<br><br>\n${gitChangeLog}\n${changeLogFile}"
                 sh("""
                           git add ${changeLogFileName}

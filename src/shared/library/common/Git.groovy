@@ -42,19 +42,25 @@ class Git implements Serializable {
     }
 
     /**
-     * git变更记录中是否存在指定的文件
+     * Git变更记录中是否存在指定的文件
      * 可用于判断各端依赖文件是否变化, 只有变化后才重新下载依赖, 减少CI无效资源和时间的浪费
      */
-    static boolean isExistsChangeFile(ctx, fileName = "package.json") {
-        def changedFiles = Jenkins.getChangedFilesList(ctx)
-        def isContains = changedFiles.findAll { a ->
-            changedFiles.any { a.contains(fileName) }
+    static boolean isExistsChangeFile(ctx, fileName = "package.json", lockFileName = "package-lock.json") {
+        try {
+            def changedFiles = Jenkins.getChangedFilesList(ctx)
+            def isContains = changedFiles.findAll { a ->
+                changedFiles.any { (a.contains(fileName) || a.contains(lockFileName)) }
+            }
+            if (changedFiles && isContains) { // 包含存在指定文件  考虑第一次下载的情况
+                return true
+            } else {
+                return false
+            }
+        } catch (error) {
+            println "获取Git变更记录中是否存在指定的文件失败"
+            println error.getMessage()
         }
-        if (changedFiles && isContains) { // 包含存在指定文件  考虑第一次下载的情况
-            return true
-        } else {
-            return false
-        }
+        return true
     }
 
     /**
