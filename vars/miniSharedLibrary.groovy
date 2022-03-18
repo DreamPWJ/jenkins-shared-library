@@ -348,6 +348,8 @@ def getInitParams(map) {
     DEFAULT_GIT_BRANCH = jsonParams.DEFAULT_GIT_BRANCH ? jsonParams.DEFAULT_GIT_BRANCH.trim() : "${map.default_git_branch}"
     // 原生小程序是否需要npm
     IS_MINI_NATIVE_NEED_NPM = jsonParams.IS_MINI_NATIVE_NEED_NPM ? jsonParams.IS_MINI_NATIVE_NEED_NPM : false
+    // npm包管理工具类型 如:  npm、yarn、pnpm
+    NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [test]的前端项目参数
     NPM_BUILD_DIRECTORY = jsonParams.NPM_BUILD_DIRECTORY ? jsonParams.NPM_BUILD_DIRECTORY.trim() : "" // npm 构建目录
     PROJECT_CHINESE_NAME = jsonParams.PROJECT_CHINESE_NAME ? jsonParams.PROJECT_CHINESE_NAME.trim() : "" // 自定义项目中文名称

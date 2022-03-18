@@ -24,7 +24,7 @@ class Node implements Serializable {
     }
 
     /**
-     * Node环境设置镜像并初始化包管理工具 如yarn、pnpm
+     * Node环境设置镜像并初始化包管理工具 如npm、yarn、pnpm
      */
     static def setMirror(ctx) {
         // 每次流水线执行都将执行 会产生无效的浪费  后面优化一下

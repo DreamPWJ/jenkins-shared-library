@@ -419,6 +419,8 @@ def getInitParams(map) {
     // 默认常用构建分支 针对环境和单独任务都可自定义设置 构建无需再次选择 实现一键构建或全自动构建
     DEFAULT_GIT_BRANCH = jsonParams.DEFAULT_GIT_BRANCH ? jsonParams.DEFAULT_GIT_BRANCH.trim() : "${map.default_git_branch}"
     PROJECT_CHINESE_NAME = jsonParams.PROJECT_CHINESE_NAME ? jsonParams.PROJECT_CHINESE_NAME.trim() : "" // 自定义项目中文名称
+    // npm包管理工具类型 如:  npm、yarn、pnpm
+    NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
     // 发布打包多环境和类型 多个按顺序逗号,分隔  npm run [test]的前端项目参数
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim().replace(",", "\n") : ""
     IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD ? jsonParams.IS_DOCKER_BUILD : false // 是否Docker方式构建
