@@ -721,7 +721,7 @@ def submitAudit() {
         isSubmitAuditSucceed = false
         println("自动提交审核失败  ❌")
         println(e.getMessage())
-        sh "exit 1"
+        sh "exit 1" // 本阶段制造异常
     }
 }
 
@@ -761,7 +761,7 @@ def submitAuthorization() {
         println "👉 授权登录二维码: ${wxScreenshotFileQrcodeUrl}"
 
         if ("${params.IS_DING_NOTICE}" == 'true') { // 是否钉钉通知
-            // 钉钉@通知 扫描微信小程序平台二维码登录
+            // 钉钉@通知 扫描微信小程序平台二维码登录授权具体小程序
             DingTalk.noticeImage(this, "${DING_TALK_CREDENTIALS_ID}", "${wxScreenshotFileQrcodeUrl}",
                     "${PROJECT_CHINESE_NAME}${PROJECT_TAG}授权提审小程序二维码 👆 v${MINI_VERSION_NUM}",
                     "#### · 【${PROJECT_CHINESE_NAME}】小程序管理权限的人员扫码授权  📱  " +
@@ -777,7 +777,7 @@ def submitAuthorization() {
         isSubmitAuditSucceed = false
         println("自动提审授权登录失败  ❌")
         println(e.getMessage())
-        sh "exit 1"
+        sh "exit 1"  // 本阶段制造异常
     }
     // input message: "是否在钉钉中扫码微信二维码完成登录？", ok: "完成"
 }

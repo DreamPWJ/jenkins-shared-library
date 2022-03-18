@@ -48,13 +48,13 @@ class Git implements Serializable {
     static boolean isExistsChangeFile(ctx, fileName = "package.json", lockFileName = "package-lock.json") {
         try {
             def changedFiles = Jenkins.getChangedFilesList(ctx)
-            def isContains = changedFiles.findAll { a ->
+            def isExistsFile = changedFiles.findAll { a ->
                 changedFiles.any { (a.contains(fileName) || a.contains(lockFileName)) }
             }
-            if (changedFiles && isContains) { // 包含存在指定文件  考虑第一次下载的情况
-                return true
+            if (changedFiles) { // 包含存在指定文件  考虑第一次下载的情况
+                return isExistsFile
             } else {
-                return false
+                return true
             }
         } catch (error) {
             println "获取Git变更记录中是否存在指定的文件失败"
