@@ -51,8 +51,7 @@ sudo docker run -d --restart=always -p 8000:8080 -p 50000:50000 -u root -m 4096m
 -v /etc/localtime:/etc/localtime:ro -v $(which bash):/bin/bash  \
 -v $(which docker):/usr/bin/docker -v /var/run/docker.sock:/var/run/docker.sock \
 -v /my/jenkins:/var/jenkins_home -v /my/jenkins/ssh:/root/.ssh  \
---add-host=github.com:140.82.114.4 --add-host=github.global.ssl.fastly.net:199.232.5.194 \
--v "$HOME":/home --privileged --name jenkins my/jenkins:lts-jdk11 \
+-v "$HOME":/home --privileged --name jenkins jenkins/jenkins:lts \
 && sudo chown -R 1000:1000 /my/jenkins
 
 #### 基于Docker安装部署GitLab系统镜像
