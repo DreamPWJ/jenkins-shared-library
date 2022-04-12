@@ -147,3 +147,7 @@ cd /${deploy_folder} && ./docker-common.sh remove_docker_image ${docker_image_id
 #  前端命令和shell命令都可使用 && 将多个命令连接执行
 #  npm install && npm run build
 #  tar -zcvf dist.tar.gz dist
+
+
+# 手动单独部署情况 不依赖自动化CI/CD和自定义Dockerfile情况
+# docker run -d --restart=always -p 8008:80 --name project-name-web -v /my/project-name-web/default.conf:/etc/nginx/conf.d/default.conf:ro -v /my/project-name-web/dist:/usr/share/nginx/html:ro  nginx:stable

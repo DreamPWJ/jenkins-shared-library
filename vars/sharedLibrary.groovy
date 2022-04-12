@@ -968,6 +968,8 @@ def mavenBuildProject() {
         // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
         // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码
         sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.test.skip=true"
+        // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
+        // sh "mvn clean install -Dmaven.test.skip=true"
     } else {
         // 基于自定义setting文件方式打包
         Maven.packageBySettingFile(this)
