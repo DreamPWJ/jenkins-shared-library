@@ -12,7 +12,7 @@ if [[ ! $(command -v certbot) ]]; then
   # Certbot 目前需要在类 UNIX 操作系统上运行 Python 3.6+。默认情况下，它需要 root 访问权限才能写入 /etc/letsencrypt
   sudo apt-get install -y certbot || true
   sudo yum install -y certbot || true
-  # sduo pip3 install certbot-dns-aliyun
+  # sudo pip3 install certbot-dns-aliyun
   certbot --version
 fi
 
