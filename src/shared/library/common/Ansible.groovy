@@ -34,6 +34,7 @@ class Ansible implements Serializable {
         // 直接访问目标机器
         // ssh root@目标机器内网IP
         // ansible -i host -m setup 目标机器内网IP
+        // ssh root@跳板机IP -p 22 -o ProxyCommand='ssh -p 22 root@目标机器内网IP -W %h:%p'
     }
 
     /**
