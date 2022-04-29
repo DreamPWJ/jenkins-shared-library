@@ -34,9 +34,9 @@ def run():
         cursor = conn.cursor()
         # 执行SQL，并返回收影响行数
         sql_str = """
-           INSERT INTO info_park_card (nid, remain_money, begin_time, end_time, leaguer_id, bind_time,
-                                       amount, valid_scope, third_valid_scope)
-               (select uuid_short(),
+        INSERT INTO info_park_card (nid, remain_money, begin_time, end_time, leaguer_id, bind_time,
+                                               amount, valid_scope, third_valid_scope)
+         (select REPLACE(UUID(), '-', ''),
                        case
                            when ilrr.recharge_fee >= 50 and ilrr.recharge_fee < 100 then 8
                            when ilrr.recharge_fee >= 100 and ilrr.recharge_fee < 200 then 20
@@ -55,7 +55,7 @@ def run():
                          inner join info_leaguer_recharge_record ilrr on il.leaguer_id = ilrr.leaguer_id
                 where ilrr.recharge_type = '9701'
                   and ilrr.recharge_fee >= 50
-                  and ilrr.recharge_time between '2022-04-30 00:00:00' and '2022-05-31 23:59:59');
+                  and ilrr.recharge_time between (select if(now() <= '2022-04-30 00:00:00', '2022-04-30 00:00:00', date_add(date_sub(now(), interval 1 hour), interval 1 second))) and '2022-05-31 23:59:59');
         """
         effect_row = cursor.execute(sql_str)
         logger.info('执行SQL返回影响行数: {}'.format(effect_row))
@@ -79,5 +79,5 @@ if __name__ == '__main__':
 # wget https://www.python.org/ftp/python/3.8.0/Python-3.8.0.tgz && tar -zxvf Python-3.8.0.tgz && cd Python-3.8.0 &&  ./configure -prefix=/usr/local/python3 && make && make install
 # 安装pip命令 yum install -y epel-release && yum install -y python-pip && pip install --upgrade pip
 # pip3 install PyMySQL
-# 0 9 1-31 5 * /usr/bin/python3 /home/tasks/youhuiquan.py >> /home/tasks/youhuiquan.log
+# 0 */1 * * * /usr/bin/python3 /home/tasks/youhuiquan.py >> /home/tasks/youhuiquan.log
 # service crond restart , Ubuntu 使用 sudo service cron start  # 重启crond生效
