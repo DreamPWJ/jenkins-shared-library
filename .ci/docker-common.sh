@@ -85,7 +85,7 @@ function get_cpu_rate() {
     # 可以filter过滤的Docker运作状态: created, restarting, running, removing, paused, exited, dead
     docker_restarting_container=$(docker ps --all -q -f status=restarting)
     if [[ ${docker_restarting_container} ]]; then
-      echo "CPU资源占用过高, 自动删除具有restarting状态的Docker容器"
+      echo "当前${public_ip}应用部署服务器CPU资源占用过高, 自动删除具有restarting状态的Docker容器"
       docker stop ${docker_restarting_container} || true && docker rm ${docker_restarting_container} || true
     fi
     # 等待时间

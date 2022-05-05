@@ -65,4 +65,5 @@ class SonarQube implements Serializable {
         ctx.println(result)
         return result
     }
+
 }

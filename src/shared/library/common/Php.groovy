@@ -13,6 +13,7 @@ class Php implements Serializable {
      */
     static def build(ctx) {
         ctx.sh "php -v"
+        // php语言无需提供制品包方式 直接使用源码部署
     }
 
 }
