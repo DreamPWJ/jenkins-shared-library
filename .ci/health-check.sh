@@ -20,7 +20,7 @@ done
 
 if [[ ${project_type} == 1 ]]; then
   # 循环检测次数
-  front_end_loop_num=20
+  front_end_loop_num=30
   # 循环检测前端启动健康状态
   for i in $(seq 1 ${front_end_loop_num}); do
     if [[ ${i} -ge ${front_end_loop_num} ]]; then
@@ -37,7 +37,7 @@ if [[ ${project_type} == 1 ]]; then
   done
 elif [[ ${project_type} == 2 ]]; then
   # 循环检测次数
-  back_end_loop_num=150
+  back_end_loop_num=180
   # 循环检测服务端启动健康状态
   for i in $(seq 1 ${back_end_loop_num}); do
     if [[ ${i} -ge ${back_end_loop_num} ]]; then

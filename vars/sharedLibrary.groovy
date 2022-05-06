@@ -737,6 +737,7 @@ def initInfo() {
     //echo sh(returnStdout: true, script: 'env')
     //sh 'printenv'
     //println "${env.PATH}"
+    //println currentBuild
     try {
         echo "$git_event_name"
         IS_AUTO_TRIGGER = true

@@ -13,7 +13,7 @@ class Deploy implements Serializable {
     /**
      * Ansible或SSH 通过堡垒机/跳板机 访问目标机器 利用ssh的ProxyCommand或ProxyJump功能来透过跳板机
      */
-    static def accessTargetMachine(ctx) {
+    static def sshProxy(ctx) {
         // Ansible机器的 ~/.ssh/config 配置如下即可：
         /*
         Host machine-name
