@@ -11,30 +11,25 @@ import shared.library.Utils
 class Deploy implements Serializable {
 
     /**
-     * Ansible或SSH 通过堡垒机/跳板机 访问目标机器 利用ssh的ProxyCommand或ProxyJump功能来透过跳板机
+     * SSH 通过堡垒机/跳板机 访问目标机器 利用ssh的高级的ProxyJump最方便或中级的ProxyCommand或者ssh tunnel功能来透过跳板机
      */
     static def sshProxy(ctx) {
-        // Ansible机器的 ~/.ssh/config 配置如下即可：
-        /*
-        Host machine-name
-            HostName  # 目标机器IP 真正登陆的服务器 不支持域名必须IP地址
-            Port 22
-            User root
-            ProxyCommand ssh root@跳板机IP -W %h:%p */
-
-        ctx.sh "ssh root@目标机器内网IP"
-
-        // 直接访问目标机器
-        // ssh root@目标机器内网IP
-        // ansible -i host -m setup 目标机器内网IP
-        // ssh username@目标机器IP -p 22 -o ProxyCommand='ssh -p 22 username@跳板机IP -W %h:%p'
+        // SSH客户端执行访问的机器通过跳板机直接访问目标机器
+        // OpenSSH 7.3版本查看版本ssh -V 开始使用更方便ssh ProxyJump 文档: https://woodenrobot.me/2019/07/18/ssh-proxyjump/
+        // ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22
+        ctx.sh "ssh -J root@${ctx.proxyJumphost}:22 ${ctx.remote.user}@${ctx.remote.host} -p 22"
+        // ssh -J root@119.188.90.222:22 root@172.16.0.91 -p 22
+        // scp -o 'ProxyJump root@跳板机IP' file.txt root@目标机器IP:/my/
+        // Tabby跨越堡垒机的SSH利器 文档: https://zhuanlan.zhihu.com/p/490662490
     }
 
     /**
      * 不同分布式部署节点不同环境文件自动替换
+     * 自定义的部署配置文件替代默认配置文件等
      */
     static def replaceEnvFile(ctx, sourceFilePath, targetFilePath) {
-        // 源文件和多个目标文件可放在代码里面维护 部署时候根据配置自动替换
+        // 源文件和多个目标文件可放在代码里面维护 部署时候根据配置自动替换到目标服务器
+        // 或者项目源码仓库内的配置文件替换CI仓库的默认文件等
         ctx.sh "cp -p ${targetFilePath} ${sourceFilePath}"
     }
 
