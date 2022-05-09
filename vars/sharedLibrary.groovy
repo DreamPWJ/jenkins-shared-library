@@ -23,7 +23,7 @@ def call(String type = 'web-java', Map map) {
     try {
         remote.host = "${REMOTE_IP}" // 部署应用程序服务器IP 动态参数 可配置在独立的job中
     } catch (exception) {
-        println exception.getMessage()
+        // println exception.getMessage()
         remote.host = "${map.remote_ip}" // 部署应用程序服务器IP  不传参数 使用默认值
     }
     remote.user = "${map.remote_user_name}"
@@ -184,7 +184,7 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                /*   stage('扫描打包') {
+                /*   stage('扫码代码') {
                        //failFast true  // 其他阶段失败 中止parallel块同级正在进行的并行阶段
                        parallel { */// 阶段并发执行
                 stage('代码质量') {
@@ -221,39 +221,35 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                 }
-/*                stage('Docker环境') {
+
+                stage('Docker For JavaScript构建') {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && !"${NODE_VERSION}".startsWith("Node")) }
+                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && IS_DOCKER_BUILD == true) }
                     }
                     agent {
+                        // label "linux"
                         docker {
                             // Node环境  构建完成自动删除容器
-                            image "node:${NODE_VERSION}"
+                            image "node:${NODE_VERSION.replace('Node', '')}"
                             reuseNode true // 使用根节点
                         }
                     }
-
                     steps {
                         script {
+                            echo "Docker环境内构建Node方式"
                             nodeBuildProject()
                         }
                     }
-                }*/
+                }
+
                 stage('JavaScript构建') {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && "${NODE_VERSION}".startsWith("Node")) }
+                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && IS_DOCKER_BUILD == false) }
                     }
-                    /*     agent {
-                             docker {
-                                 // Node环境  构建完成自动删除容器
-                                 image "node:${NODE_VERSION}"
-                                 reuseNode true // 使用根节点
-                             }
-                         }*/
                     tools {
                         // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
                         nodejs "${NODE_VERSION}"
@@ -264,6 +260,7 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                 }
+
                 stage('Java构建') {
                     when {
                         beforeAgent true
@@ -280,7 +277,6 @@ def call(String type = 'web-java', Map map) {
                         }*/
                     tools {
                         // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
-                        // nodejs "${NODE_VERSION}"
                         maven "${map.maven}"
                         jdk "${JDK_VERSION}"
                     }
@@ -290,6 +286,7 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                 }
+
                 stage('Go构建') {
                     when {
                         beforeAgent true
@@ -302,6 +299,7 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                 }
+
                 stage('Python构建') {
                     when {
                         beforeAgent true
@@ -322,6 +320,7 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                 }
+
                 stage('C++构建') {
                     when {
                         beforeAgent true
@@ -334,6 +333,7 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                 }
+
                 stage('制作镜像') {
                     when {
                         beforeAgent true
@@ -654,6 +654,8 @@ def getInitParams(map) {
     NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [test]的前端项目参数
 
+    IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD ? jsonParams.IS_DOCKER_BUILD : true
+    // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
     IS_BLUE_GREEN_DEPLOY = jsonParams.IS_BLUE_GREEN_DEPLOY ? jsonParams.IS_BLUE_GREEN_DEPLOY : false // 是否蓝绿部署
     IS_ROLL_DEPLOY = jsonParams.IS_ROLL_DEPLOY ? jsonParams.IS_ROLL_DEPLOY : false // 是否滚动部署
     IS_GRAYSCALE_DEPLOY = jsonParams.IS_GRAYSCALE_DEPLOY ? jsonParams.IS_GRAYSCALE_DEPLOY : false // 是否灰度发布
@@ -901,9 +903,11 @@ def nodeBuildProject() {
         }
     } else { // npm编译打包项目
         // 初始化Node环境变量
-        Node.initEnv(this)
-        // 动态切换Node版本
-        // Node.change(this, "${NODE_VERSION}".replaceAll("Node", ""))
+        if (IS_DOCKER_BUILD == false) {
+            Node.initEnv(this)
+            // 动态切换Node版本
+            // Node.change(this, "${NODE_VERSION}".replaceAll("Node", ""))
+        }
         // Node环境设置镜像
         Node.setMirror(this)
         // sh "rm -rf node_modules && npm cache clear --force"
@@ -917,10 +921,13 @@ def nodeBuildProject() {
                 Web.needSass(this)
             }
 
-            retry(2) {
-                println("安装依赖 📥")
-                sh "npm install" // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
+            if (Git.isExistsChangeFile(this)) { // 自动判断是否需要下载依赖 可新增动态参数用于强制下载依赖情况
+                retry(2) {
+                    println("安装依赖 📥")
+                    sh "npm install" // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
+                }
             }
+
             timeout(time: 10, unit: 'MINUTES') {
                 try {
                     // >/dev/null为Shell脚本运行程序不输出日志到终端 2>&1是把出错输出也定向到标准输出
@@ -1625,6 +1632,7 @@ def productsWarehouse(map) {
 def alwaysPost() {
     // sh 'pwd'
     // cleanWs()  // 清空工作空间
+    // Jenkins全局安全配置->标记格式器内设置Safe HTML支持html文本
     try {
         def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {

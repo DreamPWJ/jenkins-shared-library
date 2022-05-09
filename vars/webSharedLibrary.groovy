@@ -23,7 +23,7 @@ def call(String type = 'web', Map map) {
     try {
         remote.host = "${REMOTE_IP}" // 部署应用程序服务器IP 动态参数 可配置在独立的job中
     } catch (exception) {
-        println exception.getMessage()
+        // println exception.getMessage()
         remote.host = "${map.remote_ip}" // 部署应用程序服务器IP  不传参数 使用默认值
     }
     remote.user = "${map.remote_user_name}"
@@ -176,7 +176,7 @@ def call(String type = 'web', Map map) {
                     }
                 }
 
-                /*   stage('扫描打包') {
+                /*   stage('扫码代码') {
                        //failFast true  // 其他阶段失败 中止parallel块同级正在进行的并行阶段
                        parallel { */// 阶段并发执行
                 stage('代码质量') {
@@ -483,6 +483,7 @@ def getInitParams(map) {
     NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [test]的前端项目参数
 
+    IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD ? jsonParams.IS_DOCKER_BUILD : true // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
     IS_BLUE_GREEN_DEPLOY = jsonParams.IS_BLUE_GREEN_DEPLOY ? jsonParams.IS_BLUE_GREEN_DEPLOY : false // 是否蓝绿部署
     IS_ROLL_DEPLOY = jsonParams.IS_ROLL_DEPLOY ? jsonParams.IS_ROLL_DEPLOY : false // 是否滚动部署
     IS_GRAYSCALE_DEPLOY = jsonParams.IS_GRAYSCALE_DEPLOY ? jsonParams.IS_GRAYSCALE_DEPLOY : false // 是否灰度发布

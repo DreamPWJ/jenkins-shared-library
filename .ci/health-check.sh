@@ -26,6 +26,7 @@ if [[ ${project_type} == 1 ]]; then
     if [[ ${i} -ge ${front_end_loop_num} ]]; then
       echo "Web前端启动失败" # 必须包含"失败"字样 pipeline内判断
       break
+      exit 0
     else
       result=$(curl --connect-timeout 60 --max-time 60 -I ${check_url} | grep OK)
       if [[ ${result} =~ OK ]]; then
@@ -43,6 +44,7 @@ elif [[ ${project_type} == 2 ]]; then
     if [[ ${i} -ge ${back_end_loop_num} ]]; then
       echo "服务端启动失败" # 必须包含"失败"字样 pipeline内判断
       break
+      exit 0
     else
       # 注意部分服务可能不是http请求服务 如socket 后面兼容这种模式的健康探测
       code=$(curl -sIL -w "%{http_code}" -o /dev/null "${check_url}")

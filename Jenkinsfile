@@ -6,14 +6,11 @@
  * @description 核心Pipeline代码 针对Web项目和JAVA项目CI/CD的脚本
  * 注意 本文件在Git位置和名称不能随便改动 配置在jenkins里
  */
-// Pipeline可能需要安装的插件 共享库请先去配置Jenkins系统配置 -> Global Pipeline Libraries
-// Pipeline Maven Integration , NodeJS , Pipeline Utility Steps , DingTalk
-// build user vars, Git Parameter, AnsiColor, Generic Webhook Trigger, Blue Ocean, Gitlab, HTTP Request, ThinBackup,
+// Pipeline可能需要安装的插件
+// 共享库请先去配置Jenkins系统配置 -> Global Pipeline Libraries 注意名称和版本分支分开填写 最终组合如@Library('jenkins-shared-library@master')
+// Pipeline Maven Integration , NodeJS , Pipeline Utility Steps , DingTalk , Docker , Docker Pipeline
+// build user vars, Git Parameter, AnsiColor, Generic Webhook Trigger, simple theme, Blue Ocean, Gitlab, HTTP Request, ThinBackup,
 // Role Strategy, SSH Pipeline Steps, HTML Publisher, Extended Choice Parameter, Hidden Parameter, Rebuilder, Active Choices
-
-/* 建立免密连接 流水线已实现自动设置免密登录  如需手动设置步骤如下
-   jenkins容器内 ssh-keygen -t rsa   root用户在/root/.ssh/id_rsa.pub
-   公钥放在远程访问服务的/root/.ssh/authorized_keys里  在jenkins容器里执行 ssh root@ip 命令访问确认  */
 
 // 根据不同环境项目配置不同参数
 def map = [:]
@@ -73,7 +70,7 @@ map.put('is_git_tag', true)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
-// jenkins分布式构建节点名称
+// jenkins分布式构建节点label名称
 map.put('jenkins_node', 'master')
 map.put('jenkins_node_front_end', 'master')
 

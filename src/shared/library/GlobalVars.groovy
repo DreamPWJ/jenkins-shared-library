@@ -95,7 +95,7 @@ class GlobalVars implements Serializable {
     /**
      * CI代码库 自动同步部署脚本和配置等
      */
-    static String CI_REPO_URL = "https://github.com/DreamPWJ/jenkins-shared-library.git"
+    static String CI_REPO_URL = "http://47.102.214.33/lanneng_develop/jenkins-shared-library.git" // https://github.com/DreamPWJ/jenkins-shared-library.git
 
     /**
      * Git常量

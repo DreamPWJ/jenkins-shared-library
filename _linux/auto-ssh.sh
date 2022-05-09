@@ -3,6 +3,10 @@
 # Description:  批量执行SSH免密登录    chmod +x auto-ssh.sh  在hosts.txt内批量设置机器的ip 用户名 密码
 # !!!注意当前机器先执行 ssh-keygen -t rsa 或者 ssh-keygen -t dsa
 
+# 建立免密连接 流水线已实现自动设置免密登录  如需手动设置步骤如下
+# 需要在jenkins docker容器内而非宿主机 ssh-keygen -t rsa   root用户在/root/.ssh/id_rsa.pub
+# 公钥放在远程访问服务的/root/.ssh/authorized_keys里  在jenkins容器里执行 ssh root@ip 命令访问确认
+
 if [[ ! $(command -v expect) ]]; then
   yum install -y expect || true
   apt-get install -y expect || true

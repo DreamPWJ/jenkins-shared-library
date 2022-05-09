@@ -28,9 +28,7 @@ function exist_port() {
   port_exist=$(lsof -i:"$1")
   if [[ ${port_exist} ]]; then
     # kill -9  PID  # 直接杀掉进程
-    get_public_ip
-    public_ip=$?
-    echo -e "\033[31m当前${public_ip}应用部署服务端口$1已存在, Shell自动化脚本退出运行, 端口冲突停止部署 ❌ \033[0m "
+    echo -e "\033[31m当前应用部署服务端口$1已存在, Shell自动化脚本退出运行, 端口冲突停止部署 ❌ \033[0m "
     exit 1 # 1:非正常运行导致退出程序
   fi
 }
@@ -76,16 +74,14 @@ function remove_docker_image() {
 # 获取系统CPU使用率 如果CPU占用高 则排队延迟部署 避免并发部署等导致资源阻塞
 function get_cpu_rate() {
   cpu_rate=$(sudo echo $((100 - $(vmstat 1 2 | tail -1 | awk '{print $15}'))) || true)
-  get_public_ip
-  public_ip=$?
   # -ge 大于等于  大于阈值警告并等待
   if [[ ${cpu_rate} -ge 60 ]]; then
-    echo " 🚨 当前${public_ip}应用部署服务器CPU占用率高达: ${cpu_rate}% , 避免并发部署等导致资源阻塞, 排队延迟部署中, 等待10秒中... ☕ (如果CPU长时间占用高, 请去服务器查看资源占用情况)"
+    echo " 🚨 当前应用部署服务器CPU占用率高达: ${cpu_rate}% , 避免并发部署等导致资源阻塞, 排队延迟部署中, 等待10秒中... ☕ (如果CPU长时间占用高, 请去服务器查看资源占用情况)"
     # CPU资源占用过高可能是因为有些项目启动失败 在不断的重启Docker容器 这里可以做容器健康状态判断自动停掉服务
     # 可以filter过滤的Docker运作状态: created, restarting, running, removing, paused, exited, dead
     docker_restarting_container=$(docker ps --all -q -f status=restarting)
     if [[ ${docker_restarting_container} ]]; then
-      echo "当前${public_ip}应用部署服务器CPU资源占用过高, 自动删除具有restarting状态的Docker容器"
+      echo "当前应用部署服务器CPU资源占用过高, 自动删除具有restarting状态的Docker容器"
       docker stop ${docker_restarting_container} || true && docker rm ${docker_restarting_container} || true
     fi
     # 等待时间
@@ -93,7 +89,7 @@ function get_cpu_rate() {
     # 递归调用探测 如果CPU一直高, 则一直探测, 保证资源低于设置值后才继续进行部署
     get_cpu_rate
   else
-    echo -e "\033[32m当前${public_ip}应用部署服务器CPU占用率为: ${cpu_rate}% \033[0m"
+    echo -e "\033[32m当前应用部署服务器CPU占用率为: ${cpu_rate}% \033[0m"
   fi
 
   # rate=${cpu_rate//'sy'/'' } # 替换字符串
@@ -131,12 +127,12 @@ function exist_lsof() {
 
 # 获取本机外网ip
 function get_public_ip() {
-  public_ip=$(
+  str=$(
     wget http://ipecho.net/plain -O - -q
     echo
   )
-  # echo "本机外网ip为: $public_ip"
-  return $public_ip
+  # echo "本机外网ip为: $str"
+  public_ip = $str
 }
 
 if [ $# -ne 0 ]; then

@@ -65,7 +65,7 @@ map.put('is_git_tag', true)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
-// jenkins分布式构建节点名称
+// jenkins分布式构建节点label名称
 map.put('jenkins_node', 'macos-test')
 map.put('jenkins_node_front_end', 'macos-web')
 

@@ -32,7 +32,7 @@ map.put('project_tag', ' ')
 // 分发平台账号
 map.put('pgyer_api_key', "a06ee74d4063eb58b7fed20e7fde6306")
 
-// jenkins分布式构建节点名称
+// jenkins分布式构建节点label名称
 map.put('jenkins_node', 'macos-test')
 
 // 构建环境变量
