@@ -423,9 +423,10 @@ def getInitParams(map) {
     NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
     // 发布打包多环境和类型 多个按顺序逗号,分隔  npm run [test]的前端项目参数
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim().replace(",", "\n") : ""
-    IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD ? jsonParams.IS_DOCKER_BUILD : false // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
+    // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
+    IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD ? jsonParams.IS_DOCKER_BUILD : false
     IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否monorepo单体仓库
-    // 是否monorepo单体仓库主包名
+    // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
 
     // 获取通讯录
@@ -546,7 +547,14 @@ def pullProjectCode() {
     }
     // 获取应用打包代码
     if (params.GIT_TAG == GlobalVars.noGit) {
-        git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
+        // git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
+        // 对于大体积仓库或网络不好情况 自定义代码下载超时时间 默认10分钟
+        checkout([$class           : 'GitSCM',
+                  branches         : [[name: "*/${BRANCH_NAME}"]],
+                  extensions       : [[$class: 'CloneOption', timeout: 30]],
+                  gitTool          : 'Default',
+                  userRemoteConfigs: [[credentialsId: "${GIT_CREDENTIALS_ID}", url: "${REPO_URL}"]]
+        ])
     } else {
         println "Git构建标签是: ${params.GIT_TAG} 📇"
         checkout([$class                           : 'GitSCM',

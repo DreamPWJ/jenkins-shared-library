@@ -113,6 +113,7 @@ def call(String type = 'web', Map map) {
                 IS_SAME_SERVER = "${map.is_same_server}" // 是否在同一台服务器分布式部署
                 IS_NEED_SASS = "${map.is_need_sass}" // 是否需要css预处理器sass
                 IS_AUTO_TRIGGER = false // 是否是自动触发构建
+                IS_GEN_QR_CODE = false // 生成二维码 方便手机端扫描
                 IS_ARCHIVE = false // 是否归档
                 IS_CODE_QUALITY_ANALYSIS = false // 是否进行代码质量分析的总开关
                 IS_INTEGRATION_TESTING = false // 是否进集成测试
@@ -483,7 +484,8 @@ def getInitParams(map) {
     NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [test]的前端项目参数
 
-    IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD ? jsonParams.IS_DOCKER_BUILD : true // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
+    // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
+    IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD ? jsonParams.IS_DOCKER_BUILD : true
     IS_BLUE_GREEN_DEPLOY = jsonParams.IS_BLUE_GREEN_DEPLOY ? jsonParams.IS_BLUE_GREEN_DEPLOY : false // 是否蓝绿部署
     IS_ROLL_DEPLOY = jsonParams.IS_ROLL_DEPLOY ? jsonParams.IS_ROLL_DEPLOY : false // 是否滚动部署
     IS_GRAYSCALE_DEPLOY = jsonParams.IS_GRAYSCALE_DEPLOY ? jsonParams.IS_GRAYSCALE_DEPLOY : false // 是否灰度发布
@@ -491,7 +493,7 @@ def getInitParams(map) {
     IS_SERVERLESS_DEPLOY = jsonParams.IS_SERVERLESS_DEPLOY ? jsonParams.IS_SERVERLESS_DEPLOY : false // 是否Serverless发布
     IS_STATIC_RESOURCE = jsonParams.IS_STATIC_RESOURCE ? jsonParams.IS_STATIC_RESOURCE : false // 是否静态web资源
     IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否monorepo单体仓库
-    // 是否monorepo单体仓库主包名
+    // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
 
     AUTO_TEST_PARAM = jsonParams.AUTO_TEST_PARAM ? jsonParams.AUTO_TEST_PARAM.trim() : ""  // 自动化集成测试参数
@@ -652,8 +654,15 @@ def pullProjectCode() {
     // 获取应用打包代码
     if (params.GIT_TAG == GlobalVars.noGit) {
         println "Git构建分支是: ${BRANCH_NAME} 📇"
-        def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
+        // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
         // println "${git}"
+        // 对于大体积仓库或网络不好情况 自定义代码下载超时时间 默认10分钟
+        checkout([$class           : 'GitSCM',
+                  branches         : [[name: "*/${BRANCH_NAME}"]],
+                  extensions       : [[$class: 'CloneOption', timeout: 30]],
+                  gitTool          : 'Default',
+                  userRemoteConfigs: [[credentialsId: "${GIT_CREDENTIALS_ID}", url: "${REPO_URL}"]]
+        ])
     } else {
         println "Git构建标签是: ${params.GIT_TAG}} 📇"
         checkout([$class                           : 'GitSCM',
@@ -774,11 +783,13 @@ def nodeBuildProject() {
                 // 是否需要css预处理器sass处理
                 Web.needSass(this)
             }
-
-            retry(2) {
-                println("安装依赖 📥")
-                sh "npm install" // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
+            if (Git.isExistsChangeFile(this)) { // 自动判断是否需要下载依赖 可新增动态参数用于强制下载依赖情况
+                retry(2) {
+                    println("安装依赖 📥")
+                    sh "npm install" // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
+                }
             }
+
             timeout(time: 10, unit: 'MINUTES') {
                 try {
                     // >/dev/null为Shell脚本运行程序不输出日志到终端 2>&1是把出错输出也定向到标准输出
@@ -1093,7 +1104,7 @@ def deletePackagedOutput() {
  * 生成二维码 方便手机端扫描
  */
 def genQRCode() {
-    if (true) { // 是否开启二维码生成功能
+    if ("${IS_GEN_QR_CODE}" == 'true') { // 是否开启二维码生成功能
         try {
             imageSuffixName = "png"
             def imageName = "${PROJECT_NAME}"

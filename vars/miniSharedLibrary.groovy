@@ -468,7 +468,14 @@ def pullProjectCode() {
     }
     // 获取应用打包代码
     if (params.GIT_TAG == GlobalVars.noGit) {
-        git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
+        //git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
+        // 对于大体积仓库或网络不好情况 自定义代码下载超时时间 默认10分钟
+        checkout([$class           : 'GitSCM',
+                  branches         : [[name: "*/${BRANCH_NAME}"]],
+                  extensions       : [[$class: 'CloneOption', timeout: 30]],
+                  gitTool          : 'Default',
+                  userRemoteConfigs: [[credentialsId: "${GIT_CREDENTIALS_ID}", url: "${REPO_URL}"]]
+        ])
     } else {
         println "Git构建标签是: ${params.GIT_TAG} 📇"
         checkout([$class                           : 'GitSCM',

@@ -91,6 +91,11 @@ class GlobalVars implements Serializable {
     static int composeMultiPlatform = 4 // Kotlin Compose MultiPlatform跨平台桌面项目
     static int desktopQt = 5 // Qt (C/C++代码)跨平台桌面项目
 
+    /**
+     *  Java框架类型
+     */
+    static int SpringBoot = 1 // Spring Boot框架
+    static int SpringMVC = 2 // Spring MVC框架
 
     /**
      * CI代码库 自动同步部署脚本和配置等

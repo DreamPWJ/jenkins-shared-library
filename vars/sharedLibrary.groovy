@@ -121,6 +121,7 @@ def call(String type = 'web-java', Map map) {
                 IS_GRACE_SHUTDOWN = "${map.is_grace_shutdown}" // 是否进行优雅停机
                 IS_NEED_SASS = "${map.is_need_sass}" // 是否需要css预处理器sass
                 IS_AUTO_TRIGGER = false // 是否是自动触发构建
+                IS_GEN_QR_CODE = false // 生成二维码 方便手机端扫描
                 IS_ARCHIVE = false // 是否归档
                 IS_CODE_QUALITY_ANALYSIS = false // 是否进行代码质量分析的总开关
                 IS_INTEGRATION_TESTING = false // 是否进集成测试
@@ -226,7 +227,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && IS_DOCKER_BUILD == true) }
+                        expression { return (IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) }
                     }
                     agent {
                         // label "linux"
@@ -248,7 +249,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && IS_DOCKER_BUILD == false) }
+                        expression { return (IS_DOCKER_BUILD == false && "${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) }
                     }
                     tools {
                         // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
@@ -261,20 +262,32 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
+                stage('Docker For Java构建') {
+                    when {
+                        beforeAgent true
+                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression { return (IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
+                    }
+                    agent {
+                        docker {
+                            // JDK MAVEN 环境  构建完成自动删除容器
+                            image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
+                            args " -v /var/cache/maven/.m2:/root/.m2 "
+                            reuseNode true // 使用根节点
+                        }
+                    }
+                    steps {
+                        script {
+                            mavenBuildProject()
+                        }
+                    }
+                }
                 stage('Java构建') {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
+                        expression { return (IS_DOCKER_BUILD == false && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
                     }
-                    /*    agent {
-                            docker {
-                                // JDK MAVEN 环境  构建完成自动删除容器
-                                image "maven:${map.maven}-openjdk-${JDK_VERSION}"
-                                args " -v /var/cache/maven/.m2:/root/.m2 "
-                                reuseNode true // 使用根节点
-                            }
-                        }*/
                     tools {
                         // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
                         maven "${map.maven}"
@@ -654,8 +667,8 @@ def getInitParams(map) {
     NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [test]的前端项目参数
 
-    IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD ? jsonParams.IS_DOCKER_BUILD : true
     // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
+    IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD ? jsonParams.IS_DOCKER_BUILD : true
     IS_BLUE_GREEN_DEPLOY = jsonParams.IS_BLUE_GREEN_DEPLOY ? jsonParams.IS_BLUE_GREEN_DEPLOY : false // 是否蓝绿部署
     IS_ROLL_DEPLOY = jsonParams.IS_ROLL_DEPLOY ? jsonParams.IS_ROLL_DEPLOY : false // 是否滚动部署
     IS_GRAYSCALE_DEPLOY = jsonParams.IS_GRAYSCALE_DEPLOY ? jsonParams.IS_GRAYSCALE_DEPLOY : false // 是否灰度发布
@@ -664,11 +677,16 @@ def getInitParams(map) {
     IS_STATIC_RESOURCE = jsonParams.IS_STATIC_RESOURCE ? jsonParams.IS_STATIC_RESOURCE : false // 是否静态web资源
     IS_UPLOAD_OSS = jsonParams.IS_UPLOAD_OSS ? jsonParams.IS_UPLOAD_OSS : false // 是否构建产物上传到OSS
     IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否monorepo单体仓库
-    // 是否monorepo单体仓库主包名
+    // 是否Maven单模块代码
+    IS_MAVEN_SINGLE_MODULE = jsonParams.IS_MAVEN_SINGLE_MODULE ? jsonParams.IS_MAVEN_SINGLE_MODULE : false
+
+    // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
     // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
     MAVEN_SETTING_XML = jsonParams.MAVEN_SETTING_XML ? jsonParams.MAVEN_SETTING_XML.trim() : "${map.maven_setting_xml}".trim()
     AUTO_TEST_PARAM = jsonParams.AUTO_TEST_PARAM ? jsonParams.AUTO_TEST_PARAM.trim() : ""  // 自动化集成测试参数
+    // Java框架类型 1. Spring Boot  2. Spring MVC
+    JAVA_FRAMEWORK_TYPE = jsonParams.JAVA_FRAMEWORK_TYPE ? jsonParams.JAVA_FRAMEWORK_TYPE.trim() : "1"
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
@@ -726,6 +744,8 @@ def getInitParams(map) {
     webPackageSize = ""
     // Java构建包大小
     javaPackageSize = ""
+    // Maven打包后产物的位置
+    mavenPackageLocation = ""
 }
 
 /**
@@ -847,8 +867,15 @@ def pullProjectCode() {
     // 获取应用打包代码
     if (params.GIT_TAG == GlobalVars.noGit) {
         println "Git构建分支是: ${BRANCH_NAME} 📇"
-        def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
+        // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
         // println "${git}"
+        // 对于大体积仓库或网络不好情况 自定义代码下载超时时间 默认10分钟
+        checkout([$class           : 'GitSCM',
+                  branches         : [[name: "*/${BRANCH_NAME}"]],
+                  extensions       : [[$class: 'CloneOption', timeout: 30]],
+                  gitTool          : 'Default',
+                  userRemoteConfigs: [[credentialsId: "${GIT_CREDENTIALS_ID}", url: "${REPO_URL}"]]
+        ])
     } else {
         println "Git构建标签是: ${params.GIT_TAG} 📇"
         checkout([$class                           : 'GitSCM',
@@ -902,8 +929,8 @@ def nodeBuildProject() {
             Web.staticResourceBuild(this)
         }
     } else { // npm编译打包项目
-        // 初始化Node环境变量
-        if (IS_DOCKER_BUILD == false) {
+        if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
+            // 初始化Node环境变量
             Node.initEnv(this)
             // 动态切换Node版本
             // Node.change(this, "${NODE_VERSION}".replaceAll("Node", ""))
@@ -966,18 +993,25 @@ def nodeBuildProject() {
  * Maven编译构建
  */
 def mavenBuildProject() {
-    // 动态切换Maven内的对应的JDK版本
-    Java.switchJDKByJenv(this, "${JDK_VERSION}")
+    if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
+        // 动态切换Maven内的对应的JDK版本
+        Java.switchJDKByJenv(this, "${JDK_VERSION}")
+    }
     sh "mvn --version"
     // maven如果存在多级目录 一级目录设置
     MAVEN_ONE_LEVEL = "${MAVEN_ONE_LEVEL}".trim() != "" ? "${MAVEN_ONE_LEVEL}/" : "${MAVEN_ONE_LEVEL}".trim()
     println("执行Maven构建 🏗️  ")
     if ("${MAVEN_SETTING_XML}" == "") {
         // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
-        // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码
-        sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.test.skip=true"
-        // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
-        // sh "mvn clean install -Dmaven.test.skip=true"
+        if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') { // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
+            MAVEN_ONE_LEVEL = ""
+            // 在pom.xml文件文件目录下执行
+            def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
+            sh "cd ${pomPath} && mvn clean install -Dmaven.test.skip=true"
+        } else {  // 多模块情况
+            // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码
+            sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.test.skip=true"
+        }
     } else {
         // 基于自定义setting文件方式打包
         Maven.packageBySettingFile(this)
@@ -985,6 +1019,12 @@ def mavenBuildProject() {
     // 获取pom文件信息
     //Maven.getPomInfo(this)
 
+    javaPackageType = "" // Java打包类型 jar、war
+    if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
+        javaPackageType = "jar"
+    } else if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringMVC) {
+        javaPackageType = "war"
+    }
     // Maven打包产出物位置
     mavenPackageLocationDir = ("${MAVEN_ONE_LEVEL}" == "" ? "${PROJECT_NAME}" : "${MAVEN_ONE_LEVEL}${PROJECT_NAME}") + "/target"
     mavenPackageLocation = "${mavenPackageLocationDir}" + "/*.jar"
@@ -1586,7 +1626,7 @@ def deletePackagedOutput() {
  * 生成二维码 方便手机端扫描
  */
 def genQRCode() {
-    if (true) { // 是否开启二维码生成功能
+    if ("${IS_GEN_QR_CODE}" == 'true') { // 是否开启二维码生成功能
         try {
             imageSuffixName = "png"
             def imageName = "${PROJECT_NAME}"

@@ -20,7 +20,7 @@ done
 
 if [[ ${project_type} == 1 ]]; then
   # 循环检测次数
-  front_end_loop_num=30
+  front_end_loop_num=60
   # 循环检测前端启动健康状态
   for i in $(seq 1 ${front_end_loop_num}); do
     if [[ ${i} -ge ${front_end_loop_num} ]]; then
@@ -28,7 +28,7 @@ if [[ ${project_type} == 1 ]]; then
       break
       exit 0
     else
-      result=$(curl --connect-timeout 60 --max-time 60 -I ${check_url} | grep OK)
+      result=$(curl --connect-timeout 120 --max-time 120 -I ${check_url} | grep OK)
       if [[ ${result} =~ OK ]]; then
         echo "Web前端启动成功" # 必须包含"成功"字样 pipeline内判断
         break
