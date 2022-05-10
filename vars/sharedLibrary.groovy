@@ -786,11 +786,14 @@ def initInfo() {
 
     // 是否跳板机穿透方式部署
     isProxyJumpType = false
-    proxyJumpText = "" // 跳板机ssh ProxyJump访问新增的文本
+    // 跳板机ssh ProxyJump访问新增的文本
+    proxyJumpSSHText = ""
+    proxyJumpSCPText = ""
     if ("${proxy_jump_ip}".trim() != "") {
         isProxyJumpType = true
         // ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22
-        proxyJumpText = "-J root@${proxy_jump_ip}"
+        proxyJumpSSHText = " -J root@${proxy_jump_ip} "
+        proxyJumpSCPText=" -o 'ProxyJump root@${proxy_jump_ip}' "
     }
 
 }
@@ -1499,7 +1502,7 @@ def syncScript() {
         // 自动创建服务器部署目录
         // ssh登录概率性失败 连接数超报错: kex_exchange_identification
         // 解决vim /etc/ssh/sshd_config中 MaxSessions与MaxStartups改大2000 默认10 重启生效 systemctl restart sshd.service
-        sh " ssh  ${remote.user}@${remote.host} 'mkdir -p /${DEPLOY_FOLDER}/${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}' "
+        sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'mkdir -p /${DEPLOY_FOLDER}/${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}' "
     } catch (error) {
         println "访问目标服务器失败, 首先检查jenkins服务器和应用服务器的ssh免密连接是否生效 ❌"
         println error.getMessage()
@@ -1510,14 +1513,14 @@ def syncScript() {
             // Docker多阶段镜像构建处理
             Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
             // scp -r  递归复制整个目录 复制部署脚本和配置文件到服务器
-            sh " chmod -R 777 .ci && scp -r .ci/*  ${remote.user}@${remote.host}:/${DEPLOY_FOLDER}/ "
+            sh " chmod -R 777 .ci && scp ${proxyJumpSCPText} -r .ci/*  ${remote.user}@${remote.host}:/${DEPLOY_FOLDER}/ "
         } catch (error) {
             println "复制部署脚本和配置文件到服务器失败 ❌"
             println error.getMessage()
         }
 
         // 给shell脚本执行权限
-        sh " ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} " +
+        sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} " +
                 "&& chmod -R 777 web && chmod -R 777 go && chmod -R 777 python && chmod -R 777 cpp && chmod +x *.sh ' "
     }
 }
@@ -1858,7 +1861,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                         title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
                         text: [
                                 "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL})",
-                                "#### · Jenkins构建Docker部署完成 👌",
+                                "#### · CI构建Docker部署完成 👌",
                                 "#### · 服务端项目启动运行${msg}",
                                 "###### ${rollbackTag}",
                                 "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",

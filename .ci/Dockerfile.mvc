@@ -7,7 +7,7 @@ ARG JDK_VERSION
 ARG EXPOSE_PORT
 
 # 基础镜像
-FROM tomcat:8.5-jre${JDK_VERSION}
+FROM tomcat:9.0-jre8
 
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
 #LABEL author="潘维吉"
