@@ -1130,23 +1130,23 @@ def uploadRemote(filePath) {
     def projectDeployFolder = "/${DEPLOY_FOLDER}/${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}/"
     if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-            sh "cd ${filePath} && scp  ${npmPackageLocation} " +
+            sh "cd ${filePath} && scp ${proxyJumpSCPText} ${npmPackageLocation} " +
                     "${remote.user}@${remote.host}:${projectDeployFolder}"
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
             // 上传前删除部署目录的jar包 防止名称修改等导致多个部署目标jar包存在  jar包需要唯一性
-            sh " ssh  ${remote.user}@${remote.host} 'cd ${projectDeployFolder} && rm -f *.${javaPackageType}' "
+            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd ${projectDeployFolder} && rm -f *.${javaPackageType}' "
             // 上传构建包到远程服务器
-            sh "cd ${filePath} && scp ${mavenPackageLocation} " +
+            sh "cd ${filePath} && scp ${proxyJumpSCPText} ${mavenPackageLocation} " +
                     "${remote.user}@${remote.host}:${projectDeployFolder} "
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
             // Go语言打包产物 上传包到远程服务器
-            sh "cd ${filePath} && scp main.go ${remote.user}@${remote.host}:${projectDeployFolder} "
+            sh "cd ${filePath} && scp ${proxyJumpSCPText} main.go ${remote.user}@${remote.host}:${projectDeployFolder} "
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
             // Python语言打包产物 上传包到远程服务器
-            sh "cd ${filePath}/dist && scp app ${remote.user}@${remote.host}:${projectDeployFolder} "
+            sh "cd ${filePath}/dist && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) {
             // C++语言打包产物 上传包到远程服务器
-            sh "cd ${filePath} && scp app ${remote.user}@${remote.host}:${projectDeployFolder} "
+            sh "cd ${filePath} && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
         }
     }
 }
@@ -1204,22 +1204,22 @@ def runProject() {
             Docker.pull(this, "${dockerBuildImageName}")
         }
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-            sh " ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/web " +
+            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/web " +
                     "&& ./docker-release-web.sh '${SHELL_WEB_PARAMS_GETOPTS}' ' "
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
             // 部署之前的相关操作
             beforeRunProject()
-            sh " ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} " +
+            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} " +
                     "&& ./docker-release.sh '${SHELL_PARAMS_GETOPTS}' '  "
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
             // Go.deploy(this)
-            sh " ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/go " +
+            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/go " +
                     "&& ./docker-release-go.sh '${SHELL_PARAMS_GETOPTS}' '  "
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-            sh " ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/python " +
+            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/python " +
                     "&& ./docker-release-python.sh '${SHELL_PARAMS_GETOPTS}' '  "
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) {
-            sh " ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/cpp " +
+            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/cpp " +
                     "&& ./docker-release-cpp.sh '${SHELL_PARAMS_GETOPTS}' '  "
         }
     } catch (error) {
@@ -1247,7 +1247,7 @@ def healthCheck(params = '') { // 可选参数
     def healthCheckStart = new Date()
     timeout(time: 10, unit: 'MINUTES') {  // health-check.sh有检测超时时间 timeout为防止shell脚本超时失效兼容处理
         healthCheckMsg = sh(
-                script: "ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/ && ./health-check.sh ${healthCheckParams} '",
+                script: "ssh  ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/ && ./health-check.sh ${healthCheckParams} '",
                 returnStdout: true).trim()
     }
     healthCheckTimeDiff = Utils.getTimeDiff(healthCheckStart, new Date()) // 计算启动时间
@@ -1263,7 +1263,7 @@ def healthCheck(params = '') { // 可选参数
         dingNotice(1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
         // 打印应用服务启动失败日志 方便快速排查错误
         Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志开始 START 👇 ------------", "red")
-        sh " ssh  ${remote.user}@${remote.host} 'docker logs ${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}-${SHELL_ENV_MODE}' "
+        sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'docker logs ${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}-${SHELL_ENV_MODE}' "
         Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志结束 END 👆 ------------", "red")
         if ("${IS_ROLL_DEPLOY}" == 'true' || "${IS_BLUE_GREEN_DEPLOY}" == 'true') {
             println '分布式部署情况, 服务启动失败, 自动中止取消job, 防止继续部署导致其他应用服务挂掉 。'
@@ -1346,7 +1346,7 @@ def blueGreenDeploy() {
             healthCheck()
         }
         // 部署完绿服务器,销毁蓝服务器,将流量切回到绿服务器
-        sh " ssh  ${remote.user}@${blueServerIp} ' docker stop ${dockerContainerName} --time=0 || true && docker rm ${dockerContainerName} || true ' "
+        sh " ssh ${proxyJumpSSHText} ${remote.user}@${blueServerIp} ' docker stop ${dockerContainerName} --time=0 || true && docker rm ${dockerContainerName} || true ' "
         // 自动配置nginx负载均衡
         // Nginx.conf(this, "${mainServerIp}", "${SHELL_HOST_PORT}", "${blueServerIp}", "${SHELL_HOST_PORT}")
     } else if ("${IS_SAME_SERVER}" == 'true') {  // 单机蓝绿部署 适用于服务器资源有限 又要实现零停机随时部署发布 蓝绿部署只保持一份节点服务
@@ -1356,7 +1356,7 @@ def blueGreenDeploy() {
             def workShellParamsGetopts = "${SHELL_PARAMS_GETOPTS}".replace("-c ${SHELL_HOST_PORT}", "-c ${workHostPort}")
             // 先部署一个零时服务将流量切到蓝服务器上
             try {
-                dokcerReleaseWorkerMsg = Utils.getShEchoResult(this, " ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} && ./${dockerReleaseWorkerShellName} '${workShellParamsGetopts}' ' ")
+                dokcerReleaseWorkerMsg = Utils.getShEchoResult(this, " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} && ./${dockerReleaseWorkerShellName} '${workShellParamsGetopts}' ' ")
             } catch (error) {
                 println error.getMessage()
                 currentBuild.result = 'FAILURE'
@@ -1382,7 +1382,7 @@ def blueGreenDeploy() {
             sleep(time: 2, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
             // 部署完绿服务器,销毁蓝服务器,将流量切回到绿服务器
             def workDockerContainerName = "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}-worker-${SHELL_ENV_MODE}"
-            sh " ssh  ${remote.user}@${remote.host} ' docker stop ${workDockerContainerName} --time=0 || true && docker rm ${workDockerContainerName} || true ' "
+            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} ' docker stop ${workDockerContainerName} --time=0 || true && docker rm ${workDockerContainerName} || true ' "
             // 自动配置nginx负载均衡
             // Nginx.conf(this, "${remote.host}", "${SHELL_HOST_PORT}", "${remote.host}", "${workHostPort}")
         }
@@ -1422,7 +1422,7 @@ def scrollToDeploy() {
             def workShellParamsGetopts = "${SHELL_PARAMS_GETOPTS}".replace("-c ${SHELL_HOST_PORT}", "-c ${workHostPort}")
             try {
                 sleep(time: 2, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
-                dokcerReleaseWorkerMsg = Utils.getShEchoResult(this, " ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} && ./${dockerReleaseWorkerShellName} '${workShellParamsGetopts}' ' ")
+                dokcerReleaseWorkerMsg = Utils.getShEchoResult(this, " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} && ./${dockerReleaseWorkerShellName} '${workShellParamsGetopts}' ' ")
             } catch (error) {
                 println error.getMessage()
                 currentBuild.result = 'FAILURE'
@@ -1469,7 +1469,7 @@ def autoSshLogin() {
             error("请配置部署服务器登录用户名或IP地址 ❌")
         }
         // 检测ssh免密连接是否成功
-        sh "ssh ${remote.user}@${remote.host} exit"
+        sh "ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} exit"
     } catch (error) {
         println error.getMessage()
         if (error.getMessage().contains("255")) { // 0连接成功 255无法连接
@@ -1561,11 +1561,11 @@ def beforeRunProject() {
 def initDocker() {
     try {
         // 判断服务器是是否安装docker环境
-        sh "ssh ${remote.user}@${remote.host} 'docker version' "
+        sh "ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'docker version' "
     } catch (error) {
         println error.getMessage()
         dir("${env.WORKSPACE}/ci") {
-            linuxType = Utils.getShEchoResult(this, "ssh  ${remote.user}@${remote.host} 'lsb_release -a' ")
+            linuxType = Utils.getShEchoResult(this, "ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'lsb_release -a' ")
             // 判断linux主流发行版类型
             dockerFileName = ""
             if ("${linuxType}".contains("CentOS")) {
@@ -1579,11 +1579,11 @@ def initDocker() {
                 error("部署服务器非CentOS或Ubuntu系统类型 ❌")
             }
             // 上传docker初始化脚本
-            sh " scp -r ./_docker/${dockerFileName}  ${remote.user}@${remote.host}:/${DEPLOY_FOLDER}/ "
+            sh " scp ${proxyJumpSCPText} -r ./_docker/${dockerFileName}  ${remote.user}@${remote.host}:/${DEPLOY_FOLDER}/ "
             // 给shell脚本执行权限
-            sh " ssh  ${remote.user}@${remote.host} 'chmod +x /${DEPLOY_FOLDER}/${dockerFileName} ' "
+            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'chmod +x /${DEPLOY_FOLDER}/${dockerFileName} ' "
             println "初始化Docker引擎环境  执行Docker初始化脚本"
-            sh " ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} && ./${dockerFileName} ' "
+            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} && ./${dockerFileName} ' "
         }
     }
 }
