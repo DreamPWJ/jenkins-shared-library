@@ -17,10 +17,12 @@ def map = [:]
 
 // 远程服务器地址
 map.put('remote_ip', '101.200.54.165')
-// 工作服务器地址 同时支持N个服务器自动化部署
+// 工作服务器地址 同时支持N个服务器自动化分布式部署
 map.put('remote_worker_ips', [])
 // 远程服务器用户名
 map.put('remote_user_name', 'root')
+// 代理机或跳板机外网ip用于透传部署到目标机器 选填 目标机器外部无法直接访问情况填写内网ip
+map.put('proxy_jump_ip', ' ')
 
 // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
 map.put('default_git_branch', ' ')

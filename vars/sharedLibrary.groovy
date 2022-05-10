@@ -28,6 +28,8 @@ def call(String type = 'web-java', Map map) {
     }
     remote.user = "${map.remote_user_name}"
     remote_worker_ips = readJSON text: "${map.remote_worker_ips}"  // 分布式部署工作服务器地址 同时支持N个服务器
+    // 代理机或跳板机外网ip用于透传部署到目标机器
+    proxy_jump_ip = "${map.proxy_jump_ip}"
 
     if (type == "web-java") { // 针对标准项目
         pipeline {
@@ -1005,7 +1007,7 @@ def mavenBuildProject() {
         // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
         if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') { // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
             MAVEN_ONE_LEVEL = ""
-            // 在pom.xml文件文件目录下执行
+            // 在pom.xml文件目录下执行
             def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
             sh "cd ${pomPath} && mvn clean install -Dmaven.test.skip=true"
         } else {  // 多模块情况
@@ -1013,7 +1015,7 @@ def mavenBuildProject() {
             sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.test.skip=true"
         }
     } else {
-        // 基于自定义setting文件方式打包
+        // 基于自定义setting.xml文件方式打包 如私有包等
         Maven.packageBySettingFile(this)
     }
     // 获取pom文件信息
@@ -1676,8 +1678,8 @@ def alwaysPost() {
     try {
         def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-            currentBuild.description = "<img src=${qrCodeOssUrl} width=250 height=250 >" +
-                    "<br/> <a href='http://${remote.host}:${SHELL_HOST_PORT}'> 👉URL访问地址</a> " +
+            currentBuild.description = "${IS_GEN_QR_CODE == 'true' ? "<img src=${qrCodeOssUrl} width=250 height=250 > <br/> " : ""}" +
+                    "<a href='http://${remote.host}:${SHELL_HOST_PORT}'> 👉URL访问地址</a> " +
                     "<br/> 项目: ${PROJECT_NAME}" +
                     "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
                     "<br/> 大小: ${webPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"

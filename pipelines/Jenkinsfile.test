@@ -12,10 +12,12 @@ def map = [:]
 
 // 远程服务器地址
 map.put('remote_ip', '47.102.214.33')
-// 工作服务器地址 同时支持N个服务器自动化部署
+// 工作服务器地址 同时支持N个服务器自动化分布式部署
 map.put('remote_worker_ips', [])
 // 远程服务器用户名
 map.put('remote_user_name', 'root')
+// 代理机或跳板机外网ip用于透传部署到目标机器 选填 目标机器外部无法直接访问情况填写内网ip
+map.put('proxy_jump_ip', ' ')
 
 // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
 map.put('default_git_branch', ' ')
@@ -44,7 +46,7 @@ map.put('docker_repo_registry', 'registry.cn-qingdao.aliyuncs.com')
 map.put('docker_repo_namespace', 'lexiang')
 
 // 项目标签或项目简称
-map.put('project_tag', '测试')
+map.put('project_tag', ' ')
 
 // 是否是生产环境
 map.put('is_prod', false)
@@ -86,7 +88,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', ' ')
+map.put('maven_one_level', 'pellet-charging')
 // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
 map.put('maven_setting_xml', ' ')
 
@@ -111,8 +113,19 @@ JSON_PARAMS
     "NPM_RUN_PARAMS" : "build"
 }
 
-test-backend-java
-测试Java服务端
+test-backend-spring-boot
+测试Java服务端Spring Boot框架
+JSON_PARAMS
+{
+   "REPO_URL" : "http://47.102.214.33/lanneng_develop/java-backend-monorepo" ,
+   "BRANCH_NAME" : "dev" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "pellet-charging-app" ,
+   "SHELL_PARAMS" : "pellet-charging app 8098 8080 sit"
+}
+
+test-backend-spring-mvc
+测试Java服务端Spring MVC框架
 JSON_PARAMS
 {
    "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark.git" ,

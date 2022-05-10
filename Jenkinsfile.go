@@ -12,7 +12,7 @@ def map = [:]
 
 // 远程服务器地址
 map.put('remote_ip', '101.200.54.165')
-// 工作服务器地址 同时支持N个服务器自动化部署
+// 工作服务器地址 同时支持N个服务器自动化分布式部署
 map.put('remote_worker_ips', [])
 // 远程服务器用户名
 map.put('remote_user_name', 'root')
