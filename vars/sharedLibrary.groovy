@@ -1007,7 +1007,9 @@ def mavenBuildProject() {
             MAVEN_ONE_LEVEL = ""
             // 在pom.xml文件文件目录下执行
             def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
-            sh "cd ${pomPath} && mvn clean install -Dmaven.test.skip=true"
+            // sh "cd ${pomPath} && mvn clean install -Dmaven.test.skip=true"
+            // 对于离线包的情况 直接编译部署文件而非包
+            sh "cd ${pomPath} && mvn compile && ls"
         } else {  // 多模块情况
             // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码
             sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.test.skip=true"
