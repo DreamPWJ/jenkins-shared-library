@@ -7,7 +7,7 @@ echo -e "\033[32m执行Docker部署Java语言脚本  👇 \033[0m"
 # 可采用$0,$1,$2..等方式获取脚本命令行传入的参数  执行脚本  sudo ./docker-release.sh
 
 echo "使用getopts的方式进行shell参数传递"
-while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:y:z:" opt; do
+while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:y:z:" opt; do
   case $opt in
   a)
     echo "project_name_prefix=$OPTARG"
@@ -70,6 +70,10 @@ while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:y:z:" opt; do
     docker_file_run_command=$OPTARG                             # Dockerfile内 run命令动态传入
     docker_file_run_command=${docker_file_run_command//'~'/' '} # 字符串替换
     echo "docker_file_run_command=$docker_file_run_command"
+    ;;
+  q)
+    echo "java_framework_type=$OPTARG"
+    java_framework_type=$OPTARG # java框架类型 1. Spring Boot 2. Spring MVC
     ;;
   y)
     echo "remote_debug_port=$OPTARG"
@@ -166,7 +170,7 @@ if [[ ${docker_volume_mount} ]]; then
 fi
 
 echo "构建暴露端口: ${build_expose_ports}"
-echo "运行动态参数: ${docker_java_opts} ${docker_memory}  ${docker_log_opts} ${dynamic_run_args}"
+echo "运行动态参数: ${docker_java_opts} ${docker_memory} ${docker_log_opts} ${dynamic_run_args}"
 echo "远程调试参数: ${remote_debugging_param}"
 
 # 根据镜像名称查询镜像ID 用于删除无效的镜像
@@ -177,10 +181,14 @@ cd /${deploy_folder} && ./docker-common.sh get_cpu_rate && cd /${deploy_file}
 
 if [[ ${is_push_docker_repo} == false ]]; then
   echo "🏗️  开始构建Docker镜像(无缓存构建)"
+  docker_file_name="Dockerfile"
+  if [[ ${java_framework_type} == 2 ]]; then
+    docker_file_name="Dockerfile.mvc"
+  fi
   docker build -t ${docker_image_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg PROJECT_NAME=${project_name} \
     --build-arg EXPOSE_PORT="${build_expose_ports}" --build-arg JDK_VERSION=${jdk_version} \
-    -f /${deploy_folder}/Dockerfile . --no-cache
+    -f /${deploy_folder}/${docker_file_name} . --no-cache
 else
   docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}-${project_type}-${env_mode}
 fi

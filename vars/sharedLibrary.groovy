@@ -744,6 +744,8 @@ def getInitParams(map) {
     javaOssUrl = ""
     // Web构建包大小
     webPackageSize = ""
+    // Java打包类型 jar、war
+    javaPackageType = ""
     // Java构建包大小
     javaPackageSize = ""
     // Maven打包后产物的位置
@@ -781,6 +783,16 @@ def initInfo() {
     } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) {
         dockerReleaseWorkerShellName = "cpp/docker-release-worker-cpp.sh"
     }
+
+    // 是否跳板机穿透方式部署
+    isProxyJumpType = false
+    proxyJumpText = "" // 跳板机ssh ProxyJump访问新增的文本
+    if ("${proxy_jump_ip}".trim() != "") {
+        isProxyJumpType = true
+        // ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22
+        proxyJumpText = "-J root@${proxy_jump_ip}"
+    }
+
 }
 
 /**
@@ -796,7 +808,7 @@ def getShellParams(map) {
         SHELL_PARAMS_GETOPTS = " -a ${SHELL_PROJECT_NAME} -b ${SHELL_PROJECT_TYPE} -c ${SHELL_HOST_PORT} " +
                 "-d ${SHELL_EXPOSE_PORT} -e ${SHELL_ENV_MODE}  -f ${IS_PROD} -g ${DOCKER_JAVA_OPTS} -h ${DOCKER_MEMORY} " +
                 "-i ${DOCKER_LOG_OPTS}  -k ${DEPLOY_FOLDER} -l ${JDK_VERSION} -m ${IS_PUSH_DOCKER_REPO} " +
-                "-n ${DOCKER_REPO_REGISTRY}/${DOCKER_REPO_NAMESPACE} "
+                "-n ${DOCKER_REPO_REGISTRY}/${DOCKER_REPO_NAMESPACE} -q ${JAVA_FRAMEWORK_TYPE} "
         if ("${map.docker_volume_mount}") {
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -o ${map.docker_volume_mount} "
         }
@@ -1021,15 +1033,18 @@ def mavenBuildProject() {
     // 获取pom文件信息
     //Maven.getPomInfo(this)
 
-    javaPackageType = "" // Java打包类型 jar、war
     if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
         javaPackageType = "jar"
     } else if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringMVC) {
         javaPackageType = "war"
     }
     // Maven打包产出物位置
-    mavenPackageLocationDir = ("${MAVEN_ONE_LEVEL}" == "" ? "${PROJECT_NAME}" : "${MAVEN_ONE_LEVEL}${PROJECT_NAME}") + "/target"
-    mavenPackageLocation = "${mavenPackageLocationDir}" + "/*.jar"
+    if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') {
+        mavenPackageLocationDir = "target"
+    } else {
+        mavenPackageLocationDir = ("${MAVEN_ONE_LEVEL}" == "" ? "${PROJECT_NAME}" : "${MAVEN_ONE_LEVEL}${PROJECT_NAME}") + "/target"
+    }
+    mavenPackageLocation = "${mavenPackageLocationDir}" + "/*.${javaPackageType}"
     println(mavenPackageLocation)
     javaPackageSize = Utils.getFileSize(this, mavenPackageLocation)
     Tools.printColor(this, "Maven打包成功 ✅")
@@ -1086,7 +1101,7 @@ def uploadOss() {
                 // 源文件地址
                 def sourceFile = "${env.WORKSPACE}/${mavenPackageLocation}"
                 // 目标文件
-                def targetFile = "java/${env.JOB_NAME}/${PROJECT_NAME}-${SHELL_ENV_MODE}-${env.BUILD_NUMBER}.jar"
+                def targetFile = "java/${env.JOB_NAME}/${PROJECT_NAME}-${SHELL_ENV_MODE}-${env.BUILD_NUMBER}.${javaPackageType}"
                 javaOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
                 println "${javaOssUrl}"
                 Tools.printColor(this, "上传部署文件到OSS成功 ✅")
@@ -1116,7 +1131,7 @@ def uploadRemote(filePath) {
                     "${remote.user}@${remote.host}:${projectDeployFolder}"
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
             // 上传前删除部署目录的jar包 防止名称修改等导致多个部署目标jar包存在  jar包需要唯一性
-            sh " ssh  ${remote.user}@${remote.host} 'cd ${projectDeployFolder} && rm -f *.jar' "
+            sh " ssh  ${remote.user}@${remote.host} 'cd ${projectDeployFolder} && rm -f *.${javaPackageType}' "
             // 上传构建包到远程服务器
             sh "cd ${filePath} && scp ${mavenPackageLocation} " +
                     "${remote.user}@${remote.host}:${projectDeployFolder} "
@@ -1685,7 +1700,7 @@ def alwaysPost() {
                     "<br/> 大小: ${webPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
             currentBuild.description = "<a href='http://${remote.host}:${SHELL_HOST_PORT}'> 👉API访问地址</a> " +
-                    "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉直接下载构建jar包</a>" : ""}" +
+                    "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉直接下载构建${javaPackageType}包</a>" : ""}" +
                     "<br/> 项目: ${PROJECT_NAME}" +
                     "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
                     "<br/> 大小: ${javaPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
@@ -1834,7 +1849,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                 if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
                     javaInfo = "构建版本: JDK${JDK_VERSION}   包大小: ${javaPackageSize}"
                     if ("${javaOssUrl}".trim() != '') {
-                        javaInfo = javaInfo + "\n [直接下载构建jar包](${javaOssUrl})  👈"
+                        javaInfo = javaInfo + "\n [直接下载构建${javaPackageType}包](${javaOssUrl})  👈"
                     }
                 }
                 dingtalk(

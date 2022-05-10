@@ -117,7 +117,7 @@ test-backend-spring-boot
 测试Java服务端Spring Boot框架
 JSON_PARAMS
 {
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/java-backend-monorepo" ,
+   "REPO_URL" : "http://47.102.214.33/lanneng_develop/java-backend-monorepo.git" ,
    "BRANCH_NAME" : "dev" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pellet-charging-app" ,
@@ -128,11 +128,11 @@ test-backend-spring-mvc
 测试Java服务端Spring MVC框架
 JSON_PARAMS
 {
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark.git" ,
-   "BRANCH_NAME" : "develop" ,
+   "REPO_URL" : "http://47.102.214.33/pan.weiji/spring-mvc-demo.git" ,
+   "BRANCH_NAME" : "master" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "epark-server" ,
-   "SHELL_PARAMS" : "epark server 8096 8080 sit",
+   "PROJECT_NAME" : "spring-mvc-demo" ,
+   "SHELL_PARAMS" : "spring-mvc demo 8096 8080 sit",
    "IS_MAVEN_SINGLE_MODULE" : true,
    "JAVA_FRAMEWORK_TYPE" : "2"
 }
