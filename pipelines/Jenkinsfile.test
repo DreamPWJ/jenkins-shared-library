@@ -51,7 +51,7 @@ map.put('project_tag', ' ')
 // 是否是生产环境
 map.put('is_prod', false)
 // 是否在同一台服务器蓝绿部署或滚动部署
-map.put('is_same_server', true)
+map.put('is_same_server', false)
 // 是否进行优雅停机
 map.put('is_grace_shutdown', true)
 // 是否进行服务启动健康探测
