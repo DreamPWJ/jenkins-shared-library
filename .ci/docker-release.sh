@@ -185,6 +185,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
   if [[ ${java_framework_type} == 2 ]]; then
     docker_file_name="Dockerfile.mvc"
   fi
+  # 对于简单项目无需重复构建镜像  将部署文件 docker run -v 做挂载映射 直接重启容器即可
   docker build -t ${docker_image_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg PROJECT_NAME=${project_name} \
     --build-arg EXPOSE_PORT="${build_expose_ports}" --build-arg JDK_VERSION=${jdk_version} \
