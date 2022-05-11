@@ -17,7 +17,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
             script {
                 env.ENCODED_GIT_PASSWORD = URLEncoder.encode(GIT_PASSWORD, "UTF-8")
             }
-            def userPassWordUrl = " http://${GIT_USERNAME}:${ENCODED_GIT_PASSWORD}" +
+            def userPassWordUrl = " http://${GIT_USERNAME.replace("@","%40")}:${ENCODED_GIT_PASSWORD}" +
                     "@${repoUrl.toString().replace("http://", "").replace("https://", "")} "
             sh("""
                    git config --global user.email "406798106@qq.com"

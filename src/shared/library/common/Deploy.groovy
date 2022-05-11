@@ -34,10 +34,15 @@ class Deploy implements Serializable {
     }
 
     /**
-     * 执行
+     * 替换自定义的nginx配置文件
+     * 需要定制化特殊化需求可在部署的时候动态替换本文件
      */
-    static def execute(ctx) {
-        ctx.sh ""
+    static def replaceNginxConfig(ctx) {
+        if ("${ctx.CUSTOM_NGINX_CONFIG}".trim() != "") {
+            ctx.println("替换自定义的nginx配置文件")
+            ctx.sh "cp -p ${ctx.env.WORKSPACE}/${ctx.CUSTOM_NGINX_CONFIG} ${ctx.env.WORKSPACE}/ci/.ci/web/default.conf"
+        }
     }
+
 
 }

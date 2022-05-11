@@ -689,6 +689,8 @@ def getInitParams(map) {
     AUTO_TEST_PARAM = jsonParams.AUTO_TEST_PARAM ? jsonParams.AUTO_TEST_PARAM.trim() : ""  // 自动化集成测试参数
     // Java框架类型 1. Spring Boot  2. Spring MVC
     JAVA_FRAMEWORK_TYPE = jsonParams.JAVA_FRAMEWORK_TYPE ? jsonParams.JAVA_FRAMEWORK_TYPE.trim() : "1"
+    // 自定义特殊化的Nginx配置文件在项目源码中的路径  用于替换CI仓库的config默认标准配置文件
+    CUSTOM_NGINX_CONFIG = jsonParams.CUSTOM_NGINX_CONFIG ? jsonParams.CUSTOM_NGINX_CONFIG.trim() : ""
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
@@ -793,7 +795,7 @@ def initInfo() {
         isProxyJumpType = true
         // ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22
         proxyJumpSSHText = " -J root@${proxy_jump_ip} "
-        proxyJumpSCPText=" -o 'ProxyJump root@${proxy_jump_ip}' "
+        proxyJumpSCPText = " -o 'ProxyJump root@${proxy_jump_ip}' "
     }
 
 }
@@ -1004,6 +1006,8 @@ def nodeBuildProject() {
         sh "tar -zcvf ${NPM_PACKAGE_FOLDER}.tar.gz ${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 "
     }
 
+    // 替换自定义的nginx配置文件
+    Deploy.replaceNginxConfig(this)
 }
 
 /**
