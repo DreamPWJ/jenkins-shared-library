@@ -115,6 +115,21 @@ JSON_PARAMS
     "CUSTOM_NGINX_CONFIG" : "config/default.conf"
 }
 
+jxyb-epark-server-prod
+好停车epark平台服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "epark-server" ,
+   "SHELL_PARAMS" : "epark server 8080 8080 prod",
+   "IS_ROLL_DEPLOY" : true,
+   "IS_MAVEN_SINGLE_MODULE" : true,
+   "JAVA_FRAMEWORK_TYPE" : "2",
+   "DOCKER_VOLUME_MOUNT" : "/usr/local/tomcat_epark/tomcat:/usr/local/tomcat,/nfsdata/ParkPicture:/usr/local/tomcat/webapps/FileUpload"
+}
+
 */
 
 
