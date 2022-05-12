@@ -870,6 +870,9 @@ def pullCIRepo() {
         // 拉取Git上的部署文件 无需人工上传
         git url: "${GlobalVars.CI_REPO_URL}", branch: "${scmBranchName}", changelog: false, credentialsId: "${CI_GIT_CREDENTIALS_ID}"
     }
+
+    Deploy.replaceEnvFile(this, "resources/juxian", "resources")
+    error("测试")
 }
 
 /**
