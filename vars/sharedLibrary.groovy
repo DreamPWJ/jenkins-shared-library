@@ -691,6 +691,8 @@ def getInitParams(map) {
     JAVA_FRAMEWORK_TYPE = jsonParams.JAVA_FRAMEWORK_TYPE ? jsonParams.JAVA_FRAMEWORK_TYPE.trim() : "1"
     // 自定义特殊化的Nginx配置文件在项目源码中的路径  用于替换CI仓库的config默认标准配置文件
     CUSTOM_NGINX_CONFIG = jsonParams.CUSTOM_NGINX_CONFIG ? jsonParams.CUSTOM_NGINX_CONFIG.trim() : ""
+    // 自定义Docker挂载映射 docker run -v 参数  多个用逗号,分割
+    DOCKER_VOLUME_MOUNT = jsonParams.DOCKER_VOLUME_MOUNT ? jsonParams.DOCKER_VOLUME_MOUNT.trim() : "${map.docker_volume_mount}".trim()
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
@@ -814,8 +816,8 @@ def getShellParams(map) {
                 "-d ${SHELL_EXPOSE_PORT} -e ${SHELL_ENV_MODE}  -f ${IS_PROD} -g ${DOCKER_JAVA_OPTS} -h ${DOCKER_MEMORY} " +
                 "-i ${DOCKER_LOG_OPTS}  -k ${DEPLOY_FOLDER} -l ${JDK_VERSION} -m ${IS_PUSH_DOCKER_REPO} " +
                 "-n ${DOCKER_REPO_REGISTRY}/${DOCKER_REPO_NAMESPACE} -q ${JAVA_FRAMEWORK_TYPE} "
-        if ("${map.docker_volume_mount}") {
-            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -o ${map.docker_volume_mount} "
+        if ("${DOCKER_VOLUME_MOUNT}") {
+            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -o ${DOCKER_VOLUME_MOUNT} "
         }
         if ("${SHELL_PARAMS_ARRAY.length}" == '6') {
             SHELL_REMOTE_DEBUG_PORT = SHELL_PARAMS_ARRAY[5] // 远程调试端口

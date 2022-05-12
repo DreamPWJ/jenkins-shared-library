@@ -145,7 +145,8 @@ JSON_PARAMS
    "PROJECT_NAME" : "epark-server" ,
    "SHELL_PARAMS" : "epark server 8097 8080 sit",
    "IS_MAVEN_SINGLE_MODULE" : true,
-   "JAVA_FRAMEWORK_TYPE" : "2"
+   "JAVA_FRAMEWORK_TYPE" : "2",
+   "DOCKER_VOLUME_MOUNT" : "/usr/local/tomcat_epark/tomcat:/usr/local/tomcat,/nfsdata/ParkPicture:/usr/local/tomcat/webapps/FileUpload"
 }
 */
 
