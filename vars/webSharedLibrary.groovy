@@ -126,7 +126,7 @@ def call(String type = 'web', Map map) {
                 //失败重试次数
                 retry(0)
                 //超时时间 job会自动被终止
-                timeout(time: 30, unit: 'MINUTES')
+                timeout(time: 45, unit: 'MINUTES')
                 //保持构建的最大个数
                 buildDiscarder(logRotator(numToKeepStr: "${map.build_num_keep}", artifactNumToKeepStr: "${map.build_num_keep}"))
                 //控制台输出增加时间戳
@@ -497,8 +497,9 @@ def getInitParams(map) {
     IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否monorepo单体仓库
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
-
     AUTO_TEST_PARAM = jsonParams.AUTO_TEST_PARAM ? jsonParams.AUTO_TEST_PARAM.trim() : ""  // 自动化集成测试参数
+    // 自定义特殊化的Nginx配置文件在项目源码中的路径  用于替换CI仓库的config默认标准配置文件
+    CUSTOM_NGINX_CONFIG = jsonParams.CUSTOM_NGINX_CONFIG ? jsonParams.CUSTOM_NGINX_CONFIG.trim() : ""
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
@@ -670,7 +671,7 @@ def pullProjectCode() {
         checkout([$class                           : 'GitSCM',
                   branches                         : [[name: "${params.GIT_TAG}"]],
                   doGenerateSubmoduleConfigurations: false,
-                  extensions                       : [],
+                  extensions                       : [[$class: 'CloneOption', timeout: 30]],
                   gitTool                          : 'Default',
                   submoduleCfg                     : [],
                   userRemoteConfigs                : [[credentialsId: "${GIT_CREDENTIALS_ID}", url: "${REPO_URL}"]]
@@ -823,6 +824,9 @@ def nodeBuildProject() {
     } else {
         sh "tar -zcvf ${NPM_PACKAGE_FOLDER}.tar.gz ${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 "
     }
+
+    // 替换自定义的nginx配置文件
+    Deploy.replaceNginxConfig(this)
 
 }
 

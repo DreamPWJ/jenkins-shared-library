@@ -39,7 +39,7 @@ RUN cd /usr/share/nginx/html/ \
  && rm -f ${NPM_PACKAGE_FOLDER}.tar.gz
 
 # 暴露端口
-EXPOSE   80 443
+EXPOSE  80 443
 
 # 启动nginx
 CMD ["nginx", "-g", "daemon off;"]

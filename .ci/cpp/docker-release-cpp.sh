@@ -122,8 +122,8 @@ fi
 if [[ ${is_prod} == false ]]; then
   cup_num=$(cat /proc/cpuinfo | grep "processor" | wc -l)
   echo "逻辑CPU的个数: ${cup_num}"
-  limit_cup_num=$(echo "scale=4; ${cup_num} - 0.3" | bc) # 浮点数计算
-  dynamic_run_args=${dynamic_run_args}" --cpus=${limit_cup_num} "
+  # limit_cup_num=$(echo "scale=4; ${cup_num} - 0.3" | bc) # 浮点数计算 bc命令可能不存在
+  dynamic_run_args=${dynamic_run_args}" --cpus=${cup_num} "
 fi
 
 # 动态参数

@@ -7,7 +7,7 @@ ARG JDK_VERSION
 ARG EXPOSE_PORT
 
 # 基础镜像
-FROM tomcat:9.0-jre8
+FROM tomcat:9.0-jre8-alpine
 
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
 #LABEL author="潘维吉"
@@ -22,8 +22,12 @@ USER root
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+RUN rm -rf /usr/local/tomcat/webapps/*
 # 将部署文件复制到docker内
-COPY  *.war  /usr/local/tomcat/webapps/
+COPY  *.war  /usr/local/tomcat/webapps/ROOT.war
 
 # 对外暴露端口
 EXPOSE  $EXPOSE_PORT
+
+# 运行命令
+CMD ["catalina.sh","run"]

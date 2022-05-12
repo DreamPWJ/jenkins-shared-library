@@ -138,7 +138,15 @@ JSON_PARAMS
    "IS_MAVEN_SINGLE_MODULE" : true,
    "JAVA_FRAMEWORK_TYPE" : "2"
 }
-
+{
+   "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark.git" ,
+   "BRANCH_NAME" : "develop" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "epark-server" ,
+   "SHELL_PARAMS" : "epark server 8097 8080 sit",
+   "IS_MAVEN_SINGLE_MODULE" : true,
+   "JAVA_FRAMEWORK_TYPE" : "2"
+}
 */
 
 

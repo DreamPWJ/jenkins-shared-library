@@ -134,7 +134,7 @@ def call(String type = 'web-java', Map map) {
                 //失败重试次数
                 retry(0)
                 //超时时间 job会自动被终止
-                timeout(time: 30, unit: 'MINUTES')
+                timeout(time: 45, unit: 'MINUTES')
                 //保持构建的最大个数
                 buildDiscarder(logRotator(numToKeepStr: "${map.build_num_keep}", artifactNumToKeepStr: "${map.build_num_keep}"))
                 //控制台输出增加时间戳
@@ -789,8 +789,8 @@ def initInfo() {
     // 是否跳板机穿透方式部署
     isProxyJumpType = false
     // 跳板机ssh ProxyJump访问新增的文本
-    proxyJumpSSHText = ""
-    proxyJumpSCPText = ""
+    proxyJumpSSHText = "" // ssh跳板透传远程访问
+    proxyJumpSCPText = "" // scp跳板透传远程复制
     if ("${proxy_jump_ip}".trim() != "") {
         isProxyJumpType = true
         // ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22
@@ -900,7 +900,7 @@ def pullProjectCode() {
         checkout([$class                           : 'GitSCM',
                   branches                         : [[name: "${params.GIT_TAG}"]],
                   doGenerateSubmoduleConfigurations: false,
-                  extensions                       : [],
+                  extensions                       : [[$class: 'CloneOption', timeout: 30]],
                   gitTool                          : 'Default',
                   submoduleCfg                     : [],
                   userRemoteConfigs                : [[credentialsId: "${GIT_CREDENTIALS_ID}", url: "${REPO_URL}"]]
@@ -1008,6 +1008,7 @@ def nodeBuildProject() {
 
     // 替换自定义的nginx配置文件
     Deploy.replaceNginxConfig(this)
+
 }
 
 /**
@@ -1027,8 +1028,9 @@ def mavenBuildProject() {
         if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') { // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
             MAVEN_ONE_LEVEL = ""
             // 在pom.xml文件目录下执行
-            def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
-            sh "cd ${pomPath} && mvn clean install -Dmaven.test.skip=true"
+            // def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
+            // clean动态参数 针对于pom.xml文件下载  如果直接本地代码库中jar去掉clean
+            sh "mvn install -Dmaven.test.skip=true"
         } else {  // 多模块情况
             // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码
             sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.test.skip=true"

@@ -560,7 +560,7 @@ def pullProjectCode() {
         checkout([$class                           : 'GitSCM',
                   branches                         : [[name: "${params.GIT_TAG}"]],
                   doGenerateSubmoduleConfigurations: false,
-                  extensions                       : [],
+                  extensions                       : [[$class: 'CloneOption', timeout: 30]],
                   gitTool                          : 'Default',
                   submoduleCfg                     : [],
                   userRemoteConfigs                : [[credentialsId: "${GIT_CREDENTIALS_ID}", url: "${REPO_URL}"]]
