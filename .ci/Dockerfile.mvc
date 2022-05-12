@@ -29,5 +29,5 @@ COPY  *.war  /usr/local/tomcat/webapps/ROOT.war
 # 对外暴露端口
 EXPOSE  $EXPOSE_PORT
 
-# 运行命令
+# 运行启动命令
 CMD ["catalina.sh","run"]
