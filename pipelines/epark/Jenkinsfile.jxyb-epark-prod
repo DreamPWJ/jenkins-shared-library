@@ -53,7 +53,7 @@ map.put('is_prod', true)
 // 是否在同一台服务器蓝绿部署或滚动部署
 map.put('is_same_server', false)
 // 是否进行优雅停机
-map.put('is_grace_shutdown', true)
+map.put('is_grace_shutdown', false)
 // 是否进行服务启动健康探测
 map.put('is_health_check', true)
 // 是否Pipeline内脚本钉钉通知  总开关
