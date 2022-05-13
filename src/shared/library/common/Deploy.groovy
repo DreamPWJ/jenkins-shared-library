@@ -27,22 +27,32 @@ class Deploy implements Serializable {
      * 自动替换不同分布式部署节点的环境文件
      * 自定义的部署配置文件替代默认配置文件等
      */
-    static def replaceEnvFile(ctx, sourceFilePath, targetFilePath) {
+    static def replaceEnvFile(ctx) {
         // 源文件和多个目标文件可放在代码里面维护 部署时候根据配置自动替换到目标服务器
         // 或者项目源码仓库内的配置文件替换CI仓库的默认文件等
-        if ("${sourceFilePath}".trim() != "") {
+        if ("${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
+            def sourceFilePath = "${ctx.SOURCE_TARGET_CONFIG_DIR}".split(",")[0] // 源文件目录 真正的配置文件
+            def targetFilePath = "${ctx.SOURCE_TARGET_CONFIG_DIR}".split(",")[1]  // 目标文件目录 要替换的配置文件
             ctx.println("自动替换不同分布式部署节点的环境文件")
             // 获取不同机器的数字号 不同机器替换不同的机器特定配置文件
-            def machineNum = "${ctx.MACHINE_TAG.replace("号机", "")}".toInteger() || 1
+            def machineNum = "${ctx.MACHINE_TAG.replace("号机", "")}".toInteger()
             // 遍历文件夹下的所有文件并重命名 多机配置文件命名-n-拼接方式 如config-1-.yaml
-            def files = ctx.findFiles(glob: "**/${sourceFilePath}/*-${machineNum}-*") // glob符合ant风格
-            files.each { item ->
-                ctx.println("${item.name}")
-                // ctx.println("${item.name.replace("-${machineNum}-", "")}")
-                // ctx.sh "mv "
+            ctx.dir("${ctx.env.WORKSPACE}/${sourceFilePath}/") {
+                def files = ctx.findFiles(glob: "*.*") // glob符合ant风格
+                files.each { item ->
+                    //ctx.println("${item.name}")
+                    def machineFlag = "-${machineNum}-"
+                    if ("${item.name}".contains(machineFlag)) {
+                        def newConfigName = "${item.name.replace(machineFlag, "")}"
+                        //ctx.println(newConfigName)
+                        ctx.sh "mv ${item.name} ${newConfigName}"
+                    }
+                }
             }
-            // 重命名后整体复制多文件
+
+            // 重命名后整体批量复制替换多个文件
             ctx.sh "cp -r ${ctx.env.WORKSPACE}/${sourceFilePath}/* ${ctx.env.WORKSPACE}/${targetFilePath}/"
+            // 替换文件应该放在部署服务器上面 或 重新打包部署
         }
     }
 

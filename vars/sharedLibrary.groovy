@@ -693,6 +693,8 @@ def getInitParams(map) {
     CUSTOM_NGINX_CONFIG = jsonParams.CUSTOM_NGINX_CONFIG ? jsonParams.CUSTOM_NGINX_CONFIG.trim() : ""
     // 自定义Docker挂载映射 docker run -v 参数  多个用逗号,分割
     DOCKER_VOLUME_MOUNT = jsonParams.DOCKER_VOLUME_MOUNT ? jsonParams.DOCKER_VOLUME_MOUNT.trim() : "${map.docker_volume_mount}".trim()
+    // 不同部署节点动态批量替换多个环境配置文件 源文件目录 目标文件目录 逗号,分割
+    SOURCE_TARGET_CONFIG_DIR = jsonParams.SOURCE_TARGET_CONFIG_DIR ? jsonParams.SOURCE_TARGET_CONFIG_DIR.trim() : ""
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
@@ -870,9 +872,6 @@ def pullCIRepo() {
         // 拉取Git上的部署文件 无需人工上传
         git url: "${GlobalVars.CI_REPO_URL}", branch: "${scmBranchName}", changelog: false, credentialsId: "${CI_GIT_CREDENTIALS_ID}"
     }
-
-    Deploy.replaceEnvFile(this, "resources/juxian", "resources")
-    error("测试")
 }
 
 /**
@@ -1025,6 +1024,8 @@ def mavenBuildProject() {
         Java.switchJDKByJenv(this, "${JDK_VERSION}")
     }
     sh "mvn --version"
+    // 自动替换不同分布式部署节点的环境文件
+    Deploy.replaceEnvFile(this)
     // maven如果存在多级目录 一级目录设置
     MAVEN_ONE_LEVEL = "${MAVEN_ONE_LEVEL}".trim() != "" ? "${MAVEN_ONE_LEVEL}/" : "${MAVEN_ONE_LEVEL}".trim()
     println("执行Maven构建 🏗️  ")
@@ -1413,15 +1414,20 @@ def scrollToDeploy() {
         remote_worker_ips.each { ip ->
             println ip
             remote.host = ip
+
+            machineNum++
+            MACHINE_TAG = "${machineNum}号机" // 动态计算是几号机
             if (params.DEPLOY_MODE == GlobalVars.rollback) {
                 uploadRemote("${archivePath}")
             } else {
+                // 如果配置多节点动态替换不同的配置文件重新执行maven构建打包或者直接替换部署服务器文件
+                if ("${SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
+                    mavenBuildProject()
+                }
                 uploadRemote(Utils.getShEchoResult(this, "pwd"))
             }
             runProject()
             if (params.IS_HEALTH_CHECK == true) {
-                machineNum++
-                MACHINE_TAG = "${machineNum}号机" // 动态计算是几号机
                 healthCheck()
             }
         }
