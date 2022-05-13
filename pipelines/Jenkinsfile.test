@@ -136,7 +136,8 @@ JSON_PARAMS
    "PROJECT_NAME" : "spring-mvc-demo" ,
    "SHELL_PARAMS" : "spring-mvc demo 8096 8080 sit",
    "IS_MAVEN_SINGLE_MODULE" : true,
-   "JAVA_FRAMEWORK_TYPE" : "2"
+   "JAVA_FRAMEWORK_TYPE" : "2",
+   "DOCKER_VOLUME_MOUNT" : "/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
 }
 {
    "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark.git" ,
@@ -147,7 +148,6 @@ JSON_PARAMS
    "IS_MAVEN_SINGLE_MODULE" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
    "SOURCE_TARGET_CONFIG_DIR" : "resources/juxian,resources",
-   "DOCKER_VOLUME_MOUNT" : "/usr/local/tomcat_epark/tomcat:/usr/local/tomcat,/nfsdata/ParkPicture:/usr/local/tomcat/webapps/FileUpload"
 }
 */
 

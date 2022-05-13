@@ -1421,8 +1421,8 @@ def scrollToDeploy() {
                 uploadRemote("${archivePath}")
             } else {
                 // 如果配置多节点动态替换不同的配置文件重新执行maven构建打包或者直接替换部署服务器文件
-                if ("${SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
-                    mavenBuildProject()
+                if ("${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+                    mavenBuildProject() // 需要mvn jdk构建环境
                 }
                 uploadRemote(Utils.getShEchoResult(this, "pwd"))
             }

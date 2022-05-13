@@ -27,9 +27,9 @@ map.put('build_num_keep', 2)
 
 // Docker相关参数
 // JVM内存设置
-map.put('docker_java_opts', '-Xmx2000m')
+map.put('docker_java_opts', '-Xmx2600m')
 // docker内存限制
-map.put('docker_memory', '2.5G')
+map.put('docker_memory', '3G')
 // docker日志限制
 map.put('docker_log_opts', 'max-size=150m') // --log-opt max-size=50m --log-opt max-file=3
 // docker挂载映射 docker run -v 参数  多个用逗号,分割
@@ -128,7 +128,7 @@ JSON_PARAMS
    "IS_MAVEN_SINGLE_MODULE" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
    "SOURCE_TARGET_CONFIG_DIR" : "resources/juxian,resources",
-   "DOCKER_VOLUME_MOUNT" : "/usr/local/tomcat_epark/tomcat:/usr/local/tomcat,/nfsdata/ParkPicture:/usr/local/tomcat/webapps/FileUpload"
+   "DOCKER_VOLUME_MOUNT" : "/usr/local/tomcat-epark/tomcat:/usr/local/tomcat,/nfsdata/ParkPicture:/usr/local/tomcat/webapps/FileUpload"
 }
 
 */

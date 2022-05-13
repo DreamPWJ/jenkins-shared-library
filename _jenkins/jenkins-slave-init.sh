@@ -11,8 +11,9 @@ fi
 
 if [[ ! $(command -v java) ]]; then
   echo "安装jdk"
-  yum install -y java-11-openjdk-devel.x86_64 # java-1.8.0-openjdk-devel.x86_64
-  # apt install -y openjdk-8-jre-headless || true
+  # yum install -y java-11-openjdk-devel.x86_64 # java-1.8.0-openjdk-devel.x86_64
+  # sudo apt update
+  sudo apt install -y openjdk-11-jdk || true
   java -version
   which java
 fi
@@ -34,7 +35,7 @@ if [[ ! $(command -v mvn) ]]; then
   # 写入数据到文件输出重定向 双 >> 是追加 , 单 > 是覆盖
   # export JAVA_HOME=/usr/bin/java
   echo '
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.9.11-2.el8_3.x86_64
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 export JRE_HOME=$JAVA_HOME/jre
 export CLASSPATH=$JAVA_HOME/lib:$JRE_HOME/lib:$CLASSPATH
 export MAVEN_HOME=/opt/maven/apache-maven-3.6.3
