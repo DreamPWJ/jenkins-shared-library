@@ -74,7 +74,7 @@ map.put('jenkins_node_front_end', 'master')
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node14')
 map.put('maven', 'Maven3.6')
-map.put('jdk', '11')
+map.put('jdk', '8')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
@@ -128,8 +128,22 @@ JSON_PARAMS
    "IS_MAVEN_SINGLE_MODULE" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
    "SOURCE_TARGET_CONFIG_DIR" : "resources/juxian,resources",
-   "DOCKER_VOLUME_MOUNT" : "/usr/local/tomcat-epark/tomcat:/usr/local/tomcat,/nfsdata/ParkPicture:/usr/local/tomcat/webapps/FileUpload"
+   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/nfsdata/ParkPicture:/usr/local/tomcat/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
 }
+
+jxyb-park-coupon-h5-prod
+好停车优惠券H5 Web前端 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "http://47.102.214.33/lanneng_develop/park_coupon.git" ,
+    "BRANCH_NAME" : "master" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "park-coupon" ,
+    "SHELL_PARAMS" : "park-coupon h5 8008 80 prod" ,
+    "NPM_RUN_PARAMS" : "build",
+    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
+}
+REMOTE_IP: 172.16.0.91
 
 */
 

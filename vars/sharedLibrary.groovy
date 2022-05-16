@@ -469,6 +469,10 @@ def call(String type = 'web-java', Map map) {
                             return (IS_ROLL_DEPLOY == true) // 是否进行滚动部署
                         }
                     }
+                    tools {
+                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
+                        maven "${map.maven}"
+                    }
                     steps {
                         script {
                             // 滚动部署实现多台服务按顺序更新 分布式零停机
@@ -974,6 +978,7 @@ def nodeBuildProject() {
             if (Git.isExistsChangeFile(this)) { // 自动判断是否需要下载依赖 可新增动态参数用于强制下载依赖情况
                 retry(2) {
                     println("安装依赖 📥")
+                    // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱
                     sh "npm install" // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
                 }
             }

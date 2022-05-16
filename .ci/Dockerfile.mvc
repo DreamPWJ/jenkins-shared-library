@@ -25,7 +25,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # 修改tomcat配置  或者 docker run -v /my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml
 # COPY server.xml /usr/local/tomcat/conf/
 
-RUN rm -rf /usr/local/tomcat/webapps/*
+RUN rm -Rf /usr/local/tomcat/webapps/ROOT*
 # 将部署文件复制到docker内
 COPY  *.war  /usr/local/tomcat/webapps/ROOT.war
 
