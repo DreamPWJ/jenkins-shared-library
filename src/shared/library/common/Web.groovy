@@ -54,11 +54,11 @@ class Web implements Serializable {
             } catch (error) {
             }
 
-            ctx.println("执行Monorepo仓库构建 🏗️  ")
+            ctx.println("执行MonoRepo仓库构建 🏗️  ")
             if (Git.isExistsChangeFile(ctx)) { // 自动判断是否需要下载依赖 可新增动态参数用于强制下载依赖情况
                 // 全部下载依赖 更通用 bootstrap不仅是下载依赖资源 还建立多包之间的依赖软链
                 // Turborepo解决Monorepo多项目构建缓慢问题 充分利用CPU性能并发构建提速
-                ctx.sh "lerna bootstrap"
+                ctx.sh "lerna bootstrap --ci"  // --ci 选项调用npm ci而不是npm install
                 // lerna bootstrap指定作用域 加速下载依赖  --scope 限制 lerna bootstrap 在哪些包起作用 包的package.json文件中名称
                 // ctx.sh "lerna bootstrap --include-dependents --include-dependencies --scope ${ctx.PROJECT_NAME}"
             }

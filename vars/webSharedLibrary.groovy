@@ -789,7 +789,8 @@ def nodeBuildProject() {
             if (Git.isExistsChangeFile(this)) { // 自动判断是否需要下载依赖 可新增动态参数用于强制下载依赖情况
                 retry(2) {
                     println("安装依赖 📥")
-                    sh "npm install" // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
+                    // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱
+                    sh "npm ci" // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
                 }
             }
 
