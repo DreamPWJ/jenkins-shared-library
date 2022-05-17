@@ -49,7 +49,7 @@ certbot certonly -a certbot-dns-aliyun:dns-aliyun \
   --certbot-dns-aliyun:dns-aliyun-credentials /my/credentials.ini \
   --certbot-dns-aliyun:dns-aliyun-propagation-seconds 60 \
   --email 406798106@qq.com \
-  -d coffee-app-api.panweiji.com
+  -d app-api.panweiji.com
  # -d "*.panweiji.com"
 
 echo "查看生成的SSL证书"
