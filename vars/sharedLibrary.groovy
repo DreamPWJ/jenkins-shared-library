@@ -325,6 +325,7 @@ def call(String type = 'web-java', Map map) {
                         docker {
                             // Python打包环境  构建完成自动删除容器
                             image "cdrx/pyinstaller-linux:python3" // cdrx/pyinstaller-windows
+                            args " -v $PWD:/src/ "
                             reuseNode true // 使用根节点
                         }
                     }
