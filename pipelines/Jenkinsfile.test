@@ -126,6 +126,18 @@ JSON_PARAMS
    "SHELL_PARAMS" : "pellet-charging app 8098 8080 sit"
 }
 
+test-spring-boot
+测试Java服务端Spring Boot框架
+JSON_PARAMS
+{
+   "REPO_URL" : "http://47.102.214.33/lanneng_develop/openpark_backend.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "openpark" ,
+   "SHELL_PARAMS" : "openpark app 8099 9000 sit",
+   "IS_MAVEN_SINGLE_MODULE" : true,
+}
+
 test-backend-spring-mvc
 测试Java服务端Spring MVC框架
 JSON_PARAMS

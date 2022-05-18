@@ -528,7 +528,7 @@ def getInitParams(map) {
     SHELL_PROJECT_TYPE = SHELL_PARAMS_ARRAY[1] // 项目类型
     SHELL_HOST_PORT = SHELL_PARAMS_ARRAY[2] // 宿主机对外访问接口
     SHELL_EXPOSE_PORT = SHELL_PARAMS_ARRAY[3] // 容器内暴露端口
-    SHELL_ENV_MODE = SHELL_PARAMS_ARRAY[4] // 环境模式 如 dev test prod等
+    SHELL_ENV_MODE = SHELL_PARAMS_ARRAY[4] // 环境模式 如 dev sit test prod等
 
     // 目标系统类型 1. Npm生态与静态web项目 2. Flutter For Web 3. ReactNative For Web 4. Unity For Web
     switch ("${PROJECT_TYPE}".toInteger()) {

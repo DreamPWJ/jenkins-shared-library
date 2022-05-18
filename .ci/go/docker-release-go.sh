@@ -27,7 +27,7 @@ while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:y:z:" opt; do
     ;;
   e)
     echo "env_mode=$OPTARG"
-    env_mode=$OPTARG # 环境模式 如 dev test prod等
+    env_mode=$OPTARG # 环境模式 如 dev sit test prod等
     ;;
   f)
     echo "is_prod=$OPTARG"

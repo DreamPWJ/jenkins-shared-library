@@ -742,7 +742,7 @@ def getInitParams(map) {
     SHELL_PROJECT_TYPE = SHELL_PARAMS_ARRAY[1] // 项目类型
     SHELL_HOST_PORT = SHELL_PARAMS_ARRAY[2] // 宿主机对外访问接口
     SHELL_EXPOSE_PORT = SHELL_PARAMS_ARRAY[3] // 容器内暴露端口
-    SHELL_ENV_MODE = SHELL_PARAMS_ARRAY[4] // 环境模式 如 dev test prod等
+    SHELL_ENV_MODE = SHELL_PARAMS_ARRAY[4] // 环境模式 如 dev sit test prod等
 
     // 获取通讯录
     contactPeoples = ""

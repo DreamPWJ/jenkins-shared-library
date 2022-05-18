@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Author: 潘维吉
-# Description: 执行Docker发布部署shell脚本
+# Description: 执行宿主机发布部署shell脚本
 
-echo -e "\033[32m执行Docker部署Java语言脚本  👇 \033[0m"
-# chmod +x docker-release.sh 给shell脚本执行文件可执行权限
-# 可采用$0,$1,$2..等方式获取脚本命令行传入的参数  执行脚本  sudo ./docker-release.sh
+echo -e "\033[32m执行宿主机部署Java语言脚本  👇 \033[0m"
+# chmod +x release.sh 给shell脚本执行文件可执行权限
+# 可采用$0,$1,$2..等方式获取脚本命令行传入的参数  执行脚本  sudo ./release.sh
 
 echo "使用getopts的方式进行shell参数传递"
 while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:y:z:" opt; do
@@ -101,23 +101,8 @@ project_name=${project_name_prefix}-${project_type}
 # 部署文件夹
 deploy_file=/${deploy_folder}/${project_name}
 
-# 判断是否存在docker
-if [[ ! $(command -v docker) ]]; then
-  echo -e "\033[31mDocker环境不存在, 退出执行服务部署脚本 ❌ \033[0m "
-  exit 1 # 1:非正常运行导致退出程序
-fi
-
-# 检测是否存在Dockerfile文件 不存在退出执行
-cd /${deploy_folder} && ./docker-common.sh exist_docker_file
-
 # 检测是否存在部署文件夹 如果不存在创建一个
 cd /${deploy_folder} && ./docker-common.sh mkdir_deploy_file ${deploy_file}
-
-# 复制字体文件
-#if [[ ! -f "msyh.ttc" ]]; then
-#  touch msyh.ttc && chmod +x msyh.ttc # 兼容不需字体的项目 创建空文件  临时方案
-#fi
-#cp -p msyh.ttc ${deploy_file}/
 
 # 进入部署文件所在目录
 cd ${deploy_file}
@@ -179,29 +164,6 @@ docker_image_ids=$(docker images -q --filter reference=${docker_image_name})
 # 获取系统CPU使用率 如果CPU占用高 则排队延迟部署 避免并发部署等导致资源阻塞
 cd /${deploy_folder} && ./docker-common.sh get_cpu_rate && cd /${deploy_file}
 
-if [[ ${is_push_docker_repo} == false ]]; then
-  echo "🏗️  开始构建Docker镜像(无缓存构建)"
-  docker_file_name="Dockerfile"
-  if [[ ${java_framework_type} == 2 ]]; then
-    docker_file_name="Dockerfile.mvc"
-  fi
-  # 对于简单项目无需重复构建镜像  将部署文件 docker run -v 做挂载映射 直接重启容器即可
-  docker build -t ${docker_image_name} \
-    --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg PROJECT_NAME=${project_name} \
-    --build-arg EXPOSE_PORT="${build_expose_ports}" --build-arg JDK_VERSION=${jdk_version} \
-    -f /${deploy_folder}/${docker_file_name} . --no-cache
-else
-  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}-${project_type}-${env_mode}
-fi
-
-# 根据镜像创建时间判断镜像是否构建成功
-cd /${deploy_folder} && ./docker-common.sh is_success_images ${docker_image_name}
-# 子shell退出父shell
-is_success_images_code=$?
-if [[ "${is_success_images_code}" == 1 ]]; then
-  exit 1
-fi
-
 # 检查容器是否存在 停止容器
 cd /${deploy_folder} && ./docker-common.sh stop_docker ${docker_container_name}
 
@@ -234,33 +196,152 @@ docker run -d --restart=always -p ${host_port}:${expose_port} \
   -v /${deploy_folder}/${project_name}/logs:/logs \
   --name ${docker_container_name} ${docker_image_name}
 
-#docker_exited_container=$(docker ps --all -q -f status=exited)
-#if [[ ${docker_exited_container} ]]; then
-#  echo "删除具有exited状态的容器"
-#  docker rm ${docker_exited_container} || true
-#fi
-
 # 根据镜像名称获取所有ID并删除镜像
 cd /${deploy_folder} && ./docker-common.sh remove_docker_image ${docker_image_ids}
 
-# 删除所有悬空的镜像
-# cd /${deploy_folder} && ./docker-common.sh remove_docker_dangling_images
+#可变参数变量
+languageType="javac" #支持 java,javac,netcore 发布
+#参数值由pom文件传递
+baseZipName="${package-name}-${activeProfile}" #压缩包名称 publish-test.zip的publish
+packageName="${package-name}"                  #命令启动包名 xx.jar的xx
+mainclass="${boot-main}"                       #java -cp启动时，指定main入口类;命令：java -cp conf;lib\*.jar;${packageName}.jar ${mainclass}
 
-# 并发构建镜像删除none的镜像可能导致错误
-#docker_none_images=$(docker images | grep "none" | awk '{print $3}')
-#if [[ ${docker_none_images} ]]; then
-#  echo "删除名称或标签为none的镜像"
-#  docker rmi ${docker_none_images} --no-prune
-#fi
+#例子
+# baseZipName="publish-test" #压缩包名称 publish-test.zip的publish
+# packageName="publish" #命令启动包名 publish.jar的xx
 
-#echo "清除所有未使用或悬挂的图像 容器 卷和网络"
-#docker system prune -a
+#固定变量
+basePath=$(
+  cd $(dirname $0)/
+  pwd
+)
+baseZipPath="${basePath}/${baseZipName}.zip" #压缩包路径
+baseDirPath="${basePath}"                    #解压部署磁盘路径
+pid=                                         #进程pid
 
-#echo "删除2小时以上未被使用的镜像"
-#docker image prune -a --force --filter "until=2h"
+#解压
+function unzip() {
+  echo "解压---------------------------------------------"
+  echo "压缩包路径：${baseZipPath}"
+  if [ ! $(find ${baseZipPath}) ]; then
+    echo "不存在压缩包：${baseZipPath}"
+  else
+    echo "解压磁盘路径：${baseDirPath}/${baseZipName}"
+    echo "开始解压..."
 
-#  Jenkins单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块
-#  (mvn) clean install -pl app -am -Dmaven.test.skip=true  跳过单元测试打包
+    #解压命令
+    unzip -od ${baseDirPath}/${baseZipName} ${baseZipPath}
 
-# 提交检出均不转换
-# git config --global core.autocrlf false
+    #设置执行权限
+    chmod +x ${baseDirPath}/${baseZipName}/${packageName}
+
+    echo "解压完成。"
+  fi
+}
+
+#检测pid
+function getPid() {
+  echo "检测状态---------------------------------------------"
+  pid=$(ps -ef | grep -n ${packageName} | grep -v grep | awk '{print $2}')
+  if [ ${pid} ]; then
+    echo "运行pid：${pid}"
+  else
+    echo "未运行"
+  fi
+}
+
+#启动程序
+function start() {
+  #启动前，先停止之前的
+  stop
+  if [ ${pid} ]; then
+    echo "停止程序失败，无法启动"
+  else
+    echo "启动程序---------------------------------------------"
+
+    #选择语言类型
+    read -p "输入程序类型(java,javac,netcore)，下一步按回车键(默认：${languageType})：" read_languageType
+    if [ ${read_languageType} ]; then
+      languageType=${read_languageType}
+    fi
+    echo "选择程序类型：${languageType}"
+
+    #进入运行包目录
+    cd ${baseDirPath}/${baseZipName}
+
+    #分类启动
+    if [ "${languageType}" == "javac" ]; then
+      if [ ${mainclass} ]; then
+        nohup java -cp conf:lib\*.jar:${packageName}.jar ${mainclass} >${baseDirPath}/${packageName}.out 2>&1 &
+        #nohup java -cp conf:lib\*.jar:${packageName}.jar ${mainclass} >/dev/null 2>&1 &
+      fi
+    elif [ "${languageType}" == "java" ]; then
+      nohup java -jar ${baseDirPath}/${baseZipName}/${packageName}.jar >/dev/null 2>&1 &
+      # java -jar ${baseDirPath}/${baseZipName}/${packageName}.jar
+    elif [ "${languageType}" == "netcore" ]; then
+      #nohup dotnet run ${baseDirPath}/${baseZipName}/${packageName} >/dev/null 2>&1 &
+      nohup ${baseDirPath}/${baseZipName}/${packageName} >/dev/null 2>&1 &
+    fi
+
+    #查询是否有启动进程
+    getPid
+    if [ ${pid} ]; then
+      echo "已启动"
+      #nohup日志
+      tail -n 50 -f ${baseDirPath}/${packageName}.out
+    else
+      echo "启动失败"
+    fi
+  fi
+}
+
+#停止程序
+function stop() {
+  getPid
+  if [ ${pid} ]; then
+    echo "停止程序---------------------------------------------"
+    kill -9 ${pid}
+
+    getPid
+    if [ ${pid} ]; then
+      #stop
+      echo "停止失败"
+    else
+      echo "停止成功"
+    fi
+  fi
+}
+
+#启动时带参数，根据参数执行
+if [ ${#} -ge 1 ]; then
+  case ${1} in
+  "start")
+    start
+    ;;
+  "restart")
+    start
+    ;;
+  "stop")
+    stop
+    ;;
+  "unzip")
+    #执行解压
+    unzip
+    #执行启动
+    start
+    ;;
+  *)
+    echo "${1}无任何操作"
+    ;;
+  esac
+else
+  echo "
+    command如下命令：
+    unzip：解压并启动
+    start：启动
+    stop：停止进程
+    restart：重启
+
+    示例命令如：./release start
+    "
+fi

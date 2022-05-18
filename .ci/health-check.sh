@@ -50,7 +50,7 @@ elif [[ ${project_type} == 2 ]]; then
       code=$(curl -sIL -w "%{http_code}" -o /dev/null "${check_url}")
       result=$(curl --connect-timeout 600 --max-time 600 --globoff "${check_url}" | grep -E "200|404|401|403|unauthorized|Bad Request")
       if [[ ${code} == 200 || ${result} ]]; then
-        echo "状态码: ${code} 响应结果: ${result}"
+        # echo "状态码: ${code} 响应结果: ${result}"
         echo "服务端启动成功" # 必须包含"成功"字样 pipeline内判断
         break
       fi
