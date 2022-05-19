@@ -79,5 +79,6 @@ if __name__ == '__main__':
 # wget https://www.python.org/ftp/python/3.8.0/Python-3.8.0.tgz && tar -zxvf Python-3.8.0.tgz && cd Python-3.8.0 &&  ./configure -prefix=/usr/local/python3 && make && make install
 # 安装pip命令 yum install -y epel-release && yum install -y python-pip && pip install --upgrade pip
 # pip3 install PyMySQL
+# # 0 */1 * * *
 # 0 9 1-31 5 * /usr/bin/python3 /home/tasks/youhuiquan.py >> /home/tasks/youhuiquan.log
 # service crond restart , Ubuntu 使用 sudo service cron start  # 重启crond生效
