@@ -58,12 +58,12 @@ sudo netstat -tap | grep mysql
 # set global validate_password_policy=0;
 
 # ALTER USER 'root'@'localhost' IDENTIFIED WITH MYSQL_NATIVE_PASSWORD BY 'panweiji2021';
-# CREATE database if NOT EXISTS property_sales_dev;
+# CREATE database if NOT EXISTS database_name_dev;
 # show databases;
 
 # echo "新建远程用户"
-# CREATE USER IF NOT EXISTS 'property_sales'@'%' IDENTIFIED WITH MYSQL_NATIVE_PASSWORD BY 'panweiji2021';
-# GRANT all privileges ON *.* TO 'property_sales'@'%';
+# CREATE USER IF NOT EXISTS 'user_name'@'%' IDENTIFIED WITH MYSQL_NATIVE_PASSWORD BY 'panweiji2021';
+# GRANT all privileges ON *.* TO 'user_name'@'%';
 # flush privileges;
 
 # 处理端口问题

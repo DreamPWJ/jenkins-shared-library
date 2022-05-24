@@ -28,7 +28,7 @@ def call(String type = 'web', Map map) {
     }
     remote.user = "${map.remote_user_name}"
     remote_worker_ips = readJSON text: "${map.remote_worker_ips}"  // 分布式部署工作服务器地址 同时支持N个服务器
-    // 代理机或跳板机外网ip用于透传部署到目标机器
+    // 代理机或跳板机外网ip用于透传部署到内网目标机器
     proxy_jump_ip = "${map.proxy_jump_ip}"
 
     if (type == "web") { // 针对标准项目

@@ -11,7 +11,7 @@ cd  /my/datax/bin && python datax.py /my/datax/job/datax_job.json
 use information_schema;
 select TABLE_SCHEMA, table_name, table_rows, ENGINE, DATA_LENGTH, MAX_DATA_LENGTH, DATA_FREE
 from tables
-where table_schema='property_sales'
+where table_schema='database_name'
 order by table_rows desc
 limit 10;
 

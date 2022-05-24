@@ -16,7 +16,7 @@ map.put('remote_ip', '172.16.0.91')
 map.put('remote_worker_ips', [])
 // 远程服务器用户名
 map.put('remote_user_name', 'root')
-// 代理机或跳板机外网ip用于透传部署到目标机器 选填 目标机器外部无法直接访问情况填写内网ip
+// 代理机或跳板机外网ip用于透传部署到内网目标机器 选填 目标机器外部无法直接访问情况填写内网ip
 map.put('proxy_jump_ip', '119.188.90.222')
 
 // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
@@ -110,7 +110,7 @@ JSON_PARAMS
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "rzhtc" ,
     "SHELL_PARAMS" : "rzhtc h5 8020 80 sit" ,
-    "NPM_RUN_PARAMS" : "build",
+    "NPM_RUN_PARAMS" : "build:juxian",
     "IS_ROLL_DEPLOY" : true,
     "CUSTOM_NGINX_CONFIG" : "config/default.conf"
 }
