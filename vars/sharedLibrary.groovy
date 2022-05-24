@@ -30,6 +30,8 @@ def call(String type = 'web-java', Map map) {
     remote_worker_ips = readJSON text: "${map.remote_worker_ips}"  // 分布式部署工作服务器地址 同时支持N个服务器
     // 代理机或跳板机外网ip用于透传部署到内网目标机器
     proxy_jump_ip = "${map.proxy_jump_ip}"
+    // 跳板机ssh访问端口 默认22
+    proxy_jump_port = "${map.proxy_jump_port}"
 
     if (type == "web-java") { // 针对标准项目
         pipeline {
@@ -813,7 +815,7 @@ def initInfo() {
     if ("${proxy_jump_ip}".trim() != "") {
         isProxyJumpType = true
         // ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22
-        proxyJumpSSHText = " -J root@${proxy_jump_ip} "
+        proxyJumpSSHText = " -J root@${proxy_jump_ip}:${proxy_jump_port} "
         proxyJumpSCPText = " -o 'ProxyJump root@${proxy_jump_ip}' "
     }
 
