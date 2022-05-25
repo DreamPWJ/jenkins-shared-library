@@ -9,7 +9,7 @@ if [[ $(command -v docker) ]]; then
 fi
 
 echo "查看linux内核或版本"
-lsb_release -a # cat /etc/redhat-release
+lsb_release -a
 
 echo "更新包管理器 安装程序包 添加软件源信息"
 sudo apt-get update -y || true

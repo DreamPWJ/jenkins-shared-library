@@ -1,12 +1,13 @@
 package shared.library.common
 
 import shared.library.GlobalVars
+import shared.library.Utils
 
 /**
  * @author 潘维吉
  * @date 2021/3/18 16:29
  * @email 406798106@qq.com
- * @description  Docker相关
+ * @description Docker相关
  * 构建Docker镜像与上传远程仓库 拉取镜像 等
  */
 class Docker implements Serializable {
@@ -25,6 +26,40 @@ class Docker implements Serializable {
         } catch (e) {
             ctx.println("初始化Docker环境变量失败")
             ctx.println(e.getMessage())
+        }
+    }
+
+    /**
+     * 初始化Docker引擎环境 自动化第一次部署环境
+     */
+    static def initDocker(ctx) {
+        try {
+            // 判断服务器是是否安装docker环境
+            ctx.sh "ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} 'docker version' "
+        } catch (error) {
+            ctx.println error.getMessage()
+            ctx.dir("${ctx.env.WORKSPACE}/ci") {
+                def systemInfoCommand = "lsb_release -a || cat /etc/redhat-release" // 查看系统信息 Red Hat下CentOS旧版本使用cat /etc/redhat-release
+                def linuxType = Utils.getShEchoResult(ctx, "ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} '${systemInfoCommand}' ")
+                // 判断linux主流发行版类型
+                def dockerFileName = ""
+                if ("${linuxType}".contains("CentOS")) {
+                    ctx.println "CentOS系统"
+                    dockerFileName = "docker-install.sh"
+                } else if ("${linuxType}".contains("Ubuntu")) {
+                    ctx.println "Ubuntu系统"
+                    dockerFileName = "docker-install-ubuntu.sh"
+                } else {
+                    ctx.println "Linux系统: ${linuxType}"
+                    ctx.error("部署服务器非CentOS或Ubuntu系统类型 ❌")
+                }
+                // 上传docker初始化脚本
+                ctx.sh " scp ${ctx.proxyJumpSCPText} -r ./_docker/${dockerFileName}  ${ctx.remote.user}@${ctx.remote.host}:/${ctx.DEPLOY_FOLDER}/ "
+                // 给shell脚本执行权限
+                ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} 'chmod +x /${ctx.DEPLOY_FOLDER}/${dockerFileName} ' "
+                ctx.println "初始化Docker引擎环境  执行Docker初始化脚本"
+                ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} 'cd /${ctx.DEPLOY_FOLDER} && ./${dockerFileName} ' "
+            }
         }
     }
 
@@ -73,7 +108,7 @@ class Docker implements Serializable {
             }
 
             ctx.println("构建镜像上传完成后删除本地镜像")
-           // --no-prune : 不移除该镜像的过程镜像 默认移除 移除导致并发构建找不到父镜像层
+            // --no-prune : 不移除该镜像的过程镜像 默认移除 移除导致并发构建找不到父镜像层
             ctx.sh """
             docker rmi ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --no-prune || true
              """

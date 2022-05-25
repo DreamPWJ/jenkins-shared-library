@@ -1039,33 +1039,7 @@ def existCiCode() {
  * 初始化Docker引擎环境 自动化第一次部署环境
  */
 def initDocker() {
-    try {
-        // 判断服务器是是否安装docker环境
-        sh "ssh ${remote.user}@${remote.host} 'docker version' "
-    } catch (error) {
-        println error.getMessage()
-        dir("${env.WORKSPACE}/ci") {
-            linuxType = Utils.getShEchoResult(this, "ssh  ${remote.user}@${remote.host} 'lsb_release -a' ")
-            // 判断linux主流发行版类型
-            dockerFileName = ""
-            if ("${linuxType}".contains("CentOS")) {
-                println "CentOS系统"
-                dockerFileName = "docker-install.sh"
-            } else if ("${linuxType}".contains("Ubuntu")) {
-                println "Ubuntu系统"
-                dockerFileName = "docker-install-ubuntu.sh"
-            } else {
-                println "Linux系统: ${linuxType}"
-                error("部署服务器非CentOS或Ubuntu系统类型 ❌")
-            }
-            // 上传docker初始化脚本
-            sh " scp -r ./_docker/${dockerFileName}  ${remote.user}@${remote.host}:/${DEPLOY_FOLDER}/ "
-            // 给shell脚本执行权限
-            sh " ssh  ${remote.user}@${remote.host} 'chmod +x /${DEPLOY_FOLDER}/${dockerFileName} ' "
-            println "初始化Docker引擎环境  执行Docker初始化脚本"
-            sh " ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} && ./${dockerFileName} ' "
-        }
-    }
+    Docker.initDocker(this)
 }
 
 /**
