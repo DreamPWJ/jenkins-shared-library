@@ -138,7 +138,7 @@ def call(String type = 'web-java', Map map) {
                 //失败重试次数
                 retry(0)
                 //超时时间 job会自动被终止
-                timeout(time: 45, unit: 'MINUTES')
+                timeout(time: 120, unit: 'MINUTES')
                 //保持构建的最大个数
                 buildDiscarder(logRotator(numToKeepStr: "${map.build_num_keep}", artifactNumToKeepStr: "${map.build_num_keep}"))
                 //控制台输出增加时间戳
@@ -1500,36 +1500,7 @@ def serverlessDeploy() {
  * 自动设置免密连接 用于CI/CD服务器和应用部署服务器免密通信  避免手动批量设置繁琐重复劳动
  */
 def autoSshLogin() {
-    try {
-        if ("${remote.user}".trim() == "" || "${remote.host}".trim() == "") {
-            currentBuild.result = 'FAILURE'
-            error("请配置部署服务器登录用户名或IP地址 ❌")
-        }
-        // 检测ssh免密连接是否成功
-        sh "ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} exit"
-    } catch (error) {
-        println error.getMessage()
-        if (error.getMessage().contains("255")) { // 0连接成功 255无法连接
-            println "免密登录失败, 根据hosts.txt文件已有的账号信息自动设置, 如果没有配置hosts.txt请手动设置ssh免密登录"
-            println "如果有跳板机情况, 可手动将构建机器的公钥分别添加到外网跳板机和内网目标机authorized_keys内实现免密登录"
-            try {
-                // 目的是清除当前机器里关于远程服务器的缓存和公钥信息 如远程服务器已重新初始化情况 导致本地还有缓存
-                // ECDSA host key "ip" for  has changed and you have requested strict checking 报错
-                sh "ssh-keygen -R ${remote.host}"
-            } catch (e) {
-                println "清除当前机器里关于远程服务器的缓存和公钥信息失败"
-                println e.getMessage()
-            }
-            dir("${env.WORKSPACE}/ci") {
-                try {
-                    // 执行免密登录脚本
-                    sh " cd _linux && chmod +x auto-ssh.sh && ./auto-ssh.sh "
-                } catch (e) {
-                    println e.getMessage()
-                }
-            }
-        }
-    }
+    SecureShell.autoSshLogin(this)
 }
 
 /**
@@ -1739,7 +1710,7 @@ def gitTagLog() {
         def gitChangeLog = changeLog.genChangeLog(this, 100)
         def latestTag = ""
         try {
-            // 获取本地最新tag名称
+            // 获取本地当前分支最新tag名称   获取远程仓库最新tag命令 git ls-remote
             latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")
         } catch (error) {
             println "没有获取到最新的git tag标签"

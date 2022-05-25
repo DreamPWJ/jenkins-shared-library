@@ -89,7 +89,7 @@ def call(String type = 'wx-mini', Map map) {
                 //失败重试次数
                 retry(0)
                 //超时时间 job会自动被终止
-                timeout(time: 45, unit: 'MINUTES')
+                timeout(time: 60, unit: 'MINUTES')
                 //保持构建的最大个数
                 buildDiscarder(logRotator(numToKeepStr: "${map.build_num_keep}", artifactNumToKeepStr: "${map.build_num_keep}"))
                 //控制台输出增加时间戳
