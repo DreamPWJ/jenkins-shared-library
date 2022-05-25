@@ -29,7 +29,7 @@ nav:
 - Web技术项目类型 1. Npm生态与静态Web项目 2. Flutter For Web 3. React Native For Web 4. Unity For Web 5. WebAssembly
   ![avatar](../../images/web.png)
 
-### 多端CI/CD共享库流水线已支持的范围
+### 多端CI/CD共享库流水线已支持的范围  基于Jenkins Pipeline共享库实现
 
 - 移动端: Android、iOS、Flutter、React Native
 - 小程序: 原生与跨端小程序
@@ -38,7 +38,7 @@ nav:
 - 桌面端: Electron、Unity  (Windows、MacOS、Linux)
 - 视觉引擎: Unity、WebGL、Cocos
 - 仓库方式: 单仓多包式MonoRepo、多仓单包式MultiRepo
-- 部署方式: 单机部署、镜像仓库、蓝绿部署、滚动部署、分布式部署、自动扩缩容、一键回滚、自动提审上架等
+- 部署方式: 单机部署、镜像仓库、蓝绿部署、滚动部署、分布式部署、自动扩缩容、一键回滚、自动提审上架、跳板机透传部署等
 - 应用市场: App Store、小程序平台、华为商店、小米商店、自建OSS、Firebase、蒲公英、Fir等
 - 通知类型: 发布结果、发布日志、审核状态等
 - CI/CD运行系统: MacOS、Linux

@@ -30,7 +30,9 @@ def call(String type = 'web-java', Map map) {
     remote_worker_ips = readJSON text: "${map.remote_worker_ips}"  // 分布式部署工作服务器地址 同时支持N个服务器
     // 代理机或跳板机外网ip用于透传部署到内网目标机器
     proxy_jump_ip = "${map.proxy_jump_ip}"
-    // 跳板机ssh访问端口 默认22
+    // 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
+    proxy_jump_user_name = "${map.proxy_jump_user_name}"
+    // 自定义跳板机ssh和scp访问端口 默认22
     proxy_jump_port = "${map.proxy_jump_port}"
 
     if (type == "web-java") { // 针对标准项目
@@ -484,6 +486,7 @@ def call(String type = 'web-java', Map map) {
                     }
                     tools {
                         // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
+                        // 滚动部署对于不同节点配置文件不同的情况 动态替换配置文件后需要基于Maven重新打包不同节点部署包
                         maven "${map.maven}"
                     }
                     steps {
@@ -811,12 +814,12 @@ def initInfo() {
     isProxyJumpType = false
     // 跳板机ssh ProxyJump访问新增的文本
     proxyJumpSSHText = "" // ssh跳板透传远程访问
-    proxyJumpSCPText = "" // scp跳板透传远程复制
+    proxyJumpSCPText = "" // scp跳板透传远程复制传输
     if ("${proxy_jump_ip}".trim() != "") {
         isProxyJumpType = true
         // ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22
-        proxyJumpSSHText = " -J root@${proxy_jump_ip}:${proxy_jump_port} "
-        proxyJumpSCPText = " -o 'ProxyJump root@${proxy_jump_ip}' "
+        proxyJumpSSHText = " -J ${proxy_jump_user_name}@${proxy_jump_ip}:${proxy_jump_port} "
+        proxyJumpSCPText = " -o 'ProxyJump ${proxy_jump_user_name}@${proxy_jump_ip}:${proxy_jump_port}' "
     }
 
 }
@@ -1507,7 +1510,8 @@ def autoSshLogin() {
     } catch (error) {
         println error.getMessage()
         if (error.getMessage().contains("255")) { // 0连接成功 255无法连接
-            println "免密登录失败  根据hosts.txt文件已有的账号信息自动设置"
+            println "免密登录失败, 根据hosts.txt文件已有的账号信息自动设置, 如果没有配置hosts.txt请手动设置ssh免密登录"
+            println "如果有跳板机情况, 可手动将构建机器的公钥分别添加到外网跳板机和内网目标机authorized_keys内实现免密登录"
             try {
                 // 目的是清除当前机器里关于远程服务器的缓存和公钥信息 如远程服务器已重新初始化情况 导致本地还有缓存
                 // ECDSA host key "ip" for  has changed and you have requested strict checking 报错

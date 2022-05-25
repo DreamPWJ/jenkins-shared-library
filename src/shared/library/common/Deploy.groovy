@@ -19,7 +19,7 @@ class Deploy implements Serializable {
         // ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22
         ctx.sh "ssh -J root@${ctx.proxyJumphost} ${ctx.remote.user}@${ctx.remote.host}"
         // ssh -J root@119.188.90.222 root@172.16.0.91
-        // scp -o 'ProxyJump root@跳板机IP' file.txt root@目标机器IP:/my/
+        // scp -o 'ProxyJump root@跳板机IP:22' file.txt root@目标机器IP:/my/
         // Tabby跨越堡垒机的SSH利器 文档: https://zhuanlan.zhihu.com/p/490662490
     }
 
