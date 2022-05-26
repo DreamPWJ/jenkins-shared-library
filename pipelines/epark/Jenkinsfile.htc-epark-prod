@@ -113,7 +113,7 @@ JSON_PARAMS
     "BRANCH_NAME" : "main" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "rzhtc" ,
-    "SHELL_PARAMS" : "rzhtc h5 8010 80 prod" ,
+    "SHELL_PARAMS" : "rzhtc h5 9000 80 prod" ,
     "NPM_RUN_PARAMS" : "build:rizhao",
     "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf"
 }

@@ -26,8 +26,8 @@ class SecureShell implements Serializable {
                 ctx.currentBuild.result = 'FAILURE'
                 ctx.error("请配置部署服务器登录用户名或IP地址 ❌")
             }
-            // 检测ssh免密连接是否成功
-            ctx.sh "ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} exit"
+            // 检测ssh免密连接是否成功  ssh/scp跳过首次连接远程主机的fingerprint设置-o StrictHostKeyChecking=no
+            ctx.sh "ssh ${ctx.proxyJumpSSHText} -o StrictHostKeyChecking=no ${ctx.remote.user}@${ctx.remote.host} exit"
         } catch (error) {
             ctx.println error.getMessage()
             if (error.getMessage().contains("255")) { // 0连接成功 255无法连接
