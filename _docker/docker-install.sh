@@ -9,11 +9,12 @@ if [[ $(command -v docker) ]]; then
   exit
 fi
 
+# uname -r 验证  Docker要求Linux系统的内核版本高于 3.10
 echo "查看linux内核或版本"
-lsb_release -a # cat /etc/redhat-release
+lsb_release -a || cat /etc/redhat-release
 
 echo "更新yum包到最新、安装Docker相关依赖、设置yum源"
-sudo yum update -y
+sudo yum update -y || true
 # 安装需要的软件包， yum-util 提供yum-config-manager功能，另外两个是devicemapper驱动依赖的
 sudo yum install -y yum-utils device-mapper-persistent-data lvm2
 # 设置yum源 https://download.docker.com/linux/centos/docker-ce.repo
@@ -21,9 +22,10 @@ sudo yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/cen
 
 echo "安装Docker"
 sudo yum makecache # 将服务器上的软件包信息 现在本地缓存,以提高 搜索 安装软件的速度
+# sudo yum install -y docker-ce  # 对于老旧系统可手动执行命令安装
 # sudo dnf -y install docker-ce --nobest # CentOS8 dnf新包方式
 # sudo yum -y downgrade docker-ce-cli-19.03.8-3.el7 # 兼容 错误error response from daemon: client version 1.40 is too new. Maximum supported API version is 1.39
-curl -s --connect-timeout 30 --retry 5 https://get.docker.com/ | sudo sh # curl方式下载docker
+curl -s --connect-timeout 60 --retry 6 https://get.docker.com/ | sudo sh || sudo yum install -y docker-ce # curl方式下载docker
 
 echo "启动Docker并加入开机自启动"
 #sudo systemctl enable --now docker

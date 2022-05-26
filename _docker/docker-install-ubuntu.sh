@@ -8,6 +8,7 @@ if [[ $(command -v docker) ]]; then
   exit
 fi
 
+# uname -r 验证  Docker要求Linux系统的内核版本高于3.10
 echo "查看linux内核或版本"
 lsb_release -a
 
@@ -22,7 +23,7 @@ sudo add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/li
 
 # 非设置镜像情况安装Docker 网络原因可能比较慢或者失败
 echo "安装Docker"
-curl -s --connect-timeout 30 --retry 5 https://get.docker.com/ | sudo sh
+curl -s --connect-timeout 60 --retry 6 https://get.docker.com/ | sudo sh
 #sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
 echo "启动Docker并加入开机自启动"
