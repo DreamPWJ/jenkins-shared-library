@@ -115,9 +115,9 @@ JSON_PARAMS
     "PROJECT_NAME" : "rzhtc" ,
     "SHELL_PARAMS" : "rzhtc h5 8010 80 prod" ,
     "NPM_RUN_PARAMS" : "build:rizhao",
-    "IS_ROLL_DEPLOY" : true,
     "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf"
 }
+REMOTE_IP: 172.16.99.51
 
 htc-epark-server-prod
 好停车epark平台服务端
@@ -147,7 +147,7 @@ JSON_PARAMS
     "NPM_RUN_PARAMS" : "build",
     "CUSTOM_NGINX_CONFIG" : "config/default.conf"
 }
-REMOTE_IP: 172.16.0.91
+REMOTE_IP: 172.16.99.51
 
 */
 

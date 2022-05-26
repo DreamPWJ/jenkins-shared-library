@@ -51,10 +51,14 @@ class Utils implements Serializable {
             def regex = '^(([0-9]|([1-9]([0-9]*))).){2}([0-9]|([1-9]([0-9]*)))([-](([0-9A-Za-z]|([1-9A-Za-z]([0-9A-Za-z]*)))[.]){0,}([0-9A-Za-z]|([1-9A-Za-z]([0-9A-Za-z]*)))){0,1}([+](([0-9A-Za-z]{1,})[.]){0,}([0-9A-Za-z]{1,})){0,1}$'
             if (isRegexMatcher(regex, versionNum)) {
                 def version = versionNum.split("\\.")
-                if (type == GlobalVars.gitCommitFeature) {
+                if (type.contains("BREAKING CHANGE")) { // 主版本 major
+                    version[0] = version[0].toInteger() + 1
+                    version[1] = 0
+                    version[2] = 0
+                } else if (type == GlobalVars.gitCommitFeature) { // 次版本 minor
                     version[1] = version[1].toInteger() + 1
                     version[2] = 0
-                } else if (type == GlobalVars.gitCommitFix) {
+                } else if (type == GlobalVars.gitCommitFix) { // 补丁版 patch
                     version[2] = version[2].toInteger() + 1
                 }
                 return version.join(".")
