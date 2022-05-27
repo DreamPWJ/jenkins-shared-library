@@ -110,7 +110,7 @@ htc-epark-h5-prod
 JSON_PARAMS
 {
     "REPO_URL" : "http://47.102.214.33/lanneng_develop/rzhtc.git" ,
-    "BRANCH_NAME" : "main" ,
+    "BRANCH_NAME" : "rizhao" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "rzhtc" ,
     "SHELL_PARAMS" : "rzhtc h5 9000 80 prod" ,
@@ -132,7 +132,7 @@ JSON_PARAMS
    "IS_MAVEN_SINGLE_MODULE" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
    "SOURCE_TARGET_CONFIG_DIR" : "resources/rizhao,resources",
-   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/mnt/stor1:/usr/local/tomcat/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
+   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/root/apache-tomcat-7.0.70/webapps/FileUpload:/usr/local/tomcat/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
 }
 
 htc-park-coupon-h5-prod

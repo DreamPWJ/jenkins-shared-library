@@ -1,16 +1,25 @@
-#### 查看是否打开8080端口
+#### 查看运行端口
+
+netstat -tunlp
 netstat -anp | grep 8080
 lsof -i:8080
 
+#### 查看详细进程
+
+ps aux | grep tomcat
+
 #### 查IP地址
+
 ifconfig
 curl cip.cc
 
 #### 查看linux内核
+
 lsb_release -a
 
 #### 添加定时执行计划表
-crontab -e　
+
+crontab -e
 crontab -l
 service crond restart , Ubuntu 使用 sudo service cron start
 tail -f /var/log/cron
