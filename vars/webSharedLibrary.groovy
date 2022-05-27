@@ -653,13 +653,13 @@ def pullProjectCode() {
     if (!params.GIT_TAG) {
         params.GIT_TAG = GlobalVars.noGit
     }
-    // 自定义选择指定分支 不使用配置好的分支情况
-    if (params.IS_GIT_TAG && "${BRANCH_NAME}" != "${params.GIT_BRANCH}") {
-        BRANCH_NAME = "${params.GIT_BRANCH}"  // Git分支
-    }
 
     // 获取应用打包代码
     if (params.GIT_TAG == GlobalVars.noGit) {
+        // 自定义选择指定分支 不使用配置好的分支情况
+        if ("${BRANCH_NAME}" != "${params.GIT_BRANCH}") {
+            BRANCH_NAME = "${params.GIT_BRANCH}"  // Git分支
+        }
         println "Git构建分支是: ${BRANCH_NAME} 📇"
         // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
         // println "${git}"
