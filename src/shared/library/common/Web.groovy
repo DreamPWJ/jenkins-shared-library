@@ -33,11 +33,11 @@ class Web implements Serializable {
         } catch (error) {
             ctx.sh "yarn global add dotenv-cli"
         }
-/*        try {
+        try {
             ctx.sh "rimraf"
         } catch (error) {
             ctx.sh "yarn global add rimraf"
-        }*/
+        }
     }
 
     /**

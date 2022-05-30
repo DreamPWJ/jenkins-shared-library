@@ -112,9 +112,10 @@ JSON_PARAMS
     "REPO_URL" : "http://47.102.214.33/lanneng_develop/react-frontend-monorepo.git" ,
     "BRANCH_NAME" : "dev" ,
     "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "pellet-charging" ,
-    "SHELL_PARAMS" : "pellet-charging web 8020 80 sit" ,
+    "PROJECT_NAME" : "pellet-charging-admin" ,
+    "SHELL_PARAMS" : "pellet-charging-admin web 8020 80 sit" ,
     "NPM_RUN_PARAMS" : "build",
+    "IS_MONO_REPO": true
 }
 
 pellet-charging-app-sit
