@@ -21,7 +21,7 @@ map.put('proxy_jump_ip', '58.59.49.122')
 // 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
 map.put('proxy_jump_user_name', 'root')
 // 自定义跳板机ssh和scp访问端口 默认22
-map.put('proxy_jump_port', '22')
+map.put('proxy_jump_port', '3900')
 
 // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
 map.put('default_git_branch', ' ')
@@ -61,7 +61,7 @@ map.put('is_grace_shutdown', false)
 // 是否进行服务启动健康探测
 map.put('is_health_check', true)
 // 是否Pipeline内脚本钉钉通知  总开关
-map.put('is_ding_notice', false)
+map.put('is_ding_notice', true)
 // 是否进行部署前通知
 map.put('is_before_deploy_notice', false)
 // 是否通知变更记录
