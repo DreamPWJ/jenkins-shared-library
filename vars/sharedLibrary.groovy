@@ -240,6 +240,7 @@ def call(String type = 'web-java', Map map) {
                         docker {
                             // Node环境  构建完成自动删除容器
                             image "node:${NODE_VERSION.replace('Node', '')}"
+                            args " -v /var/cache/node/:/usr/local/app/ "
                             reuseNode true // 使用根节点
                         }
                     }

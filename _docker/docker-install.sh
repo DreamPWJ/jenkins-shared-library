@@ -60,4 +60,8 @@ sleep 1
 echo "Docker版本 验证安装是否成功 "
 docker version
 
-echo -e "\033[32mDocker安装完成 ✔ \033[0m"
+if [[ $(command -v docker) ]]; then
+  echo -e "\033[32mDocker安装成功 ✔ \033[0m"
+else
+  echo -e "\033[3132mDocker安装失败 ❌ \033[0m "
+fi
