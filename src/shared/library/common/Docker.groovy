@@ -39,7 +39,8 @@ class Docker implements Serializable {
         } catch (error) {
             ctx.println error.getMessage()
             ctx.dir("${ctx.env.WORKSPACE}/ci") {
-                def systemInfoCommand = "lsb_release -a || cat /etc/redhat-release" // 查看系统信息 Red Hat下CentOS旧版本使用cat /etc/redhat-release
+                def systemInfoCommand = "lsb_release -a || cat /etc/redhat-release"
+                // 查看系统信息 Red Hat下CentOS旧版本使用cat /etc/redhat-release
                 def linuxType = Utils.getShEchoResult(ctx, "ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} '${systemInfoCommand}' ")
                 // 判断linux主流发行版类型
                 def dockerFileName = ""
@@ -75,18 +76,18 @@ class Docker implements Serializable {
                    docker login ${ctx.DOCKER_REPO_REGISTRY} --username=${ctx.DOCKER_HUB_USER_NAME} --password=${ctx.DOCKER_HUB_PASSWORD}
                    """
             //docker buildx 多CPU架构支持 Building Multi-Arch Images for Arm and x86 with Docker Desktop
-            //docker buildx create --name mybuilder , docker buildx use mybuilder &&  docker buildx build --platform linux/amd64
+            //docker buildx create --name mybuilder && docker buildx use mybuilder &&  docker buildx build --platform linux/amd64
             //多CPU架构文档: https://docs.docker.com/develop/develop-images/build_enhancements/
             ctx.println("开始制作多CPU架构Docker镜像并上传远程仓库")
             // 解决buildx报错error: failed to solve: rpc error: code = Unknown desc = failed to solve with frontend dockerfile.v0
             // Docker desktop -> Settings -> Docker Engine -> Change the "features": { buildkit: true} to "features": { buildkit: false}
-            ctx.sh """  export DOCKER_BUILDKIT=0
-                        export COMPOSE_DOCKER_CLI_BUILD=0
+            // 开启BuildKit模式 /etc/docker/daemon.json 设置 { "features": { "buildkit": true } }
+            ctx.sh """  export DOCKER_BUILDKIT=1
                        """
             if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
                 ctx.sh """  cp -p ${ctx.env.WORKSPACE}/ci/.ci/web/default.conf ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} &&
                             cd ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} && pwd && \
-                            docker  buildx build --platform linux/amd64  -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
+                            docker buildx build --platform linux/amd64  -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
                             --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg WEB_STRIP_COMPONENTS="${ctx.WEB_STRIP_COMPONENTS}" \
                             --build-arg NPM_PACKAGE_FOLDER=${ctx.NPM_PACKAGE_FOLDER}  -f ${ctx.env.WORKSPACE}/ci/.ci/web/Dockerfile . --no-cache \
                             --push
