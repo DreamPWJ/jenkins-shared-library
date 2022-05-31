@@ -66,6 +66,7 @@ export PATH=$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH
 echo $MAVEN_HOME && echo $JAVA_HOME && echo $PATH
 
 ##### 安装nodejs
+
 curl -sL https://rpm.nodesource.com/setup_12.x | sudo bash -
 yum install -y nodejs
 npm install -g npm
@@ -75,13 +76,19 @@ node -v && npm -v
 which node
 yum remove -y nodejs
 
+#### 安装Ubuntu服务器系统
+
+- 参考文章: https://bynss.com/howto/633952.html
+
 ##### 在Ubuntu上安装图形化界面
+
 sudo sudo apt update && apt-get update && apt-get upgrade
-apt-get install -y ubuntu-desktop  # Gnome桌面
+apt-get install -y ubuntu-desktop # Gnome桌面
 reboot
+
 - 使用阿里云自带的远程连接VNC
 - sudo apt-get install xrdp vnc4server xbase-clients # 安装VNC
-- sudo apt-get install dconf-editor  # 安装dconf-editor  5yX6xi
+- sudo apt-get install dconf-editor # 安装dconf-editor 5yX6xi
 - 取消权限限制：打开dconf-editor，依次展开org->gnome->desktop->remote-access，然后取消 “requlre-encryption”的勾选即可
 - VNC工具或者Windows自带的mstsc(远程桌面控制)进行访问就行
 - 选择模式【vnc-any】，然后输入IP地址和密码进行登录 其中端口号默认为5900
