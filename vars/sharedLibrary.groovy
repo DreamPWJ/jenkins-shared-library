@@ -240,7 +240,7 @@ def call(String type = 'web-java', Map map) {
                         docker {
                             // Node环境  构建完成自动删除容器
                             //image "node:${NODE_VERSION.replace('Node', '')}"
-                            image "my/node:14" // 使用自定义Dockerfile的node环境 加速monorepo依赖构建内置lerna等相关依赖
+                            image "panweiji/node:14" // 使用自定义Dockerfile的node环境 加速monorepo依赖构建内置lerna等相关依赖
                             reuseNode true // 使用根节点
                         }
                     }

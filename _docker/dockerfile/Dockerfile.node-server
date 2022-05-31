@@ -1,0 +1,54 @@
+# Author: 潘维吉
+# Version 1.0.0
+# Description: 自定义构建Node项目服务端镜像
+
+# 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
+# ARG EXPOSE_PORT
+
+
+# 指定我们的基础镜像是node 如果指定的镜像不存在默认会自动从Docker Hub上下载
+FROM node:14
+
+# 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
+#LABEL author="潘维吉"
+
+# 挂载数据卷 docker删除后数据不丢失 docker run -v 映射
+VOLUME /logs
+
+# 指定切换用户
+USER root
+
+# 设置时区
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# 将根目录下的文件都copy到docker容器文件系统的app文件夹下
+ADD . /app/
+# cd到app文件夹下
+WORKDIR /app
+
+# 安装项目依赖包  RUN和CMD都是执行命令，他们的差异在于RUN中定义的命令会在执行docker build命令创建镜像时执行，而CMD中定义的命令会在执行docker run命令运行镜像时执行
+RUN npm install --only=production &&  npm rebuild node-sass --force
+
+# 配置环境变量
+# ENV HOST 0.0.0.0
+ENV PORT 8000
+
+# 容器对外暴露的端口号
+EXPOSE 8000
+
+# 容器启动时执行的命令，类似npm run start
+CMD ["npm", "start"]
+
+#  node服务端
+
+#  构建镜像(无缓存构建)
+#  docker build -t at-things/node .  --no-cache
+#  停止指定的容器
+#  docker stop at-things-node
+#  删除未运行的容器
+#  docker rm $(docker ps -a -q)
+#  启动容器 指定端口映射 容器名称和对应的镜像名称
+#  docker run -d --restart=always --name at-things-node -p 8000:8000 at-things/node
+#  删除名称或标签为none的镜像
+#  docker rmi $(docker images | grep "none" | awk '{print $3}')
