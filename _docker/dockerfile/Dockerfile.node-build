@@ -1,0 +1,30 @@
+# Author: 潘维吉
+# Version 1.0.0
+# Description: 自定义构建Node项目镜像
+
+# 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
+# ARG EXPOSE_PORT
+
+# 基础镜像
+FROM node:14
+
+# 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
+#LABEL author="潘维吉"
+
+# 挂载数据卷 docker删除后数据不丢失 docker run -v 映射
+VOLUME /logs
+
+# 指定切换用户
+USER root
+
+# 设置时区
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# 自定义环境
+RUN npm -v && npm config set registry https://registry.npm.taobao.org && npm i -g lerna && yarn global add dotenv-cli && yarn global add rimraf
+
+# 对外暴露端口
+# EXPOSE  $EXPOSE_PORT
+
+# docker build -t my/node:14  -f /my/Dockerfile.node-build . --no-cache
