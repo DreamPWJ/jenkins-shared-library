@@ -29,12 +29,12 @@ class Web implements Serializable {
         // yarn镜像源
         // ctx.sh "yarn config set registry https://registry.npm.taobao.org"
         try {
-            ctx.sh "dotenv --version"
+            ctx.sh "dotenv --help"
         } catch (error) {
             ctx.sh "yarn global add dotenv-cli"
         }
         try {
-            ctx.sh "rimraf"
+            ctx.sh "rimraf --help"
         } catch (error) {
             ctx.sh "yarn global add rimraf"
         }

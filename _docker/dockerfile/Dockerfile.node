@@ -1,12 +1,12 @@
 # Author: 潘维吉
 # Version 1.0.0
-# Description: 自定义构建Spring MVC项目镜像
+# Description: 自定义构建Node项目镜像
 
 # 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
-ARG EXPOSE_PORT
+# ARG EXPOSE_PORT
 
 # 基础镜像
-FROM tomcat:8.5-jre8
+FROM node:14
 
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
 #LABEL author="潘维吉"
@@ -21,8 +21,10 @@ USER root
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# 将部署文件复制到docker内
-COPY  *.war  /usr/local/tomcat/webapps/
+# 自定义环境
+RUN npm -v && npm config set registry https://registry.npm.taobao.org && npm i -g lerna && yarn global add dotenv-cli && yarn global add rimraf
 
 # 对外暴露端口
-EXPOSE  $EXPOSE_PORT
+# EXPOSE  $EXPOSE_PORT
+
+# docker build -t my/node:14  -f /my/Dockerfile.node . --no-cache
