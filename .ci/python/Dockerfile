@@ -36,5 +36,5 @@ RUN  tar -xzvf python.tar.gz >/dev/null 2>&1 \
 EXPOSE $EXPOSE_PORT
 
 # 启动命令
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
-#CMD [ "python3", "app.py"]
+#CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+CMD [ "python3", "main.py"]
