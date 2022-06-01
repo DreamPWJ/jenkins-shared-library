@@ -2,16 +2,16 @@
 docker info
 vim /etc/docker/daemon.json
 {
-  "registry-mirrors": [
-   "https://e6x18rmb.mirror.aliyuncs.com",
-   "https://mirror.ccs.tencentyun.com",
-   "http://registry.docker-cn.com",
-   "http://docker.mirrors.ustc.edu.cn",
-   "http://hub-mirror.c.163.com"
-  ]
+"registry-mirrors": [
+"https://e6x18rmb.mirror.aliyuncs.com",
+"https://em1sutsj.mirror.aliyuncs.com",
+"https://mirror.ccs.tencentyun.com",
+"http://registry.docker-cn.com",
+"http://docker.mirrors.ustc.edu.cn",
+"http://hub-mirror.c.163.com"
+]
 }
-sudo systemctl daemon-reload
-sudo systemctl restart docker
+sudo systemctl daemon-reload && sudo systemctl restart docker
 
 #### 从Docker Hub里拉取mysql镜像来部署
 docker pull mysql

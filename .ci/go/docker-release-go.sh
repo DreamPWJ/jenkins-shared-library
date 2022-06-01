@@ -157,7 +157,7 @@ else
 fi
 
 # 根据镜像创建时间判断镜像是否构建成功
-cd /${deploy_folder} && ./docker-common.sh is_success_images ${docker_image_name}
+cd /${deploy_folder} && ./docker-common.sh is_success_images ${docker_image_name} ${is_push_docker_repo}
 # 子shell退出父shell
 is_success_images_code=$?
 if [[ "${is_success_images_code}" == 1 ]]; then

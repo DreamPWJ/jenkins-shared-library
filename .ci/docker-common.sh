@@ -40,8 +40,8 @@ function is_success_images() {
   docker_image_create_time_stamp=$(date -d "${docker_image_create_time}" +%s)
   # 当前时间和镜像创建时间差
   docker_image_time_diff=$((($(date -d "$(date)" +%s)) - ${docker_image_create_time_stamp}))
-  # 时间差大于等于多少秒 说明不是最新镜像 考虑远程仓库情况时间差可能比较大
-  if [[ ${docker_image_time_diff} -ge 120 ]]; then
+  # 时间差大于等于多少秒 说明不是最新镜像
+  if [[ ${docker_image_time_diff} -ge 60 && $2 == false ]]; then
     #echo "当前时间与创建镜像的时间差: ${docker_image_time_diff}秒"
     echo -e "\033[31mDocker镜像构建失败  ❌  \033[0m " # 镜像可能不是最新镜像 可能为同一台服务器并发构建导致父镜像层被删除
     echo "请查看错误日志后, 再次尝试部署 🤪 "

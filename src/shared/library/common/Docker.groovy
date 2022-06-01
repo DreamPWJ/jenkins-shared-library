@@ -75,26 +75,38 @@ class Docker implements Serializable {
             ctx.sh """      
                    docker login ${ctx.DOCKER_REPO_REGISTRY} --username=${ctx.DOCKER_HUB_USER_NAME} --password=${ctx.DOCKER_HUB_PASSWORD}
                    """
-            //docker buildx 多CPU架构支持 Building Multi-Arch Images for Arm and x86 with Docker Desktop
-            //docker buildx create --name mybuilder && docker buildx use mybuilder && docker buildx build --platform linux/amd64 .
-            //多CPU架构文档: https://docs.docker.com/develop/develop-images/build_enhancements/
-            ctx.println("开始制作多CPU架构Docker镜像并上传远程仓库")
-            // 解决buildx报错error: failed to solve: rpc error: code = Unknown desc = failed to solve with frontend dockerfile.v0
-            // Docker desktop -> Settings -> Docker Engine -> Change the "features": { buildkit: true} to "features": { buildkit: false}
+            def dockerBuildDiffStr = " build " // 默认构建镜像
+            def dockerPushDiffStr = "" // 默认不同时推送镜像
+            // 是否使用buildkit构建多CPU架构支持
+            def isBuildKit = false
 
-            // 开启Buildkit
-            ctx.sh """  export DOCKER_BUILDKIT=1
+            if (isBuildKit) {
+                //docker buildx 多CPU架构支持 Building Multi-Arch Images for Arm and x86 with Docker Desktop
+                //docker buildx create --name mybuilder && docker buildx use mybuilder && docker buildx build --platform linux/amd64 .
+                //多CPU架构文档: https://docs.docker.com/develop/develop-images/build_enhancements/
+                ctx.println("开始制作多CPU架构Docker镜像并上传远程仓库")
+                // 解决buildx报错error: failed to solve: rpc error: code = Unknown desc = failed to solve with frontend dockerfile.v0
+                // Docker desktop -> Settings -> Docker Engine -> Change the "features": { buildkit: true} to "features": { buildkit: false}
+
+                // 开启Buildkit
+                ctx.sh """  export DOCKER_BUILDKIT=1
                        """
-            // 在Docker容器内使用Buildkit
-           /* ctx.sh """  DOCKER_CLI_EXPERIMENTAL=enabled
-                       """*/
+                // 在Docker容器内使用Buildkit
+                /* ctx.sh """  DOCKER_CLI_EXPERIMENTAL=enabled
+                            """*/
+                dockerBuildDiffStr = " buildx build --platform linux/amd64 "
+                dockerPushDiffStr = " --push "
+            } else {
+                ctx.println("开始制作Docker镜像并上传远程仓库")
+            }
+
             if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
                 ctx.sh """  cp -p ${ctx.env.WORKSPACE}/ci/.ci/web/default.conf ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} &&
                             cd ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} && pwd && \
-                            docker buildx build --platform linux/amd64  -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
+                            docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
                             --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg WEB_STRIP_COMPONENTS="${ctx.WEB_STRIP_COMPONENTS}" \
                             --build-arg NPM_PACKAGE_FOLDER=${ctx.NPM_PACKAGE_FOLDER}  -f ${ctx.env.WORKSPACE}/ci/.ci/web/Dockerfile . --no-cache \
-                            --push
+                            ${dockerPushDiffStr}
                             """
             } else if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
                 def exposePort = "${ctx.SHELL_HOST_PORT}"
@@ -104,14 +116,17 @@ class Docker implements Serializable {
                 exposePort = "${ctx.IS_PROD}" == 'true' ? "${exposePort}" : "${exposePort} 5005"
                 if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
                     ctx.sh """ cd ${ctx.mavenPackageLocationDir} && pwd &&
-                            docker buildx build --platform linux/amd64  -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
+                            docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg EXPOSE_PORT="${exposePort}" \
                             --build-arg JDK_VERSION=${ctx.JDK_VERSION}  -f ${ctx.env.WORKSPACE}/ci/.ci/Dockerfile . --no-cache \
-                            --push
+                            ${dockerPushDiffStr}
                             """
                 }
             }
-
+            // 非buildkit构建 推送镜像到远程仓库
+            if (!isBuildKit) {
+                ctx.sh " docker push ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} "
+            }
             ctx.println("构建镜像上传完成后删除本地镜像")
             // --no-prune : 不移除该镜像的过程镜像 默认移除 移除导致并发构建找不到父镜像层
             ctx.sh """
@@ -141,7 +156,7 @@ class Docker implements Serializable {
         def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${imageTag}"
         ctx.withCredentials([ctx.usernamePassword(credentialsId: "${ctx.DOCKER_REPO_CREDENTIALS_ID}", usernameVariable: 'DOCKER_HUB_USER_NAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
             ctx.sh """     
-                       ssh  ${ctx.remote.user}@${ctx.remote.host} \
+                       ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} \
                       'docker login ${ctx.DOCKER_REPO_REGISTRY} --username=${ctx.DOCKER_HUB_USER_NAME} --password=${ctx.DOCKER_HUB_PASSWORD} && \
                        docker pull ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}'
                     """
