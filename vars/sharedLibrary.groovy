@@ -1113,7 +1113,7 @@ def pythonBuildProject() {
         // Python.build(this)
         // 压缩源码文件 加速传输
         sh "rm -rf *.tar.gz"
-        sh " tar --warning=no-file-changed -zcvf python.tar.gz --exclude '*.md' --exclude '*.pyc' --exclude .git --exclude ci --exclude ci@tmp --exclude '*.log' --exclude '*.xlsx' * >/dev/null 2>&1 "
+        sh " tar --warning=no-file-changed -zcvf python.tar.gz --exclude '*.md' --exclude '*.pyc' --exclude .git --exclude ci --exclude ci@tmp --exclude '*.log' --exclude '*.docx' --exclude '*.xlsx' * >/dev/null 2>&1 "
     }
     Tools.printColor(this, "Python语言构建成功 ✅")
 }
