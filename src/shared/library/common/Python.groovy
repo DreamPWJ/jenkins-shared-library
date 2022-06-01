@@ -12,6 +12,8 @@ class Python implements Serializable {
 
     /**
      * 构建
+     * Python作为解析型语言无需提供制品包方式 可以直接使用源码部署
+     * 参考镜像构建: https://docs.docker.com/language/python/build-images/
      */
     static def build(ctx) {
         // pip3 install pyinstaller 、 pip3 install flask 、 apt install -y upx
@@ -27,10 +29,10 @@ class Python implements Serializable {
 
         ctx.sh " python3 --version "
         ctx.sh " rm -rf build && rm -rf dist "
-        // requirements.txt 可以保证项目依赖包版本的确定性, 不会因为依赖更新而导致异常产生，通常可以由 pip 来生成
+        // requirements.txt 可以保证项目依赖包版本的确定性, 不会因为依赖更新而导致异常产生，通常可以由 pip 来生成 pip freeze > requirements.txt
         def requirementsFile = "requirements.txt"
         if (ctx.fileExists(requirementsFile)) {
-            ctx.sh " pip3 install -r $requirementsFile "
+            ctx.sh " pip3 install -r $requirementsFile || true "
         }
         // PyInstaller自身支持跨平台 来编译打包 Python 项目 , 但是，它不是一个交叉编译器 操作系统不互通
         // 注意!!! linux下打包只能在linux下运行，windows下打包只能在windows下运行，macos下打包只能在macos下运行 生成的可执行文件再dist目录下，可执行文件的名字与py文件名一致

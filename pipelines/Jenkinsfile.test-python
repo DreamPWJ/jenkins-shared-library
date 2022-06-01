@@ -110,12 +110,14 @@ test-python
 测试Python语言流水线
 JSON_PARAMS
 {
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/louyu" ,
+    "REPO_URL" : "http://47.102.214.33/lanneng_develop/rsu_controller.git" ,
     "BRANCH_NAME" : "main" ,
     "PROJECT_TYPE" : "2" ,
     "COMPUTER_LANGUAGE" : "3" ,
     "PROJECT_NAME" : "test-python" ,
-    "SHELL_PARAMS" : "test-python demo 8079 5000 sit"
+    "SHELL_PARAMS" : "test-python demo 8079 5000 sit",
+    "GIT_PROJECT_FOLDER_NAME" : "rsu_controller" ,
+    "IS_DOCKER_BUILD": "false",
 }
 
 */

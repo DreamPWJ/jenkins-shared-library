@@ -57,7 +57,7 @@
 - Docker、Shell、Node、C#、Playwright
 - Fastlane、Ruby
 
-### [自动化初始化Jenkins完整环境配置](https://www.digitalocean.com/community/tutorials/how-to-automate-jenkins-setup-with-docker-and-jenkins-configuration-as-code)
+##### [自动化初始化Jenkins完整环境配置](https://www.digitalocean.com/community/tutorials/how-to-automate-jenkins-setup-with-docker-and-jenkins-configuration-as-code)
 
 ### 核心贡献者
 

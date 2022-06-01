@@ -320,25 +320,25 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                stage('Docker For Python构建') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return (IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) }
-                    }
-                    agent {
-                        docker {
-                            // Python打包环境  构建完成自动删除容器
-                            image "cdrx/pyinstaller-linux:python3" // cdrx/pyinstaller-windows
-                            reuseNode true // 使用根节点
-                        }
-                    }
-                    steps {
-                        script {
-                            pythonBuildProject()
-                        }
-                    }
-                }
+                /*  stage('Docker For Python构建') {
+                      when {
+                          beforeAgent true
+                          environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                          expression { return (IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) }
+                      }
+                      agent {
+                          docker {
+                              // Python打包环境  构建完成自动删除容器
+                              image "cdrx/pyinstaller-linux:python3" // cdrx/pyinstaller-windows
+                              reuseNode true // 使用根节点
+                          }
+                      }
+                      steps {
+                          script {
+                              pythonBuildProject()
+                          }
+                      }
+                  }*/
                 stage('Python构建') {
                     when {
                         beforeAgent true
@@ -691,7 +691,7 @@ def getInitParams(map) {
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [test]的前端项目参数
 
     // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
-    IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD ? jsonParams.IS_DOCKER_BUILD : true
+    IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true
     IS_BLUE_GREEN_DEPLOY = jsonParams.IS_BLUE_GREEN_DEPLOY ? jsonParams.IS_BLUE_GREEN_DEPLOY : false // 是否蓝绿部署
     IS_ROLL_DEPLOY = jsonParams.IS_ROLL_DEPLOY ? jsonParams.IS_ROLL_DEPLOY : false // 是否滚动部署
     IS_GRAYSCALE_DEPLOY = jsonParams.IS_GRAYSCALE_DEPLOY ? jsonParams.IS_GRAYSCALE_DEPLOY : false // 是否灰度发布
@@ -716,6 +716,8 @@ def getInitParams(map) {
     DOCKER_VOLUME_MOUNT = jsonParams.DOCKER_VOLUME_MOUNT ? jsonParams.DOCKER_VOLUME_MOUNT.trim() : "${map.docker_volume_mount}".trim()
     // 不同部署节点动态批量替换多个环境配置文件 源文件目录 目标文件目录 逗号,分割
     SOURCE_TARGET_CONFIG_DIR = jsonParams.SOURCE_TARGET_CONFIG_DIR ? jsonParams.SOURCE_TARGET_CONFIG_DIR.trim() : ""
+    // 不同项目通过文件目录区分放在相同的仓库中 设置Git代码项目文件夹名称 用于找到相关源码
+    GIT_PROJECT_FOLDER_NAME = jsonParams.GIT_PROJECT_FOLDER_NAME ? jsonParams.GIT_PROJECT_FOLDER_NAME.trim() : ""
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
@@ -838,15 +840,21 @@ def getShellParams(map) {
         SHELL_PARAMS_GETOPTS = " -a ${SHELL_PROJECT_NAME} -b ${SHELL_PROJECT_TYPE} -c ${SHELL_HOST_PORT} " +
                 "-d ${SHELL_EXPOSE_PORT} -e ${SHELL_ENV_MODE}  -f ${IS_PROD} -g ${DOCKER_JAVA_OPTS} -h ${DOCKER_MEMORY} " +
                 "-i ${DOCKER_LOG_OPTS}  -k ${DEPLOY_FOLDER} -l ${JDK_VERSION} -m ${IS_PUSH_DOCKER_REPO} " +
-                "-n ${DOCKER_REPO_REGISTRY}/${DOCKER_REPO_NAMESPACE} -q ${JAVA_FRAMEWORK_TYPE} "
+                "-n ${DOCKER_REPO_REGISTRY}/${DOCKER_REPO_NAMESPACE} "
+
+        // 区分JAVA框架类型参数
+        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE}"
+        }
+        // 是否存在容器挂载
         if ("${DOCKER_VOLUME_MOUNT}") {
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -o ${DOCKER_VOLUME_MOUNT} "
         }
+        // 可选远程调试端口
         if ("${SHELL_PARAMS_ARRAY.length}" == '6') {
             SHELL_REMOTE_DEBUG_PORT = SHELL_PARAMS_ARRAY[5] // 远程调试端口
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -y ${SHELL_REMOTE_DEBUG_PORT}"
         }
-
         if ("${SHELL_PARAMS_ARRAY.length}" == '7') {
             SHELL_EXTEND_PORT = SHELL_PARAMS_ARRAY[6]  // 扩展端口
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -z ${SHELL_EXTEND_PORT}"
@@ -1101,7 +1109,12 @@ def goBuildProject() {
  * Python编译构建
  */
 def pythonBuildProject() {
-    Python.build(this)
+    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
+        // Python.build(this)
+        // 压缩源码文件 加速传输
+        sh "rm -rf *.tar.gz"
+        sh " tar --warning=no-file-changed -zcvf python.tar.gz --exclude '*.md' --exclude '*.pyc' --exclude .git --exclude ci --exclude ci@tmp --exclude '*.log' --exclude '*.xlsx' * >/dev/null 2>&1 "
+    }
     Tools.printColor(this, "Python语言构建成功 ✅")
 }
 
@@ -1177,7 +1190,10 @@ def uploadRemote(filePath) {
             sh "cd ${filePath} && scp ${proxyJumpSCPText} main.go ${remote.user}@${remote.host}:${projectDeployFolder} "
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
             // Python语言打包产物 上传包到远程服务器
-            sh "cd ${filePath}/dist && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
+            // sh "cd ${filePath}/dist && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
+            dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
+                sh "scp ${proxyJumpSCPText} python.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
+            }
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) {
             // C++语言打包产物 上传包到远程服务器
             sh "cd ${filePath} && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "

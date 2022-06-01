@@ -10,10 +10,10 @@ class Php implements Serializable {
 
     /**
      * 构建
+     * PHP作为解析型语言无需提供制品包方式 可以直接使用源码部署
      */
     static def build(ctx) {
         ctx.sh "php -v"
-        // php语言无需提供制品包方式 直接使用源码部署
     }
 
 }

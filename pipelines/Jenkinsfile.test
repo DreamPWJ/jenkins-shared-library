@@ -27,7 +27,7 @@ map.put('proxy_jump_port', '22')
 map.put('default_git_branch', ' ')
 
 // 保持构建的最大个数
-map.put('build_num_keep', 2)
+map.put('build_num_keep', 1)
 
 // Docker相关参数
 // JVM内存设置

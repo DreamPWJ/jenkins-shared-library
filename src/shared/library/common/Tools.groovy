@@ -29,8 +29,18 @@ class Tools implements Serializable {
 
     /**
      * zip压缩文件
+     * 文档：https://www.jenkins.io/doc/pipeline/steps/pipeline-utility-steps/#zip-create-zip-file
      */
     static def zipFile(ctx, String path, String fileName) {
         ctx.zip(dir: "${path}", glob: '', zipFile: "${fileName}")
     }
+
+    /**
+     * unzip解压文件
+     * 文档：https://www.jenkins.io/doc/pipeline/steps/pipeline-utility-steps/#unzip-extract-zip-file
+     */
+    static def unzipFile(ctx, String path, String fileName) {
+        ctx.unzip(dir: "${path}", glob: '', zipFile: "${fileName}")
+    }
+
 }
