@@ -10,6 +10,13 @@ ARG EXPOSE_PORT
 # 依赖基础镜像
 FROM golang:1.17-alpine
 
+# 指定切换用户
+USER root
+
+# 设置时区
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # 复制构建包到容器
 COPY *.go /main.go
 

@@ -62,11 +62,12 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                     // 当前分支处于分离状态 fatal: You are not currently on a branch
                     def tempBranch = "pan-wei-ji-temp-branch"
                     sh("""
+                          git branch -d ${tempBranch} || true
                           git branch ${tempBranch}
                           git checkout ${ctx.BRANCH_NAME}
                           git merge ${tempBranch}
                           git push ${userPassWordUrl}
-                          git branch -d ${tempBranch}
+                          git branch -d ${tempBranch} 
                            """)
                 }
                 // 设置git远程tag
