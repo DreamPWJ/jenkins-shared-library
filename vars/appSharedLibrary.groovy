@@ -169,17 +169,17 @@ def call(String type = 'android-ios', Map map) {
                         beforeAgent true  // 只有在 when 条件验证为真时才会进入 agent
                         expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.android) }
                     }
-                    /*   agent {
-                           docker {
-                               // android sdk环境  构建完成自动删除容器
-                               image "thyrlian/android-sdk:latest"
-                               // 缓存gradle工具  :ro或者 :rw 前者表示容器只读，后者表示容器对数据卷是可读可写的。默认情况下是可读可写的
-                               // 挂载android sdk先执行 docker run -it --rm -v /my/android/sdk:/sdk thyrlian/android-sdk bash -c 'cp -a $ANDROID_SDK_ROOT/. /sdk'
-                               // 安装jdk后再执行 cd /my/android/sdk/cmdline-tools && tools/bin/sdkmanager --update
-                               args " -v /var/cache/gradle:/root/.gradle:rw -v /my/android/sdk:/opt/android-sdk "
-                               reuseNode true // 使用根节点
-                           }
-                       }*/
+                    agent {
+                        docker {
+                            // android sdk环境  构建完成自动删除容器
+                            image "thyrlian/android-sdk:latest"
+                            // 缓存gradle工具  :ro或者 :rw 前者表示容器只读，后者表示容器对数据卷是可读可写的。默认情况下是可读可写的
+                            // 挂载android sdk先执行 docker run -it --rm -v /my/android/sdk:/sdk thyrlian/android-sdk bash -c 'cp -a $ANDROID_SDK_ROOT/. /sdk'
+                            // 安装jdk后再执行 cd /my/android/sdk/cmdline-tools && tools/bin/sdkmanager --update
+                            args " -v /var/cache/gradle:/root/.gradle:rw -v /my/android/sdk:/opt/android-sdk "
+                            reuseNode true // 使用根节点
+                        }
+                    }
                     tools {
                         jdk "${JDK_VERSION}" // android 使用gradle编译的jdk版本
                     }

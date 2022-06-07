@@ -149,6 +149,19 @@ JSON_PARAMS
 }
 REMOTE_IP: 172.16.0.91
 
+jxyb-induction-screen-server-prod
+好停车诱导屏服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "http://47.102.214.33/lanneng_develop/traffic.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "induction-screen" ,
+   "SHELL_PARAMS" : "induction-screen server 8082 8082 prod-juxian",
+   "IS_MAVEN_SINGLE_MODULE" : true
+}
+REMOTE_IP: 172.16.0.91
+
 */
 
 
