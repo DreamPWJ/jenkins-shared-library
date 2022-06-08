@@ -181,9 +181,9 @@ def call(String type = 'android-ios', Map map) {
                             reuseNode true // 使用根节点
                         }
                     }
-                    tools {
-                        jdk "${JDK_VERSION}" // android 使用gradle编译的jdk版本
-                    }
+                    /*tools {
+                        jdk "${JDK_VERSION}" // android 使用gradle编译的jdk版本 jenkins内配置工具 不使用Docker镜像构建情况下才需要配置
+                    }*/
                     steps {
                         script {
                             echo "Android打包APK"
@@ -1100,6 +1100,8 @@ def androidBuildPackage(map) {
 
     // 初始化环境变量
     Android.initEnv(this)
+    // 切换JDK版本
+    Java.switchJDKByDocker(this)
 
     // gradle配置后可实现自动签名 打包签名一体化
     if (isUnix()) {

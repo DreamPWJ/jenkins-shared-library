@@ -38,15 +38,15 @@ class Gradle implements Serializable {
         try {
             ctx.sh "gradle wrapper && chmod +x ./gradlew && ./gradlew -v"
         } catch (e) {
-            ctx.println("初始化Gradle安装")
-            ctx.sh """
-            apt install -y gradle || true
-            yum install -y gradle || true
-            brew install gradle || true
-            gradle -v
-            """
+            /*   ctx.println("初始化Gradle安装")
+                 ctx.sh """
+                 apt install -y gradle || true
+                 yum install -y gradle || true
+                 brew install gradle || true
+                 gradle -v
+                 """
+                 */
         }
-
     }
 
     /**

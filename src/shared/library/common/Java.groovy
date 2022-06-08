@@ -41,6 +41,24 @@ class Java implements Serializable {
     }
 
     /**
+     * Docker方式切换JDK版本
+     */
+    static def switchJDKByDocker(ctx) {
+        try {
+            def pathStr = ""
+            if ("${ctx.JDK_VERSION}".toInteger() <= 10) {
+                pathStr = "jre/"
+            }
+            // 对于使用容器方式切换JDK版本  https://github.com/mingchen/docker-android-build-box
+            ctx.sh "update-alternatives --list java"
+            ctx.sh "update-alternatives --set java /usr/lib/jvm/java-${ctx.JDK_VERSION}-openjdk-amd64/${pathStr}bin/java"
+            ctx.sh "java -version"
+        } catch (e) {
+            ctx.println("Docker方式切换JDK版本失败")
+        }
+    }
+
+    /**
      * 别名方式切换JDK版本
      */
     static def switchJDKByAlias(ctx) {
