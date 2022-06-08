@@ -27,7 +27,7 @@ map.put('is_git_tag', false)
 // 项目标签或项目简称
 map.put('project_tag', ' ')
 
-// jenkins分布式构建节点label名称
+// jenkins分布式构建节点label名称  预配置在jenkins节点管理内
 map.put('jenkins_node', 'master')
 
 // 构建环境变量
