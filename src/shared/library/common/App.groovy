@@ -17,6 +17,7 @@ class App implements Serializable {
             ctx.sh "yargs"
         } catch (error) {
             ctx.sh "npm i -D yargs"
+            ctx.sh "npm install app-info-parser"
         }
     }
 
