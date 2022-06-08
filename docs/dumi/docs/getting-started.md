@@ -7,6 +7,7 @@ nav:
 # One For All DevOps
 
 ## 开源的初衷: 取之开源、回馈开源、赠人玫瑰、手留余香
+### 欢迎大家PR共建生态 各端流水线已经过几万次的企业级构建考验
 
 ### 愿景 All In One 强大、灵活、易用、跨端
 
@@ -29,7 +30,7 @@ nav:
 - Web技术项目类型 1. Npm生态与静态Web项目 2. Flutter For Web 3. React Native For Web 4. Unity For Web 5. WebAssembly
   ![avatar](../../images/web.png)
 
-### 多端CI/CD共享库流水线已支持的范围
+### 多端CI/CD共享库流水线已支持的范围 基于Jenkins Pipeline共享库实现
 
 - 移动端: Android、iOS、Flutter、React Native
 - 小程序: 原生与跨端小程序
@@ -38,7 +39,7 @@ nav:
 - 桌面端: Electron、Unity  (Windows、MacOS、Linux)
 - 视觉引擎: Unity、WebGL、Cocos
 - 仓库方式: 单仓多包式MonoRepo、多仓单包式MultiRepo
-- 部署方式: 单机部署、镜像仓库、蓝绿部署、滚动部署、分布式部署、自动扩缩容、一键回滚、自动提审上架等
+- 部署方式: 单机部署、镜像仓库、蓝绿部署、滚动部署、分布式部署、自动扩缩容、一键回滚、自动提审上架、跳板机透传部署等
 - 应用市场: App Store、小程序平台、华为商店、小米商店、自建OSS、Firebase、蒲公英、Fir等
 - 通知类型: 发布结果、发布日志、审核状态等
 - CI/CD运行系统: MacOS、Linux
@@ -50,7 +51,8 @@ nav:
 
 ### 工程目录
 
-- .ci目录 部署相关脚本和配置
+- .ci目录 容器部署相关脚本和配置
+- pipelines目录 流水线配置文件入口
 - resources目录 非Groovy文件存储 通过外部库中的libraryResource步骤加载任意文件 文件会当做字符串加载
 - src目录 Pipeline流水线通用类、工具类和常量等封装
 - vars目录 不同端共享核心Pipeline工作流和文档
@@ -62,11 +64,8 @@ nav:
 - Docker、Shell、Node、C#、Playwright
 - Fastlane、Ruby
 
-### DevOps最佳实战
-
-- [DevOps分与合](https://help.coding.net/docs/best-practices/devops-inside.html)
+##### [自动化初始化Jenkins完整环境配置](https://www.digitalocean.com/community/tutorials/how-to-automate-jenkins-setup-with-docker-and-jenkins-configuration-as-code)
 
 ### 核心贡献者
 
 - 潘维吉
-

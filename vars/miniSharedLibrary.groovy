@@ -340,6 +340,7 @@ class Constants {
  */
 def getInitParams(map) {
     // echo sh(returnStdout: true, script: 'env')
+    // JSON_PARAMS为单独项目的初始化参数  JSON_PARAMS为key值  value为json结构  请选择jenkins动态参数中的 "文本参数" 配置  具体参数定义如下
     def jsonParams = readJSON text: "${JSON_PARAMS}"
     // println "${jsonParams}"
     PROJECT_TYPE = jsonParams.PROJECT_TYPE ? jsonParams.PROJECT_TYPE.trim() : ""  // 项目类型 1 原生小程序 2 Taro跨端小程序

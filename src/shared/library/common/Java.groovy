@@ -1,5 +1,7 @@
 package shared.library.common
 
+import shared.library.Utils
+
 /**
  * @author 潘维吉
  * @date 2021/3/3 13:22
@@ -50,8 +52,14 @@ class Java implements Serializable {
                 pathStr = "jre/"
             }
             // 对于使用容器方式切换JDK版本  https://github.com/mingchen/docker-android-build-box
+            def jdkPlatform = "amd64" // 架构为x86_64
+            def cpuArchitecture = Utils.getShEchoResult(ctx, "uname -m")
+            if (cpuArchitecture == "aarch64" || cpuArchitecture == "arm64") {
+                jdkPlatform = "arm64"
+            }
+            // 也可以使用jenv方式切换jdk版本  如 jenv global 11
             ctx.sh "update-alternatives --list java"
-            ctx.sh "update-alternatives --set java /usr/lib/jvm/java-${ctx.JDK_VERSION}-openjdk-amd64/${pathStr}bin/java"
+            ctx.sh "update-alternatives --set java /usr/lib/jvm/java-${ctx.JDK_VERSION}-openjdk-${jdkPlatform}/${pathStr}bin/java"
             ctx.sh "java -version"
         } catch (e) {
             ctx.println("Docker方式切换JDK版本失败")
