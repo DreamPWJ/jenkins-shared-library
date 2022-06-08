@@ -20,10 +20,10 @@ fi
 
 if [[ ! $(command -v node) ]]; then
   echo "安装nodejs"
-  #  curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-  #  sudo apt -y install nodejs
+  # curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
   curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
-  yum install -y nodejs
+  yum install -y nodejs || true
+  sudo apt install -y nodejs || true
   node -v && npm -v
   which node
 fi
@@ -59,22 +59,22 @@ if [[ ! $(command -v adb) ]]; then
   mkdir tools
   mv -i * tools
 
-vim ~/.zshrc
-export ANDROID_HOME=$HOME/android
-export PATH=$ANDROID_HOME/cmdline-tools/tools/bin/:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools/:$PATH
-source ~/.zshrc
+  vim ~/.zshrc
+  export ANDROID_HOME=$HOME/android
+  export PATH=$ANDROID_HOME/cmdline-tools/tools/bin/:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools/:$PATH
+  source ~/.zshrc
 
-sdkmanager
-sdkmanager --list
-#安装 Android SDK
-sdkmanager  "platform-tools" "platforms;android-30" "build-tools;30.0.2" "ndk;21.0.6113669"
-adb --version
+  sdkmanager
+  sdkmanager --list
+  #安装 Android SDK
+  sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.2" "ndk;21.0.6113669"
+  adb --version
 
-# api-versions.xml文件不再存在
-mkdir $ANDROID_HOME/platform-tools/api/
-cp $ANDROID_HOME/platforms/android-30/data/api-versions.xml $ANDROID_HOME/platform-tools/api/
+  # api-versions.xml文件不再存在
+  mkdir $ANDROID_HOME/platform-tools/api/
+  cp $ANDROID_HOME/platforms/android-30/data/api-versions.xml $ANDROID_HOME/platform-tools/api/
 
-sdkmanager --update
+  sdkmanager --update
 fi
 echo $ANDROID_HOME && echo $JAVA_HOME && echo $PATH
 
@@ -82,9 +82,8 @@ echo $ANDROID_HOME && echo $JAVA_HOME && echo $PATH
 # Flutter官网安装文档: https://docs.flutter.dev/get-started/install
 
 # MacOS安装Android SDK命令文档: https://proandroiddev.com/how-to-setup-android-sdk-without-android-studio-6d60d0f2812a
-# MacOS 安装 Android SDK  用Android Studio内安装Android SDK
+# MacOS安装Android SDK  用Android Studio内安装Android SDK
 # adb --version
-
 
 # Mac OS 11 Big Sur 设置JAVA_HOME （如果是 bash 则在 ~/.bash_profile; 如果是 zsh，则在 ~/.zshrc 新macos系统默认是zsh）
 # 1. nano ~/.zshenv  2. 写入export JAVA_HOME=$(/usr/libexec/java_home)  3. source ~/.zshenv  4. echo $JAVA_HOME && mvn -v

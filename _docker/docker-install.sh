@@ -50,6 +50,7 @@ sudo cat <<EOF >/etc/docker/daemon.json
   ]
 }
 EOF
+
 # 重启镜像源生效
 sudo systemctl daemon-reload
 sudo systemctl restart docker
@@ -64,5 +65,6 @@ docker version
 if [[ $(command -v docker) ]]; then
   echo -e "\033[32mDocker安装成功 ✔ \033[0m"
 else
-  echo -e "\033[3132mDocker安装失败 ❌ \033[0m "
+  echo -e "\033[31mDocker安装失败 ❌ \033[0m"
+  exit 1
 fi

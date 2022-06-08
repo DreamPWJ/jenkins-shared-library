@@ -11,6 +11,13 @@ ARG EXPOSE_PORT
 FROM ubuntu:bionic
 FROM gcc:latest
 
+# 指定切换用户
+USER root
+
+# 设置时区
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # 复制构建包到容器
 COPY app /app
 #COPY *.cpp /server.cpp

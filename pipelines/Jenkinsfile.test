@@ -17,7 +17,7 @@ map.put('remote_worker_ips', [])
 // 远程服务器用户名
 map.put('remote_user_name', 'root')
 // 代理机或跳板机外网ip用于透传部署到内网目标机器 选填 目标机器外部无法直接访问情况填写内网ip
-map.put('proxy_jump_ip', '119.188.90.222')
+map.put('proxy_jump_ip', ' ') // 119.188.90.222
 // 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
 map.put('proxy_jump_user_name', 'root')
 // 自定义跳板机ssh和scp访问端口 默认22
@@ -166,6 +166,21 @@ JSON_PARAMS
    "SOURCE_TARGET_CONFIG_DIR" : "resources/juxian,resources",
    "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/nfsdata/ParkPicture:/usr/local/tomcat/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
 }
+
+test-open-park-saas
+测试OpenPark SAAS框架
+JSON_PARAMS
+{
+   "REPO_URL" : "http://47.102.214.33/lanneng_develop/openpark_saas_backend" ,
+   "BRANCH_NAME" : "panweiji-test" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "openpark-saas" ,
+   "SHELL_PARAMS" : "openpark saas 8096 9000 sit",
+   "IS_MAVEN_SINGLE_MODULE" : true
+}
+
+REMOTE_IP: 120.92.155.194
+
 */
 
 

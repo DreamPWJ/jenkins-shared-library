@@ -63,6 +63,8 @@ platform :android do
       flags: "--no-daemon", # 要传递给 gradle 命令的所有参数标志 --no-daemon解决jenkins并发执行会将gradle杀掉
     )
 
+     # 为Android应用签名: https://developer.android.com/studio/publish/app-signing
+
     if options[:is_aab]
       APK_PATH = Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
       puts "\033[32mAAB包路径: #{APK_PATH}\033[0m\n"

@@ -1,3 +1,4 @@
+# 弃用ruby语言版本 已使用JS语言方案实现
 # sudo gem install app-info
 # sudo gem install app-info -v 2.7.0 从2.7.0开始支持android的aab新格式
 # 可能兼容问题 sudo gem uninstall google-protobuf && sudo gem install google-protobuf -v 3.18.2 --platform=ruby

@@ -94,7 +94,8 @@ def call(String type = 'android-ios', Map map) {
                 // 系统环境变量
                 LANG = 'en_US.UTF-8'
                 LC_ALL = 'en_US.UTF-8'
-                ANDROID_SDK_ROOT = "/Users/$USER/android" // 安装android sdk环境 Library/Android/sdk
+                ANDROID_SDK_ROOT = "/opt/android-sdk" // 安装android sdk环境 /Users/$USER/android 或 Library/Android/sdk
+                // ANDROID_NDK_HOME="" // 安装android ndk
                 GEM_HOME = "~/.gems" // gem环境 ~/.gems  执行gem env或bundle env查看
                 SYSTEM_HOME = "$HOME" // 系统主目录
 
@@ -169,17 +170,17 @@ def call(String type = 'android-ios', Map map) {
                         beforeAgent true  // 只有在 when 条件验证为真时才会进入 agent
                         expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.android) }
                     }
-                    /*   agent {
-                           docker {
-                               // android sdk环境  构建完成自动删除容器
-                               image "thyrlian/android-sdk:latest"
-                               // 缓存gradle工具  :ro或者 :rw 前者表示容器只读，后者表示容器对数据卷是可读可写的。默认情况下是可读可写的
-                               // 挂载android sdk先执行 docker run -it --rm -v /my/android/sdk:/sdk thyrlian/android-sdk bash -c 'cp -a $ANDROID_SDK_ROOT/. /sdk'
-                               // 安装jdk后再执行 cd /my/android/sdk/cmdline-tools && tools/bin/sdkmanager --update
-                               args " -v /var/cache/gradle:/root/.gradle:rw -v /my/android/sdk:/opt/android-sdk "
-                               reuseNode true // 使用根节点
-                           }
-                       }*/
+                    agent {
+                        docker {
+                            // android sdk环境  构建完成自动删除容器  容器自动下载jdk需要在Jenkins内设置oracle账号1287019365@qq.com Oracle@1234
+                            image "mingc/android-build-box:latest" // thyrlian/android-sdk:latest
+                            // 缓存gradle工具  :ro或者 :rw 前者表示容器只读，后者表示容器对数据卷是可读可写的。默认情况下是可读可写的
+                            // 挂载android sdk先执行 docker run -it --rm -v /my/android/sdk:/sdk thyrlian/android-sdk bash -c 'cp -a $ANDROID_SDK_ROOT/. /sdk'
+                            // 安装jdk后再执行 cd /my/android/sdk/cmdline-tools && tools/bin/sdkmanager --update
+                            args " -v /var/cache/gradle:/root/.gradle:rw  " // -v /my/android/sdk:/sdk:ro
+                            reuseNode true // 使用根节点
+                        }
+                    }
                     tools {
                         jdk "${JDK_VERSION}" // android 使用gradle编译的jdk版本
                     }
@@ -305,7 +306,18 @@ def call(String type = 'android-ios', Map map) {
                 }
 
                 stage('APP信息') {
-                    when { expression { return true } }
+                    when {
+                        beforeAgent true
+                        expression { return true }
+                    }
+                    agent {
+                        docker {
+                            // Node环境  构建完成自动删除容器
+                            //image "node:14"
+                            image "panweiji/node:14" // 使用自定义Dockerfile的node环境 加速monorepo依赖构建内置lerna等相关依赖
+                            reuseNode true // 使用根节点
+                        }
+                    }
                     steps {
                         script {
                             echo "获取APP信息"
@@ -404,6 +416,7 @@ def call(String type = 'android-ios', Map map) {
 
                 stage('钉钉通知') {
                     when {
+                        beforeAgent true
                         expression { return ("${params.IS_DING_NOTICE}" == 'true') }
                     }
                     steps {
@@ -518,7 +531,7 @@ class Constants {
     static final String DEBUG_BUILD = 'Debug' // 调试打包
     static final String RELEASE_BUILD = 'Release' // 正式打包
 
-    static final String ANDROID_TEST_BUILD = 'DebugT' // 默认Android自定义测试打包配置
+    static final String ANDROID_TEST_BUILD = 'Test' // 默认Android自定义测试打包配置
     static final String IOS_TEST_BUILD = 'Test' // 默认iOS自定义测试打包配置
 
     // 苹果打包签名导出方式
@@ -1013,7 +1026,8 @@ def iconAddBadge(map, type) {
     try {
         if (params.IS_ICON_ADD_BADGE == true) {
             // 文档地址: https://github.com/HazAT/badge    https://shields.io/
-            // 先初始化依赖 sudo gem install badge 与 brew install imagemagick 与 brew install librsvg
+            // 先初始化依赖 sudo apt update && sudo apt install -y ruby-full && ruby --version
+            // 再安装 sudo gem install badge && apt install -y imagemagick && sudo gem install librsvg
             // 保证raster.shields.io地址可访问  如果无法访问配置地址映射
 
             if ((type == GlobalVars.android && !"${androidBuildType}".contains(Constants.RELEASE_BUILD)) ||
@@ -1112,6 +1126,8 @@ def androidBuildPackage(map) {
         }
         // 清空android打包输出目录
         sh "rm -rf  ${"${PROJECT_TYPE}".toInteger() == GlobalVars.flutter ? "../" + androidPackagesOutputDirPrefix : androidPackagesOutputDirPrefix}/*"
+        // 删除android代码中的本地配置文件 可能影响CI打包
+        sh "rm -f local.properties"
         // 设置App的Icon图标徽章
         iconAddBadge(map, GlobalVars.android)
         // 设置应用版本号

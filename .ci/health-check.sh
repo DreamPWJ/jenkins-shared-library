@@ -18,6 +18,12 @@ while getopts ":a:b:" opt; do
   esac
 done
 
+if [[ ! $(command -v curl) ]]; then
+  echo "curl命令不存在，安装curl命令"
+  yum install -y curl || true
+  apt-get install -y curl || true
+fi
+
 if [[ ${project_type} == 1 ]]; then
   # 循环检测次数
   front_end_loop_num=60
