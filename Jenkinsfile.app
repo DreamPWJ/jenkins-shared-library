@@ -82,6 +82,7 @@ JSON_PARAMS:
 {
     "PROJECT_TYPE" : "1",
     "REPO_URL" : "https://github.com/DreamPWJ/member/member-android.git",
+    "DEFAULT_GIT_BRANCH" : "master",
     "CUSTOM_ANDROID_BUILD_TYPE" : "DebugT,PreRelease",
     "IS_ANDROID_STORE_IDENTIFY" : true,
     "IS_ANDROID_AAB" : false
