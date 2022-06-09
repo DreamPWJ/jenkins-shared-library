@@ -70,9 +70,9 @@ class Apple implements Serializable {
                 // 如果定时job不存在 再创建新的job信息
                 if (!"${jobInfo}".contains("${ctx.iosAppIdentifier}")) {
                     ctx.dir(operationDir) {
-                        try {
-                            ctx.sh "yargs"
-                        } catch (error) {
+                        // 查看当前项目的依赖模块 查看全局依赖模块命令是 npm ls -g --depth 0
+                        def nodePackages = Utils.getShEchoResult(ctx, "npm ls --depth 0")
+                        if (!nodePackages.contains("yargs")) {
                             ctx.sh "npm i -D yargs"
                         }
                     }

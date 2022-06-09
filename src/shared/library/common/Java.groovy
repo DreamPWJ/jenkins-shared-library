@@ -60,6 +60,8 @@ class Java implements Serializable {
             // 也可以使用jenv方式切换jdk版本  如 jenv global 11
             ctx.sh "update-alternatives --list java"
             ctx.sh "update-alternatives --set java /usr/lib/jvm/java-${ctx.JDK_VERSION}-openjdk-${jdkPlatform}/${pathStr}bin/java"
+            //ctx.sh "jenv versions"
+            //ctx.sh "jenv global ${ctx.JDK_VERSION}"
             ctx.sh "java -version"
         } catch (e) {
             ctx.println("Docker方式切换JDK版本失败")

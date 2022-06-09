@@ -1405,7 +1405,7 @@ def getAppInfo() {
         def appInfoJavaScript = "${env.WORKSPACE}/ci/_jenkins/web/app-info.js"  // JavaScript语言实现
         // sh "chmod +x ${appInfoRuby}"
         sh "chmod +x ${appInfoJavaScript}"
-        App.getAppInfo(this)
+        App.getAppInfoPackageInit(this)
 
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.android) {
             if (!fileExists("${androidPackagesOutputDir}/")) {
