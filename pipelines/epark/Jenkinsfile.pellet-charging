@@ -115,7 +115,8 @@ JSON_PARAMS
     "PROJECT_NAME" : "pellet-charging-admin" ,
     "SHELL_PARAMS" : "pellet-charging-admin web 8020 80 sit" ,
     "NPM_RUN_PARAMS" : "build",
-    "IS_MONO_REPO": true
+    "IS_MONO_REPO": true,
+    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
 }
 
 pellet-charging-app-sit
@@ -126,7 +127,7 @@ JSON_PARAMS
    "BRANCH_NAME" : "dev" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pellet-charging-app" ,
-   "SHELL_PARAMS" : "pellet-charging app 8098 8080 sit"
+   "SHELL_PARAMS" : "pellet-charging app 8098 8080 sit",
 }
 
 
