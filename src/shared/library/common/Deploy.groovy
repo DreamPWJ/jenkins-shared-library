@@ -36,8 +36,11 @@ class Deploy implements Serializable {
             ctx.println("自动替换不同分布式部署节点的环境文件")
             // 获取不同机器的数字号 不同机器替换不同的机器特定配置文件
             def machineNum = "${ctx.MACHINE_TAG.replace("号机", "")}".toInteger()
+            // 获取项目代码具体目录
+            def projectDir = "${ctx.env.WORKSPACE} " +
+                    "${ctx.IS_MAVEN_SINGLE_MODULE}" == 'true' ? "" : ("${ctx.MAVEN_ONE_LEVEL}" == "" ? "/${ctx.PROJECT_NAME}" : "/${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME}")
             // 遍历文件夹下的所有文件并重命名 多机配置文件命名-n-拼接方式 如config-1-.yaml
-            ctx.dir("${ctx.env.WORKSPACE}/${sourceFilePath}/") {
+            ctx.dir("${projectDir}/${sourceFilePath}/") {
                 def files = ctx.findFiles(glob: "*.*") // glob符合ant风格
                 files.each { item ->
                     //ctx.println("${item.name}")
@@ -51,7 +54,7 @@ class Deploy implements Serializable {
             }
 
             // 重命名后整体批量复制替换多个文件
-            ctx.sh "cp -r ${ctx.env.WORKSPACE}/${sourceFilePath}/* ${ctx.env.WORKSPACE}/${targetFilePath}/"
+            ctx.sh "cp -r ${projectDir}/${sourceFilePath}/* ${projectDir}/${targetFilePath}/"
             // 替换文件应该放在部署服务器上面 或 重新打包部署
         }
     }
