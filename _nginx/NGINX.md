@@ -1,5 +1,6 @@
 ### Let’s Encrypt 是一个自动签发 https 证书的免费项目
 ### Certbot 是 Let’s Encrypt 官方推荐的证书生成客户端工具
+### 可视化自动生成Nginx配置工具: https://www.digitalocean.com/community/tools/nginx
 
 ### 静态资源配置
 server {
