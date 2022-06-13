@@ -11,6 +11,26 @@ package shared.library.common
 class Kubernetes implements Serializable {
 
     /**
+     * 声明式执行部署
+     */
+    static def deploy(ctx) {
+        // K8S_CONFIG为k8s中kubectl命令的yaml配置文件内容 数据保存为jenkins的“Secret Text”类型的凭据，用credentials方法从凭据中获取
+        ctx.withCredentials([string(credentialsId: "${ctx.K8S_CONFIG_CREDENTIALS_ID}", variable: 'SECRET')]) {
+            ctx.println("k8s密钥：${ctx.SECRET}")
+            ctx.sh "mkdir -p ~/.kube"
+            ctx.sh "echo ${ctx.SECRET} | base64 -d > ~/.kube/config"
+            // sh "sed -e 's#{IMAGE_URL}#${params.HARBOR_HOST}/${params.DOCKER_IMAGE}#g;s#{IMAGE_TAG}#${GIT_TAG}#g;s#{APP_NAME}#${params.APP_NAME}#g;s#{SPRING_PROFILE}#k8s-test#g' k8s-deployment.tpl > k8s-deployment.yml"
+
+            // 部署应用
+            ctx.sh "kubectl apply -f deployment.yaml"
+            // 部署service
+            //ctx.sh "kubectl apply -f service.yaml"
+            // 部署ingress
+            // ctx.sh "kubectl apply -f ingress.yaml"
+        }
+    }
+
+    /**
      * 镜像方式部署
      */
     static def deployByImage(ctx, imageName, deploymentName, port) {
@@ -36,13 +56,6 @@ class Kubernetes implements Serializable {
     static def setYamlConfig(ctx) {
         ctx.sh "sed -i 's/<BUILD_TAG>/${ctx.dockerBuildTag}/' k8s.yaml"
         ctx.sh "sed -i 's/<BRANCH_NAME>/${ctx.env.BRANCH_NAME}/' k8s.yaml"
-    }
-
-    /**
-     * 声明式执行部署
-     */
-    static def deploy(ctx) {
-        ctx.sh "kubectl apply -f k8s.yaml"
     }
 
     /**
