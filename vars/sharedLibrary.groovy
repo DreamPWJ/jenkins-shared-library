@@ -449,13 +449,6 @@ def call(String type = 'web-java', Map map) {
                                     && "${AUTO_TEST_PARAM}" != "" && IS_BLUE_GREEN_DEPLOY == false)
                         }
                     }
-/*                    agent {
-                        docker {
-                            // Node环境  构建完成自动删除容器
-                            image "node:${NODE_VERSION}"
-                            reuseNode true // 使用根节点
-                        }
-                    }*/
                     steps {
                         script {
                             integrationTesting()
@@ -465,6 +458,7 @@ def call(String type = 'web-java', Map map) {
 
                 stage('蓝绿部署') {
                     when {
+                        beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             return (IS_BLUE_GREEN_DEPLOY == true)  // 是否进行蓝绿部署
@@ -480,6 +474,7 @@ def call(String type = 'web-java', Map map) {
 
                 stage('滚动部署') {
                     when {
+                        beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             return (IS_ROLL_DEPLOY == true) // 是否进行滚动部署
@@ -487,8 +482,9 @@ def call(String type = 'web-java', Map map) {
                     }
                     tools {
                         // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
-                        // 滚动部署对于不同节点配置文件不同的情况 动态替换配置文件后需要基于Maven重新打包不同节点部署包
+                        // 针对滚动部署对于不同节点配置文件不同的情况 动态替换配置文件后需要基于Maven重新打包不同节点部署包 如果不需要可屏蔽
                         maven "${map.maven}"
+                        jdk "${JDK_VERSION}"
                     }
                     steps {
                         script {
@@ -501,6 +497,7 @@ def call(String type = 'web-java', Map map) {
                 stage('灰度发布') {
                     when {
                         // branch 'master'
+                        beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             return (IS_GRAYSCALE_DEPLOY == true) // 是否进行灰度发布
@@ -516,9 +513,18 @@ def call(String type = 'web-java', Map map) {
 
                 stage('Kubernetes云原生') {
                     when {
+                        beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             return (IS_K8S_DEPLOY == true)  // 是否进行云原生K8S集群部署
+                        }
+                    }
+                    agent {
+                        docker {
+                            // kubectl 环境  构建完成自动删除容器
+                            image "bitnami/kubectl:latest"
+                            // args " -v /my/kube/config:/.kube/config "
+                            reuseNode true // 使用根节点
                         }
                     }
                     steps {
@@ -532,6 +538,7 @@ def call(String type = 'web-java', Map map) {
                 stage('Serverless工作流') {
                     when {
                         // branch 'master'
+                        beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             return (IS_SERVERLESS_DEPLOY == true) // 是否进行Serverless发布
@@ -1339,7 +1346,7 @@ def integrationTesting() {
         Tests.createSmokeReport(this)
 
         // 结合YApi接口管理做自动化API测试
-        def yapiUrl = "http://yapi.panweijikeji.com"
+        def yapiUrl = "http://yapi.panweiji.com"
         def testUrl = "${yapiUrl}/api/open/run_auto_test?${AUTO_TEST_PARAM}"
         // 执行接口测试
         def content = HttpRequest.get(this, "${testUrl}")
@@ -1501,7 +1508,7 @@ def grayscaleDeploy() {
 }
 
 /**
- * 云原生K8S部署大规模集群
+ * 云原生K8S部署大规模集群 弹性扩缩容
  */
 def k8sDeploy() {
     // 执行部署

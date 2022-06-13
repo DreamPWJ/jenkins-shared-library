@@ -188,7 +188,7 @@ JSON_PARAMS:
     "IOS_APP_IDENTIFIER" : "panweiji.com.saasAnjiaJinHua",
     "IOS_PROJECT_LEVEL_DIR" : "saasAnjiaJinHua",
     "IOS_MULTI_TARGET_NAMES" : "anjia,jinhua",
-    "IOS_MULTI_TARGET_PARAMS" : "panweiji.com.saasAnjialexiangNew~saaspanweijikeji,panweiji.com.saasAnjiaJinHua~saasAnjiaJinHua"
+    "IOS_MULTI_TARGET_PARAMS" : "panweiji.com.saasAnjialexiangNew~saaspanweiji,panweiji.com.saasAnjiaJinHua~saasAnjiaJinHua"
 }
 IOS_APP_REVIEW_INFO:
 {
@@ -206,7 +206,7 @@ JSON_PARAMS:
     "IOS_APP_IDENTIFIER" : "panweiji.com.saasMangerJinHua",
     "IOS_PROJECT_LEVEL_DIR" : "saasMangerJinHua",
     "IOS_MULTI_TARGET_NAMES" : "anjia,jinhua",
-    "IOS_MULTI_TARGET_PARAMS" : "panweiji.com.saasMangerlexiang~saasMangerpanweijikeji,panweiji.com.saasMangerJinHua~saasMangerJinHua"
+    "IOS_MULTI_TARGET_PARAMS" : "panweiji.com.saasMangerlexiang~saasMangerpanweiji,panweiji.com.saasMangerJinHua~saasMangerJinHua"
 }
 IOS_APP_REVIEW_INFO:
 {

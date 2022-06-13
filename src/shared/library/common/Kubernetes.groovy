@@ -14,9 +14,10 @@ class Kubernetes implements Serializable {
      * 声明式执行部署
      */
     static def deploy(ctx) {
-        // K8S_CONFIG为k8s中kubectl命令的yaml配置文件内容 数据保存为jenkins的“Secret Text”类型的凭据，用credentials方法从凭据中获取
-        ctx.withCredentials([string(credentialsId: "${ctx.K8S_CONFIG_CREDENTIALS_ID}", variable: 'SECRET')]) {
-            ctx.println("k8s密钥：${ctx.SECRET}")
+        // K8S_CONFIG为k8s中kubectl命令的yaml配置授权访问文件内容 数据保存为jenkins的“Secret Text”类型的凭据，用credentials方法从凭据中获取
+        ctx.withCredentials([string(credentialsId: "${ctx.map.k8s_credentials_id}", variable: 'SECRET')]) {
+            ctx.sh "kubectl --version"
+            ctx.println("k8s集群访问配置：${ctx.SECRET}")
             ctx.sh "mkdir -p ~/.kube"
             ctx.sh "echo ${ctx.SECRET} | base64 -d > ~/.kube/config"
             // sh "sed -e 's#{IMAGE_URL}#${params.HARBOR_HOST}/${params.DOCKER_IMAGE}#g;s#{IMAGE_TAG}#${GIT_TAG}#g;s#{APP_NAME}#${params.APP_NAME}#g;s#{SPRING_PROFILE}#k8s-test#g' k8s-deployment.tpl > k8s-deployment.yml"
