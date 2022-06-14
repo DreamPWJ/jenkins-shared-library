@@ -555,6 +555,17 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
+                stage('钉钉通知') {
+                    when {
+                        expression { return ("${params.IS_DING_NOTICE}" == 'true' && params.IS_HEALTH_CHECK == false) }
+                    }
+                    steps {
+                        script {
+                            dingNotice(1, "成功") // ✅
+                        }
+                    }
+                }
+
                 stage('发布日志') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
@@ -776,8 +787,6 @@ def getInitParams(map) {
 
     // tag版本变量定义
     tagVersion = ""
-    // 是否健康检测失败状态
-    isHealthCheckFail = false
     // 扫描二维码地址
     qrCodeOssUrl = ""
     // Java构建包OSS地址Url
@@ -790,6 +799,13 @@ def getInitParams(map) {
     javaPackageSize = ""
     // Maven打包后产物的位置
     mavenPackageLocation = ""
+    // 是否健康检测失败状态
+    isHealthCheckFail = false
+    // 计算应用启动时间
+    healthCheckTimeDiff = "未知"
+    // 健康检测url地址
+    healthCheckUrl = ""
+
 }
 
 /**
@@ -1311,7 +1327,7 @@ def healthCheck(params = '') { // 可选参数
                 script: "ssh  ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/ && ./health-check.sh ${healthCheckParams} '",
                 returnStdout: true).trim()
     }
-    healthCheckTimeDiff = Utils.getTimeDiff(healthCheckStart, new Date()) // 计算启动时间
+    healthCheckTimeDiff = Utils.getTimeDiff(healthCheckStart, new Date()) // 计算应用启动时间
 
     if ("${healthCheckMsg}".contains("成功")) {
         Tools.printColor(this, "${healthCheckMsg} ✅")
@@ -1507,6 +1523,7 @@ def scrollToDeploy() {
  * 基于Nginx Ingress 灰度发布  实现多版本并存 非强制用户更新提升用户体验
  */
 def grayscaleDeploy() {
+    // Nginx-ingress 是使用 Nginx 作为反向代理和负载平衡器的 Kubernetes 的 Ingress 控制器
 
 }
 
@@ -1514,8 +1531,8 @@ def grayscaleDeploy() {
  * 云原生K8S部署大规模集群 弹性扩缩容
  */
 def k8sDeploy(map) {
-    // 执行部署
-    Kubernetes.deploy(this,map)
+    // 执行k8s集群部署
+    Kubernetes.deploy(this, map)
 }
 
 /**

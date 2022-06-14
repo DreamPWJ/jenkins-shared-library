@@ -55,7 +55,7 @@ spec:         #必选，Pod中容器的详细定义
        failureThreshold: 0
        securityContext:
          privileged:false
-    restartPolicy: [Always | Never | OnFailure]#Pod的重启策略，Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Nerver表示不再重启该Pod
+    restartPolicy: [Always | Never | OnFailure] #Pod的重启策略，Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Nerver表示不再重启该Pod
     nodeSelector: obeject  #设置NodeSelector表示将该Pod调度到包含这个label的node上，以key：value的格式指定
     imagePullSecrets:    #Pull镜像时使用的secret名称，以key：secretkey格式指定
     - name: string
