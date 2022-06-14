@@ -24,17 +24,13 @@ class Kubernetes implements Serializable {
               ctx.sh "cat ~/.kube/config" */
 
             // 动态替换k8s yaml文件
-            ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#latest#g;" +
-                    " s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
-                    " s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g;s#{CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
-                    " ' ${ctx.WORKSPACE}/ci/_k8s/k8s-deployment.yaml > k8s-deployment.yaml "
-            ctx.sh " cat k8s-deployment.yaml "
+            setYamlConfig(ctx)
 
             // ctx.sh "kubectl version"
             // 部署应用 指定命名空间--namespace=
             ctx.sh """ 
                     kubectl apply -f k8s-deployment.yaml
-                    kubectl get pods
+                    kubectl get pod
                     kubectl get node
                     """
             // 部署service
@@ -42,6 +38,17 @@ class Kubernetes implements Serializable {
             // 部署ingress
             // ctx.sh "kubectl apply -f ingress.yaml"
         }
+    }
+
+    /**
+     * 动态设置yaml配置
+     */
+    static def setYamlConfig(ctx) {
+        ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#latest#g;" +
+                " s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
+                " s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g;s#{CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
+                " ' ${ctx.WORKSPACE}/ci/_k8s/k8s-deployment.yaml > k8s-deployment.yaml "
+        ctx.sh " cat k8s-deployment.yaml "
     }
 
     /**
@@ -62,14 +69,6 @@ class Kubernetes implements Serializable {
         // kubectl 停止删除pod 先删除deployment 命令kubectl delete deployment  删除所有 kubectl delete pods --all  --force
         // kubectl delete pod podName
         // 查看详细信息   kubectl describe pod podName
-    }
-
-    /**
-     * 设置yaml配置
-     */
-    static def setYamlConfig(ctx) {
-        ctx.sh "sed -i 's/<BUILD_TAG>/${ctx.dockerBuildTag}/' k8s.yaml"
-        ctx.sh "sed -i 's/<BRANCH_NAME>/${ctx.env.BRANCH_NAME}/' k8s.yaml"
     }
 
     /**

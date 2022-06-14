@@ -11,13 +11,13 @@
 def map = [:]
 
 // 远程服务器地址
-map.put('remote_ip', '127.0.0.1')
+map.put('remote_ip', '172.16.0.91')
 // 工作服务器地址 同时支持N个服务器自动化分布式部署
 map.put('remote_worker_ips', [])
 // 远程服务器用户名
 map.put('remote_user_name', 'root')
 // 代理机或跳板机外网ip用于透传部署到内网目标机器 选填 目标机器外部无法直接访问情况填写内网ip
-map.put('proxy_jump_ip', ' ') // 119.188.90.222
+map.put('proxy_jump_ip', '119.188.90.222')
 // 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
 map.put('proxy_jump_user_name', 'root')
 // 自定义跳板机ssh和scp访问端口 默认22

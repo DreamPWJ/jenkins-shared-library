@@ -2,10 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {APP_NAME}-deployment
+  namespace: default
   labels:
     app: {APP_NAME}
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: {APP_NAME}
@@ -22,3 +23,6 @@ spec:
         env:
           - name: SPRING_PROFILES_ACTIVE
             value: {SPRING_PROFILE}
+      # 私有镜像配置
+      #imagePullSecrets:
+        #- name: myregistrykey
