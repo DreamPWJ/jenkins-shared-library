@@ -18,8 +18,7 @@ spec:
       - name: {APP_NAME}
         image: {IMAGE_URL}:{IMAGE_TAG}
         ports:
-        - hostPort: {HOST_PORT}
-        - containerPort: ${CONTAINER_PORT}
+        - containerPort: {CONTAINER_PORT}
         env:
           - name: SPRING_PROFILES_ACTIVE
             value: {SPRING_PROFILE}

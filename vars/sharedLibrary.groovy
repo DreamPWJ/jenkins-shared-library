@@ -533,7 +533,7 @@ def call(String type = 'web-java', Map map) {
                     steps {
                         script {
                             // 云原生K8s部署大规模集群
-                            k8sDeploy()
+                            k8sDeploy(map)
                         }
                     }
                 }
@@ -1513,10 +1513,9 @@ def grayscaleDeploy() {
 /**
  * 云原生K8S部署大规模集群 弹性扩缩容
  */
-def k8sDeploy() {
-    sh "kubectl version"
+def k8sDeploy(map) {
     // 执行部署
-    Kubernetes.deploy(this)
+    Kubernetes.deploy(this,map)
 }
 
 /**

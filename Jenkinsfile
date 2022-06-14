@@ -8,8 +8,8 @@
  */
 // Pipeline可能需要安装的插件
 // 共享库请先去配置Jenkins系统配置 -> Global Pipeline Libraries 注意名称和版本分支分开填写 最终组合如@Library('jenkins-shared-library@master')
-// Pipeline Maven Integration , NodeJS , Pipeline Utility Steps , DingTalk , Docker , Docker Pipeline , Maven Integration
-// build user vars, Git Parameter, AnsiColor, Generic Webhook Trigger, simple theme, Blue Ocean, Gitlab, HTTP Request, ThinBackup,
+// Pipeline Maven Integration , NodeJS , Pipeline Utility Steps , DingTalk , Docker , Docker Pipeline , Maven Integration, Kubernetes ,
+// build user vars, Git Parameter, AnsiColor, Generic Webhook Trigger, simple theme, Blue Ocean, Gitlab,  HTTP Request, ThinBackup,
 // Role Strategy, SSH Pipeline Steps, HTML Publisher, Extended Choice Parameter, Hidden Parameter, Rebuilder, Active Choices
 
 // 根据不同环境项目配置不同参数
@@ -55,7 +55,7 @@ map.put('docker_repo_registry', 'registry.cn-qingdao.aliyuncs.com')
 map.put('docker_repo_namespace', 'lexiang')
 
 // K8S集群相关参数
-// K8S集群访问授权账号kube.config配置信息信任id   Jenkins凭据设置界面，类型选择为“Secret text”配置yaml转换base64的数据
+// K8S集群访问授权账号kube.config配置信息信任id   Jenkins凭据设置界面，类型选择为“Secret file”配置
 map.put('k8s_credentials_id', ' ')
 
 // 项目标签或项目简称
