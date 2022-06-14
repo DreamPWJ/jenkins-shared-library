@@ -29,8 +29,9 @@ class Kubernetes implements Serializable {
             // ctx.sh "kubectl version"
             // 部署应用 指定命名空间--namespace=
             ctx.sh """ 
-                    kubectl apply -f k8s-deployment.yaml
+                    kubectl apply -f k8s.yaml
                     kubectl get pod
+                    kubectl get svc
                     kubectl get node
                     """
             // 部署service
@@ -47,8 +48,8 @@ class Kubernetes implements Serializable {
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#latest#g;" +
                 " s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g;s#{CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
-                " ' ${ctx.WORKSPACE}/ci/_k8s/k8s-deployment.yaml > k8s-deployment.yaml "
-        ctx.sh " cat k8s-deployment.yaml "
+                " ' ${ctx.WORKSPACE}/ci/_k8s/k8s.yaml > k8s.yaml "
+        ctx.sh " cat k8s.yaml "
     }
 
     /**
