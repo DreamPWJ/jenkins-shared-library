@@ -38,6 +38,9 @@ class Kubernetes implements Serializable {
             // ctx.sh "kubectl apply -f service.yaml"
             // 部署ingress
             // ctx.sh "kubectl apply -f ingress.yaml"
+            
+            // 删除服务
+            // ctx.sh "kubectl delete -f k8s.yaml"
         }
     }
 

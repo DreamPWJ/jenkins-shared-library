@@ -1,0 +1,140 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    k8s-app: gitlab
+  name: gitlab
+  namespace: devops
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: gitlab
+  template:
+    metadata:
+      labels:
+        k8s-app: gitlab
+      namespace: devops
+      name: gitlab
+    spec:
+      containers:
+        - name: gitlab
+          image: gitlab/gitlab-ce:12.9.0-ce.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 30088
+              name: web
+              protocol: TCP
+            - containerPort: 22
+              name: agent
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 8Gi
+            requests:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /users/sign_in
+              port: 30088
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 12
+          readinessProbe:
+            httpGet:
+              path: /users/sign_in
+              port: 30088
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 12
+          volumeMounts:
+            - name: gitlab-conf
+              mountPath: /etc/gitlab
+            - name: gitlab-log
+              mountPath: /var/log/gitlab
+            - name: gitlab-data
+              mountPath: /var/opt/gitlab
+          env:
+            - name: gitlab_HOME
+              value: /var/lib/gitlab
+      volumes:
+        - name: gitlab-conf
+          hostPath:
+            path: /data/devops/gitlab/config
+            type: Directory
+        - name: gitlab-log
+          hostPath:
+            path: /data/devops/gitlab/logs
+            type: Directory
+        - name: gitlab-data
+          hostPath:
+            path: /data/devops/gitlab/data
+            type: Directory
+      serviceAccountName: gitlab
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    k8s-app: gitlab
+  name: gitlab
+  namespace: devops
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: gitlab
+  name: gitlab
+  namespace: devops
+spec:
+  type: NodePort
+  ports:
+    - name: web
+      port: 30088
+      targetPort: 30088
+      nodePort: 30088
+    - name: slave
+      port: 22
+      targetPort: 22
+      nodePort: 30022
+  selector:
+    k8s-app: gitlab
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: gitlab
+  namespace: devops
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["create","delete","get","list","patch","update","watch"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create","delete","get","list","patch","update","watch"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get","list","watch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: gitlab
+  namespace: devops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: gitlab
+subjects:
+  - kind: ServiceAccount
+    name: gitlab
+    namespace: devops
+
