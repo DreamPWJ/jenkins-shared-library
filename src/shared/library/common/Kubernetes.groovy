@@ -16,16 +16,20 @@ class Kubernetes implements Serializable {
     static def deploy(ctx) {
         // K8S_CONFIG为k8s中kubectl命令的yaml配置授权访问文件内容 数据保存为jenkins的“Secret Text”类型的凭据，用credentials方法从凭据中获取
         ctx.withCredentials([string(credentialsId: "${ctx.map.k8s_credentials_id}", variable: 'SECRET')]) {
-            ctx.sh "kubectl --version"
             ctx.println("k8s集群访问配置：${ctx.SECRET}")
-            ctx.sh "mkdir -p ~/.kube"
+            // Jenkins凭据配置的是base64  在linux中配置文件base64编码命令  base64 kube.config.yaml > kube.config.txt
+            ctx.sh "mkdir -p ~/.kube" // 保存为~/.kube/config
             ctx.sh "echo ${ctx.SECRET} | base64 -d > ~/.kube/config"
-            // sh "sed -e 's#{IMAGE_URL}#${params.HARBOR_HOST}/${params.DOCKER_IMAGE}#g;s#{IMAGE_TAG}#${GIT_TAG}#g;s#{APP_NAME}#${params.APP_NAME}#g;s#{SPRING_PROFILE}#k8s-test#g' k8s-deployment.tpl > k8s-deployment.yml"
-
+            // 动态替换k8s yaml文件
+            ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#latest#g;" +
+                    " s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
+                    " s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g;s#{CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
+                    " ' ${ctx.WORKSPACE}/_k8s/k8s-deployment.tpl > k8s-deployment.yaml "
+            ctx.sh " cat k8s-deployment.yaml "
             // 部署应用
-            ctx.sh "kubectl apply -f deployment.yaml"
+            ctx.sh "kubectl apply -f k8s-deployment.yaml" // --namespace=
             // 部署service
-            //ctx.sh "kubectl apply -f service.yaml"
+            // ctx.sh "kubectl apply -f service.yaml"
             // 部署ingress
             // ctx.sh "kubectl apply -f ingress.yaml"
         }

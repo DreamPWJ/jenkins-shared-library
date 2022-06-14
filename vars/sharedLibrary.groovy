@@ -382,6 +382,9 @@ def call(String type = 'web-java', Map map) {
                 stage('上传云端') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            return (IS_K8S_DEPLOY == false)  // k8s集群部署 镜像方式无需上传到服务器
+                        }
                     }
                     steps {
                         script {
@@ -408,7 +411,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (IS_BLUE_GREEN_DEPLOY == false)  // 非蓝绿部署 蓝绿部署有单独步骤
+                            return (IS_BLUE_GREEN_DEPLOY == false && IS_K8S_DEPLOY == false)  // 非蓝绿和k8s集群部署 都有单独步骤
                         }
                     }
                     steps {
@@ -522,7 +525,7 @@ def call(String type = 'web-java', Map map) {
                     agent {
                         docker {
                             // kubectl 环境  构建完成自动删除容器
-                            image "bitnami/kubectl:latest"
+                            image "lwolf/helm-kubectl-docker" //  bitnami/kubectl:latest
                             // args " -v /my/kube/config:/.kube/config "
                             reuseNode true // 使用根节点
                         }
@@ -1511,6 +1514,7 @@ def grayscaleDeploy() {
  * 云原生K8S部署大规模集群 弹性扩缩容
  */
 def k8sDeploy() {
+    sh "kubectl version"
     // 执行部署
     Kubernetes.deploy(this)
 }

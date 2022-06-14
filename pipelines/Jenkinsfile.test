@@ -50,7 +50,7 @@ map.put('docker_repo_registry', 'registry.cn-qingdao.aliyuncs.com')
 map.put('docker_repo_namespace', 'lexiang')
 
 // K8S集群相关参数
-// K8S集群访问授权账号kube.config配置信息信任id 如果非空表示k8s集群部署方式  Jenkins凭据设置界面，类型选择为“Secret text”配置
+// K8S集群访问授权账号kube.config配置信息信任id   Jenkins凭据设置界面，类型选择为“Secret text”配置yaml转换base64的数据
 map.put('k8s_credentials_id', ' ')
 
 // 项目标签或项目简称
