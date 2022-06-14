@@ -47,7 +47,11 @@ map.put('docker_repo_credentials_id', '9a7c8e37-cb19-4e5c-a7a0-635517b1eb74')
 // docker镜像仓库注册地址
 map.put('docker_repo_registry', 'registry.cn-qingdao.aliyuncs.com')
 // docker仓库命名空间名称
-map.put('docker_repo_namespace', 'panweiji-coffee')
+map.put('docker_repo_namespace', 'panweiji')
+
+// K8S集群相关参数
+// K8S集群访问授权账号kube.config配置信息信任id   Jenkins凭据设置界面，类型选择为“Secret file”配置
+map.put('k8s_credentials_id', ' ')
 
 // 项目标签或项目简称
 map.put('project_tag', ' ')
@@ -73,7 +77,7 @@ map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
 map.put('jenkins_node', 'linux')
-map.put('jenkins_node_front_end', 'macos-web')
+map.put('jenkins_node_front_end', 'panweiji')
 
 // 构建环境变量
 map.put('nodejs', 'Node14')

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {APP_NAME}-deployment
+  namespace: default
+  labels:
+    app: {APP_NAME}
+spec:
+  replicas: 3
+  #minReplicas: 2                    #最小副本数
+  #maxReplicas: 6                    #最大副本数
+  selector:
+    matchLabels:
+      app: {APP_NAME}
+  template:
+    metadata:
+      labels:
+        app: {APP_NAME}
+    spec:
+      containers:
+      - name: {APP_NAME}
+        image: {IMAGE_URL}:{IMAGE_TAG}
+        ports:
+        - containerPort: {CONTAINER_PORT}
+        env:
+          - name: SPRING_PROFILES_ACTIVE
+            value: {SPRING_PROFILE}
+      # 私有镜像配置
+      #imagePullSecrets:
+        #- name: myregistrykey

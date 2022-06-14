@@ -49,6 +49,10 @@ map.put('docker_repo_registry', 'registry.cn-qingdao.aliyuncs.com')
 // docker仓库命名空间名称
 map.put('docker_repo_namespace', 'lexiang')
 
+// K8S集群相关参数
+// K8S集群访问授权账号kube.config配置信息信任id   Jenkins凭据设置界面，类型选择为“Secret file”配置
+map.put('k8s_credentials_id', ' ')
+
 // 项目标签或项目简称
 map.put('project_tag', '单体式')
 
@@ -111,7 +115,7 @@ vue-frontend-monorepo
 Vue大前端统一的单体式仓库❤️
 JSON_PARAMS
 {
-    "REPO_URL" : "https://github.com/DreamPWJ/panweijikeji/vue-frontend-monorepo.git" ,
+    "REPO_URL" : "https://github.com/DreamPWJ/panweiji/vue-frontend-monorepo.git" ,
     "BRANCH_NAME" : "dev" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "property-sales-manage,vue-demo" ,

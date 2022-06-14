@@ -49,6 +49,10 @@ map.put('docker_repo_registry', 'registry.cn-shanghai.aliyuncs.com')
 // docker仓库命名空间名称
 map.put('docker_repo_namespace', 'lannengkeji')
 
+// K8S集群相关参数
+// K8S集群访问授权账号kube.config配置信息信任id   Jenkins凭据设置界面，类型选择为“Secret file”配置
+map.put('k8s_credentials_id', ' ')
+
 // 项目标签或项目简称
 map.put('project_tag', '颗粒计费')
 

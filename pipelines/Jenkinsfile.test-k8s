@@ -17,7 +17,7 @@ map.put('remote_worker_ips', [])
 // 远程服务器用户名
 map.put('remote_user_name', 'root')
 // 代理机或跳板机外网ip用于透传部署到内网目标机器 选填 目标机器外部无法直接访问情况填写内网ip
-map.put('proxy_jump_ip', ' ') // 119.188.90.222
+map.put('proxy_jump_ip', '119.188.90.222')
 // 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
 map.put('proxy_jump_user_name', 'root')
 // 自定义跳板机ssh和scp访问端口 默认22
@@ -41,17 +41,17 @@ map.put('docker_volume_mount', '')
 // Dockerfile多阶段构建 镜像名称
 map.put('docker_multistage_build_images', ' ')
 // 是否上传镜像到docker容器仓库
-map.put('is_push_docker_repo', false)
+map.put('is_push_docker_repo', true)
 // docker容器镜像仓库账号信任id
-map.put('docker_repo_credentials_id', '5553c9ed-5416-4bbf-b7fc-9d53ed856177')
+map.put('docker_repo_credentials_id', '73f6b3b0-4580-4acf-b04a-63892fcf9ba8')
 // docker镜像仓库注册地址
-map.put('docker_repo_registry', 'registry.cn-qingdao.aliyuncs.com')
+map.put('docker_repo_registry', 'hub.kce.ksyun.com')
 // docker仓库命名空间名称
-map.put('docker_repo_namespace', 'lexiang')
+map.put('docker_repo_namespace', 'lanneng')
 
 // K8S集群相关参数
 // K8S集群访问授权账号kube.config配置信息信任id   Jenkins凭据设置界面，类型选择为“Secret file”配置
-map.put('k8s_credentials_id', ' ')
+map.put('k8s_credentials_id', '	74a3d376-cb4c-4a20-9bf7-7300a5eaa84d')
 
 // 项目标签或项目简称
 map.put('project_tag', ' ')
@@ -63,7 +63,7 @@ map.put('is_same_server', false)
 // 是否进行优雅停机
 map.put('is_grace_shutdown', false)
 // 是否进行服务启动健康探测
-map.put('is_health_check', true)
+map.put('is_health_check', false)
 // 是否Pipeline内脚本钉钉通知  总开关
 map.put('is_ding_notice', false)
 // 是否进行部署前通知
@@ -82,7 +82,7 @@ map.put('jenkins_node_front_end', 'master')
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node14')
 map.put('maven', 'Maven3.6')
-map.put('jdk', '8')
+map.put('jdk', '11')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
@@ -96,7 +96,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', 'pellet-charging')
+map.put('maven_one_level', ' ')
 // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
 map.put('maven_setting_xml', ' ')
 
@@ -105,85 +105,23 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/Jenkinsfile.test
+// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/Jenkinsfile.test-k8s
 
 /*
 
-test-frontend-web
-测试Web前端 ❤️
+test-k8s
+测试K8S集群服务端
 JSON_PARAMS
 {
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/rzhtc.git" ,
-    "BRANCH_NAME" : "dev" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "rzhtc" ,
-    "SHELL_PARAMS" : "rzhtc h5 8020 80 sit" ,
-    "NPM_RUN_PARAMS" : "build:juxian",
-    "IS_ROLL_DEPLOY" : true,
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
-}
-
-test-backend-spring-boot
-测试Java服务端Spring Boot框架
-JSON_PARAMS
-{
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/java-backend-monorepo.git" ,
-   "BRANCH_NAME" : "dev" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "pellet-charging-app" ,
-   "SHELL_PARAMS" : "pellet-charging app 8098 8080 sit"
-}
-
-test-spring-boot
-测试Java服务端Spring Boot框架
-JSON_PARAMS
-{
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/openpark_backend.git" ,
-   "BRANCH_NAME" : "main" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "openpark" ,
-   "SHELL_PARAMS" : "openpark app 8099 9000 sit",
-   "IS_MAVEN_SINGLE_MODULE" : true,
-}
-
-test-backend-spring-mvc
-测试Java服务端Spring MVC框架
-JSON_PARAMS
-{
-   "REPO_URL" : "http://47.102.214.33/pan.weiji/spring-mvc-demo.git" ,
+   "REPO_URL" : "https://gitee.com/tinylk/pipeline-demo" ,
    "BRANCH_NAME" : "master" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "spring-mvc-demo" ,
-   "SHELL_PARAMS" : "spring-mvc demo 8096 8080 sit",
+   "PROJECT_NAME" : "test-k8s" ,
+   "SHELL_PARAMS" : "test k8s 8099 40080 sit",
    "IS_MAVEN_SINGLE_MODULE" : true,
-   "JAVA_FRAMEWORK_TYPE" : "2",
-   "DOCKER_VOLUME_MOUNT" : "/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
-}
-{
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark.git" ,
-   "BRANCH_NAME" : "develop" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "epark-server" ,
-   "SHELL_PARAMS" : "epark server 8097 8080 sit",
-   "IS_MAVEN_SINGLE_MODULE" : true,
-   "JAVA_FRAMEWORK_TYPE" : "2",
-   "SOURCE_TARGET_CONFIG_DIR" : "resources/juxian,resources",
-   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/nfsdata/ParkPicture:/usr/local/tomcat/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
+   "IS_K8S_DEPLOY" : true,
 }
 
-test-open-park-saas
-测试OpenPark SAAS框架
-JSON_PARAMS
-{
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/openpark_saas_backend" ,
-   "BRANCH_NAME" : "panweiji-test" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "openpark-saas" ,
-   "SHELL_PARAMS" : "openpark saas 8096 9000 sit",
-   "IS_MAVEN_SINGLE_MODULE" : true
-}
-
-REMOTE_IP: 120.92.155.194
 
 */
 

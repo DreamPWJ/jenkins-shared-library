@@ -382,6 +382,9 @@ def call(String type = 'web-java', Map map) {
                 stage('上传云端') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            return (IS_K8S_DEPLOY == false)  // k8s集群部署 镜像方式无需上传到服务器
+                        }
                     }
                     steps {
                         script {
@@ -408,7 +411,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (IS_BLUE_GREEN_DEPLOY == false)  // 非蓝绿部署 蓝绿部署有单独步骤
+                            return (IS_BLUE_GREEN_DEPLOY == false && IS_K8S_DEPLOY == false)  // 非蓝绿和k8s集群部署 都有单独步骤
                         }
                     }
                     steps {
@@ -449,13 +452,6 @@ def call(String type = 'web-java', Map map) {
                                     && "${AUTO_TEST_PARAM}" != "" && IS_BLUE_GREEN_DEPLOY == false)
                         }
                     }
-/*                    agent {
-                        docker {
-                            // Node环境  构建完成自动删除容器
-                            image "node:${NODE_VERSION}"
-                            reuseNode true // 使用根节点
-                        }
-                    }*/
                     steps {
                         script {
                             integrationTesting()
@@ -465,6 +461,7 @@ def call(String type = 'web-java', Map map) {
 
                 stage('蓝绿部署') {
                     when {
+                        beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             return (IS_BLUE_GREEN_DEPLOY == true)  // 是否进行蓝绿部署
@@ -480,6 +477,7 @@ def call(String type = 'web-java', Map map) {
 
                 stage('滚动部署') {
                     when {
+                        beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             return (IS_ROLL_DEPLOY == true) // 是否进行滚动部署
@@ -487,8 +485,9 @@ def call(String type = 'web-java', Map map) {
                     }
                     tools {
                         // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
-                        // 滚动部署对于不同节点配置文件不同的情况 动态替换配置文件后需要基于Maven重新打包不同节点部署包
+                        // 针对滚动部署对于不同节点配置文件不同的情况 动态替换配置文件后需要基于Maven重新打包不同节点部署包 如果不需要可屏蔽
                         maven "${map.maven}"
+                        jdk "${JDK_VERSION}"
                     }
                     steps {
                         script {
@@ -501,6 +500,7 @@ def call(String type = 'web-java', Map map) {
                 stage('灰度发布') {
                     when {
                         // branch 'master'
+                        beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             return (IS_GRAYSCALE_DEPLOY == true) // 是否进行灰度发布
@@ -516,15 +516,24 @@ def call(String type = 'web-java', Map map) {
 
                 stage('Kubernetes云原生') {
                     when {
+                        beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             return (IS_K8S_DEPLOY == true)  // 是否进行云原生K8S集群部署
                         }
                     }
+                    agent {
+                        docker {
+                            // kubectl 环境  构建完成自动删除容器
+                            image "lwolf/helm-kubectl-docker" //  bitnami/kubectl:latest
+                            // args " -v /my/kube/config:/.kube/config "
+                            reuseNode true // 使用根节点
+                        }
+                    }
                     steps {
                         script {
                             // 云原生K8s部署大规模集群
-                            k8sDeploy()
+                            k8sDeploy(map)
                         }
                     }
                 }
@@ -532,6 +541,7 @@ def call(String type = 'web-java', Map map) {
                 stage('Serverless工作流') {
                     when {
                         // branch 'master'
+                        beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             return (IS_SERVERLESS_DEPLOY == true) // 是否进行Serverless发布
@@ -541,6 +551,17 @@ def call(String type = 'web-java', Map map) {
                         script {
                             // Serverless发布方式免运维
                             serverlessDeploy()
+                        }
+                    }
+                }
+
+                stage('钉钉通知') {
+                    when {
+                        expression { return ("${params.IS_DING_NOTICE}" == 'true' && params.IS_HEALTH_CHECK == false) }
+                    }
+                    steps {
+                        script {
+                            dingNotice(1, "成功") // ✅
                         }
                     }
                 }
@@ -766,8 +787,6 @@ def getInitParams(map) {
 
     // tag版本变量定义
     tagVersion = ""
-    // 是否健康检测失败状态
-    isHealthCheckFail = false
     // 扫描二维码地址
     qrCodeOssUrl = ""
     // Java构建包OSS地址Url
@@ -780,6 +799,13 @@ def getInitParams(map) {
     javaPackageSize = ""
     // Maven打包后产物的位置
     mavenPackageLocation = ""
+    // 是否健康检测失败状态
+    isHealthCheckFail = false
+    // 计算应用启动时间
+    healthCheckTimeDiff = "未知"
+    // 健康检测url地址
+    healthCheckUrl = ""
+
 }
 
 /**
@@ -1301,7 +1327,7 @@ def healthCheck(params = '') { // 可选参数
                 script: "ssh  ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/ && ./health-check.sh ${healthCheckParams} '",
                 returnStdout: true).trim()
     }
-    healthCheckTimeDiff = Utils.getTimeDiff(healthCheckStart, new Date()) // 计算启动时间
+    healthCheckTimeDiff = Utils.getTimeDiff(healthCheckStart, new Date()) // 计算应用启动时间
 
     if ("${healthCheckMsg}".contains("成功")) {
         Tools.printColor(this, "${healthCheckMsg} ✅")
@@ -1339,7 +1365,7 @@ def integrationTesting() {
         Tests.createSmokeReport(this)
 
         // 结合YApi接口管理做自动化API测试
-        def yapiUrl = "http://yapi.panweijikeji.com"
+        def yapiUrl = "http://yapi.panweiji.com"
         def testUrl = "${yapiUrl}/api/open/run_auto_test?${AUTO_TEST_PARAM}"
         // 执行接口测试
         def content = HttpRequest.get(this, "${testUrl}")
@@ -1497,15 +1523,16 @@ def scrollToDeploy() {
  * 基于Nginx Ingress 灰度发布  实现多版本并存 非强制用户更新提升用户体验
  */
 def grayscaleDeploy() {
+    // Nginx-ingress 是使用 Nginx 作为反向代理和负载平衡器的 Kubernetes 的 Ingress 控制器
 
 }
 
 /**
- * 云原生K8S部署大规模集群
+ * 云原生K8S部署大规模集群 弹性扩缩容
  */
-def k8sDeploy() {
-    // 执行部署
-    Kubernetes.deploy(this)
+def k8sDeploy(map) {
+    // 执行k8s集群部署
+    Kubernetes.deploy(this, map)
 }
 
 /**

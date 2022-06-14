@@ -8,6 +8,11 @@ location ~ .*\.(gif|jpg|pdf|jpeg|png)$ {
 root /usr/share/nginx/html/images/;
 expires 30d;
 access_log off;
+
+location ~ .*\.(json|txt)$ {
+root /usr/share/nginx/html/;
+expires 30d;
+access_log off;
 }
 }
 

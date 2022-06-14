@@ -15,7 +15,7 @@ copyright "© #{Time.now.year} 山东乐享信息技术有限公司"
 
 # 技术支持网址
 support_url({
-              'zh-Hans' => "http://www.panweijikeji.com"
+              'zh-Hans' => "http://www.panweiji.com"
             })
 
 # App名称

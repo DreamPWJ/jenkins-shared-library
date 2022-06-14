@@ -37,7 +37,7 @@ class Deploy implements Serializable {
             // 获取不同机器的数字号 不同机器替换不同的机器特定配置文件
             def machineNum = "${ctx.MACHINE_TAG.replace("号机", "")}".toInteger()
             // 获取项目代码具体目录
-            def projectDir = "${ctx.env.WORKSPACE} " +
+            def projectDir = "${ctx.env.WORKSPACE}" +
                     "${ctx.IS_MAVEN_SINGLE_MODULE}" == 'true' ? "" : ("${ctx.MAVEN_ONE_LEVEL}" == "" ? "/${ctx.PROJECT_NAME}" : "/${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME}")
             // 遍历文件夹下的所有文件并重命名 多机配置文件命名-n-拼接方式 如config-1-.yaml
             ctx.dir("${projectDir}/${sourceFilePath}/") {
