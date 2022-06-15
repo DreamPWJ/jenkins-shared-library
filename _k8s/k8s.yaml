@@ -41,12 +41,12 @@ metadata:
     app: {APP_NAME}-service
 
 spec:
-  type: NodePort                       # 规格类型，选择LoadBalancer是因为我们要实现Pod之间的负载均衡
+  type: LoadBalancer                   # 规格类型NodePort、oadBalancer、Ingress实现Pod外网访问和负载均衡
   selector:
     app: {APP_NAME}                    # 通过Pod的labels指定Pod 建立关联
   ports:
     - name: {APP_NAME}
       port: {HOST_PORT}                # 指定Service接收请求的端口
       targetPort: {HOST_PORT}          # 请求转发的端口
-      nodePort: {HOST_PORT}
+      #nodePort: {HOST_PORT}
       protocol: TCP                    # 定义通信协议

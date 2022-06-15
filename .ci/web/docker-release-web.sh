@@ -142,7 +142,9 @@ docker run -d --restart=always -p ${host_port}:${expose_port} \
 cd /${deploy_folder} && ./docker-common.sh remove_docker_image ${docker_image_ids}
 
 # 删除所有悬空的镜像
-# cd /${deploy_folder} && ./docker-common.sh remove_docker_dangling_images
+if [[ ${is_push_docker_repo} == true ]]; then
+  cd /${deploy_folder} && ./docker-common.sh remove_docker_dangling_images
+fi
 
 #  前端命令和shell命令都可使用 && 将多个命令连接执行
 #  npm install && npm run build
