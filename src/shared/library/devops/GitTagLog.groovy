@@ -48,6 +48,11 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                 if (fileExists("${changeLogFileName}")) {
                     changeLogFile = readFile(file: "${changeLogFileName}")
                 }
+                // 设置git远程tag
+                sh("""
+                          git tag -a ${tagVersion} -m '${gitChangeLog}'
+                          git push ${userPassWordUrl} ${tagVersion}
+                           """)
                 //if (!changeLogFile.contains(gitChangeLog)) {  // 重复变更日志和无新增和修复记录 补丁小版本记录 不自动生成发布日志(存在新版本未被记录的情况) 频繁发布情况可以考虑按天打tag和记录 防止tag数量杂乱
                 writeFile file: "${changeLogFileName}", text: "## ${tagVersion}\n`${Utils.formatDate()}`<br><br>\n${gitChangeLog}\n${changeLogFile}"
                 try {
@@ -62,7 +67,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                     // 当前分支处于分离状态 fatal: You are not currently on a branch
                     def tempBranch = "pan-wei-ji-temp-branch"
                     sh("""
-                          git branch -d ${tempBranch} || true
+                          git branch -D ${tempBranch} || true
                           git branch ${tempBranch}
                           git checkout ${ctx.BRANCH_NAME}
                           git merge ${tempBranch}
@@ -70,11 +75,6 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                           git branch -d ${tempBranch} 
                            """)
                 }
-                // 设置git远程tag
-                sh("""
-                          git tag -a ${tagVersion} -m '${gitChangeLog}'
-                          git push ${userPassWordUrl} ${tagVersion}
-                           """)
                 //}
                 //}
             } else {

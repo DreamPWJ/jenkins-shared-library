@@ -2,9 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: an-plus-business-deployment
+  name: panweiji-business-deployment
   labels:
-    app: an-plus-business-deployment
+    app: panweiji-business-deployment
 
 spec:
   replicas: 2                   # Deployment Spec对象的一个属性，用于定义我们需要运行几个Pod
@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       labels:
-        app: an-plus-business   # Service中的selector通过这个信息匹配Pod
+        app: panweiji-business   # Service中的selector通过这个信息匹配Pod
       spec:
         containers:
           - name: hello-k8s

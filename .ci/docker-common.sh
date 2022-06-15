@@ -61,7 +61,7 @@ function remove_docker_dangling_images() {
   fi
 }
 
-# 根据镜像名称获取所有ID并删除旧镜像
+# 根据镜像名称获取所有ID并删除旧镜像  不适合远程镜像情况
 function remove_docker_image() {
   if [[ $1 ]]; then
     # 根据镜像名称查询镜像ID组

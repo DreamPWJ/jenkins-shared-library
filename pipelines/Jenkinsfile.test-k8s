@@ -109,6 +109,21 @@ sharedLibrary(map)
 
 /*
 
+test-k8s-web
+测试K8S集群Web前端 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "http://47.102.214.33/lanneng_develop/react-frontend-monorepo.git" ,
+    "BRANCH_NAME" : "dev" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "pellet-charging-admin" ,
+    "SHELL_PARAMS" : "pellet-charging-admin web 30001 80 sit" ,
+    "NPM_RUN_PARAMS" : "build",
+    "IS_MONO_REPO": true,
+    "CUSTOM_NGINX_CONFIG" : "config/default.conf",
+    "IS_K8S_DEPLOY" : true,
+}
+
 test-k8s
 测试K8S集群服务端
 JSON_PARAMS
@@ -117,7 +132,7 @@ JSON_PARAMS
    "BRANCH_NAME" : "master" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "test-k8s" ,
-   "SHELL_PARAMS" : "test k8s 8099 40080 sit",
+   "SHELL_PARAMS" : "test k8s 30000 40080 sit",
    "IS_MAVEN_SINGLE_MODULE" : true,
    "IS_K8S_DEPLOY" : true,
 }

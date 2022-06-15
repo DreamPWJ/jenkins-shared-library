@@ -244,7 +244,9 @@ docker run -d --restart=always -p ${host_port}:${expose_port} \
 cd /${deploy_folder} && ./docker-common.sh remove_docker_image ${docker_image_ids}
 
 # 删除所有悬空的镜像
-# cd /${deploy_folder} && ./docker-common.sh remove_docker_dangling_images
+if [[ ${is_push_docker_repo} == true ]]; then
+  cd /${deploy_folder} && ./docker-common.sh remove_docker_dangling_images
+fi
 
 # 并发构建镜像删除none的镜像可能导致错误
 #docker_none_images=$(docker images | grep "none" | awk '{print $3}')

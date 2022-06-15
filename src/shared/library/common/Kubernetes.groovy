@@ -14,8 +14,9 @@ class Kubernetes implements Serializable {
      * 声明式执行部署
      */
     static def deploy(ctx, map) {
-        // K8S_CONFIG为k8s中kubectl命令的yaml配置授权访问文件内容 数据保存为jenkins的“Secret file”类型的凭据，用credentials方法从凭据中获取
+        // KUBECONFIG变量为k8s中kubectl命令的yaml配置授权访问文件内容 数据保存为jenkins的“Secret file”类型的凭据，用credentials方法从凭据中获取
         ctx.withCredentials([ctx.file(credentialsId: "${map.k8s_credentials_id}", variable: 'KUBECONFIG')]) {
+            // 安装kubectl命令访问k8s集群: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
             // ctx.println("k8s集群访问配置：${ctx.KUBECONFIG}")
             // 下载集群的配置文件，复制到本地计算机的 $HOME/.kube/config（kubectl的默认路径）
             // 若您之前配置过KUBECONFIG环境变量，kubectl会优先加载KUBECONFIG环境变量，而不是$HOME/.kube/config，使用时请注意
@@ -29,14 +30,22 @@ class Kubernetes implements Serializable {
             // ctx.sh "kubectl version"
             // 部署应用 指定命名空间--namespace=
             ctx.sh """ 
-                    kubectl apply -f k8s-deployment.yaml
+                    kubectl apply -f k8s.yaml
                     kubectl get pod
+                    kubectl get svc
                     kubectl get node
                     """
             // 部署service
             // ctx.sh "kubectl apply -f service.yaml"
             // 部署ingress
             // ctx.sh "kubectl apply -f ingress.yaml"
+
+            // 删除服务
+            // ctx.sh "kubectl delete -f k8s.yaml"
+            // 查看pod在哪个node节点运行
+            ctx.sh "kubectl get pod -n default -o wide"
+            // K8S健康检查
+            // healthDetection(ctx)
         }
     }
 
@@ -47,8 +56,8 @@ class Kubernetes implements Serializable {
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#latest#g;" +
                 " s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g;s#{CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
-                " ' ${ctx.WORKSPACE}/ci/_k8s/k8s-deployment.yaml > k8s-deployment.yaml "
-        ctx.sh " cat k8s-deployment.yaml "
+                " ' ${ctx.WORKSPACE}/ci/_k8s/k8s.yaml > k8s.yaml "
+        ctx.sh " cat k8s.yaml "
     }
 
     /**
@@ -75,6 +84,7 @@ class Kubernetes implements Serializable {
      * K8s健康探测
      */
     static def healthDetection(ctx) {
+        // Pod通过两类探针来检查容器的健康状态。分别是LivenessProbe（存活探测）和 ReadinessProbe（就绪探测）
         ctx.sh ""
     }
 

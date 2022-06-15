@@ -76,7 +76,7 @@ appSharedLibrary(map)
 
 /*
 
-an-plus-android-app
+panweiji-android-app
 乐享生活用户Android端 🤖
 JSON_PARAMS:
 {
@@ -93,7 +93,7 @@ ANDROID_APP_INFO:
    "xiaomiMarketPrivateKey" : ""
 }
 
-an-plus-android-mapp
+panweiji-android-mapp
 乐享服务管理Android端 🤖
 JSON_PARAMS:
 {
@@ -102,7 +102,7 @@ JSON_PARAMS:
     "DEFAULT_GIT_BRANCH" : "develop",
 }
 
-an-plus-saas-android-app
+panweiji-saas-android-app
 安家Saas用户Android端 🚴
 JSON_PARAMS:
 {
@@ -119,7 +119,7 @@ ANDROID_APP_INFO:
    "xiaomiMarketPrivateKey" : "xxx,xxx,xxx,xxx,wj9i3nlzcpqge6qry8r6jf3ink82vd1qyf9thdma31avfatwn2,xxx,xxx"
 }
 
-an-plus-saas-android-mapp
+panweiji-saas-android-mapp
 安家Saas管理Android端
 JSON_PARAMS:
 {
@@ -145,7 +145,7 @@ ANDROID_APP_INFO:
 
 ------------------------------------------------------------------------------------------------------
 
-an-plus-ios-app
+panweiji-ios-app
 乐享生活IOS用户端 ‍🍏️
 JSON_PARAMS:
 {
@@ -162,7 +162,7 @@ IOS_APP_REVIEW_INFO:
    "demoPassword" : "123456"
 }
 
-an-plus-ios-mapp
+panweiji-ios-mapp
 乐享服务IOS管理端 ‍🍏️
 JSON_PARAMS:
 {
@@ -178,7 +178,7 @@ IOS_APP_REVIEW_INFO:
    "demoPassword" : "123"
 }
 
-an-plus-jinhua-ios-app
+panweiji-jinhua-ios-app
 安家用户iOS端-集团账号
 JSON_PARAMS:
 {
@@ -196,7 +196,7 @@ IOS_APP_REVIEW_INFO:
    "demoPassword" : "123456a"
 }
 
-an-plus-jinhua-ios-mapp
+panweiji-jinhua-ios-mapp
 安家管理iOS端-集团账号
 JSON_PARAMS:
 {
@@ -214,7 +214,7 @@ IOS_APP_REVIEW_INFO:
    "demoPassword" : "123456"
 }
 
-an-plus-saas-ios-app
+panweiji-saas-ios-app
 安家Saas用户IOS端-科技账号
 JSON_PARAMS:
 {
@@ -229,7 +229,7 @@ IOS_APP_REVIEW_INFO:
    "demoPassword" : "123456a"
 }
 
-an-plus-saas-ios-mapp
+panweiji-saas-ios-mapp
 安家Saas管理IOS端-科技账号
 JSON_PARAMS:
 {

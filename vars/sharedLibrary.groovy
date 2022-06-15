@@ -557,11 +557,13 @@ def call(String type = 'web-java', Map map) {
 
                 stage('钉钉通知') {
                     when {
-                        expression { return ("${params.IS_DING_NOTICE}" == 'true' && params.IS_HEALTH_CHECK == false) }
+                        expression { return true }
                     }
                     steps {
                         script {
-                            dingNotice(1, "成功") // ✅
+                            if ("${params.IS_DING_NOTICE}" == 'true' && params.IS_HEALTH_CHECK == false) {
+                                dingNotice(1, "成功") // ✅
+                            }
                         }
                     }
                 }

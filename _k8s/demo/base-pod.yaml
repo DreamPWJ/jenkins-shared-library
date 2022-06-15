@@ -2,9 +2,9 @@ apiVersion: v1
 kind: Pod
 
 metadata:
-  name: an-plus-base-prod
+  name: panweiji-base-prod
   labels:
-    app: an-plus-base-prod    # 指定 label，便于检索
+    app: panweiji-base-prod    # 指定 label，便于检索
 
 spec:
   containers:
