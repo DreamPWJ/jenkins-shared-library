@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gray-release-canary
+  namespace: default
+  annotations: # 文档: https://help.aliyun.com/document_detail/200941.html
+    # 开启Canary。
+    nginx.ingress.kubernetes.io/canary: "true"
+    # Http Header请求头为foo。
+    nginx.ingress.kubernetes.io/canary-by-header: "foo"
+    # 请求头foo=bar时，请求才会被路由到新版本服务中。
+    nginx.ingress.kubernetes.io/canary-by-header-value: "bar"
+    # 在满足上述匹配规则的基础上仅允许百分比的流量会被路由到新版本服务中。
+    nginx.ingress.kubernetes.io/canary-weight: "100"
+
+spec:
+  rules:
+    - host: www.panweiji.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: serviceName1
+              servicePort: 80
+    - host: www.dream.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: serviceName2
+              servicePort: 80

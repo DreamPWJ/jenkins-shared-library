@@ -35,3 +35,5 @@ spec:
 # kubectl logs -f pod名称
 # 进入Pod的内部容器
 # kubectl exec -it pod名称 bash
+# 删除Ingress
+# kubectl delete ingress ingress-name

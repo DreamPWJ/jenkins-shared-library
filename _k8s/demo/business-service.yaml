@@ -22,3 +22,5 @@ spec:
 # kubectl get svc
 # 查看Service的详细信息
 # kubectl describe svc/business-service
+# 删除Service
+# kubectl delete svc svc-name

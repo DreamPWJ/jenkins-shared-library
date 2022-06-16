@@ -8,7 +8,7 @@ metadata:
 spec:
   replicas: 3
   #minReplicas: 2                    #最小副本数
-  #maxReplicas: 6                    #最大副本数
+  #maxReplicas: 10                   #最大副本数
   selector:
     matchLabels:
       app: {APP_NAME}
@@ -26,6 +26,7 @@ spec:
         env:
           - name: SPRING_PROFILES_ACTIVE
             value: {SPRING_PROFILE}
+      restartPolicy: Always
 
       # 私有镜像配置
       #imagePullSecrets:
@@ -43,7 +44,7 @@ metadata:
     app: {APP_NAME}-service
 
 spec:
-  type: LoadBalancer                   # 规格类型NodePort、oadBalancer、Ingress实现Pod外网访问和负载均衡
+  type: LoadBalancer                   # 规格类型NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡
   selector:
     app: {APP_NAME}                    # 通过Pod的labels指定Pod 建立关联
   ports:
