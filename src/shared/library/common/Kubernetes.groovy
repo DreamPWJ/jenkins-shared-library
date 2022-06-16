@@ -14,7 +14,7 @@ import shared.library.Utils
 class Kubernetes implements Serializable {
 
     /**
-     * 声明式执行部署
+     * 声明式执行k8s集群部署
      */
     static def deploy(ctx, map) {
         // 动态替换k8s yaml声明式部署文件
@@ -65,6 +65,14 @@ class Kubernetes implements Serializable {
                 " s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g;s#{CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/k8s.yaml > k8s.yaml "
         ctx.sh " cat k8s.yaml "
+    }
+
+    /**
+     * 灰度发布
+     */
+    static def ingressDeploy(ctx, map) {
+        ctx.sh "kubectl apply -f ingress.yaml"
+        ctx.sh "kubectl get ingress"
     }
 
     /**

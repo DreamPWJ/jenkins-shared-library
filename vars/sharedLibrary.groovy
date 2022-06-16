@@ -509,7 +509,7 @@ def call(String type = 'web-java', Map map) {
                     steps {
                         script {
                             // 基于Nginx Ingress 灰度发布  实现多版本共存 非强制更新提升用户体验
-                            grayscaleDeploy()
+                            grayscaleDeploy(map)
                         }
                     }
                 }
@@ -1524,8 +1524,9 @@ def scrollToDeploy() {
 /**
  * 基于Nginx Ingress 灰度发布  实现多版本并存 非强制用户更新提升用户体验
  */
-def grayscaleDeploy() {
+def grayscaleDeploy(map) {
     // Nginx-ingress 是使用 Nginx 作为反向代理和负载平衡器的 Kubernetes 的 Ingress 控制器
+    Kubernetes.ingressDeploy(this, map)
 
 }
 

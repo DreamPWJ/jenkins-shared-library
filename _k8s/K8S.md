@@ -75,7 +75,5 @@ spec:         #必选，Pod中容器的详细定义
         items:
         - key: string
 
-### Kompose-使用Docker Compose生成k8s资源
-#### Windows
-curl -L https://github.com/kubernetes/kompose/releases/download/v1.1.0/kompose-windows-amd64.exe -o kompose.exe
-kompose --file _/docker/docker-compose.yaml convert
+
+### 通过kubectl创建简单nginx服务 [文档](https://docs.ksyun.com/documents/5517)
