@@ -193,8 +193,11 @@ class Utils implements Serializable {
     /**
      * 获取版本号方法
      */
-    static def getVersionNum(String versionNum = '') {
-        return new Date().format('yyyy-MM-dd') + "${versionNum}"
+    static def getVersionNum(ctx, String versionNum = '') {
+        if (versionNum == '') {
+            versionNum = ctx.env.BUILD_NUMBER
+        }
+        return new Date().format('yyyy-MM-dd') + "-v" + "${versionNum}"
     }
 
     /**

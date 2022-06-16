@@ -96,6 +96,7 @@ docker_image_ids=$(docker images -q --filter reference=${docker_image_name})
 # 获取系统CPU使用率 如果CPU占用高 则排队延迟部署 避免并发部署等导致资源阻塞
 cd /${deploy_folder} && ./docker-common.sh get_cpu_rate && cd /${deploy_file}
 
+# 是否是远程镜像仓库方式
 if [[ ${is_push_docker_repo} == false ]]; then
   echo "🏗️  开始构建Docker镜像(无缓存构建)"
   docker build -t ${docker_image_name} \

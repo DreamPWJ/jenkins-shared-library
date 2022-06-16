@@ -20,11 +20,13 @@ spec:
       containers:
       - name: {APP_NAME}
         image: {IMAGE_URL}:{IMAGE_TAG}
+        imagePullPolicy: Always
         ports:
         - containerPort: {CONTAINER_PORT}
         env:
           - name: SPRING_PROFILES_ACTIVE
             value: {SPRING_PROFILE}
+
       # 私有镜像配置
       #imagePullSecrets:
         #- name: myregistrykey

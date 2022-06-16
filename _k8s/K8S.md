@@ -12,7 +12,7 @@ spec:         #必选，Pod中容器的详细定义
   containers:      #必选，Pod中容器列表
   - name: string     #必选，容器名称
     image: string    #必选，容器的镜像名称
-    imagePullPolicy: [Always | Never | IfNotPresent] #获取镜像的策略 Alawys表示下载镜像 IfnotPresent表示优先使用本地镜像，否则下载镜像，Nerver表示仅使用本地镜像
+    imagePullPolicy: [Always | Never | IfNotPresent] #获取镜像的策略 Always表示下载镜像 IfnotPresent表示优先使用本地镜像，否则下载镜像，Nerver表示仅使用本地镜像
     command: [string]    #容器的启动命令列表，如不指定，使用打包时使用的启动命令
     args: [string]     #容器的启动命令参数列表
     workingDir: string     #容器的工作目录

@@ -146,6 +146,7 @@ echo "远程调试参数: ${remote_debugging_param}"
 # 根据镜像名称查询镜像ID 用于删除无效的镜像
 docker_image_ids=$(docker images -q --filter reference=${docker_image_name})
 
+# 是否是远程镜像仓库方式
 if [[ ${is_push_docker_repo} == false ]]; then
   echo "🏗️  开始构建Docker镜像(无缓存构建)"
   docker build -t ${docker_image_name} \
