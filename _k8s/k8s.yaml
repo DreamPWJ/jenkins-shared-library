@@ -21,6 +21,11 @@ spec:
       - name: {APP_NAME}
         image: {IMAGE_URL}:{IMAGE_TAG}
         imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "{MEMORY_SIZE}i"
+          limits:
+            memory: "{MEMORY_SIZE}i"
         ports:
         - containerPort: {CONTAINER_PORT}
         env:
@@ -28,9 +33,9 @@ spec:
             value: {SPRING_PROFILE}
       restartPolicy: Always
 
-      # 私有镜像配置
-      #imagePullSecrets:
-        #- name: myregistrykey
+      # 私有镜像拉取密钥配置 文档：https://docs.ksyun.com/documents/5482
+      imagePullSecrets:
+        - name: lannengkeji2022
 
 ---
 
