@@ -50,6 +50,6 @@ spec:
   ports:
     - name: {APP_NAME}
       port: {HOST_PORT}                # 指定Service接收请求的端口
-      targetPort: {HOST_PORT}          # 请求转发的端口
-      #nodePort: {HOST_PORT}
+      targetPort: {CONTAINER_PORT}     # 请求转发的端口 容器内部端口
+      #nodePort: {HOST_PORT}           # NodePort类型端口区间 30000–32767
       protocol: TCP                    # 定义通信协议

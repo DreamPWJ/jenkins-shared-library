@@ -1527,7 +1527,6 @@ def scrollToDeploy() {
 def grayscaleDeploy(map) {
     // Nginx-ingress 是使用 Nginx 作为反向代理和负载平衡器的 Kubernetes 的 Ingress 控制器
     Kubernetes.ingressDeploy(this, map)
-
 }
 
 /**
