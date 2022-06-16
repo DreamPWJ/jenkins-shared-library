@@ -70,7 +70,7 @@ class Docker implements Serializable {
      */
     static def build(ctx, imageName) {
         //ctx.pullCIRepo()
-        def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${imageTag}"
+        def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${Utils.getVersionNum(ctx)}"
         ctx.withCredentials([ctx.usernamePassword(credentialsId: "${ctx.DOCKER_REPO_CREDENTIALS_ID}", usernameVariable: 'DOCKER_HUB_USER_NAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
             ctx.sh """      
                    docker login ${ctx.DOCKER_REPO_REGISTRY} --username=${ctx.DOCKER_HUB_USER_NAME} --password=${ctx.DOCKER_HUB_PASSWORD}
@@ -140,7 +140,7 @@ class Docker implements Serializable {
      *  Docker镜像上传远程仓库
      */
     static def push(ctx, imageName) {
-        def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${imageTag}"
+        def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${Utils.getVersionNum(ctx)}"
         ctx.withCredentials([ctx.usernamePassword(credentialsId: "${ctx.DOCKER_REPO_CREDENTIALS_ID}", usernameVariable: 'DOCKER_HUB_USER_NAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
             ctx.sh """  docker login ${ctx.DOCKER_REPO_REGISTRY} --username=${ctx.DOCKER_HUB_USER_NAME} --password=${ctx.DOCKER_HUB_PASSWORD}
                         docker push ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}
@@ -153,7 +153,7 @@ class Docker implements Serializable {
      *  拉取远程仓库Docker镜像
      */
     static def pull(ctx, imageName) {
-        def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${imageTag}"
+        def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${Utils.getVersionNum(ctx)}"
         ctx.withCredentials([ctx.usernamePassword(credentialsId: "${ctx.DOCKER_REPO_CREDENTIALS_ID}", usernameVariable: 'DOCKER_HUB_USER_NAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
             ctx.sh """     
                        ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} \

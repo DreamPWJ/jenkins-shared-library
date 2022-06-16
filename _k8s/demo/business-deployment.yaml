@@ -18,7 +18,6 @@ spec:
         containers:
           - name: hello-k8s
             image: bigwhite/hello-kubernetes-demo:v0.1
-            restartPolicy: Always
             imagePullPolicy: IfNotPresent
             ports:
               - containerPort: 8080

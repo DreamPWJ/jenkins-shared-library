@@ -1892,7 +1892,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                         title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
                         text: [
                                 "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL})",
-                                "#### · CI构建Docker部署完成 👌",
+                                "#### · CI构建CD部署完成 👌",
                                 "#### · 服务端项目启动运行${msg}",
                                 "###### ${rollbackTag}",
                                 "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
