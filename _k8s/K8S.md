@@ -34,7 +34,7 @@ spec:         #必选，Pod中容器的详细定义
         memory: string     #内存限制，单位可以为Mib/Gib，将用于docker run --memory参数
       requests:      #资源请求的设置
         cpu: string    #Cpu请求，容器启动的初始可用数量
-        memory: string     #内存清楚，容器启动的初始可用数量
+        memory: string     #内存请求，容器启动的初始可用数量
     livenessProbe:     #对Pod内个容器健康检查的设置，当探测无响应几次后将自动重启该容器，检查方法有exec、httpGet和tcpSocket，对一个容器只需设置其中一种方法即可
       exec:      #对Pod容器内检查方式设置为exec方式
         command: [string]  #exec方式需要制定的命令或脚本

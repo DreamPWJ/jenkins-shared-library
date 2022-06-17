@@ -18,7 +18,7 @@ class Kubernetes implements Serializable {
      */
     static def deploy(ctx, map) {
         // 动态替换k8s yaml声明式部署文件
-        setYamlConfig(ctx)
+        setYamlConfig(ctx, map)
 
         // 多个k8s集群同时滚动循环部署
         "${map.k8s_credentials_ids}".trim().split(",").each { k8s_credentials_id ->
@@ -59,10 +59,11 @@ class Kubernetes implements Serializable {
     /**
      * 动态替换k8s yaml声明式部署文件
      */
-    static def setYamlConfig(ctx) {
+    static def setYamlConfig(ctx, map) {
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${Utils.getVersionNum(ctx)}#g;" +
                 " s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g;s#{CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
+                " s#{MEMORY_SIZE}#${map.docker_memory}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/k8s.yaml > k8s.yaml "
         ctx.sh " cat k8s.yaml "
     }
