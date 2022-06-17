@@ -9,7 +9,6 @@ import shared.library.Utils
  * @email 406798106@qq.com
  * @description 部署Kubernetes云原生应用
  * Kubernetes 是一个开源系统，用于容器化应用的自动部署、扩缩和管理。它将构成应用的容器按逻辑单位进行分组以便于管理和发现。
- * 参考文档: https://minikube.sigs.k8s.io/docs/start/
  */
 class Kubernetes implements Serializable {
 
@@ -33,6 +32,9 @@ class Kubernetes implements Serializable {
                 // 部署应用 指定命名空间--namespace=
                 ctx.sh """ 
                     kubectl apply -f k8s.yaml
+                    """
+                // 查看个组件的状态
+                ctx.sh """ 
                     kubectl get pod
                     kubectl get svc
                     kubectl get node
@@ -49,7 +51,10 @@ class Kubernetes implements Serializable {
                 // 查看详细信息   kubectl describe pod podName
 
                 // 查看命名空间下pod在哪些node节点运行
-                ctx.sh "kubectl get pod -n default -o wide"
+                // ctx.sh "kubectl get pod -n default -o wide"
+                // 查看node节点当前的节点资源占用情况
+                // ctx.sh "kubectl top nodes"
+
                 // K8S健康检查
                 // healthDetection(ctx)
             }
