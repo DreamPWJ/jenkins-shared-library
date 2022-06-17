@@ -70,6 +70,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                     sh("""
                           git branch -D ${tempBranch} || true
                           git branch ${tempBranch}
+                          git fetch
                           git checkout ${ctx.BRANCH_NAME}
                           git merge ${tempBranch}
                           git push ${userPassWordUrl}

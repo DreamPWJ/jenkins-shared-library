@@ -21,11 +21,11 @@ spec:
       - name: {APP_NAME}
         image: {IMAGE_URL}:{IMAGE_TAG}
         imagePullPolicy: Always
-        resources:
-          requests:
-            memory: "{MEMORY_SIZE}i"
-          limits:
-            memory: "{MEMORY_SIZE}i"
+#        resources:
+#          requests:
+#            memory: "{MEMORY_SIZE}i"
+#          limits:
+#            memory: "{MEMORY_SIZE}i"
         ports:
         - containerPort: {CONTAINER_PORT}
         env:
