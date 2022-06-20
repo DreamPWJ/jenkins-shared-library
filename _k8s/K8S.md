@@ -77,3 +77,6 @@ spec:         #必选，Pod中容器的详细定义
 
 
 ### 通过kubectl创建简单nginx服务 [文档](https://docs.ksyun.com/documents/5517)
+
+### 通过kubectl创建MySQL服务
+kubectl run my-nginx --image=nginx --replicas=1 --port=3306
