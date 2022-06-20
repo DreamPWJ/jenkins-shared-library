@@ -1,8 +1,4 @@
----
-nav:
-  title: 快速上手
-  order: 1
----
+[English](./README.md) | 简体中文
 
 # One For All DevOps
 
@@ -20,15 +16,15 @@ nav:
 ### 跨端CI/CD共享库流水线图例
 
 - APP原生Android、iOS、Flutter、React Native、Unity 技术
-  ![avatar](../../images/app.png)
+  ![avatar](./docs/images/app.png)
 - 服务端Java、Go、Python、C++等多语言项目
-  ![avatar](../../images/img.png)
+  ![avatar](./docs/images/img.png)
 - 小程序技术类型 1. 原生小程序 2. Taro跨端小程序 3. uni-app跨端小程序 4. mpvue跨端小程序 5. Remax跨端小程序
-  ![avatar](../../images/mini.png)
+  ![avatar](./docs/images/mini.png)
 - 桌面客户端 Electron、Unity(Windows、MacOS、Linux)
-  ![avatar](../../images/desktop.png)
+  ![avatar](./docs/images/desktop.png)
 - Web技术项目类型 1. Npm生态与静态Web项目 2. Flutter For Web 3. React Native For Web 4. Unity For Web 5. WebAssembly
-  ![avatar](../../images/web.png)
+  ![avatar](./docs/images/web.png)
 
 ### 多端CI/CD共享库流水线已支持的范围 基于Jenkins Pipeline共享库实现
 
