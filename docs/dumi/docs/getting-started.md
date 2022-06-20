@@ -20,15 +20,15 @@ Design a general and fully automated DevOps to improve the efficiency and qualit
 ### Cross-end CI/CD shared library pipeline legend
 
 - APP native Android, iOS, Flutter, React Native, Unity technology
-  ![avatar](./docs/images/app.png)
+  ![avatar]((../../images/app.png)
 - Server-side Java, Go, Python, C++ and other multi-language projects
-  ![avatar](./docs/images/img.png)
+  ![avatar]((../../images/img.png)
 - Mini Program Technology Type 1. Native Mini Program 2. Taro Cross-End Mini Program 3. uni-app Cross-End Mini Program 4. mpvue Cross-End Mini Program 5. Remax Cross-End Mini Program
-  ![avatar](./docs/images/mini.png)
+  ![avatar]((../../images/mini.png)
 - Desktop client Electron, Unity (Windows, MacOS, Linux)
-  ![avatar](./docs/images/desktop.png)
+  ![avatar]((../../images/desktop.png)
 - Web Technology Project Type 1. Npm Ecology and Static Web Project 2. Flutter For Web 3. React Native For Web 4. Unity For Web 5. WebAssembly
-  ![avatar](./docs/images/web.png)
+  ![avatar]((../../images/web.png)
 
 ### Supported range of multi-terminal CI/CD shared library pipeline based on Jenkins Pipeline shared library implementation
 
