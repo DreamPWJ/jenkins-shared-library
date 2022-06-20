@@ -3,6 +3,6 @@ nav:
   title: Help
 ---
 
-# 帮助
+# Help
 
-使用标准的Jenkins Pipeline共享库实现, 请先具备基础Jenkins知识后再使用本项目。
+Use the standard Jenkins Pipeline shared library implementation, please have basic Jenkins knowledge before using this project。
