@@ -60,8 +60,6 @@ Design a general and fully automated DevOps to improve the efficiency and qualit
 - Docker, Shell, Node, C#, Playwright
 - Fastlane, Ruby
 
-##### [Automatic initialization of Jenkins complete environment configuration](https://www.digitalocean.com/community/tutorials/how-to-automate-jenkins-setup-with-docker-and-jenkins-configuration-as- code)
-
 ### Core contributors
 
 - Pan Weiji
