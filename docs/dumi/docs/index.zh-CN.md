@@ -6,7 +6,7 @@ hero:
     - text: GitHub源码
       link: https://github.com/DreamPWJ/jenkins-shared-library
     - text: 快速上手
-      link: /getting-started.zh-CN
+      link: /getting-started
 features:
   - icon: https://gw.alipayobjects.com/zos/bmw-prod/881dc458-f20b-407b-947a-95104b5ec82b/k79dm8ih_w144_h144.png
     title: 强大
