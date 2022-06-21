@@ -886,8 +886,10 @@ def getShellParams(map) {
             SHELL_REMOTE_DEBUG_PORT = SHELL_PARAMS_ARRAY[5] // 远程调试端口
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -y ${SHELL_REMOTE_DEBUG_PORT}"
         }
+        // 可选扩展端口
+        SHELL_EXTEND_PORT = ""
         if ("${SHELL_PARAMS_ARRAY.length}" == '7') {
-            SHELL_EXTEND_PORT = SHELL_PARAMS_ARRAY[6]  // 扩展端口
+            SHELL_EXTEND_PORT = SHELL_PARAMS_ARRAY[6]
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -z ${SHELL_EXTEND_PORT}"
         }
         // println "${SHELL_PARAMS_GETOPTS}"

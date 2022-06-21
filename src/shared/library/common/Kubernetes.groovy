@@ -65,10 +65,16 @@ class Kubernetes implements Serializable {
      * 动态替换k8s yaml声明式部署文件
      */
     static def setYamlConfig(ctx, map) {
+        def hostPort = "${ctx.SHELL_HOST_PORT}" // 宿主机端口
+        def containerPort = "${ctx.SHELL_EXPOSE_PORT}" // 容器内端口
 
+        // 判断是否存在扩展端口
+        if (ctx.SHELL_EXTEND_PORT != "") {
+            containerPort = "${ctx.SHELL_EXTEND_PORT}"
+        }
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${Utils.getVersionNum(ctx)}#g;" +
                 " s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
-                " s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g;s#{CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
+                " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
                 " s#{MEMORY_SIZE}#${map.docker_memory}#g;s#{K8S_POD_REPLICAS}#${ctx.K8S_POD_REPLICAS}#g; " +
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/k8s.yaml > k8s.yaml "
