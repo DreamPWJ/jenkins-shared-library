@@ -22,7 +22,7 @@ class Docker implements Serializable {
         try {
             //println(Utils.getShEchoResult(this, "whoami"))
             //def dockerPath = tool 'Docker' //全局配置里 名称Docker 位置/usr/local  使用系统安装好的docker引擎
-            ctx.env.PATH = "${ctx.env.PATH}:/usr/local/bin:/usr/local/go/bin" //添加了系统环境变量上
+            ctx.env.PATH = "${ctx.env.PATH}:/usr/local/bin:/usr/local/go/bin:/usr/bin/docker" //添加了系统环境变量上
         } catch (e) {
             ctx.println("初始化Docker环境变量失败")
             ctx.println(e.getMessage())
@@ -110,10 +110,10 @@ class Docker implements Serializable {
                             """
             } else if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
                 def exposePort = "${ctx.SHELL_HOST_PORT}"
-                if ("${ctx.SHELL_PARAMS_ARRAY.length}" == '7') {
+                if ("${ctx.SHELL_PARAMS_ARRAY.length}" == '7') { // 扩展端口
                     exposePort = "${ctx.SHELL_HOST_PORT} ${ctx.SHELL_EXTEND_PORT}"
                 }
-                exposePort = "${ctx.IS_PROD}" == 'true' ? "${exposePort}" : "${exposePort} 5005"
+                exposePort = "${ctx.IS_PROD}" == 'true' ? "${exposePort}" : "${exposePort} 5005" // 调试端口
                 if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
                     ctx.sh """ cd ${ctx.mavenPackageLocationDir} && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \

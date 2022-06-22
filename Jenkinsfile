@@ -15,7 +15,7 @@
 // 根据不同环境项目配置不同参数
 def map = [:]
 
-// 远程服务器地址
+// 远程服务器地址 k8s集群方式填空
 map.put('remote_ip', '101.200.54.165')
 // 工作服务器地址 同时支持N个服务器自动化分布式部署
 map.put('remote_worker_ips', [])
@@ -57,6 +57,8 @@ map.put('docker_repo_namespace', 'lexiang')
 // K8S集群相关参数
 // K8S集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins凭据设置界面，类型选择为“Secret file”配置
 map.put('k8s_credentials_ids', ' ')
+// K8S集群私有镜像仓库拉取密钥
+map.put('k8s_image_pull_secrets', ' ')
 
 // 项目标签或项目简称
 map.put('project_tag', ' ')

@@ -6,7 +6,7 @@ metadata:
   labels:
     app: {APP_NAME}
 spec:
-  replicas: 3
+  replicas: {K8S_POD_REPLICAS}
   #minReplicas: 2                    #最小副本数
   #maxReplicas: 10                   #最大副本数
   selector:
@@ -41,9 +41,9 @@ spec:
 #                      operator: In
 #                      values:
 #                        - {APP_NAME}
-      # 私有镜像拉取密钥配置 文档：https://docs.ksyun.com/documents/5482
+      # 私有镜像拉取密钥配置 参考文档：https://docs.ksyun.com/documents/5482
       imagePullSecrets:
-        - name: lannengkeji2022
+        - name: {K8S_IMAGE_PULL_SECRETS}
 
 ---
 

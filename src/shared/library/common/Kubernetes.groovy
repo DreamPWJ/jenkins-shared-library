@@ -1,6 +1,7 @@
 package shared.library.common
 
 import shared.library.Utils
+import shared.library.GlobalVars
 
 
 /**
@@ -57,6 +58,9 @@ class Kubernetes implements Serializable {
 
                 // K8S健康检查
                 // healthDetection(ctx)
+
+                // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用 移除所有没有容器使用的镜像 -a
+                ctx.sh "whoami && docker version &&  docker images prune -a || true"
             }
         }
     }
@@ -65,10 +69,19 @@ class Kubernetes implements Serializable {
      * 动态替换k8s yaml声明式部署文件
      */
     static def setYamlConfig(ctx, map) {
+        def hostPort = "${ctx.SHELL_HOST_PORT}" // 宿主机端口
+        def containerPort = "${ctx.SHELL_EXPOSE_PORT}" // 容器内端口
+
+        // 判断是否存在扩展端口
+        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && ctx.SHELL_EXTEND_PORT != "") {
+            containerPort = "${ctx.SHELL_EXTEND_PORT}"
+            ctx.println("应用服务扩展端口: " + containerPort)
+        }
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${Utils.getVersionNum(ctx)}#g;" +
                 " s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
-                " s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g;s#{CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
-                " s#{MEMORY_SIZE}#${map.docker_memory}#g; " +
+                " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
+                " s#{MEMORY_SIZE}#${map.docker_memory}#g;s#{K8S_POD_REPLICAS}#${ctx.K8S_POD_REPLICAS}#g; " +
+                " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/k8s.yaml > k8s.yaml "
         ctx.sh " cat k8s.yaml "
     }

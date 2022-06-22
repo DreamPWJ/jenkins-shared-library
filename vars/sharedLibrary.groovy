@@ -525,8 +525,8 @@ def call(String type = 'web-java', Map map) {
                     agent {
                         docker {
                             // kubectl 环境  构建完成自动删除容器
-                            image "lwolf/helm-kubectl-docker" //  bitnami/kubectl:latest
-                            // args " -v /my/kube/config:/.kube/config "
+                            image "lwolf/helm-kubectl-docker" //  bitnami/kubectl:latest  // -v /my/kube/config:/.kube/config
+                            // args " -v /usr/bin/docker:/usr/bin/docker -v /var/run/docker.sock:/var/run/docker.sock "
                             reuseNode true // 使用根节点
                         }
                     }
@@ -742,6 +742,8 @@ def getInitParams(map) {
     SOURCE_TARGET_CONFIG_DIR = jsonParams.SOURCE_TARGET_CONFIG_DIR ? jsonParams.SOURCE_TARGET_CONFIG_DIR.trim() : ""
     // 不同项目通过文件目录区分放在相同的仓库中 设置Git代码项目文件夹名称 用于找到相关源码
     GIT_PROJECT_FOLDER_NAME = jsonParams.GIT_PROJECT_FOLDER_NAME ? jsonParams.GIT_PROJECT_FOLDER_NAME.trim() : ""
+    // k8s集群 Pod初始化副本数量
+    K8S_POD_REPLICAS = jsonParams.K8S_POD_REPLICAS ? jsonParams.K8S_POD_REPLICAS.trim() : 3
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
@@ -884,8 +886,10 @@ def getShellParams(map) {
             SHELL_REMOTE_DEBUG_PORT = SHELL_PARAMS_ARRAY[5] // 远程调试端口
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -y ${SHELL_REMOTE_DEBUG_PORT}"
         }
+        // 可选扩展端口
+        SHELL_EXTEND_PORT = ""
         if ("${SHELL_PARAMS_ARRAY.length}" == '7') {
-            SHELL_EXTEND_PORT = SHELL_PARAMS_ARRAY[6]  // 扩展端口
+            SHELL_EXTEND_PORT = SHELL_PARAMS_ARRAY[6]
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -z ${SHELL_EXTEND_PORT}"
         }
         // println "${SHELL_PARAMS_GETOPTS}"

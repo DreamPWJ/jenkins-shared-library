@@ -11,23 +11,23 @@
 def map = [:]
 
 // 远程服务器地址 k8s集群方式填空
-map.put('remote_ip', '172.16.0.91')
+map.put('remote_ip', ' ')
 // 工作服务器地址 同时支持N个服务器自动化分布式部署
 map.put('remote_worker_ips', [])
 // 远程服务器用户名
 map.put('remote_user_name', 'root')
 // 代理机或跳板机外网ip用于透传部署到内网目标机器 选填 目标机器外部无法直接访问情况填写内网ip
-map.put('proxy_jump_ip', '119.188.90.222')
+map.put('proxy_jump_ip', ' ')
 // 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
 map.put('proxy_jump_user_name', 'root')
 // 自定义跳板机ssh和scp访问端口 默认22
-map.put('proxy_jump_port', '22')
+map.put('proxy_jump_port', ' ')
 
 // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
 map.put('default_git_branch', ' ')
 
 // 保持构建的最大个数
-map.put('build_num_keep', 1)
+map.put('build_num_keep', 2)
 
 // Docker相关参数
 // JVM内存设置
@@ -56,7 +56,7 @@ map.put('k8s_credentials_ids', '74a3d376-cb4c-4a20-9bf7-7300a5eaa84d')
 map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
 // 项目标签或项目简称
-map.put('project_tag', ' ')
+map.put('project_tag', '颗粒计费')
 
 // 是否是生产环境
 map.put('is_prod', false)
@@ -67,7 +67,7 @@ map.put('is_grace_shutdown', false)
 // 是否进行服务启动健康探测
 map.put('is_health_check', false)
 // 是否Pipeline内脚本钉钉通知  总开关
-map.put('is_ding_notice', false)
+map.put('is_ding_notice', true)
 // 是否进行部署前通知
 map.put('is_before_deploy_notice', false)
 // 是否通知变更记录
@@ -77,7 +77,7 @@ map.put('is_git_tag', true)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
-// jenkins分布式构建节点label名称
+// jenkins分布式构建节点label名称  预配置在jenkins节点管理内
 map.put('jenkins_node', 'master')
 map.put('jenkins_node_front_end', 'master')
 
@@ -98,7 +98,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', ' ')
+map.put('maven_one_level', 'pellet-charging')
 // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
 map.put('maven_setting_xml', ' ')
 
@@ -107,38 +107,49 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/Jenkinsfile.test-k8s
+// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.pellet-charging-test
 
 /*
 
-test-k8s-web
-测试K8S集群Web前端 ❤️
+pellet-charging-web-k8s-test
+颗粒计费Web前端-k8s集群 ❤️
 JSON_PARAMS
 {
     "REPO_URL" : "http://47.102.214.33/lanneng_develop/react-frontend-monorepo.git" ,
     "BRANCH_NAME" : "dev" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "pellet-charging-admin" ,
-    "SHELL_PARAMS" : "pellet-charging-admin web 30001 80 sit" ,
+    "SHELL_PARAMS" : "pellet-charging-admin web 8020 80 test" ,
     "NPM_RUN_PARAMS" : "build",
     "IS_MONO_REPO": true,
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf",
     "IS_K8S_DEPLOY" : true,
+    "K8S_POD_REPLICAS" : "3",
 }
 
-test-k8s
-测试K8S集群服务端
+pellet-charging-app-k8s-test
+颗粒计费App服务端-k8s集群
 JSON_PARAMS
 {
-   "REPO_URL" : "https://gitee.com/tinylk/pipeline-demo" ,
-   "BRANCH_NAME" : "master" ,
+   "REPO_URL" : "http://47.102.214.33/lanneng_develop/java-backend-monorepo.git" ,
+   "BRANCH_NAME" : "dev" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "test-k8s" ,
-   "SHELL_PARAMS" : "test k8s 30000 40080 sit",
-   "IS_MAVEN_SINGLE_MODULE" : true,
+   "PROJECT_NAME" : "pellet-charging-app" ,
+   "SHELL_PARAMS" : "pellet-charging app 8080 8080 test",
    "IS_K8S_DEPLOY" : true,
 }
 
+pellet-charging-job-k8s-test
+颗粒计费Job服务端-k8s集群
+JSON_PARAMS
+{
+   "REPO_URL" : "http://47.102.214.33/lanneng_develop/java-backend-monorepo.git" ,
+   "BRANCH_NAME" : "dev" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "pellet-charging-job" ,
+   "SHELL_PARAMS" : "pellet-charging job 8065 8065 test 8165 8265",
+   "IS_K8S_DEPLOY" : true,
+   "K8S_POD_REPLICAS" : "2",
+}
 
 */
 
