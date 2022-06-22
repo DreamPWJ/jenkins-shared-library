@@ -1,6 +1,7 @@
 package shared.library.common
 
 import shared.library.Utils
+import shared.library.GlobalVars
 
 
 /**
@@ -57,6 +58,9 @@ class Kubernetes implements Serializable {
 
                 // K8S健康检查
                 // healthDetection(ctx)
+
+                // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用 移除所有没有容器使用的镜像 -a
+                ctx.sh "whoami && docker version &&  docker images prune -a || true"
             }
         }
     }
@@ -69,8 +73,9 @@ class Kubernetes implements Serializable {
         def containerPort = "${ctx.SHELL_EXPOSE_PORT}" // 容器内端口
 
         // 判断是否存在扩展端口
-        if (ctx.SHELL_EXTEND_PORT != "") {
+        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && ctx.SHELL_EXTEND_PORT != "") {
             containerPort = "${ctx.SHELL_EXTEND_PORT}"
+            ctx.println("应用服务扩展端口: " + containerPort)
         }
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${Utils.getVersionNum(ctx)}#g;" +
                 " s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
