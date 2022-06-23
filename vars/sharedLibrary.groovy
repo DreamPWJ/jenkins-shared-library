@@ -525,8 +525,8 @@ def call(String type = 'web-java', Map map) {
                     agent {
                         docker {
                             // kubectl 环境  构建完成自动删除容器
-                            image "lwolf/helm-kubectl-docker" //  bitnami/kubectl:latest  // -v /my/kube/config:/.kube/config
-                            // args " -v /usr/bin/docker:/usr/bin/docker -v /var/run/docker.sock:/var/run/docker.sock "
+                            image "dtzar/helm-kubectl:latest"
+                            // args " -v ~/.kube:/root/.kube"
                             reuseNode true // 使用根节点
                         }
                     }

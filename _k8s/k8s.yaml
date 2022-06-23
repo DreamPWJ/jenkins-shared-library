@@ -31,6 +31,9 @@ spec:
         env:
           - name: SPRING_PROFILES_ACTIVE
             value: {SPRING_PROFILE}
+          - name: EXTEND_PORT
+            value: "{CONTAINER_PORT}"
+
       restartPolicy: Always # 停机总是重启
 #      affinity: # 使用工作负载反亲和特性，让Pod之间尽量“互斥”，能尽量均匀的分布在各node节点上
 #        nodeAffinity: # 工作负载反亲和

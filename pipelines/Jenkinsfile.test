@@ -130,7 +130,7 @@ test-backend-spring-boot
 JSON_PARAMS
 {
    "REPO_URL" : "http://47.102.214.33/lanneng_develop/java-backend-monorepo.git" ,
-   "BRANCH_NAME" : "dev" ,
+   "BRANCH_NAME" : "develop" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pellet-charging-app" ,
    "SHELL_PARAMS" : "pellet-charging app 8098 8080 sit"
