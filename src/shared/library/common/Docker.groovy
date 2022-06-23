@@ -127,7 +127,7 @@ class Docker implements Serializable {
             if (!isBuildKit) {
                 ctx.sh " docker push ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} "
             }
-            ctx.println("构建镜像上传完成后删除本地镜像")
+            ctx.println("构建镜像上传完成并删除本地镜像")
             // --no-prune : 不移除该镜像的过程镜像 默认移除 移除导致并发构建找不到父镜像层
             ctx.sh """
             docker rmi ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --no-prune || true

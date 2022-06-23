@@ -5,6 +5,7 @@ metadata:
   namespace: default
   labels:
     app: {APP_NAME}
+
 spec:
   replicas: {K8S_POD_REPLICAS}
   #minReplicas: 2                    #最小副本数
@@ -58,6 +59,10 @@ metadata:
   namespace: default
   labels:
     app: {APP_NAME}-service
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/metrics"
+    prometheus.io/port: "http"
 
 spec:
   type: LoadBalancer                   # 规格类型NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡
