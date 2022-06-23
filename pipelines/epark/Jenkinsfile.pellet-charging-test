@@ -131,7 +131,7 @@ pellet-charging-app-k8s-test
 JSON_PARAMS
 {
    "REPO_URL" : "http://47.102.214.33/lanneng_develop/java-backend-monorepo.git" ,
-   "BRANCH_NAME" : "dev" ,
+   "BRANCH_NAME" : "develop" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pellet-charging-app" ,
    "SHELL_PARAMS" : "pellet-charging app 8080 8080 test",
@@ -143,7 +143,7 @@ pellet-charging-job-k8s-test
 JSON_PARAMS
 {
    "REPO_URL" : "http://47.102.214.33/lanneng_develop/java-backend-monorepo.git" ,
-   "BRANCH_NAME" : "dev" ,
+   "BRANCH_NAME" : "develop" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pellet-charging-job" ,
    "SHELL_PARAMS" : "pellet-charging job 8065 8065 test 8165 8265",

@@ -9,7 +9,7 @@ import shared.library.GlobalVars
  * @date 2021/8/18 13:22
  * @email 406798106@qq.com
  * @description 部署Kubernetes云原生应用
- * Kubernetes 是一个开源系统，用于容器化应用的自动部署、扩缩和管理。它将构成应用的容器按逻辑单位进行分组以便于管理和发现。
+ * Kubernetes 是一个开源系统，用于容器化应用的自动部署、容器编排、自动扩缩与修复等管理。它将构成应用的容器按逻辑单位进行分组以便于管理和发现。
  */
 class Kubernetes implements Serializable {
 
@@ -59,8 +59,8 @@ class Kubernetes implements Serializable {
                 // K8S健康检查
                 // healthDetection(ctx)
 
-                // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用 移除所有没有容器使用的镜像 -a
-                ctx.sh "whoami && docker version &&  docker images prune -a || true"
+                // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用
+                cleanImages(ctx)
             }
         }
     }
@@ -118,6 +118,13 @@ class Kubernetes implements Serializable {
     static def healthDetection(ctx) {
         // Pod通过两类探针来检查容器的健康状态。分别是LivenessProbe（存活探测）和 ReadinessProbe（就绪探测）
         ctx.sh ""
+    }
+
+    /**
+     * 清除k8s集群无效镜像  删除无效镜像 减少磁盘占用
+     */
+    static def cleanImages(ctx) {
+        ctx.sh "whoami && docker version &&  docker rmi \$(docker image ls -f dangling=true -q) --no-prune || true"
     }
 
 }
