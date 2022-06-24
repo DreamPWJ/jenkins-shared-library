@@ -98,7 +98,7 @@ class GlobalVars implements Serializable {
     static int SpringMVC = 2 // Spring MVC框架
 
     /**
-     * CI代码库 自动同步部署脚本和配置等
+     * CI代码库 jenkins-shared-library仓库 自动同步部署脚本和配置等
      */
     static String CI_REPO_URL = "http://47.102.214.33/lanneng_develop/jenkins-shared-library.git" // https://github.com/DreamPWJ/jenkins-shared-library.git
 
@@ -107,7 +107,7 @@ class GlobalVars implements Serializable {
      */
     static String noChangeLog = "No New Changes"  // 没有变更记录
     static String noGit = "NONE"  // 无git标识
-    static String defaultBranch = "master"  // 默认分支
+    static String defaultBranch = "master"  // 默认主分支
 
     /**
      * 默认常量

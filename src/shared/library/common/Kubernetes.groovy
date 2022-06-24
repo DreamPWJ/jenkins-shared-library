@@ -9,7 +9,7 @@ import shared.library.GlobalVars
  * @date 2021/8/18 13:22
  * @email 406798106@qq.com
  * @description 部署Kubernetes云原生应用
- * Kubernetes 是一个开源系统，用于容器化应用的自动部署、容器编排、自动扩缩与修复等管理。它将构成应用的容器按逻辑单位进行分组以便于管理和发现。
+ * Kubernetes 是一个开源系统，用于容器化应用的自动部署、自动容器编排、自动扩缩与自动修复等管理。它将构成应用的容器按逻辑单位进行分组以便于管理和发现。
  */
 class Kubernetes implements Serializable {
 
@@ -44,6 +44,9 @@ class Kubernetes implements Serializable {
                 // ctx.sh "kubectl apply -f service.yaml"
                 // 部署ingress
                 // ctx.sh "kubectl apply -f ingress.yaml"
+
+                // 部署pod水平扩缩容 基于QPS自动伸缩
+                // deployHPA(ctx, map)
 
                 // 删除服务
                 // ctx.sh "kubectl delete -f k8s.yaml"

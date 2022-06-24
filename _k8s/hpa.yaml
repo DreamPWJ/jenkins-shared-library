@@ -1,0 +1,24 @@
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {APP_NAME}-hpa
+  namespace: default
+
+spec:
+  minReplicas: 2
+  maxReplicas: 10
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {APP_NAME}-deployment
+  metrics:
+    - type: Pods
+      pods:
+        metric:
+          name: httpserver_requests_qps  # 基于QPS自动伸缩 安装 prometheus-adapter 来实现基于自定义指标的 Pod 弹性伸缩
+        target:
+          type: AverageValue
+          averageValue: 50  # 当每个业务Pod的QPS指标平均值高于时，触发自动进行扩容
+
+
+#  kubectl get hpa

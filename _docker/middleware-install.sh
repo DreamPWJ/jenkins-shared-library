@@ -57,6 +57,7 @@ Y | y)
   echo "基于Docker安装部署分布式任务调度平台XXL-JOB"
   docker pull xuxueli/xxl-job-admin:2.1.2
 
+  # 默认密码是admin  123456  访问添加/xxl-job-admin路径
   docker run -d --restart=always -p 8081:8080 \
     -e PARAMS="--spring.config.location=/application.properties" \
     -v /my/xxl-job/applogs:/data/applogs -v /my/xxl-job/application.properties:/application.properties \
