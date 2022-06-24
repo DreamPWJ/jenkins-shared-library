@@ -44,8 +44,10 @@ class Kubernetes implements Serializable {
                 // ctx.sh "kubectl apply -f service.yaml"
                 // 部署ingress
                 // ctx.sh "kubectl apply -f ingress.yaml"
+
                 // 部署pod水平扩缩容 基于QPS自动伸缩
-                deployHPA(ctx,map)
+                // deployHPA(ctx, map)
+
                 // 删除服务
                 // ctx.sh "kubectl delete -f k8s.yaml"
                 // kubectl 停止删除pod 默认等待30秒  删除deployment 命令kubectl delete deployment  删除所有 kubectl delete pods --all  --force
@@ -61,9 +63,7 @@ class Kubernetes implements Serializable {
                 // healthDetection(ctx)
 
                 // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用
-                cleanDockerImages(ctx)
-
-                ctx.println("K8S集群部署完成")
+                cleanImages(ctx)
             }
         }
     }
@@ -87,18 +87,6 @@ class Kubernetes implements Serializable {
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/k8s.yaml > k8s.yaml "
         ctx.sh " cat k8s.yaml "
-    }
-
-    /**
-     * 基于QPS部署pod水平扩缩容
-     */
-    static def deployHPA(ctx, map) {
-        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.PROJECT_NAME}#g; " +
-                " ' ${ctx.WORKSPACE}/ci/_k8s/hpa.yaml > hpa.yaml "
-        ctx.sh " cat hpa.yaml "
-
-        // 部署pod水平扩缩容
-        ctx.sh "kubectl apply -f hpa.yaml"
     }
 
     /**
@@ -138,7 +126,7 @@ class Kubernetes implements Serializable {
     /**
      * 清除k8s集群无效镜像  删除无效镜像 减少磁盘占用
      */
-    static def cleanDockerImages(ctx) {
+    static def cleanImages(ctx) {
         ctx.sh "whoami && docker version &&  docker rmi \$(docker image ls -f dangling=true -q) --no-prune || true"
     }
 
