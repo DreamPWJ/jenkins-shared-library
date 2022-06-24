@@ -78,3 +78,6 @@ spec:         #必选，Pod中容器的详细定义
 
 ### 通过kubectl创建简单nginx服务 [文档](https://docs.ksyun.com/documents/5517)
 kubectl run my-nginx --image=nginx --replicas=3 --port=80
+
+### 创建镜像私有库密钥ImagePullSecrets
+kubectl create secret docker-registry <name> --docker-server=DOCKER_REGISTRY_SERVER --docker-username=DOCKER_USER --docker-password=DOCKER_PASSWORD --docker-email=DOCKER_EMAIL

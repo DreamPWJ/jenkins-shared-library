@@ -13,7 +13,8 @@ import shared.library.Utils
 class Docker implements Serializable {
 
     // 镜像标签  也可自定义版本标签用于无需重复构建相同的镜像, 做到复用镜像CD持续部署到多环境中
-    static def imageTag = "latest"
+    // k8s集群中 在生产环境中部署容器时，你应该避免使用 :latest 标签，因为这使得正在运行的镜像的版本难以追踪，并且难以正确地回滚
+    static def imageTag = "latest" // Utils.getVersionNum(ctx)
 
     /**
      *  初始化环境变量
@@ -23,6 +24,10 @@ class Docker implements Serializable {
             //println(Utils.getShEchoResult(this, "whoami"))
             //def dockerPath = tool 'Docker' //全局配置里 名称Docker 位置/usr/local  使用系统安装好的docker引擎
             ctx.env.PATH = "${ctx.env.PATH}:/usr/local/bin:/usr/local/go/bin:/usr/bin/docker" //添加了系统环境变量上
+            // k8s用版本号方式给tag打标签
+            if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
+                imageTag = Utils.getVersionNum(ctx)
+            }
         } catch (e) {
             ctx.println("初始化Docker环境变量失败")
             ctx.println(e.getMessage())
@@ -70,7 +75,7 @@ class Docker implements Serializable {
      */
     static def build(ctx, imageName) {
         //ctx.pullCIRepo()
-        def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${Utils.getVersionNum(ctx)}"
+        def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${imageTag}"
         ctx.withCredentials([ctx.usernamePassword(credentialsId: "${ctx.DOCKER_REPO_CREDENTIALS_ID}", usernameVariable: 'DOCKER_HUB_USER_NAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
             ctx.sh """      
                    docker login ${ctx.DOCKER_REPO_REGISTRY} --username=${ctx.DOCKER_HUB_USER_NAME} --password=${ctx.DOCKER_HUB_PASSWORD}
@@ -140,7 +145,7 @@ class Docker implements Serializable {
      *  Docker镜像上传远程仓库
      */
     static def push(ctx, imageName) {
-        def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${Utils.getVersionNum(ctx)}"
+        def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${imageTag}"
         ctx.withCredentials([ctx.usernamePassword(credentialsId: "${ctx.DOCKER_REPO_CREDENTIALS_ID}", usernameVariable: 'DOCKER_HUB_USER_NAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
             ctx.sh """  docker login ${ctx.DOCKER_REPO_REGISTRY} --username=${ctx.DOCKER_HUB_USER_NAME} --password=${ctx.DOCKER_HUB_PASSWORD}
                         docker push ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}
@@ -153,7 +158,7 @@ class Docker implements Serializable {
      *  拉取远程仓库Docker镜像
      */
     static def pull(ctx, imageName) {
-        def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${Utils.getVersionNum(ctx)}"
+        def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${imageTag}"
         ctx.withCredentials([ctx.usernamePassword(credentialsId: "${ctx.DOCKER_REPO_CREDENTIALS_ID}", usernameVariable: 'DOCKER_HUB_USER_NAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
             ctx.sh """     
                        ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} \

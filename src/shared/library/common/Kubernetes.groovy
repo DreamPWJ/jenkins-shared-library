@@ -2,6 +2,7 @@ package shared.library.common
 
 import shared.library.Utils
 import shared.library.GlobalVars
+import shared.library.common.Docker
 
 
 /**
@@ -63,7 +64,7 @@ class Kubernetes implements Serializable {
                 // healthDetection(ctx)
 
                 // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用
-                cleanDockerImages(ctx)
+                // cleanDockerImages(ctx)
 
                 ctx.println("K8S集群部署完成")
             }
@@ -82,7 +83,7 @@ class Kubernetes implements Serializable {
             containerPort = "${ctx.SHELL_EXTEND_PORT}"
             ctx.println("应用服务扩展端口: " + containerPort)
         }
-        ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${Utils.getVersionNum(ctx)}#g;" +
+        ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${Docker.imageTag}#g;" +
                 " s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
                 " s#{MEMORY_SIZE}#${map.docker_memory}#g;s#{K8S_POD_REPLICAS}#${ctx.K8S_POD_REPLICAS}#g; " +
@@ -142,7 +143,9 @@ class Kubernetes implements Serializable {
      */
     static def cleanDockerImages(ctx) {
         // kubelet容器GC垃圾回收  参考文档: https://kubernetes-docsy-staging.netlify.app/zh/docs/concepts/cluster-administration/kubelet-garbage-collection/
-        ctx.sh "whoami && docker version &&  docker rmi \$(docker image ls -f dangling=true -q) --no-prune || true"
+        // 默认Kubelet会在节点驱逐信号触发和Image对应的Filesystem空间不足的情况下删除冗余的镜像
+        // 镜像占用磁盘空间的比例超过高水位（默认值为90%，可以通过参数ImageGCHighThresholdPercent 进行配置），kubelet 就会清理不用的镜像
+        // ctx.sh "whoami && docker version &&  docker rmi \$(docker image ls -f dangling=true -q) --no-prune || true"
     }
 
 }

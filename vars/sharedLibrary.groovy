@@ -1403,7 +1403,7 @@ def blueGreenDeploy() {
         def blueServerIp = ""  // 蓝服务器IP
         // 先部署一个零时服务将流量切到蓝服务器上
         if (remote_worker_ips.isEmpty()) {
-            error("多机蓝绿部署, 请先在相关的Jenkinsfile配置从服务器ip数组remote_worker_ips参数 ❌")
+            error("多机蓝绿部署, 请先在相关的Jenkinsfile.x配置从服务器ip数组remote_worker_ips参数 ❌")
         }
         // 循环串行执行多机分布式部署
         remote_worker_ips.each { ip ->
@@ -1752,7 +1752,7 @@ def alwaysPost() {
  * 生成tag和变更日志
  */
 def gitTagLog() {
-    // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行jenkins任务才能生效
+    // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行一次jenkins任务才能生效
     if (!params.IS_GIT_TAG && params.IS_GIT_TAG != false) {
         params.IS_GIT_TAG = true
     }
