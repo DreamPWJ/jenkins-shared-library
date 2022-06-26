@@ -19,10 +19,11 @@ class Ansible implements Serializable {
     }
 
     /**
-     * 批量同步配置
+     * 多个机器批量执行命令
      */
     static def batchSync(ctx) {
-        ctx.sh ""
+        // ansible 主机组或者主机 -m 模块 -a 命令  参考文章: https://blog.51cto.com/395469372/2133486
+        ctx.sh "ansible groupName -m command -a \"pwd\" "
     }
 
 }
