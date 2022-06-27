@@ -120,10 +120,30 @@ class Kubernetes implements Serializable {
 
     /**
      * 灰度发布
+     * 参考文档: https://help.aliyun.com/document_detail/200941.html
      */
     static def ingressDeploy(ctx, map) {
         ctx.sh "kubectl apply -f ingress.yaml"
         ctx.sh "kubectl get ingress"
+        // 系统运行一段时间后，当新版本服务已经稳定并且符合预期后，需要下线老版本的服务 ，仅保留新版本服务在线上运行。
+        // 为了达到该目标，需要将旧版本的Service指向新版本服务的Deployment，并且删除旧版本的Deployment和新版本的Service。
+
+        // 修改旧版本Service，使其指向新版本服务 更改selector: app的新pod名称
+        ctx.sh "kubectl apply -f service.yaml"
+        // 删除Canary Ingress资源gray-release-canary
+        ctx.sh "kubectl delete ingress gray-release-canary"
+        // 删除旧版本的Deployment和新版本的Service
+        ctx.sh "kubectl delete deploy old-deployment-name"
+        ctx.sh "kubectl delete svc new-service-name"
+    }
+
+    /**
+     * k8s方式实现蓝绿部署
+     */
+    static def blueGreenDeploy(ctx, map) {
+        // 蓝绿发布是为新版本创建一个与老版本完全一致的生产环境，在不影响老版本的前提下，按照一定的规则把部分流量切换到新版本，
+        // 当新版本试运行一段时间没有问题后，将用户的全量流量从老版本迁移至新版本。
+        ctx.sh ""
     }
 
     /**

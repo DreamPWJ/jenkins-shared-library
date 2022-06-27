@@ -66,6 +66,7 @@ metadata:
 
 spec:
   type: LoadBalancer                   # 规格类型NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡
+  #sessionAffinity: ClientIP           # 设置为 "ClientIP" （默认值是 "None"），来基于客户端的IP地址选择固定会话Pod关联
   selector:
     app: {APP_NAME}                    # 通过Pod的labels指定Pod 建立关联
   ports:
