@@ -144,7 +144,7 @@ class Kubernetes implements Serializable {
     static def cleanDockerImages(ctx) {
         // kubelet容器GC垃圾回收  参考文档: https://kubernetes-docsy-staging.netlify.app/zh/docs/concepts/cluster-administration/kubelet-garbage-collection/
         // 默认Kubelet会在节点驱逐信号触发和Image对应的Filesystem空间不足的情况下删除冗余的镜像
-        // 镜像占用磁盘空间的比例超过高水位（默认值为90%，可以通过参数ImageGCHighThresholdPercent 进行配置），kubelet 就会清理不用的镜像
+        // node节点 cat /etc/kubernetes/kubelet 镜像占用磁盘空间的比例超过高水位（可以通过参数ImageGCHighThresholdPercent 进行配置），kubelet 就会清理不用的镜像
         // ctx.sh "whoami && docker version &&  docker rmi \$(docker image ls -f dangling=true -q) --no-prune || true"
     }
 
