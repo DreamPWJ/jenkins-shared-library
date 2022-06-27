@@ -26,19 +26,23 @@ metadata:
 
 spec:
   rules:
-    - host: new-service.com
+    - host: new-version.com
       http:
         paths:
           - path: /
             backend:
-              serviceName: newServiceName
-              servicePort: 80
+              service:
+                name: {APP_NAME}-service
+                port:
+                  number: {HOST_PORT}
             pathType: ImplementationSpecific
-    - host: old-service.com
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: oldServiceName
-              servicePort: 80
-            pathType: ImplementationSpecific
+#    - host: old-version.com
+#      http:
+#        paths:
+#          - path: /
+#            backend:
+#              service:
+#                name: oldServiceName
+#                port:
+#                  number: 80
+#            pathType: ImplementationSpecific
