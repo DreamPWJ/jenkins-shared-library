@@ -12,20 +12,33 @@ metadata:
     nginx.ingress.kubernetes.io/canary-by-header-value: "bar"
     # 在满足上述匹配规则的基础上仅允许百分比的流量会被路由到新版本服务中。
     nginx.ingress.kubernetes.io/canary-weight: "100"
+    # 开启跨域
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    # 数据传输大小
+    nginx.ingress.kubernetes.io/proxy-body-size: 2048m
+    # 数据请求超时时间
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    # 负载均衡算法 如ip_hash
+    nginx.ingress.kubernetes.io/upstream-hash-by: "$host"
+
 
 spec:
   rules:
-    - host: www.panweiji.com
+    - host: new-service.com
       http:
         paths:
           - path: /
             backend:
-              serviceName: serviceName1
+              serviceName: newServiceName
               servicePort: 80
-    - host: www.dream.com
+            pathType: ImplementationSpecific
+    - host: old-service.com
       http:
         paths:
           - path: /
             backend:
-              serviceName: serviceName2
+              serviceName: oldServiceName
               servicePort: 80
+            pathType: ImplementationSpecific
