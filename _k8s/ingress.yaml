@@ -3,13 +3,13 @@ kind: Ingress
 metadata:
   name: gray-release-canary
   namespace: default
-  annotations: # 文档: https://help.aliyun.com/document_detail/200941.html
+  annotations:
     # 开启Canary。
     nginx.ingress.kubernetes.io/canary: "true"
-    # Http Header请求头为foo。
-    nginx.ingress.kubernetes.io/canary-by-header: "foo"
-    # 请求头foo=bar时，请求才会被路由到新版本服务中。
-    nginx.ingress.kubernetes.io/canary-by-header-value: "bar"
+    # Http Header请求头为version。
+    nginx.ingress.kubernetes.io/canary-by-header: "version"
+    # 请求头version=v2.0.0时，请求才会被路由到新版本服务中。
+    nginx.ingress.kubernetes.io/canary-by-header-value: "v2.0.0"
     # 在满足上述匹配规则的基础上仅允许百分比的流量会被路由到新版本服务中。
     nginx.ingress.kubernetes.io/canary-weight: "100"
     # 开启跨域
@@ -26,19 +26,23 @@ metadata:
 
 spec:
   rules:
-    - host: new-service.com
+    - host: new-version.com
       http:
         paths:
           - path: /
             backend:
-              serviceName: newServiceName
-              servicePort: 80
+              service:
+                name: {APP_NAME}-service
+                port:
+                  number: {HOST_PORT}
             pathType: ImplementationSpecific
-    - host: old-service.com
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: oldServiceName
-              servicePort: 80
-            pathType: ImplementationSpecific
+#    - host: old-version.com
+#      http:
+#        paths:
+#          - path: /
+#            backend:
+#              service:
+#                name: oldServiceName
+#                port:
+#                  number: 80
+#            pathType: ImplementationSpecific

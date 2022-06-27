@@ -41,10 +41,9 @@ class Kubernetes implements Serializable {
                     kubectl get svc
                     kubectl get node
                     """
-                // 部署service
-                // ctx.sh "kubectl apply -f service.yaml"
-                // 部署ingress
-                // ctx.sh "kubectl apply -f ingress.yaml"
+
+                // 七层负载和灰度发布配置部署ingress
+                // ingressNginxDeploy(ctx, map)
 
                 // 部署pod水平扩缩容 基于QPS自动伸缩
                 // deployHPA(ctx, map)
@@ -83,33 +82,68 @@ class Kubernetes implements Serializable {
             containerPort = "${ctx.SHELL_EXTEND_PORT}"
             ctx.println("应用服务扩展端口: " + containerPort)
         }
+        def yamlName = "k8s.yaml"
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${Docker.imageTag}#g;" +
                 " s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
                 " s#{MEMORY_SIZE}#${map.docker_memory}#g;s#{K8S_POD_REPLICAS}#${ctx.K8S_POD_REPLICAS}#g; " +
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
-                " ' ${ctx.WORKSPACE}/ci/_k8s/k8s.yaml > k8s.yaml "
-        ctx.sh " cat k8s.yaml "
+                " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
+        ctx.sh " cat ${yamlName} "
     }
 
     /**
      * 基于QPS部署pod水平扩缩容
      */
     static def deployHPA(ctx, map) {
+        def yamlName = "hpa.yaml"
         ctx.sh "sed -e ' s#{APP_NAME}#${ctx.PROJECT_NAME}#g; " +
-                " ' ${ctx.WORKSPACE}/ci/_k8s/hpa.yaml > hpa.yaml "
-        ctx.sh " cat hpa.yaml "
+                " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
+        ctx.sh " cat ${yamlName} "
 
         // 部署pod水平扩缩容
-        ctx.sh "kubectl apply -f hpa.yaml"
+        ctx.sh "kubectl apply -f ${yamlName}"
+    }
+
+    /**
+     * 七层负载和灰度发布配置部署
+     */
+    static def ingressNginx(ctx, map) {
+        def yamlName = "ingress.yaml"
+        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
+                " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
+        ctx.sh " cat ${yamlName} "
+
+        // 部署七层负载和灰度发布配置
+        ctx.sh "kubectl apply -f ${yamlName}"
     }
 
     /**
      * 灰度发布
+     * 参考文档: https://help.aliyun.com/document_detail/200941.html
      */
     static def ingressDeploy(ctx, map) {
         ctx.sh "kubectl apply -f ingress.yaml"
         ctx.sh "kubectl get ingress"
+        // 系统运行一段时间后，当新版本服务已经稳定并且符合预期后，需要下线老版本的服务 ，仅保留新版本服务在线上运行。
+        // 为了达到该目标，需要将旧版本的Service指向新版本服务的Deployment，并且删除旧版本的Deployment和新版本的Service。
+
+        // 修改旧版本Service，使其指向新版本服务 更改selector: app的新pod名称
+        ctx.sh "kubectl apply -f service.yaml"
+        // 删除Canary Ingress资源gray-release-canary
+        ctx.sh "kubectl delete ingress gray-release-canary"
+        // 删除旧版本的Deployment和新版本的Service
+        ctx.sh "kubectl delete deploy old-deployment-name"
+        ctx.sh "kubectl delete svc new-service-name"
+    }
+
+    /**
+     * k8s方式实现蓝绿部署
+     */
+    static def blueGreenDeploy(ctx, map) {
+        // 蓝绿发布是为新版本创建一个与老版本完全一致的生产环境，在不影响老版本的前提下，按照一定的规则把部分流量切换到新版本，
+        // 当新版本试运行一段时间没有问题后，将用户的全量流量从老版本迁移至新版本。
+        ctx.sh ""
     }
 
     /**
