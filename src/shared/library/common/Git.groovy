@@ -52,7 +52,7 @@ class Git implements Serializable {
                 return true
             } else {
                 def isExistsFile = changedFiles.findAll { a ->
-                    changedFiles.any { (a.contains(fileName) || a.contains(lockFileName) || a.contains("yarn.lock")) }
+                    changedFiles.any { (a.contains(fileName) || a.contains(lockFileName) || a.contains("yarn.lock") || a.contains("pnpm-lock.yaml") || a.contains("Podfile")) }
                 }
                 if (isExistsFile) {
                     ctx.println "依赖包配置管理文件在Git代码中上发生了变化"

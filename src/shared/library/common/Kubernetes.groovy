@@ -2,6 +2,7 @@ package shared.library.common
 
 import shared.library.Utils
 import shared.library.GlobalVars
+import shared.library.common.Docker
 
 
 /**
@@ -63,7 +64,9 @@ class Kubernetes implements Serializable {
                 // healthDetection(ctx)
 
                 // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用
-                cleanImages(ctx)
+                // cleanDockerImages(ctx)
+
+                ctx.println("K8S集群部署完成")
             }
         }
     }
@@ -80,13 +83,25 @@ class Kubernetes implements Serializable {
             containerPort = "${ctx.SHELL_EXTEND_PORT}"
             ctx.println("应用服务扩展端口: " + containerPort)
         }
-        ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${Utils.getVersionNum(ctx)}#g;" +
+        ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${Docker.imageTag}#g;" +
                 " s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
                 " s#{MEMORY_SIZE}#${map.docker_memory}#g;s#{K8S_POD_REPLICAS}#${ctx.K8S_POD_REPLICAS}#g; " +
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/k8s.yaml > k8s.yaml "
         ctx.sh " cat k8s.yaml "
+    }
+
+    /**
+     * 基于QPS部署pod水平扩缩容
+     */
+    static def deployHPA(ctx, map) {
+        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.PROJECT_NAME}#g; " +
+                " ' ${ctx.WORKSPACE}/ci/_k8s/hpa.yaml > hpa.yaml "
+        ctx.sh " cat hpa.yaml "
+
+        // 部署pod水平扩缩容
+        ctx.sh "kubectl apply -f hpa.yaml"
     }
 
     /**
@@ -126,8 +141,11 @@ class Kubernetes implements Serializable {
     /**
      * 清除k8s集群无效镜像  删除无效镜像 减少磁盘占用
      */
-    static def cleanImages(ctx) {
-        ctx.sh "whoami && docker version &&  docker rmi \$(docker image ls -f dangling=true -q) --no-prune || true"
+    static def cleanDockerImages(ctx) {
+        // kubelet容器GC垃圾回收  参考文档: https://kubernetes-docsy-staging.netlify.app/zh/docs/concepts/cluster-administration/kubelet-garbage-collection/
+        // 默认Kubelet会在节点驱逐信号触发和Image对应的Filesystem空间不足的情况下删除冗余的镜像
+        // node节点 cat /etc/kubernetes/kubelet 镜像占用磁盘空间的比例超过高水位（可以通过参数ImageGCHighThresholdPercent 进行配置），kubelet 就会清理不用的镜像
+        // ctx.sh "whoami && docker version &&  docker rmi \$(docker image ls -f dangling=true -q) --no-prune || true"
     }
 
 }
