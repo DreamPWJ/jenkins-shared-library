@@ -202,6 +202,7 @@ def call(String type = 'web-java', Map map) {
                             anyOf {
                                 branch 'master'
                                 branch 'prod'
+                                branch 'main'
                             }
                         }
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
@@ -212,18 +213,24 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                     agent {
-                        label "linux"
+                        /* label "linux"*/
                         /*   docker {
                                // sonarqube环境  构建完成自动删除容器
                                image "sonarqube:community"
                                reuseNode true // 使用根节点
                            }*/
+                        docker {
+                            image 'jetbrains/qodana-jvm-community' // js、jvm、php、jvm-android、python、php。 jvm-community是免费版
+                            args " --entrypoint='' -v ${env.WORKSPACE}:/data/project/ -v ${env.WORKSPACE}/qodana-reports:/data/results/ -v $HOME/.m2/:/root/.m2/ "
+                            reuseNode true // 使用根节点
+                        }
                     }
                     steps {
                         // 只显示当前阶段stage失败  而整个流水线构建显示成功
                         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                             script {
-                                codeQualityAnalysis()
+                                // codeQualityAnalysis()
+                                Qodana.analyse(this)
                             }
                         }
                     }
