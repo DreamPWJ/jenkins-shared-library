@@ -3,6 +3,7 @@ package shared.library.common
 import shared.library.Utils
 import shared.library.GlobalVars
 import shared.library.common.Docker
+import shared.library.common.Helm
 
 
 /**
@@ -46,7 +47,7 @@ class Kubernetes implements Serializable {
                 // ingressNginxDeploy(ctx, map)
 
                 // 部署pod水平扩缩容 基于QPS自动伸缩
-                // deployHPA(ctx, map)
+                 deployHPA(ctx, map)
 
                 // 删除服务
                 // ctx.sh "kubectl delete -f k8s.yaml"
@@ -96,6 +97,9 @@ class Kubernetes implements Serializable {
      * 基于QPS部署pod水平扩缩容
      */
     static def deployHPA(ctx, map) {
+        // 安装k8s-prometheus-adpater
+        Helm.installPrometheus(ctx)
+
         def yamlName = "hpa.yaml"
         ctx.sh "sed -e ' s#{APP_NAME}#${ctx.PROJECT_NAME}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
