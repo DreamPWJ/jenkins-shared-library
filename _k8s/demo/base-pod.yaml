@@ -37,5 +37,3 @@ spec:
 # kubectl exec -it pod名称 bash
 # 删除Pod
 # kubectl delete pod pod-name
-# 删除Ingress
-# kubectl delete ingress ingress-name

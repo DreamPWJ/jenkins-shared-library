@@ -202,28 +202,37 @@ def call(String type = 'web-java', Map map) {
                             anyOf {
                                 branch 'master'
                                 branch 'prod'
+                                branch 'main'
                             }
                         }
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             // 是否进行代码质量分析  && fileExists("sonar-project.properties") == true 代码根目录配置sonar-project.properties文件才进行代码质量分析
                             // return ("${IS_CODE_QUALITY_ANALYSIS}" == 'true' )
-                            return false
+                            return true
                         }
                     }
                     agent {
-                        label "linux"
+                        /* label "linux"*/
                         /*   docker {
                                // sonarqube环境  构建完成自动删除容器
                                image "sonarqube:community"
                                reuseNode true // 使用根节点
                            }*/
+                        docker {
+                            image 'jetbrains/qodana:latest'
+                            args "-v ${env.WORKSPACE}:/data/project/"
+                            args "-v ${env.WORKSPACE}:/data/results/"
+                            args '--entrypoint=""'
+                            reuseNode true // 使用根节点
+                        }
                     }
                     steps {
                         // 只显示当前阶段stage失败  而整个流水线构建显示成功
                         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                             script {
-                                codeQualityAnalysis()
+                                // codeQualityAnalysis()
+                                Qodana.analyse(this)
                             }
                         }
                     }

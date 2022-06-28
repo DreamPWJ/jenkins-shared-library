@@ -1,0 +1,17 @@
+version: 1.0
+failThreshold: 0
+profile:
+  name: qodana.recommended
+include:
+  - name: SomeInspectionId
+exclude:
+  - name: Annotator
+  - name: AnotherInspectionId
+    paths:
+      - relative/path
+      - another/relative/path
+  - name: All
+    paths:
+      - /src/main/java/com
+      - benchmarks
+      - tools

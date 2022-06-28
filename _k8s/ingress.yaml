@@ -46,3 +46,7 @@ spec:
 #                port:
 #                  number: 80
 #            pathType: ImplementationSpecific
+
+
+# 删除Ingress
+# kubectl delete ingress ingress-name
