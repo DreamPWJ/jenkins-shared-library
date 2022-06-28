@@ -5,6 +5,7 @@ package shared.library.common
  * @date 2022/06/28 13:22
  * @email 406798106@qq.com
  * @description Qodana是一个代码质量监控平台 JetBrains公司出品
+ * 官网： https://www.jetbrains.com/qodana/
  */
 class Qodana implements Serializable {
 
