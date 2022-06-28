@@ -221,8 +221,7 @@ def call(String type = 'web-java', Map map) {
                            }*/
                         docker {
                             image 'jetbrains/qodana:latest'
-                            args "-v ${env.WORKSPACE}:/data/project/"
-                            args "-v ${env.WORKSPACE}/qodana/results:/data/results/"
+                            args "-v ${env.WORKSPACE}:/data/project/ -v ${env.WORKSPACE}/qodana/results:/data/results/"
                             reuseNode true // 使用根节点
                         }
                     }
