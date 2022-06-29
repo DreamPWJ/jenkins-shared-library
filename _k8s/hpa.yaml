@@ -5,7 +5,7 @@ metadata:
   namespace: default
 
 spec:
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 10
   scaleTargetRef:
     apiVersion: apps/v1
@@ -20,5 +20,24 @@ spec:
           type: AverageValue
           averageValue: 50  # 当每个业务Pod的QPS指标平均值高于时，触发自动进行扩容
 
+---
+
+# 已安装 prometheus-operator，可以通过创建 ServiceMonitor 的 CRD 对象配置 Prometheus
+#apiVersion: monitoring.coreos.com/v1
+#kind: ServiceMonitor
+#metadata:
+#  name: {APP_NAME}-service-monitor
+#  namespace: default
+#
+#spec:
+#  endpoints:
+#    - port: http
+#      interval: 5s
+#  namespaceSelector:
+#    matchNames:
+#      - default
+#  selector:
+#    matchLabels:
+#      app: {APP_NAME}
 
 #  kubectl get hpa

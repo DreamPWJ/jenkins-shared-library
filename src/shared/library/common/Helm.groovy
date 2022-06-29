@@ -11,7 +11,7 @@ class Helm implements Serializable {
 
     /**
      * 安装k8s-prometheus-adpater
-     * 参考文档：https://cloud.tencent.com/document/product/457/61114
+     * 参考文档：https://intl.cloud.tencent.com/zh/document/product/457/38941
      */
     static def installPrometheus(ctx) {
         // 安装前需要删除已经注册的 Custom Metrics API
@@ -23,13 +23,13 @@ class Helm implements Serializable {
 
         // Helm 3安装k8s-prometheus-adapter
         // ctx.sh " helm version "
-        def namespace = "kube-system"
-        ctx.sh " helm install prometheus-adapter stable/prometheus-adapter -f  ${ctx.WORKSPACE}/ci/_k8s/value.yaml --namespace ${namespace}  || true "
+        def namespace = "default"  // 命名空间 不同空间是隔离的
+        ctx.sh " helm delete -n ${namespace} prometheus-adapter || true "
+        ctx.sh " helm install prometheus-adapter stable/prometheus-adapter -f ${ctx.WORKSPACE}/ci/_k8s/value.yaml --namespace ${namespace}  || true "
+        //ctx.sh " helm install kube-prometheus stable/kube-prometheus -n ${namespace}  || true "
         //ctx.sh " helm list -n ${namespace} "
         //ctx.sh " kubectl get pod -n ${namespace} "
         //ctx.sh " kubectl get apiservice "
-        // 若安装正确，可用执行以下命令查询自定义指标
-        ctx.sh " kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 || true "
     }
 
     /**

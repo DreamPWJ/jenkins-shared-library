@@ -107,6 +107,8 @@ class Kubernetes implements Serializable {
 
         // 部署pod水平扩缩容
         ctx.sh "kubectl apply -f ${yamlName}"
+        // 若安装正确，可用执行以下命令查询自定义指标 查看到 Custom Metrics API 返回配置的 QPS 相关指标
+        ctx.sh " kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 || true "
     }
 
     /**

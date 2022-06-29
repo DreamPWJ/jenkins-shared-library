@@ -4,7 +4,7 @@ package shared.library.common
  * @author 潘维吉
  * @date 2021/12/12 13:22
  * @email 406798106@qq.com
- * @description Sentry实时的错误事件日志和聚合平台  支持大部分语言
+ * @description Sentry实时的错误事件日志、聚合平台、性能分析等  支持大部分语言
  */
 class Sentry implements Serializable {
 

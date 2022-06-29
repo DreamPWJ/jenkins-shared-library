@@ -65,15 +65,5 @@ Prometheus监控 http://118.190.150.96:9090
 Grafana监控 http://118.190.150.96:3000  默认用户和密码均为admin
 
 
-###  钉钉告警通知
-#### 参考文章 
-- https://yunlzheng.gitbook.io/prometheus-book/parti-prometheus-ji-chu/alert/alert-manager-use-receiver/alert-manager-extension-with-webhook
-- https://blog.51cto.com/lovebetterworld/2839894
-
-docker run -d --restart=always --name alertmanager -p 9093:9093  \
--v /my/prometheus/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml prom/alertmanager:latest
-
-####  prometheus-webhook-dingtalk 2.0版本 弃用 --ding.profile等
-docker pull timonwong/prometheus-webhook-dingtalk
-docker run -d --restart=always -p 8060:8060 --name prometheus-webhook-dingtalk timonwong/prometheus-webhook-dingtalk \
- --ding.profile="webhook1=https://oapi.dingtalk.com/robot/send?access_token=7e0a34d57be41808ab02b1955ed2f19d64d1fbd95e521331eff8cfe16e05b861"
+###  各种PrometheusAlert告警通知  
+- 参考项目：https://github.com/feiyu563/PrometheusAlert
