@@ -1,0 +1,23 @@
+# 全局配置
+global:
+  scrape_interval:     15s   # 多久 收集 一次数据
+  evaluation_interval: 15s   # 多久评估一次 规则
+  scrape_timeout:      10s   # 每次 收集数据的 超时时间
+
+scrape_configs:
+  - job_name: project-app-name
+      scrape_interval: 5s
+      kubernetes_sd_configs:
+        - role: endpoints
+            namespaces:
+              names:
+                - default
+      relabel_configs:
+        - action: keep
+            source_labels:
+              - __meta_kubernetes_service_label_app
+            regex: project-app-name
+        - action: keep
+            source_labels:
+              - __meta_kubernetes_endpoint_port_name
+            regex: http

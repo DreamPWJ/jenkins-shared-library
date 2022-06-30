@@ -12,6 +12,7 @@ class Helm implements Serializable {
     /**
      * 安装k8s-prometheus-adpater
      * 参考文档：https://intl.cloud.tencent.com/zh/document/product/457/38941
+     *         https://atbug.com/kubernetes-pod-autoscale-on-prometheus-metrics/
      */
     static def installPrometheus(ctx) {
         // 安装前需要删除已经注册的 Custom Metrics API
@@ -25,7 +26,8 @@ class Helm implements Serializable {
         // ctx.sh " helm version "
         def namespace = "default"  // 命名空间 不同空间是隔离的
         ctx.sh " helm delete -n ${namespace} prometheus-adapter || true "
-        ctx.sh " helm install prometheus-adapter stable/prometheus-adapter -f ${ctx.WORKSPACE}/ci/_k8s/value.yaml --namespace ${namespace}  || true "
+        // 安装文档: https://artifacthub.io/packages/helm/prometheus-community/prometheus-adapter
+        ctx.sh " helm install prometheus-adapter stable/prometheus-adapter -f ${ctx.WORKSPACE}/ci/_k8s/value-adapter.yaml --namespace ${namespace}  || true "
         //ctx.sh " helm install kube-prometheus stable/kube-prometheus -n ${namespace}  || true "
         //ctx.sh " helm list -n ${namespace} "
         //ctx.sh " kubectl get pod -n ${namespace} "
