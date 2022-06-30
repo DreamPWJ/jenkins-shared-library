@@ -18,7 +18,7 @@ class Helm implements Serializable {
         // 安装前需要删除已经注册的 Custom Metrics API
         ctx.sh " kubectl delete apiservice v1beta1.custom.metrics.k8s.io || true "
         // 使用镜像的adapter的
-        // ctx.sh " helm repo add prometheus-community https://prometheus-community.github.io/helm-charts "
+        ctx.sh " helm repo add aliyunhub https://aliacs-app-catalog.oss-cn-hangzhou.aliyuncs.com/charts-incubator/ "
         // ctx.sh " helm repo update "
         // ctx.sh " helm repo ls "
 
@@ -28,7 +28,7 @@ class Helm implements Serializable {
         ctx.sh " helm delete -n ${namespace} prometheus-adapter || true "
         // 安装文档: https://artifacthub.io/packages/helm/prometheus-community/prometheus-adapter
         ctx.sh " helm install prometheus-adapter stable/prometheus-adapter -f ${ctx.WORKSPACE}/ci/_k8s/value-adapter.yaml --namespace ${namespace}  || true "
-        //ctx.sh " helm install kube-prometheus stable/kube-prometheus -n ${namespace}  || true "
+        ctx.sh " helm install ack-prometheus-operator aliyunhub/ack-prometheus-operator -n ${namespace}  || true "
         //ctx.sh " helm list -n ${namespace} "
         //ctx.sh " kubectl get pod -n ${namespace} "
         //ctx.sh " kubectl get apiservice "
@@ -38,7 +38,7 @@ class Helm implements Serializable {
      * 下载包
      */
     static def install(ctx) {
-        ctx.sh " helm version"
+        ctx.sh " helm version "
     }
 
 }

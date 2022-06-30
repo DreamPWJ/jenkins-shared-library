@@ -98,7 +98,7 @@ class Kubernetes implements Serializable {
      */
     static def deployHPA(ctx, map) {
         // 安装k8s-prometheus-adpater
-        // Helm.installPrometheus(ctx)
+        Helm.installPrometheus(ctx)
 
         def yamlName = "hpa.yaml"
         ctx.sh "sed -e ' s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +

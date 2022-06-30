@@ -31,7 +31,7 @@ metadata:
 
 spec:
   endpoints:
-    - port: {HOST_PORT}     # 对应service的端口名
+    - port: "{HOST_PORT}"     # 对应service的端口名
       interval: 10s  # 多少时间获取一次信息
   namespaceSelector:
     matchNames:
