@@ -4,7 +4,7 @@ metadata:
   name: gray-release-canary
   namespace: default
   annotations:
-    # 开启Canary。
+    # 开启金丝雀Canary。
     nginx.ingress.kubernetes.io/canary: "true"
     # Http Header请求头为version。
     nginx.ingress.kubernetes.io/canary-by-header: "version"

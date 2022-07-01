@@ -8,7 +8,7 @@ metadata:
 
 spec:
   replicas: {K8S_POD_REPLICAS}
-  #minReplicas: 2                    #最小副本数
+  #minReplicas: 1                    #最小副本数
   #maxReplicas: 10                   #最大副本数
   selector:
     matchLabels:
@@ -17,6 +17,7 @@ spec:
     metadata:
       labels:
         app: {APP_NAME}
+
     spec:
       containers:
       - name: {APP_NAME}
@@ -24,8 +25,10 @@ spec:
         imagePullPolicy: Always       # 强制拉取线上镜像
 #        resources:
 #          requests:
+#            cpu: "100m"
 #            memory: {MEMORY_SIZE}i
 #          limits:
+#            cpu: "100m"
 #            memory: {MEMORY_SIZE}i
         ports:
         - containerPort: {CONTAINER_PORT}
@@ -35,16 +38,9 @@ spec:
           - name: EXTEND_PORT
             value: "{CONTAINER_PORT}"
 
-      restartPolicy: Always # 停机总是重启
+      restartPolicy: Always   # 停机后总是不断重启
 #      affinity: # 使用工作负载反亲和特性，让Pod之间尽量“互斥”，能尽量均匀的分布在各node节点上
-#        nodeAffinity: # 工作负载反亲和
-#          requiredDuringSchedulingIgnoredDuringExecution: # 尽量满足如下条件
-#             nodeSelectorTerms:
-#               - matchExpressions:
-#                    - key: app
-#                      operator: In
-#                      values:
-#                        - {APP_NAME}
+
       # 私有镜像拉取密钥配置 参考文档：https://docs.ksyun.com/documents/5482
       imagePullSecrets:
         - name: {K8S_IMAGE_PULL_SECRETS}
@@ -61,11 +57,11 @@ metadata:
     app: {APP_NAME}-service
   annotations:
     prometheus.io/scrape: "true"
-    prometheus.io/path: "/metrics"
+    prometheus.io/path: "/actuator/prometheus"  # /metric路径是代码集成内提供的 Prometheus 监控接口
     prometheus.io/port: "http"
 
 spec:
-  type: LoadBalancer                   # 规格类型NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡
+  type: LoadBalancer                      # 规格类型ClusterIP、NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡
   #sessionAffinity: ClientIP           # 设置为 "ClientIP" （默认值是 "None"），来基于客户端的IP地址选择固定会话Pod关联
   selector:
     app: {APP_NAME}                    # 通过Pod的labels指定Pod 建立关联

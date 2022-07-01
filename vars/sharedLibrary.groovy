@@ -1408,7 +1408,7 @@ def blueGreenDeploy() {
     if ("${IS_SAME_SERVER}" == 'false') { // 不同服务器蓝绿部署
         def mainServerIp = remote.host // 主服务器IP
         def blueServerIp = ""  // 蓝服务器IP
-        // 先部署一个零时服务将流量切到蓝服务器上
+        // 先部署一个临时服务将流量切到蓝服务器上
         if (remote_worker_ips.isEmpty()) {
             error("多机蓝绿部署, 请先在相关的Jenkinsfile.x配置从服务器ip数组remote_worker_ips参数 ❌")
         }
@@ -1444,7 +1444,7 @@ def blueGreenDeploy() {
         def workHostPort = Integer.parseInt(SHELL_HOST_PORT) - 1000
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) { // 同一台服务器主从部署情况 情况只针对后端项目
             def workShellParamsGetopts = "${SHELL_PARAMS_GETOPTS}".replace("-c ${SHELL_HOST_PORT}", "-c ${workHostPort}")
-            // 先部署一个零时服务将流量切到蓝服务器上
+            // 先部署一个临时服务将流量切到蓝服务器上
             try {
                 dokcerReleaseWorkerMsg = Utils.getShEchoResult(this, " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} && ./${dockerReleaseWorkerShellName} '${workShellParamsGetopts}' ' ")
             } catch (error) {

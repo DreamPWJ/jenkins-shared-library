@@ -3,6 +3,7 @@ package shared.library.common
 import shared.library.Utils
 import shared.library.GlobalVars
 import shared.library.common.Docker
+import shared.library.common.Helm
 
 
 /**
@@ -96,13 +97,18 @@ class Kubernetes implements Serializable {
      * 基于QPS部署pod水平扩缩容
      */
     static def deployHPA(ctx, map) {
+        // 安装k8s-prometheus-adpater
+        Helm.installPrometheus(ctx)
+
         def yamlName = "hpa.yaml"
-        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.PROJECT_NAME}#g; " +
+        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
         ctx.sh " cat ${yamlName} "
 
         // 部署pod水平扩缩容
         ctx.sh "kubectl apply -f ${yamlName}"
+        // 若安装正确，可用执行以下命令查询自定义指标 查看到 Custom Metrics API 返回配置的 QPS 相关指标
+        ctx.sh " kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 || true "
     }
 
     /**

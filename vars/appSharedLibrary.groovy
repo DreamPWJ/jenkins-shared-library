@@ -1607,7 +1607,7 @@ def uploadDistribution() {
         uploadResultBuildKey = uploadResult.data.buildKey
     } catch (e) {
         println(e.getMessage())
-        // 第三方分发平台上传失败  上传自建分发OSS 保证流水线高用性
+        println("第三方分发平台上传失败, 自动切换上传到自建的分发OSS平台 保证流水线高用性  ❌")
         uploadDistributionOss()
     }
 
