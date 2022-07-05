@@ -6,7 +6,7 @@ import shared.library.GlobalVars
  * @author 潘维吉
  * @date 2021/1/20 22:29
  * @email 406798106@qq.com
- * @description 生成变更日志
+ * @description 自动生成变更日志
  */
 
 @NonCPS

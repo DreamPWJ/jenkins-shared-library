@@ -7,7 +7,7 @@ import shared.library.Utils
  * @author 潘维吉
  * @date 2021/1/20 22:29
  * @email 406798106@qq.com
- * @description 生成tag和变更日志
+ * @description 自动生成Git Tag和变更日志
  */
 
 def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
@@ -94,7 +94,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
             }
         }
     } catch (e) {
-        println "捕获Git生成Tag和变更日志异常"
+        println "捕获生成Git Tag和变更日志异常"
         println e.getMessage()
     }
 }
