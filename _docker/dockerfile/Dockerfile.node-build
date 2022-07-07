@@ -32,6 +32,6 @@ RUN node -v && npm -v && npm config set registry https://registry.npm.taobao.org
 # EXPOSE  $EXPOSE_PORT
 
 # 构建镜像
-# docker build -t panweiji/node:14  -f /my/Dockerfile.node-build . --no-cache
+# docker build -t panweiji/node:14  -f /my/Dockerfile.node-build . --no-cache --load
 # 上传镜像
 # docker push panweiji/node:14
