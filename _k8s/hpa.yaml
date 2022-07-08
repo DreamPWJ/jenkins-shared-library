@@ -22,9 +22,11 @@ spec:
 #    - type: Resource
 #      resource:
 #        name: cpu
-#        target:
-#          type: Utilization
-#          averageUtilization: 50 # CPU超过多少  触发自动进行扩容
+#        targetAverageUtilization: 50 # CPU超过多少  触发自动进行扩容
+#    - type: Resource
+#      resource:
+#        name: memory
+#        targetAverageValue: 2000Mi # 当内存超过多少时，触发自动进行扩容
 
 ---
 
