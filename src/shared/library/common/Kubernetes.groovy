@@ -129,6 +129,13 @@ class Kubernetes implements Serializable {
      * 参考文档: https://help.aliyun.com/document_detail/200941.html
      */
     static def ingressDeploy(ctx, map) {
+        // 需要提供一下几个参数：
+        // 灰度发布匹配的方式  1、 header  2、 cookie
+        // 灰度匹配的名称version  灰度匹配的值new  。 version=new 表示新版本
+        // 灰度发布初始化流量权重 当时灰度部署完成后的新版流量权重 如20%访问新版
+        // 新版发布后启动等待时间, 每隔多长时间更改流量规则, 单位秒  逐渐提高新版流量权重实现灰度发布
+        // 新版发布全部完成老版本下线等待时间, 隔多长时间下线旧应用, 单位秒  流量全部切到新版本后下线旧应用等待保证稳定性
+
         ctx.sh "kubectl apply -f ingress.yaml"
         ctx.sh "kubectl get ingress"
         // 系统运行一段时间后，当新版本服务已经稳定并且符合预期后，需要下线老版本的服务 ，仅保留新版本服务在线上运行。
