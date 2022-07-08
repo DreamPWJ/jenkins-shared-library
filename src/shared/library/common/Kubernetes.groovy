@@ -40,14 +40,14 @@ class Kubernetes implements Serializable {
                 ctx.sh """ 
                     kubectl get pod
                     kubectl get svc
-                    kubectl get node
+                    kubectl top nodes
                     """
 
                 // 七层负载和灰度发布配置部署ingress
                 // ingressNginxDeploy(ctx, map)
 
                 // 部署pod水平扩缩容 基于QPS自动伸缩
-                // deployHPA(ctx, map)
+                deployHPA(ctx, map)
 
                 // 删除服务
                 // ctx.sh "kubectl delete -f k8s.yaml"
@@ -107,8 +107,8 @@ class Kubernetes implements Serializable {
 
         // 部署pod水平扩缩容
         ctx.sh "kubectl apply -f ${yamlName}"
-        // 若安装正确，可用执行以下命令查询自定义指标 查看到 Custom Metrics API 返回配置的 QPS 相关指标
-        ctx.sh " kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 || true "
+        // 若安装正确，可用执行以下命令查询自定义指标 查看到 Custom Metrics API 返回配置的 QPS 相关指标  可能需要等待几分钟才能查询到
+        // ctx.sh " kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 || true "
     }
 
     /**
@@ -131,8 +131,8 @@ class Kubernetes implements Serializable {
     static def ingressDeploy(ctx, map) {
         // 需要提供一下几个参数：
         // 灰度发布匹配的方式  1、 header  2、 cookie
-        // 灰度匹配的名称version  灰度匹配的值new  。 version=new 表示新版本
-        // 灰度发布初始化流量权重 当时灰度部署完成后的新版流量权重 如20%访问新版
+        // yaml文件中灰度匹配的名称version  灰度匹配的值new  。 version=new 表示新版本
+        // 灰度发布初始化流量权重 当时灰度部署完成后的新版流量权重 如20%访问流量到新版本
         // 新版发布后启动等待时间, 每隔多长时间更改流量规则, 单位秒  逐渐提高新版流量权重实现灰度发布
         // 新版发布全部完成老版本下线等待时间, 隔多长时间下线旧应用, 单位秒  流量全部切到新版本后下线旧应用等待保证稳定性
 
@@ -189,7 +189,7 @@ class Kubernetes implements Serializable {
      * 清除k8s集群无效镜像  删除无效镜像 减少磁盘占用
      */
     static def cleanDockerImages(ctx) {
-        // kubelet容器GC垃圾回收  参考文档: https://kubernetes-docsy-staging.netlify.app/zh/docs/concepts/cluster-administration/kubelet-garbage-collection/
+        // kubelet容器自动GC垃圾回收  参考文档: https://kubernetes-docsy-staging.netlify.app/zh/docs/concepts/cluster-administration/kubelet-garbage-collection/
         // 默认Kubelet会在节点驱逐信号触发和Image对应的Filesystem空间不足的情况下删除冗余的镜像
         // node节点 cat /etc/kubernetes/kubelet 镜像占用磁盘空间的比例超过高水位（可以通过参数ImageGCHighThresholdPercent 进行配置），kubelet 就会清理不用的镜像
         // ctx.sh "whoami && docker version &&  docker rmi \$(docker image ls -f dangling=true -q) --no-prune || true"
