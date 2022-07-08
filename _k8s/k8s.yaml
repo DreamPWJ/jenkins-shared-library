@@ -13,10 +13,15 @@ spec:
   selector:
     matchLabels:
       app: {APP_NAME}
+
   template:
     metadata:
       labels:
         app: {APP_NAME}
+      annotations:
+        prometheus.io/scrape: "true"  # 让prometheus自动发现
+        prometheus.io/path: "/actuator/prometheus"  # /metric路径是集成内提供的 Prometheus 监控接口 或利用 exporter 服务来为 Prometheus 提供指标数据
+        prometheus.io/port: "{CONTAINER_PORT}"  # /metric接口的端口
 
     spec:
       containers:
@@ -25,10 +30,10 @@ spec:
         imagePullPolicy: Always       # 强制拉取线上镜像
 #        resources:
 #          requests:
-#            cpu: "100m"
+#            cpu: "300m"
 #            memory: {MEMORY_SIZE}i
 #          limits:
-#            cpu: "100m"
+#            cpu: "300m"
 #            memory: {MEMORY_SIZE}i
         ports:
         - containerPort: {CONTAINER_PORT}
@@ -55,13 +60,9 @@ metadata:
   namespace: default
   labels:
     app: {APP_NAME}-service
-  annotations:
-    prometheus.io/scrape: "true"
-    prometheus.io/path: "/actuator/prometheus"  # /metric路径是代码集成内提供的 Prometheus 监控接口
-    prometheus.io/port: "http"
 
 spec:
-  type: LoadBalancer                      # 规格类型ClusterIP、NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡
+  type: LoadBalancer                   # 规格类型ClusterIP、NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡
   #sessionAffinity: ClientIP           # 设置为 "ClientIP" （默认值是 "None"），来基于客户端的IP地址选择固定会话Pod关联
   selector:
     app: {APP_NAME}                    # 通过Pod的labels指定Pod 建立关联

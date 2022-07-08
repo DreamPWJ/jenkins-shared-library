@@ -76,6 +76,8 @@ spec:         #必选，Pod中容器的详细定义
         - key: string
 
 
+### 基于Ansible自动部署K8S集群 [项目](https://github.com/lizhenliang/ansible-install-k8s)
+
 ### 通过kubectl创建简单nginx服务 [文档](https://docs.ksyun.com/documents/5517)
 kubectl run my-nginx --image=nginx --replicas=3 --port=80
 

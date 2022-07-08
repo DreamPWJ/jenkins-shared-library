@@ -26,6 +26,7 @@ class Deploy implements Serializable {
     /**
      * 自动替换不同分布式部署节点的环境文件
      * 自定义的部署配置文件替代默认配置文件等
+     * 注意：多机配置文件命名-n-拼接方式覆盖 如config-1-.yaml
      */
     static def replaceEnvFile(ctx) {
         // 源文件和多个目标文件可放在代码里面维护 部署时候根据配置自动替换到目标服务器
