@@ -220,7 +220,8 @@ def call(String type = 'web-java', Map map) {
                                reuseNode true // 使用根节点
                            }*/
                         docker {
-                            image 'jetbrains/qodana-jvm-community' // js、jvm、php、jvm-android、python、php。 jvm-community是免费版
+                            // js、jvm、php、jvm-android、python、php。 jvm-community是免费版
+                            image 'jetbrains/qodana-jvm-community'
                             args " --entrypoint='' -v ${env.WORKSPACE}:/data/project/ -v ${env.WORKSPACE}/qodana-reports:/data/results/ -v $HOME/.m2/:/root/.m2/ "
                             reuseNode true // 使用根节点
                         }
@@ -785,6 +786,9 @@ def getInitParams(map) {
     SHELL_EXPOSE_PORT = SHELL_PARAMS_ARRAY[3] // 容器内暴露端口
     SHELL_ENV_MODE = SHELL_PARAMS_ARRAY[4] // 环境模式 如 dev sit test prod等
 
+    // 项目全名 防止项目名称重复
+    FULL_PROJECT_NAME = "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}"
+
     // 获取通讯录
     contactPeoples = ""
     try {
@@ -853,7 +857,7 @@ def initInfo() {
 
     // 是否跳板机穿透方式部署
     isProxyJumpType = false
-    // 跳板机ssh ProxyJump访问新增的文本
+    // 跳板机ssh ProxyJump访问新增的文本 考虑多层跳板机穿透情况
     proxyJumpSSHText = "" // ssh跳板透传远程访问
     proxyJumpSCPText = "" // scp跳板透传远程复制传输
     if ("${proxy_jump_ip}".trim() != "") {
@@ -991,7 +995,7 @@ def pullProjectCode() {
  */
 def codeQualityAnalysis() {
     pullProjectCode()
-    SonarQube.scan(this, "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}")
+    SonarQube.scan(this, "${FULL_PROJECT_NAME}")
     // SonarQube.getStatus(this, "${PROJECT_NAME}")
 /*    def scannerHome = tool 'SonarQube' // 工具名称
     withSonarQubeEnv('SonarQubeServer') { // 服务地址链接名称
@@ -1172,7 +1176,7 @@ def cppBuildProject() {
  */
 def buildImage() {
     // 定义镜像唯一构建名称
-    dockerBuildImageName = "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}-${SHELL_ENV_MODE}"
+    dockerBuildImageName = "${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}"
     // Docker多阶段镜像构建处理
     Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
     // 构建Docker镜像  只构建一次
@@ -1214,7 +1218,7 @@ def uploadRemote(filePath) {
         syncScript()
     }
     Tools.printColor(this, "上传部署文件到远程云端 🚀 ")
-    def projectDeployFolder = "/${DEPLOY_FOLDER}/${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}/"
+    def projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
     if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             sh "cd ${filePath} && scp ${proxyJumpSCPText} ${npmPackageLocation} " +
@@ -1353,7 +1357,7 @@ def healthCheck(params = '') { // 可选参数
         dingNotice(1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
         // 打印应用服务启动失败日志 方便快速排查错误
         Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志开始 START 👇 ------------", "red")
-        sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'docker logs ${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}-${SHELL_ENV_MODE}' "
+        sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'docker logs ${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}' "
         Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志结束 END 👆 ------------", "red")
         if ("${IS_ROLL_DEPLOY}" == 'true' || "${IS_BLUE_GREEN_DEPLOY}" == 'true') {
             println '分布式部署情况, 服务启动失败, 自动中止取消job, 防止继续部署导致其他应用服务挂掉 。'
@@ -1403,7 +1407,7 @@ def blueGreenDeploy() {
     // 蓝绿部署: 好处是只用一个主单点服务资源实现部署过程中不间断提供服务
     // 1、先启动部署一个临时服务将流量切到蓝服务器上  2、再部署真正提供服务的绿服务器  3、部署完绿服务器,销毁蓝服务器,将流量切回到绿服务器
     // 镜像容器名称
-    dockerContainerName = "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}-${SHELL_ENV_MODE}"
+    dockerContainerName = "${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}"
     // 先判断是否在一台服务器部署
     if ("${IS_SAME_SERVER}" == 'false') { // 不同服务器蓝绿部署
         def mainServerIp = remote.host // 主服务器IP
@@ -1471,7 +1475,7 @@ def blueGreenDeploy() {
             }
             sleep(time: 2, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
             // 部署完绿服务器,销毁蓝服务器,将流量切回到绿服务器
-            def workDockerContainerName = "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}-worker-${SHELL_ENV_MODE}"
+            def workDockerContainerName = "${FULL_PROJECT_NAME}-worker-${SHELL_ENV_MODE}"
             sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} ' docker stop ${workDockerContainerName} --time=0 || true && docker rm ${workDockerContainerName} || true ' "
             // 自动配置nginx负载均衡
             // Nginx.conf(this, "${remote.host}", "${SHELL_HOST_PORT}", "${remote.host}", "${workHostPort}")
@@ -1570,7 +1574,7 @@ def syncScript() {
         // 自动创建服务器部署目录
         // ssh登录概率性失败 连接数超报错: kex_exchange_identification
         // 解决vim /etc/ssh/sshd_config中 MaxSessions与MaxStartups改大2000 默认10 重启生效 systemctl restart sshd.service
-        sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'mkdir -p /${DEPLOY_FOLDER}/${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}' "
+        sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'mkdir -p /${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}' "
     } catch (error) {
         println "访问目标服务器失败, 首先检查jenkins服务器和应用服务器的ssh免密连接是否生效 ❌"
         println error.getMessage()

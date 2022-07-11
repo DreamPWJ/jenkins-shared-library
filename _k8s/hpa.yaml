@@ -21,12 +21,12 @@ spec:
           averageValue: 50  # 当每个业务Pod的QPS指标平均值高于时，触发自动进行扩容
 #    - type: Resource
 #      resource:
-#        name: cpu
+#        name: "cpu"
 #        targetAverageUtilization: 50 # CPU超过多少  触发自动进行扩容
 #    - type: Resource
 #      resource:
-#        name: memory
-#        targetAverageValue: 2000Mi # 当内存超过多少时，触发自动进行扩容
+#        name: "memory"
+#        targetAverageValue: 4000Mi # 当内存超过多少时，触发自动进行扩容
 
 ---
 

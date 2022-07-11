@@ -30,10 +30,10 @@ spec:
         imagePullPolicy: Always       # 强制拉取线上镜像
 #        resources:
 #          requests:
-#            cpu: "300m"
+#            cpu: "200m"
 #            memory: {MEMORY_SIZE}i
 #          limits:
-#            cpu: "300m"
+#            cpu: "500m"
 #            memory: {MEMORY_SIZE}i
         ports:
         - containerPort: {CONTAINER_PORT}

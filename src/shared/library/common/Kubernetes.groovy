@@ -85,7 +85,7 @@ class Kubernetes implements Serializable {
         }
         def yamlName = "k8s.yaml"
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${Docker.imageTag}#g;" +
-                " s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
+                " s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
                 " s#{MEMORY_SIZE}#${map.docker_memory}#g;s#{K8S_POD_REPLICAS}#${ctx.K8S_POD_REPLICAS}#g; " +
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
@@ -101,7 +101,7 @@ class Kubernetes implements Serializable {
         Helm.installPrometheus(ctx)
 
         def yamlName = "hpa.yaml"
-        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
+        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
         ctx.sh " cat ${yamlName} "
 
@@ -116,7 +116,7 @@ class Kubernetes implements Serializable {
      */
     static def ingressNginx(ctx, map) {
         def yamlName = "ingress.yaml"
-        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
+        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
         ctx.sh " cat ${yamlName} "
 

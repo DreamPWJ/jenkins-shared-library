@@ -5,31 +5,25 @@ global:
   scrape_timeout:      10s   # 每次 收集数据的 超时时间
 
 # 告警alertmanager配置
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets:  ['172.31.88.89:9093']
+#alerting:
+#  alertmanagers:
+#    - static_configs:
+#        - targets:  ['172.31.88.89:9093']
 
 # 规则文件, 可以使用通配符
-rule_files:
-  - "rules.yml"
-# - "second_rules.yml"
+#rule_files:
+#  - "rules.yml"
+## - "second_rules.yml"
 
 scrape_configs:
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
 
-  # Spring Boot应用配置
-  - job_name: 'property-sales-app'
+  # 应用配置数组
+  - job_name: 'pellet-charging-app'
     scrape_interval: 5s
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['172.31.88.89:8096']
+      - targets: ['120.92.49.178:8080']
 
-  # Spring Boot应用配置
-  - job_name: 'property-sales-mapp'
-    scrape_interval: 15s
-    metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets: ['172.31.88.89:8095']
