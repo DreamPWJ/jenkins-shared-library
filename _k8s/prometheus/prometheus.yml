@@ -21,9 +21,51 @@ scrape_configs:
       - targets: ['localhost:9090']
 
   # 应用配置数组
-  - job_name: 'pellet-charging-app'
-    scrape_interval: 5s
-    metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets: ['120.92.49.178:8080']
-
+  - job_name: kubernetes-pods
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    metrics_path: /actuator/prometheus
+    scheme: http
+    kubernetes_sd_configs:
+      - kubeconfig_file: /etc/config-lanneng
+        role: pod
+        namespaces:
+          names: []
+    tls_config:
+      insecure_skip_verify: true
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace]
+        separator: ;
+        regex: (.*)
+        target_label: namespace
+        replacement: $1
+        action: replace
+      - source_labels: [__meta_kubernetes_pod_name]
+        separator: ;
+        regex: (.*)
+        target_label: pod
+        replacement: $1
+        action: replace
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        separator: ;
+        regex: "true"
+        replacement: $1
+        action: keep
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        separator: ;
+        regex: (.+)
+        target_label: __metrics_path__
+        replacement: $1
+        action: replace
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        separator: ;
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        target_label: __address__
+        replacement: $1:$2
+        action: replace
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scheme]
+        separator: ;
+        regex: (.+)
+        target_label: __scheme__
+        replacement: $1
+        action: replace
