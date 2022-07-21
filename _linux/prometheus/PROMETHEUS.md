@@ -58,12 +58,12 @@ management:
 - 查看度量指标是否集成成功
   访问 http://localhost:8080/actuator/prometheus
 
-在Grafana导入Prometheus数据源后, 配置导入监控面板
+首先在Grafana的Data Sources导入Prometheus数据源后, 再配置导入监控面板类型
 - import配置https://grafana.com/dashboards/4701 是 jvm使用面板 和 10280 是 Spring Boot面板
 
 Prometheus监控 http://118.190.150.96:9090
 Grafana监控 http://118.190.150.96:3000  默认用户和密码均为admin
 
 
-###  各种PrometheusAlert告警通知  
+###  各种PrometheusAlert告警通知服务
 - 参考项目：https://github.com/feiyu563/PrometheusAlert

@@ -15,35 +15,19 @@ spec:
     - type: Pods
       pods:
         metric:
-          name: httpserver_requests_qps  # 基于QPS自动伸缩 安装 prometheus-adapter 来实现基于自定义指标的 Pod 弹性伸缩
+          name: http_server_requests_seconds_count_sum  # 基于QPS自动伸缩 安装 prometheus-adapter 来实现基于自定义指标的 Pod 弹性伸缩
         target:
           type: AverageValue
-          averageValue: 50  # 当每个业务Pod的QPS指标平均值高于时，触发自动进行扩容
+          averageValue: 10  # 当每个业务Pod的QPS指标平均值高于时，触发自动进行扩容
 #    - type: Resource
 #      resource:
-#        name: cpu
-#        target:
-#          type: Utilization
-#          averageUtilization: 50 # CPU超过多少  触发自动进行扩容
+#        name: "cpu"
+#        targetAverageUtilization: 50 # CPU超过多少  触发自动进行扩容
+#    - type: Resource
+#      resource:
+#        name: "memory"
+#        targetAverageValue: 4000Mi # 当内存超过多少时，触发自动进行扩容
 
 ---
-
-# 已安装 prometheus-operator(已经改名为 kube-prometheus)，可以通过创建 ServiceMonitor 的 CRD 对象配置 Prometheus
-#apiVersion: monitoring.coreos.com/v1
-#kind: ServiceMonitor
-#metadata:
-#  name: {APP_NAME}-service-monitor
-#  namespace: default
-#
-#spec:
-#  endpoints:
-#    - port: "{HOST_PORT}"     # 对应service的端口名
-#      interval: 10s  # 多少时间获取一次信息
-#  namespaceSelector:
-#    matchNames:
-#      - default
-#  selector:  # 匹配的 Service 的labels，如果使用mathLabels，则下面的所有标签都匹配时才会匹配该service，如果使用matchExpressions，则至少匹配一个标签的service都会被选择
-#    matchLabels:
-#      app: {APP_NAME}-service
 
 #  kubectl get hpa

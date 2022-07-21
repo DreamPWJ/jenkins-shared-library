@@ -19,9 +19,9 @@ spec:
       labels:
         app: {APP_NAME}
       annotations:
-        prometheus.io/scrape: "true"  # 让prometheus自动发现
+        prometheus.io/scrape: "true"                # 让prometheus自动发现
         prometheus.io/path: "/actuator/prometheus"  # /metric路径是集成内提供的 Prometheus 监控接口 或利用 exporter 服务来为 Prometheus 提供指标数据
-        prometheus.io/port: "{CONTAINER_PORT}"  # /metric接口的端口
+        prometheus.io/port: "{CONTAINER_PORT}"      # /metric接口的端口
 
     spec:
       containers:
@@ -30,10 +30,10 @@ spec:
         imagePullPolicy: Always       # 强制拉取线上镜像
 #        resources:
 #          requests:
-#            cpu: "300m"
+#            cpu: "200m"
 #            memory: {MEMORY_SIZE}i
 #          limits:
-#            cpu: "300m"
+#            cpu: "500m"
 #            memory: {MEMORY_SIZE}i
         ports:
         - containerPort: {CONTAINER_PORT}
@@ -60,6 +60,10 @@ metadata:
   namespace: default
   labels:
     app: {APP_NAME}-service
+  annotations:
+    prometheus.io/scrape: "true"                # 让prometheus自动发现
+    prometheus.io/path: "/actuator/prometheus"  # /metric路径是集成内提供的 Prometheus 监控接口 或利用 exporter 服务来为 Prometheus 提供指标数据
+    prometheus.io/port: "{CONTAINER_PORT}"      # /metric接口的端口
 
 spec:
   type: LoadBalancer                   # 规格类型ClusterIP、NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡

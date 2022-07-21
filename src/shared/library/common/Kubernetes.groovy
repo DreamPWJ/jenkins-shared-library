@@ -66,7 +66,7 @@ class Kubernetes implements Serializable {
                 // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用
                 // cleanDockerImages(ctx)
 
-                ctx.println("K8S集群部署完成")
+                ctx.println("K8S集群部署完成 ✅")
             }
         }
     }
@@ -85,7 +85,7 @@ class Kubernetes implements Serializable {
         }
         def yamlName = "k8s.yaml"
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${Docker.imageTag}#g;" +
-                " s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
+                " s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
                 " s#{MEMORY_SIZE}#${map.docker_memory}#g;s#{K8S_POD_REPLICAS}#${ctx.K8S_POD_REPLICAS}#g; " +
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
@@ -95,13 +95,15 @@ class Kubernetes implements Serializable {
 
     /**
      * 基于QPS部署pod水平扩缩容
+     * 参考文档：https://piotrminkowski.com/2020/11/05/spring-boot-autoscaling-on-kubernetes/
+     * https://github.com/stefanprodan/k8s-prom-hpa
      */
     static def deployHPA(ctx, map) {
         // 安装k8s-prometheus-adpater
         Helm.installPrometheus(ctx)
 
         def yamlName = "hpa.yaml"
-        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
+        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
         ctx.sh " cat ${yamlName} "
 
@@ -109,6 +111,10 @@ class Kubernetes implements Serializable {
         ctx.sh "kubectl apply -f ${yamlName}"
         // 若安装正确，可用执行以下命令查询自定义指标 查看到 Custom Metrics API 返回配置的 QPS 相关指标  可能需要等待几分钟才能查询到
         // ctx.sh " kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 || true "
+        // kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/default/pods/*/http_server_requests_seconds_count_sum"
+
+        // 并发测试ab（apache benchmark） CentOS环境 sudo yum -y install httpd-tools    Ubuntu环境 sudo apt-get update && sudo apt-get -y install apache2-utils
+        // ab -c 100 -n 10000 -r http://120.92.49.178:8080/  // 并发数-c  总请求数-n  是否允许请求错误-r  总的请求数(n) = 次数 * 一次并发数(c)
     }
 
     /**
@@ -116,7 +122,7 @@ class Kubernetes implements Serializable {
      */
     static def ingressNginx(ctx, map) {
         def yamlName = "ingress.yaml"
-        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
+        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
         ctx.sh " cat ${yamlName} "
 

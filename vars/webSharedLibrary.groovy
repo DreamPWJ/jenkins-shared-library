@@ -535,6 +535,9 @@ def getInitParams(map) {
     SHELL_EXPOSE_PORT = SHELL_PARAMS_ARRAY[3] // 容器内暴露端口
     SHELL_ENV_MODE = SHELL_PARAMS_ARRAY[4] // 环境模式 如 dev sit test prod等
 
+    // 项目全名 防止项目名称重复
+    FULL_PROJECT_NAME = "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}"
+
     // 目标系统类型 1. Npm生态与静态web项目 2. Flutter For Web 3. ReactNative For Web 4. Unity For Web
     switch ("${PROJECT_TYPE}".toInteger()) {
         case GlobalVars.npmWeb:
@@ -569,12 +572,16 @@ def getInitParams(map) {
 
     // tag版本变量定义
     tagVersion = ""
-    // 是否健康检测失败状态
-    isHealthCheckFail = false
     // 扫描二维码地址
     qrCodeOssUrl = ""
     // Web构建包大小
     webPackageSize = ""
+    // 是否健康检测失败状态
+    isHealthCheckFail = false
+    // 计算应用启动时间
+    healthCheckTimeDiff = "未知"
+    // 健康检测url地址
+    healthCheckUrl = ""
 }
 
 /**
@@ -693,7 +700,7 @@ def pullProjectCode() {
  */
 def codeQualityAnalysis() {
     pullProjectCode()
-    SonarQube.scan(this, "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}")
+    SonarQube.scan(this, "${FULL_PROJECT_NAME}")
     // SonarQube.getStatus(this, "${PROJECT_NAME}")
     // 可打通项目管理平台自动提交bug指派任务
 }
@@ -842,7 +849,7 @@ def nodeBuildProject() {
  */
 def buildImage() {
     // 定义镜像唯一构建名称
-    dockerBuildImageName = "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}-${SHELL_ENV_MODE}"
+    dockerBuildImageName = "${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}"
     // Docker多阶段镜像构建处理
     Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
     // 构建Docker镜像  只构建一次
@@ -860,7 +867,7 @@ def uploadRemote(filePath) {
         syncScript()
     }
     Tools.printColor(this, "上传部署文件到远程云端 🚀 ")
-    def projectDeployFolder = "/${DEPLOY_FOLDER}/${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}/"
+    def projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
     if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
         sh "cd ${filePath} && scp  ${npmPackageLocation} " +
                 "${remote.user}@${remote.host}:${projectDeployFolder}"
@@ -917,7 +924,7 @@ def healthCheck(params = '') { // 可选参数
         dingNotice(1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
         // 打印应用服务启动失败日志 方便快速排查错误
         Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动日志开始 START 👇 ------------", "red")
-        sh " ssh  ${remote.user}@${remote.host} 'docker logs ${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}-${SHELL_ENV_MODE}' "
+        sh " ssh  ${remote.user}@${remote.host} 'docker logs ${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}' "
         Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动日志结束 END 👆 ------------", "red")
         if ("${IS_ROLL_DEPLOY}" == 'true' || "${IS_BLUE_GREEN_DEPLOY}" == 'true') {
             println '分布式部署情况, 服务启动失败, 自动中止取消job, 防止继续部署导致其他应用服务挂掉 。'
@@ -974,7 +981,7 @@ def syncScript() {
         // 自动创建服务器部署目录
         // ssh登录概率性失败 连接数超报错: kex_exchange_identification
         // 解决vim /etc/ssh/sshd_config中 MaxSessions与MaxStartups改大2000 默认10 重启生效 systemctl restart sshd.service
-        sh " ssh  ${remote.user}@${remote.host} 'mkdir -p /${DEPLOY_FOLDER}/${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}' "
+        sh " ssh  ${remote.user}@${remote.host} 'mkdir -p /${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}' "
     } catch (error) {
         println "访问目标服务器失败, 首先检查jenkins服务器和应用服务器的ssh免密连接是否生效 ❌"
         println error.getMessage()
