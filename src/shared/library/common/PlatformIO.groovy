@@ -15,7 +15,7 @@ class PlatformIO implements Serializable {
      * 多平台和多架构构建系统
      */
     static def build(ctx) {
-        if ("${ctx.IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式式仓库
+        if ("${ctx.IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
             // ctx.sh " pio ci ${ctx.MONO_REPO_MAIN_PACKAGE}/${ctx.PROJECT_NAME} "
            ctx.sh " platformio run -d ./${ctx.MONO_REPO_MAIN_PACKAGE}/${ctx.PROJECT_NAME} "  // 构建烧录固件位置: .pio/build/*/firmware.bin
         } else {

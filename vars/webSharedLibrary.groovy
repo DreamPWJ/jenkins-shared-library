@@ -499,7 +499,7 @@ def getInitParams(map) {
     IS_K8S_DEPLOY = jsonParams.IS_K8S_DEPLOY ? jsonParams.IS_K8S_DEPLOY : false // 是否K8s集群部署
     IS_SERVERLESS_DEPLOY = jsonParams.IS_SERVERLESS_DEPLOY ? jsonParams.IS_SERVERLESS_DEPLOY : false // 是否Serverless发布
     IS_STATIC_RESOURCE = jsonParams.IS_STATIC_RESOURCE ? jsonParams.IS_STATIC_RESOURCE : false // 是否静态web资源
-    IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式式仓库
+    IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
     AUTO_TEST_PARAM = jsonParams.AUTO_TEST_PARAM ? jsonParams.AUTO_TEST_PARAM.trim() : ""  // 自动化集成测试参数
@@ -764,14 +764,14 @@ def unityBuildPackage(map) {
  */
 def nodeBuildProject() {
     monoRepoProjectDir = "" // monorepo项目所在目录 默认根目录
-    if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式式仓库
+    if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
         monoRepoProjectDir = "${MONO_REPO_MAIN_PACKAGE}/${PROJECT_NAME}"
     }
 
     if ("${IS_STATIC_RESOURCE}" == 'true') { // 静态资源项目
         // 静态文件打包
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.npmWeb) {
-            if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式式仓库
+            if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
                 dir("${monoRepoProjectDir}") {
                     // MonoRepo静态文件打包
                     Web.staticResourceBuild(this)
@@ -790,7 +790,7 @@ def nodeBuildProject() {
         Node.setMirror(this)
         // sh "rm -rf node_modules && npm cache clear --force"
 
-        if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式式仓库
+        if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
             // 基于Lerna管理的Monorepo仓库打包
             Web.monorepoBuild(this)
         } else {

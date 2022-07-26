@@ -731,7 +731,7 @@ def getInitParams(map) {
     IS_SERVERLESS_DEPLOY = jsonParams.IS_SERVERLESS_DEPLOY ? jsonParams.IS_SERVERLESS_DEPLOY : false // 是否Serverless发布
     IS_STATIC_RESOURCE = jsonParams.IS_STATIC_RESOURCE ? jsonParams.IS_STATIC_RESOURCE : false // 是否静态web资源
     IS_UPLOAD_OSS = jsonParams.IS_UPLOAD_OSS ? jsonParams.IS_UPLOAD_OSS : false // 是否构建产物上传到OSS
-    IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式式仓库
+    IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
     // 是否Maven单模块代码
     IS_MAVEN_SINGLE_MODULE = jsonParams.IS_MAVEN_SINGLE_MODULE ? jsonParams.IS_MAVEN_SINGLE_MODULE : false
 
@@ -1011,12 +1011,12 @@ def codeQualityAnalysis() {
  */
 def nodeBuildProject() {
     monoRepoProjectDir = "" // monorepo项目所在目录 默认根目录
-    if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式式仓库
+    if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
         monoRepoProjectDir = "${MONO_REPO_MAIN_PACKAGE}/${PROJECT_NAME}"
     }
 
     if ("${IS_STATIC_RESOURCE}" == 'true') { // 静态资源项目
-        if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式式仓库
+        if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
             dir("${monoRepoProjectDir}") {
                 // MonoRepo静态文件打包
                 Web.staticResourceBuild(this)
@@ -1036,7 +1036,7 @@ def nodeBuildProject() {
         Node.setMirror(this)
         // sh "rm -rf node_modules && npm cache clear --force"
 
-        if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式式仓库
+        if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
             // 基于Lerna管理的Monorepo仓库打包
             Web.monorepoBuild(this)
         } else {
