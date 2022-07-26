@@ -16,11 +16,11 @@ class PlatformIO implements Serializable {
      */
     static def build(ctx) {
         if ("${ctx.IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式式仓库
-            ctx.sh " pio ci --lib ${MONO_REPO_MAIN_PACKAGE}/${ctx.PROJECT_NAME} "
+            // ctx.sh " pio ci ${ctx.MONO_REPO_MAIN_PACKAGE}/${ctx.PROJECT_NAME} "
+           ctx.sh " platformio run -d ./${ctx.MONO_REPO_MAIN_PACKAGE}/${ctx.PROJECT_NAME} "  // 构建烧录固件位置: .pio/build/*/firmware.bin
         } else {
-            ctx.sh " pio ci "
+            ctx.sh " platformio run "
         }
-        // ctx.sh " platformio run -d ./example/ "  // 构建烧录固件位置: example/.pio/build/esp32dev/firmware.bin
     }
 
     /**

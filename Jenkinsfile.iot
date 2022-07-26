@@ -51,7 +51,7 @@ iotSharedLibrary(map)
 test-embedded-monorepo
 测试IoT物联网嵌入式项目
 
-*/
+/*
 
 JSON_PARAMS
 {

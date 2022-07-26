@@ -30,8 +30,8 @@ def call(String type = 'iot', Map map) {
                 choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback],
                         description: '选择部署方式  1. ' + GlobalVars.release + '发布 2. ' + GlobalVars.rollback +
                                 '回滚(基于jenkins归档方式回滚选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚请选择' + GlobalVars.release + ')')
-                choice(name: 'MONOREPO_PROJECT_NAME', choices: "${MONOREPO_PROJECT_NAMES}",
-                        description: "选择MonoRepo单体式统一仓库项目名称, ${GlobalVars.defaultValue}选项是MultiRepo多体式独立仓库或未配置, 大统一单体式仓库流水线可减少构建时间和磁盘空间")
+                /*              choice(name: 'MONOREPO_PROJECT_NAME', choices: "${MONOREPO_PROJECT_NAMES}",
+                                      description: "选择MonoRepo单体式统一仓库项目名称, ${GlobalVars.defaultValue}选项是MultiRepo多体式独立仓库或未配置, 大统一单体式仓库流水线可减少构建时间和磁盘空间")*/
                 gitParameter(name: 'GIT_BRANCH', type: 'PT_BRANCH', defaultValue: "${BRANCH_NAME}", selectedValue: "DEFAULT",
                         useRepository: "${REPO_URL}", sortMode: 'ASCENDING', branchFilter: 'origin/(.*)',
                         description: "选择要构建的Git分支 默认: " + "${BRANCH_NAME} (可自定义配置具体任务的默认常用分支, 实现一键或全自动构建)")
@@ -213,7 +213,7 @@ def call(String type = 'iot', Map map) {
                     }
                     steps {
                         script {
-                            uploadRemote(Utils.getShEchoResult(this, "pwd"))
+                            uploadOss()
                         }
                     }
                 }
@@ -244,9 +244,8 @@ def call(String type = 'iot', Map map) {
                         }
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            // 是否进行集成测试  是否存在postman_collection.json文件才进行API集成测试  fileExists("_test/postman/postman_collection.json") == true
-                            return ("${IS_INTEGRATION_TESTING}" == 'true' && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd
-                                    && "${AUTO_TEST_PARAM}" != "" && IS_BLUE_GREEN_DEPLOY == false)
+                            // 是否进行集成测试
+                            return ("${IS_INTEGRATION_TESTING}" == 'true')
                         }
                     }
                     steps {
@@ -265,6 +264,7 @@ def call(String type = 'iot', Map map) {
                     }
                     steps {
                         script {
+                            echo "OTA空中升级"
                         }
                     }
                 }
@@ -398,7 +398,7 @@ def getInitParams(map) {
     }
 
     // 项目全名 防止项目名称重复
-    FULL_PROJECT_NAME = "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}"
+    FULL_PROJECT_NAME = "${PROJECT_NAME}"
 
     // 获取通讯录
     contactPeoples = ""
@@ -546,8 +546,6 @@ def embeddedBuildProject() {
     println("执行PlatformIO嵌入式编构建 🏗️  ")
     PlatformIO.build(this)
     Tools.printColor(this, "嵌入式打包成功 ✅")
-    // 上传部署文件到OSS
-    uploadOss()
 }
 
 
@@ -558,57 +556,17 @@ def embeddedBuildProject() {
 def uploadOss() {
     if ("${IS_UPLOAD_OSS}" == 'true') {
         try {
-            if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-                // 源文件地址
-                def sourceFile = "${env.WORKSPACE}/${mavenPackageLocation}"
-                // 目标文件
-                def targetFile = "java/${env.JOB_NAME}/${PROJECT_NAME}-${SHELL_ENV_MODE}-${env.BUILD_NUMBER}.${javaPackageType}"
-                javaOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
-                println "${javaOssUrl}"
-                Tools.printColor(this, "上传部署文件到OSS成功 ✅")
-            }
+            // 源文件地址
+            def sourceFile = "${env.WORKSPACE}/${mavenPackageLocation}"
+            // 目标文件
+            def targetFile = "iot/${env.JOB_NAME}/${PROJECT_NAME}-${ENV_TYPE}-${env.BUILD_NUMBER}.${javaPackageType}"
+            javaOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
+            println "${javaOssUrl}"
+            Tools.printColor(this, "上传部署文件到OSS成功 ✅")
+
         } catch (error) {
             println "上传部署文件到OSS异常"
             println error.getMessage()
-        }
-    }
-}
-
-/**
- * 上传部署文件到远程云端
- */
-def uploadRemote(filePath) {
-    // ssh免密登录检测和设置
-    autoSshLogin()
-    timeout(time: 1, unit: 'MINUTES') {
-        // 同步脚本和配置到部署服务器
-        syncScript()
-    }
-    Tools.printColor(this, "上传部署文件到远程云端 🚀 ")
-    def projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
-    if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
-        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-            sh "cd ${filePath} && scp ${proxyJumpSCPText} ${npmPackageLocation} " +
-                    "${remote.user}@${remote.host}:${projectDeployFolder}"
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-            // 上传前删除部署目录的jar包 防止名称修改等导致多个部署目标jar包存在  jar包需要唯一性
-            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd ${projectDeployFolder} && rm -f *.${javaPackageType}' "
-            // 上传构建包到远程服务器
-            sh "cd ${filePath} && scp ${proxyJumpSCPText} ${mavenPackageLocation} " +
-                    "${remote.user}@${remote.host}:${projectDeployFolder} "
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
-            // Go语言打包产物 上传包到远程服务器
-            sh "cd ${filePath} && scp ${proxyJumpSCPText} main.go ${remote.user}@${remote.host}:${projectDeployFolder} "
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-            // Python语言打包产物 上传包到远程服务器
-            // sh "cd ${filePath}/dist && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
-            dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
-                sh "scp ${proxyJumpSCPText} python.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
-            }
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) {
-            // C++语言打包产物 上传包到远程服务器
-            sh "cd ${filePath} && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
         }
     }
 }
@@ -618,114 +576,19 @@ def uploadRemote(filePath) {
  * 每一个人都有点击执行流水线权限  但是不一定有发布上线的权限 为了保证项目稳定安全等需要人工审批
  */
 def manualApproval() {
-    // 针对生产环境部署前做人工发布审批
-    if ("${IS_PROD}" == 'true') {
-        // 选择具有审核权限的人员 可以配置一个或多个
-        def approvalPersons = ["潘维吉"] // 多审批人数组 参数化配置 也可指定审批人
-        def approvalPersonMobiles = ["18863302302"] // 审核人的手机数组 用于钉钉通知等
 
-        // 两种审批 1. 或签(一名审批人员同意或拒绝即可) 2. 会签(须所有审批人同意)
-        if ("${approvalPersons}".contains("${BUILD_USER}")) {
-            // 如果是有审核权限人员发布的跳过本次审核
-        } else {
-            // 同时钉钉通知到审核人 点击链接自动进入要审核流水线  如果Jenkins提供Open API审核可直接在钉钉内完成点击审批
-            DingTalk.notice(this, "${DING_TALK_CREDENTIALS_ID}", "发布流水线申请人工审批 ✍🏻 ",
-                    "#### ${BUILD_USER}申请发布${PROJECT_NAME}服务, [请您审批](${env.BUILD_URL}) 👈🏻  !" +
-                            " \n ###### Jenkins  [运行日志](${env.BUILD_URL}console)  " +
-                            " \n ###### 发布人: ${BUILD_USER}" +
-                            " \n ###### 通知时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
-                    "${approvalPersonMobiles}".split(","))
-            input {
-                message "请【${approvalPersons.split(",")}】相关人员审批本次部署, 是否同意继续发布 ?"
-                ok "同意"
-            }
-            def currentUser = env.BUILD_USER
-            println(currentUser)
-            if (!"${approvalPersons}".contains(currentUser)) {
-                error("人工审批失败, 您没有审批的权限, 请重新运行流水线发起审批 ❌")
-            } else {
-                // 审核人同意后通知发布人 消息自动及时高效传递
-                DingTalk.notice(this, "${DING_TALK_CREDENTIALS_ID}", "您发布流水线已被${currentUser}审批同意 ✅",
-                        "#### 前往流水线 [查看](${env.BUILD_URL})  !" +
-                                " \n ###### 审批时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
-                        "${BUILD_USER_MOBILE}")
-            }
-        }
-    }
-}
-
-/**
- * 部署启动运行项目
- */
-def runProject() {
-    // 初始化docker
-    initDocker()
-    try {
-        if ("${IS_PUSH_DOCKER_REPO}" == 'true') {
-            // 拉取远程仓库Docker镜像
-            Docker.pull(this, "${dockerBuildImageName}")
-        }
-        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/web " +
-                    "&& ./docker-release-web.sh '${SHELL_WEB_PARAMS_GETOPTS}' ' "
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-            // 部署之前的相关操作
-            beforeRunProject()
-            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} " +
-                    "&& ./docker-release.sh '${SHELL_PARAMS_GETOPTS}' '  "
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
-            // Go.deploy(this)
-            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/go " +
-                    "&& ./docker-release-go.sh '${SHELL_PARAMS_GETOPTS}' '  "
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/python " +
-                    "&& ./docker-release-python.sh '${SHELL_PARAMS_GETOPTS}' '  "
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) {
-            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/cpp " +
-                    "&& ./docker-release-cpp.sh '${SHELL_PARAMS_GETOPTS}' '  "
-        }
-    } catch (error) {
-        println error.getMessage()
-        currentBuild.result = 'FAILURE'
-        error("部署运行步骤出现异常 ❌")
-    }
 }
 
 /**
  * 集成测试
  */
 def integrationTesting() {
-    // 可先动态传入数据库名称部署集成测试应用 启动测试完成销毁 再重新部署业务应用
     try {
-        // 创建JMeter性能报告
-        Tests.createJMeterReport(this)
-        // 创建冒烟测试报告
-        Tests.createSmokeReport(this)
 
-        // 结合YApi接口管理做自动化API测试
-        def yapiUrl = "http://yapi.panweiji.com"
-        def testUrl = "${yapiUrl}/api/open/run_auto_test?${AUTO_TEST_PARAM}"
-        // 执行接口测试
-        def content = HttpRequest.get(this, "${testUrl}")
-        def json = readJSON text: "${content}"
-        def failedNum = "${json.message.failedNum}"
-        def projectId = "${AUTO_TEST_PARAM}".trim().split("&")[2].split("=")[0].replaceAll("env_", "")
-        def testCollectionId = "${AUTO_TEST_PARAM}".trim().split("&")[0].replaceAll("id=", "")
-        DingTalk.notice(this, "${DING_TALK_CREDENTIALS_ID}", "自动化API集成测试报告 🙋",
-                "#### ${json.message.msg} \n #### 测试报告: [查看结果](${testUrl.replace("mode=json", "mode=html")}) 🚨" +
-                        "\n ##### 测试总耗时:  ${json.runTime} \n ##### 测试用例不完善也可导致不通过 👉[去完善](${yapiUrl}/project/${projectId}/interface/col/${testCollectionId})  ",
-                "${failedNum}" == "0" ? "" : "${BUILD_USER_MOBILE}")
     } catch (e) {
         println "自动化集成测试失败 ❌"
         println e.getMessage()
     }
-}
-
-/**
- * 自动设置免密连接 用于CI/CD服务器和应用部署服务器免密通信  避免手动批量设置繁琐重复劳动
- */
-def autoSshLogin() {
-    SecureShell.autoSshLogin(this)
 }
 
 /**
@@ -750,11 +613,7 @@ def initDocker() {
  */
 def archive() {
     try {
-        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-            archiveArtifacts artifacts: "${npmPackageLocation}", onlyIfSuccessful: true
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-            archiveArtifacts artifacts: "${mavenPackageLocation}", onlyIfSuccessful: true
-        }
+        // archiveArtifacts artifacts: "${iotPackageLocation}", onlyIfSuccessful: true
     } catch (error) {
         println "归档文件异常"
         println error.getMessage()
@@ -767,11 +626,7 @@ def archive() {
 def deletePackagedOutput() {
     try {
         //if ("${IS_PROD}" != 'true') {
-        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-            sh " rm -f ${npmPackageLocation} "
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-            sh " rm -f ${mavenPackageLocation} "
-        }
+        // sh " rm -f ${iotPackageLocation} "
         //}
     } catch (error) {
         println "删除打包产出物异常"
@@ -787,20 +642,12 @@ def alwaysPost() {
     // cleanWs()  // 清空工作空间
     // Jenkins全局安全配置->标记格式器内设置Safe HTML支持html文本
     try {
-        def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
-        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-            currentBuild.description = "${IS_GEN_QR_CODE == 'true' ? "<img src=${qrCodeOssUrl} width=250 height=250 > <br/> " : ""}" +
-                    "<a href='http://${remote.host}:${SHELL_HOST_PORT}'> 👉URL访问地址</a> " +
-                    "<br/> 项目: ${PROJECT_NAME}" +
-                    "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
-                    "<br/> 大小: ${webPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-            currentBuild.description = "<a href='http://${remote.host}:${SHELL_HOST_PORT}'> 👉API访问地址</a> " +
-                    "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉直接下载构建${javaPackageType}包</a>" : ""}" +
-                    "<br/> 项目: ${PROJECT_NAME}" +
-                    "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
-                    "<br/> 大小: ${javaPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
-        }
+        def releaseEnvironment = "${ENV_TYPE}"
+        currentBuild.description = "<a href='http://${remote.host}'> 👉下载地址</a> " +
+                "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉 固件直接下载</a>" : ""}" +
+                "<br/> 项目: ${PROJECT_NAME}" +
+                "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
+                "<br/> 大小: ${javaPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
     } catch (error) {
         println error.getMessage()
     }
@@ -852,9 +699,6 @@ def dingNotice(int type, msg = '', atMobiles = '') {
         if (notifierPhone == "oneself") { // 通知自己
             notifierPhone = "${BUILD_USER_MOBILE}"
         }
-        if ("${IS_ROLL_DEPLOY}" == 'false' && "${IS_BLUE_GREEN_DEPLOY}" == 'false') {
-            MACHINE_TAG = "" // 不是多节点部署不添加机器标识
-        }
         def rollbackTag = ""
         if (params.DEPLOY_MODE == GlobalVars.rollback) {
             rollbackTag = "**回滚版本号: ${ROLLBACK_BUILD_ID}**" // 回滚版本添加标识
@@ -867,16 +711,13 @@ def dingNotice(int type, msg = '', atMobiles = '') {
             monorepoProjectName = "MonoRepo项目: ${PROJECT_NAME}"   // 单体仓库区分项目
         }
         def projectTypeName = ""
-        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-            projectTypeName = "前端"
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-            projectTypeName = "后端"
-        }
+
         def envTypeMark = "内测版"  // 环境类型标志
         if ("${IS_PROD}" == 'true') {
             envTypeMark = "正式版"
         }
-        def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
+        def releaseEnvironment = "${ENV_TYPE}"
+        def isHealthCheckFail = false
         if (type == 0) { // 失败
             if (!isHealthCheckFail) {
                 dingtalk(
@@ -896,77 +737,25 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                 )
             }
         } else if (type == 1) { // 部署完成
-            if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-                // 生成二维码 方便手机端扫描
-                genQRCode()
-                dingtalk(
-                        robot: "${DING_TALK_CREDENTIALS_ID}",
-                        type: 'ACTION_CARD',
-                        title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
-                        text: [
-                                "![screenshot](${qrCodeOssUrl})",
-                                "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL})",
-                                "##### 版本信息",
-                                "- Nginx Web服务启动${msg}",
-                                "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
-                                "- 构建版本: ${NODE_VERSION}   包大小: ${webPackageSize}",
-                                "${monorepoProjectName}",
-                                "###### ${rollbackTag}",
-                                "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
-                                "###### 访问URL: [${healthCheckUrl}](${healthCheckUrl})",
-                                "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
-                                "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
-                                "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                        ],
-                        btns: [
-                                [
-                                        title    : "直接访问URL地址",
-                                        actionUrl: "${healthCheckUrl}"
-                                ]
-                        ],
-                        at: [isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone)]
-                )
-            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-                def javaInfo = ""
-                if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-                    javaInfo = "构建版本: JDK${JDK_VERSION}   包大小: ${javaPackageSize}"
-                    if ("${javaOssUrl}".trim() != '') {
-                        javaInfo = javaInfo + "\n [直接下载构建${javaPackageType}包](${javaOssUrl})  👈"
-                    }
-                }
-                dingtalk(
-                        robot: "${DING_TALK_CREDENTIALS_ID}",
-                        type: 'MARKDOWN',
-                        title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
-                        text: [
-                                "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL})",
-                                "#### · CI构建CD部署完成 👌",
-                                "#### · 服务端项目启动运行${msg}",
-                                "###### ${rollbackTag}",
-                                "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
-                                "###### 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
-                                "###### ${javaInfo}",
-                                "###### API地址: [${healthCheckUrl}](${healthCheckUrl})",
-                                "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})", // Sonar地址  [查看](http://182.92.126.7:9000/)
-                                "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
-                                "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                        ],
-                        at: [isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone)]
-                )
-            }
-        } else if (type == 2) { // 部署之前
             dingtalk(
                     robot: "${DING_TALK_CREDENTIALS_ID}",
                     type: 'MARKDOWN',
-                    title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署前通知",
+                    title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
                     text: [
-                            "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${envTypeMark}${projectTypeName}](${env.JOB_URL})",
-                            "#### ${PROJECT_TAG}服务部署启动中 🚀  请稍等...  ☕",
-                            "###### 发布人: ${BUILD_USER}",
+                            "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName}](${env.JOB_URL})",
+                            "#### · CI构建CD部署完成 👌",
+                            "#### · 服务端项目启动运行${msg}",
+                            "###### ${rollbackTag}",
+                            "###### 持续时间: ${durationTimeString}",
+                            "###### 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
+                            "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})", // Sonar地址  [查看](http://182.92.126.7:9000/)
+                            "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
                             "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
                     ],
-                    at: []
+                    at: [isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone)]
             )
+        } else if (type == 2) { // 部署之前
+
         } else if (type == 3) { // 变更记录
             if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
                 def gitChangeLog = changeLog.genChangeLog(this, 10)
