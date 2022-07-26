@@ -83,7 +83,6 @@ def call(String type = 'iot', Map map) {
                 DING_TALK_CREDENTIALS_ID = "${map.ding_talk_credentials_id}" // 钉钉授信ID 系统设置里面配置 自动生成
                 PROJECT_TAG = "${map.project_tag}" // 项目标签或项目简称
                 IS_PROD = "${map.is_prod}" // 是否是生产环境
-                IS_BEFORE_DEPLOY_NOTICE = "${map.is_before_deploy_notice}" // 是否进行部署前通知
                 IS_AUTO_TRIGGER = false // 是否是自动触发构建
                 IS_ARCHIVE = false // 是否归档
                 IS_CODE_QUALITY_ANALYSIS = false // 是否进行代码质量分析的总开关
@@ -209,7 +208,7 @@ def call(String type = 'iot', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (IS_K8S_DEPLOY == false)  // k8s集群部署 镜像方式无需上传到服务器
+                            return false
                         }
                     }
                     steps {
@@ -377,7 +376,7 @@ def getInitParams(map) {
     // println "${jsonParams}"
     REPO_URL = jsonParams.REPO_URL ? jsonParams.REPO_URL.trim() : "" // Git源码地址
     BRANCH_NAME = jsonParams.BRANCH_NAME ? jsonParams.BRANCH_NAME.trim() : GlobalVars.defaultBranch  // Git默认分支
-    PROJECT_TYPE = jsonParams.PROJECT_TYPE ? jsonParams.PROJECT_TYPE.trim() : ""  // 项目类型 1. 嵌入式  2. VR AR XR  3. 元宇宙
+    PROJECT_TYPE = jsonParams.PROJECT_TYPE ? jsonParams.PROJECT_TYPE.trim() : "1"  // 项目类型 1. 嵌入式  2. VR AR XR  3. 元宇宙
     // 计算机语言类型 1. C++  2. C  3. Python 4. JavaScript 5. Rust
     COMPUTER_LANGUAGE = jsonParams.COMPUTER_LANGUAGE ? jsonParams.COMPUTER_LANGUAGE.trim() : "1"
     // 项目名 获取部署资源位置和指定构建模块名等

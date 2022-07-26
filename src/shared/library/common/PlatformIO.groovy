@@ -20,7 +20,7 @@ class PlatformIO implements Serializable {
         } else {
             ctx.sh " pio ci "
         }
-        // ctx.sh " platformio run -d ./example/ "  // 构建产物位置: example/.pio/build/esp32dev/firmware.bin
+        // ctx.sh " platformio run -d ./example/ "  // 构建烧录固件位置: example/.pio/build/esp32dev/firmware.bin
     }
 
     /**

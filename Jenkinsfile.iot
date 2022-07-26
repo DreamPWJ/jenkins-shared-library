@@ -49,16 +49,17 @@ iotSharedLibrary(map)
 /*
 
 test-embedded-monorepo
-测试IOT物联网嵌入式项目
+测试IoT物联网嵌入式项目
 
 */
+
 JSON_PARAMS
 {
     "REPO_URL" : "http://47.102.214.33/lanneng_develop/embedded-monorepo.git" ,
     "BRANCH_NAME" : "develop" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "esp32-demo" ,
-    "IS_MONO_REPO": true,
+    "IS_MONO_REPO" : true ,
 }
 
 */
