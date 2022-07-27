@@ -14,9 +14,9 @@ features:
   - icon: https://gw.alipayobjects.com/zos/bmw-prod/d60657df-0822-4631-9d7c-e7a869c2f21c/k79dmz3q_w126_h126.png
     title: 易用
     desc: 简单易用, 动态参数化配置让您一分钟搞定CI/CD流水线, 代码共享使迭代配置维护更简单, 全Docker化与大量的自动化脚本使您无需人工配置搭建环境等
-  - icon: https://gw.alipayobjects.com/zos/bmw-prod/d1ee0c6f-5aed-4a45-a507-339a4bfe076c/k7bjsocq_w144_h144.png
-    title: 跨端
-    desc: 丰富跨端, APP端Android、iOS、Flutter、React Native、Unity, 服务端Java、Go、Python、C++多语言, 小程序端原生与Taro跨端, Web大前端所有JavaScript语言, 桌面端Electron等
+    - icon: https://gw.alipayobjects.com/zos/bmw-prod/d1ee0c6f-5aed-4a45-a507-339a4bfe076c/k7bjsocq_w144_h144.png
+      title: 跨端
+      desc: 丰富跨端, APP端Android、iOS、Flutter、React Native、Unity, 服务端Java、Go、Python、C++多语言, 小程序端原生与Taro跨端, Web大前端所有JavaScript语言, 桌面端Electron, IoT物联网端等
 footer: 潘维吉 MIT Licensed | Copyright © 2022<br />Powered by [dumi](https://d.umijs.org)
 ---
 

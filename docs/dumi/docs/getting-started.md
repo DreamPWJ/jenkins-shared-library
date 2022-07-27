@@ -37,6 +37,7 @@ Design a general and fully automated DevOps to improve the efficiency and qualit
 - Large front-end: JavaScript language: static web and multi-version Node mainstream frameworks and mainstream cross-platform frameworks
 - Server: Multi-version Java, Go, Python, C++
 - Desktop: Electron, Unity (Windows, MacOS, Linux)
+- IoT: Embedded (PlatformIO, Arduino)
 - Visual Engine: Unity, WebGL, Cocos
 - Warehouse method: Single warehouse multi-package MonoRepo, multi-warehouse single package MultiRepo
 - Deployment method: stand-alone deployment, mirror warehouse, blue-green deployment, rolling deployment, distributed deployment, K8S cluster automatic scaling, one-click rollback, automatic review and listing, springboard transparent transmission deployment, etc.
