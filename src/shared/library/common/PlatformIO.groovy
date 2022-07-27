@@ -15,11 +15,18 @@ class PlatformIO implements Serializable {
      * 多平台和多架构构建系统
      */
     static def build(ctx) {
+        def monorepoProjectDir = "" // 工程目录
         if ("${ctx.IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
+            monorepoProjectDir = "${ctx.MONO_REPO_MAIN_PACKAGE}/${ctx.PROJECT_NAME}"
+        }
+        ctx.dir("${ctx.env.WORKSPACE}/${monorepoProjectDir}") {
             // ctx.sh " pio ci ${ctx.MONO_REPO_MAIN_PACKAGE}/${ctx.PROJECT_NAME} "
-           ctx.sh " platformio run -d ./${ctx.MONO_REPO_MAIN_PACKAGE}/${ctx.PROJECT_NAME} "  // 构建烧录固件位置: .pio/build/*/firmware.bin
-        } else {
-            ctx.sh " platformio run "
+            ctx.sh " platformio run  "  // -d ./${ctx.MONO_REPO_MAIN_PACKAGE}/${ctx.PROJECT_NAME}
+            // 构建烧录固件位置: .pio/build/*/firmware.bin
+            def binFile = Utils.getShEchoResult(ctx, "find .pio/build/*/firmware.bin")
+            ctx.println(binFile)
+            def packageSize = Utils.getFileSize(ctx, binFile)
+            ctx.println("固件大小: " + packageSize)
         }
     }
 

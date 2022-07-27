@@ -17,7 +17,7 @@ map.put('default_git_branch', ' ')
 map.put('build_num_keep', 1)
 
 // 项目标签或项目简称
-map.put('project_tag', ' ')
+map.put('project_tag', 'IoT物联网')
 
 // 是否是生产环境
 map.put('is_prod', false)

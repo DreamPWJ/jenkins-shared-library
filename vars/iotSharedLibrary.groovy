@@ -94,7 +94,7 @@ def call(String type = 'iot', Map map) {
                 //失败重试次数
                 retry(0)
                 //超时时间 job会自动被终止
-                timeout(time: 90, unit: 'MINUTES')
+                timeout(time: 120, unit: 'MINUTES')
                 //保持构建的最大个数
                 buildDiscarder(logRotator(numToKeepStr: "${map.build_num_keep}", artifactNumToKeepStr: "${map.build_num_keep}"))
                 //控制台输出增加时间戳
@@ -193,7 +193,7 @@ def call(String type = 'iot', Map map) {
                         docker {
                             // PlatformIO 环境  构建完成自动删除容器  https://hub.docker.com/r/infinitecoding/platformio-for-ci
                             image "infinitecoding/platformio-for-ci:latest"
-                            args " "
+                            args " -v /root/.platformio:/root/.platformio "
                             reuseNode true // 使用根节点
                         }
                     }
@@ -275,7 +275,7 @@ def call(String type = 'iot', Map map) {
                     }
                     steps {
                         script {
-                            if ("${params.IS_DING_NOTICE}" == 'true' && params.IS_HEALTH_CHECK == false) {
+                            if ("${params.IS_DING_NOTICE}" == 'true') {
                                 dingNotice(1, "成功") // ✅
                             }
                         }
@@ -381,6 +381,8 @@ def getInitParams(map) {
     COMPUTER_LANGUAGE = jsonParams.COMPUTER_LANGUAGE ? jsonParams.COMPUTER_LANGUAGE.trim() : "1"
     // 项目名 获取部署资源位置和指定构建模块名等
     PROJECT_NAME = jsonParams.PROJECT_NAME ? jsonParams.PROJECT_NAME.trim() : ""
+    // 环境类型变量设置
+    ENV_TYPE = jsonParams.ENV_TYPE ? jsonParams.ENV_TYPE.trim() : ""
 
     // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
     IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true
