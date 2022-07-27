@@ -276,7 +276,7 @@ def call(String type = 'iot', Map map) {
                     steps {
                         script {
                             if ("${params.IS_DING_NOTICE}" == 'true') {
-                                dingNotice(1, "成功") // ✅
+                                dingNotice(1, "成功 ✅ ") // ✅
                             }
                         }
                     }
@@ -748,7 +748,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                     text: [
                             "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName}](${env.JOB_URL})",
                             "#### · CI构建CD部署完成 👌",
-                            "#### · 服务端项目启动运行${msg}",
+                            "#### · 固件构建打包${msg}",
                             "###### ${rollbackTag}",
                             "###### 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
                             "###### 持续时间: ${durationTimeString}   固件大小: ${iotPackageSize}",
