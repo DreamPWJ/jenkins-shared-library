@@ -33,6 +33,7 @@
 - 大前端: JavaScript语言: 静态Web与多版本Node主流框架以及主流跨平台框架
 - 服务端: 多版本Java语言、Go语言、Python语言、C++语言
 - 桌面端: Electron、Unity  (Windows、MacOS、Linux)
+- IoT物联网端: 嵌入式(PlatformIO、Arduino)
 - 视觉引擎: Unity、WebGL、Cocos
 - 仓库方式: 单仓多包式MonoRepo、多仓单包式MultiRepo
 - 部署方式: 单机部署、镜像仓库、蓝绿部署、滚动部署、分布式部署、K8S集群自动扩缩容、一键回滚、自动提审上架、跳板机透传部署等

@@ -84,7 +84,7 @@ def call(String type = 'iot', Map map) {
                 PROJECT_TAG = "${map.project_tag}" // 项目标签或项目简称
                 IS_PROD = "${map.is_prod}" // 是否是生产环境
                 IS_AUTO_TRIGGER = false // 是否是自动触发构建
-                IS_ARCHIVE = false // 是否归档
+                IS_ARCHIVE = true // 是否归档
                 IS_CODE_QUALITY_ANALYSIS = false // 是否进行代码质量分析的总开关
                 IS_INTEGRATION_TESTING = false // 是否进集成测试
                 IS_NOTICE_CHANGE_LOG = "${map.is_notice_change_log}" // 是否通知变更记录
@@ -323,8 +323,7 @@ def call(String type = 'iot', Map map) {
                 success {
                     script {
                         echo '当前成功时运行'
-                        deletePackagedOutput()
-                        //deployMultiEnv()
+                        // deletePackagedOutput()
                     }
                 }
                 failure {
@@ -392,7 +391,7 @@ def getInitParams(map) {
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
     // 嵌入式框架类型 1. Arduino  2. ESP-IDF
-    JAVA_FRAMEWORK_TYPE = jsonParams.JAVA_FRAMEWORK_TYPE ? jsonParams.JAVA_FRAMEWORK_TYPE.trim() : "1"
+    IOT_FRAMEWORK_TYPE = jsonParams.IOT_FRAMEWORK_TYPE ? jsonParams.IOT_FRAMEWORK_TYPE.trim() : "1"
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
@@ -415,10 +414,14 @@ def getInitParams(map) {
 
     // tag版本变量定义
     tagVersion = ""
-    // IOT产物构建包OSS地址Url
+    // IoT产物构建包OSS地址Url
     iotOssUrl = ""
-    // IOT产物构建包大小
+    // IoT产物构建包大小
     iotPackageSize = ""
+    // IoT产物构建固件位置
+    iotPackageLocation = ""
+    // IoT产物构建固件文件格式
+    iotPackageType = "bin" // hex
 }
 
 /**
@@ -559,11 +562,11 @@ def uploadOss() {
     if ("${IS_UPLOAD_OSS}" == 'true') {
         try {
             // 源文件地址
-            def sourceFile = "${env.WORKSPACE}/${mavenPackageLocation}"
+            def sourceFile = "${iotPackageLocation}"
             // 目标文件
-            def targetFile = "iot/${env.JOB_NAME}/${PROJECT_NAME}-${ENV_TYPE}-${env.BUILD_NUMBER}.${javaPackageType}"
-            javaOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
-            println "${javaOssUrl}"
+            def targetFile = "iot/${env.JOB_NAME}/${PROJECT_NAME}-${ENV_TYPE}-${env.BUILD_NUMBER}.${iotPackageType}"
+            iotOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
+            println "${iotOssUrl}"
             Tools.printColor(this, "上传部署文件到OSS成功 ✅")
 
         } catch (error) {
@@ -615,7 +618,7 @@ def initDocker() {
  */
 def archive() {
     try {
-        // archiveArtifacts artifacts: "${iotPackageLocation}", onlyIfSuccessful: true
+        archiveArtifacts artifacts: "${iotPackageLocation}", onlyIfSuccessful: true
     } catch (error) {
         println "归档文件异常"
         println error.getMessage()
@@ -628,7 +631,7 @@ def archive() {
 def deletePackagedOutput() {
     try {
         //if ("${IS_PROD}" != 'true') {
-        // sh " rm -f ${iotPackageLocation} "
+        sh " rm -f ${iotPackageLocation} "
         //}
     } catch (error) {
         println "删除打包产出物异常"
@@ -645,11 +648,10 @@ def alwaysPost() {
     // Jenkins全局安全配置->标记格式器内设置Safe HTML支持html文本
     try {
         def releaseEnvironment = "${ENV_TYPE}"
-        currentBuild.description = "<a href='http://${remote.host}'> 👉下载地址</a> " +
-                "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉 固件直接下载</a>" : ""}" +
+        currentBuild.description = "${iotOssUrl.trim() != '' ? "<br/><a href='${iotOssUrl}'> 👉 固件直接下载</a>" : ""}" +
                 "<br/> 项目: ${PROJECT_NAME}" +
                 "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
-                "<br/> 大小: ${javaPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
+                "<br/> 大小: ${iotPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
     } catch (error) {
         println error.getMessage()
     }
@@ -709,7 +711,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
             rollbackTag = "**Git Tag构建版本: ${params.GIT_TAG}**" // Git Tag版本添加标识
         }
         def monorepoProjectName = ""
-        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && "${IS_MONO_REPO}" == 'true') {
+        if ("${IS_MONO_REPO}" == 'true') {
             monorepoProjectName = "MonoRepo项目: ${PROJECT_NAME}"   // 单体仓库区分项目
         }
         def projectTypeName = ""
@@ -748,8 +750,8 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                             "#### · CI构建CD部署完成 👌",
                             "#### · 服务端项目启动运行${msg}",
                             "###### ${rollbackTag}",
-                            "###### 持续时间: ${durationTimeString}",
                             "###### 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
+                            "###### 持续时间: ${durationTimeString}   固件大小: ${iotPackageSize}",
                             "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})", // Sonar地址  [查看](http://182.92.126.7:9000/)
                             "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
                             "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"

@@ -16,7 +16,7 @@ features:
     desc: Simple and easy to use, dynamic parameterized configuration allows you to complete the CI/CD pipeline in one minute, code sharing makes iterative configuration maintenance easier, full Dockerization and a large number of automated scripts allow you to build the environment without manual configuration, etc.
   - icon: https://gw.alipayobjects.com/zos/bmw-prod/d1ee0c6f-5aed-4a45-a507-339a4bfe076c/k7bjsocq_w144_h144.png
     title: across all ends
-    desc: Rich cross-end, APP-side Android, iOS, Flutter, React Native, Unity, server-side Java, Go, Python, C++ multi-language, applet-side native and Taro cross-end, web front-end all JavaScript languages, desktop Electron, etc.
+    desc: Rich cross-end, APP-side Android, iOS, Flutter, React Native, Unity, server-side Java, Go, Python, C++ multi-language, applet-side native and Taro cross-end, web front-end all JavaScript languages, desktop Electron, IoT etc.
 footer: 潘维吉 MIT Licensed | Copyright © 2022<br />Powered by [dumi](https://d.umijs.org)
 ---
 
