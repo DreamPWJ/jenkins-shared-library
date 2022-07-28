@@ -79,6 +79,7 @@ yum remove -y nodejs
 #### 安装Ubuntu服务器系统
 
 - 参考文章: https://bynss.com/howto/633952.html
+- 固定IP可在路由器上设置静态地址 防止被DHCP动态分配
 
 ##### 在Ubuntu上安装图形化界面
 
