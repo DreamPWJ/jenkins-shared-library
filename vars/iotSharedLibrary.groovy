@@ -548,11 +548,10 @@ def codeQualityAnalysis() {
  */
 def embeddedBuildProject() {
     sh "pio --version"
-    println("执行PlatformIO嵌入式编构建 🏗️  ")
+    println("执行嵌入式程序PlatformIO构建 🏗️  ")
     PlatformIO.build(this)
     Tools.printColor(this, "嵌入式打包成功 ✅")
 }
-
 
 /**
  * 上传部署文件到OSS
