@@ -11,6 +11,8 @@ import shared.library.GlobalVars
 
 @NonCPS
 def genChangeLog(ctx, int maxRecordsNum = 100) {
+    // Jenkins构建时只能获取变更日志 如果构建失败下次构建无法获取currentBuild变更日志
+    // 思路: 可以在上次构建失败后获取到变更日志存储, 等下次构建发现无变更日志时候再获取, 获取成功后再删除日志存储
     try {
         ctx.println("开始生成自定义变更日志")
         def changeLog = ""
