@@ -7,15 +7,15 @@
 # 防止和系统环境变量冲突 ，变量命名规则 下划线分割 如果它是你的变量，小写它。如果你导出它，大写它，而${}这种方式引用，使引用变量更明确，以减少不必要的麻烦
 
 HOST="127.0.0.1"                                         #数据库连接ip
-DATABASE="wellness_unblocked"                            #数据库名
-USER_NAME="wellness_unblocked"                           #数据库用户名
+DATABASE="test"                            #数据库名
+USER_NAME="test"                           #数据库用户名
 PASSWORD="panweiji2021!@#"                              #数据库密码
 ADMINISTRATOR="406798106@qq.com"                         #管理员
 
 date=$(date '+%Y%m%d-%H%M')                              #日期格式（作为文件名）
 backup_dir=/my/backup                                    #备份文件存储路径
 dump_file=${DATABASE}-${date}.sql                        #备份文件名(数据库名+备份时间)
-mysql_options="-u${USER_NAME} -p${PASSWORD} ${DATABASE}" #docker方式备份参数组合
+mysql_options="-u${USER_NAME} -p${PASSWORD} ${DATABASE}" #备份参数组合
 
 # 宿主机方式压缩备份
 sudo mysqldump ${mysql_options} | gzip >${backup_dir}/${dump_file}.gz
@@ -39,3 +39,5 @@ find ${backup_dir} -name "*.sql.gz" -type f -mtime +7 -exec rm -rf {} \; >/dev/n
 # service cron restart # 重启crond生效
 # crontab -l # 查看crond列表
 # GNU nano编辑器CTRL+O 再 CTRL+X 保存退出
+
+# 新版的mysqldump默认启用了一个新标志  禁用统计--column-statistics=0

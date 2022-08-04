@@ -16,7 +16,7 @@ where table_schema='database_name'
 order by table_rows desc
 limit 10;
 
-### 查看 MySQL「所有库」的容量大小
+#### 查看 MySQL「所有库」的容量大小
 
 SELECT
 table_schema as '数据库',
@@ -28,7 +28,7 @@ from information_schema.tables
 group by table_schema
 order by sum(data_length) desc, sum(index_length) desc;
 
-### binlog回滚 按时间点进行恢复 主要参数 ［–start-datetime –stop-datetime］ 指定日期间隔内的所有日志
+#### binlog回滚 按时间点进行恢复 主要参数 ［–start-datetime –stop-datetime］ 指定日期间隔内的所有日志
 
 mysqlbinlog –start-datetime='2022-04-20 10:01:00' –stop-datetime='2022-04-20 9:59:59'
 /usr/local/mysql/data/binlog.123456 | mysql -u root -p
@@ -46,7 +46,7 @@ select * from information_schema.INNODB_TRX;
 select concat('KILL ', id, ';')
 from information_schema.processlist p
 inner join information_schema.INNODB_TRX x on p.id = x.trx_mysql_thread_id
-where db = 'anjia';
+where db = 'panweiji';
 
 批量KILL执行正在提交的事务
 DataGrip批量导出CSV格式数据批量执行kill
