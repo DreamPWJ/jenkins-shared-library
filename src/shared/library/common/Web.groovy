@@ -55,7 +55,7 @@ class Web implements Serializable {
             }
 
             ctx.println("执行MonoRepo仓库构建 🏗️  ")
-            if (Git.isExistsChangeFile(ctx)) { // 自动判断是否需要下载依赖 可新增动态参数用于强制下载依赖情况
+            if (Git.isExistsChangeFile(ctx)) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
                 try {
                     // 全部下载依赖 更通用 bootstrap不仅是下载依赖资源 还建立多包之间的依赖软链
                     // Turborepo解决Monorepo多项目构建缓慢问题 充分利用CPU性能并发构建提速  同时新版Lerna v5.1集成Nx实现加速构建
