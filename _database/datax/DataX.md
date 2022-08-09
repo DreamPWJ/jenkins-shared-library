@@ -4,10 +4,14 @@
 
 cd /my
 wget http://datax-opensource.oss-cn-hangzhou.aliyuncs.com/datax.tar.gz
-tar -xzvf datax.tar.gz  && rm -rf /my/datax/plugin/*/._*
+tar -xzvf datax.tar.gz
 
 cd /my/datax/bin && python datax.py /my/datax/job/datax_job.json
 
 #### 参考文章
 
 - https://juejin.cn/post/7077744714954309669
+
+#### Ubuntu系统安装
+
+sudo apt-get install python-is-python3
