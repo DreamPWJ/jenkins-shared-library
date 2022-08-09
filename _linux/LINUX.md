@@ -32,49 +32,7 @@ tail -f /var/log/cron
 
 #### 建立免密连接
 - ssh-keygen -t rsa   root用户在/root/.ssh/id_rsa.pub
-- 公钥放在远程访问服务的/root/.ssh/authorized_keys里  执行 ssh root@ip 命令访问确认  
-   
-#### 基础环境安装
-##### 安装git
-yum install -y git
-git --version
-- 查看编辑git配置
-git config --list
-git config --global --edit
-
-##### 安装jdk
-yum search java
-yum install -y java-1.8.0-openjdk-devel.x86_64 // java-1.8.0-openjdk-devel.x86_64
-apt install -y openjdk-8-jre-headless
-java -version
-which java
-yum  remove -y java-1.8.0-openjdk.x86_64 
-
-##### 安装maven
-mkdir -p /opt/maven && cd /opt/maven && wget https://mirror.its.dal.ca/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
-tar -xzvf  apache-maven-3.6.3-bin.tar.gz
-vim /etc/profile
-
-//export JAVA_HOME=/usr/bin/java
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.9.11-0.el8_2.x86_64
-export JRE_HOME=$JAVA_HOME/jre
-export CLASSPATH=$JAVA_HOME/lib:$JRE_HOME/lib:$CLASSPATH
-export MAVEN_HOME=/opt/maven/apache-maven-3.6.3
-export PATH=$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH
-
-. /etc/profile && mvn -version
-echo $MAVEN_HOME && echo $JAVA_HOME && echo $PATH
-
-##### 安装nodejs
-
-curl -sL https://rpm.nodesource.com/setup_12.x | sudo bash -
-yum install -y nodejs
-npm install -g npm
-npm install -g n
-n 12.18.3 // n stable
-node -v && npm -v
-which node
-yum remove -y nodejs
+- 公钥放在远程访问服务的/root/.ssh/authorized_keys里  执行 ssh root@ip 命令访问确认
 
 #### 安装Ubuntu服务器系统 大部分按F12可以进入USB启动引导盘安装 (不同电脑快捷键不一样 有EFI源文件安装)
 

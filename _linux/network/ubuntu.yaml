@@ -1,0 +1,11 @@
+network:
+  ethernets:
+    enp1s0: #配置的网卡的名称 ip addr命令查看
+      addresses: [ 192.168.1.200/24 ]    #配置的静态ip地址和掩码
+      dhcp4: no    #关闭DHCP，如果需要打开DHCP则写yes
+      optional: true
+  version: 2
+
+# 1.查看网卡设备号  ip addr 并配置网卡名称
+# 2. 配置网络yaml文件  sudo nano /etc/netplan/00-installer-config.yaml    GNU nano编辑器CTRL+X 保存退出
+# 3.让配置生效  sudo netplan apply

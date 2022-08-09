@@ -17,7 +17,7 @@
                   "jdbc:mysql://192.168.1.102:3306/epark?useUnicode=true&characterEncoding=utf8"
                 ],
                 "table": [
-                  "t_member"
+                  "*"
                 ]
               }
             ]
@@ -33,14 +33,13 @@
               {
                 "jdbcUrl": "jdbc:mysql://rm-uf68e1k9e071859p05o.mysql.rds.aliyuncs.com:3306/epark?useUnicode=true&characterEncoding=utf8",
                 "table": [
-                  "t_member"
+                  "*"
                 ]
               }
             ],
             "username": "lanneng",
             "password": "lannengkeji@2022",
             "preSql": [
-              "truncate t_member"
             ],
             "session": [
               "set session sql_mode='ANSI'"
