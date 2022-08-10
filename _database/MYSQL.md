@@ -1,11 +1,7 @@
-###  DataX离线数据同步工具/平台 异构数据源之间高效的数据同步功能
+#### 开启MySql的binlog日志
 
-#### 安装DataX
-cd /my
-wget http://datax-opensource.oss-cn-hangzhou.aliyuncs.com/datax.tar.gz
-tar -xzvf datax.tar.gz
-
-cd /my/datax/bin && python datax.py /my/datax/job/datax_job.json
+- 查看 show variables like '%log_bin%'; 设置在my.inf主文件配置 log_bin=on; 后重启mysql
+- https://developer.aliyun.com/article/400581
 
 #### Mysql查询哪些表数据量最大  ShardingSphere零侵入性的分库分表、读写分离、分布式事务
 
