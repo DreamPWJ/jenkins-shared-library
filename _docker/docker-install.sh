@@ -35,6 +35,7 @@ sudo systemctl start docker
 if [[ "$(whoami)" != "root" ]]; then
   echo "非root用户设置权限 将当前用户$(whoami)添加到docker组 用于与docker服务通信"
   sudo usermod -aG docker $(whoami)
+  # 非root用户可能需要在安装完成后重启服务器 Docker服务引擎生效
 fi
 
 echo "设置国内镜像源 加速docker pull速度"

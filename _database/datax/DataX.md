@@ -4,14 +4,14 @@
 
 cd /my
 wget http://datax-opensource.oss-cn-hangzhou.aliyuncs.com/datax.tar.gz
-tar -xzvf datax.tar.gz
+tar -xzvf datax.tar.gz  && rm -rf /my/datax/plugin/*/._*
 
-cd /my/datax/bin && python datax.py /my/datax/job/datax_job.json
+cd /my/datax/bin && python2 datax.py /my/datax/job/datax_job.json
 
 #### 参考文章
 
 - https://juejin.cn/post/7077744714954309669
 
-#### Ubuntu系统安装
+#### Ubuntu系统安装  现在DataX对Python2适配更好
 
-sudo apt-get install python-is-python3
+sudo apt install -y python2 && python2 -V
