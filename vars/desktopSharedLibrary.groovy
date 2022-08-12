@@ -297,7 +297,7 @@ def call(String type = 'desktop', Map map) {
                     steps {
                         script {
                             echo "上传制品"
-                            uploadProducts()
+                            uploadProducts(map)
                         }
                     }
                 }
@@ -309,7 +309,7 @@ def call(String type = 'desktop', Map map) {
                     steps {
                         script {
                             echo "制作二维码"
-                            genQRCode()
+                            genQRCode(map)
                         }
                     }
                 }
@@ -770,16 +770,16 @@ def multiSystemBuild() {
 /**
  * 上传制品到OSS
  */
-def uploadProducts() {
+def uploadProducts(map) {
     if ("${PROJECT_TYPE}".toInteger() == GlobalVars.electron) {
         def sourceFile = "${env.WORKSPACE}/${electronPackageFile}/${buildPackageName}.${packageSuffixName}" // 源文件
         def targetFile = "desktop/${env.JOB_NAME}/${BUILD_ENVIRONMENT}/${buildPackageName}.${packageSuffixName}" // 目标文件
-        packageOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
+        packageOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
         try {
             def updateFileName = "latest.yml"
             def sourceYamlFile = "${env.WORKSPACE}/${electronPackageFile}/${updateFileName}"
             def targetYamlFile = "desktop/${env.JOB_NAME}/${BUILD_ENVIRONMENT}/${updateFileName}"
-            AliYunOss.upload(this, sourceYamlFile, targetYamlFile)
+            AliYunOSS.upload(this, map, sourceYamlFile, targetYamlFile)
         } catch (e) {
             println e.getMessage()
             println "Electron应用内升级yml文件上传失败"
@@ -793,7 +793,7 @@ def uploadProducts() {
 
         def sourceFile = "${env.WORKSPACE}/${unityWindowsPackagesOutputDir}.zip" // 源文件
         def targetFile = "desktop/${env.JOB_NAME}/${env.BUILD_NUMBER}/${unityWindowsPackagesOutputDir}.zip" // 目标文件
-        packageOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
+        packageOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
         sh "rm -f ${sourceFile}"
     }
 
@@ -804,7 +804,7 @@ def uploadProducts() {
 /**
  * 生成二维码
  */
-def genQRCode() {
+def genQRCode(map) {
     imageSuffixName = "png"
     sh "rm -f *.${imageSuffixName}"
     if ("${PROJECT_TYPE}".toInteger() == GlobalVars.electron) {
@@ -812,7 +812,7 @@ def genQRCode() {
         def sourceFile = "${env.WORKSPACE}/${buildPackageName}.${imageSuffixName}" // 源文件
         // 目标文件
         def targetFile = "desktop/${env.JOB_NAME}/${BUILD_ENVIRONMENT}/${buildPackageName}.${imageSuffixName}"
-        qrCodeOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
+        qrCodeOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
     } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.desktopFlutter) {
 
     } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.desktopUnity) {
@@ -820,7 +820,7 @@ def genQRCode() {
         def sourceFile = "${env.WORKSPACE}/${unityWindowsPackagesOutputDir}.${imageSuffixName}" // 源文件
         // 目标文件
         def targetFile = "desktop/${env.JOB_NAME}/${env.BUILD_NUMBER}/${unityWindowsPackagesOutputDir}.${imageSuffixName}"
-        qrCodeOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
+        qrCodeOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
     }
     println "生成二维码: ${qrCodeOssUrl}"
 }

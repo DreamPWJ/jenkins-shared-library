@@ -358,7 +358,7 @@ def call(String type = 'web', Map map) {
                     }
                     steps {
                         script {
-                            healthCheck()
+                            healthCheck(map)
                         }
                     }
                 }
@@ -373,7 +373,7 @@ def call(String type = 'web', Map map) {
                     steps {
                         script {
                             // 滚动部署实现多台服务按顺序更新 分布式零停机
-                            scrollToDeploy()
+                            scrollToDeploy(map)
                         }
                     }
                 }
@@ -387,7 +387,7 @@ def call(String type = 'web', Map map) {
                             // 自动打tag和生成CHANGELOG.md文件
                             gitTagLog()
                             // 钉钉通知变更记录
-                            dingNotice(3)
+                            dingNotice(map, 3)
                         }
                     }
                 }
@@ -413,7 +413,7 @@ def call(String type = 'web', Map map) {
                     }
                     steps {
                         script {
-                            rollbackVersion()
+                            rollbackVersion(map)
                         }
                     }
                 }
@@ -436,7 +436,7 @@ def call(String type = 'web', Map map) {
                 failure {
                     script {
                         echo '当前失败时才运行'
-                        dingNotice(0, "CI/CD流水线失败 ❌")
+                        dingNotice(map, 0, "CI/CD流水线失败 ❌")
                     }
                 }
                 unstable {
@@ -897,7 +897,7 @@ def runProject() {
 /**
  * 健康检测
  */
-def healthCheck(params = '') { // 可选参数
+def healthCheck(map, params = '') { // 可选参数
     if (params?.trim()) { // 为null或空判断
         // 单机滚动部署从服务
         healthCheckParams = params
@@ -915,13 +915,13 @@ def healthCheck(params = '') { // 可选参数
 
     if ("${healthCheckMsg}".contains("成功")) {
         Tools.printColor(this, "${healthCheckMsg} ✅")
-        dingNotice(1, "**成功 ✅**") // 钉钉成功通知
+        dingNotice(map, 1, "**成功 ✅**") // 钉钉成功通知
     } else if ("${healthCheckMsg}".contains("失败")) { // shell返回echo信息包含值
         isHealthCheckFail = true
         Tools.printColor(this, "${healthCheckMsg} ❌", "red")
         println("👉 健康检测失败原因分析: 首选排除CI服务器和应用服务器网络和端口是否连通, 再查看应用服务启动日志是否失败")
         // 钉钉失败通知
-        dingNotice(1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
+        dingNotice(map, 1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
         // 打印应用服务启动失败日志 方便快速排查错误
         Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动日志开始 START 👇 ------------", "red")
         sh " ssh  ${remote.user}@${remote.host} 'docker logs ${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}' "
@@ -940,7 +940,7 @@ def healthCheck(params = '') { // 可选参数
 /**
  * 滚动部署
  */
-def scrollToDeploy() {
+def scrollToDeploy(map) {
     // 负载均衡和滚动更新worker应用服务
     if ("${IS_SAME_SERVER}" == 'false') {   // 不同服务器滚动部署
         def machineNum = 1
@@ -960,7 +960,7 @@ def scrollToDeploy() {
             if (params.IS_HEALTH_CHECK == true) {
                 machineNum++
                 MACHINE_TAG = "${machineNum}号机" // 动态计算是几号机
-                healthCheck()
+                healthCheck(map)
             }
         }
     }
@@ -1024,7 +1024,7 @@ def initDocker() {
 /**
  * 回滚版本
  */
-def rollbackVersion() {
+def rollbackVersion(map) {
     if ("${ROLLBACK_BUILD_ID}" == '0') { // 默认回滚到上一个版本
         ROLLBACK_BUILD_ID = "${Integer.parseInt(env.BUILD_ID) - 2}"
     }
@@ -1034,10 +1034,10 @@ def rollbackVersion() {
     uploadRemote("${archivePath}")
     runProject()
     if (params.IS_HEALTH_CHECK == true) {
-        healthCheck()
+        healthCheck(map)
     }
     if ("${IS_ROLL_DEPLOY}" == 'true') {
-        scrollToDeploy()
+        scrollToDeploy(map)
     }
 }
 
@@ -1068,7 +1068,7 @@ def deletePackagedOutput() {
 /**
  * 生成二维码 方便手机端扫描
  */
-def genQRCode() {
+def genQRCode(map) {
     if ("${IS_GEN_QR_CODE}" == 'true') { // 是否开启二维码生成功能
         try {
             imageSuffixName = "png"
@@ -1078,7 +1078,7 @@ def genQRCode() {
             def sourceFile = "${env.WORKSPACE}/${imageName}.${imageSuffixName}" // 源文件
             def targetFile = "frontend/${env.JOB_NAME}/${env.BUILD_NUMBER}/${imageName}.${imageSuffixName}"
             // 目标文件
-            qrCodeOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
+            qrCodeOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
             println "${qrCodeOssUrl}"
         } catch (error) {
             println " 生成二维码失败 ❌ "
@@ -1142,7 +1142,7 @@ def gitTagLog() {
  * @type 0 失败 1 部署完成 2 部署之前 3 变更记录
  * @msg 自定义消息* @atMobiles 要@的手机号
  */
-def dingNotice(int type, msg = '', atMobiles = '') {
+def dingNotice(map, int type, msg = '', atMobiles = '') {
     if ("${params.IS_DING_NOTICE}" == 'true') { // 是否钉钉通知
         println("钉钉通知: " + params.NOTIFIER_PHONES)
         // 格式化持续时间
@@ -1191,7 +1191,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
             }
         } else if (type == 1) { // 部署完成
             // 生成二维码 方便手机端扫描
-            genQRCode()
+            genQRCode(map)
             dingtalk(
                     robot: "${DING_TALK_CREDENTIALS_ID}",
                     type: 'ACTION_CARD',

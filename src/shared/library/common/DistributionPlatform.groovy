@@ -11,11 +11,11 @@ class DistributionPlatform implements Serializable {
     /**
      *  上传自建OSS分发 不依赖受限第三方分发平台
      */
-    static def uploadOss(ctx, appName, filePosition) {
+    static def uploadOss(ctx, map, appName, filePosition) {
         ctx.println("上传自建OSS分发 🚀")
         def sourceFile = "${ctx.env.WORKSPACE}/${filePosition}/${appName}" // 源文件
         def targetFile = "${ctx.SYSTEM_TYPE_NAME.toLowerCase()}/${ctx.env.JOB_NAME}/${appName}" // 目标文件
-        def packageOssUrl = AliYunOss.upload(ctx, sourceFile, targetFile)
+        def packageOssUrl = AliYunOSS.upload(ctx, map, sourceFile, targetFile)
         return packageOssUrl
     }
 

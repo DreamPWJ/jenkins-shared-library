@@ -1,0 +1,63 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": "5",
+        "byte": 10485760,
+        "record": 1000
+      },
+      "errorLimit": {
+        "record": 0,
+        "percentage": 0.02
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "mysqlreader",
+          "parameter": {
+            "username": "test",
+            "password": "aabbcc2020",
+            "column": [
+              "*"
+            ],
+            "connection": [
+              {
+                "jdbcUrl": [
+                  "jdbc:mysql://192.168.1.102:3306/epark?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai"
+                ],
+                "table": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        },
+        "writer": {
+          "name": "mysqlwriter",
+          "parameter": {
+            "username": "root",
+            "password": "123456",
+            "column": [
+              "*"
+            ],
+            "connection": [
+              {
+                "jdbcUrl": "jdbc:mysql://rm-uf68e1k9e071859p05o.mysql.rds.aliyuncs.com:3306/epark?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai",
+                "table": [
+                  "*"
+                ]
+              }
+            ],
+            "preSql": [
+            ],
+            "session": [
+              "set session sql_mode='ANSI'"
+            ],
+            "writeMode": "insert"
+          }
+        }
+      }
+    ]
+  }
+}

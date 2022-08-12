@@ -293,7 +293,7 @@ def call(String type = 'web-java', Map map) {
                     }
                     steps {
                         script {
-                            mavenBuildProject()
+                            mavenBuildProject(map)
                         }
                     }
                 }
@@ -310,7 +310,7 @@ def call(String type = 'web-java', Map map) {
                     }
                     steps {
                         script {
-                            mavenBuildProject()
+                            mavenBuildProject(map)
                         }
                     }
                 }
@@ -424,7 +424,7 @@ def call(String type = 'web-java', Map map) {
                     }
                     steps {
                         script {
-                            runProject()
+                            runProject(map)
                         }
                     }
                 }
@@ -438,7 +438,7 @@ def call(String type = 'web-java', Map map) {
                     }
                     steps {
                         script {
-                            healthCheck()
+                            healthCheck(map)
                         }
                     }
                 }
@@ -478,7 +478,7 @@ def call(String type = 'web-java', Map map) {
                     steps {
                         script {
                             // 蓝绿部署是实现零停机部署最经济的方式 只有单个服务长期占用资源
-                            blueGreenDeploy()
+                            blueGreenDeploy(map)
                         }
                     }
                 }
@@ -500,7 +500,7 @@ def call(String type = 'web-java', Map map) {
                     steps {
                         script {
                             // 滚动部署实现多台服务按顺序更新 分布式零停机
-                            scrollToDeploy()
+                            scrollToDeploy(map)
                         }
                     }
                 }
@@ -570,7 +570,7 @@ def call(String type = 'web-java', Map map) {
                     steps {
                         script {
                             if ("${params.IS_DING_NOTICE}" == 'true' && params.IS_HEALTH_CHECK == false) {
-                                dingNotice(1, "成功") // ✅
+                                dingNotice(map, 1, "成功") // ✅
                             }
                         }
                     }
@@ -585,7 +585,7 @@ def call(String type = 'web-java', Map map) {
                             // 自动打tag和生成CHANGELOG.md文件
                             gitTagLog()
                             // 钉钉通知变更记录
-                            dingNotice(3)
+                            dingNotice(map, 3)
                         }
                     }
                 }
@@ -641,7 +641,7 @@ def call(String type = 'web-java', Map map) {
                     }
                     steps {
                         script {
-                            rollbackVersion()
+                            rollbackVersion(map)
                         }
                     }
                 }
@@ -665,7 +665,7 @@ def call(String type = 'web-java', Map map) {
                 failure {
                     script {
                         echo '当前失败时才运行'
-                        dingNotice(0, "CI/CD流水线失败 ❌")
+                        dingNotice(map, 0, "CI/CD流水线失败 ❌")
                     }
                 }
                 unstable {
@@ -1093,7 +1093,7 @@ def nodeBuildProject() {
 /**
  * Maven编译构建
  */
-def mavenBuildProject() {
+def mavenBuildProject(map) {
     if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
         // 动态切换Maven内的对应的JDK版本
         Java.switchJDKByJenv(this, "${JDK_VERSION}")
@@ -1138,7 +1138,7 @@ def mavenBuildProject() {
     javaPackageSize = Utils.getFileSize(this, mavenPackageLocation)
     Tools.printColor(this, "Maven打包成功 ✅")
     // 上传部署文件到OSS
-    uploadOss()
+    uploadOss(map)
 }
 
 /**
@@ -1187,7 +1187,7 @@ def buildImage() {
  * 上传部署文件到OSS
  * 方便下载构建部署包
  */
-def uploadOss() {
+def uploadOss(map) {
     if ("${IS_UPLOAD_OSS}" == 'true') {
         try {
             if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
@@ -1196,7 +1196,7 @@ def uploadOss() {
                 def sourceFile = "${env.WORKSPACE}/${mavenPackageLocation}"
                 // 目标文件
                 def targetFile = "java/${env.JOB_NAME}/${PROJECT_NAME}-${SHELL_ENV_MODE}-${env.BUILD_NUMBER}.${javaPackageType}"
-                javaOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
+                javaOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
                 println "${javaOssUrl}"
                 Tools.printColor(this, "上传部署文件到OSS成功 ✅")
             }
@@ -1289,7 +1289,7 @@ def manualApproval() {
 /**
  * 部署启动运行项目
  */
-def runProject() {
+def runProject(map) {
     // 初始化docker
     initDocker()
     try {
@@ -1302,7 +1302,7 @@ def runProject() {
                     "&& ./docker-release-web.sh '${SHELL_WEB_PARAMS_GETOPTS}' ' "
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
             // 部署之前的相关操作
-            beforeRunProject()
+            beforeRunProject(map)
             sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} " +
                     "&& ./docker-release.sh '${SHELL_PARAMS_GETOPTS}' '  "
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
@@ -1326,7 +1326,7 @@ def runProject() {
 /**
  * 健康检测
  */
-def healthCheck(params = '') { // 可选参数
+def healthCheck(map, params = '') { // 可选参数
     Tools.printColor(this, "开始应用服务健康探测, 请耐心等待... 🚀 ")
     if (params?.trim()) { // 为null或空判断
         // 单机分布式部署从服务
@@ -1348,13 +1348,13 @@ def healthCheck(params = '') { // 可选参数
 
     if ("${healthCheckMsg}".contains("成功")) {
         Tools.printColor(this, "${healthCheckMsg} ✅")
-        dingNotice(1, "**成功 ✅**") // 钉钉成功通知
+        dingNotice(map, 1, "**成功 ✅**") // 钉钉成功通知
     } else if ("${healthCheckMsg}".contains("失败")) { // shell返回echo信息包含值
         isHealthCheckFail = true
         Tools.printColor(this, "${healthCheckMsg} ❌", "red")
         println("👉 健康检测失败原因分析: 首选排除CI服务器和应用服务器网络是否连通、应用服务器端口是否开放, 再查看应用服务启动日志是否失败")
         // 钉钉失败通知
-        dingNotice(1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
+        dingNotice(map, 1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
         // 打印应用服务启动失败日志 方便快速排查错误
         Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志开始 START 👇 ------------", "red")
         sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'docker logs ${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}' "
@@ -1403,7 +1403,7 @@ def integrationTesting() {
 /**
  * 蓝绿部署
  */
-def blueGreenDeploy() {
+def blueGreenDeploy(map) {
     // 蓝绿部署: 好处是只用一个主单点服务资源实现部署过程中不间断提供服务
     // 1、先启动部署一个临时服务将流量切到蓝服务器上  2、再部署真正提供服务的绿服务器  3、部署完绿服务器,销毁蓝服务器,将流量切回到绿服务器
     // 镜像容器名称
@@ -1426,18 +1426,18 @@ def blueGreenDeploy() {
             } else {
                 uploadRemote(Utils.getShEchoResult(this, "pwd"))
             }
-            runProject()
+            runProject(map)
             if (params.IS_HEALTH_CHECK == true) {
                 MACHINE_TAG = "蓝机"
-                healthCheck()
+                healthCheck(map)
             }
         }
         // 再部署真正提供服务的绿服务器
         remote.host = mainServerIp
-        runProject()
+        runProject(map)
         if (params.IS_HEALTH_CHECK == true) {
             MACHINE_TAG = "绿机"
-            healthCheck()
+            healthCheck(map)
         }
         // 部署完绿服务器,销毁蓝服务器,将流量切回到绿服务器
         sh " ssh ${proxyJumpSSHText} ${remote.user}@${blueServerIp} ' docker stop ${dockerContainerName} --time=0 || true && docker rm ${dockerContainerName} || true ' "
@@ -1460,7 +1460,7 @@ def blueGreenDeploy() {
                 try {
                     MACHINE_TAG = "蓝机"
                     healthCheckUrl = "http://${remote.host}:${workHostPort}/"
-                    healthCheck(" -a ${PROJECT_TYPE} -b ${healthCheckUrl}")
+                    healthCheck(map, " -a ${PROJECT_TYPE} -b ${healthCheckUrl}")
                 } catch (error) {
                     // 注意：这地方是使用的旧镜像部署，会导致一个问题，如果旧镜像本身就有问题，会导致部署失败，因为永远无法使用新镜像
                     println error.getMessage()
@@ -1468,10 +1468,10 @@ def blueGreenDeploy() {
                 }
             }
             // 再部署真正提供服务的绿服务器
-            runProject()
+            runProject(map)
             if (params.IS_HEALTH_CHECK == true) {
                 MACHINE_TAG = "绿机"
-                healthCheck()
+                healthCheck(map)
             }
             sleep(time: 2, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
             // 部署完绿服务器,销毁蓝服务器,将流量切回到绿服务器
@@ -1486,7 +1486,7 @@ def blueGreenDeploy() {
 /**
  * 滚动部署
  */
-def scrollToDeploy() {
+def scrollToDeploy(map) {
     // 主从架构与双主架构等  负载均衡和滚动更新worker应用服务
     if ("${IS_SAME_SERVER}" == 'false') {   // 不同服务器滚动部署
         def machineNum = 1
@@ -1505,13 +1505,13 @@ def scrollToDeploy() {
             } else {
                 // 如果配置多节点动态替换不同的配置文件重新执行maven构建打包或者直接替换部署服务器文件
                 if ("${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-                    mavenBuildProject() // 需要mvn jdk构建环境
+                    mavenBuildProject(map) // 需要mvn jdk构建环境
                 }
                 uploadRemote(Utils.getShEchoResult(this, "pwd"))
             }
-            runProject()
+            runProject(map)
             if (params.IS_HEALTH_CHECK == true) {
-                healthCheck()
+                healthCheck(map)
             }
         }
     } else if ("${IS_SAME_SERVER}" == 'true') {  // 单机滚动部署 适用于服务器资源有限 又要实现零停机随时部署发布
@@ -1530,7 +1530,7 @@ def scrollToDeploy() {
             if (params.IS_HEALTH_CHECK == true && !dokcerReleaseWorkerMsg.contains("跳过执行")) {
                 MACHINE_TAG = "2号机"
                 healthCheckUrl = "http://${remote.host}:${workHostPort}/"
-                healthCheck(" -a ${PROJECT_TYPE} -b ${healthCheckUrl}")
+                healthCheck(map, " -a ${PROJECT_TYPE} -b ${healthCheckUrl}")
             }
         }
     }
@@ -1610,11 +1610,11 @@ def existCiCode() {
 /**
  * 部署运行之前操作
  */
-def beforeRunProject() {
+def beforeRunProject(map) {
     // 多节点部署无感知不执行部署前通知
     if ("${IS_BEFORE_DEPLOY_NOTICE}" == 'true' && "${IS_ROLL_DEPLOY}" == 'false' && "${IS_BLUE_GREEN_DEPLOY}" == 'false') {
         // 部署之前通知
-        dingNotice(2)
+        dingNotice(map, 2)
     }
     try {
         if ("${IS_GRACE_SHUTDOWN}" == 'true') {
@@ -1637,7 +1637,7 @@ def initDocker() {
 /**
  * 回滚版本
  */
-def rollbackVersion() {
+def rollbackVersion(map) {
     if ("${ROLLBACK_BUILD_ID}" == '0') { // 默认回滚到上一个版本
         ROLLBACK_BUILD_ID = "${Integer.parseInt(env.BUILD_ID) - 2}"
     }
@@ -1645,12 +1645,12 @@ def rollbackVersion() {
     //该/var/jenkins_home/**路径只适合在master节点执行的项目 不适合slave节点的项目
     archivePath = "/var/jenkins_home/jobs/${env.JOB_NAME}/builds/${ROLLBACK_BUILD_ID}/archive/"
     uploadRemote("${archivePath}")
-    runProject()
+    runProject(map)
     if (params.IS_HEALTH_CHECK == true) {
-        healthCheck()
+        healthCheck(map)
     }
     if ("${IS_ROLL_DEPLOY}" == 'true') {
-        scrollToDeploy()
+        scrollToDeploy(map)
     }
 }
 
@@ -1691,7 +1691,7 @@ def deletePackagedOutput() {
 /**
  * 生成二维码 方便手机端扫描
  */
-def genQRCode() {
+def genQRCode(map) {
     if ("${IS_GEN_QR_CODE}" == 'true') { // 是否开启二维码生成功能
         try {
             imageSuffixName = "png"
@@ -1702,7 +1702,7 @@ def genQRCode() {
                 def sourceFile = "${env.WORKSPACE}/${imageName}.${imageSuffixName}" // 源文件
                 def targetFile = "frontend/${env.JOB_NAME}/${env.BUILD_NUMBER}/${imageName}.${imageSuffixName}"
                 // 目标文件
-                qrCodeOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
+                qrCodeOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
                 println "${qrCodeOssUrl}"
             }
         } catch (error) {
@@ -1728,7 +1728,7 @@ def productsWarehouse(map) {
     // Docker.push(this)
 
     // 通用OSS制品仓库
-    // AliYunOss.upload(this)
+    // AliYunOSS.upload(this, map)
 
 }
 
@@ -1810,7 +1810,7 @@ def deployMultiEnv() {
  * @type 0 失败 1 部署完成 2 部署之前 3 变更记录
  * @msg 自定义消息* @atMobiles 要@的手机号
  */
-def dingNotice(int type, msg = '', atMobiles = '') {
+def dingNotice(map, int type, msg = '', atMobiles = '') {
     if ("${params.IS_DING_NOTICE}" == 'true') { // 是否钉钉通知
         println("钉钉通知: " + params.NOTIFIER_PHONES)
         // 格式化持续时间
@@ -1865,7 +1865,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
         } else if (type == 1) { // 部署完成
             if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
                 // 生成二维码 方便手机端扫描
-                genQRCode()
+                genQRCode(map)
                 dingtalk(
                         robot: "${DING_TALK_CREDENTIALS_ID}",
                         type: 'ACTION_CARD',

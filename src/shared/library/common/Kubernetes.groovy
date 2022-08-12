@@ -24,7 +24,7 @@ class Kubernetes implements Serializable {
 
         // 多个k8s集群同时滚动循环部署
         "${map.k8s_credentials_ids}".trim().split(",").each { k8s_credentials_id ->
-            // KUBECONFIG变量为k8s中kubectl命令的yaml配置授权访问文件内容 数据保存为jenkins的“Secret file”类型的凭据，用credentials方法从凭据中获取
+            // KUBECONFIG变量为k8s中kubectl命令的yaml配置授权访问文件内容 数据保存为Jenkins的“Secret file”类型的凭据，用credentials方法从凭据中获取
             ctx.withCredentials([ctx.file(credentialsId: "${k8s_credentials_id}", variable: 'KUBECONFIG')]) {
                 // 安装kubectl命令访问k8s集群: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
                 // 下载集群的配置文件，复制到本地计算机的 $HOME/.kube/config（kubectl的默认路径）
