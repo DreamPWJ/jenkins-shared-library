@@ -32,9 +32,20 @@ class AliYunOSS implements Serializable {
     }
 
     /**
-     *  下载资源
+     *  下载OSS资源
      */
-    static def download(ctx) {
-        def shellFile = "download-aliyun-oss.sh"
+    static def download(ctx, map, sourceFile, targetFile) {
+        ctx.withCredentials([ctx.file(credentialsId: "${map.oss_credentials_id}", variable: 'ALI_YUN_OSS')]) {
+            def ossData = ctx.readFile(file: "${ctx.ALI_YUN_OSS}")
+            def json = ctx.readJSON text: "${ossData}"
+            def accessKeyId = json.AccessKeyId
+            def accessKeySecret = json.AccessKeySecret
+            def bucketName = json.BucketName
+            def endpoint = json.Endpoint
+            def shellFile = "download-aliyun-oss.sh"
+            ctx.sh " cd ci/_linux/shell/oss/ && chmod +x ${shellFile} && ./${shellFile}" +
+                    " -a ${sourceFile} -b ${targetFile} -c ${bucketName} -d ${endpoint} -e ${accessKeyId} -f ${accessKeySecret} "
+            ctx.println("下载OSS资源完成")
+        }
     }
 }

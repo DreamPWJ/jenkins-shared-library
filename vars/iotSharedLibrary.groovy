@@ -265,6 +265,7 @@ def call(String type = 'iot', Map map) {
                     steps {
                         script {
                             echo "OTA空中升级"
+                            otaUpgrade(map)
                         }
                     }
                 }
@@ -596,6 +597,14 @@ def integrationTesting() {
 }
 
 /**
+ * OTA空中升级
+ */
+def otaUpgrade(map) {
+    // 将固件包上传到OTA服务器、上传设置版本号和新固件地址的JSON升级文件  嵌入式设备会自动检测升级
+
+}
+
+/**
  * 是否存在CI代码
  */
 def existCiCode() {
@@ -751,7 +760,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                             "###### ${rollbackTag}",
                             "###### 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
                             "###### 持续时间: ${durationTimeString}   固件大小: ${iotPackageSize}",
-                            "###### [固件下载](${iotOssUrl})",
+                            "###### 嵌入式固件  [直接下载](${iotOssUrl})",
                             "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})", // Sonar地址  [查看](http://182.92.126.7:9000/)
                             "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
                             "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
