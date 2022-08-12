@@ -1196,7 +1196,7 @@ def uploadOss() {
                 def sourceFile = "${env.WORKSPACE}/${mavenPackageLocation}"
                 // 目标文件
                 def targetFile = "java/${env.JOB_NAME}/${PROJECT_NAME}-${SHELL_ENV_MODE}-${env.BUILD_NUMBER}.${javaPackageType}"
-                javaOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
+                javaOssUrl = AliYunOSS.upload(this, sourceFile, targetFile)
                 println "${javaOssUrl}"
                 Tools.printColor(this, "上传部署文件到OSS成功 ✅")
             }
@@ -1702,7 +1702,7 @@ def genQRCode() {
                 def sourceFile = "${env.WORKSPACE}/${imageName}.${imageSuffixName}" // 源文件
                 def targetFile = "frontend/${env.JOB_NAME}/${env.BUILD_NUMBER}/${imageName}.${imageSuffixName}"
                 // 目标文件
-                qrCodeOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
+                qrCodeOssUrl = AliYunOSS.upload(this, sourceFile, targetFile)
                 println "${qrCodeOssUrl}"
             }
         } catch (error) {
@@ -1728,7 +1728,7 @@ def productsWarehouse(map) {
     // Docker.push(this)
 
     // 通用OSS制品仓库
-    // AliYunOss.upload(this)
+    // AliYunOSS.upload(this)
 
 }
 

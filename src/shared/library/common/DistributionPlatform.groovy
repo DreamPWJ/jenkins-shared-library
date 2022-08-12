@@ -15,7 +15,7 @@ class DistributionPlatform implements Serializable {
         ctx.println("上传自建OSS分发 🚀")
         def sourceFile = "${ctx.env.WORKSPACE}/${filePosition}/${appName}" // 源文件
         def targetFile = "${ctx.SYSTEM_TYPE_NAME.toLowerCase()}/${ctx.env.JOB_NAME}/${appName}" // 目标文件
-        def packageOssUrl = AliYunOss.upload(ctx, sourceFile, targetFile)
+        def packageOssUrl = AliYunOSS.upload(ctx, sourceFile, targetFile)
         return packageOssUrl
     }
 

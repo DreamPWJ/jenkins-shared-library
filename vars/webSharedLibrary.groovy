@@ -1078,7 +1078,7 @@ def genQRCode() {
             def sourceFile = "${env.WORKSPACE}/${imageName}.${imageSuffixName}" // 源文件
             def targetFile = "frontend/${env.JOB_NAME}/${env.BUILD_NUMBER}/${imageName}.${imageSuffixName}"
             // 目标文件
-            qrCodeOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
+            qrCodeOssUrl = AliYunOSS.upload(this, sourceFile, targetFile)
             println "${qrCodeOssUrl}"
         } catch (error) {
             println " 生成二维码失败 ❌ "

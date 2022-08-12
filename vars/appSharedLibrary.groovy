@@ -1657,7 +1657,7 @@ def genQRCode(url, projectType = GlobalVars.ios) {
     QRCode.generate(this, "${url}", "${imageFileName}")
     def sourceFile = "${env.WORKSPACE}/${imageFileName}.${imageSuffixName}" // 源文件
     def targetFile = "${SYSTEM_TYPE_NAME.toLowerCase()}/${env.JOB_NAME}/${imageFileName}.${imageSuffixName}" // 目标文件
-    qrCodeOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
+    qrCodeOssUrl = AliYunOSS.upload(this, sourceFile, targetFile)
     if (projectType == GlobalVars.android) {
         androidQrCodeOssUrl = qrCodeOssUrl
     }

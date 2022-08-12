@@ -36,8 +36,8 @@
         "writer": {
           "name": "mysqlwriter",
           "parameter": {
-            "username": "lanneng",
-            "password": "lannengkeji@2022",
+            "username": "root",
+            "password": "123456",
             "column": [
               "*"
             ],

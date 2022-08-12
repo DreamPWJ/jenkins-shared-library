@@ -60,6 +60,7 @@ JSON_PARAMS
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "esp32-demo" ,
     "IS_MONO_REPO" : true ,
+    "IS_UPLOAD_OSS" : true ,
 }
 
 */

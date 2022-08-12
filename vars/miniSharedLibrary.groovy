@@ -709,7 +709,7 @@ def previewImageUpload() {
     // 源文件地址
     def sourceFile = "${env.WORKSPACE}/${PROJECT_NAME == "" ? "" : "${PROJECT_NAME}/"}${wxPreviewQrcodeName}.jpg"
     def targetFile = "mini/${env.JOB_NAME}/${wxPreviewQrcodeName}-${env.BUILD_NUMBER}.jpg" // 目标文件
-    wxPreviewQrcodeUrl = AliYunOss.upload(this, sourceFile, targetFile)
+    wxPreviewQrcodeUrl = AliYunOSS.upload(this, sourceFile, targetFile)
     println "${wxPreviewQrcodeUrl}"
 }
 
@@ -767,7 +767,7 @@ def submitAuthorization() {
         // 源文件地址
         def sourceFile = "${env.WORKSPACE}/${screenshotFile}"
         def targetFile = "mini/${env.JOB_NAME}/${screenshotFile.replace('.png', '')}-${env.BUILD_NUMBER}.png" // 目标文件
-        wxScreenshotFileQrcodeUrl = AliYunOss.upload(this, sourceFile, targetFile)
+        wxScreenshotFileQrcodeUrl = AliYunOSS.upload(this, sourceFile, targetFile)
         println "👉 授权登录二维码: ${wxScreenshotFileQrcodeUrl}"
 
         if ("${params.IS_DING_NOTICE}" == 'true') { // 是否钉钉通知

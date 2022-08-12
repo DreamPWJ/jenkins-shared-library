@@ -563,13 +563,13 @@ def uploadOss() {
             // 源文件地址
             def sourceFile = "${iotPackageLocation}"
             // 目标文件
-            def targetFile = "iot/${env.JOB_NAME}/${PROJECT_NAME}-${ENV_TYPE}-${env.BUILD_NUMBER}.${iotPackageType}"
-            iotOssUrl = AliYunOss.upload(this, sourceFile, targetFile)
+            def targetFile = "iot/${PROJECT_NAME}/${ENV_TYPE}.${iotPackageType}"
+            iotOssUrl = AliYunOSS.upload(this, sourceFile, targetFile)
             println "${iotOssUrl}"
-            Tools.printColor(this, "上传部署文件到OSS成功 ✅")
+            Tools.printColor(this, "上传固件文件到OSS成功 ✅")
 
         } catch (error) {
-            println "上传部署文件到OSS异常"
+            println "上传固件文件到OSS异常"
             println error.getMessage()
         }
     }
@@ -751,6 +751,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                             "###### ${rollbackTag}",
                             "###### 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
                             "###### 持续时间: ${durationTimeString}   固件大小: ${iotPackageSize}",
+                            "###### [固件下载](${iotOssUrl})",
                             "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})", // Sonar地址  [查看](http://182.92.126.7:9000/)
                             "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
                             "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
