@@ -3,7 +3,7 @@
 # Description:  Shell脚本方式上传阿里云OSS
 
 echo "使用getopts的方式进行shell参数传递"
-while getopts ":a:b:c:d:z:" opt; do
+while getopts ":a:b:c:d:e:f:z:" opt; do
   case $opt in
   a)
     echo "source_file=$OPTARG"

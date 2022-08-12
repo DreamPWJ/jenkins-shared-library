@@ -208,12 +208,12 @@ def call(String type = 'iot', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return false
+                            return true
                         }
                     }
                     steps {
                         script {
-                            uploadOss()
+                            uploadOss(map)
                         }
                     }
                 }
@@ -557,14 +557,14 @@ def embeddedBuildProject() {
  * 上传部署文件到OSS
  * 方便下载构建部署包
  */
-def uploadOss() {
+def uploadOss(map) {
     if ("${IS_UPLOAD_OSS}" == 'true') {
         try {
             // 源文件地址
-            def sourceFile = "${iotPackageLocation}"
+            def sourceFile = "${env.WORKSPACE}/${iotPackageLocation}"
             // 目标文件
-            def targetFile = "iot/${PROJECT_NAME}/${ENV_TYPE}.${iotPackageType}"
-            iotOssUrl = AliYunOSS.upload(this, sourceFile, targetFile)
+            def targetFile = "iot/${PROJECT_NAME}/firmware.${iotPackageType}"
+            iotOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
             println "${iotOssUrl}"
             Tools.printColor(this, "上传固件文件到OSS成功 ✅")
 

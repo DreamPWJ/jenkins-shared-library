@@ -381,7 +381,7 @@ def call(String type = 'android-ios', Map map) {
                     steps {
                         script {
                             echo "内测分发"
-                            uploadDistribution()
+                            uploadDistribution(map)
                         }
                     }
                 }
@@ -1538,7 +1538,7 @@ def firebaseTestLab(map) {
 /**
  * 上传分发
  */
-def uploadDistribution() {
+def uploadDistribution(map) {
     try {
         //变更日志
         changelog = "\n备注: Git构建分支: ${BRANCH_NAME}," +
@@ -1608,7 +1608,7 @@ def uploadDistribution() {
     } catch (e) {
         println(e.getMessage())
         println("第三方分发平台上传失败, 自动切换上传到自建的分发OSS平台 保证流水线高用性  ❌")
-        uploadDistributionOss()
+        uploadDistributionOss(map)
     }
 
     println("分发平台上传成功 ✅")
@@ -1617,47 +1617,47 @@ def uploadDistribution() {
 /**
  * 上传自建分发OSS
  */
-def uploadDistributionOss() {
+def uploadDistributionOss(map) {
     if ("${PROJECT_TYPE}".toInteger() == GlobalVars.android) {
-        packageOssUrl = DistributionPlatform.uploadOss(this, "${androidApkName}", "${androidPackagesOutputDir}")
+        packageOssUrl = DistributionPlatform.uploadOss(this, map, "${androidApkName}", "${androidPackagesOutputDir}")
         androidPackageOssUrl = packageOssUrl
-        genQRCode("${androidPackageOssUrl}", GlobalVars.android)
+        genQRCode(map, "${androidPackageOssUrl}", GlobalVars.android)
     }
 
     if ("${PROJECT_TYPE}".toInteger() == GlobalVars.ios) {
-        packageOssUrl = DistributionPlatform.uploadOss(this, "${iosIpaName}", "${IOS_PROJECT_LEVEL_DIR}/${iosPackagesOutputDir}")
+        packageOssUrl = DistributionPlatform.uploadOss(this, map, "${iosIpaName}", "${IOS_PROJECT_LEVEL_DIR}/${iosPackagesOutputDir}")
     }
 
     if ("${PROJECT_TYPE}".toInteger() == GlobalVars.flutter || "${PROJECT_TYPE}".toInteger() == GlobalVars.reactNative
             || "${PROJECT_TYPE}".toInteger() == GlobalVars.unity) {
         if ("${BUILD_SYSTEM_TYPES}".contains("${Constants.ANDROID}")) {
-            packageOssUrl = DistributionPlatform.uploadOss(this, "${androidApkName}", "${androidPackagesOutputDir}")
+            packageOssUrl = DistributionPlatform.uploadOss(this, map, "${androidApkName}", "${androidPackagesOutputDir}")
             androidPackageOssUrl = packageOssUrl
-            genQRCode("${androidPackageOssUrl}", GlobalVars.android)
+            genQRCode(map, "${androidPackageOssUrl}", GlobalVars.android)
         }
 
         if ("${BUILD_SYSTEM_TYPES}".contains("${Constants.IOS}")) {
-            packageOssUrl = DistributionPlatform.uploadOss(this, "${iosIpaName}", "${IOS_PROJECT_LEVEL_DIR}/${iosPackagesOutputDir}")
+            packageOssUrl = DistributionPlatform.uploadOss(this, map, "${iosIpaName}", "${IOS_PROJECT_LEVEL_DIR}/${iosPackagesOutputDir}")
         }
 
     }
     println("${packageOssUrl}")
     println("上传自建分发OSS成功 ✅")
     // 生成二维码
-    genQRCode("${packageOssUrl}")
+    genQRCode(map, "${packageOssUrl}")
 }
 
 /**
  * 生成二维码
  */
-def genQRCode(url, projectType = GlobalVars.ios) {
+def genQRCode(map, url, projectType = GlobalVars.ios) {
     imageSuffixName = "png"
     sh "rm -f *.${imageSuffixName}"
     def imageFileName = "${SYSTEM_TYPE_NAME}-${env.BUILD_NUMBER}"
     QRCode.generate(this, "${url}", "${imageFileName}")
     def sourceFile = "${env.WORKSPACE}/${imageFileName}.${imageSuffixName}" // 源文件
     def targetFile = "${SYSTEM_TYPE_NAME.toLowerCase()}/${env.JOB_NAME}/${imageFileName}.${imageSuffixName}" // 目标文件
-    qrCodeOssUrl = AliYunOSS.upload(this, sourceFile, targetFile)
+    qrCodeOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
     if (projectType == GlobalVars.android) {
         androidQrCodeOssUrl = qrCodeOssUrl
     }

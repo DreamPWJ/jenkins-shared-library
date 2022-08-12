@@ -95,6 +95,8 @@ map.put('jdk', '11')
 map.put('ci_git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
 map.put('git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
 map.put('ding_talk_credentials_id', 'ba0ebec7-73ad-4a26-af8b-d15c470b1328')
+// OSS对象存储访问凭据配置 Jenkins凭据设置界面，类型选择为“Secret file”配置
+map.put('oss_credentials_id', ' ')
 
 // 服务器上部署所在的文件夹名称
 map.put('deploy_folder', "my")

@@ -215,7 +215,7 @@ def call(String type = 'wx-mini', Map map) {
                     }
                     steps {
                         script {
-                            previewImageUpload()
+                            previewImageUpload(map)
                         }
                     }
                 }
@@ -236,7 +236,7 @@ def call(String type = 'wx-mini', Map map) {
                                         submitAudit()
                                     },
                                     '授权': {
-                                        submitAuthorization()
+                                        submitAuthorization(map)
                                     })
                             // }
                         }
@@ -704,12 +704,12 @@ def miniInfo() {
 /**
  * 预览码图片上传OSS
  */
-def previewImageUpload() {
+def previewImageUpload(map) {
     wxPreviewQrcodeUrl = "" // 微信预览码图片访问Url
     // 源文件地址
     def sourceFile = "${env.WORKSPACE}/${PROJECT_NAME == "" ? "" : "${PROJECT_NAME}/"}${wxPreviewQrcodeName}.jpg"
     def targetFile = "mini/${env.JOB_NAME}/${wxPreviewQrcodeName}-${env.BUILD_NUMBER}.jpg" // 目标文件
-    wxPreviewQrcodeUrl = AliYunOSS.upload(this, sourceFile, targetFile)
+    wxPreviewQrcodeUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
     println "${wxPreviewQrcodeUrl}"
 }
 
@@ -738,7 +738,7 @@ def submitAudit() {
 /**
  * 提审授权
  */
-def submitAuthorization() {
+def submitAuthorization(map) {
     try {
         def screenshotFile = "mini-playwright-screenshot.png"
         sh "rm -f ${screenshotFile}"
@@ -767,7 +767,7 @@ def submitAuthorization() {
         // 源文件地址
         def sourceFile = "${env.WORKSPACE}/${screenshotFile}"
         def targetFile = "mini/${env.JOB_NAME}/${screenshotFile.replace('.png', '')}-${env.BUILD_NUMBER}.png" // 目标文件
-        wxScreenshotFileQrcodeUrl = AliYunOSS.upload(this, sourceFile, targetFile)
+        wxScreenshotFileQrcodeUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
         println "👉 授权登录二维码: ${wxScreenshotFileQrcodeUrl}"
 
         if ("${params.IS_DING_NOTICE}" == 'true') { // 是否钉钉通知

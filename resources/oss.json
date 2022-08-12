@@ -1,0 +1,6 @@
+{
+  "AccessKeyId": "111",
+  "AccessKeySecret": "222",
+  "BucketName": "archive-artifacts",
+  "Endpoint": "oss-cn-shanghai.aliyuncs.com"
+}
