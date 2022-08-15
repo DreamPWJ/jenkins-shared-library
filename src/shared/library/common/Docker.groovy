@@ -24,10 +24,6 @@ class Docker implements Serializable {
             //println(Utils.getShEchoResult(this, "whoami"))
             //def dockerPath = tool 'Docker' //全局配置里 名称Docker 位置/usr/local  使用系统安装好的docker引擎
             ctx.env.PATH = "${ctx.env.PATH}:/usr/local/bin:/usr/local/go/bin:/usr/bin/docker" //添加了系统环境变量上
-            // k8s用版本号方式给tag打标签
-            if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
-                imageTag = Utils.getVersionNum(ctx)
-            }
         } catch (e) {
             ctx.println("初始化Docker环境变量失败")
             ctx.println(e.getMessage())
@@ -74,6 +70,10 @@ class Docker implements Serializable {
      *  Docker For Mac 3.1.0以后docker login登录镜像仓库报错 删除 ~/.docker/config.json中的credsStore这行解决
      */
     static def build(ctx, imageName) {
+        // k8s用版本号方式给tag打标签
+        if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
+            imageTag = Utils.getVersionNum(ctx)
+        }
         //ctx.pullCIRepo()
         def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${imageTag}"
         ctx.withCredentials([ctx.usernamePassword(credentialsId: "${ctx.DOCKER_REPO_CREDENTIALS_ID}", usernameVariable: 'DOCKER_HUB_USER_NAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {

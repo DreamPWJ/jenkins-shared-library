@@ -469,6 +469,9 @@ def getUserInfo() {
                 // 获取钉钉插件手机号 注意需要系统设置里in-process script approval允许权限
                 def user = hudson.model.User.getById(env.BUILD_USER_ID, false).getProperty(io.jenkins.plugins.DingTalkUserProperty.class)
                 BUILD_USER_MOBILE = user.mobile
+                if ("${BUILD_USER_MOBILE}".trim() == "") {
+                    BUILD_USER_MOBILE = BUILD_USER // 未填写钉钉插件手机号则使用用户名代替显示
+                }
             } catch (error) {
                 println "获取账号部分信息失败"
                 println error.getMessage()
@@ -656,7 +659,7 @@ def alwaysPost() {
     // Jenkins全局安全配置->标记格式器内设置Safe HTML支持html文本
     try {
         def releaseEnvironment = "${ENV_TYPE}"
-        currentBuild.description = "${iotOssUrl.trim() != '' ? "<br/><a href='${iotOssUrl}'> 👉 固件直接下载</a>" : ""}" +
+        currentBuild.description = "${iotOssUrl.trim() != '' ? "<br/><a href='${iotOssUrl}'> 👉 直接下载固件</a>" : ""}" +
                 "<br/> 项目: ${PROJECT_NAME}" +
                 "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
                 "<br/> 大小: ${iotPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
