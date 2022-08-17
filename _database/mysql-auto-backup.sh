@@ -41,3 +41,6 @@ find ${backup_dir} -name "*.sql.gz" -type f -mtime +7 -exec rm -rf {} \; >/dev/n
 # GNU nano编辑器CTRL+O 再 CTRL+X 保存退出
 
 # 新版的mysqldump默认启用了一个新标志  禁用统计--column-statistics=0
+
+# 备份数据库: mysqldump -h localhost -u root -p123456 db_name > /my/dump.sql
+# 还原数据库: mysql -h localhost -u root -p123456 db_name < /my/dump.sql
