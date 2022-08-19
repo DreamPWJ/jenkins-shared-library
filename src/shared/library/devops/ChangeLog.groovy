@@ -40,11 +40,12 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
                     } else if (truncatedMsg.toString().startsWith(GlobalVars.gitCommitFix)) {
                         fixChangeLog += combinationMsg
                     } else {
-                        if ((combinationMsg.contains("docs") || combinationMsg.contains("chore") || combinationMsg.contains("test"))) {
-                            combinationMsg = ""
-                        } else {
-                            otherChangeLog += combinationMsg
-                        }
+                        // 过滤无需生成的变更日志类型
+                        // if ((combinationMsg.contains("revert") || combinationMsg.contains("chore") || combinationMsg.contains("test"))) {
+                        // combinationMsg = ""
+                        // } else {
+                        otherChangeLog += combinationMsg
+                        //  }
                     }
                 }
                 changeLog += combinationMsg

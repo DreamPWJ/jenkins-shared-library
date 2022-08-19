@@ -207,7 +207,7 @@ def call(String type = 'iot', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return true
+                            return ("${IS_UPLOAD_OSS}" == 'true')
                         }
                     }
                     steps {
@@ -258,7 +258,7 @@ def call(String type = 'iot', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return false
+                            return ("${IS_OTA}" == 'true')
                         }
                     }
                     steps {
@@ -386,6 +386,7 @@ def getInitParams(map) {
     // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
     IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true
     IS_UPLOAD_OSS = jsonParams.IS_UPLOAD_OSS ? jsonParams.IS_UPLOAD_OSS : false // 是否构建产物上传到OSS
+    IS_OTA = jsonParams.IS_OTA ? jsonParams.IS_OTA : false // 是否进行OTA空中升级
     IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
 
     // 设置monorepo单体仓库主包文件夹名
@@ -553,7 +554,7 @@ def embeddedBuildProject() {
     sh "pio --version"
     println("执行嵌入式程序PlatformIO构建 🏗️  ")
     PlatformIO.build(this)
-    Tools.printColor(this, "嵌入式打包成功 ✅")
+    Tools.printColor(this, "嵌入式固件打包成功 ✅")
 }
 
 /**
@@ -561,7 +562,6 @@ def embeddedBuildProject() {
  * 方便下载构建部署包
  */
 def uploadOss(map) {
-    if ("${IS_UPLOAD_OSS}" == 'true') {
         try {
             // 源文件地址
             def sourceFile = "${env.WORKSPACE}/${iotPackageLocation}"
@@ -570,12 +570,10 @@ def uploadOss(map) {
             iotOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
             println "${iotOssUrl}"
             Tools.printColor(this, "上传固件文件到OSS成功 ✅")
-
         } catch (error) {
             println "上传固件文件到OSS异常"
             println error.getMessage()
         }
-    }
 }
 
 /**
@@ -603,7 +601,17 @@ def integrationTesting() {
  */
 def otaUpgrade(map) {
     // 将固件包上传到OTA服务器、上传设置版本号和新固件地址的JSON升级文件  嵌入式设备会自动检测升级
-
+        try {
+            def updateFileName = "ota.json"
+            def sourceJsonFile = "${env.WORKSPACE}/${PROJECT_NAME}/${updateFileName}"
+            def targetJsonFile = "iot/${PROJECT_NAME}/${updateFileName}"
+            def jsonOssUrl = AliYunOSS.upload(this, map, sourceJsonFile, targetJsonFile)
+            println "${jsonOssUrl}"
+            Tools.printColor(this, "上传ATA固件升级文件到OSS成功 ✅")
+        } catch (e) {
+            println e.getMessage()
+            println "OTA固件升级JSON文件上传失败"
+        }
 }
 
 /**
