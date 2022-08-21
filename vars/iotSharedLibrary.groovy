@@ -206,7 +206,7 @@ def call(String type = 'iot', Map map) {
                     }
                 }
 
-                stage('上传云端') {
+                stage('上传固件') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
@@ -444,7 +444,7 @@ def getInitParams(map) {
     // IoT产物构建固件包OSS地址Url
     iotOssUrl = ""
     // IoT固件OTA升级OSS地址Url
-    jsonOssUrl = ""
+    otaOssUrl = ""
     // IoT产物构建包大小
     iotPackageSize = ""
     // IoT产物构建固件位置
@@ -700,8 +700,8 @@ def otaUpgrade(map) {
     // try {
     def sourceJsonFile = "${env.WORKSPACE}/${VERSION_FILE}"
     def targetJsonFile = "iot/${PROJECT_NAME}/${ENV_TYPE}/${VERSION_FILE}"
-    jsonOssUrl = AliYunOSS.upload(this, map, sourceJsonFile, targetJsonFile)
-    println "${jsonOssUrl}"
+    otaOssUrl = AliYunOSS.upload(this, map, sourceJsonFile, targetJsonFile)
+    println "${otaOssUrl}"
     Tools.printColor(this, "上传OTA固件升级文件到OSS成功 ✅")
 /*    } catch (e) {
         println e.getMessage()
@@ -762,8 +762,7 @@ def alwaysPost() {
     try {
         def releaseEnvironment = "${ENV_TYPE}"
         currentBuild.description = "${iotOssUrl.trim() != '' ? "<a href='${iotOssUrl}'> 👉 直接下载固件</a>" : ""}" +
-                "<br/> 项目: ${PROJECT_NAME}" +
-                "<br/> 版本: ${IOT_VERSION_NUM}" +
+                "<br/> ${PROJECT_CHINESE_NAME} v${IOT_VERSION_NUM}" +
                 "<br/> 大小: ${iotPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
     } catch (error) {
         println error.getMessage()
@@ -825,52 +824,68 @@ def dingNotice(int type, msg = '', atMobiles = '') {
         if ("${IS_MONO_REPO}" == 'true') {
             monorepoProjectName = "MonoRepo项目: ${PROJECT_NAME}"   // 单体仓库区分项目
         }
+        def buildNoticeMsg = "" // 构建版本类型提示信息
         def projectTypeName = ""
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.Embedded) {
             projectTypeName = "嵌入式"
+            if ("${IS_UPLOAD_OSS}" == 'true') {
+                buildNoticeMsg = "嵌入式固件上传成功 ✅ "
+            }
+            if ("${IS_OTA}" == 'true') {
+                buildNoticeMsg = buildNoticeMsg + "\nOTA升级配置上传成功 ✅ "
+            }
         }
         def envTypeMark = "内测版"  // 环境类型标志
         if ("${IS_PROD}" == 'true') {
             envTypeMark = "正式版"
         }
+
         def releaseEnvironment = "${ENV_TYPE}"
-        def isHealthCheckFail = false
+
         if (type == 0) { // 失败
-            if (!isHealthCheckFail) {
-                dingtalk(
-                        robot: "${DING_TALK_CREDENTIALS_ID}",
-                        type: 'MARKDOWN',
-                        title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}流水线失败通知",
-                        text: [
-                                "### [${env.JOB_NAME}#${env.BUILD_NUMBER}](${env.BUILD_URL}) ${PROJECT_TAG}${envTypeMark}${projectTypeName}项目${msg}",
-                                "#### 请及时处理 🏃",
-                                "###### ** 流水线失败原因: [运行日志](${env.BUILD_URL}console) 👈 **",
-                                "###### Jenkins地址  [查看](${env.JENKINS_URL})   源码地址  [查看](${REPO_URL})",
-                                "###### 发布环境: ${releaseEnvironment}  持续时间: ${durationTimeString}",
-                                "###### 发布人: ${BUILD_USER}",
-                                "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                        ],
-                        at: ["${BUILD_USER_MOBILE}"]
-                )
-            }
-        } else if (type == 1) { // 发布通知
             dingtalk(
                     robot: "${DING_TALK_CREDENTIALS_ID}",
                     type: 'MARKDOWN',
-                    title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName} v${IOT_VERSION_NUM} 发布通知",
+                    title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}流水线失败通知",
                     text: [
-                            "### [${env.JOB_NAME} ${PROJECT_TAG}${envTypeMark}${projectTypeName} 📟  v${IOT_VERSION_NUM} #${env.BUILD_NUMBER} ](${env.JOB_URL})",
-                            "#### · CI构建CD部署完成 👌",
-                            "#### · 固件构建打包${msg}",
-                            "###### ${rollbackTag}",
-                            "###### 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
-                            "###### 持续时间: ${durationTimeString}   固件大小: ${iotPackageSize}",
-                            "###### 嵌入式固件  [直接下载](${iotOssUrl})   OTA配置  [查看](${jsonOssUrl}) ",
-                            "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
-                            "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
+                            "### [${env.JOB_NAME}#${env.BUILD_NUMBER}](${env.BUILD_URL}) ${PROJECT_TAG}${envTypeMark}${projectTypeName}项目${msg}",
+                            "#### 请及时处理 🏃",
+                            "###### ** 流水线失败原因: [运行日志](${env.BUILD_URL}console) 👈 **",
+                            "###### Jenkins地址  [查看](${env.JENKINS_URL})   源码地址  [查看](${REPO_URL})",
+                            "###### 发布环境: ${releaseEnvironment}  持续时间: ${durationTimeString}",
+                            "###### 发布人: ${BUILD_USER}",
                             "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
                     ],
-                    at: [isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone)]
+                    at: ["${BUILD_USER_MOBILE}"]
+            )
+        } else if (type == 1) { // 发布通知
+            dingtalk(
+                    robot: "${DING_TALK_CREDENTIALS_ID}",
+                    type: 'ACTION_CARD',
+                    title: "CI/CD ${PROJECT_CHINESE_NAME} ${projectTypeName} v${IOT_VERSION_NUM} 发布通知",
+                    text: [
+                            "### [${PROJECT_CHINESE_NAME}${PROJECT_TAG}${envTypeMark}${projectTypeName} 📟  v${IOT_VERSION_NUM} #${env.BUILD_NUMBER} ](${env.JOB_URL})",
+                            "###### ${rollbackTag}",
+                            "##### 版本信息",
+                            "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
+                            "- 固件大小: ${iotPackageSize}   持续时间: ${durationTimeString}",
+                            "- 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
+                            "##### ${buildNoticeMsg}",
+                            "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
+                            "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
+                    ],
+                    btnLayout: 'V',
+                    btns: [
+                            [
+                                    title    : "OTA空中升级配置",
+                                    actionUrl: "${otaOssUrl}"
+                            ],
+                            [
+                                    title    : '嵌入式固件直接下载',
+                                    actionUrl: "${iotOssUrl}"
+                            ]
+                    ],
+                    at: [notifierPhone == '110' ? '' : notifierPhone]
             )
         } else if (type == 2) { // 部署之前
 
@@ -881,11 +896,9 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                     dingtalk(
                             robot: "${DING_TALK_CREDENTIALS_ID}",
                             type: 'MARKDOWN',
-                            title: "${envTypeMark}${projectTypeName} v${IOT_VERSION_NUM} 发布日志",
+                            title: "${PROJECT_CHINESE_NAME}${projectTypeName} v${IOT_VERSION_NUM} 发布日志",
                             text: [
-                                    "### ${envTypeMark}${projectTypeName} 📟  v${IOT_VERSION_NUM} 发布日志 🎉",
-                                    "#### 项目: ${PROJECT_NAME}",
-                                    "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}**",
+                                    "### ${PROJECT_CHINESE_NAME}${PROJECT_TAG}${envTypeMark}${projectTypeName} 📟  v${IOT_VERSION_NUM} 发布日志 🎉",
                                     "${gitChangeLog}",
                                     ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看",
                                     "###### 发布人: ${BUILD_USER}",
