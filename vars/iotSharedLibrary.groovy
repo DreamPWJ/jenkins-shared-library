@@ -829,18 +829,18 @@ def dingNotice(int type, msg = '', atMobiles = '') {
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.Embedded) {
             projectTypeName = "嵌入式"
             if ("${IS_UPLOAD_OSS}" == 'true') {
-                buildNoticeMsg = "嵌入式固件上传成功 ✅ "
+                buildNoticeMsg = "嵌入式固件"
             }
             if ("${IS_OTA}" == 'true') {
-                buildNoticeMsg = buildNoticeMsg + "\nOTA升级配置上传成功 ✅ "
+                buildNoticeMsg = buildNoticeMsg + "与OTA配置"
             }
+            buildNoticeMsg = buildNoticeMsg + "上传成功 ✅ "
         }
+        def releaseEnvironment = "${ENV_TYPE}"
         def envTypeMark = "内测版"  // 环境类型标志
         if ("${IS_PROD}" == 'true') {
             envTypeMark = "正式版"
         }
-
-        def releaseEnvironment = "${ENV_TYPE}"
 
         if (type == 0) { // 失败
             dingtalk(
