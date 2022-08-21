@@ -41,7 +41,7 @@ def call(String type = 'iot', Map map) {
                 string(name: 'VERSION_NUM', defaultValue: "", description: '选填 设置IoT物联网固件的语义化版本号 如1.0.0 (默认不填写 自动获取之前设置的版本号并自增) 🖊')
                 text(name: 'VERSION_DESC', defaultValue: "${Constants.IOT_DEFAULT_VERSION_COPYWRITING}",
                         description: '填写IoT物联网版本描述文案(文案会显示在钉钉通知、Git Tag、CHANGELOG.md等, ' +
-                                '不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志,) 🖊')
+                                '不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊')
                 booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}",
                         description: '是否生产环境自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录')
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 📢 ")

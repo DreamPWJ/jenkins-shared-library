@@ -39,7 +39,7 @@ def call(String type = 'wx-mini', Map map) {
                 string(name: 'VERSION_NUM', defaultValue: "", description: '选填 设置小程序的语义化版本号 如1.0.0 (默认不填写 自动获取之前设置的版本号并自增) 🖊')
                 text(name: 'VERSION_DESC', defaultValue: "${Constants.MINI_DEFAULT_VERSION_COPYWRITING}",
                         description: '填写小程序版本描述文案(文案会显示在钉钉通知、小程序平台、Git Tag、CHANGELOG.md等, ' +
-                                '不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志,) 🖊')
+                                '不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊')
                 booleanParam(name: 'IS_AUTO_SUBMIT_FOR_REVIEW', defaultValue: true,
                         description: "是否自动提交审核 (⚠️确保CI机器人提交的已为体验版并在小程序平台列表第一个, 同时满足${Constants.RELEASE_TYPE}正式版才会自动提审)")
                 choice(name: 'CI_ROBOT', choices: "1\n2\n3\n4\n5\n6\n7\n8\n9\n10",
