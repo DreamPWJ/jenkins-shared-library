@@ -257,7 +257,21 @@ def call(String type = 'iot', Map map) {
                     }
                 }
 
-                stage('OTA升级') {
+                stage('设置版本信息') {
+                    when {
+                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            return ("${IS_OTA}" == 'true')
+                        }
+                    }
+                    steps {
+                        script {
+                            setVersionInfo(map)
+                        }
+                    }
+                }
+
+                stage('OTA空中升级') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
@@ -567,8 +581,9 @@ def codeQualityAnalysis() {
 
 /**
  * 设置版本信息
+ * 自动生成升级Json文件 包含版本号和固件地址
  */
-def setVersionInfo() {
+def setVersionInfo(map) {
     if ("${IS_MONO_REPO}" == "true") { // 是单体式monorepo仓库
     }
     // 设置版本号和固件地址
@@ -681,8 +696,6 @@ def integrationTesting() {
  * OTA空中升级
  */
 def otaUpgrade(map) {
-    // 自动生成升级Json文件 包含版本号和固件地址
-    setVersionInfo()
     // 将固件包上传到OTA服务器、上传设置版本号和新固件地址的JSON升级文件  嵌入式设备会自动检测升级
     // try {
     def sourceJsonFile = "${env.WORKSPACE}/${VERSION_FILE}"
