@@ -22,7 +22,7 @@ map.put('project_tag', 'IoT物联网')
 // 是否是生产环境
 map.put('is_prod', false)
 // 是否Pipeline内脚本钉钉通知  总开关
-map.put('is_ding_notice', false)
+map.put('is_ding_notice', true)
 // 是否通知变更记录
 map.put('is_notice_change_log', true)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
@@ -60,8 +60,11 @@ JSON_PARAMS
     "BRANCH_NAME" : "develop" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "esp32-demo" ,
+    "PROJECT_CHINESE_NAME" : "地锁控制器" ,
+    "ENV_TYPE" : "sit" ,
     "IS_MONO_REPO" : true ,
     "IS_UPLOAD_OSS" : true ,
+    "IS_OTA" : true ,
 }
 
 */

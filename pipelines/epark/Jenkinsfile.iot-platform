@@ -41,7 +41,7 @@ map.put('docker_volume_mount', '')
 // Dockerfile多阶段构建 镜像名称
 map.put('docker_multistage_build_images', ' ')
 // 是否上传镜像到docker容器仓库
-map.put('is_push_docker_repo', true)
+map.put('is_push_docker_repo', false)
 // docker容器镜像仓库账号信任id
 map.put('docker_repo_credentials_id', '6b186cac-2f4d-49dd-810b-3a8227ea3115')
 // docker镜像仓库注册地址
@@ -56,7 +56,7 @@ map.put('k8s_credentials_ids', ' ')
 map.put('k8s_image_pull_secrets', ' ')
 
 // 项目标签或项目简称
-map.put('project_tag', '颗粒计费')
+map.put('project_tag', 'IoT物联网')
 
 // 是否是生产环境
 map.put('is_prod', false)
@@ -100,7 +100,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', 'pellet-charging')
+map.put('maven_one_level', 'iot-platform')
 // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
 map.put('maven_setting_xml', ' ')
 
@@ -109,33 +109,20 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.pellet-charging
+// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.iot-platform
 
 /*
 
-pellet-charging-web-sit
-颗粒计费Web前端 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/react-frontend-monorepo.git" ,
-    "BRANCH_NAME" : "dev" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "pellet-charging-admin" ,
-    "SHELL_PARAMS" : "pellet-charging-admin web 8020 80 sit" ,
-    "NPM_RUN_PARAMS" : "build",
-    "IS_MONO_REPO": true,
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
-}
 
-pellet-charging-app-sit
-颗粒计费App服务端
+iot-platform-app-sit
+IoT物联网App服务端
 JSON_PARAMS
 {
    "REPO_URL" : "http://47.102.214.33/lanneng_develop/java-backend-monorepo.git" ,
-   "BRANCH_NAME" : "develop" ,
+   "BRANCH_NAME" : "feature/iot-platform" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "pellet-charging-app" ,
-   "SHELL_PARAMS" : "pellet-charging app 8098 8080 sit",
+   "PROJECT_NAME" : "iot-platform-app" ,
+   "SHELL_PARAMS" : "iot-platform app 8088 8080 sit",
 }
 
 

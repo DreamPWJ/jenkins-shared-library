@@ -74,6 +74,13 @@ class GlobalVars implements Serializable {
     static int webAssembly = 5 // WebAssembly生态Web项目
 
     /**
+     * IoT物联网技术类型
+     */
+    static int Embedded = 1 // 嵌入式
+    static int XR = 2 //  VR AR XR
+    static int MetaVerse = 3 // 元宇宙
+
+    /**
      * 桌面客户端项目类型
      */
     static int AllDesktop = 0 // Windows、MacOS、Linux全部系統
@@ -100,7 +107,8 @@ class GlobalVars implements Serializable {
     /**
      * CI代码库 jenkins-shared-library仓库 自动同步部署脚本和配置等
      */
-    static String CI_REPO_URL = "http://47.102.214.33/lanneng_develop/jenkins-shared-library.git" // https://github.com/DreamPWJ/jenkins-shared-library.git
+    static String CI_REPO_URL = "http://47.102.214.33/lanneng_develop/jenkins-shared-library.git"
+    // https://github.com/DreamPWJ/jenkins-shared-library.git
 
     /**
      * Git常量

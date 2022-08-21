@@ -39,7 +39,7 @@ def call(String type = 'wx-mini', Map map) {
                 string(name: 'VERSION_NUM', defaultValue: "", description: '选填 设置小程序的语义化版本号 如1.0.0 (默认不填写 自动获取之前设置的版本号并自增) 🖊')
                 text(name: 'VERSION_DESC', defaultValue: "${Constants.MINI_DEFAULT_VERSION_COPYWRITING}",
                         description: '填写小程序版本描述文案(文案会显示在钉钉通知、小程序平台、Git Tag、CHANGELOG.md等, ' +
-                                '不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志,) 🖊')
+                                '不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊')
                 booleanParam(name: 'IS_AUTO_SUBMIT_FOR_REVIEW', defaultValue: true,
                         description: "是否自动提交审核 (⚠️确保CI机器人提交的已为体验版并在小程序平台列表第一个, 同时满足${Constants.RELEASE_TYPE}正式版才会自动提审)")
                 choice(name: 'CI_ROBOT', choices: "1\n2\n3\n4\n5\n6\n7\n8\n9\n10",
@@ -436,6 +436,9 @@ def getUserInfo() {
                 // 获取钉钉插件手机号 注意需要系统设置里in-process script approval允许权限
                 def user = hudson.model.User.getById(env.BUILD_USER_ID, false).getProperty(io.jenkins.plugins.DingTalkUserProperty.class)
                 BUILD_USER_MOBILE = user.mobile
+                if ("${BUILD_USER_MOBILE}".trim() == "") {
+                    BUILD_USER_MOBILE = BUILD_USER // 未填写钉钉插件手机号则使用用户名代替显示
+                }
             } catch (error) {
                 println "获取账号部分信息失败"
             }
@@ -525,6 +528,10 @@ def setVersionInfo() {
  * 设置版本号和描述
  */
 def setVersion() {
+    if (!fileExists("${VERSION_FILE}")) { // 文件不存在则创建
+        writeJSON file: "${VERSION_FILE}", json: [version: "${MINI_VERSION_NUM}", versionDesc: params.VERSION_DESC], pretty: 2
+    }
+
     if ("${params.VERSION_NUM}".trim() != "") { // 手动输入版本号情况
         try {
             // 写入本地版本文件

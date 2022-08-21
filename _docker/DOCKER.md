@@ -27,7 +27,7 @@ sudo docker run -d --restart=always -p 5672:5672 -p 15672:15672 --name rabbitmq 
 --log-opt max-size=1024m --log-opt max-file=1   \
 -e RABBITMQ_DEFAULT_USER=root -e RABBITMQ_DEFAULT_PASS=panweiji2020 rabbitmq:management
 
-#### zookeeper分布式应用程序调度服务
+#### ZooKeeper分布式应用程序调度服务
 docker pull zookeeper
 
 docker run -d --restart=always  -p 2181:2181 \
@@ -36,7 +36,14 @@ docker run -d --restart=always  -p 2181:2181 \
 --log-opt max-size=1024m --log-opt max-file=1   \
 --privileged=true  --name zookeeper  zookeeper:latest
 
- 
+#### EMQX物联网MQTT服务器 Dashboard地址http://127.0.0.1:18083  用户名 admin 与默认密码 public
+docker pull emqx/emqx
+
+docker run -d --restart=always  -p 18083:18083 -p 1883:1883 \
+-e TZ="Asia/Shanghai" \
+--log-opt max-size=1024m --log-opt max-file=1 \
+--name emqx  emqx/emqx:latest
+
 #### 安装 分布式任务调度平台XXL-JOB服务 在浏览器中使用http://47.105.198.77:8081/xxl-job-admin/ 默认用户名和密码 admin 123456
 docker pull xuxueli/xxl-job-admin:2.1.2
 

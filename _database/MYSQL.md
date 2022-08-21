@@ -1,4 +1,4 @@
-#### 开启MySql的binlog日志
+#### 开启MySql的binlog日志   Galera可以做数据库多主集群配置(需要MySQL Galera集群版本)
 
 - 查看 show variables like '%log_bin%'; 设置在my.inf主文件配置 log_bin=on; 后重启mysql
 - https://developer.aliyun.com/article/400581

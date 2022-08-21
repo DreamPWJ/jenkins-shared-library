@@ -923,6 +923,9 @@ def getUserInfo() {
                 // 获取钉钉插件手机号 注意需要系统设置里in-process script approval允许权限
                 def user = hudson.model.User.getById(env.BUILD_USER_ID, false).getProperty(io.jenkins.plugins.DingTalkUserProperty.class)
                 BUILD_USER_MOBILE = user.mobile
+                if ("${BUILD_USER_MOBILE}".trim() == "") {
+                    BUILD_USER_MOBILE = BUILD_USER // 未填写钉钉插件手机号则使用用户名代替显示
+                }
             } catch (error) {
                 println "获取账号部分信息失败"
                 println error.getMessage()
@@ -1914,7 +1917,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                 "###### 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
                                 "###### ${javaInfo}",
                                 "###### API地址: [${healthCheckUrl}](${healthCheckUrl})",
-                                "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})", // Sonar地址  [查看](http://182.92.126.7:9000/)
+                                "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
                                 "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
                                 "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
                         ],
