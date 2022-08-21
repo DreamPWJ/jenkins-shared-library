@@ -1,6 +1,6 @@
 {
-  "AccessKeyId": "ALTAI5t7ggrMqAztoQo1h5CTUB",
-  "AccessKeySecret": "BSlVKGrddYfKFExDFBuOUrzxgjIN9bjC",
+  "AccessKeyId": "111",
+  "AccessKeySecret": "222",
   "BucketName": "archive-artifacts-pipeline",
   "Endpoint": "oss-cn-shanghai.aliyuncs.com"
 }
