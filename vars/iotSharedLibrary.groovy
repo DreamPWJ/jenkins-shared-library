@@ -749,7 +749,7 @@ def alwaysPost() {
         def releaseEnvironment = "${ENV_TYPE}"
         currentBuild.description = "${iotOssUrl.trim() != '' ? "<a href='${iotOssUrl}'> 👉 直接下载固件</a>" : ""}" +
                 "<br/> 项目: ${PROJECT_NAME}" +
-                "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
+                "<br/> 版本: v${IOT_VERSION_NUM}" +
                 "<br/> 大小: ${iotPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
     } catch (error) {
         println error.getMessage()
@@ -791,7 +791,7 @@ def gitTagLog() {
 
 /**
  * 钉钉通知
- * @type 0 失败 1 部署完成 2 部署之前 3 变更记录
+ * @type 0 失败 1 发布通知 2 部署之前 3 变更记录
  * @msg 自定义消息* @atMobiles 要@的手机号
  */
 def dingNotice(int type, msg = '', atMobiles = '') {
@@ -839,13 +839,13 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                         at: ["${BUILD_USER_MOBILE}"]
                 )
             }
-        } else if (type == 1) { // 部署完成
+        } else if (type == 1) { // 发布通知
             dingtalk(
                     robot: "${DING_TALK_CREDENTIALS_ID}",
                     type: 'MARKDOWN',
-                    title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
+                    title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName} v${IOT_VERSION_NUM} 发布通知",
                     text: [
-                            "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName}](${env.JOB_URL})",
+                            "### [${env.JOB_NAME}${PROJECT_TAG}${envTypeMark}${projectTypeName} ${projectTypeName}📟  v${IOT_VERSION_NUM} #${env.BUILD_NUMBER} ](${env.JOB_URL})",
                             "#### · CI构建CD部署完成 👌",
                             "#### · 固件构建打包${msg}",
                             "###### ${rollbackTag}",
@@ -864,19 +864,12 @@ def dingNotice(int type, msg = '', atMobiles = '') {
             if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
                 def gitChangeLog = changeLog.genChangeLog(this, 10)
                 if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
-                    def titlePrefix = "${PROJECT_TAG} BUILD#${env.BUILD_NUMBER}"
-                    try {
-                        if ("${tagVersion}") {
-                            titlePrefix = "${PROJECT_TAG} ${tagVersion}"
-                        }
-                    } catch (e) {
-                    }
                     dingtalk(
                             robot: "${DING_TALK_CREDENTIALS_ID}",
                             type: 'MARKDOWN',
-                            title: "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
+                            title: "${envTypeMark}${projectTypeName} ${projectTypeName} v${IOT_VERSION_NUM} 发布日志",
                             text: [
-                                    "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉",
+                                    "### ${envTypeMark}${projectTypeName}${projectTypeName}📟  v${IOT_VERSION_NUM} 发布日志 🎉",
                                     "#### 项目: ${PROJECT_NAME}",
                                     "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}**",
                                     "${gitChangeLog}",
