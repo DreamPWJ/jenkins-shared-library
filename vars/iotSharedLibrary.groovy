@@ -391,6 +391,7 @@ def getInitParams(map) {
     COMPUTER_LANGUAGE = jsonParams.COMPUTER_LANGUAGE ? jsonParams.COMPUTER_LANGUAGE.trim() : "1"
     // 项目名 获取部署资源位置和指定构建模块名等
     PROJECT_NAME = jsonParams.PROJECT_NAME ? jsonParams.PROJECT_NAME.trim() : ""
+    PROJECT_CHINESE_NAME = jsonParams.PROJECT_CHINESE_NAME ? jsonParams.PROJECT_CHINESE_NAME.trim() : "" // 自定义项目中文名称
     // 环境类型变量设置
     ENV_TYPE = jsonParams.ENV_TYPE ? jsonParams.ENV_TYPE.trim() : ""
 
@@ -749,7 +750,7 @@ def alwaysPost() {
         def releaseEnvironment = "${ENV_TYPE}"
         currentBuild.description = "${iotOssUrl.trim() != '' ? "<a href='${iotOssUrl}'> 👉 直接下载固件</a>" : ""}" +
                 "<br/> 项目: ${PROJECT_NAME}" +
-                "<br/> 版本: v${IOT_VERSION_NUM}" +
+                "<br/> 版本: ${IOT_VERSION_NUM}" +
                 "<br/> 大小: ${iotPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
     } catch (error) {
         println error.getMessage()
@@ -845,7 +846,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                     type: 'MARKDOWN',
                     title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName} v${IOT_VERSION_NUM} 发布通知",
                     text: [
-                            "### [${env.JOB_NAME}${PROJECT_TAG}${envTypeMark}${projectTypeName} ${projectTypeName}📟  v${IOT_VERSION_NUM} #${env.BUILD_NUMBER} ](${env.JOB_URL})",
+                            "### [${env.JOB_NAME} ${PROJECT_TAG}${envTypeMark}${projectTypeName} 📟  v${IOT_VERSION_NUM} #${env.BUILD_NUMBER} ](${env.JOB_URL})",
                             "#### · CI构建CD部署完成 👌",
                             "#### · 固件构建打包${msg}",
                             "###### ${rollbackTag}",
@@ -867,9 +868,9 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                     dingtalk(
                             robot: "${DING_TALK_CREDENTIALS_ID}",
                             type: 'MARKDOWN',
-                            title: "${envTypeMark}${projectTypeName} ${projectTypeName} v${IOT_VERSION_NUM} 发布日志",
+                            title: "${envTypeMark}${projectTypeName} v${IOT_VERSION_NUM} 发布日志",
                             text: [
-                                    "### ${envTypeMark}${projectTypeName}${projectTypeName}📟  v${IOT_VERSION_NUM} 发布日志 🎉",
+                                    "### ${envTypeMark}${projectTypeName} 📟  v${IOT_VERSION_NUM} 发布日志 🎉",
                                     "#### 项目: ${PROJECT_NAME}",
                                     "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}**",
                                     "${gitChangeLog}",
