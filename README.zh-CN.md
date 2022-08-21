@@ -25,6 +25,8 @@
   ![avatar](./docs/images/desktop.png)
 - Web技术项目类型 1. Npm生态与静态Web项目 2. Flutter For Web 3. React Native For Web 4. Unity For Web 5. WebAssembly
   ![avatar](./docs/images/web.png)
+- IoT物联网项目类型  1. 嵌入式  2. VR AR XR  3. 元宇宙
+  ![avatar](./docs/images/iot.png)
 
 ### 多端CI/CD共享库流水线已支持的范围 基于Jenkins Pipeline共享库实现
 
