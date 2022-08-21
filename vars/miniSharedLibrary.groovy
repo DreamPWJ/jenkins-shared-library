@@ -528,6 +528,10 @@ def setVersionInfo() {
  * 设置版本号和描述
  */
 def setVersion() {
+    if (!fileExists("${VERSION_FILE}")) { // 文件不存在则创建
+        writeJSON file: "${VERSION_FILE}", json: [version: "${MINI_VERSION_NUM}", versionDesc: params.VERSION_DESC], pretty: 2
+    }
+
     if ("${params.VERSION_NUM}".trim() != "") { // 手动输入版本号情况
         try {
             // 写入本地版本文件

@@ -15,6 +15,7 @@ class PlatformIO implements Serializable {
      * 多平台和多架构构建系统
      */
     static def build(ctx) {
+        ctx.sh "pio --version"
         def monorepoProjectDir = "" // 工程目录
         if ("${ctx.IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
             monorepoProjectDir = "${ctx.MONO_REPO_MAIN_PACKAGE}/${ctx.PROJECT_NAME}/"

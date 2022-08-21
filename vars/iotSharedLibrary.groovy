@@ -38,7 +38,10 @@ def call(String type = 'iot', Map map) {
                 gitParameter(name: 'GIT_TAG', type: 'PT_TAG', defaultValue: GlobalVars.noGit, selectedValue: GlobalVars.noGit,
                         useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*',
                         description: "DEPLOY_MODE基于" + GlobalVars.release + "部署方式, 可选择指定Git Tag版本标签构建, 默认不选择是获取指定分支下的最新代码, 选择后按tag代码而非分支代码构建⚠️, 同时可作为一键回滚版本使用 🔙 ")
-                string(name: 'VERSION_NUM', defaultValue: "", description: '选填 设置嵌入式固件的语义化版本号 如1.0.0 (默认不填写 自动获取之前设置的版本号并自增) 🖊')
+                string(name: 'VERSION_NUM', defaultValue: "", description: '选填 设置IoT物联网固件的语义化版本号 如1.0.0 (默认不填写 自动获取之前设置的版本号并自增) 🖊')
+                text(name: 'VERSION_DESC', defaultValue: "${Constants.IOT_DEFAULT_VERSION_COPYWRITING}",
+                        description: '填写IoT物联网版本描述文案(文案会显示在钉钉通知、Git Tag、CHANGELOG.md等, ' +
+                                '不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志,) 🖊')
                 booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}",
                         description: '是否生产环境自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录')
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 📢 ")
@@ -367,6 +370,14 @@ def call(String type = 'iot', Map map) {
 }
 
 /**
+ * 常量定义类型
+ */
+class Constants {
+    // IoT物联网默认版本描述文案
+    static final String IOT_DEFAULT_VERSION_COPYWRITING = '1. 优化了一些细节体验\n2. 修复了一些已知问题 \n'
+}
+
+/**
  *  获取初始化参数方法
  */
 def getInitParams(map) {
@@ -557,7 +568,7 @@ def codeQualityAnalysis() {
  * 设置版本信息
  */
 def setVersionInfo() {
-    if ("${IS_MONO_REPO}" == "true") {     // 是单体式monorepo仓库
+    if ("${IS_MONO_REPO}" == "true") { // 是单体式monorepo仓库
     }
     // 设置版本号和固件地址
     setVersion()
@@ -571,10 +582,15 @@ def setVersionInfo() {
  * 设置版本号和固件地址
  */
 def setVersion() {
+    def firmwareUrl = "${iotOssUrl}".replace("https://", "http://") // 固件地址  去掉https协议
+    if (!fileExists("${VERSION_FILE}")) { // 文件不存在则创建
+        writeJSON file: "${VERSION_FILE}", json: [version: "${IOT_VERSION_NUM}", file: firmwareUrl], pretty: 2
+    }
+
     if ("${params.VERSION_NUM}".trim() != "") { // 手动输入版本号情况
         try {
             // 写入本地版本文件
-            writeJSON file: "${VERSION_FILE}", json: [version: params.VERSION_NUM, file: iotOssUrl], pretty: 2
+            writeJSON file: "${VERSION_FILE}", json: [version: params.VERSION_NUM, file: firmwareUrl], pretty: 2
         } catch (e) {
             println(e.getMessage())
             println("设置${VERSION_FILE}本地文件内的版本号和固件地址失败, 不影响流水线运行 ❌ ")
@@ -615,7 +631,6 @@ def getVersion() {
  * 嵌入式编译构建
  */
 def embeddedBuildProject() {
-    sh "pio --version"
     println("执行嵌入式程序PlatformIO构建 🏗️  ")
     PlatformIO.build(this)
     Tools.printColor(this, "嵌入式固件打包成功 ✅")
@@ -752,18 +767,19 @@ def gitTagLog() {
     // 构建成功后生产环境并发布类型自动打tag和变更记录  指定tag方式不再重新打tag
     if (params.IS_GIT_TAG == true && "${IS_PROD}" == 'true' && params.GIT_TAG == GlobalVars.noGit) {
         // 获取变更记录
-        def gitChangeLog = changeLog.genChangeLog(this, 100)
-        def latestTag = ""
-        try {
-            // 获取本地当前分支最新tag名称   获取远程仓库最新tag命令 git ls-remote
-            latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")
-        } catch (error) {
-            println "没有获取到最新的git tag标签"
-            println error.getMessage()
+        def gitChangeLog = ""
+        if ("${Constants.IOT_DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESC) {
+            gitChangeLog = changeLog.genChangeLog(this, 100)
+        } else {
+            // 使用自定义文案
+            gitChangeLog = "${params.VERSION_DESC}"
         }
         // 生成语义化版本号
-        tagVersion = Utils.genSemverVersion(latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
-                GlobalVars.gitCommitFeature : GlobalVars.gitCommitFix)
+        tagVersion = "${IOT_VERSION_NUM}"
+        // monorepo单体式仓库 独立版本号Tag重复处理
+        if ("${IS_MONO_REPO}" == "true") {
+            tagVersion = tagVersion + "-" + "${PROJECT_NAME}".toLowerCase()
+        }
         // 生成tag和变更日志
         gitTagLog.genTagAndLog(this, tagVersion, gitChangeLog, "${REPO_URL}", "${GIT_CREDENTIALS_ID}")
     }
