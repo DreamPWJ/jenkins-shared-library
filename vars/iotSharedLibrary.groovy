@@ -415,14 +415,20 @@ def getInitParams(map) {
 
     // tag版本变量定义
     tagVersion = ""
-    // IoT产物构建包OSS地址Url
+    // IoT产物构建固件包OSS地址Url
     iotOssUrl = ""
+    // IoT固件OTA升级OSS地址Url
+    jsonOssUrl = ""
     // IoT产物构建包大小
     iotPackageSize = ""
     // IoT产物构建固件位置
     iotPackageLocation = ""
     // IoT产物构建固件文件格式
     iotPackageType = "bin" // hex
+    // 默认IoT固件版本号
+    IOT_VERSION_NUM = "1.0.0"
+    // 版本号和固件地址记录存储文件名称
+    VERSION_FILE = "${PROJECT_NAME}" + "ota.json"
 }
 
 /**
@@ -548,6 +554,64 @@ def codeQualityAnalysis() {
 }
 
 /**
+ * 设置版本信息
+ */
+def setVersionInfo() {
+    if ("${IS_MONO_REPO}" == "true") {     // 是单体式monorepo仓库
+    }
+    // 设置版本号和固件地址
+    setVersion()
+    // 获取版本号和固件地址
+    getVersion()
+    // 获取应用名称
+    // getProjectName()
+}
+
+/**
+ * 设置版本号和固件地址
+ */
+def setVersion() {
+    if ("${params.VERSION_NUM}".trim() != "") { // 手动输入版本号情况
+        try {
+            // 写入本地版本文件
+            writeJSON file: "${VERSION_FILE}", json: [version: params.VERSION_NUM, file: iotOssUrl], pretty: 2
+        } catch (e) {
+            println(e.getMessage())
+            println("设置${VERSION_FILE}本地文件内的版本号和固件地址失败, 不影响流水线运行 ❌ ")
+        }
+    }
+}
+
+/**
+ * 获取版本号和固件地址
+ */
+def getVersion() {
+    try {
+        if ("${params.VERSION_NUM}".trim() == "") { // 没有手动输入版本号情况
+            if (params.GIT_TAG == GlobalVars.noGit && fileExists("${VERSION_FILE}")) {
+                // 读取版本信息
+                def versionJson = readJSON file: "${VERSION_FILE}", text: ''
+                // println(versionJson.version)
+                // println(versionJson.file)
+                // 自增版本号
+                def newVersion = Utils.genSemverVersion(versionJson.version)
+                println("自增版本号: " + newVersion)
+                IOT_VERSION_NUM = newVersion
+                // 写入本地版本文件
+                writeJSON file: "${VERSION_FILE}", json: [version: "${IOT_VERSION_NUM}", file: iotOssUrl], pretty: 2
+            } else if (params.GIT_TAG != GlobalVars.noGit) { // 回滚版本情况
+                IOT_VERSION_NUM = params.GIT_TAG
+            }
+        } else { // 手动输入版本号情况
+            IOT_VERSION_NUM = params.VERSION_NUM
+        }
+    } catch (e) {
+        println(e.getMessage())
+        println("获取${VERSION_FILE}本地文件内的版本号和固件地址失败, 不影响流水线运行 ❌ ")
+    }
+}
+
+/**
  * 嵌入式编译构建
  */
 def embeddedBuildProject() {
@@ -562,18 +626,19 @@ def embeddedBuildProject() {
  * 方便下载构建部署包
  */
 def uploadOss(map) {
-        try {
-            // 源文件地址
-            def sourceFile = "${env.WORKSPACE}/${iotPackageLocation}"
-            // 目标文件
-            def targetFile = "iot/${PROJECT_NAME}/firmware.${iotPackageType}"
-            iotOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
-            println "${iotOssUrl}"
-            Tools.printColor(this, "上传固件文件到OSS成功 ✅")
-        } catch (error) {
-            println "上传固件文件到OSS异常"
-            println error.getMessage()
-        }
+    // try {
+    // 源文件地址
+    def sourceFile = "${env.WORKSPACE}/${iotPackageLocation}"
+    // 目标文件
+    def targetFile = "iot/${PROJECT_NAME}/${ENV_TYPE}/firmware.${iotPackageType}"
+    iotOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
+    println "${iotOssUrl}"
+    Tools.printColor(this, "上传固件文件到OSS成功 ✅")
+
+//    } catch (error) {
+//        println "上传固件文件到OSS异常"
+//        println error.getMessage()
+//    }
 }
 
 /**
@@ -600,18 +665,19 @@ def integrationTesting() {
  * OTA空中升级
  */
 def otaUpgrade(map) {
+    // 自动生成升级Json文件 包含版本号和固件地址
+    setVersionInfo()
     // 将固件包上传到OTA服务器、上传设置版本号和新固件地址的JSON升级文件  嵌入式设备会自动检测升级
-        try {
-            def updateFileName = "ota.json"
-            def sourceJsonFile = "${env.WORKSPACE}/${PROJECT_NAME}/${updateFileName}"
-            def targetJsonFile = "iot/${PROJECT_NAME}/${updateFileName}"
-            def jsonOssUrl = AliYunOSS.upload(this, map, sourceJsonFile, targetJsonFile)
-            println "${jsonOssUrl}"
-            Tools.printColor(this, "上传ATA固件升级文件到OSS成功 ✅")
-        } catch (e) {
-            println e.getMessage()
-            println "OTA固件升级JSON文件上传失败"
-        }
+    // try {
+    def sourceJsonFile = "${env.WORKSPACE}/${VERSION_FILE}"
+    def targetJsonFile = "iot/${PROJECT_NAME}/${ENV_TYPE}/${VERSION_FILE}"
+    jsonOssUrl = AliYunOSS.upload(this, map, sourceJsonFile, targetJsonFile)
+    println "${jsonOssUrl}"
+    Tools.printColor(this, "上传OTA固件升级文件到OSS成功 ✅")
+/*    } catch (e) {
+        println e.getMessage()
+        println "OTA固件升级JSON文件上传失败"
+    }*/
 }
 
 /**
@@ -666,7 +732,7 @@ def alwaysPost() {
     // Jenkins全局安全配置->标记格式器内设置Safe HTML支持html文本
     try {
         def releaseEnvironment = "${ENV_TYPE}"
-        currentBuild.description = "${iotOssUrl.trim() != '' ? "<br/><a href='${iotOssUrl}'> 👉 直接下载固件</a>" : ""}" +
+        currentBuild.description = "${iotOssUrl.trim() != '' ? "<a href='${iotOssUrl}'> 👉 直接下载固件</a>" : ""}" +
                 "<br/> 项目: ${PROJECT_NAME}" +
                 "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
                 "<br/> 大小: ${iotPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
@@ -730,7 +796,9 @@ def dingNotice(int type, msg = '', atMobiles = '') {
             monorepoProjectName = "MonoRepo项目: ${PROJECT_NAME}"   // 单体仓库区分项目
         }
         def projectTypeName = ""
-
+        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.Embedded) {
+            projectTypeName = "嵌入式"
+        }
         def envTypeMark = "内测版"  // 环境类型标志
         if ("${IS_PROD}" == 'true') {
             envTypeMark = "正式版"
@@ -767,8 +835,8 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                             "###### ${rollbackTag}",
                             "###### 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
                             "###### 持续时间: ${durationTimeString}   固件大小: ${iotPackageSize}",
-                            "###### 嵌入式固件  [直接下载](${iotOssUrl})",
-                            "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})", // Sonar地址  [查看](http://182.92.126.7:9000/)
+                            "###### 嵌入式固件  [直接下载](${iotOssUrl})   OTA配置  [查看](${jsonOssUrl}) ",
+                            "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
                             "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
                             "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
                     ],

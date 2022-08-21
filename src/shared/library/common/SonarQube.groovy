@@ -6,7 +6,7 @@ import shared.library.GlobalVars
  * @author 潘维吉
  * @date 2021/2/18 8:41
  * @email 406798106@qq.com
- * @description Sonar代码质量扫描
+ * @description Sonar代码质量与安全扫描
  */
 class SonarQube implements Serializable {
 
