@@ -598,7 +598,7 @@ def setVersionInfo(map) {
  * 设置版本号和固件地址
  */
 def setVersion() {
-    def firmwareUrl = "${iotOssUrl}".replace("https://", "http://") // 固件地址  去掉https协议
+    def firmwareUrl = "${iotOssUrl}".replace("https", "http") // 固件地址  去掉https协议
     if (!fileExists("${VERSION_FILE}")) { // 文件不存在则创建
         writeJSON file: "${VERSION_FILE}", json: [version: "${IOT_VERSION_NUM}", file: firmwareUrl], pretty: 2
     }
