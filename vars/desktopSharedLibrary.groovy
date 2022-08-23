@@ -476,7 +476,7 @@ def getInitParams(map) {
 
     packageOssUrl = "" // 包访问Url
     qrCodeOssUrl = "" // 二维码访问url
-    packageSuffixName = "" // 包后缀名称 如.exe .dmg .deb等
+    packageSuffixName = "" // 包后缀名称 如.exe .msix .dmg .deb 等
     packageSize = "" // 包大小
 
 }

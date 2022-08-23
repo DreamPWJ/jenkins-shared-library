@@ -32,13 +32,13 @@ def call(String type = 'iot', Map map) {
                                 '回滚(基于jenkins归档方式回滚选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚请选择' + GlobalVars.release + ')')
                 /*              choice(name: 'MONOREPO_PROJECT_NAME', choices: "${MONOREPO_PROJECT_NAMES}",
                                       description: "选择MonoRepo单体式统一仓库项目名称, ${GlobalVars.defaultValue}选项是MultiRepo多体式独立仓库或未配置, 大统一单体式仓库流水线可减少构建时间和磁盘空间")*/
+                string(name: 'VERSION_NUM', defaultValue: "", description: '选填 设置IoT物联网固件的语义化版本号 如1.0.0 (默认不填写 自动获取之前设置的版本号并自增) 🖊')
                 gitParameter(name: 'GIT_BRANCH', type: 'PT_BRANCH', defaultValue: "${BRANCH_NAME}", selectedValue: "DEFAULT",
                         useRepository: "${REPO_URL}", sortMode: 'ASCENDING', branchFilter: 'origin/(.*)',
                         description: "选择要构建的Git分支 默认: " + "${BRANCH_NAME} (可自定义配置具体任务的默认常用分支, 实现一键或全自动构建)")
                 gitParameter(name: 'GIT_TAG', type: 'PT_TAG', defaultValue: GlobalVars.noGit, selectedValue: GlobalVars.noGit,
                         useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*',
                         description: "DEPLOY_MODE基于" + GlobalVars.release + "部署方式, 可选择指定Git Tag版本标签构建, 默认不选择是获取指定分支下的最新代码, 选择后按tag代码而非分支代码构建⚠️, 同时可作为一键回滚版本使用 🔙 ")
-                string(name: 'VERSION_NUM', defaultValue: "", description: '选填 设置IoT物联网固件的语义化版本号 如1.0.0 (默认不填写 自动获取之前设置的版本号并自增) 🖊')
                 text(name: 'VERSION_DESC', defaultValue: "${Constants.IOT_DEFAULT_VERSION_COPYWRITING}",
                         description: '填写IoT物联网版本描述文案(文案会显示在钉钉通知、Git Tag、CHANGELOG.md等, ' +
                                 '不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊')
@@ -598,7 +598,7 @@ def setVersionInfo(map) {
  * 设置版本号和固件地址
  */
 def setVersion() {
-    def firmwareUrl = "${iotOssUrl}".replace("https", "http") // 固件地址  去掉https协议
+    def firmwareUrl = "${iotOssUrl}".trim().replaceAll("https", "http") // 固件地址  去掉https协议
     if (!fileExists("${VERSION_FILE}")) { // 文件不存在则创建
         writeJSON file: "${VERSION_FILE}", json: [version: "${IOT_VERSION_NUM}", file: firmwareUrl], pretty: 2
     }
