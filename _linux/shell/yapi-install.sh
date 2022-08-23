@@ -72,6 +72,6 @@ echo "在服务器上验证YApi启动是否成功"
 curl localhost:6006
 
 # 管理员登录账号
-#访问地址  http://ip:6006
-#登录账号: 406798106@qq.com
-#密码: ymfe.org or yapi.pro
+# 访问地址  http://ip:6006
+# 登录账号: 406798106@qq.com
+# 密码: ymfe.org or yapi.pro
