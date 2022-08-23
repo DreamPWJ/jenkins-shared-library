@@ -584,6 +584,7 @@ def codeQualityAnalysis() {
  * 自动生成升级Json文件 包含版本号和固件地址
  */
 def setVersionInfo(map) {
+    firmwareUrl = "${iotOssUrl}".trim().replace("https://", "http://") // 固件地址  去掉https协议
     if ("${IS_MONO_REPO}" == "true") { // 是单体式monorepo仓库
     }
     // 设置版本号和固件地址
@@ -598,7 +599,6 @@ def setVersionInfo(map) {
  * 设置版本号和固件地址
  */
 def setVersion() {
-    def firmwareUrl = "${iotOssUrl}".trim().replaceAll("https", "http") // 固件地址  去掉https协议
     if (!fileExists("${VERSION_FILE}")) { // 文件不存在则创建
         writeJSON file: "${VERSION_FILE}", json: [version: "${IOT_VERSION_NUM}", file: firmwareUrl], pretty: 2
     }
@@ -630,7 +630,7 @@ def getVersion() {
                 println("自增版本号: " + newVersion)
                 IOT_VERSION_NUM = newVersion
                 // 写入本地版本文件
-                writeJSON file: "${VERSION_FILE}", json: [version: "${IOT_VERSION_NUM}", file: iotOssUrl], pretty: 2
+                writeJSON file: "${VERSION_FILE}", json: [version: "${IOT_VERSION_NUM}", file: firmwareUrl], pretty: 2
             } else if (params.GIT_TAG != GlobalVars.noGit) { // 回滚版本情况
                 IOT_VERSION_NUM = params.GIT_TAG
             }
