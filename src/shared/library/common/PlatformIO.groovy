@@ -22,6 +22,7 @@ class PlatformIO implements Serializable {
         }
         ctx.dir("${ctx.env.WORKSPACE}/${monorepoProjectDir}") {
             // ctx.sh " pio ci ${ctx.MONO_REPO_MAIN_PACKAGE}/${ctx.PROJECT_NAME} "
+            // -e, --environment 指定环境变量 多环境文档 https://docs.platformio.org/en/stable/projectconf/section_env.html
             ctx.sh " platformio run  "  // -d ./${ctx.MONO_REPO_MAIN_PACKAGE}/${ctx.PROJECT_NAME}
         }
         // 构建烧录固件位置: .pio/build/*/firmware.bin

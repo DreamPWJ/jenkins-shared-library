@@ -186,6 +186,20 @@ def call(String type = 'iot', Map map) {
                     }
                 }
 
+                stage('设置版本信息') {
+                    when {
+                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            return ("${IS_OTA}" == 'true')
+                        }
+                    }
+                    steps {
+                        script {
+                            setVersionInfo(map)
+                        }
+                    }
+                }
+
                 stage('嵌入式构建') {
                     when {
                         beforeAgent true
@@ -254,20 +268,6 @@ def call(String type = 'iot', Map map) {
                     steps {
                         script {
                             integrationTesting()
-                        }
-                    }
-                }
-
-                stage('设置版本信息') {
-                    when {
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return ("${IS_OTA}" == 'true')
-                        }
-                    }
-                    steps {
-                        script {
-                            setVersionInfo(map)
                         }
                     }
                 }
@@ -585,7 +585,7 @@ def codeQualityAnalysis() {
  * 自动生成升级Json文件 包含版本号和固件地址
  */
 def setVersionInfo(map) {
-    firmwareUrl = "${iotOssUrl}".trim().replace("https://", "http://") // 固件地址  去掉https协议
+    firmwareUrl = "" // 固件地址
     if ("${IS_MONO_REPO}" == "true") { // 是单体式monorepo仓库
     }
     // 设置版本号和固件地址
@@ -645,9 +645,28 @@ def getVersion() {
 }
 
 /**
+ * 设置代码中的版本信息
+ */
+def setCodeVersion() {
+    // 对于Arduino框架 规范定义在src/main.cpp中的CI_OTA_FIRMWARE_VERSION关键字
+    def versionFile = "src/main.cpp"
+    if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
+        versionFile = "${MONO_REPO_MAIN_PACKAGE}/${PROJECT_NAME}/" + versionFile
+    }
+    def versionFileContent = readFile(file: "${versionFile}")
+    writeFile file: "${versionFile}", text: "${versionFileContent}"
+            .replaceAll("CI_OTA_FIRMWARE_VERSION", "${IOT_VERSION_NUM}")
+}
+
+/**
  * 嵌入式编译构建
  */
 def embeddedBuildProject() {
+    if ("${IS_OTA}" == "true") {
+        // 设置代码中的版本信息
+        setCodeVersion()
+    }
+
     println("执行嵌入式程序PlatformIO构建 🏗️  ")
     PlatformIO.build(this)
     Tools.printColor(this, "嵌入式固件打包成功 ✅")
@@ -697,6 +716,10 @@ def integrationTesting() {
  * OTA空中升级
  */
 def otaUpgrade(map) {
+    // 重新写入固件地址
+    firmwareUrl = "${iotOssUrl}".trim().replace("https://", "http://") // 固件地址  去掉https协议
+    writeJSON file: "${VERSION_FILE}", json: [version: "${IOT_VERSION_NUM}", file: firmwareUrl], pretty: 2
+
     // 将固件包上传到OTA服务器、上传设置版本号和新固件地址的JSON升级文件  嵌入式设备会自动检测升级
     // try {
     def sourceJsonFile = "${env.WORKSPACE}/${VERSION_FILE}"
