@@ -9,7 +9,7 @@ import shared.library.devops.GitTagLog
  * @author 潘维吉
  * @description 通用核心共享Pipeline脚本库 针对IoT物联网
  * 类型  1. 嵌入式  2. VR AR XR  3. 元宇宙
- * 基于PlatformIO与Golioth实现嵌入式固件自动化构建和OTA升级
+ * 基于PlatformIO实现嵌入式固件自动化构建和OTA空中升级
  */
 
 def call(String type = 'iot', Map map) {
@@ -31,8 +31,9 @@ def call(String type = 'iot', Map map) {
                         description: '选择部署方式  1. ' + GlobalVars.release + '发布 2. ' + GlobalVars.rollback +
                                 '回滚(基于jenkins归档方式回滚选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚请选择' + GlobalVars.release + ')')
                 /*              choice(name: 'MONOREPO_PROJECT_NAME', choices: "${MONOREPO_PROJECT_NAMES}",
-                                      description: "选择MonoRepo单体式统一仓库项目名称, ${GlobalVars.defaultValue}选项是MultiRepo多体式独立仓库或未配置, 大统一单体式仓库流水线可减少构建时间和磁盘空间")*/
+                                      description: "选择MonoRepo单体式统一仓库项目名称, ${GlobalVars.defaultValue}选项是MultiRepo多体式独立仓库或未配置, 大统一单体式仓库流水线可减少构建时间和磁盘空间") */
                 string(name: 'VERSION_NUM', defaultValue: "", description: '选填 设置IoT物联网固件的语义化版本号 如1.0.0 (默认不填写 自动获取之前设置的版本号并自增) 🖊')
+                booleanParam(name: 'IS_OTA_UPGRADE', defaultValue: "${map.is_ota_upgrade}", description: "是否开启OTA空中升级功能  🌎 ")
                 gitParameter(name: 'GIT_BRANCH', type: 'PT_BRANCH', defaultValue: "${BRANCH_NAME}", selectedValue: "DEFAULT",
                         useRepository: "${REPO_URL}", sortMode: 'ASCENDING', branchFilter: 'origin/(.*)',
                         description: "选择要构建的Git分支 默认: " + "${BRANCH_NAME} (可自定义配置具体任务的默认常用分支, 实现一键或全自动构建)")
@@ -412,7 +413,7 @@ def getInitParams(map) {
     // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
     IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true
     IS_UPLOAD_OSS = jsonParams.IS_UPLOAD_OSS ? jsonParams.IS_UPLOAD_OSS : false // 是否构建产物上传到OSS
-    IS_OTA = jsonParams.IS_OTA ? jsonParams.IS_OTA : false // 是否进行OTA空中升级
+    IS_OTA = jsonParams.IS_OTA ? jsonParams.IS_OTA : params.IS_OTA_UPGRADE // 是否进行OTA空中升级
     IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
 
     // 设置monorepo单体仓库主包文件夹名
