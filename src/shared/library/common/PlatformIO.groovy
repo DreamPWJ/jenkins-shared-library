@@ -33,8 +33,8 @@ class PlatformIO implements Serializable {
     }
 
     /**
-     * Golioth嵌入式云端构建和OTA升級
-     * 參考文檔：https://github.com/goliothlabs/arduino-sdk
+     * Golioth嵌入式云端构建和OTA控制升級
+     * 參考文档：https://github.com/goliothlabs/arduino-sdk
      */
     static def buildInCloud(ctx) {
         ctx.sh "pio ci"

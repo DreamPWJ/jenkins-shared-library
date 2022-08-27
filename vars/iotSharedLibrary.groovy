@@ -648,7 +648,7 @@ def getVersion() {
  * 设置代码中的版本信息
  */
 def setCodeVersion() {
-    // 对于Arduino框架 规范定义在src/main.cpp中的CI_OTA_FIRMWARE_VERSION关键字
+    // 对于PlatformIO平台 规范定义在src/main.cpp中的CI_OTA_FIRMWARE_VERSION关键字或使用JSON文件定义
     def versionFile = "src/main.cpp"
     if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
         versionFile = "${MONO_REPO_MAIN_PACKAGE}/${PROJECT_NAME}/" + versionFile
