@@ -114,7 +114,7 @@ sharedLibrary(map)
 /*
 
 jxyb-epark-h5-prod
-好停车H5 Web前端 ❤️
+莒县云泊停车H5 Web前端 ❤️
 JSON_PARAMS
 {
     "REPO_URL" : "http://47.102.214.33/lanneng_develop/rzhtc.git" ,
@@ -128,7 +128,7 @@ JSON_PARAMS
 }
 
 jxyb-epark-server-prod
-好停车epark平台服务端
+莒县云泊停车epark平台服务端
 JSON_PARAMS
 {
    "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark.git" ,
@@ -144,7 +144,7 @@ JSON_PARAMS
 }
 
 jxyb-park-coupon-h5-prod
-好停车优惠券H5 Web前端 ❤️
+莒县云泊停车优惠券H5 Web前端 ❤️
 JSON_PARAMS
 {
     "REPO_URL" : "http://47.102.214.33/lanneng_develop/park_coupon.git" ,
@@ -158,7 +158,7 @@ JSON_PARAMS
 REMOTE_IP: 172.16.0.91
 
 jxyb-induction-screen-server-prod
-好停车诱导屏服务端
+莒县云泊停车诱导屏服务端
 JSON_PARAMS
 {
    "REPO_URL" : "http://47.102.214.33/lanneng_develop/traffic.git" ,
@@ -167,6 +167,19 @@ JSON_PARAMS
    "PROJECT_NAME" : "induction-screen" ,
    "SHELL_PARAMS" : "induction-screen server 8082 8082 prod-juxian",
    "IS_MAVEN_SINGLE_MODULE" : true
+}
+REMOTE_IP: 172.16.0.91
+
+jxyb-induction-screen-web-prod
+莒县云泊停车诱导屏 Web前端 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "http://47.102.214.33/lanneng_develop/parktraffic-vue.git" ,
+    "BRANCH_NAME" : "main" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "induction-screen" ,
+    "SHELL_PARAMS" : "induction-screen web 8009 80 prod" ,
+    "NPM_RUN_PARAMS" : "build"
 }
 REMOTE_IP: 172.16.0.91
 

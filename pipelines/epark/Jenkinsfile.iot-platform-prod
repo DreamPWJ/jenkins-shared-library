@@ -125,7 +125,7 @@ JSON_PARAMS
    "SHELL_PARAMS" : "iot-platform app 8088 8080 prod",
 }
 
-REMOTE_IP: 172.16.0.91
+REMOTE_IP: 172.16.0.16
 
 */
 
