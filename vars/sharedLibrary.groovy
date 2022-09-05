@@ -102,8 +102,6 @@ def call(String type = 'web-java', Map map) {
                 // 动态设置环境变量  配置相关自定义工具
                 //PATH = "${JAVA_HOME}/bin:$PATH"
 
-                NODE_VERSION = "${map.nodejs}" // nodejs版本
-                JDK_VERSION = "${map.jdk}" // JDK版本
                 CI_GIT_CREDENTIALS_ID = "${map.ci_git_credentials_id}" // CI仓库信任ID
                 GIT_CREDENTIALS_ID = "${map.git_credentials_id}" // Git信任ID
                 DING_TALK_CREDENTIALS_ID = "${map.ding_talk_credentials_id}" // 钉钉授信ID 系统设置里面配置 自动生成
@@ -248,7 +246,8 @@ def call(String type = 'web-java', Map map) {
                         docker {
                             // Node环境  构建完成自动删除容器
                             //image "node:${NODE_VERSION.replace('Node', '')}"
-                            image "panweiji/node:14" // 使用自定义Dockerfile的node环境 加速monorepo依赖构建内置lerna等相关依赖
+                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}"
+                            // 使用自定义Dockerfile的node环境 加速monorepo依赖构建内置lerna等相关依赖
                             reuseNode true // 使用根节点
                         }
                     }
@@ -718,7 +717,9 @@ def getInitParams(map) {
     PROJECT_NAME = jsonParams.PROJECT_NAME ? jsonParams.PROJECT_NAME.trim() : ""
     SHELL_PARAMS = jsonParams.SHELL_PARAMS ? jsonParams.SHELL_PARAMS.trim() : "" // shell传入前端或后端参数
 
+    JDK_VERSION = jsonParams.JDK_VERSION ? jsonParams.JDK_VERSION.trim() : "${map.jdk}" // JDK版本
     // npm包管理工具类型 如:  npm、yarn、pnpm
+    NODE_VERSION = jsonParams.NODE_VERSION ? jsonParams.NODE_VERSION.trim() : "${map.nodejs}" // nodejs版本
     NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [test]的前端项目参数
 
@@ -1052,7 +1053,7 @@ def nodeBuildProject() {
                 retry(2) {
                     println("安装依赖 📥")
                     // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱
-                    sh "npm ci" // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
+                    sh "npm install" // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
                 }
             }
 

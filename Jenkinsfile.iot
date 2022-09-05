@@ -62,8 +62,25 @@ JSON_PARAMS
     "BRANCH_NAME" : "develop" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "esp32-demo" ,
-    "PROJECT_CHINESE_NAME" : "地锁控制器" ,
+    "PROJECT_CHINESE_NAME" : "测试ESP32单片机" ,
     "ENV_TYPE" : "sit" ,
+    "IS_MONO_REPO" : true ,
+    "IS_UPLOAD_OSS" : true ,
+    "IS_OTA" : true ,
+}
+
+ground-lock-embedded-monorepo
+地锁控制器嵌入式项目
+/*
+
+JSON_PARAMS
+{
+    "REPO_URL" : "http://47.102.214.33/lanneng_develop/embedded-monorepo.git" ,
+    "BRANCH_NAME" : "develop" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "ground-lock" ,
+    "PROJECT_CHINESE_NAME" : "地锁控制器" ,
+    "ENV_TYPE" : "prod" ,
     "IS_MONO_REPO" : true ,
     "IS_UPLOAD_OSS" : true ,
     "IS_OTA" : true ,

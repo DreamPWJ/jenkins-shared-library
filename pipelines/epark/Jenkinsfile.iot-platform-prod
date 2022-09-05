@@ -1,5 +1,5 @@
 #!groovy
-@Library('jenkins-shared-library@dev') _
+@Library('jenkins-shared-library@master') _
 
 /**
  * @author 潘维吉
@@ -31,9 +31,9 @@ map.put('build_num_keep', 2)
 
 // Docker相关参数
 // JVM内存设置
-map.put('docker_java_opts', '-Xmx2600m')
+map.put('docker_java_opts', '-Xmx2000m')
 // docker内存限制
-map.put('docker_memory', '3G')
+map.put('docker_memory', '2.5G')
 // docker日志限制
 map.put('docker_log_opts', 'max-size=150m') // --log-opt max-size=50m --log-opt max-file=3
 // docker挂载映射 docker run -v 参数  多个用逗号,分割
@@ -43,11 +43,11 @@ map.put('docker_multistage_build_images', ' ')
 // 是否上传镜像到docker容器仓库
 map.put('is_push_docker_repo', false)
 // docker容器镜像仓库账号信任id
-map.put('docker_repo_credentials_id', '5553c9ed-5416-4bbf-b7fc-9d53ed856177')
+map.put('docker_repo_credentials_id', '6b186cac-2f4d-49dd-810b-3a8227ea3115')
 // docker镜像仓库注册地址
-map.put('docker_repo_registry', 'registry.cn-qingdao.aliyuncs.com')
+map.put('docker_repo_registry', 'registry.cn-shanghai.aliyuncs.com')
 // docker仓库命名空间名称
-map.put('docker_repo_namespace', 'lexiang')
+map.put('docker_repo_namespace', 'lannengkeji')
 
 // K8S集群相关参数
 // K8S集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins凭据设置界面，类型选择为“Secret file”配置
@@ -56,20 +56,20 @@ map.put('k8s_credentials_ids', ' ')
 map.put('k8s_image_pull_secrets', ' ')
 
 // 项目标签或项目简称
-map.put('project_tag', '莒县云泊')
+map.put('project_tag', 'IoT物联网')
 
 // 是否是生产环境
 map.put('is_prod', true)
 // 是否在同一台服务器蓝绿部署或滚动部署 非k8s集群方式设置
 map.put('is_same_server', false)
 // 是否进行优雅停机
-map.put('is_grace_shutdown', false)
+map.put('is_grace_shutdown', true)
 // 是否进行服务启动健康探测
 map.put('is_health_check', true)
 // 是否Pipeline内脚本钉钉通知  总开关
 map.put('is_ding_notice', true)
 // 是否进行部署前通知
-map.put('is_before_deploy_notice', false)
+map.put('is_before_deploy_notice', true)
 // 是否通知变更记录
 map.put('is_notice_change_log', true)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
@@ -77,14 +77,14 @@ map.put('is_git_tag', true)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
-// jenkins分布式构建节点label名称
+// jenkins分布式构建节点label名称  预配置在jenkins节点管理内
 map.put('jenkins_node', 'master')
 map.put('jenkins_node_front_end', 'master')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node14')
 map.put('maven', 'Maven3.6')
-map.put('jdk', '8')
+map.put('jdk', '11')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
@@ -100,7 +100,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', ' ')
+map.put('maven_one_level', 'iot-platform')
 // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
 map.put('maven_setting_xml', ' ')
 
@@ -109,81 +109,23 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.jxyb-epark-prod
+// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.iot-platform-prod
 
 /*
 
-jxyb-epark-h5-prod
-莒县云泊停车H5 Web前端 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/rzhtc.git" ,
-    "BRANCH_NAME" : "main" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "rzhtc" ,
-    "SHELL_PARAMS" : "rzhtc h5 8010 80 prod" ,
-    "NPM_RUN_PARAMS" : "build:juxian",
-    "IS_ROLL_DEPLOY" : true,
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
-}
 
-jxyb-epark-server-prod
-莒县云泊停车epark平台服务端
+iot-platform-app-prod
+IoT物联网App服务端
 JSON_PARAMS
 {
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark.git" ,
-   "BRANCH_NAME" : "main" ,
+   "REPO_URL" : "http://47.102.214.33/lanneng_develop/java-backend-monorepo.git" ,
+   "BRANCH_NAME" : "feature/iot-platform" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "epark-server" ,
-   "SHELL_PARAMS" : "epark server 8080 8080 prod",
-   "IS_ROLL_DEPLOY" : true,
-   "IS_MAVEN_SINGLE_MODULE" : true,
-   "JAVA_FRAMEWORK_TYPE" : "2",
-   "SOURCE_TARGET_CONFIG_DIR" : "resources/juxian,resources",
-   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/nfsdata/ParkPicture:/usr/local/tomcat/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
+   "PROJECT_NAME" : "iot-platform-app" ,
+   "SHELL_PARAMS" : "iot-platform app 8088 8080 prod",
 }
 
-jxyb-park-coupon-h5-prod
-莒县云泊停车优惠券H5 Web前端 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/park_coupon.git" ,
-    "BRANCH_NAME" : "master" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "park-coupon" ,
-    "SHELL_PARAMS" : "park-coupon h5 8008 80 prod" ,
-    "NPM_RUN_PARAMS" : "build",
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
-}
-REMOTE_IP: 172.16.0.91
-
-jxyb-induction-screen-server-prod
-莒县云泊停车诱导屏服务端
-JSON_PARAMS
-{
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/traffic.git" ,
-   "BRANCH_NAME" : "main" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "induction-screen" ,
-   "SHELL_PARAMS" : "induction-screen server 8082 8082 prod-juxian",
-   "IS_MAVEN_SINGLE_MODULE" : true
-}
-REMOTE_IP: 172.16.0.91
-
-jxyb-induction-screen-web-prod
-莒县云泊停车诱导屏 Web前端 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/parktraffic-vue.git" ,
-    "BRANCH_NAME" : "main" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "induction-screen" ,
-    "SHELL_PARAMS" : "induction-screen web 8009 80 prod" ,
-    "NODE_VERSION" : "10",
-    "NPM_RUN_PARAMS" : "build",
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
-}
-REMOTE_IP: 172.16.0.91
+REMOTE_IP: 172.16.0.16
 
 */
 
