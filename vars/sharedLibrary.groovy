@@ -102,7 +102,6 @@ def call(String type = 'web-java', Map map) {
                 // 动态设置环境变量  配置相关自定义工具
                 //PATH = "${JAVA_HOME}/bin:$PATH"
 
-                NODE_VERSION = "${map.nodejs}" // nodejs版本
                 JDK_VERSION = "${map.jdk}" // JDK版本
                 CI_GIT_CREDENTIALS_ID = "${map.ci_git_credentials_id}" // CI仓库信任ID
                 GIT_CREDENTIALS_ID = "${map.git_credentials_id}" // Git信任ID
@@ -248,7 +247,8 @@ def call(String type = 'web-java', Map map) {
                         docker {
                             // Node环境  构建完成自动删除容器
                             //image "node:${NODE_VERSION.replace('Node', '')}"
-                            image "panweiji/node:14" // 使用自定义Dockerfile的node环境 加速monorepo依赖构建内置lerna等相关依赖
+                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}"
+                            // 使用自定义Dockerfile的node环境 加速monorepo依赖构建内置lerna等相关依赖
                             reuseNode true // 使用根节点
                         }
                     }
@@ -719,6 +719,7 @@ def getInitParams(map) {
     SHELL_PARAMS = jsonParams.SHELL_PARAMS ? jsonParams.SHELL_PARAMS.trim() : "" // shell传入前端或后端参数
 
     // npm包管理工具类型 如:  npm、yarn、pnpm
+    NODE_VERSION = jsonParams.NODE_VERSION ? jsonParams.NODE_VERSION.trim() : "${map.nodejs}" // nodejs版本
     NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [test]的前端项目参数
 

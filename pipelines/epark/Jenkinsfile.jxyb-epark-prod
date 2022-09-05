@@ -179,6 +179,7 @@ JSON_PARAMS
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "induction-screen" ,
     "SHELL_PARAMS" : "induction-screen web 8009 80 prod" ,
+    "NODE_VERSION" : "12",
     "NPM_RUN_PARAMS" : "build",
     "CUSTOM_NGINX_CONFIG" : "config/default.conf"
 }
