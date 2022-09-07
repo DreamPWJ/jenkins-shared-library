@@ -717,7 +717,7 @@ def integrationTesting() {
  */
 def otaUpgrade(map) {
     // 重新写入固件地址
-    firmwareUrl = "${iotOssUrl}".trim() // .replace("https://", "http://") // 固件地址  去掉https协议
+    firmwareUrl = "${iotOssUrl}".trim().replace("https://", "http://") // 固件地址  去掉https协议
     writeJSON file: "${VERSION_FILE}", json: [version: "${IOT_VERSION_NUM}", file: firmwareUrl], pretty: 2
 
     // 将固件包上传到OTA服务器、上传设置版本号和新固件地址的JSON升级文件  嵌入式设备会自动检测升级
