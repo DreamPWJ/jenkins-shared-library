@@ -33,6 +33,14 @@ class PlatformIO implements Serializable {
     }
 
     /**
+     * 单元测试
+     * 参考文档： https://docs.platformio.org/en/latest/core/userguide/cmd_test.html
+     */
+    static def unitTest(ctx) {
+        ctx.sh "pio test"
+    }
+
+    /**
      * Golioth嵌入式云端构建和OTA控制升級
      * 參考文档：https://github.com/goliothlabs/arduino-sdk
      */
