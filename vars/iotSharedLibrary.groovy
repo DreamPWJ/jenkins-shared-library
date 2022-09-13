@@ -186,6 +186,29 @@ def call(String type = 'iot', Map map) {
                     }
                 }
 
+                stage('单元测试') {
+                    when {
+                        beforeAgent true
+                        // 生产环境不进行集成测试 缩减构建时间
+                        not {
+                            anyOf {
+                                branch 'master'
+                                branch 'prod'
+                            }
+                        }
+                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            // 是否进行集成测试
+                            return ("${IS_INTEGRATION_TESTING}" == 'true')
+                        }
+                    }
+                    steps {
+                        script {
+                            integrationTesting()
+                        }
+                    }
+                }
+
                 stage('设置版本信息') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
@@ -245,29 +268,6 @@ def call(String type = 'iot', Map map) {
                     steps {
                         script {
                             manualApproval()
-                        }
-                    }
-                }
-
-                stage('集成测试') {
-                    when {
-                        beforeAgent true
-                        // 生产环境不进行集成测试 缩减构建时间
-                        not {
-                            anyOf {
-                                branch 'master'
-                                branch 'prod'
-                            }
-                        }
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            // 是否进行集成测试
-                            return ("${IS_INTEGRATION_TESTING}" == 'true')
-                        }
-                    }
-                    steps {
-                        script {
-                            integrationTesting()
                         }
                     }
                 }
@@ -581,6 +581,18 @@ def codeQualityAnalysis() {
 }
 
 /**
+ * 集成测试
+ */
+def integrationTesting() {
+    try {
+        PlatformIO.unitTest(this)
+    } catch (e) {
+        println "自动化集成测试失败 ❌"
+        println e.getMessage()
+    }
+}
+
+/**
  * 设置版本信息
  * 自动生成升级Json文件 包含版本号和固件地址
  */
@@ -698,18 +710,6 @@ def uploadOss(map) {
  */
 def manualApproval() {
 
-}
-
-/**
- * 集成测试
- */
-def integrationTesting() {
-    try {
-
-    } catch (e) {
-        println "自动化集成测试失败 ❌"
-        println e.getMessage()
-    }
 }
 
 /**
