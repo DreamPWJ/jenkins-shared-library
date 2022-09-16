@@ -46,7 +46,7 @@ spec:
       restartPolicy: Always   # 停机后总是不断重启
 #      affinity: # 使用工作负载反亲和特性，让Pod之间尽量“互斥”，能尽量均匀的分布在各node节点上
 
-      # 私有镜像拉取密钥配置   参考文档：https://docs.ksyun.com/documents/5482
+      # 私有镜像拉取密钥配置   参考文档：https://kubernetes.io/docs/concepts/containers/images/#creating-a-secret-with-a-docker-config
       # kubectl create secret docker-registry panweiji2022 --docker-server=registry.cn-qingdao.aliyuncs.com  --docker-username=2000160180 --docker-password=panweiji@2022--docker-email=406798106@qq.com --namespace=default
       imagePullSecrets:
         - name: {K8S_IMAGE_PULL_SECRETS}
