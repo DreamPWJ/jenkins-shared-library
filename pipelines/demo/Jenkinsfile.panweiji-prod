@@ -52,7 +52,7 @@ map.put('docker_repo_namespace', 'lexiang')
 // K8S集群相关参数
 // K8S集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins凭据设置界面，类型选择为“Secret file”配置
 map.put('k8s_credentials_ids', ' ')
-// K8S集群私有镜像仓库拉取密钥
+// K8S集群私有镜像仓库拉取密钥 在集群内使用kubectl create secret命令生成
 map.put('k8s_image_pull_secrets', ' ')
 
 // 项目标签或项目简称
@@ -64,7 +64,7 @@ map.put('is_prod', true)
 map.put('is_same_server', true)
 // 是否进行优雅停机
 map.put('is_grace_shutdown', true)
-// 是否进行服务启动健康探测
+// 是否进行服务启动健康探测 K8S集群类型设置false
 map.put('is_health_check', true)
 // 是否Pipeline内脚本钉钉通知  总开关
 map.put('is_ding_notice', true)
