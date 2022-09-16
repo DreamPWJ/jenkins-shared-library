@@ -1,5 +1,5 @@
 #!groovy
-@Library('jenkins-shared-library@dev') _
+@Library('jenkins-shared-library@master') _
 
 /**
  * @author 潘维吉
@@ -59,7 +59,7 @@ map.put('k8s_image_pull_secrets', 'lannengkeji@2022')
 map.put('project_tag', '颗粒计费')
 
 // 是否是生产环境
-map.put('is_prod', false)
+map.put('is_prod', true)
 // 是否在同一台服务器蓝绿部署或滚动部署 非k8s集群方式设置
 map.put('is_same_server', false)
 // 是否进行优雅停机
@@ -73,7 +73,7 @@ map.put('is_before_deploy_notice', false)
 // 是否通知变更记录
 map.put('is_notice_change_log', true)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', true)
+map.put('is_git_tag', false)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
@@ -109,26 +109,26 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.pellet-charging-test
+// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.pellet-charging-prod
 
 /*
 
-pellet-charging-web-k8s-test
+pellet-charging-web-k8s-prod
 颗粒计费Web前端-k8s集群 ❤️
 JSON_PARAMS
 {
     "REPO_URL" : "http://47.102.214.33/lanneng_develop/react-frontend-monorepo.git" ,
-    "BRANCH_NAME" : "dev" ,
+    "BRANCH_NAME" : "develop" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "pellet-charging-admin" ,
-    "SHELL_PARAMS" : "pellet-charging-admin web 8020 80 test" ,
+    "SHELL_PARAMS" : "pellet-charging-admin web 8020 80 prod" ,
     "NPM_RUN_PARAMS" : "build",
     "IS_MONO_REPO": true,
     "IS_K8S_DEPLOY" : true,
     "K8S_POD_REPLICAS" : "3",
 }
 
-pellet-charging-app-k8s-test
+pellet-charging-app-k8s-prod
 颗粒计费App服务端-k8s集群
 JSON_PARAMS
 {
@@ -136,11 +136,11 @@ JSON_PARAMS
    "BRANCH_NAME" : "develop" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pellet-charging-app" ,
-   "SHELL_PARAMS" : "pellet-charging app 8080 8080 test",
+   "SHELL_PARAMS" : "pellet-charging app 8080 8080 prod",
    "IS_K8S_DEPLOY" : true,
 }
 
-pellet-charging-job-k8s-test
+pellet-charging-job-k8s-prod
 颗粒计费Job服务端-k8s集群
 JSON_PARAMS
 {
@@ -148,7 +148,7 @@ JSON_PARAMS
    "BRANCH_NAME" : "develop" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pellet-charging-job" ,
-   "SHELL_PARAMS" : "pellet-charging job 8065 8065 test 8165 8265",
+   "SHELL_PARAMS" : "pellet-charging job 8065 8065 prod 8165 8265",
    "IS_K8S_DEPLOY" : true,
    "K8S_POD_REPLICAS" : "2",
 }
