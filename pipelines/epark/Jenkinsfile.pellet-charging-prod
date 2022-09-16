@@ -52,8 +52,8 @@ map.put('docker_repo_namespace', 'lanneng')
 // K8S集群相关参数
 // K8S集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins凭据设置界面，类型选择为“Secret file”配置
 map.put('k8s_credentials_ids', '74a3d376-cb4c-4a20-9bf7-7300a5eaa84d')
-// K8S集群私有镜像仓库拉取密钥
-map.put('k8s_image_pull_secrets', 'lannengkeji@2022')
+// K8S集群私有镜像仓库拉取密钥 在集群内使用kubectl create secret命令生成
+map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
 // 项目标签或项目简称
 map.put('project_tag', '颗粒计费')
