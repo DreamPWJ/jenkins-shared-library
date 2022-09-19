@@ -671,6 +671,22 @@ def setCodeVersion() {
 }
 
 /**
+ * 获取文件MD5值
+ */
+def getMD5() {
+    try {
+        def filePath = "" // 文件名称
+        // 获取固件md5值用于 OTA升级安全签名校验  升级json文件中的原始md5值和http请求头中Content-MD5的md5值保持一致
+        def result = Utils.getShEchoResult(this, "md5sum " + filePath)
+        def md5 = result.split("  ")[0]
+        println(md5)
+    } catch (e) {
+        println(e.getMessage())
+        println("获取${VERSION_FILE}文件MD5值失败, 不影响流水线运行 ❌ ")
+    }
+}
+
+/**
  * 嵌入式编译构建
  */
 def embeddedBuildProject() {
@@ -716,6 +732,8 @@ def manualApproval() {
  * OTA空中升级
  */
 def otaUpgrade(map) {
+    // 1. 整包固件升级  2. 差分固件升级
+
     // 重新写入固件地址
     firmwareUrl = "${iotOssUrl}".trim().replace("https://", "http://") // 固件地址  去掉https协议
     writeJSON file: "${VERSION_FILE}", json: [version: "${IOT_VERSION_NUM}", file: firmwareUrl], pretty: 2
