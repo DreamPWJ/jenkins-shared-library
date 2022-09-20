@@ -84,6 +84,7 @@ JSON_PARAMS
     "IS_MONO_REPO" : true ,
     "IS_UPLOAD_OSS" : true ,
     "IS_OTA" : true ,
+    "IS_OTA_DIFF" : true ,
 }
 
 */
