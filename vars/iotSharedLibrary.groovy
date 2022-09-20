@@ -414,6 +414,8 @@ def getInitParams(map) {
     IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true
     IS_UPLOAD_OSS = jsonParams.IS_UPLOAD_OSS ? jsonParams.IS_UPLOAD_OSS : false // 是否构建产物上传到OSS
     IS_OTA = jsonParams.IS_OTA ? jsonParams.IS_OTA : params.IS_OTA_UPGRADE // 是否进行OTA空中升级
+    IS_OTA_DIFF = jsonParams.IS_OTA_DIFF ? jsonParams.IS_OTA_DIFF : false // 是否进行OTA差分补丁升级方式
+    IS_OTA_MD5 = jsonParams.IS_OTA_MD5 ? jsonParams.IS_OTA_MD5 : false // 是否进行OTA升级MD5签名算法
     IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
 
     // 设置monorepo单体仓库主包文件夹名
@@ -450,6 +452,8 @@ def getInitParams(map) {
     iotPackageSize = ""
     // IoT产物构建固件位置
     iotPackageLocation = ""
+    // IoT产物构建差分固件位置
+    iotPatchPackageLocation = ""
     // IoT产物构建固件文件格式
     iotPackageType = "bin" // hex
     // 默认IoT固件版本号
@@ -671,22 +675,6 @@ def setCodeVersion() {
 }
 
 /**
- * 获取文件MD5值
- */
-def getMD5() {
-    try {
-        def filePath = "" // 文件名称
-        // 获取固件md5值用于 OTA升级安全签名校验  升级json文件中的原始md5值和http请求头中Content-MD5的md5值保持一致
-        def result = Utils.getShEchoResult(this, "md5sum " + filePath)
-        def md5 = result.split("  ")[0]
-        println(md5)
-    } catch (e) {
-        println(e.getMessage())
-        println("获取${VERSION_FILE}文件MD5值失败, 不影响流水线运行 ❌ ")
-    }
-}
-
-/**
  * 嵌入式编译构建
  */
 def embeddedBuildProject() {
@@ -694,7 +682,6 @@ def embeddedBuildProject() {
         // 设置代码中的版本信息
         setCodeVersion()
     }
-
     println("执行嵌入式程序PlatformIO构建 🏗️  ")
     PlatformIO.build(this)
     Tools.printColor(this, "嵌入式固件打包成功 ✅")
@@ -729,10 +716,68 @@ def manualApproval() {
 }
 
 /**
+ * 获取文件MD5签名值
+ */
+def getMD5() {
+    if ("${IS_OTA_MD5}" == "true") {
+        try {
+            def filePath = "" // 固件文件路径
+            // 获取固件md5值用于 OTA升级安全签名校验  升级json文件中的原始md5值和http请求头中Content-MD5的md5值保持一致
+            def result = Utils.getShEchoResult(this, "md5sum " + filePath)
+            otaMD5 = result.split("  ")[0]
+            println(otaMD5)
+        } catch (e) {
+            println(e.getMessage())
+            println("获取${VERSION_FILE}文件MD5值失败, 不影响流水线运行 ❌ ")
+        }
+    }
+}
+
+/**
+ * 制作OTA固件升级差分包
+ */
+def otaDiff(map) {
+    if ("${IS_OTA_DIFF}" == "true") {
+        // 差分升级是将老版本和新版本取差异部分进行增量升级，可以极大的减少下载包的流量，同时能节省存储升级固件的ROM或Flash存储空间
+        // 差分算法: https://github.com/mendsley/bsdiff
+        try {
+            // sudo apt-get install -y bsdiff
+            try {
+                // 判断服务器是是否安装bsdiff 环境
+                sh "bsdiff"
+            } catch (error) {
+                // 自动安装bsdiff环境  sudo apt-get update
+                // sh "apt-get update || true"
+                sh "apt-get install -y bsdiff || true"
+                sh "yum install -y bsdiff || true"
+                sh "brew install -y bsdiff || true"
+            }
+            // 命令文档: https://manpages.ubuntu.com/manpages/jammy/en/man1/bsdiff.1.html
+            dir("${env.WORKSPACE}/${iotPackageLocationPath}") {
+                sh " bsdiff  firmware-old.bin  firmware.bin  firmware-patch.bin " // 制作差分补丁包命令
+            }
+            iotPatchPackageLocation = "${iotPackageLocationPath}/firmware-patch.bin"
+            // 源文件地址
+            def sourceFile = "${env.WORKSPACE}/${iotPatchPackageLocation}"
+            // 目标文件
+            def targetFile = "iot/${PROJECT_NAME}/${ENV_TYPE}/firmware.${iotPackageType}"
+            iotOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
+            println "${iotOssUrl}"
+            Tools.printColor(this, "上传差分固件文件到OSS成功 ✅")
+
+        } catch (e) {
+            println(e.getMessage())
+            println("制作OTA固件升级差分包失败 ❌ ")
+        }
+    }
+}
+
+/**
  * OTA空中升级
  */
 def otaUpgrade(map) {
     // 1. 整包固件升级  2. 差分固件升级
+    otaDiff(map)
 
     // 重新写入固件地址
     firmwareUrl = "${iotOssUrl}".trim().replace("https://", "http://") // 固件地址  去掉https协议
@@ -774,6 +819,10 @@ def initDocker() {
 def archive() {
     try {
         archiveArtifacts artifacts: "${iotPackageLocation}", onlyIfSuccessful: true
+        if ("${IS_OTA_DIFF}" == "true") {
+            // OTA差分升级 旧固件包重新命名
+            sh " mv ${iotPackageLocation} ${iotPackageLocationPath}/firmware-old.bin "
+        }
     } catch (error) {
         println "归档文件异常"
         println error.getMessage()

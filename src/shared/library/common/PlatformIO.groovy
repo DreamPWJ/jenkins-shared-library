@@ -27,6 +27,7 @@ class PlatformIO implements Serializable {
         }
         // 构建烧录固件位置: .pio/build/*/firmware.bin
         ctx.iotPackageLocation = Utils.getShEchoResult(ctx, "find " + monorepoProjectDir + ".pio/build/*/firmware.bin")
+        ctx.iotPackageLocationPath = ctx.iotPackageLocation.replace("/firmware.bin", "")
         ctx.println(ctx.iotPackageLocation)
         ctx.iotPackageSize = Utils.getFileSize(ctx, ctx.iotPackageLocation)
         ctx.println("固件大小: " + ctx.iotPackageSize)
