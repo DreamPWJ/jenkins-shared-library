@@ -16,6 +16,6 @@ rules:
       metricsQuery: sum(rate(<<.Series>>{<<.LabelMatchers>>}[1m])) by (<<.GroupBy>>)
 
 prometheus:
-  url: http://120.92.49.181 # 替换安装的 Prometheus服务地址 (不写端口) 并设置好 prometheus.yml文件要关联监听的服务 保证服务targets正常运行
+  url: http://120.92.140.217 # 替换安装的 Prometheus服务地址 (不写端口) 并设置好 prometheus.yml文件要关联监听的服务 保证服务targets正常运行
   port: 9090
   path: ""
