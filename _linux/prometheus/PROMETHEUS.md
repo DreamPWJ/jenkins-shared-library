@@ -67,6 +67,18 @@ management:
 Prometheus监控 http://118.190.150.96:9090
 Grafana监控 http://118.190.150.96:3000  默认用户和密码均为admin
 
-### 各种PrometheusAlert告警通知服务
+### 各种PrometheusAlert告警通知服务 开源的运维告警中心消息转发系统
 
 - 参考项目：https://github.com/feiyu563/PrometheusAlert
+
+  docker pull feiyu563/prometheus-alert:latest
+
+  docker run -d --restart=always -p 9091:8080 \
+  -v /my/prometheus-alert/:/conf/  \
+  -e PA_LOGIN_USER=prometheusalert \
+  -e PA_LOGIN_PASSWORD=prometheusalert \
+  -e PA_TITLE=PrometheusAlert \
+  -e PA_OPEN_FEISHU=1 \
+  -e PA_OPEN_DINGDING=1 \
+  -e PA_OPEN_WEIXIN=1 \
+  --name prometheus-alert feiyu563/prometheus-alert:latest
