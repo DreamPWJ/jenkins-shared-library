@@ -1205,7 +1205,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             "##### 版本信息",
                             "- Nginx Web服务启动${msg}",
                             "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
-                            "- 构建版本: ${NODE_VERSION}   包大小: ${webPackageSize}",
+                            "- Node版本: ${NODE_VERSION}   包大小: ${webPackageSize}",
                             "${monorepoProjectName}",
                             "###### ${rollbackTag}",
                             "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
