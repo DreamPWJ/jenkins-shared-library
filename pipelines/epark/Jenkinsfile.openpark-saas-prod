@@ -135,7 +135,7 @@ JSON_PARAMS
    "BRANCH_NAME" : "develop" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "openpark-saas-app" ,
-   "SHELL_PARAMS" : "openpark-saas app 8085 8080 prod",
+   "SHELL_PARAMS" : "openpark-saas app 8085 9000 prod",
    "IS_K8S_DEPLOY" : true,
 }
 
