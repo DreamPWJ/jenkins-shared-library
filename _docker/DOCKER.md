@@ -37,7 +37,7 @@ docker run -d --restart=always  -p 2181:2181 \
 --privileged=true  --name zookeeper  zookeeper:latest
 
 #### EMQX物联网MQTT服务器 Dashboard地址http://127.0.0.1:18083  用户名 admin 与默认密码 public
-docker pull emqx/emqx
+docker pull emqx/emqx:latest
 
 docker run -d --restart=always  -p 18083:18083 -p 1883:1883 \
 -e TZ="Asia/Shanghai" \

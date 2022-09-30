@@ -7,6 +7,6 @@ package shared.library.enums
  * @description 部署环境枚举
  */
 enum DeployEnvEnum {
-    // DEV开发 SIT联调 TEST测试 STAGING预发布 PROD生产
-    DEV, SIT, TEST, STAGING, PROD
+    // DEV开发 SIT联调 TEST测试 UAT用户验收 STAGING预发布 PROD生产
+    DEV, SIT, TEST, UAT, STAGING, PROD
 }
