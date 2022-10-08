@@ -97,6 +97,7 @@ class GlobalVars implements Serializable {
     static int desktopUnity = 3 // Unity跨平台桌面项目
     static int composeMultiPlatform = 4 // Kotlin Compose MultiPlatform跨平台桌面项目
     static int desktopQt = 5 // Qt (C/C++代码)跨平台桌面项目
+    static int desktopTauri = 6 // Tauri (JavaScript代码)跨平台桌面项目
 
     /**
      *  Java框架类型
