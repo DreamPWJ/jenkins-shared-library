@@ -141,6 +141,18 @@ JSON_PARAMS
    "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
 }
 
+htc-epark-pay-server-test
+好停车epark支付服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark_pay.git" ,
+   "BRANCH_NAME" : "develop" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "epark-pay-service" ,
+   "SHELL_PARAMS" : "epark-pay app 8001 8001 dev",
+   "DOCKER_VOLUME_MOUNT" : "/root/cert/app/cert:/root/cert/app/cert"
+}
+
 */
 
 

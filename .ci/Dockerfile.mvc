@@ -28,7 +28,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # 将旧部署文件删除和可能导致高危漏洞的文件
 RUN rm -Rf /usr/local/tomcat/webapps/ROOT* && rm -rf /usr/local/tomcat/examples/* && rm -rf /usr/local/tomcat/docs/*
 
-# 将部署文件复制到docker内
+# 将部署文件复制到docker内  ROOT是默认根目录  如实现同一个Tomcat下部署多个应用 可自定义其名称 访问路径多加目录名称访问
 COPY  *.war  /usr/local/tomcat/webapps/ROOT.war
 
 # 对外暴露端口
