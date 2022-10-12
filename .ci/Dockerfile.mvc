@@ -3,11 +3,20 @@
 # Description: 自定义构建Spring MVC项目镜像
 
 # 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
+ARG TOMCAT_VERSION
 ARG JDK_VERSION
 ARG EXPOSE_PORT
 
-# 基础镜像
+# Dockerfile多阶段构建 参考文档: https://docs.docker.com/develop/develop-images/multistage-build/
+# 示例 FROM golang:1.16 下行注释的KEY值动态替换
+#FROM-MULTISTAGE-BUILD-IMAGES
+
+# 基础镜像  默认值变量方式 ${JDK_VERSION:-11}
 FROM tomcat:7.0-jre8
+
+# 多阶段构建镜像 从上一个镜像内复制环境到本镜像
+# 示例 COPY --from=0 / /   下行注释的KEY值动态替换
+#COPY-MULTISTAGE-BUILD-IMAGES
 
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
 #LABEL author="潘维吉"
