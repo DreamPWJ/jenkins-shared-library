@@ -124,7 +124,7 @@ JSON_PARAMS
    "SHELL_PARAMS" : "epark server 8086 8080 test",
    "IS_MAVEN_SINGLE_MODULE" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
-   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/root/apache-tomcat-7.0.70/webapps/FileUpload:/usr/local/tomcat/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
+   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/root/apache-tomcat-7.0.70/webapps/FileUpload:/root/apache-tomcat-7.0.70/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
 }
 
 htc-open-epark-server-test
@@ -139,6 +139,18 @@ JSON_PARAMS
    "IS_MAVEN_SINGLE_MODULE" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
    "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
+}
+
+htc-epark-pay-server-test
+好停车epark支付服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark_pay.git" ,
+   "BRANCH_NAME" : "develop" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "epark-pay-service" ,
+   "SHELL_PARAMS" : "epark-pay app 8001 8001 dev",
+   "DOCKER_VOLUME_MOUNT" : "/root/cert/app/cert:/root/cert/app/cert"
 }
 
 */

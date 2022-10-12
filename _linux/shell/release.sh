@@ -118,7 +118,7 @@ if [[ ${extend_port} ]]; then
   dynamic_run_args=" -p ${extend_port}:${extend_port} -e "EXTEND_PORT=${extend_port}" "
 fi
 
-# 动态调试端口 IDEA断点默认会挂起整个VM ,任何一个线程进入断点都会导致所有的请求被阻塞。可能影响生产环境的正常使用
+# 动态调试端口 IDEA远程调试断点默认会挂起整个VM, 任何一个线程进入断点都会导致所有的请求被阻塞。影响程序的正常使用, 生产环境禁用
 remote_debugging_param=""
 if [[ ${is_prod} == false && ${remote_debug_port} ]]; then
   build_expose_ports=${build_expose_ports}" 5005 "

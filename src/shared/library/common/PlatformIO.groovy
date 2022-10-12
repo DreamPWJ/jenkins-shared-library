@@ -42,6 +42,14 @@ class PlatformIO implements Serializable {
     }
 
     /**
+     * 代码质量规范检测
+     */
+    static def codeCheck(ctx) {
+        // clang-tidy代码规范分析 LLVM编译器是 C/C++/ObjectiveC语言基础 运行 clang-tidy 时，它会执行静态代码分析以查找一些常见问题和代码样式违规，并提供可应用于您的代码的修复程序
+        ctx.sh "pio check"
+    }
+
+    /**
      * Golioth嵌入式云端构建和OTA控制升級
      * 參考文档：https://github.com/goliothlabs/arduino-sdk
      */
