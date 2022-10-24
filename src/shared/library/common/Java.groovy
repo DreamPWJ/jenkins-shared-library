@@ -49,7 +49,7 @@ class Java implements Serializable {
         try {
             def pathStr = ""
             if ("${ctx.JDK_VERSION}".toInteger() <= 10) {
-                pathStr = "jre/"
+                pathStr = "jre/"  // 新版本JDK中无jre目录
             }
             // 对于使用容器方式切换JDK版本  https://github.com/mingchen/docker-android-build-box
             def jdkPlatform = "amd64" // 架构为x86_64
