@@ -16,9 +16,6 @@ def call(String type = 'web-java', Map map) {
     changeLog = new ChangeLog()
     gitTagLog = new GitTagLog()
 
-    // 初始化参数
-    getInitParams(map)
-
     remote = [:]
     try {
         remote.host = "${REMOTE_IP}" // 部署应用程序服务器IP 动态参数 可配置在独立的job中
@@ -34,6 +31,9 @@ def call(String type = 'web-java', Map map) {
     proxy_jump_user_name = "${map.proxy_jump_user_name}"
     // 自定义跳板机ssh和scp访问端口 默认22
     proxy_jump_port = "${map.proxy_jump_port}"
+
+    // 初始化参数
+    getInitParams(map)
 
     if (type == "web-java") { // 针对标准项目
         pipeline {
@@ -806,7 +806,7 @@ def getInitParams(map) {
     // 健康检测url地址
     healthCheckUrl = ""
     if ("${APPLICATION_DOMAIN}".trim() == "") {
-        healthCheckUrl = "http://${map.remote_ip}:${SHELL_HOST_PORT}"
+        healthCheckUrl = "http://${remote.host}:${SHELL_HOST_PORT}"
     } else {
         healthCheckUrl = "${APPLICATION_DOMAIN}"
     }
