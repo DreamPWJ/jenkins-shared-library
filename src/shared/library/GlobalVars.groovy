@@ -92,7 +92,7 @@ class GlobalVars implements Serializable {
      * 桌面客户端技术实现类型
      */
     static int desktopNative = 0 // 原生桌面技术(如C++ For Windows、Linux, Swift For MacOS)
-    static int electron = 1 // Electron跨平台桌面项目
+    static int electron = 1 // Electron (JavaScript代码)跨平台桌面项目
     static int desktopFlutter = 2 // Flutter跨平台桌面项目
     static int desktopUnity = 3 // Unity跨平台桌面项目
     static int composeMultiPlatform = 4 // Kotlin Compose MultiPlatform跨平台桌面项目

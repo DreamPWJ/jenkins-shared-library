@@ -18,7 +18,7 @@ map.put('remote_worker_ips', ['172.16.0.181'])
 map.put('remote_user_name', 'root')
 // 代理机或跳板机外网ip用于透传部署到内网目标机器 选填 目标机器外部无法直接访问情况填写内网ip
 map.put('proxy_jump_ip', '119.188.90.222')
-// 自定义跳板机用户名 可精细控制权限 默认root
+// 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
 map.put('proxy_jump_user_name', 'root')
 // 自定义跳板机ssh和scp访问端口 默认22
 map.put('proxy_jump_port', '22')

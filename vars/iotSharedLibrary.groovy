@@ -44,7 +44,7 @@ def call(String type = 'iot', Map map) {
                         description: '填写IoT物联网版本描述文案(文案会显示在钉钉通知、Git Tag、CHANGELOG.md等, ' +
                                 '不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊')
                 booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}",
-                        description: '是否生产环境自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录')
+                        description: '是否在生产环境中自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录')
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 📢 ")
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
             }

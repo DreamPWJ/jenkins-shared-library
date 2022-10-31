@@ -31,10 +31,10 @@ def call(String type = 'desktop', Map map) {
                 gitParameter(name: 'GIT_BRANCH', type: 'PT_BRANCH', defaultValue: "${DEFAULT_GIT_BRANCH}", selectedValue: "DEFAULT",
                         useRepository: "${REPO_URL}", sortMode: 'ASCENDING', branchFilter: 'origin/(.*)',
                         description: "选择要构建的Git分支 默认: " + "${DEFAULT_GIT_BRANCH} (可自定义配置具体任务的默认常用分支, 实现一键或全自动构建)")
+                choice(name: 'PUBLISH_ENV_TYPE', choices: "${NPM_RUN_PARAMS}", description: '选择指定的打包环境和系统类型发布')
                 gitParameter(name: 'GIT_TAG', type: 'PT_TAG', defaultValue: GlobalVars.noGit, selectedValue: GlobalVars.noGit,
                         useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*',
                         description: "可选择指定Git Tag版本标签构建, 默认不选择是获取指定分支下的最新代码, 选择后按tag代码而非分支代码构建⚠️, 同时可作为一键回滚版本使用 🔙 ")
-                choice(name: 'PUBLISH_ENV_TYPE', choices: "${NPM_RUN_PARAMS}", description: '选择指定环境和类型发布')
                 string(name: 'VERSION_NUM', defaultValue: "", description: '选填 设置桌面端语义化版本号 如1.0.0 (默认不填写 自动获取之前设置的版本号并自增, 自动更新package.json内的版本号) 🖊')
                 text(name: 'VERSION_DESCRIPTION', defaultValue: "${Constants.DEFAULT_VERSION_COPYWRITING}",
                         description: "填写版本描述文案 (文案会显示在钉钉通知、应用商店、Git Tag、CHANGELOG.md等, " +
