@@ -753,7 +753,7 @@ def getInitParams(map) {
     GIT_PROJECT_FOLDER_NAME = jsonParams.GIT_PROJECT_FOLDER_NAME ? jsonParams.GIT_PROJECT_FOLDER_NAME.trim() : ""
     // k8s集群 Pod初始化副本数量 默认值3个节点
     K8S_POD_REPLICAS = jsonParams.K8S_POD_REPLICAS ? jsonParams.K8S_POD_REPLICAS.trim() : 3
-    // 应用服务访问完整域名 带https或http前缀 用于反馈显示等
+    // 应用服务访问完整域名或代理服务器IP 带https或http前缀 用于反馈显示等
     APPLICATION_DOMAIN = jsonParams.APPLICATION_DOMAIN ? jsonParams.APPLICATION_DOMAIN.trim() : ""
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
@@ -805,9 +805,10 @@ def getInitParams(map) {
 
     // 健康检测url地址
     healthCheckUrl = ""
-    // 使用域名或IP地址
+    // 使用域名或机器IP地址
     if ("${APPLICATION_DOMAIN}".trim() == "") {
-        healthCheckUrl = "http://${map.remote_ip}:${SHELL_HOST_PORT}"
+        def applicationRemoteIp = "${map.remote_ip}"
+        healthCheckUrl = "http://${applicationRemoteIp}:${SHELL_HOST_PORT}"
     } else {
         healthCheckUrl = "${APPLICATION_DOMAIN}"
     }
