@@ -807,7 +807,7 @@ def getInitParams(map) {
     healthCheckUrl = ""
     // 使用域名或机器IP地址
     if ("${APPLICATION_DOMAIN}".trim() == "") {
-        def applicationRemoteIp = "${map.remote_ip}"
+        def applicationRemoteIp = "${map.remote_ip}".toString()
         healthCheckUrl = "http://${applicationRemoteIp}:${SHELL_HOST_PORT}"
     } else {
         healthCheckUrl = "${APPLICATION_DOMAIN}"
