@@ -803,14 +803,6 @@ def getInitParams(map) {
         println(e.getMessage())
     }
 
-    // 健康检测url地址
-    healthCheckUrl = ""
-    if ("${APPLICATION_DOMAIN}".trim() == "") {
-        healthCheckUrl = "http://${remote.host}:${SHELL_HOST_PORT}"
-    } else {
-        healthCheckUrl = "${APPLICATION_DOMAIN}"
-    }
-
     // tag版本变量定义
     tagVersion = ""
     // 扫描二维码地址
@@ -829,6 +821,8 @@ def getInitParams(map) {
     isHealthCheckFail = false
     // 计算应用启动时间
     healthCheckTimeDiff = "未知"
+    // 健康检测url地址
+    healthCheckUrl = ""
 
 }
 
@@ -876,6 +870,12 @@ def initInfo() {
         proxyJumpSCPText = " -o 'ProxyJump ${proxy_jump_user_name}@${proxy_jump_ip}:${proxy_jump_port}' "
     }
 
+    // 使用域名或IP地址
+    if ("${APPLICATION_DOMAIN}".trim() == "") {
+        healthCheckUrl = "http://${remote.host}:${SHELL_HOST_PORT}"
+    } else {
+        healthCheckUrl = "${APPLICATION_DOMAIN}"
+    }
 }
 
 /**
