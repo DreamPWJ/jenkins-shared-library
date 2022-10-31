@@ -16,9 +16,6 @@ def call(String type = 'web-java', Map map) {
     changeLog = new ChangeLog()
     gitTagLog = new GitTagLog()
 
-    // 初始化参数
-    getInitParams(map)
-
     remote = [:]
     try {
         remote.host = "${REMOTE_IP}" // 部署应用程序服务器IP 动态参数 可配置在独立的job中
@@ -34,6 +31,9 @@ def call(String type = 'web-java', Map map) {
     proxy_jump_user_name = "${map.proxy_jump_user_name}"
     // 自定义跳板机ssh和scp访问端口 默认22
     proxy_jump_port = "${map.proxy_jump_port}"
+
+    // 初始化参数
+    getInitParams(map)
 
     if (type == "web-java") { // 针对标准项目
         pipeline {
@@ -753,7 +753,7 @@ def getInitParams(map) {
     GIT_PROJECT_FOLDER_NAME = jsonParams.GIT_PROJECT_FOLDER_NAME ? jsonParams.GIT_PROJECT_FOLDER_NAME.trim() : ""
     // k8s集群 Pod初始化副本数量 默认值3个节点
     K8S_POD_REPLICAS = jsonParams.K8S_POD_REPLICAS ? jsonParams.K8S_POD_REPLICAS.trim() : 3
-    // 应用服务访问完整域名 带https或http前缀 用于反馈显示等
+    // 应用服务访问完整域名或代理服务器IP 带https或http前缀 用于反馈显示等
     APPLICATION_DOMAIN = jsonParams.APPLICATION_DOMAIN ? jsonParams.APPLICATION_DOMAIN.trim() : ""
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
@@ -805,8 +805,9 @@ def getInitParams(map) {
 
     // 健康检测url地址
     healthCheckUrl = ""
+    // 使用域名或机器IP地址
     if ("${APPLICATION_DOMAIN}".trim() == "") {
-        healthCheckUrl = "http://${map.remote_ip}:${SHELL_HOST_PORT}"
+        healthCheckUrl = "http://${remote.host}:${SHELL_HOST_PORT}"
     } else {
         healthCheckUrl = "${APPLICATION_DOMAIN}"
     }
@@ -875,7 +876,6 @@ def initInfo() {
         proxyJumpSSHText = " -J ${proxy_jump_user_name}@${proxy_jump_ip}:${proxy_jump_port} "
         proxyJumpSCPText = " -o 'ProxyJump ${proxy_jump_user_name}@${proxy_jump_ip}:${proxy_jump_port}' "
     }
-
 }
 
 /**

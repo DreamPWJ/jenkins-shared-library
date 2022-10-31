@@ -15,6 +15,8 @@ import shared.library.common.Helm
  */
 class Kubernetes implements Serializable {
 
+    static def k8sYAMLFile = "k8s.yaml" // k8s集群应用部署yaml定义文件
+
     /**
      * 声明式执行k8s集群部署
      */
@@ -34,7 +36,7 @@ class Kubernetes implements Serializable {
 
                 // 部署应用 指定命名空间--namespace=
                 ctx.sh """ 
-                    kubectl apply -f k8s.yaml
+                    kubectl apply -f ${k8sYAMLFile}
                     """
                 // 查看个组件的状态
                 ctx.sh """ 
@@ -47,10 +49,10 @@ class Kubernetes implements Serializable {
                 // ingressNginxDeploy(ctx, map)
 
                 // 部署pod水平扩缩容 基于QPS自动伸缩
-                deployHPA(ctx, map)
+                // deployHPA(ctx, map)
 
                 // 删除服务
-                // ctx.sh "kubectl delete -f k8s.yaml"
+                // ctx.sh "kubectl delete -f ${k8sYAMLFile}"
                 // kubectl 停止删除pod 默认等待30秒  删除deployment 命令kubectl delete deployment  删除所有 kubectl delete pods --all  --force
                 // kubectl delete pod podName
                 // 查看详细信息   kubectl describe pod podName
@@ -83,14 +85,13 @@ class Kubernetes implements Serializable {
             containerPort = "${ctx.SHELL_EXTEND_PORT}"
             ctx.println("应用服务扩展端口: " + containerPort)
         }
-        def yamlName = "k8s.yaml"
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${Docker.imageTag}#g;" +
                 " s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
                 " s#{MEMORY_SIZE}#${map.docker_memory}#g;s#{K8S_POD_REPLICAS}#${ctx.K8S_POD_REPLICAS}#g; " +
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
-                " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
-        ctx.sh " cat ${yamlName} "
+                " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYAMLFile} > ${k8sYAMLFile} "
+        ctx.sh " cat ${k8sYAMLFile} "
     }
 
     /**
