@@ -907,13 +907,6 @@ def getShellParams(map) {
         }
         // println "${SHELL_PARAMS_GETOPTS}"
     }
-
-    // 使用域名或IP地址
-    if ("${APPLICATION_DOMAIN}".trim() == "") {
-        healthCheckUrl = "http://${remote.host}:${SHELL_HOST_PORT}"
-    } else {
-        healthCheckUrl = "${APPLICATION_DOMAIN}"
-    }
 }
 
 /**
@@ -999,6 +992,13 @@ def pullProjectCode() {
     // 是否存在CI代码
     dir("${env.WORKSPACE}/ci") {
         existCiCode()
+    }
+
+    // 使用域名或IP地址
+    if ("${APPLICATION_DOMAIN}".trim() == "") {
+        healthCheckUrl = "http://${remote.host}:${SHELL_HOST_PORT}"
+    } else {
+        healthCheckUrl = "${APPLICATION_DOMAIN}"
     }
 }
 
