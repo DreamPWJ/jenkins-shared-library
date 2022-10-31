@@ -751,8 +751,10 @@ def getInitParams(map) {
     SOURCE_TARGET_CONFIG_DIR = jsonParams.SOURCE_TARGET_CONFIG_DIR ? jsonParams.SOURCE_TARGET_CONFIG_DIR.trim() : ""
     // 不同项目通过文件目录区分放在相同的仓库中 设置Git代码项目文件夹名称 用于找到相关源码
     GIT_PROJECT_FOLDER_NAME = jsonParams.GIT_PROJECT_FOLDER_NAME ? jsonParams.GIT_PROJECT_FOLDER_NAME.trim() : ""
-    // k8s集群 Pod初始化副本数量
+    // k8s集群 Pod初始化副本数量 默认值3个节点
     K8S_POD_REPLICAS = jsonParams.K8S_POD_REPLICAS ? jsonParams.K8S_POD_REPLICAS.trim() : 3
+    // 应用服务访问完整域名 带https或http前缀 用于反馈显示等
+    APPLICATION_DOMAIN = jsonParams.APPLICATION_DOMAIN ? jsonParams.APPLICATION_DOMAIN.trim() : ""
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
@@ -801,6 +803,13 @@ def getInitParams(map) {
         println(e.getMessage())
     }
 
+    // 健康检测url地址
+    if ("${APPLICATION_DOMAIN}".trim() != "") {
+        healthCheckUrl = "http://${remote.host}:${SHELL_HOST_PORT}"
+    } else {
+        healthCheckUrl = "${APPLICATION_DOMAIN}"
+    }
+
     // tag版本变量定义
     tagVersion = ""
     // 扫描二维码地址
@@ -819,8 +828,6 @@ def getInitParams(map) {
     isHealthCheckFail = false
     // 计算应用启动时间
     healthCheckTimeDiff = "未知"
-    // 健康检测url地址
-    healthCheckUrl = ""
 
 }
 
@@ -1336,7 +1343,6 @@ def healthCheck(map, params = '') { // 可选参数
         // 单机分布式部署从服务
         healthCheckParams = params
     } else {
-        healthCheckUrl = "http://${remote.host}:${SHELL_HOST_PORT}"
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) { // 服务端
             healthCheckUrl = "${healthCheckUrl}/"
         }
@@ -1623,7 +1629,7 @@ def beforeRunProject(map) {
     try {
         if ("${IS_GRACE_SHUTDOWN}" == 'true') {
             // Spring Boot优雅停机 curl几秒超时
-            sh " curl --connect-timeout 3 --max-time 10  http://${remote.host}:${SHELL_HOST_PORT}/actuator/shutdown -X POST "
+            sh " curl --connect-timeout 3 --max-time 10  ${healthCheckUrl}/actuator/shutdown -X POST "
         }
     } catch (error) {
         println "服务已无法访问情况 优雅停机等出现异常捕获 继续部署流程"
@@ -1702,7 +1708,7 @@ def genQRCode(map) {
             def imageName = "${PROJECT_NAME}"
             if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
                 sh "rm -f *.${imageSuffixName}"
-                QRCode.generate(this, "http://${remote.host}:${SHELL_HOST_PORT}", imageName)
+                QRCode.generate(this, "${healthCheckUrl}", imageName)
                 def sourceFile = "${env.WORKSPACE}/${imageName}.${imageSuffixName}" // 源文件
                 def targetFile = "frontend/${env.JOB_NAME}/${env.BUILD_NUMBER}/${imageName}.${imageSuffixName}"
                 // 目标文件
@@ -1747,12 +1753,12 @@ def alwaysPost() {
         def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             currentBuild.description = "${IS_GEN_QR_CODE == 'true' ? "<img src=${qrCodeOssUrl} width=250 height=250 > <br/> " : ""}" +
-                    "<a href='http://${remote.host}:${SHELL_HOST_PORT}'> 👉URL访问地址</a> " +
+                    "<a href='${healthCheckUrl}'> 👉URL访问地址</a> " +
                     "<br/> 项目: ${PROJECT_NAME}" +
                     "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
                     "<br/> 大小: ${webPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-            currentBuild.description = "<a href='http://${remote.host}:${SHELL_HOST_PORT}'> 👉API访问地址</a> " +
+            currentBuild.description = "<a href='${healthCheckUrl}'> 👉API访问地址</a> " +
                     "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉直接下载构建${javaPackageType}包</a>" : ""}" +
                     "<br/> 项目: ${PROJECT_NAME}" +
                     "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
