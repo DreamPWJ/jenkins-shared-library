@@ -869,13 +869,6 @@ def initInfo() {
         proxyJumpSSHText = " -J ${proxy_jump_user_name}@${proxy_jump_ip}:${proxy_jump_port} "
         proxyJumpSCPText = " -o 'ProxyJump ${proxy_jump_user_name}@${proxy_jump_ip}:${proxy_jump_port}' "
     }
-
-    // 使用域名或IP地址
-    if ("${APPLICATION_DOMAIN}".trim() == "") {
-        healthCheckUrl = "http://${remote.host}:${SHELL_HOST_PORT}"
-    } else {
-        healthCheckUrl = "${APPLICATION_DOMAIN}"
-    }
 }
 
 /**
@@ -913,6 +906,13 @@ def getShellParams(map) {
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -z ${SHELL_EXTEND_PORT}"
         }
         // println "${SHELL_PARAMS_GETOPTS}"
+    }
+
+    // 使用域名或IP地址
+    if ("${APPLICATION_DOMAIN}".trim() == "") {
+        healthCheckUrl = "http://${remote.host}:${SHELL_HOST_PORT}"
+    } else {
+        healthCheckUrl = "${APPLICATION_DOMAIN}"
     }
 }
 
