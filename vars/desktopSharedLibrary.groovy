@@ -302,6 +302,18 @@ def call(String type = 'desktop', Map map) {
                     }
                 }
 
+                stage('自动升级') {
+                    when {
+                        expression { return true }
+                    }
+                    steps {
+                        script {
+                            echo "应用内升级"
+                            inAppUpgrade(map)
+                        }
+                    }
+                }
+
                 stage('制作二维码') {
                     when {
                         expression { return true }
@@ -778,15 +790,6 @@ def uploadProducts(map) {
         def sourceFile = "${env.WORKSPACE}/${electronPackageFile}/${buildPackageName}.${packageSuffixName}" // 源文件
         def targetFile = "desktop/${env.JOB_NAME}/${BUILD_ENVIRONMENT}/${buildPackageName}.${packageSuffixName}" // 目标文件
         packageOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
-        try {
-            def updateFileName = "latest.yml"
-            def sourceYamlFile = "${env.WORKSPACE}/${electronPackageFile}/${updateFileName}"
-            def targetYamlFile = "desktop/${env.JOB_NAME}/${BUILD_ENVIRONMENT}/${updateFileName}"
-            AliYunOSS.upload(this, map, sourceYamlFile, targetYamlFile)
-        } catch (e) {
-            println e.getMessage()
-            println "Electron应用内升级yml文件上传失败"
-        }
         sh "rm -f ${sourceFile}"
     } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.desktopFlutter) {
 
@@ -802,6 +805,25 @@ def uploadProducts(map) {
 
     println "${packageOssUrl}"
     println("上传制品到OSS成功 ✅")
+}
+
+/**
+ * 应用内自动升级
+ * 上传升级文件 在应用打开可检测升级、下载、重启生效等
+ */
+def inAppUpgrade(map) {
+    if ("${PROJECT_TYPE}".toInteger() == GlobalVars.electron) {
+        try {
+            def updateFileName = "latest.yml"
+            def sourceYamlFile = "${env.WORKSPACE}/${electronPackageFile}/${updateFileName}"
+            def targetYamlFile = "desktop/${env.JOB_NAME}/${BUILD_ENVIRONMENT}/${updateFileName}"
+            AliYunOSS.upload(this, map, sourceYamlFile, targetYamlFile)
+        } catch (e) {
+            println e.getMessage()
+            println "Electron应用内升级yml文件上传失败"
+        }
+    }
+    println("应用内升级配置文件到OSS成功 ✅")
 }
 
 /**
