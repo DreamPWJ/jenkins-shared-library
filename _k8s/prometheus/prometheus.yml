@@ -27,3 +27,8 @@ scrape_configs:
     static_configs:
       - targets: ['120.92.140.41:8080']
 
+  - job_name: 'openpark-saas-app'
+    scrape_interval: 5s
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['120.92.140.41:8085']
