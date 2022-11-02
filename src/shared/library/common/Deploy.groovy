@@ -24,7 +24,7 @@ class Deploy implements Serializable {
     }
 
     /**
-     * 自动替换不同分布式部署节点的环境文件
+     * 自动替换相同应该不同分布式部署节点的环境文件
      * 自定义的部署配置文件替代默认配置文件等
      * 注意：多机配置文件命名-n-拼接方式覆盖 如config-1-.yaml
      */
@@ -43,7 +43,7 @@ class Deploy implements Serializable {
             ctx.dir("${projectDir}/${sourceFilePath}/") {
                 def files = ctx.findFiles(glob: "*.*") // glob符合ant风格
                 files.each { item ->
-                    //ctx.println("${item.name}")
+                    // ctx.println("${item.name}")
                     def machineFlag = "-${machineNum}-"
                     if ("${item.name}".contains(machineFlag)) {
                         def newConfigName = "${item.name.replace(machineFlag, "")}"

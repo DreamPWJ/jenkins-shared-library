@@ -188,4 +188,13 @@ class Docker implements Serializable {
         }
     }
 
+    /**
+     * 自动替换相同应该不同分布式部署节点的环境文件
+     */
+    static def envFileBuild(ctx, map) {
+        if ("${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
+            // 重新打包并重新打镜像 标签区分不同机器环境配置
+        }
+    }
+
 }
