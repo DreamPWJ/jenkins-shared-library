@@ -24,7 +24,7 @@ class Kubernetes implements Serializable {
         // 动态替换k8s yaml声明式部署文件
         setYamlConfig(ctx, map)
 
-        // 多个k8s集群同时滚动循环部署
+        // 多个K8s集群同时循环滚动部署
         "${map.k8s_credentials_ids}".trim().split(",").each { k8s_credentials_id ->
             // KUBECONFIG变量为k8s中kubectl命令的yaml配置授权访问文件内容 数据保存为Jenkins的“Secret file”类型的凭据，用credentials方法从凭据中获取
             ctx.withCredentials([ctx.file(credentialsId: "${k8s_credentials_id}", variable: 'KUBECONFIG')]) {
@@ -34,7 +34,7 @@ class Kubernetes implements Serializable {
                 // ctx.println("k8s集群访问配置：${ctx.KUBECONFIG}")
                 // ctx.sh "kubectl version"
 
-                // 部署应用 指定命名空间--namespace=
+                // 部署应用 相同应用不同环境配置 需循环执行不同的镜像 指定命名空间--namespace=
                 ctx.sh """ 
                     kubectl apply -f ${k8sYAMLFile}
                     """
