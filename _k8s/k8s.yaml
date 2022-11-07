@@ -42,6 +42,16 @@ spec:
             value: {SPRING_PROFILE}
           - name: EXTEND_PORT
             value: "{CONTAINER_PORT}"
+#        volumeMounts:
+#          - name: nfs-storage
+#            mountPath: {NFS_HOST_PATH}
+            # The variable expansion uses round brackets (not curly brackets).
+            # subPathExpr: $(POD_NAME)
+#      volumes:
+#        - name: nfs-storage
+#          nfs:
+#            server: {NFS_SERVER}
+#            path: {NFS_SERVER_PATH}
 
       restartPolicy: Always   # 停机后总是不断重启
 #      affinity: # 使用工作负载反亲和特性，让Pod之间尽量“互斥”，能尽量均匀的分布在各node节点上

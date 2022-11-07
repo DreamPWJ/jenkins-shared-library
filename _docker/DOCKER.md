@@ -44,6 +44,15 @@ docker run -d --restart=always  -p 18083:18083 -p 1883:1883 \
 --log-opt max-size=1024m --log-opt max-file=1 \
 --name emqx  emqx/emqx:latest
 
+#### RocketMQ消息队列服务
+docker pull apache/rocketmq:latest
+
+docker run -d --restart=always  -p 9876:9876 \
+-v /my/rocketmq/logs:/home/rocketmq/logs \
+-e TZ="Asia/Shanghai" \
+--log-opt max-size=1024m --log-opt max-file=1 \
+--name rocketmq  apache/rocketmq:latest
+
 #### 安装 分布式任务调度平台XXL-JOB服务 在浏览器中使用http://47.105.198.77:8081/xxl-job-admin/ 默认用户名和密码 admin 123456
 docker pull xuxueli/xxl-job-admin:2.1.2
 

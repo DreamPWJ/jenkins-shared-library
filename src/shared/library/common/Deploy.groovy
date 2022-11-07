@@ -24,11 +24,11 @@ class Deploy implements Serializable {
     }
 
     /**
-     * 自动替换相同应该不同分布式部署节点的环境文件
+     * 自动替换相同应用不同分布式部署节点的环境文件
      * 自定义的部署配置文件替代默认配置文件等
      * 注意：多机配置文件命名-n-拼接方式覆盖 如config-1-.yaml
      */
-    static def replaceEnvFile(ctx) {
+    static def replaceEnvFile(ctx, deployNum = 0) {
         // 源文件和多个目标文件可放在代码里面维护 部署时候根据配置自动替换到目标服务器
         // 或者项目源码仓库内的配置文件替换CI仓库的默认文件等
         if ("${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
@@ -36,7 +36,8 @@ class Deploy implements Serializable {
             def targetFilePath = "${ctx.SOURCE_TARGET_CONFIG_DIR}".split(",")[1]  // 目标文件目录 要替换的配置文件
             ctx.println("自动替换不同分布式部署节点的环境文件")
             // 获取不同机器的数字号 不同机器替换不同的机器特定配置文件
-            def machineNum = "${ctx.MACHINE_TAG.replace("号机", "")}".toInteger()
+            def machineNum = deployNum == 0 ? "${ctx.MACHINE_TAG.replace("号机", "")}".toInteger() : deployNum
+
             // 获取项目代码具体目录
             def projectDir = "${ctx.env.WORKSPACE}" + ("${ctx.IS_MAVEN_SINGLE_MODULE}" == 'true' ? "" : ("${ctx.MAVEN_ONE_LEVEL}" == "" ? "/${ctx.PROJECT_NAME}" : "/${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME}"))
             // 遍历文件夹下的所有文件并重命名 多机配置文件命名-n-拼接方式 如config-1-.yaml

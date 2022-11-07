@@ -20,9 +20,9 @@ class Kubernetes implements Serializable {
     /**
      * 声明式执行k8s集群部署
      */
-    static def deploy(ctx, map) {
+    static def deploy(ctx, map, deployNum = 0) {
         // 动态替换k8s yaml声明式部署文件
-        setYamlConfig(ctx, map)
+        setYamlConfig(ctx, map, deployNum)
 
         // 多个K8s集群同时循环滚动部署
         "${map.k8s_credentials_ids}".trim().split(",").each { k8s_credentials_id ->
@@ -76,20 +76,38 @@ class Kubernetes implements Serializable {
     /**
      * 动态替换k8s yaml声明式部署文件
      */
-    static def setYamlConfig(ctx, map) {
+    static def setYamlConfig(ctx, map, deployNum = 0) {
         def hostPort = "${ctx.SHELL_HOST_PORT}" // 宿主机端口
         def containerPort = "${ctx.SHELL_EXPOSE_PORT}" // 容器内端口
+
+        def imageTag = Docker.imageTag
+        def k8sPodReplicas = "${ctx.K8S_POD_REPLICAS}"
 
         // 判断是否存在扩展端口
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && ctx.SHELL_EXTEND_PORT != "") {
             containerPort = "${ctx.SHELL_EXTEND_PORT}"
             ctx.println("应用服务扩展端口: " + containerPort)
         }
-        ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${Docker.imageTag}#g;" +
+        // 判断是否存在NFS网络文件服务挂载信息
+        def nfsHostPath = ""    // NFS宿主机文件路径
+        def nfsServerPath = ""  // NFS服务器文件路径
+        if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") {
+            nfsHostPath = "${ctx.NFS_MOUNT_PATHS}".split(",")[0]
+            nfsServerPath = "${ctx.NFS_MOUNT_PATHS}".split(",")[1]
+            if (deployNum != 0) { // k8s内相同应用不同容器镜像标签部署
+                imageTag += Docker.imageNodeTag + deployNum
+                k8sPodReplicas = Integer.parseInt(k8sPodReplicas) - 1 // 除主节点其它节点相同
+            } else {
+                k8sPodReplicas = 1  // 主节点只部署一个
+            }
+        }
+
+        ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
                 " s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
-                " s#{MEMORY_SIZE}#${map.docker_memory}#g;s#{K8S_POD_REPLICAS}#${ctx.K8S_POD_REPLICAS}#g; " +
+                " s#{MEMORY_SIZE}#${map.docker_memory}#g;s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g; " +
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
+                " s#{NFS_SERVER}#${map.NFS_SERVER}#g;s#{NFS_HOST_PATH}#${nfsHostPath}#g;s#{NFS_SERVER_PATH}#${nfsServerPath}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYAMLFile} > ${k8sYAMLFile} "
         ctx.sh " cat ${k8sYAMLFile} "
     }

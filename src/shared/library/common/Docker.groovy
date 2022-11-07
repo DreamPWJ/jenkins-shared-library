@@ -15,6 +15,7 @@ class Docker implements Serializable {
     // 镜像标签  也可自定义版本标签用于无需重复构建相同的镜像, 做到复用镜像CD持续部署到多环境中
     // k8s集群中 在生产环境中部署容器时，你应该避免使用 :latest 标签，因为这使得正在运行的镜像的版本难以追踪，并且难以正确地回滚
     static def imageTag = "latest" // Utils.getVersionNum(ctx)
+    static def imageNodeTag = "-node-" // 相同应用不同容器镜像标签
 
     /**
      *  初始化环境变量
@@ -71,13 +72,18 @@ class Docker implements Serializable {
      *  构建Docker镜像
      *  Docker For Mac 3.1.0以后docker login登录镜像仓库报错 删除 ~/.docker/config.json中的credsStore这行解决
      */
-    static def build(ctx, imageName) {
+    static def build(ctx, imageName, deployNum = 0) {
         // k8s用版本号方式给tag打标签
         if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
             imageTag = Utils.getVersionNum(ctx)
         }
+        def localImageTag = imageTag
+        // 自动替换相同应用不同分布式部署节点的环境文件
+        if ("${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "" && deployNum != 0) {
+            localImageTag += imageNodeTag + deployNum // 重新定义镜像标签 区分不同节点不同配置情况
+        }
         //ctx.pullCIRepo()
-        def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${imageTag}"
+        def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${localImageTag}"
         ctx.withCredentials([ctx.usernamePassword(credentialsId: "${ctx.DOCKER_REPO_CREDENTIALS_ID}", usernameVariable: 'DOCKER_HUB_USER_NAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
             ctx.sh """      
                    docker login ${ctx.DOCKER_REPO_REGISTRY} --username=${ctx.DOCKER_HUB_USER_NAME} --password=${ctx.DOCKER_HUB_PASSWORD}
@@ -122,10 +128,16 @@ class Docker implements Serializable {
                 }
                 exposePort = "${ctx.IS_PROD}" == 'true' ? "${exposePort}" : "${exposePort} 5005" // 调试端口
                 if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+                    def dockerFileName = ""
+                    if ("${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
+                        dockerFileName = "Dockerfile"
+                    } else if ("${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringMVC) {
+                        dockerFileName = "Dockerfile.mvc"
+                    }
                     ctx.sh """ cd ${ctx.mavenPackageLocationDir} && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg EXPOSE_PORT="${exposePort}" \
-                            --build-arg JDK_VERSION=${ctx.JDK_VERSION}  -f ${ctx.env.WORKSPACE}/ci/.ci/Dockerfile . --no-cache \
+                            --build-arg JDK_VERSION=${ctx.JDK_VERSION}  -f ${ctx.env.WORKSPACE}/ci/.ci/${dockerFileName} . --no-cache \
                             ${dockerPushDiffStr}
                             """
                 }
@@ -185,15 +197,6 @@ class Docker implements Serializable {
                         .replaceAll("#FROM-MULTISTAGE-BUILD-IMAGES", "FROM ${imageName}")
                         .replaceAll("#COPY-MULTISTAGE-BUILD-IMAGES", "COPY --from=0 / /")
             }
-        }
-    }
-
-    /**
-     * 自动替换相同应该不同分布式部署节点的环境文件
-     */
-    static def envFileBuild(ctx, map) {
-        if ("${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
-            // 重新打包并重新打镜像 标签区分不同机器环境配置
         }
     }
 

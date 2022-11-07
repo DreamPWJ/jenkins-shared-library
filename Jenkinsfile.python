@@ -36,7 +36,7 @@ map.put('docker_java_opts', '-Xmx1000m')
 map.put('docker_memory', '1G')
 // docker日志限制
 map.put('docker_log_opts', 'max-size=50m') // --log-opt max-size=50m --log-opt max-file=3
-// docker挂载映射  docker run -v 参数  多个用逗号,分割
+// docker挂载映射  docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
 map.put('docker_volume_mount', '')
 // Dockerfile多阶段构建 镜像名称
 map.put('docker_multistage_build_images', ' ')

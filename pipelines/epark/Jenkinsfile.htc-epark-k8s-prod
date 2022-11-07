@@ -1,5 +1,5 @@
 #!groovy
-@Library('jenkins-shared-library@master') _
+@Library('jenkins-shared-library@dev') _
 
 /**
  * @author 潘维吉
@@ -36,7 +36,7 @@ map.put('docker_java_opts', '-Xmx2600m')
 map.put('docker_memory', '3G')
 // docker日志限制
 map.put('docker_log_opts', 'max-size=150m') // --log-opt max-size=50m --log-opt max-file=3
-// docker挂载映射 docker run -v 参数  多个用逗号,分割
+// docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
 map.put('docker_volume_mount', '')
 // Dockerfile多阶段构建 镜像名称
 map.put('docker_multistage_build_images', ' ')
@@ -73,7 +73,7 @@ map.put('is_before_deploy_notice', false)
 // 是否通知变更记录
 map.put('is_notice_change_log', true)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', true)
+map.put('is_git_tag', false)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
@@ -125,7 +125,9 @@ JSON_PARAMS
    "IS_MAVEN_SINGLE_MODULE" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
    "SOURCE_TARGET_CONFIG_DIR" : "resources/rizhao,resources",
-   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/root/apache-tomcat-7.0.70/webapps/FileUpload:/usr/local/tomcat/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml",
+   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/epark/webapps/FileUpload:/usr/local/tomcat/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml",
+   "NFS_SERVER" : "nfs.jtss.rzbus.cn",
+   "NFS_MOUNT_PATHS" : "/mnt/stor1,/mnt/stor",
    "IS_K8S_DEPLOY" : true,
 }
 

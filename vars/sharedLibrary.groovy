@@ -378,10 +378,16 @@ def call(String type = 'web-java', Map map) {
                         expression { return ("${IS_PUSH_DOCKER_REPO}" == 'true') }
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
+                    tools {
+                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
+                        // 针对滚动部署对于不同节点配置文件不同的情况 动态替换配置文件后需要基于Maven重新打包不同节点部署包 如果不需要可屏蔽
+                        maven "${map.maven}"
+                        jdk "${JDK_VERSION}"
+                    }
                     //agent { label "slave-jdk11-prod" }
                     steps {
                         script {
-                            buildImage()
+                            buildImage(map)
                         }
                     }
                 }
@@ -743,18 +749,22 @@ def getInitParams(map) {
     AUTO_TEST_PARAM = jsonParams.AUTO_TEST_PARAM ? jsonParams.AUTO_TEST_PARAM.trim() : ""  // 自动化集成测试参数
     // Java框架类型 1. Spring Boot  2. Spring MVC
     JAVA_FRAMEWORK_TYPE = jsonParams.JAVA_FRAMEWORK_TYPE ? jsonParams.JAVA_FRAMEWORK_TYPE.trim() : "1"
-    // 自定义Docker挂载映射 docker run -v 参数  多个用逗号,分割
+    // 自定义Docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
     DOCKER_VOLUME_MOUNT = jsonParams.DOCKER_VOLUME_MOUNT ? jsonParams.DOCKER_VOLUME_MOUNT.trim() : "${map.docker_volume_mount}".trim()
     // 自定义特殊化的Nginx配置文件在项目源码中的路径  用于替换CI仓库的config默认标准配置文件
     CUSTOM_NGINX_CONFIG = jsonParams.CUSTOM_NGINX_CONFIG ? jsonParams.CUSTOM_NGINX_CONFIG.trim() : ""
     // 不同部署节点动态批量替换多个环境配置文件 源文件目录 目标文件目录 逗号,分割
     SOURCE_TARGET_CONFIG_DIR = jsonParams.SOURCE_TARGET_CONFIG_DIR ? jsonParams.SOURCE_TARGET_CONFIG_DIR.trim() : ""
-    // 不同项目通过文件目录区分放在相同的仓库中 设置Git代码项目文件夹名称 用于找到相关源码
+    // 不同项目通过文件目录区分放在相同的仓库中 设置Git代码项目文件夹名称 用于找到相关应用源码
     GIT_PROJECT_FOLDER_NAME = jsonParams.GIT_PROJECT_FOLDER_NAME ? jsonParams.GIT_PROJECT_FOLDER_NAME.trim() : ""
     // k8s集群 Pod初始化副本数量 默认值3个节点
     K8S_POD_REPLICAS = jsonParams.K8S_POD_REPLICAS ? jsonParams.K8S_POD_REPLICAS.trim() : 3
     // 应用服务访问完整域名或代理服务器IP 带https或http前缀 用于反馈显示等
     APPLICATION_DOMAIN = jsonParams.APPLICATION_DOMAIN ? jsonParams.APPLICATION_DOMAIN.trim() : ""
+    // NFS网络文件服务地址
+    NFS_SERVER = jsonParams.NFS_SERVER ? jsonParams.NFS_SERVER.trim() : ""
+    // 挂载宿主机路径与NFS服务器文件路径映射关系 NFS宿主机文件路径 NFS服务器文件路径  逗号,分割
+    NFS_MOUNT_PATHS = jsonParams.NFS_MOUNT_PATHS ? jsonParams.NFS_MOUNT_PATHS.trim() : ""
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
@@ -1105,14 +1115,14 @@ def nodeBuildProject() {
 /**
  * Maven编译构建
  */
-def mavenBuildProject(map) {
+def mavenBuildProject(map, deployNum = 0) {
     if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
         // 动态切换Maven内的对应的JDK版本
         Java.switchJDKByJenv(this, "${JDK_VERSION}")
     }
     sh "mvn --version"
-    // 自动替换不同分布式部署节点的环境文件
-    Deploy.replaceEnvFile(this)
+    // 自动替换不同分布式部署节点的环境文件  deployNum部署节点数
+    Deploy.replaceEnvFile(this, deployNum)
     // maven如果存在多级目录 一级目录设置
     MAVEN_ONE_LEVEL = "${MAVEN_ONE_LEVEL}".trim() != "" ? "${MAVEN_ONE_LEVEL}/" : "${MAVEN_ONE_LEVEL}".trim()
     println("执行Maven构建 🏗️  ")
@@ -1186,13 +1196,23 @@ def cppBuildProject() {
  * 制作镜像
  * 可通过ssh在不同机器上构建镜像
  */
-def buildImage() {
+def buildImage(map) {
     // 定义镜像唯一构建名称
     dockerBuildImageName = "${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}"
     // Docker多阶段镜像构建处理
     Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
-    // 构建Docker镜像  只构建一次
+    // 构建并上传Docker镜像仓库  只构建一次
     Docker.build(this, "${dockerBuildImageName}")
+
+    // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
+    if ("${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+        def deployNum = 2  // 暂时区分两个不同环境文件 实际还存在每一个部署服务的环境配置文件都不一样
+        mavenBuildProject(map, deployNum) // 需要mvn jdk构建环境
+        // Docker多阶段镜像构建处理
+        Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
+        // 构建并上传Docker镜像仓库  多节点部署只构建一次
+        Docker.build(this, "${dockerBuildImageName}", deployNum)
+    }
 }
 
 /**
@@ -1561,6 +1581,11 @@ def grayscaleDeploy(map) {
 def k8sDeploy(map) {
     // 执行k8s集群部署
     Kubernetes.deploy(this, map)
+    // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
+    if ("${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+        println("K8S集群部署相同应用不同环境的部署节点")
+        Kubernetes.deploy(this, map, 2)
+    }
 }
 
 /**
