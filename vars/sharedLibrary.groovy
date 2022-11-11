@@ -378,12 +378,12 @@ def call(String type = 'web-java', Map map) {
                         expression { return ("${IS_PUSH_DOCKER_REPO}" == 'true') }
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                    tools {
+                 /*   tools {
                         // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
                         // 针对滚动部署对于不同节点配置文件不同的情况 动态替换配置文件后需要基于Maven重新打包不同节点部署包 如果不需要可屏蔽
                         maven "${map.maven}"
                         jdk "${JDK_VERSION}"
-                    }
+                    }*/
                     //agent { label "slave-jdk11-prod" }
                     steps {
                         script {

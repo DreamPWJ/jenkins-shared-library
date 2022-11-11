@@ -92,8 +92,10 @@ docker pull mritd/shadowsocks
 sudo docker run -dt --restart=always -p 8888:6433 --name shadowsocks-server mritd/shadowsocks \
 -s "-s 0.0.0.0 -p 6433 -m chacha20-ietf-poly1305 -k guigu321 "
 
-#### 搭建OPEN VPN服务 参考步骤: https://git.io/vpn
+#### 搭建OPEN VPN服务 参考步骤: https://github.com/Nyr/openvpn-install
 ./openvpn-install.sh
+
+systemctl restart openvpn-server@server.service
 
 #### 已启动容器动态修改时区 进入容器 docker exec 执行命令  date命令验证
 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
