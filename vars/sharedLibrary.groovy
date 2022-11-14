@@ -575,7 +575,7 @@ def call(String type = 'web-java', Map map) {
                     steps {
                         script {
                             if ("${params.IS_DING_NOTICE}" == 'true' && params.IS_HEALTH_CHECK == false) {
-                                dingNotice(map, 1, "成功") // ✅
+                                dingNotice(map, 1, "**成功 ✅**") // ✅
                             }
                         }
                     }

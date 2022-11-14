@@ -34,10 +34,12 @@ class Kubernetes implements Serializable {
                 // ctx.println("k8s集群访问配置：${ctx.KUBECONFIG}")
                 // ctx.sh "kubectl version"
 
+                def k8sStartTime = new Date()
                 // 部署应用 相同应用不同环境配置 需循环执行不同的镜像 指定命名空间--namespace=
                 ctx.sh """ 
                     kubectl apply -f ${k8sYAMLFile}
                     """
+                ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date()) // 计算应用启动时间
                 // 查看个组件的状态
                 ctx.sh """ 
                     kubectl get pod
