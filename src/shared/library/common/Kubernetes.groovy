@@ -109,18 +109,20 @@ class Kubernetes implements Serializable {
         if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") {
             ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
                 def kubernetesFile = "kubernetes.yaml"
-                def yamlData = ctx.readYaml file: kubernetesFile
+                def data = ctx.readFile(file: "${kubernetesFile}")
+                def yamlData = ctx.readYaml text: data
 
-                ctx.println(yamlData.spec.template.spec.containers.volumeMounts.name instanceof String)
-                ctx.println(yamlData.spec.template.spec.volumes.nfs.server instanceof String)
-                ctx.println(yamlData.spec.template.spec.containers.env.name instanceof ArrayList)
-                ctx.println(yamlData.spec.template.spec.containers.env[0] instanceof ArrayList)
+                ctx.println(yamlData.spec.template.spec.containers[0].volumeMounts[0].name[0])
+                ctx.println(yamlData.spec.template.spec.volumes[0].nfs[0].server)
+                ctx.println(yamlData.spec.template.spec.containers[0].env.name)
+                ctx.println(yamlData.spec.template.spec.containers[0].env[0])
 
                 yamlData.spec.template.spec.containers.volumeMounts.name = "NFS宿主机名称"
                 yamlData.spec.template.spec.containers.volumeMounts.mountPath = nfsHostPath
                 yamlData.spec.template.spec.volumes.name = "NFS服务器名称"
                 yamlData.spec.template.spec.volumes.nfs.server = map.NFS_SERVER
                 yamlData.spec.template.spec.volumes.nfs.path = nfsServerPath
+
                 ctx.sh "rm -f ${kubernetesFile}"
                 ctx.writeYaml file: "${kubernetesFile}", data: yamlData
                 ctx.sh " cat ${kubernetesFile} "
