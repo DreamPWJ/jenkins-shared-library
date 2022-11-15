@@ -112,9 +112,9 @@ class Kubernetes implements Serializable {
                 def data = ctx.readFile(file: "${kubernetesFile}")
                 def yamlData = ctx.readYaml text: data
 
-                def containers0 = yamlData.spec.template.spec.containers[0]
-                def volumeMounts0 = yamlData.spec.template.spec.containers[0].volumeMounts[0]
-                def volumes0 = yamlData.spec.template.spec.volumes[0]
+                def containers0 = yamlData.spec.template.spec.containers[0] as ArrayList
+                def volumeMounts0 = yamlData.spec.template.spec.containers[0].volumeMounts[0] as ArrayList
+                def volumes0 = yamlData.spec.template.spec.volumes[0] as ArrayList
 
                 /*  ctx.println(volumeMounts0.name[0])
                   ctx.println(volumes0.nfs[0].server)
