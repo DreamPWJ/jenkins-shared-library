@@ -105,13 +105,6 @@ class Kubernetes implements Serializable {
             }
         }
 
-        ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
-                " s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
-                " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
-                " s#{MEMORY_SIZE}#${map.docker_memory}#g;s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g; " +
-                " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
-                " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYAMLFile} > ${k8sYAMLFile} "
-
         // 复杂参数动态组合配置yaml文件
         if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") {
             ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
@@ -123,8 +116,16 @@ class Kubernetes implements Serializable {
                 yamlData.spec.template.spec.containers.volumes.nfs.path = nfsServerPath
                 ctx.sh "rm -f ${k8sYAMLFile}"
                 ctx.writeYaml file: "${k8sYAMLFile}", data: yamlData
+                ctx.sh " cat ${k8sYAMLFile} "
             }
         }
+
+        ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
+                " s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
+                " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
+                " s#{MEMORY_SIZE}#${map.docker_memory}#g;s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g; " +
+                " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
+                " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYAMLFile} > ${k8sYAMLFile} "
 
         ctx.sh " cat ${k8sYAMLFile} "
     }
