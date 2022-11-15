@@ -110,11 +110,11 @@ class Kubernetes implements Serializable {
             ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
                 def kubernetesFile = "kubernetes.yaml"
                 def yamlData = ctx.readYaml file: "${kubernetesFile}"
-                yamlData.spec.template.spec.containers.volumeMounts.name = "NFS宿主机名称"
-                yamlData.spec.template.spec.containers.volumeMounts.mountPath = nfsHostPath
-                yamlData.spec.template.spec.containers.volumes.name = "NFS服务器名称"
-                yamlData.spec.template.spec.containers.volumes.nfs.server = map.NFS_SERVER
-                yamlData.spec.template.spec.containers.volumes.nfs.path = nfsServerPath
+                yamlData.spec.template.spec.containers.volumeMounts[0].name = "NFS宿主机名称"
+                yamlData.spec.template.spec.containers.volumeMounts[0].mountPath = nfsHostPath
+                yamlData.spec.template.spec.volumes[0].name = "NFS服务器名称"
+                yamlData.spec.template.spec.volumes[0].nfs.server = map.NFS_SERVER
+                yamlData.spec.template.spec.volumes[0].nfs.path = nfsServerPath
                 ctx.sh "rm -f ${kubernetesFile}"
                 ctx.writeYaml file: "${kubernetesFile}", data: yamlData
                 ctx.sh " cat ${kubernetesFile} "

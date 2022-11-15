@@ -42,16 +42,16 @@ spec:
             value: prod
           - name: EXTEND_PORT
             value: "8080"
-#        volumeMounts:
-#          - name: nfs-storage
-#            mountPath: {NFS_HOST_PATH}
+        volumeMounts:
+          - name: nfs-storage
+            mountPath: nfs-storage
             # The variable expansion uses round brackets (not curly brackets).
             # subPathExpr: $(POD_NAME)
-#      volumes:
-#        - name: nfs-storage
-#          nfs:
-#            server: {NFS_SERVER}
-#            path: {NFS_SERVER_PATH}
+      volumes:
+      - name: nfs-storage
+        nfs:
+          server: server
+          path: server
 
       # 对节点（就绪探测）服务可用性进行检测， initialDelaySeconds启动多少秒后开始，periodSeconds每多少秒检测一次，timeoutSeconds超时时间秒
 #      readinessProbe:
