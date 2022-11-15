@@ -21,6 +21,7 @@ class Kubernetes implements Serializable {
      * 声明式执行k8s集群部署
      */
     static def deploy(ctx, map, deployNum = 0) {
+        def k8sStartTime = new Date()
         // 动态替换k8s yaml声明式部署文件
         setYamlConfig(ctx, map, deployNum)
 
@@ -34,12 +35,11 @@ class Kubernetes implements Serializable {
                 // ctx.println("k8s集群访问配置：${ctx.KUBECONFIG}")
                 // ctx.sh "kubectl version"
 
-                def k8sStartTime = new Date()
                 // 部署应用 相同应用不同环境配置 需循环执行不同的镜像 指定命名空间--namespace=
                 ctx.sh """ 
                     kubectl apply -f ${k8sYAMLFile}
                     """
-                ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date()) // 计算应用启动时间
+
                 // 查看个组件的状态
                 ctx.sh """ 
                     kubectl get pod
@@ -73,6 +73,7 @@ class Kubernetes implements Serializable {
                 ctx.println("K8S集群部署完成 ✅")
             }
         }
+        ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date()) // 计算应用启动时间
     }
 
     /**
@@ -109,8 +110,22 @@ class Kubernetes implements Serializable {
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
                 " s#{MEMORY_SIZE}#${map.docker_memory}#g;s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g; " +
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
-                " s#{NFS_SERVER}#${map.NFS_SERVER}#g;s#{NFS_HOST_PATH}#${nfsHostPath}#g;s#{NFS_SERVER_PATH}#${nfsServerPath}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYAMLFile} > ${k8sYAMLFile} "
+
+        // 复杂参数动态组合配置yaml文件
+        if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") {
+            ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
+                def yamlData = ctx.readYaml file: "${k8sYAMLFile}"
+                yamlData.spec.template.spec.containers.volumeMounts.name = "NFS宿主机名称"
+                yamlData.spec.template.spec.containers.volumeMounts.mountPath = nfsHostPath
+                yamlData.spec.template.spec.containers.volumes.name = "NFS服务器名称"
+                yamlData.spec.template.spec.containers.volumes.nfs.server = map.NFS_SERVER
+                yamlData.spec.template.spec.containers.volumes.nfs.path = nfsServerPath
+                ctx.sh "rm -f ${k8sYAMLFile}"
+                ctx.writeYaml file: "${k8sYAMLFile}", data: yamlData
+            }
+        }
+
         ctx.sh " cat ${k8sYAMLFile} "
     }
 
