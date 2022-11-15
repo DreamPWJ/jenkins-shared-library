@@ -112,16 +112,23 @@ class Kubernetes implements Serializable {
                 def data = ctx.readFile(file: "${kubernetesFile}")
                 def yamlData = ctx.readYaml text: data
 
-                ctx.println(yamlData.spec.template.spec.containers[0].volumeMounts[0].name[0])
-                ctx.println(yamlData.spec.template.spec.volumes[0].nfs[0].server)
-                ctx.println(yamlData.spec.template.spec.containers[0].env[0].name)
-                ctx.println(yamlData.spec.template.spec.containers[0].env[0])
+                def containers0 = yamlData.spec.template.spec.containers[0]
+                def volumeMounts0 = yamlData.spec.template.spec.containers[0].volumeMounts[0]
+                def volumes0 = yamlData.spec.template.spec.volumes[0]
 
-                yamlData.spec.template.spec.containers[0].volumeMounts[0].name[0] = "test"
-                yamlData.spec.template.spec.containers[0].volumeMounts[0].mountPath[0] = nfsHostPath
-                yamlData.spec.template.spec.volumes[0].name[0] = "test"
-                yamlData.spec.template.spec.volumes[0].nfs[0].server = ctx.NFS_SERVER
-                yamlData.spec.template.spec.volumes[0].nfs[0].path = nfsServerPath
+                /*  ctx.println(volumeMounts0.name[0])
+                  ctx.println(volumes0.nfs[0].server)
+                  ctx.println(containers0.env[0].name)
+                  ctx.println(containers0.env[0])*/
+
+                if (volumeMounts0.name[0] instanceof String) {
+                    volumeMounts0.name[0] = "test"
+                }
+                volumeMounts0.mountPath[0] = nfsHostPath
+
+                volumes0.name[0] = "test"
+                volumes0.nfs[0].server = ctx.NFS_SERVER
+                volumes0.nfs[0].path = nfsServerPath
 
                 ctx.sh "rm -f ${kubernetesFile}"
                 ctx.writeYaml file: "${kubernetesFile}", data: yamlData
