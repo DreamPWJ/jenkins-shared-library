@@ -108,15 +108,16 @@ class Kubernetes implements Serializable {
         // 复杂参数动态组合配置yaml文件
         if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") {
             ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
-                def yamlData = ctx.readYaml file: "${k8sYAMLFile}"
+                def kubernetesFile = "kubernetes.yaml"
+                def yamlData = ctx.readYaml file: "${kubernetesFile}"
                 yamlData.spec.template.spec.containers.volumeMounts.name = "NFS宿主机名称"
                 yamlData.spec.template.spec.containers.volumeMounts.mountPath = nfsHostPath
                 yamlData.spec.template.spec.containers.volumes.name = "NFS服务器名称"
                 yamlData.spec.template.spec.containers.volumes.nfs.server = map.NFS_SERVER
                 yamlData.spec.template.spec.containers.volumes.nfs.path = nfsServerPath
-                ctx.sh "rm -f ${k8sYAMLFile}"
-                ctx.writeYaml file: "${k8sYAMLFile}", data: yamlData
-                ctx.sh " cat ${k8sYAMLFile} "
+                ctx.sh "rm -f ${kubernetesFile}"
+                ctx.writeYaml file: "${kubernetesFile}", data: yamlData
+                ctx.sh " cat ${kubernetesFile} "
             }
         }
 
