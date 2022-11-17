@@ -122,12 +122,9 @@ class Kubernetes implements Serializable {
                   ctx.println(containers0.env[0].name)
                   ctx.println(containers0.env[0])*/
 
-                if (volumeMounts0.name[0] instanceof String) {
-                    volumeMounts0.name[0] = "test"
-                }
-                if (volumeMounts0.mountPath instanceof String) {
-                    volumeMounts0.mountPath = nfsHostPath
-                }
+                volumeMounts0.name = "test"
+                volumeMounts0.mountPath = nfsHostPath
+
                 volumes0.name[0] = "test"
                 volumes0.nfs[0].server = ctx.NFS_SERVER
                 volumes0.nfs[0].path = nfsServerPath
