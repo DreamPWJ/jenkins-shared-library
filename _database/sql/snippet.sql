@@ -70,5 +70,5 @@ where find_in_set(id
 # Mybatis like查询的写法
 # select * from community where name like "%"#{name}"%"
 
-# MySQL写的顺序: select ... from... where.... group by... having... order by... limit [offset,] (rows)
+# MySQL书写顺序: select ... from... where.... group by... having... order by... limit [offset,] (rows)
 # MySQL执行顺序: from... where...group by... having.... select ... order by... limit

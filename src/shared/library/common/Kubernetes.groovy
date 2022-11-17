@@ -78,6 +78,7 @@ class Kubernetes implements Serializable {
 
     /**
      * 动态替换k8s yaml声明式部署文件
+     * 可自定义yaml部署文件 如存放在业务代码仓库 无需本次动态配置
      */
     static def setYamlConfig(ctx, map, deployNum = 0) {
         def hostPort = "${ctx.SHELL_HOST_PORT}" // 宿主机端口
@@ -124,8 +125,9 @@ class Kubernetes implements Serializable {
                 if (volumeMounts0.name[0] instanceof String) {
                     volumeMounts0.name[0] = "test"
                 }
-                volumeMounts0.mountPath[0] = nfsHostPath
-
+                if (volumeMounts0.mountPath[0] instanceof String) {
+                    volumeMounts0.mountPath[0] = nfsHostPath
+                }
                 volumes0.name[0] = "test"
                 volumes0.nfs[0].server = ctx.NFS_SERVER
                 volumes0.nfs[0].path = nfsServerPath

@@ -50,3 +50,7 @@ where db = 'panweiji';
 
 批量KILL执行正在提交的事务
 DataGrip批量导出CSV格式数据批量执行kill
+
+
+####  MySQL书写顺序: select... from... join... on... where.... group by... having... order by... limit [offset,] (rows)
+####  MySQL执行顺序: from...  on... join... where...group by... having.... select ... order by... limit

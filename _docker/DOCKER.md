@@ -33,13 +33,13 @@ docker pull zookeeper
 docker run -d --restart=always  -p 2181:2181 \
 -e "ZOO_INIT_LIMIT=10"  -e TZ="Asia/Shanghai" \
 -v /my/zookeeper/data:/data \
---log-opt max-size=1024m --log-opt max-file=1   \
+--log-opt max-size=1024m --log-opt max-file=1 \
 --privileged=true  --name zookeeper  zookeeper:latest
 
 #### EMQX物联网MQTT服务器 Dashboard地址http://127.0.0.1:18083  用户名 admin 与默认密码 public
 docker pull emqx/emqx:latest
 
-docker run -d --restart=always  -p 18083:18083 -p 1883:1883 \
+docker run -d --restart=always  -p 18083:18083 -p 1883:1883 -p 8083:8083  \
 -e TZ="Asia/Shanghai" \
 --log-opt max-size=1024m --log-opt max-file=1 \
 --name emqx  emqx/emqx:latest
