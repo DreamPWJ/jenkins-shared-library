@@ -123,11 +123,12 @@ class Kubernetes implements Serializable {
                   ctx.println(containers0.env[0])*/
 
                 def nfsName = "nfs-storage"
-                volumeMounts0.each { volumeMountsItem ->
+                volumeMounts0.eachWithIndex { volumeMountsItem, index ->
+                    ctx.println(index)
                     volumeMountsItem.name = nfsName
                     volumeMountsItem.mountPath = nfsHostPath
                 }
-                volumes0.each { volumesItem ->
+                volumes0.eachWithIndex { volumesItem, index ->
                     volumesItem.name = nfsName
                 }
 
