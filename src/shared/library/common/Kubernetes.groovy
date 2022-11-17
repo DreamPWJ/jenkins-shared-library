@@ -125,8 +125,8 @@ class Kubernetes implements Serializable {
                 if (volumeMounts0.name[0] instanceof String) {
                     volumeMounts0.name[0] = "test"
                 }
-                if (volumeMounts0.mountPath[0] instanceof String) {
-                    volumeMounts0.mountPath[0] = nfsHostPath
+                if (volumeMounts0.mountPath instanceof String) {
+                    volumeMounts0.mountPath = nfsHostPath
                 }
                 volumes0.name[0] = "test"
                 volumes0.nfs[0].server = ctx.NFS_SERVER
