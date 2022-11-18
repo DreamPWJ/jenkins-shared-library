@@ -1,5 +1,6 @@
 package shared.library.common
 
+//import groovy.json.JsonSlurper
 import shared.library.Utils
 import shared.library.GlobalVars
 import shared.library.common.Docker
@@ -80,6 +81,7 @@ class Kubernetes implements Serializable {
      * 动态替换k8s yaml声明式部署文件
      * 可自定义yaml部署文件 如存放在业务代码仓库 无需本次动态配置
      */
+    //@NonCPS
     static def setYamlConfig(ctx, map, deployNum = 0) {
         def hostPort = "${ctx.SHELL_HOST_PORT}" // 宿主机端口
         def containerPort = "${ctx.SHELL_EXPOSE_PORT}" // 容器内端口
@@ -113,27 +115,33 @@ class Kubernetes implements Serializable {
                 def data = ctx.readFile(file: "${kubernetesFile}")
                 def yamlData = ctx.readYaml text: data
 
-                def containers0 = yamlData.spec.template.spec.containers[0] as ArrayList
-                def volumeMounts0 = yamlData.spec.template.spec.containers[0].volumeMounts[0] as ArrayList
-                def volumes0 = yamlData.spec.template.spec.volumes[0] as ArrayList
+                def containers = yamlData.spec.template.spec.containers as ArrayList
+                def volumeMounts = yamlData.spec.template.spec.containers[0].volumeMounts as ArrayList
+                def volumes = yamlData.spec.template.spec.volumes as ArrayList
 
-                /*  ctx.println(volumeMounts0.name[0])
-                  ctx.println(volumes0.nfs[0].server)
-                  ctx.println(containers0.env[0].name)
-                  ctx.println(containers0.env[0])*/
+                /* ctx.println(volumeMounts[0].name[0])
+                 ctx.println(volumes[0].nfs[0].server)
+                 ctx.println(containers[0].env[0].name)
+                 ctx.println(containers[0].env[0])*/
 
                 def nfsName = "nfs-storage"
-                volumeMounts0.eachWithIndex { volumeMountsItem, index ->
-                    ctx.println(index)
+                volumeMounts[0].eachWithIndex { volumeMountsItem, index ->
                     volumeMountsItem.name = nfsName
                     volumeMountsItem.mountPath = nfsHostPath
+                    //volumeMountsItem?.other = "Name-2"
                 }
-                volumes0.eachWithIndex { volumesItem, index ->
+                volumeMounts.add(1, [])
+                volumeMounts[1].eachWithIndex { volumeMountsItem, index ->
+                    volumeMountsItem.name = "nfsName-2"
+                    volumeMountsItem.mountPath = "nfsHostPath-2"
+                }
+
+                volumes[0].eachWithIndex { volumesItem, index ->
                     volumesItem.name = nfsName
                 }
 
-                volumes0.nfs[0].server = ctx.NFS_SERVER
-                volumes0.nfs[0].path = nfsServerPath
+                volumes[0].nfs[0].server = ctx.NFS_SERVER
+                volumes[0].nfs[0].path = nfsServerPath
 
                 ctx.sh "rm -f ${kubernetesFile}"
                 ctx.writeYaml file: "${kubernetesFile}", data: yamlData
