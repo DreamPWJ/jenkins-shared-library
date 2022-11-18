@@ -130,9 +130,10 @@ class Kubernetes implements Serializable {
                     volumeMountsItem.mountPath = nfsHostPath
                     volumeMountsItem?.other = "Name-2"
                 }
-                volumeMounts.add(1,  volumeMounts[0])
-/*                volumeMounts[1]?.name = "nfsName-2"
-                volumeMounts[1]?.mountPath = "nfsHostPath-2"*/
+                volumeMounts[1] = volumeMounts[0]
+                //volumeMounts.add(1,  volumeMounts[0])
+/*              volumeMounts[1]?.name = "nfsName-2"
+                volumeMounts[1]?.mountPath = "nfsHostPath-2" */
 
                 volumes[0].eachWithIndex { volumesItem, index ->
                     volumesItem.name = nfsName
