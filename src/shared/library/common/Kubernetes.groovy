@@ -131,11 +131,13 @@ class Kubernetes implements Serializable {
                     // volumeMountsItem?.other = "Name-2"
                 }
                 def emptyMap = [:]
-                emptyMap["name"] = "nfsName-2"
-                emptyMap["mountPath"] = "nfsHostPath-2"
+                emptyMap["name"] = ""
+                emptyMap["mountPath"] = ""
                 volumeMounts.add(1, [emptyMap])
-                volumeMounts.eachWithIndex { volumeMountsItem, index ->
+                volumeMounts[1].eachWithIndex { volumeMountsItem, index ->
                     ctx.println(volumeMountsItem)
+                    volumeMountsItem.name = "nfsName-2"
+                    volumeMountsItem.mountPath = "nfsHostPath-2"
                 }
 
                 volumes[0].eachWithIndex { volumesItem, index ->
