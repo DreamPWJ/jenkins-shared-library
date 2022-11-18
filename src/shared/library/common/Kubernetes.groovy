@@ -131,9 +131,9 @@ class Kubernetes implements Serializable {
                     //volumeMountsItem?.other = "Name-2"
                 }
                 volumeMounts.add(1, [])
-                volumeMounts[1].eachWithIndex { volumeMountsItem, index ->
-                    volumeMountsItem.name = "nfsName-2"
-                    volumeMountsItem.mountPath = "nfsHostPath-2"
+                volumeMounts[1].each { volumeMountsItem ->
+                    volumeMountsItem?.name = "nfsName-2"
+                    volumeMountsItem?.mountPath = "nfsHostPath-2"
                 }
 
                 volumes[0].eachWithIndex { volumesItem, index ->
