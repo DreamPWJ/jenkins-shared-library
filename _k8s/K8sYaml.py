@@ -9,10 +9,15 @@ from ruamel.yaml import YAML
   @description Python语言动态控制K8s集群yaml定义文件
   参考文章: https://yaml.readthedocs.io/en/latest/example.html 、 http://testingpai.com/article/1595507236293
   使用官方pypi源来安装
-  pip install ruamel.yaml
+  pip install ruamel.yaml  pip install sys
 """
 
-inp = """\
+# 传递参数  执行示例  python K8sYaml.py 1,2,3
+#arg1 = sys.argv[1]
+#argArray = [int(arg1.split(","))]
+#print arg1
+
+yamlText = """\
 # example
 name:
   # details
@@ -21,7 +26,7 @@ name:
 """
 
 yaml = YAML()
-code = yaml.load(inp)
+code = yaml.load(yamlText)
 code['name']['given'] = 'Bob'
 code['name']['me'] = 'panweiji'
 src_data = {'user': {'name': '潘维吉', 'age': 18, 'money': None, 'gender': True},
