@@ -1,5 +1,6 @@
-from ruamel.yaml import YAML
 import sys
+from ruamel.yaml import YAML
+
 
 """
   @author 潘维吉
@@ -11,14 +12,34 @@ import sys
   pip install ruamel.yaml
 """
 
-# 第一步: 创建YAML对象
-# yaml = YAML(typ='safe')
-yaml = YAML()
+inp = """\
+# example
+name:
+  # details
+  family: Smith   # very common
+  given: Alice    # one of the siblings
+"""
 
-# 第二步: 将Python中的字典类型数据转化为yaml格式的数据
-src_data = {'user': {'name': '可优', 'age': 17, 'money': None, 'gender': True},
+yaml = YAML()
+code = yaml.load(inp)
+code['name']['given'] = 'Bob'
+code['name']['me'] = 'panweiji'
+src_data = {'user': {'name': '潘维吉', 'age': 18, 'money': None, 'gender': True},
             'lovers': ['柠檬小姐姐', '橘子小姐姐', '小可可']
             }
+code['name']['item']=[]
+code['name']['item'].append(src_data)
+yaml.dump(code, sys.stdout)
 
-with open('new.yaml', mode='w', encoding='utf-8') as file:
-    yaml.dump(src_data, file)
+
+# # 第一步: 创建YAML对象
+# # yaml = YAML(typ='safe')
+# yaml = YAML()
+#
+# # 第二步: 将Python中的字典类型数据转化为yaml格式的数据
+# src_data = {'user': {'name': '可优', 'age': 17, 'money': None, 'gender': True},
+#             'lovers': ['柠檬小姐姐', '橘子小姐姐', '小可可']
+#             }
+#
+# with open('new.yaml', mode='w', encoding='utf-8') as file:
+#     yaml.dump(src_data, file)
