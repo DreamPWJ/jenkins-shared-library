@@ -21,7 +21,7 @@ class Python implements Serializable {
         try {
             // 动态获取环境变量使用 which  命令响应结果
             def path = Utils.getShEchoResult(ctx, "which pyinstaller")
-            ctx.env.PATH = "${ctx.env.PATH}:${path}" //添加了系统环境变量上
+            ctx.env.PATH = "${ctx.env.PATH}:${path}" // 添加了系统环境变量上
         } catch (e) {
             println("初始化Python环境变量失败")
             println(e.getMessage())

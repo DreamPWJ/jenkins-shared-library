@@ -8,7 +8,7 @@ from ruamel.yaml import YAML
   @description Python语言动态控制K8s集群yaml定义文件
   参考文章: https://yaml.readthedocs.io/en/latest/example.html 、 http://testingpai.com/article/1595507236293
   使用官方pypi源来安装
-  pip install ruamel.yaml && pip install sys
+  pip install ruamel.yaml
 """
 
 # 传递参数  执行示例  python K8sYaml.py 1,2,3
