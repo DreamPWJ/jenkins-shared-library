@@ -12,13 +12,13 @@
 
 yum install ansible -y || true
 apt-get install ansible -y || true
-apt-get install sshpass -y || true
+apt-get install sshpass -y || true # 需要hosts设置用户名密码情况 如 ansible_ssh_user=root ansible_ssh_pass=123456
 
 # 查看帮助命令  ansible-doc -l
 ansible shiyiyuan -m ping
 ansible shiyiyuan -m command -a "pwd"
 
 # src指定本地的文件 dest指定远程主机的目录或者文件
-ansible shiyiyuan -m copy -a "src=/home/lanneng/lxw/xianshi.zip dest=/home/orangepi/"
+ansible shiyiyuan -m copy -a " src=/home/lanneng/lxw/xianshi.zip dest=/home/orangepi/ "
 ansible shiyiyuan -m command -a " unzip -o -d /home/orangepi/xianshi /home/orangepi/xianshi.zip "
 # ansible shiyiyuan -m command -a " /usr/sbin/reboot "

@@ -1,7 +1,6 @@
 import sys
 from ruamel.yaml import YAML
 
-
 """
   @author 潘维吉
   @date 2022/11/19 13:22
@@ -13,9 +12,9 @@ from ruamel.yaml import YAML
 """
 
 # 传递参数  执行示例  python K8sYaml.py 1,2,3
-#arg1 = sys.argv[1]
-#argArray = [int(arg1.split(","))]
-#print arg1
+# arg1 = sys.argv[1]
+# argArray = [int(arg1.split(","))]
+# print arg1
 
 yamlText = """\
 # example
@@ -32,10 +31,9 @@ code['name']['me'] = 'panweiji'
 src_data = {'user': {'name': '潘维吉', 'age': 18, 'money': None, 'gender': True},
             'lovers': ['柠檬小姐姐', '橘子小姐姐', '小可可']
             }
-code['name']['item']=[]
+code['name']['item'] = []
 code['name']['item'].append(src_data)
 yaml.dump(code, sys.stdout)
-
 
 # # 第一步: 创建YAML对象
 # # yaml = YAML(typ='safe')
