@@ -16,14 +16,15 @@ class Ansible implements Serializable {
     static def install(ctx) {
         ctx.sh "yum install -y ansible || true"
         ctx.sh "apt-get install -y ansible || true"
+        ctx.sh "apt-get install sshpass -y || true"
     }
 
     /**
      * 多个机器批量执行命令
      */
-    static def batchSync(ctx) {
+    static def batchSync(ctx, groupName = "panweiji", command = "pwd") {
         // ansible 主机组或者主机 -m 模块 -a 命令  参考文章: https://blog.51cto.com/395469372/2133486
-        ctx.sh "ansible groupName -m command -a \"pwd\" "
+        ctx.sh "ansible ${groupName} -m command -a \"pwd\" "
     }
 
 }
