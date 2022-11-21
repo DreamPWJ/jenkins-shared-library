@@ -81,5 +81,5 @@ if __name__ == '__main__':
 # pip3 install PyMySQL
 # crontab -e
 # 0 */1 * * *
-# 0 9 1-31 5 * /usr/bin/python3 /home/tasks/youhuiquan.py >> /home/tasks/info.log
+# 0 9 1-31 5 * /usr/bin/python3 /home/tasks/ExecuteSql.py >> /my/tasks/info.log
 # service crond restart , Ubuntu 使用 sudo service cron start  # 重启crond生效
