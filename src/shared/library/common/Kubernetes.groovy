@@ -108,37 +108,38 @@ class Kubernetes implements Serializable {
             }
         }
 
+        ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
+                " s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
+                " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
+                " s#{MEMORY_SIZE}#${map.docker_memory}#g;s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g; " +
+                " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
+                " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYAMLFile} > ${k8sYAMLFile} "
+
         // 复杂参数动态组合配置yaml文件
         if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") {
             ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
-                def kubernetesFile = "kubernetes.yaml"
-                def data = ctx.readFile(file: "${kubernetesFile}")
+                def kubernetesFile = "${k8sYAMLFile}"
+                // 使用Python动态处理Yaml文件
+                ctx.sh "python --version"
+                ctx.sh "  pip install ruamel.yaml && pip install sys "
+/*              def data = ctx.readFile(file: "${kubernetesFile}")
                 def yamlData = ctx.readYaml text: data
 
                 def containers = yamlData.spec.template.spec.containers as ArrayList
                 def volumeMounts = yamlData.spec.template.spec.containers[0].volumeMounts as ArrayList
-                def volumes = yamlData.spec.template.spec.volumes as ArrayList
+                def volumes = yamlData.spec.template.spec.volumes as ArrayList*/
 
                 /* ctx.println(volumeMounts[0].name[0])
                  ctx.println(volumes[0].nfs[0].server)
                  ctx.println(containers[0].env[0].name)
                  ctx.println(containers[0].env[0])*/
 
-                def nfsName = "nfs-storage"
+/*                def nfsName = "nfs-storage"
                 volumeMounts[0].eachWithIndex { volumeMountsItem, index ->
                     volumeMountsItem.name = nfsName
                     volumeMountsItem.mountPath = nfsHostPath
                     // volumeMountsItem?.other = "Name-2"
                 }
-/*              def emptyMap = [:]
-                emptyMap["name"] = ""
-                emptyMap["mountPath"] = ""
-                volumeMounts.add(1, [emptyMap])*/
-                /*       volumeMounts[1].eachWithIndex { volumeMountsItem, index ->
-                           ctx.println(volumeMountsItem)
-                           volumeMountsItem.name = "nfsName-2"
-                           volumeMountsItem.mountPath = "nfsHostPath-2"
-                       }*/
 
                 volumes[0].eachWithIndex { volumesItem, index ->
                     volumesItem.name = nfsName
@@ -148,17 +149,10 @@ class Kubernetes implements Serializable {
                 volumes[0].nfs[0].path = nfsServerPath
 
                 ctx.sh "rm -f ${kubernetesFile}"
-                ctx.writeYaml file: "${kubernetesFile}", data: yamlData
+                ctx.writeYaml file: "${kubernetesFile}", data: yamlData*/
                 ctx.sh " cat ${kubernetesFile} "
             }
         }
-
-        ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
-                " s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
-                " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
-                " s#{MEMORY_SIZE}#${map.docker_memory}#g;s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g; " +
-                " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
-                " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYAMLFile} > ${k8sYAMLFile} "
 
         ctx.sh " cat ${k8sYAMLFile} "
     }
