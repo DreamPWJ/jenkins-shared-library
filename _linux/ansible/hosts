@@ -1,7 +1,44 @@
-[testgroup]
-192.168.56.40
-192.168.56.41
-
+[shiyiyuan]
+192.168.3.101  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.102  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.103  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.104  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.105  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.106  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.107  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.108  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.109  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.110  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.111  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.112  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.113  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.114  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.115  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.116  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.117  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.118  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.119  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.120  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.121  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.122  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.123  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.124  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.125  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.126  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.127  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.128  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.129  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.130  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.131  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.132  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.133  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.134  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.135  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.136  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.137  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.138  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.139  ansible_ssh_user=root ansible_ssh_pass=orangepi
+192.168.3.140  ansible_ssh_user=root ansible_ssh_pass=orangepi
 
 [panweiji]
-192.168.56.42
+192.168.0.100 ansible_ssh_user=root ansible_ssh_pass=panweiji

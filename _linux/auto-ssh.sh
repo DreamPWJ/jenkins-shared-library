@@ -9,6 +9,8 @@
 # 公钥放在远程访问服务的/root/.ssh/authorized_keys里  在jenkins容器里执行 ssh root@ip 命令访问确认
 # 如果有跳板机情况 可手动将构建机器的公钥分别添加外网跳板机和内网目标机authorized_keys内实现免密登录 touch authorized_keys
 # 自动命令 scp -p ~/.ssh/id_rsa.pub root@<remote_ip>:/root/.ssh/authorized_keys && ssh root@<remote_ip> -p 22
+# 非root用户 执行 chmod 700 /home/非root用户名/.ssh && chmod 600 /home/非root用户名/.ssh/authorized_keys
+# 免密后仍然需要密码  编辑 /etc/ssh/sshd_config 把#StrictModes yes设置为StrictModes no
 
 if [[ ! $(command -v expect) ]]; then
   yum install -y expect || true
