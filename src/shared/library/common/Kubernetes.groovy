@@ -120,8 +120,10 @@ class Kubernetes implements Serializable {
             ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
                 def kubernetesFile = "${k8sYAMLFile}"
                 // 使用Python动态处理Yaml文件
-                ctx.sh "python --version"
-                ctx.sh "  pip install ruamel.yaml && pip install sys "
+                ctx.sh " python --version "
+                ctx.sh " pip install ruamel.yaml && pip install sys "
+               // ctx.sh " python K8sYaml.py "
+
 /*              def data = ctx.readFile(file: "${kubernetesFile}")
                 def yamlData = ctx.readYaml text: data
 

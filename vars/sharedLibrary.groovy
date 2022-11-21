@@ -539,7 +539,7 @@ def call(String type = 'web-java', Map map) {
                         docker {
                             // kubectl 环境  构建完成自动删除容器
                             image "dtzar/helm-kubectl:latest"
-                            // args " -v ~/.kube:/root/.kube"
+                            args " -v \$(which bash):/bin/bash "
                             reuseNode true // 使用根节点
                         }
                     }
