@@ -9,7 +9,7 @@ ARG PROJECT_NAME
 ARG EXPOSE_PORT
 
 # 依赖基础镜像
-FROM python:3.8-slim-buster
+FROM python:3.10.0-slim
 
 # Docker 将此路径用作所有后续命令的默认位置
 WORKDIR /app

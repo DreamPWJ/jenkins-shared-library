@@ -1,0 +1,8 @@
+# PlayBook提供更强大更灵活的批量多任务 执行 ansible-playbook  ansible-playbook.yaml
+- hosts: testgroup
+  tasks:
+    - name: test ansible
+      shell: echo "shell 1" >>/tmp/a
+    - name: test copy
+      copy: src=/tmp/a dest=/usr/local/src/
+      #when: inventory_hostname == "host1IP"

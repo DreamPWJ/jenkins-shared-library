@@ -22,3 +22,7 @@ ansible shiyiyuan -m command -a "pwd"
 ansible shiyiyuan -m copy -a " src=/home/lanneng/lxw/xianshi.zip dest=/home/orangepi/ "
 ansible shiyiyuan -m command -a " unzip -o -d /home/orangepi/xianshi /home/orangepi/xianshi.zip "
 # ansible shiyiyuan -m command -a " /usr/sbin/reboot "
+
+# 把脚本下发到所有的服务器，然后再运行脚本。相当于copy+shell+delete
+chmod a+x /usr/local/src/script
+ansible testgroup -m script -a "/usr/local/src/script"

@@ -1,0 +1,25 @@
+# Author: 潘维吉
+# Version 1.0.0
+# Description: 自定义K8S云原生构建部署环境
+
+# 多阶段进行 利用Python语言便利性自定义脚本处理等
+#FROM python:3.10.0-slim
+
+# 基础镜像
+FROM dtzar/helm-kubectl:latest
+
+#COPY --from=0 / /
+
+ENV PYTHONUNBUFFERED=1
+
+# Python环境
+RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python \
+&& python3 -m ensurepip \
+&& pip3 install --no-cache --upgrade pip setuptools
+# Python动态处理yaml文件
+RUN apk add gcc && pip install ruamel.yaml
+
+# 构建镜像
+# docker build -t panweiji/k8s:latest  -f /my/Dockerfile.k8s . --no-cache --load
+# 上传镜像
+# docker push panweiji/k8s:latest

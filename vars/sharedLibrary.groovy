@@ -378,12 +378,12 @@ def call(String type = 'web-java', Map map) {
                         expression { return ("${IS_PUSH_DOCKER_REPO}" == 'true') }
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                 /*   tools {
-                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
-                        // 针对滚动部署对于不同节点配置文件不同的情况 动态替换配置文件后需要基于Maven重新打包不同节点部署包 如果不需要可屏蔽
-                        maven "${map.maven}"
-                        jdk "${JDK_VERSION}"
-                    }*/
+                    /*   tools {
+                           // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
+                           // 针对滚动部署对于不同节点配置文件不同的情况 动态替换配置文件后需要基于Maven重新打包不同节点部署包 如果不需要可屏蔽
+                           maven "${map.maven}"
+                           jdk "${JDK_VERSION}"
+                       }*/
                     //agent { label "slave-jdk11-prod" }
                     steps {
                         script {
@@ -535,13 +535,20 @@ def call(String type = 'web-java', Map map) {
                             return (IS_K8S_DEPLOY == true)  // 是否进行云原生K8S集群部署
                         }
                     }
-                    agent {
-                        docker {
-                            // kubectl 环境  构建完成自动删除容器
-                            image "dtzar/helm-kubectl:latest"
-                            // args " -v ~/.kube:/root/.kube"
-                            reuseNode true // 使用根节点
+                    agent { // agent语法文档： https://www.jenkins.io/doc/book/pipeline/syntax/#agent
+                        dockerfile {
+                            filename 'Dockerfile.k8s' // 在WORKSPACE工作区代码目录
+                            dir "${env.WORKSPACE}/ci"
+                            // additionalBuildArgs  '--build-arg version=1.0.2'
+                            // args " -v /${env.WORKSPACE}:/tmp "
+                            reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
                         }
+                        /*  docker {
+                              // kubectl 环境  构建完成自动删除容器
+                              image "dtzar/helm-kubectl:latest"
+                              // args " -v ~/.kube:/root/.kube"
+                              reuseNode true // 使用根节点
+                          } */
                     }
                     steps {
                         script {
