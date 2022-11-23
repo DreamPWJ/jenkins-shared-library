@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: epark-server-deployment
+  name: app-name-deployment
   namespace: default
   labels:
-    app: epark-server
+    app: app-name
 
 spec:
   replicas: 3
@@ -12,12 +12,12 @@ spec:
   #maxReplicas: 10                   #最大副本数
   selector:
     matchLabels:
-      app: epark-server
+      app: app-name
 
   template:
     metadata:
       labels:
-        app: epark-server
+        app: app-name
       annotations:
         prometheus.io/scrape: "true"                # 让prometheus自动发现
         prometheus.io/path: "/actuator/prometheus"  # /metric路径是集成内提供的 Prometheus 监控接口 或利用 exporter 服务来为 Prometheus 提供指标数据
@@ -25,8 +25,8 @@ spec:
 
     spec:
       containers:
-      - name: epark-server
-        image: hub-cn-shanghai-2.kce.ksyun.com/lanneng/epark-server-prod:2022-11-14-v9
+      - name: app-name
+        image: app-name-prod:latest
         imagePullPolicy: Always       # 强制拉取线上镜像
 #        resources:
 #          requests:
@@ -75,10 +75,10 @@ apiVersion: v1
 kind: Service
 
 metadata:
-  name: epark-server-service
+  name: app-name-service
   namespace: default
   labels:
-    app: epark-server-service
+    app: app-name-service
   annotations:
     prometheus.io/scrape: "true"                # 让prometheus自动发现
     prometheus.io/path: "/actuator/prometheus"  # /metric路径是集成内提供的 Prometheus 监控接口 或利用 exporter 服务来为 Prometheus 提供指标数据
@@ -88,9 +88,9 @@ spec:
   type: LoadBalancer                   # 规格类型ClusterIP、NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡
   #sessionAffinity: ClientIP           # 设置为 "ClientIP" （默认值是 "None"），来基于客户端的IP地址选择固定会话Pod关联
   selector:
-    app: epark-server                    # 通过Pod的labels指定Pod 建立关联
+    app: app-name                    # 通过Pod的labels指定Pod 建立关联
   ports:
-    - name: epark-server
+    - name: app-name
       port: 8080                # 指定Service接收请求的端口
       targetPort: 8085          # 请求转发的端口 容器内部端口
       #nodePort: {HOST_PORT}           # NodePort类型端口区间 30000–32767

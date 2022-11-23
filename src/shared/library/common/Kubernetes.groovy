@@ -84,6 +84,7 @@ class Kubernetes implements Serializable {
      */
     //@NonCPS
     static def setYamlConfig(ctx, map, deployNum = 0) {
+        def appName = "${ctx.FULL_PROJECT_NAME}" // 应用名称
         def hostPort = "${ctx.SHELL_HOST_PORT}" // 宿主机端口
         def containerPort = "${ctx.SHELL_EXPOSE_PORT}" // 容器内端口
 
@@ -102,6 +103,7 @@ class Kubernetes implements Serializable {
             nfsHostPath = "${ctx.NFS_MOUNT_PATHS}".split(",")[0]
             nfsServerPath = "${ctx.NFS_MOUNT_PATHS}".split(",")[1]
             if (deployNum != 0) { // k8s内相同应用不同容器镜像标签部署
+                appName += "-node"
                 imageTag += Docker.imageNodeTag + deployNum
                 k8sPodReplicas = Integer.parseInt(k8sPodReplicas) - 1 // 除主节点其它节点相同
             } else {
@@ -110,9 +112,9 @@ class Kubernetes implements Serializable {
         }
 
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
-                " s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
+                " s#{APP_NAME}#${appName}#g;s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
-                " s#{MEMORY_SIZE}#${map.docker_memory}#g;s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g; " +
+                " s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g;s#{MEMORY_SIZE}#${map.docker_memory}#g; " +
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYAMLFile} > ${k8sYAMLFile} "
 
