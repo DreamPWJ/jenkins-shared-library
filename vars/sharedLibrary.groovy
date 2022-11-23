@@ -378,11 +378,13 @@ def call(String type = 'web-java', Map map) {
                         expression { return ("${IS_PUSH_DOCKER_REPO}" == 'true') }
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                    docker {
-                        // JDK MAVEN 环境  构建完成自动删除容器
-                        image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
-                        args " -v /var/cache/maven/.m2:/root/.m2 "
-                        reuseNode true // 使用根节点
+                    agent {
+                        docker {
+                            // JDK MAVEN 环境  构建完成自动删除容器
+                            image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
+                            args " -v /var/cache/maven/.m2:/root/.m2 "
+                            reuseNode true // 使用根节点
+                        }
                     }
                     //agent { label "slave-jdk11-prod" }
                     steps {
