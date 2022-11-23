@@ -59,6 +59,7 @@ yaml.default_flow_style = False  # 按原风格输出
 # 第二步: 读取yaml格式的文件
 # with open('kubernetes.yaml', encoding='utf-8') as file:
 # data = yaml.load(file)  # 为列表类型
+print(k8s_yaml_file)
 yamlContent = list(yaml.load_all(open(k8s_yaml_file)))  # 多文档结构读取---分割的yaml文件
 
 yaml_volume_mounts = yamlContent[0]['spec']['template']['spec']['containers'][0]['volumeMounts'] = []

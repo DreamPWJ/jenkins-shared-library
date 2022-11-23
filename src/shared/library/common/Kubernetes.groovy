@@ -17,6 +17,7 @@ import shared.library.common.Helm
 class Kubernetes implements Serializable {
 
     static def k8sYAMLFile = "k8s.yaml" // k8s集群应用部署yaml定义文件
+    static def pythonYamlFile = "K8sYaml.py" // 使用Python动态处理Yaml文件
 
     /**
      * 声明式执行k8s集群部署
@@ -116,14 +117,21 @@ class Kubernetes implements Serializable {
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYAMLFile} > ${k8sYAMLFile} "
 
         // 复杂参数动态组合配置yaml文件
-        if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") {
+        if ("${ctx.DOCKER_VOLUME_MOUNT}".trim() != "") { // 容器挂载映射
             ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
-                def kubernetesFile = "${k8sYAMLFile}"
                 // 使用Python动态处理Yaml文件
-                ctx.sh " python --version "
+                // ctx.sh " python --version "
                 // ctx.sh " pip install ruamel.yaml "
-                ctx.sh " python K8sYaml.py --nfs_params=${nfsHostPath},${ctx.NFS_SERVER},${nfsServerPath} --volume_mounts=${ctx.DOCKER_VOLUME_MOUNT} "
-
+                // 使用Python动态处理Yaml文件
+                def volumeMounts = " --k8s_yaml_file=${ctx.env.WORKSPACE}/${k8sYAMLFile}  --volume_mounts=${ctx.DOCKER_VOLUME_MOUNT} "
+                ctx.sh " python ${pythonYamlFile} ${volumeMounts} "
+            }
+        }
+        if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") { // NFS服务
+            ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
+                // 使用Python动态处理Yaml文件
+                def nfsParams = " --k8s_yaml_file=${ctx.env.WORKSPACE}/${k8sYAMLFile} --nfs_params=${nfsHostPath},${ctx.NFS_SERVER},${nfsServerPath} "
+                ctx.sh " python ${pythonYamlFile} ${nfsParams} "
 /*              def data = ctx.readFile(file: "${kubernetesFile}")
                 def yamlData = ctx.readYaml text: data
 
@@ -153,18 +161,17 @@ class Kubernetes implements Serializable {
                 ctx.sh "rm -f ${kubernetesFile}"
                 ctx.writeYaml file: "${kubernetesFile}", data: yamlData
                 */
-                ctx.sh " cat ${kubernetesFile} "
             }
         }
 
         ctx.sh " cat ${k8sYAMLFile} "
     }
 
-    /**
-     * 基于QPS部署pod水平扩缩容
-     * 参考文档：https://piotrminkowski.com/2020/11/05/spring-boot-autoscaling-on-kubernetes/
-     * https://github.com/stefanprodan/k8s-prom-hpa
-     */
+/**
+ * 基于QPS部署pod水平扩缩容
+ * 参考文档：https://piotrminkowski.com/2020/11/05/spring-boot-autoscaling-on-kubernetes/
+ * https://github.com/stefanprodan/k8s-prom-hpa
+ */
     static def deployHPA(ctx, map) {
         // 安装k8s-prometheus-adpater
         Helm.installPrometheus(ctx)
@@ -184,9 +191,9 @@ class Kubernetes implements Serializable {
         // ab -c 100 -n 10000 -r http://120.92.49.178:8080/  // 并发数-c  总请求数-n  是否允许请求错误-r  总的请求数(n) = 次数 * 一次并发数(c)
     }
 
-    /**
-     * 七层负载和灰度发布配置部署
-     */
+/**
+ * 七层负载和灰度发布配置部署
+ */
     static def ingressNginx(ctx, map) {
         def yamlName = "ingress.yaml"
         ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
@@ -197,10 +204,10 @@ class Kubernetes implements Serializable {
         ctx.sh "kubectl apply -f ${yamlName}"
     }
 
-    /**
-     * 灰度发布
-     * 参考文档: https://help.aliyun.com/document_detail/200941.html
-     */
+/**
+ * 灰度发布
+ * 参考文档: https://help.aliyun.com/document_detail/200941.html
+ */
     static def ingressDeploy(ctx, map) {
         // 需要提供一下几个参数：
         // 灰度发布匹配的方式  1、 header  2、 cookie
@@ -223,24 +230,25 @@ class Kubernetes implements Serializable {
         ctx.sh "kubectl delete svc new-service-name"
     }
 
-    /**
-     * k8s方式实现蓝绿部署
-     */
+/**
+ * k8s方式实现蓝绿部署
+ */
     static def blueGreenDeploy(ctx, map) {
         // 蓝绿发布是为新版本创建一个与老版本完全一致的生产环境，在不影响老版本的前提下，按照一定的规则把部分流量切换到新版本，
         // 当新版本试运行一段时间没有问题后，将用户的全量流量从老版本迁移至新版本。
         ctx.sh ""
     }
 
-    /**
-     * 镜像方式部署
-     */
+/**
+ * 镜像方式部署
+ */
     static def deployByImage(ctx, imageName, deploymentName, port) {
         ctx.println("开始部署Kubernetes云原生应用")
         // 创建示例部署并在端口 上公开它
         ctx.sh "kubectl delete deployment ${deploymentName}"
         ctx.sh "kubectl delete service ${deploymentName}"
-        ctx.sh "kubectl create deployment balanced  ${deploymentName} --image=${imageName}" // 测试镜像: idoop/zentao:latest
+        ctx.sh "kubectl create deployment balanced  ${deploymentName} --image=${imageName}"
+        // 测试镜像: idoop/zentao:latest
         ctx.sh "kubectl expose deployment balanced  ${deploymentName} --type=NodePort --port=${port} "
         // 获取服务
         ctx.sh "kubectl get services ${deploymentName} && kubectl get pod" // STATUS 为 Running
@@ -250,17 +258,17 @@ class Kubernetes implements Serializable {
 
     }
 
-    /**
-     * K8s健康探测
-     */
+/**
+ * K8s健康探测
+ */
     static def healthDetection(ctx) {
         // Pod通过两类探针来检查容器的健康状态。分别是LivenessProbe（存活探测）和 ReadinessProbe（就绪探测）
         ctx.sh ""
     }
 
-    /**
-     * 清除k8s集群无效镜像  删除无效镜像 减少磁盘占用
-     */
+/**
+ * 清除k8s集群无效镜像  删除无效镜像 减少磁盘占用
+ */
     static def cleanDockerImages(ctx) {
         // kubelet容器自动GC垃圾回收  参考文档: https://kubernetes-docsy-staging.netlify.app/zh/docs/concepts/cluster-administration/kubelet-garbage-collection/
         // 默认Kubelet会在节点驱逐信号触发和Image对应的Filesystem空间不足的情况下删除冗余的镜像
