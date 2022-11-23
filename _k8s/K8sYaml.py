@@ -67,13 +67,20 @@ yamlContent = list(yaml.load_all(open(k8s_yaml_file)))  # 多文档结构读取-
 yaml_volume_mounts = yamlContent[0]['spec']['template']['spec']['containers'][0]['volumeMounts'] = []
 yaml_volume = yamlContent[0]['spec']['template']['spec']['volumes'] = []
 
-yaml_volume_mounts.extend(
-    [nsf_mount_yaml, *volume_mounts_yaml]
-)
-
-yaml_volume.extend(
-    [nsf_server_yaml, *volume_host_mounts_yaml]
-)
+if volume_mounts is not None:
+    yaml_volume_mounts.extend(
+        [*volume_mounts_yaml]
+    )
+    yaml_volume.extend(
+        [*volume_host_mounts_yaml]
+    )
+if nfs_params is not None:
+    yaml_volume_mounts.extend(
+        [nsf_mount_yaml]
+    )
+    yaml_volume.extend(
+        [nsf_server_yaml]
+    )
 
 # print(yamlContent)
 
