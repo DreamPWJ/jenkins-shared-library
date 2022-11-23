@@ -29,10 +29,27 @@ class Maven implements Serializable {
     }
 
     /**
+     * Maven打包时重命名
+     */
+    static def renameBuildPom(ctx) {
+        // 思路是复制原来的pom.xml 成 pom-copy.xml 在pom-copy.xml 里 改项目名
+        // mvn clean package -f pom-copy.xml
+        // ctx.sh " "
+        // 读取pom.xml信息
+        def pom = ctx.readMavenPom(file: 'pom.xml')
+        def pomVersion = pom.version
+        // 写入pom.xml信息
+        pom.name = "panweiji"
+        ctx.writeMavenPom model: pom
+        ctx.println(pomVersion)
+        ctx.println(ctx.readMavenPom(file: 'pom.xml'))
+    }
+
+    /**
      * 上传Maven仓库
      */
     static def uploadWarehouse(ctx) {
-        // 推送
+        // 推送包到远程仓库
         ctx.sh "mvn clean install org.apache.maven.plugins:maven-deploy-plugin:2.8:deploy -DskipTests"
     }
 

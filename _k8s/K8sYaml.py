@@ -36,8 +36,8 @@ if volume_mounts is not None:
         volume_mounts_path_array = volume_mounts_array[index].strip().split(":")
         volume_mounts_host_path = volume_mounts_path_array[0]
         volume_mounts_path = volume_mounts_path_array[1]
-        volume_mounts_yaml.append({"name": volume_mounts_name, "mountPath": volume_mounts_host_path})
-        volume_host_mounts_yaml.append({"name": volume_mounts_name, "hostPath": {"path": volume_mounts_path}})
+        volume_mounts_yaml.append({"name": volume_mounts_name, "mountPath": volume_mounts_path})
+        volume_host_mounts_yaml.append({"name": volume_mounts_name, "hostPath": {"path": volume_mounts_host_path}})
 
 nfs_params = args.nfs_params
 nsf_mount_yaml = None
