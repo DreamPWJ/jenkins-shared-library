@@ -97,7 +97,7 @@ class Kubernetes implements Serializable {
             ctx.println("应用服务扩展端口: " + containerPort)
         }
         // 判断是否存在NFS网络文件服务挂载信息
-        def nfsHostPath = ""    // NFS宿主机文件路径
+        def nfsHostPath = ""    // NFS宿主机文件路径(NFS应用容器内的路径)
         def nfsServerPath = ""  // NFS服务器文件路径
         if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") {
             nfsHostPath = "${ctx.NFS_MOUNT_PATHS}".split(",")[0]

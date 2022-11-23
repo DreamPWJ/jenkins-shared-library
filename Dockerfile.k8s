@@ -16,7 +16,7 @@ ENV PYTHONUNBUFFERED=1
 RUN apk add --update --no-cache python3 gcc musl-dev python3-dev && ln -sf python3 /usr/bin/python \
 && python3 -m ensurepip \
 && pip3 install --no-cache --upgrade pip setuptools
-# Python动态处理yaml文件 apk add build-base
+# Python动态处理yaml文件
 RUN pip install ruamel.yaml
 
 # 构建镜像
