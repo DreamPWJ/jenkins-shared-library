@@ -32,7 +32,7 @@ if volume_mounts is not None:
     print(volume_mounts)
     volume_mounts_array = volume_mounts.split(",")
     for index in range(len(volume_mounts_array)):
-        volume_mounts_name = "volume_mounts_" + str(index)
+        volume_mounts_name = "volume-mounts-" + str(index)
         volume_mounts_path_array = volume_mounts_array[index].strip().split(":")
         volume_mounts_host_path = volume_mounts_path_array[0]
         volume_mounts_path = volume_mounts_path_array[1]
@@ -59,8 +59,10 @@ yaml.default_flow_style = False  # 按原风格输出
 # 第二步: 读取yaml格式的文件
 # with open('kubernetes.yaml', encoding='utf-8') as file:
 # data = yaml.load(file)  # 为列表类型
+
 print(k8s_yaml_file)
 yamlContent = list(yaml.load_all(open(k8s_yaml_file)))  # 多文档结构读取---分割的yaml文件
+# print(yamlContent)
 
 yaml_volume_mounts = yamlContent[0]['spec']['template']['spec']['containers'][0]['volumeMounts'] = []
 yaml_volume = yamlContent[0]['spec']['template']['spec']['volumes'] = []
@@ -76,7 +78,10 @@ yaml_volume.extend(
 # print(yamlContent)
 
 with open(k8s_yaml_file, mode='w', encoding='utf-8') as file:
-    yaml.dump(yamlContent, file)
+    yaml.dump(yamlContent[0], file)
+    file.write("\n---\n")
+    yaml.dump(yamlContent[1], file)
+
 
 # yamlText = """\
 # # example

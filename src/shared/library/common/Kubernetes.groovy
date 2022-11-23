@@ -117,53 +117,21 @@ class Kubernetes implements Serializable {
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYAMLFile} > ${k8sYAMLFile} "
 
         // 复杂参数动态组合配置yaml文件
-        if ("${ctx.DOCKER_VOLUME_MOUNT}".trim() != "") { // 容器挂载映射
+        if ("${ctx.DOCKER_VOLUME_MOUNT}".trim() != "") { // 容器挂载映射 与 NFS服务等
             ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
                 // 使用Python动态处理Yaml文件
                 // ctx.sh " python --version "
                 // ctx.sh " pip install ruamel.yaml "
                 // 使用Python动态处理Yaml文件
                 def volumeMounts = " --k8s_yaml_file=${ctx.env.WORKSPACE}/${k8sYAMLFile}  --volume_mounts=${ctx.DOCKER_VOLUME_MOUNT} "
-                ctx.sh " python ${pythonYamlFile} ${volumeMounts} "
+                if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") {
+                    def nfsParams = "  --nfs_params=${nfsHostPath},${ctx.NFS_SERVER},${nfsServerPath} "
+                    ctx.sh " python ${pythonYamlFile} ${volumeMounts} ${nfsParams} "
+                } else {
+                    ctx.sh " python ${pythonYamlFile} ${volumeMounts} "
+                }
             }
         }
-        if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") { // NFS服务
-            ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
-                // 使用Python动态处理Yaml文件
-                def nfsParams = " --k8s_yaml_file=${ctx.env.WORKSPACE}/${k8sYAMLFile} --nfs_params=${nfsHostPath},${ctx.NFS_SERVER},${nfsServerPath} "
-                ctx.sh " python ${pythonYamlFile} ${nfsParams} "
-/*              def data = ctx.readFile(file: "${kubernetesFile}")
-                def yamlData = ctx.readYaml text: data
-
-                def containers = yamlData.spec.template.spec.containers as ArrayList
-                def volumeMounts = yamlData.spec.template.spec.containers[0].volumeMounts as ArrayList
-                def volumes = yamlData.spec.template.spec.volumes as ArrayList*/
-
-                /* ctx.println(volumeMounts[0].name[0])
-                 ctx.println(volumes[0].nfs[0].server)
-                 ctx.println(containers[0].env[0].name)
-                 ctx.println(containers[0].env[0])*/
-
-/*                def nfsName = "nfs-storage"
-                volumeMounts[0].eachWithIndex { volumeMountsItem, index ->
-                    volumeMountsItem.name = nfsName
-                    volumeMountsItem.mountPath = nfsHostPath
-                    // volumeMountsItem?.other = "Name-2"
-                }
-
-                volumes[0].eachWithIndex { volumesItem, index ->
-                    volumesItem.name = nfsName
-                }
-
-                volumes[0].nfs[0].server = ctx.NFS_SERVER
-                volumes[0].nfs[0].path = nfsServerPath
-
-                ctx.sh "rm -f ${kubernetesFile}"
-                ctx.writeYaml file: "${kubernetesFile}", data: yamlData
-                */
-            }
-        }
-
         ctx.sh " cat ${k8sYAMLFile} "
     }
 
