@@ -23,20 +23,16 @@ parser.add_argument('--k8s_yaml_file', type=str, default="k8s.yaml")
 parser.add_argument('--nfs_params', type=str, default=None)
 parser.add_argument('--volume_mounts', type=str, default=None)
 args = parser.parse_args()
-k8s_yaml_file = args.k8s_yaml_file
 
+k8s_yaml_file = args.k8s_yaml_file
 volume_mounts = args.volume_mounts
 volume_mounts_yaml = []
 volume_host_mounts_yaml = []
 if volume_mounts is not None:
     print(volume_mounts)
     volume_mounts_array = volume_mounts.split(",")
-    print(volume_mounts_array)
-
     for index in range(len(volume_mounts_array)):
-        print(volume_mounts_array[index])
         volume_mounts_name = "volume_mounts_" + str(index)
-        print(volume_mounts_name)
         volume_mounts_path_array = volume_mounts_array[index].strip().split(":")
         volume_mounts_host_path = volume_mounts_path_array[0]
         volume_mounts_path = volume_mounts_path_array[1]
@@ -49,7 +45,6 @@ nsf_server_yaml = None
 if nfs_params is not None:
     print(nfs_params)
     nfs_array = nfs_params.split(",")
-    print(nfs_array)
     nfs_mount_path = nfs_array[0]
     nfs_server = nfs_array[1]
     nfs_server_path = nfs_array[2]
@@ -64,7 +59,7 @@ yaml.default_flow_style = False  # 按原风格输出
 # 第二步: 读取yaml格式的文件
 # with open('kubernetes.yaml', encoding='utf-8') as file:
 # data = yaml.load(file)  # 为列表类型
-yamlContent = list(yaml.load_all(open('kubernetes.yaml')))  # 多文档结构读取---分割的yaml文件
+yamlContent = list(yaml.load_all(open(k8s_yaml_file)))  # 多文档结构读取---分割的yaml文件
 
 yaml_volume_mounts = yamlContent[0]['spec']['template']['spec']['containers'][0]['volumeMounts'] = []
 yaml_volume = yamlContent[0]['spec']['template']['spec']['volumes'] = []
@@ -79,7 +74,7 @@ yaml_volume.extend(
 
 # print(yamlContent)
 
-with open('new.yaml', mode='w', encoding='utf-8') as file:
+with open(k8s_yaml_file, mode='w', encoding='utf-8') as file:
     yaml.dump(yamlContent, file)
 
 # yamlText = """\

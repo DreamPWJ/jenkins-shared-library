@@ -122,7 +122,7 @@ class Kubernetes implements Serializable {
                 // 使用Python动态处理Yaml文件
                 ctx.sh " python --version "
                 // ctx.sh " pip install ruamel.yaml "
-                ctx.sh " python K8sYaml.py "
+                ctx.sh " python K8sYaml.py --nfs_params=${nfsHostPath},${ctx.NFS_SERVER},${nfsServerPath} --volume_mounts=${ctx.DOCKER_VOLUME_MOUNT} "
 
 /*              def data = ctx.readFile(file: "${kubernetesFile}")
                 def yamlData = ctx.readYaml text: data
