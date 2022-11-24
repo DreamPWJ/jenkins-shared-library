@@ -54,22 +54,21 @@ spec:
 #            path: {NFS_SERVER_PATH}
 
       # 对节点（就绪探测）服务可用性进行检测， initialDelaySeconds启动多少秒后开始，periodSeconds每多少秒检测一次，timeoutSeconds超时时间秒
-#      readinessProbe:
-#        httpGet:
-#          path: /
-#          port: {CONTAINER_PORT}
-#        initialDelaySeconds: 2
-#        periodSeconds: 2
-#        timeoutSeconds: 1
-#        failureThreshold: 600
-#      # LivenessProbe（存活探测） 对Pod内个容器健康检查的设置，当探测无响应几次后将自动重启该容器
-#      livenessProbe:
-#        httpGet:
-#          path: /
-#          port: {CONTAINER_PORT}
-#        initialDelaySeconds: 60
-#        timeoutSeconds: 5
-#        failureThreshold: 10
+        readinessProbe:
+          tcpSocket:
+            port: {CONTAINER_PORT}
+          initialDelaySeconds: 2   # 探针在容器启动后的多少秒才开始执行
+          periodSeconds: 2         # 探针执行频率。默认是10秒，最小1秒
+          timeoutSeconds: 1        # 探测超时时间。默认1秒，最小1秒
+          failureThreshold: 600    # 探测成功后，最少连续探测失败多少次才被认定为失败。默认是3。最小值是1
+        # LivenessProbe（存活探测） 对Pod内个容器健康检查的设置，当探测无响应几次后将自动重启该容器
+        livenessProbe:
+          tcpSocket:
+            port: {CONTAINER_PORT}
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 10
 
       restartPolicy: Always   # 停机后总是不断重启
 #      affinity: # 使用工作负载反亲和特性，让Pod之间尽量“互斥”，能尽量均匀的分布在各node节点上

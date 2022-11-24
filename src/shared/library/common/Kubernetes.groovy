@@ -137,11 +137,11 @@ class Kubernetes implements Serializable {
         ctx.sh " cat ${k8sYAMLFile} "
     }
 
-/**
- * 基于QPS部署pod水平扩缩容
- * 参考文档：https://piotrminkowski.com/2020/11/05/spring-boot-autoscaling-on-kubernetes/
- * https://github.com/stefanprodan/k8s-prom-hpa
- */
+    /**
+     * 基于QPS部署pod水平扩缩容
+     * 参考文档：https://piotrminkowski.com/2020/11/05/spring-boot-autoscaling-on-kubernetes/
+     * https://github.com/stefanprodan/k8s-prom-hpa
+     */
     static def deployHPA(ctx, map) {
         // 安装k8s-prometheus-adpater
         Helm.installPrometheus(ctx)
@@ -161,9 +161,9 @@ class Kubernetes implements Serializable {
         // ab -c 100 -n 10000 -r http://120.92.49.178:8080/  // 并发数-c  总请求数-n  是否允许请求错误-r  总的请求数(n) = 次数 * 一次并发数(c)
     }
 
-/**
- * 七层负载和灰度发布配置部署
- */
+    /**
+     * 七层负载和灰度发布配置部署
+     */
     static def ingressNginx(ctx, map) {
         def yamlName = "ingress.yaml"
         ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
@@ -174,10 +174,10 @@ class Kubernetes implements Serializable {
         ctx.sh "kubectl apply -f ${yamlName}"
     }
 
-/**
- * 灰度发布
- * 参考文档: https://help.aliyun.com/document_detail/200941.html
- */
+    /**
+     * 灰度发布
+     * 参考文档: https://help.aliyun.com/document_detail/200941.html
+     */
     static def ingressDeploy(ctx, map) {
         // 需要提供一下几个参数：
         // 灰度发布匹配的方式  1、 header  2、 cookie
@@ -200,18 +200,18 @@ class Kubernetes implements Serializable {
         ctx.sh "kubectl delete svc new-service-name"
     }
 
-/**
- * k8s方式实现蓝绿部署
- */
+    /**
+     * k8s方式实现蓝绿部署
+     */
     static def blueGreenDeploy(ctx, map) {
         // 蓝绿发布是为新版本创建一个与老版本完全一致的生产环境，在不影响老版本的前提下，按照一定的规则把部分流量切换到新版本，
         // 当新版本试运行一段时间没有问题后，将用户的全量流量从老版本迁移至新版本。
         ctx.sh ""
     }
 
-/**
- * 镜像方式部署
- */
+    /**
+     * 镜像方式部署
+     */
     static def deployByImage(ctx, imageName, deploymentName, port) {
         ctx.println("开始部署Kubernetes云原生应用")
         // 创建示例部署并在端口 上公开它
@@ -228,17 +228,17 @@ class Kubernetes implements Serializable {
 
     }
 
-/**
- * K8s健康探测
- */
+    /**
+     * K8s健康探测
+     */
     static def healthDetection(ctx) {
         // Pod通过两类探针来检查容器的健康状态。分别是LivenessProbe（存活探测）和 ReadinessProbe（就绪探测）
         ctx.sh ""
     }
 
-/**
- * 清除k8s集群无效镜像  删除无效镜像 减少磁盘占用
- */
+    /**
+     * 清除k8s集群无效镜像  删除无效镜像 减少磁盘占用
+     */
     static def cleanDockerImages(ctx) {
         // kubelet容器自动GC垃圾回收  参考文档: https://kubernetes-docsy-staging.netlify.app/zh/docs/concepts/cluster-administration/kubelet-garbage-collection/
         // 默认Kubelet会在节点驱逐信号触发和Image对应的Filesystem空间不足的情况下删除冗余的镜像
