@@ -44,15 +44,6 @@ docker run -d --restart=always  -p 18083:18083 -p 1883:1883 -p 8083:8083  \
 --log-opt max-size=1024m --log-opt max-file=1 \
 --name emqx  emqx/emqx:latest
 
-#### RocketMQ消息队列服务
-docker pull apache/rocketmq:latest
-
-docker run -d --restart=always  -p 9876:9876 \
--v /my/rocketmq/logs:/home/rocketmq/logs \
--e TZ="Asia/Shanghai" \
---log-opt max-size=1024m --log-opt max-file=1 \
---name rocketmq  apache/rocketmq:latest
-
 #### 安装 分布式任务调度平台XXL-JOB服务 在浏览器中使用http://47.105.198.77:8081/xxl-job-admin/ 默认用户名和密码 admin 123456
 docker pull xuxueli/xxl-job-admin:2.1.2
 
@@ -62,5 +53,20 @@ docker run -d --restart=always -p 8081:8080  \
 --log-opt max-size=1024m --log-opt max-file=1   \
 --name xxl-job-admin xuxueli/xxl-job-admin:2.1.2
 
+#### RocketMQ消息队列服务  官方文档： https://github.com/apache/rocketmq-docker
+docker pull apache/rocketmq:latest
 
+docker run -d --restart=always  -p 9876:9876 \
+-v /my/rocketmq/server/logs:/home/rocketmq/logs \
+-e TZ="Asia/Shanghai" -e "JAVA_OPT_EXT=-Xms1024M -Xmx1024M -Xmn128m"  \
+--log-opt max-size=1024m --log-opt max-file=1 \
+--name rocketmq-server  apache/rocketmq:latest
 
+docker run -d --restart=always -p 10909:10909 -p 10911:10911 -p 10912:10912 \
+-v /my/rocketmq/broker/conf:/home/rocketmq/conf  -v /my/rocketmq/broker/logs:/home/rocketmq/logs -v /my/rocketmq/broker/store:/home/rocketmq/store \
+-e "NAMESRV_ADDR=rocketmq-server:9876" \
+--name rocketmq-broker apache/rocketmq:latest
+
+docker run -d --restart=always  -p 6765:8080  \
+-e "JAVA_OPTS=-Drocketmq.namesrv.addr=127.0.0.1:9876" \ 
+--name rocketmq-dashboard apache/rocketmq-dashboard:latest

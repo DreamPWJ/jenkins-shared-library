@@ -49,7 +49,7 @@ spec:
             # subPathExpr: $(POD_NAME)
 #      volumes:
 #        - name: nfs-storage
-#          nfs:
+#          nfs: # 自建NFS文档: https://docs.ksyun.com/documents/5509?type=3
 #            server: {NFS_SERVER}
 #            path: {NFS_SERVER_PATH}
 
