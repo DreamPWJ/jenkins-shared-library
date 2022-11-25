@@ -4,7 +4,7 @@ metadata:
   name: {APP_NAME}-deployment
   namespace: default
   labels:
-    app: {APP_COMMON_NAME}           # Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
+    app.kubernetes.io/name: {APP_COMMON_NAME}           # Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
 
 spec:
   replicas: {K8S_POD_REPLICAS}
@@ -116,7 +116,7 @@ spec:
   type: LoadBalancer                   # 规格类型ClusterIP、NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡
   #sessionAffinity: ClientIP           # 设置为 "ClientIP" （默认值是 "None"），来基于客户端的IP地址选择固定会话Pod关联
   selector:
-    app: {APP_COMMON_NAME}             # 通过Pod的labels指定Pod 建立关联  Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
+    app.kubernetes.io/name: {APP_COMMON_NAME}             # 通过Pod的labels指定Pod 建立关联  Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
   ports:
     - name: {APP_COMMON_NAME}
       port: {HOST_PORT}                # 指定Service接收请求的端口
