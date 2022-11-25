@@ -78,7 +78,7 @@ spec:
             nodeSelectorTerms:
               - matchExpressions:
                   - key: nodeLabelName  # node节点标签方式 kubectl get nodes --show-labels 与 kubectl label nodes <your-node-name> nodeLabelName=node1
-                    operator: In
+                    operator: NotIn     # NotIn 和 DoesNotExist 可用来实现节点反亲和性行为。 你也可以使用节点污点 将 Pod 从特定节点上驱逐
                     values:
                       - node1
                       - node2
