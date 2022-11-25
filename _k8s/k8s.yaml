@@ -30,11 +30,11 @@ spec:
         imagePullPolicy: Always       # 强制拉取线上镜像
 #        resources:
 #          requests:
-#            cpu: "300m"
-#            memory: {MEMORY_SIZE}i
+#            cpu: 300m
+#            memory: 512Mi
 #          limits:
 #            cpu: "600m"
-#            memory: {MEMORY_SIZE}i
+#            memory: 2048Mi
         ports:
         - containerPort: {CONTAINER_PORT}
         env:
@@ -71,8 +71,17 @@ spec:
           failureThreshold: 10
 
       restartPolicy: Always   # 停机后总是不断重启
-#      affinity: # 使用工作负载反亲和特性，让Pod之间尽量“互斥”，能尽量均匀的分布在各node节点上
-
+#     affinity: # 使用工作负载反亲和特性，让Pod之间尽量“互斥”，能尽量均匀的分布在各node节点上  参考文档： https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - {APP_COMMON_NAME}
       # 私有镜像拉取密钥配置   参考文档：https://kubernetes.io/docs/concepts/containers/images/#creating-a-secret-with-a-docker-config
       # kubectl create secret docker-registry panweiji2022 --docker-server=registry.cn-qingdao.aliyuncs.com  --docker-username=2000160180 --docker-password=panweiji@2022--docker-email=406798106@qq.com --namespace=default
       imagePullSecrets:
