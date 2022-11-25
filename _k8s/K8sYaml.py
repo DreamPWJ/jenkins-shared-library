@@ -20,12 +20,17 @@ from ruamel.yaml import YAML
 # 传递参数  执行示例  python K8sYaml.py  --nfs_params=A,B,C --volume_mounts=AAA/name:BBB/path,CCC:BBB,DDD:BBB
 parser = argparse.ArgumentParser(description='manual to this script')
 parser.add_argument('--k8s_yaml_file', type=str, default="k8s.yaml")
-parser.add_argument('--nfs_params', type=str, default=None)
 parser.add_argument('--volume_mounts', type=str, default=None)
+parser.add_argument('--cpu_shares', type=str, default=None)
+parser.add_argument('--memory', type=str, default=None)
+parser.add_argument('--nfs_params', type=str, default=None)
+parser.add_argument('--remote_debug_port', type=int, default=None)
 args = parser.parse_args()
 
 k8s_yaml_file = args.k8s_yaml_file
 volume_mounts = args.volume_mounts
+
+# 挂载映射参数
 volume_mounts_yaml = []
 volume_host_mounts_yaml = []
 if volume_mounts is not None:
@@ -39,6 +44,7 @@ if volume_mounts is not None:
         volume_mounts_yaml.append({"name": volume_mounts_name, "mountPath": volume_mounts_path})
         volume_host_mounts_yaml.append({"name": volume_mounts_name, "hostPath": {"path": volume_mounts_host_path}})
 
+# NFS网络文件系统参数
 nfs_params = args.nfs_params
 nsf_mount_yaml = None
 nsf_server_yaml = None
