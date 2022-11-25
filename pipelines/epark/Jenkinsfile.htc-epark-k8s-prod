@@ -118,10 +118,10 @@ htc-epark-server-k8s-prod
 JSON_PARAMS
 {
    "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark.git" ,
-   "BRANCH_NAME" : "main" ,
+   "BRANCH_NAME" : "feature/k8s" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "epark-server" ,
-   "SHELL_PARAMS" : "epark server 8085 8080 prod",
+   "SHELL_PARAMS" : "epark server 8090 8080 prod",
    "IS_MAVEN_SINGLE_MODULE" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
    "SOURCE_TARGET_CONFIG_DIR" : "resources/rizhao,resources",

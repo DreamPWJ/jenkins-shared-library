@@ -94,8 +94,8 @@ spec:
   strategy:
     type: RollingUpdate  # 滚动更新 “RollingUpdate”是默认值   Recreate类型在创建新 Pod 之前，所有现有的 Pod 会被杀死
     rollingUpdate:  # 滚动更新速率控制
-      maxSurge: 1   # 过期望副本数最大比例或最大值  值越小，越能保证服务稳定，更新越平滑
-      maxUnavailable: 1  # 最大不可用副本数最大比例或最大值  值调的越大，副本更新速度越快
+      maxSurge: 25%   # 过期望副本数最大比例或最大值  值越小，越能保证服务稳定，更新越平滑
+      maxUnavailable: 25%  # 最大不可用副本数最大比例或最大值  值调的越大，副本更新速度越快
 
 ---
 
