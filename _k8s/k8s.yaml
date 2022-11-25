@@ -38,10 +38,13 @@ spec:
         ports:
         - containerPort: {CONTAINER_PORT}
         env:
+          - name: TZ
+            value: Asia/Shanghai
           - name: SPRING_PROFILES_ACTIVE
             value: {SPRING_PROFILE}
           - name: EXTEND_PORT
             value: "{CONTAINER_PORT}"
+
 #        volumeMounts:
 #          - name: nfs-storage
 #            mountPath: {NFS_HOST_PATH}
