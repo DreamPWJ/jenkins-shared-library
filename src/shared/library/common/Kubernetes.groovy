@@ -225,7 +225,6 @@ class Kubernetes implements Serializable {
         // 启动服务
         ctx.sh "minikube service ${deploymentName}"
         // ctx.sh "kubectl port-forward service/${deploymentName} 8080:8080" // 使用 kubectl 转发端口  kubectl port-forward 不会返回
-
     }
 
     /**
@@ -233,7 +232,7 @@ class Kubernetes implements Serializable {
      */
     static def healthDetection(ctx) {
         // Pod通过两类探针来检查容器的健康状态。分别是LivenessProbe（存活探测）和 ReadinessProbe（就绪探测）
-        ctx.sh ""
+        ctx.sh "kubectl get pods **** -o custom-columns=NAME:.metadata.name,FINISHED:.metadata.creationTimestamp"
     }
 
     /**

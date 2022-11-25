@@ -74,14 +74,15 @@ spec:
 #     affinity: # 使用工作负载反亲和特性，让Pod之间尽量“互斥”，能尽量均匀的分布在各node节点上  参考文档： https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/
       affinity:
         nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 1
-              preference:
-                matchExpressions:
-                  - key: app
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nodeLabelName  # node节点标签方式 kubectl get nodes --show-labels 与 kubectl label nodes <your-node-name> nodeLabelName=node1
                     operator: In
                     values:
-                      - {APP_COMMON_NAME}
+                      - node1
+                      - node2
+                      - node3
       # 私有镜像拉取密钥配置   参考文档：https://kubernetes.io/docs/concepts/containers/images/#creating-a-secret-with-a-docker-config
       # kubectl create secret docker-registry panweiji2022 --docker-server=registry.cn-qingdao.aliyuncs.com  --docker-username=2000160180 --docker-password=panweiji@2022--docker-email=406798106@qq.com --namespace=default
       imagePullSecrets:
