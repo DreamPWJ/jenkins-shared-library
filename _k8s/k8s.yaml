@@ -65,7 +65,7 @@ spec:
           periodSeconds: 3         # 探针执行频率。默认是10秒，最小1秒
           timeoutSeconds: 1        # 探测超时时间。默认1秒，最小1秒
           failureThreshold: 600    # 探测成功后，最少连续探测失败多少次才被认定为失败。默认是3。最小值是1
-        # LivenessProbe（存活探测） 对Pod内个容器健康检查的设置，当探测无响应几次后将自动重启该容器
+      # LivenessProbe（存活探测） 对Pod内个容器健康检查的设置，当探测无响应几次后将自动重启该容器
         livenessProbe:
           httpGet:
             path: /
@@ -84,10 +84,10 @@ spec:
             podAffinityTerm:
               labelSelector:
                 matchExpressions:
-                  - key: app  # node节点标签方式 kubectl get nodes --show-labels 与 kubectl label nodes <your-node-name> nodeLabelName=node1
+                  - key: app            # node节点标签方式 kubectl get nodes --show-labels 与 kubectl label nodes <your-node-name> nodeLabelName=node1
                     operator: In        # NotIn 和 DoesNotExist 可用来实现节点反亲和性行为。 你也可以使用节点污点 将 Pod 从特定节点上驱逐
                     values:
-                      - {APP_NAME}
+                      - {APP_COMMON_NAME}
               namespaces:
               - default
               topologyKey: kubernetes.io/hostname         # pod不会调度到同一节点 在节点上起作用
