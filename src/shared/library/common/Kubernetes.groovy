@@ -118,20 +118,29 @@ class Kubernetes implements Serializable {
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYAMLFile} > ${k8sYAMLFile} "
 
+        def pythonYamlParams = ""
+        def isUseSession = ""
+        def volumeMounts = ""
+        def nfsParams = ""
         // 复杂参数动态组合配置yaml文件
-        if ("${ctx.DOCKER_VOLUME_MOUNT}".trim() != "") { // 容器挂载映射 与 NFS服务等
+        if ("${ctx.IS_USE_SESSION}" == "true") {   // k8s集群业务应用是否使用Session 做亲和度关联
+            isUseSession = " --is_use_session=true "
+        }
+        if ("${ctx.DOCKER_VOLUME_MOUNT}".trim() != "") { // 容器挂载映射
+            volumeMounts = " --k8s_yaml_file=${ctx.env.WORKSPACE}/ci/_k8s/${k8sYAMLFile}  --volume_mounts=${ctx.DOCKER_VOLUME_MOUNT} "
+        }
+        if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") { // NFS服务等
+            nfsParams = "  --nfs_params=${nfsHostPath},${ctx.NFS_SERVER},${nfsServerPath} "
+        }
+
+        pythonYamlParams = isUseSession + volumeMounts + nfsParams
+        if ("${pythonYamlParams}".trim() != "") {
             ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
                 // 使用Python动态处理Yaml文件
                 // ctx.sh " python --version "
                 // ctx.sh " pip install ruamel.yaml "
                 // 使用Python动态处理Yaml文件
-                def volumeMounts = " --k8s_yaml_file=${ctx.env.WORKSPACE}/${k8sYAMLFile}  --volume_mounts=${ctx.DOCKER_VOLUME_MOUNT} "
-                if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") {
-                    def nfsParams = "  --nfs_params=${nfsHostPath},${ctx.NFS_SERVER},${nfsServerPath} "
-                    ctx.sh " python ${pythonYamlFile} ${volumeMounts} ${nfsParams} "
-                } else {
-                    ctx.sh " python ${pythonYamlFile} ${volumeMounts} "
-                }
+                ctx.sh " python ${pythonYamlFile} ${pythonYamlParams} "
             }
         }
         ctx.sh " cat ${k8sYAMLFile} "

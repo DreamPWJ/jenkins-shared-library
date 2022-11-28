@@ -128,6 +128,7 @@ JSON_PARAMS
    "NFS_SERVER" : "nfs.jtss.rzbus.cn",
    "NFS_MOUNT_PATHS" : "/usr/local/tomcat/webapps/FileUpload,/mnt/stor",
    "IS_K8S_DEPLOY" : true,
+   "IS_USE_SESSION" : true,
 }
 
 htc-epark-h5-k8s-prod
