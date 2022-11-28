@@ -57,7 +57,7 @@ spec:
 #            path: {NFS_SERVER_PATH}
 
       # 对节点（就绪探测）服务可用性进行检测， initialDelaySeconds启动多少秒后开始，periodSeconds每多少秒检测一次，timeoutSeconds超时时间秒
-        readinessProbe:
+        readinessProbe: #  Pod 未就绪时，它会从服务负载均衡器中删除
           httpGet:  # 任何大于或等于 200 且小于 400 的代码都表示成功。任何其他代码表示失败
             path: /
             port: {CONTAINER_PORT}
@@ -119,7 +119,10 @@ metadata:
 
 spec:
   type: LoadBalancer                   # 规格类型ClusterIP、NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡
-  #sessionAffinity: ClientIP           # 设置为 "ClientIP" （默认值是 "None"），来基于客户端的IP地址选择固定会话Pod关联
+  sessionAffinity: ClientIP            # 集群Session共享设置为 "ClientIP" （默认值是 "None"值 Service向后台Pod转发规则是轮询），来基于客户端的IP地址选择固定会话Pod关联
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800            # 保持时间 秒
   selector:
     app: {APP_COMMON_NAME}             # 通过Pod的labels指定Pod 建立关联  Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
   ports:
