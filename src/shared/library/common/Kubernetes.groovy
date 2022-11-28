@@ -102,6 +102,9 @@ class Kubernetes implements Serializable {
         if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") {
             nfsHostPath = "${ctx.NFS_MOUNT_PATHS}".split(",")[0]
             nfsServerPath = "${ctx.NFS_MOUNT_PATHS}".split(",")[1]
+        }
+        // 不同配置环境的相同应用
+        if ("${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
             if (deployNum != 0) { // k8s内相同应用不同容器镜像标签部署
                 appName += "-node"
                 imageTag += Docker.imageNodeTag + deployNum
@@ -110,6 +113,7 @@ class Kubernetes implements Serializable {
                 k8sPodReplicas = 1  // 主节点只部署一个
             }
         }
+
 
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
                 " s#{APP_NAME}#${appName}#g;s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
@@ -127,7 +131,7 @@ class Kubernetes implements Serializable {
             isUseSession = " --is_use_session=true "
         }
         if ("${ctx.DOCKER_VOLUME_MOUNT}".trim() != "") { // 容器挂载映射
-            volumeMounts = " --k8s_yaml_file=${ctx.env.WORKSPACE}/ci/_k8s/${k8sYAMLFile}  --volume_mounts=${ctx.DOCKER_VOLUME_MOUNT} "
+            volumeMounts = "  --volume_mounts=${ctx.DOCKER_VOLUME_MOUNT} "
         }
         if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") { // NFS服务等
             nfsParams = "  --nfs_params=${nfsHostPath},${ctx.NFS_SERVER},${nfsServerPath} "
@@ -140,7 +144,7 @@ class Kubernetes implements Serializable {
                 // ctx.sh " python --version "
                 // ctx.sh " pip install ruamel.yaml "
                 // 使用Python动态处理Yaml文件
-                ctx.sh " python ${pythonYamlFile} ${pythonYamlParams} "
+                ctx.sh " python ${pythonYamlFile} --k8s_yaml_file=${ctx.env.WORKSPACE}/${k8sYAMLFile}  ${pythonYamlParams} "
             }
         }
         ctx.sh " cat ${k8sYAMLFile} "
