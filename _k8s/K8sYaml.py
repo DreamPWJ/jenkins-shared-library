@@ -64,7 +64,7 @@ is_use_session = args.is_use_session
 session_yaml = None
 if is_use_session:
     print(is_use_session)
-    session_yaml = {"sessionAffinity": "ClientIP", "sessionAffinityConfig": {"clientIP": {"timeoutSeconds": 10800}}}
+    session_yaml = {"sessionAffinity": "ClientIP"} #  "sessionAffinityConfig": {"clientIP": {"timeoutSeconds": 10800}}
 
 # 第一步: 创建YAML对象
 yaml = YAML()  # typ='safe' 导致生成的yaml文件和原顺序不一致
