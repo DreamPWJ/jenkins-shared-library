@@ -4,7 +4,7 @@ metadata:
   name: {APP_NAME}-deployment
   namespace: default
   labels:
-    app: {APP_NAME}     # Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
+    app: {APP_COMMON_NAME}     # Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
 
 spec:
   replicas: {K8S_POD_REPLICAS}
@@ -12,12 +12,12 @@ spec:
   #maxReplicas: 10                   #最大副本数
   selector:
     matchLabels:
-      app: {APP_NAME}
+      app: {APP_COMMON_NAME}
 
   template:
     metadata:
       labels:
-        app: {APP_NAME}
+        app: {APP_COMMON_NAME}
       annotations:
         prometheus.io/scrape: "true"                # 让prometheus自动发现
         prometheus.io/path: "/actuator/prometheus"  # /metric路径是集成内提供的 Prometheus 监控接口 或利用 exporter 服务来为 Prometheus 提供指标数据
@@ -58,15 +58,17 @@ spec:
 
       # 对节点（就绪探测）服务可用性进行检测， initialDelaySeconds启动多少秒后开始，periodSeconds每多少秒检测一次，timeoutSeconds超时时间秒
         readinessProbe:
-          tcpSocket:
+          httpGet:  # 任何大于或等于 200 且小于 400 的代码都表示成功。任何其他代码表示失败
+            path: /
             port: {CONTAINER_PORT}
           initialDelaySeconds: 2   # 探针在容器启动后的多少秒才开始执行
-          periodSeconds: 2         # 探针执行频率。默认是10秒，最小1秒
+          periodSeconds: 3         # 探针执行频率。默认是10秒，最小1秒
           timeoutSeconds: 1        # 探测超时时间。默认1秒，最小1秒
           failureThreshold: 600    # 探测成功后，最少连续探测失败多少次才被认定为失败。默认是3。最小值是1
         # LivenessProbe（存活探测） 对Pod内个容器健康检查的设置，当探测无响应几次后将自动重启该容器
         livenessProbe:
-          tcpSocket:
+          httpGet:
+            path: /
             port: {CONTAINER_PORT}
           initialDelaySeconds: 60
           periodSeconds: 10
@@ -94,11 +96,11 @@ spec:
       imagePullSecrets:
         - name: {K8S_IMAGE_PULL_SECRETS}
   # 部署更新策略
-  strategy:
-    type: RollingUpdate  # 滚动更新 “RollingUpdate”是默认值   Recreate类型在创建新 Pod 之前，所有现有的 Pod 会被杀死
-    rollingUpdate:  # 滚动更新速率控制
-      maxSurge: 25%   # 过期望副本数最大比例或最大值  值越小，越能保证服务稳定，更新越平滑
-      maxUnavailable: 25%  # 最大不可用副本数最大比例或最大值  值调的越大，副本更新速度越快
+#  strategy:
+#    type: RollingUpdate  # 滚动更新 “RollingUpdate”是默认值   Recreate类型在创建新 Pod 之前，所有现有的 Pod 会被杀死
+#    rollingUpdate:  # 滚动更新速率控制
+#      maxSurge: 25%   # 过期望副本数最大比例或最大值  值越小，越能保证服务稳定，更新越平滑
+#      maxUnavailable: 25%  # 最大不可用副本数最大比例或最大值  值调的越大，副本更新速度越快
 
 ---
 
