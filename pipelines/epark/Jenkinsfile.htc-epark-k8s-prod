@@ -129,6 +129,7 @@ JSON_PARAMS
    "NFS_MOUNT_PATHS" : "/usr/local/tomcat/webapps/FileUpload,/mnt/stor",
    "IS_K8S_DEPLOY" : true,
    "IS_USE_SESSION" : true,
+   "APPLICATION_DOMAIN" : "http://epark.ggjtss.cn",
 }
 
 htc-epark-h5-k8s-prod
