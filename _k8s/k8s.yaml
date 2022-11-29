@@ -119,10 +119,6 @@ metadata:
 
 spec:
   type: LoadBalancer                   # 规格类型ClusterIP、NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡
-#  sessionAffinity: ClientIP            # 集群Session共享设置为 "ClientIP" 注意只适用NodePort类型 （默认值是 "None"值 Service向后台Pod转发规则是轮询），来基于客户端的IP地址选择固定会话Pod关联
-#  sessionAffinityConfig:
-#    clientIP:
-#      timeoutSeconds: 10800            # 保持时间 秒
   selector:
     app: {APP_COMMON_NAME}             # 通过Pod的labels指定Pod 建立关联  Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
   ports:
@@ -131,3 +127,9 @@ spec:
       targetPort: {CONTAINER_PORT}     # 请求转发的端口 容器内部端口
       #nodePort: {HOST_PORT}           # NodePort类型端口区间 30000–32767 不指定端口，系统将分配一个随机端口
       protocol: TCP                    # 定义通信协议
+
+#  Session保持  Ingress的解决方案:  https://www.modb.pro/db/210201
+#  sessionAffinity: ClientIP            # 集群Session共享设置为 "ClientIP" 注意只适用NodePort类型 （默认值是 "None"值 Service向后台Pod转发规则是轮询），来基于客户端的IP地址选择固定会话Pod关联
+#  sessionAffinityConfig:
+#    clientIP:
+#      timeoutSeconds: 10800            # 保持时间 秒
