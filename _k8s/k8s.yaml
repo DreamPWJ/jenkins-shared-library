@@ -62,10 +62,10 @@ spec:
             path: /
             port: {CONTAINER_PORT}
           initialDelaySeconds: 2   # 探针在容器启动后的多少秒才开始执行
-          periodSeconds: 3         # 探针执行频率。默认是10秒，最小1秒
+          periodSeconds: 10        # 探针执行频率。默认是10秒，最小1秒
           timeoutSeconds: 1        # 探测超时时间。默认1秒，最小1秒
           successThreshold: 1      # 连续探测1次成功表示成功
-          failureThreshold: 300    # 探测成功后，最少连续探测失败多少次才被认定为失败。默认是3。最小值是1
+          failureThreshold: 60     # 探测成功后，最少连续探测失败多少次才被认定为失败。默认是3。最小值是1
       # LivenessProbe（存活探测） 对Pod内个容器健康检查的设置，当探测无响应几次后将自动重启该容器
         livenessProbe:
           httpGet:
