@@ -44,6 +44,8 @@ spec:
             value: {SPRING_PROFILE}
           - name: EXTEND_PORT
             value: "{CONTAINER_PORT}"
+#          - name: JAVA_OPTS
+#            value: -Xms256m -Xmx1024m
 
 #        volumeMounts:
 #          - name: nfs-storage
