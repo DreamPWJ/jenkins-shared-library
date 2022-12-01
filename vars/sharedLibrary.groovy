@@ -828,11 +828,12 @@ def getInitParams(map) {
 
     // 健康检测url地址
     healthCheckUrl = ""
+    healthCheckDomainUrl = ""
     // 使用域名或机器IP地址
     if ("${APPLICATION_DOMAIN}".trim() == "") {
         healthCheckUrl = "http://${remote.host}:${SHELL_HOST_PORT}"
     } else {
-        healthCheckUrl = "${APPLICATION_DOMAIN}"
+        healthCheckDomainUrl = "${APPLICATION_DOMAIN}"
     }
 
     // tag版本变量定义
@@ -1377,6 +1378,7 @@ def healthCheck(map, params = '') { // 可选参数
         // 单机分布式部署从服务
         healthCheckParams = params
     } else {
+        healthCheckUrl = "http://${remote.host}:${SHELL_HOST_PORT}"
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) { // 服务端
             healthCheckUrl = "${healthCheckUrl}/"
         }
@@ -1790,14 +1792,15 @@ def alwaysPost() {
     // Jenkins全局安全配置->标记格式器内设置Safe HTML支持html文本
     try {
         def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
+        def noticeHealthCheckUrl = "${APPLICATION_DOMAIN == "" ? healthCheckUrl : healthCheckDomainUrl}"
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             currentBuild.description = "${IS_GEN_QR_CODE == 'true' ? "<img src=${qrCodeOssUrl} width=250 height=250 > <br/> " : ""}" +
-                    "<a href='${healthCheckUrl}'> 👉URL访问地址</a> " +
+                    "<a href='${noticeHealthCheckUrl}'> 👉URL访问地址</a> " +
                     "<br/> 项目: ${PROJECT_NAME}" +
                     "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
                     "<br/> 大小: ${webPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-            currentBuild.description = "<a href='${healthCheckUrl}'> 👉API访问地址</a> " +
+            currentBuild.description = "<a href='${noticeHealthCheckUrl}'> 👉API访问地址</a> " +
                     "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉直接下载构建${javaPackageType}包</a>" : ""}" +
                     "<br/> 项目: ${PROJECT_NAME}" +
                     "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
@@ -1893,6 +1896,8 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             envTypeMark = "正式版"
         }
         def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
+        def noticeHealthCheckUrl = "${APPLICATION_DOMAIN == "" ? healthCheckUrl : healthCheckDomainUrl}"
+
         if (type == 0) { // 失败
             if (!isHealthCheckFail) {
                 dingtalk(
@@ -1929,7 +1934,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                 "${monorepoProjectName}",
                                 "###### ${rollbackTag}",
                                 "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
-                                "###### 访问URL: [${healthCheckUrl}](${healthCheckUrl})",
+                                "###### 访问URL: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl})",
                                 "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
                                 "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
                                 "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
@@ -1937,7 +1942,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                         btns: [
                                 [
                                         title    : "直接访问URL地址",
-                                        actionUrl: "${healthCheckUrl}"
+                                        actionUrl: "${noticeHealthCheckUrl}"
                                 ]
                         ],
                         at: [isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone)]
@@ -1962,7 +1967,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                 "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
                                 "###### 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
                                 "###### ${javaInfo}",
-                                "###### API地址: [${healthCheckUrl}](${healthCheckUrl})",
+                                "###### API地址: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl})",
                                 "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
                                 "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
                                 "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
