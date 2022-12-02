@@ -24,8 +24,10 @@ parser.add_argument('--volume_mounts', type=str, default=None)
 parser.add_argument('--cpu_shares', type=str, default=None)
 parser.add_argument('--memory', type=str, default=None)
 parser.add_argument('--nfs_params', type=str, default=None)
+parser.add_argument('--default_port', type=int, default=None)
 parser.add_argument('--remote_debug_port', type=int, default=None)
 parser.add_argument('--is_use_session', type=bool, default=False)
+
 args = parser.parse_args()
 
 k8s_yaml_file = args.k8s_yaml_file
@@ -66,6 +68,7 @@ if is_use_session:
     print(is_use_session)
     session_yaml = {"sessionAffinity": "ClientIP", "sessionAffinityConfig": {"clientIP": {"timeoutSeconds": 10800}}}
 
+
 # 第一步: 创建YAML对象
 yaml = YAML()  # typ='safe' 导致生成的yaml文件和原顺序不一致
 yaml.default_flow_style = False  # 按原风格输出
@@ -78,8 +81,10 @@ print(k8s_yaml_file)
 yamlContent = list(yaml.load_all(open(k8s_yaml_file)))  # 多文档结构读取---分割的yaml文件
 # print(yamlContent)
 
-yaml_volume_mounts = yamlContent[0]['spec']['template']['spec']['containers'][0]['volumeMounts'] = []
+yaml_containers = yamlContent[0]['spec']['template']['spec']['containers']
+yaml_volume_mounts = yaml_containers[0]['volumeMounts'] = []
 yaml_volume = yamlContent[0]['spec']['template']['spec']['volumes'] = []
+
 
 # 挂载映射参数处理
 if volume_mounts is not None:
@@ -104,6 +109,12 @@ if is_use_session:
     service_spec = yamlContent[1]['spec']
     service_spec['type'] = "NodePort"
     service_spec.update(session_yaml)  # update更新JSON数据
+
+# 默认应用端口
+default_port = args.default_port
+if default_port  is not None :
+    print(default_port)
+    yaml_containers[0]['ports'].append({'containerPort' : default_port})
 
 # print(yamlContent)
 

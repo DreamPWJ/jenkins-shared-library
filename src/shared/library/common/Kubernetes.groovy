@@ -92,8 +92,10 @@ class Kubernetes implements Serializable {
         def k8sPodReplicas = "${ctx.K8S_POD_REPLICAS}"
 
         // 判断是否存在扩展端口
+        def yamlDefaultPort = ""
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && ctx.SHELL_EXTEND_PORT != "") {
             containerPort = "${ctx.SHELL_EXTEND_PORT}"
+            yamlDefaultPort = " --default_port=${ctx.SHELL_HOST_PORT} "
             ctx.println("应用服务扩展端口: " + containerPort)
         }
         // 判断是否存在NFS网络文件服务挂载信息
@@ -114,30 +116,29 @@ class Kubernetes implements Serializable {
             }
         }
 
-
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
                 " s#{APP_NAME}#${appName}#g;s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
-                " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
+                " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g;s#{DEFAULT_CONTAINER_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
                 " s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g;s#{MEMORY_SIZE}#${map.docker_memory}#g; " +
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g;s#{CUSTOM_HEALTH_CHECK_PATH}#${ctx.CUSTOM_HEALTH_CHECK_PATH}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYAMLFile} > ${k8sYAMLFile} "
 
         def pythonYamlParams = ""
-        def isUseSession = ""
-        def volumeMounts = ""
-        def nfsParams = ""
+        def isYamlUseSession = ""
+        def yamlVolumeMounts = ""
+        def yamlNfsParams = ""
         // 复杂参数动态组合配置yaml文件
         if ("${ctx.IS_USE_SESSION}" == "true") {   // k8s集群业务应用是否使用Session 做亲和度关联
-            isUseSession = " --is_use_session=true "
+            isYamlUseSession = " --is_use_session=true "
         }
         if ("${ctx.DOCKER_VOLUME_MOUNT}".trim() != "") { // 容器挂载映射
-            volumeMounts = "  --volume_mounts=${ctx.DOCKER_VOLUME_MOUNT} "
+            yamlVolumeMounts = "  --volume_mounts=${ctx.DOCKER_VOLUME_MOUNT} "
         }
         if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") { // NFS服务等
-            nfsParams = "  --nfs_params=${nfsHostPath},${ctx.NFS_SERVER},${nfsServerPath} "
+            yamlNfsParams = "  --nfs_params=${nfsHostPath},${ctx.NFS_SERVER},${nfsServerPath} "
         }
 
-        pythonYamlParams = isUseSession + volumeMounts + nfsParams
+        pythonYamlParams = isYamlUseSession + yamlVolumeMounts + yamlNfsParams + yamlDefaultPort
         if ("${pythonYamlParams}".trim() != "") {
             ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
                 // 使用Python动态处理Yaml文件

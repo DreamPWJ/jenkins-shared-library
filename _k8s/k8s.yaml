@@ -62,7 +62,7 @@ spec:
         readinessProbe: #  Pod 未就绪时，它会从服务负载均衡器中删除   Readiness探针在容器的整个生命周期内运行在容器上
           httpGet:  # 任何大于或等于 200 且小于 400 的代码都表示成功。任何其他代码表示失败
             path: {CUSTOM_HEALTH_CHECK_PATH}
-            port: {CONTAINER_PORT}
+            port: {DEFAULT_CONTAINER_PORT}
           initialDelaySeconds: 2   # 探针在容器启动后的多少秒才开始执行
           periodSeconds: 10        # 探针执行频率。默认是10秒，最小1秒
           timeoutSeconds: 1        # 探测超时时间。默认1秒，最小1秒
@@ -72,7 +72,7 @@ spec:
         livenessProbe:
           httpGet:
             path: {CUSTOM_HEALTH_CHECK_PATH}
-            port: {CONTAINER_PORT}
+            port: {DEFAULT_CONTAINER_PORT}
           initialDelaySeconds: 60
           periodSeconds: 60
           timeoutSeconds: 5
