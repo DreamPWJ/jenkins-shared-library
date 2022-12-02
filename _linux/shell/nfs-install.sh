@@ -2,7 +2,7 @@
 # Author: 潘维吉
 # Description: NFS分布式网络文件存储服务
 # 参考文章: https://cloud.tencent.com/developer/article/1914388
-# 对外分别开通NFS服务的tcp 111 2049 端口 udp 111 4046端口并确保IP白名单可访问NFS服务
+# 对外分别开通NFS服务的tcp 111 2049 端口 udp 111 4046端口并确保IP白名单可访问NFS服务 并且默认客户端访问端口要小于1024
 
 cd /my
 
@@ -25,7 +25,7 @@ sudo cat <<EOF >>/etc/exports
 /my/nfs/data/ *(insecure,rw,sync,no_all_squash,no_subtree_check)
 EOF
 
-# 载入配置
+# reload载入配置生效
 exportfs -rv
 
 echo "启动NFS服务"
@@ -53,6 +53,8 @@ cat /var/lib/nfs/etab
 
 # 重启NFS服务
 # sudo service nfs-server restart
+# 命令用于使新加载的配置生效
+# exportfs -rv 命令相当于 /etc/init.d/nfs reload
 
 # ------------------------- 创建部署一个NFS客户端 -----------------------------------
 
@@ -64,4 +66,4 @@ cat /var/lib/nfs/etab
 # 挂在共享目录到客户端
 # sudo mount -t nfs NFSServerIP:/mnt/nfs_shared_server /mnt/nfs_shared_client
 # umount -f /mnt/nfs_shared_client
-sudo mount -t nfs 58.58.179.242:/mnt/stor1 /mnt/stor1
+# sudo mount -t nfs 58.58.179.242:/mnt/stor1 /mnt/stor1
