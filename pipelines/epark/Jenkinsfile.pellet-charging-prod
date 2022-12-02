@@ -139,6 +139,7 @@ JSON_PARAMS
    "SHELL_PARAMS" : "pellet-charging app 8080 8080 prod",
    "IS_K8S_DEPLOY" : true,
    "APPLICATION_DOMAIN" : "https://charge-app-api.ggjtss.cn",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/healthyCheck",
 }
 
 pellet-charging-job-k8s-prod
@@ -152,6 +153,7 @@ JSON_PARAMS
    "SHELL_PARAMS" : "pellet-charging job 8065 8065 prod 8165 8265",
    "IS_K8S_DEPLOY" : true,
    "K8S_POD_REPLICAS" : "2",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/healthyCheck",
 }
 
 */

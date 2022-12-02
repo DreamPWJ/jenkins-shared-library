@@ -61,7 +61,7 @@ spec:
       # 对节点（就绪探测）服务可用性进行检测， initialDelaySeconds启动多少秒后开始，periodSeconds每多少秒检测一次，timeoutSeconds超时时间秒
         readinessProbe: #  Pod 未就绪时，它会从服务负载均衡器中删除   Readiness探针在容器的整个生命周期内运行在容器上
           httpGet:  # 任何大于或等于 200 且小于 400 的代码都表示成功。任何其他代码表示失败
-            path: /
+            path: ${CUSTOM_HEALTH_CHECK_PATH}
             port: {CONTAINER_PORT}
           initialDelaySeconds: 2   # 探针在容器启动后的多少秒才开始执行
           periodSeconds: 10        # 探针执行频率。默认是10秒，最小1秒
@@ -71,7 +71,7 @@ spec:
       # LivenessProbe（存活探测） 对Pod内个容器健康检查的设置，当探测无响应几次后将自动重启该容器
         livenessProbe:
           httpGet:
-            path: /
+            path: ${CUSTOM_HEALTH_CHECK_PATH}
             port: {CONTAINER_PORT}
           initialDelaySeconds: 60
           periodSeconds: 60

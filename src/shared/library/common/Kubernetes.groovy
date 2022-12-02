@@ -119,7 +119,7 @@ class Kubernetes implements Serializable {
                 " s#{APP_NAME}#${appName}#g;s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g; " +
                 " s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g;s#{MEMORY_SIZE}#${map.docker_memory}#g; " +
-                " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g; " +
+                " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g;s#{CUSTOM_HEALTH_CHECK_PATH}#${ctx.CUSTOM_HEALTH_CHECK_PATH}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYAMLFile} > ${k8sYAMLFile} "
 
         def pythonYamlParams = ""

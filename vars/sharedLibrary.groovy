@@ -778,6 +778,8 @@ def getInitParams(map) {
     NFS_SERVER = jsonParams.NFS_SERVER ? jsonParams.NFS_SERVER.trim() : ""
     // 挂载宿主机路径与NFS服务器文件路径映射关系 NFS宿主机文件路径 NFS服务器文件路径  逗号,分割
     NFS_MOUNT_PATHS = jsonParams.NFS_MOUNT_PATHS ? jsonParams.NFS_MOUNT_PATHS.trim() : ""
+    // 自定义健康探测HTTP路径Path  默认根目录 /
+    CUSTOM_HEALTH_CHECK_PATH = jsonParams.CUSTOM_HEALTH_CHECK_PATH ? jsonParams.CUSTOM_HEALTH_CHECK_PATH.trim() : "/"
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
