@@ -59,7 +59,8 @@ if nfs_params is not None:
     nfs_server_path = nfs_array[2]
     nfs_name = "nfs-storage"
     nsf_mount_yaml = {"name": nfs_name, "mountPath": nfs_mount_path}
-    nsf_server_yaml = {"name": nfs_name, "nfs": {"server": nfs_server, "path": nfs_server_path}}
+    # readOnly设置False 而 NFS服务器是只读模式 可能导致Pod无法启动
+    nsf_server_yaml = {"name": nfs_name, "nfs": {"server": nfs_server, "path": nfs_server_path, "readOnly": False}}
 
 # 业务应用是否使用Session
 is_use_session = args.is_use_session
