@@ -20,8 +20,9 @@ mkdir -p /my/nfs/data/
 chmod -R 777 /my/nfs/data/
 
 # 编辑NFS配置并加入以下内容  允许访问NFS服务器的网段，也可以写 * ，表示所有地址都可以访问NFS服务和权限
-sudo cat <<EOF >/etc/exports
-/my/nfs/data/ *(rw,sync,no_all_squash,no_subtree_check)
+# secure 选项要求mount客户端请求源端口小于1024  非法端口号可能导致挂载被拒绝  客户端访问端口大于1024添加insecure才能访问
+sudo cat <<EOF >>/etc/exports
+/my/nfs/data/ *(insecure,rw,sync,no_all_squash,no_subtree_check)
 EOF
 
 # 载入配置
@@ -46,6 +47,12 @@ cat /var/lib/nfs/etab
 # 通过showmount命令查看NFS共享情况
 # showmount -e localhost
 # rpcinfo -p localhost
+
+# 查看NFS服务日志
+# cat /var/log/messages | grep nfs
+
+# 重启NFS服务
+# sudo service nfs-server restart
 
 # ------------------------- 创建部署一个NFS客户端 -----------------------------------
 
