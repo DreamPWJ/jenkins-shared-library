@@ -73,9 +73,9 @@ spec:
           httpGet:
             path: {CUSTOM_HEALTH_CHECK_PATH}
             port: {DEFAULT_CONTAINER_PORT}
-          initialDelaySeconds: 60
+          initialDelaySeconds: 180
           periodSeconds: 60
-          timeoutSeconds: 5
+          timeoutSeconds: 2
           successThreshold: 1      # 连续探测1次成功表示成功
           failureThreshold: 3
 
