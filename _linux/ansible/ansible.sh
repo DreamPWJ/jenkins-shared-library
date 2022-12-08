@@ -19,8 +19,8 @@ ansible shiyiyuan -m ping
 ansible shiyiyuan -m command -a "pwd"
 
 # src指定本地的文件 dest指定远程主机的目录或者文件
-ansible shiyiyuan -m copy -a " src=/home/lanneng/lxw/xianshi.zip dest=/home/orangepi/ "
-ansible shiyiyuan -m command -a " unzip -o -d /home/orangepi/xianshi /home/orangepi/xianshi.zip "
+ansible shiyiyuan -m copy -a " src=/home/panweiji/test.zip dest=/home/orangepi/ "
+ansible shiyiyuan -m command -a " unzip -o -d /home/orangepi/test /home/orangepi/test.zip "
 # ansible shiyiyuan -m command -a " /usr/sbin/reboot "
 
 # 把脚本下发到所有的服务器，然后再运行脚本。相当于copy+shell+delete

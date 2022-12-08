@@ -3,7 +3,7 @@
 # Description: NFS分布式网络文件存储服务
 # 参考文章: https://cloud.tencent.com/developer/article/1914388
 # 对外分别开通NFS服务的tcp 111 2049 端口 udp 111 4046端口并确保IP白名单可访问NFS服务
-# 并且默认客户端访问端口要小于1024否则被NFS服务端拒绝 is waiting to start: ContainerCreating Pod直接无法启动了
+# 并且默认客户端访问端口要小于1024否则被NFS服务端拒绝  如NAT网关导致NFS客户端端口号高于1024 在K8S集群报错is waiting to start: ContainerCreating Pod直接无法启动了
 
 cd /my
 
@@ -66,4 +66,5 @@ cat /var/lib/nfs/etab
 # sudo mkdir -p /mnt/nfs_shared_client
 # 挂在共享目录到客户端
 # sudo mount -t nfs -o nolock NFSServerIP:/mnt/nfs_shared_server /mnt/nfs_shared_client
+# 卸载共享目录到客户端
 # umount -f /mnt/nfs_shared_client
