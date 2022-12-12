@@ -1,6 +1,6 @@
 ## 在Kubernetes上部署一套 Redis 集群
 
-- 参考文章: https://juejin.cn/post/7042173689948798989 与  https://github.com/sobotklp/kubernetes-redis-cluster
+- 参考文章: https://github.com/sobotklp/kubernetes-redis-cluster
 
 ### 创建所需资源
 

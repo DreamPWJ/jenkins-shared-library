@@ -1,5 +1,6 @@
 #
 # Redis Cluster service
+# 参考地址https://github.com/sobotklp/kubernetes-redis-cluster/blob/master/redis-cluster.yml
 #
 apiVersion: v1
 kind: Service
@@ -7,21 +8,23 @@ metadata:
   name: redis-cluster
   labels:
     app: redis-cluster
-    environment: dev
+    environment: prod
 spec:
   publishNotReadyAddresses: true
   ports:
     - port: 6379
       targetPort: 6379
-      name: client
+      name: redis-client
     - port: 16379
       targetPort: 16379
-      name: gossip
+      name: redis-gossip # Gossip协议是一个多主协议
   clusterIP: None
   #type: ClusterIP
   selector:
     app: redis-cluster
+
 ---
+
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -31,7 +34,9 @@ spec:
     matchLabels:
       app: redis-cluster
   maxUnavailable: 0
+
 ---
+
 #
 # Redis configuration file for clustered mode
 #
@@ -85,7 +90,9 @@ data:
     fi
 
     wait
+
 ---
+
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -93,7 +100,7 @@ metadata:
 spec:
   podManagementPolicy: OrderedReady # default
   serviceName: redis-cluster
-  replicas: 6
+  replicas: 3
   selector:
     matchLabels:
       app: redis-cluster # has to match .spec.template.metadata.labels
@@ -116,7 +123,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: redis-cluster
-          image: redis:6.2.6
+          image: redis:latest
           ports:
             - containerPort: 6379
               name: client
