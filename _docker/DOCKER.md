@@ -56,16 +56,21 @@ docker run -d --restart=always -p 8081:8080  \
 #### RocketMQ消息队列服务  官方文档： https://github.com/apache/rocketmq-docker
 docker pull apache/rocketmq:latest
 
+sudo chmod 777  /my/rocketmq/ -R
+
 docker run -d -p 9876:9876 \
 -v /my/rocketmq/server/logs:/home/rocketmq/logs \
 -e TZ="Asia/Shanghai" -e "JAVA_OPT_EXT=-Xms1024M -Xmx1024M -Xmn128m"  \
---name rocketmq-server  apache/rocketmq:latest
+--name rocketmq-server  apache/rocketmq:latest  \
+sh mqnamesrv
 
 docker run -d -p 10909:10909 -p 10911:10911 -p 10912:10912 \
 -v /my/rocketmq/broker/conf:/home/rocketmq/conf  -v /my/rocketmq/broker/logs:/home/rocketmq/logs -v /my/rocketmq/broker/store:/home/rocketmq/store \
 -e "NAMESRV_ADDR=rocketmq-server:9876" \
---name rocketmq-broker  apache/rocketmq:latest
+--name rocketmq-broker  apache/rocketmq:latest  \
+sh mqbroker 
+#-c /my/rocketmq/broker/conf/broker.conf
 
-docker run -d -it -p 6765:8080  \
--e "JAVA_OPTS=-Drocketmq.namesrv.addr=192.168.1.200:9876" \ 
---name rocketmq-dashboard  apache/rocketmq-dashboard:latest
+docker run -d -t -p 6765:8080  \
+-e "JAVA_OPTS=-Drocketmq.namesrv.addr=127.0.0.1:9876" \
+--name rocketmq-dashboard  apacherocketmq/rocketmq-dashboard:latest
