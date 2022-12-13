@@ -56,7 +56,7 @@ docker run -d --restart=always -p 8081:8080  \
 #### RocketMQ消息队列服务  官方文档： https://github.com/apache/rocketmq-docker
 docker pull apache/rocketmq:latest
 
-sudo chmod 777  /my/rocketmq/ -R
+sudo chmod 777  /my/rocketmq/ -R && mkdir -p /my/rocketmq/broker/conf
 
 docker run -d -p 9876:9876 \
 -v /my/rocketmq/server/logs:/home/rocketmq/logs \

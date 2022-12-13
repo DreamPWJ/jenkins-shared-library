@@ -1,7 +1,9 @@
 #
 # Redis Cluster service
-# 参考地址https://github.com/sobotklp/kubernetes-redis-cluster/blob/master/redis-cluster.yml
+# 参考地址: https://github.com/sobotklp/kubernetes-redis-cluster/blob/master/redis-cluster.yml
+# kubectl apply -f redis-cluster.yaml
 #
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -13,20 +15,17 @@ spec:
   publishNotReadyAddresses: true
   ports:
     - port: 6379
-      targetPort: 6379
       name: redis-client
     - port: 16379
-      targetPort: 16379
       name: redis-gossip # Gossip协议是一个多主协议
-  clusterIP: None
-  #type: ClusterIP
+  type: LoadBalancer
   selector:
     app: redis-cluster
 
 ---
 
 apiVersion: policy/v1
-kind: PodDisruptionBudget
+kind: PodDisruptionBudget # Pod中断预算
 metadata:
   name: redis-cluster-pdb
 spec:
@@ -71,7 +70,7 @@ data:
     redis-server /conf/redis.conf &
     
     # TODO: Wait until redis-server process is ready
-    sleep 1
+    sleep 3
 
     if [ $PET_ORDINAL -lt $NUM_SHARDS ]; then
       # Set up primary nodes. Divide slots into equal(ish) contiguous blocks
@@ -100,7 +99,7 @@ metadata:
 spec:
   podManagementPolicy: OrderedReady # default
   serviceName: redis-cluster
-  replicas: 3
+  replicas: 6
   selector:
     matchLabels:
       app: redis-cluster # has to match .spec.template.metadata.labels
@@ -110,25 +109,27 @@ spec:
         app: redis-cluster
         name: redis-cluster
     spec:
-      #      affinity:  # Ensure that each Redis instance is provisioned on a different k8s node
-      #        podAntiAffinity:
-      #          requiredDuringSchedulingIgnoredDuringExecution:
-      #            - labelSelector:
-      #                matchExpressions:
-      #                  - key: "app"
-      #                    operator: In
-      #                    values:
-      #                      - redis-cluster
-      #              topologyKey: "kubernetes.io/hostname"
+      affinity: # Ensure that each Redis instance is provisioned on a different k8s node
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - redis-cluster
+                topologyKey: kubernetes.io/hostname
       terminationGracePeriodSeconds: 10
       containers:
         - name: redis-cluster
           image: redis:latest
           ports:
             - containerPort: 6379
-              name: client
+              name: redis-client
             - containerPort: 16379
-              name: gossip
+              name: redis-gossip # Gossip协议是一个多主协议
           command:
             - sh
           args:
@@ -141,7 +142,7 @@ spec:
                 - sh
                 - -c
                 - "redis-cli -h $(hostname) ping"
-            initialDelaySeconds: 5
+            initialDelaySeconds: 10
             timeoutSeconds: 5
 
           securityContext:
@@ -175,11 +176,14 @@ spec:
             - name: podinfo
               mountPath: /etc/podinfo
               readOnly: false
+            - name: redis-pvc
+              mountPath: /data
+              readOnly: false
       initContainers:
         # Wait for the redis-cluster service to exist. We need it to resolve the hostnames of our nodes
         - name: init-redis-cluster
-          image: busybox:1.28
-          command: ['sh', '-c', "until nslookup redis-cluster.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for redis-cluster; sleep 2; done"]
+          image: busybox:latest  # BusyBox 是一个集成了一百多个最常用 Linux 命令和工具 运行于多款 POSIX 环境的操作系统中，如 Linux（包括 Android）
+          command: [ 'sh', '-c', "until nslookup redis-cluster.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for redis-cluster; sleep 2; done" ]
       volumes:
         # Insert our pre-baked Redis configuration file into /conf/redis.conf
         - name: conf
@@ -208,9 +212,10 @@ spec:
                   fieldPath: metadata.namespace
   volumeClaimTemplates:
     - metadata:
-        name: datadir
+        name: redis-pvc
       spec:
         accessModes: [ "ReadWriteOnce" ]
+        storageClassName: lanneng-storage-class  # 提前设置StorageClass名称
         resources:
           requests:
-            storage: 10Gi
+            storage: 1Gi
