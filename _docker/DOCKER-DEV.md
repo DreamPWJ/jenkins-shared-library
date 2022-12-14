@@ -1,6 +1,6 @@
 #### 设置镜像源  解决pull下载慢卡住问题
 docker info
-vim /etc/docker/daemon.json
+sudo vim /etc/docker/daemon.json
 {
 "registry-mirrors": [
 "https://e6x18rmb.mirror.aliyuncs.com",

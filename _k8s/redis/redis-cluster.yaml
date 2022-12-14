@@ -99,7 +99,7 @@ metadata:
 spec:
   podManagementPolicy: OrderedReady # default
   serviceName: redis-cluster
-  replicas: 6
+  replicas: 3 # 如果均匀分配反亲和度的话 数量根据Node数量设置
   selector:
     matchLabels:
       app: redis-cluster # has to match .spec.template.metadata.labels
@@ -215,7 +215,7 @@ spec:
         name: redis-pvc
       spec:
         accessModes: [ "ReadWriteOnce" ]
-        storageClassName: lanneng-storage-class  # 提前设置StorageClass名称
+        storageClassName: ks-ssd # 提前设置StorageClass名称
         resources:
           requests:
             storage: 1Gi
