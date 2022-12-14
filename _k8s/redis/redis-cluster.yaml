@@ -130,6 +130,10 @@ spec:
               name: redis-client
             - containerPort: 16379
               name: redis-gossip # Gossip协议是一个多主协议
+          lifecycle:
+            postStart:
+              exec:
+                command: [ "/bin/sh", "-c", "redis-cli config set requirepass Lannengkeji@2022" ]
           command:
             - sh
           args:

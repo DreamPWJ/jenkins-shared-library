@@ -19,7 +19,7 @@ kubectl create configmap redis-conf --from-file=redis.conf
 - 扩容至6副本
 kubectl scale -n default statefulset redis-cluster --replicas=6
 - 缩容只2副本
-kubectl scale -n default statefulset redis-cluster --replicas==2
+kubectl scale -n default statefulset redis-cluster --replicas=2
 
 
 ### 清理
