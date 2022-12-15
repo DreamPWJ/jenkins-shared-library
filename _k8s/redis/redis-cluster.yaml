@@ -12,15 +12,16 @@ metadata:
     app: redis-cluster
     environment: prod
 spec:
+  clusterIP: 10.254.174.63
+  type: LoadBalancer
   publishNotReadyAddresses: true
+  selector:
+    app: redis-cluster
   ports:
     - port: 6379
       name: redis-client
     - port: 16379
       name: redis-gossip # Gossip协议是一个多主协议
-  type: LoadBalancer
-  selector:
-    app: redis-cluster
 
 ---
 
@@ -70,7 +71,7 @@ data:
     redis-server /conf/redis.conf &
     
     # TODO: Wait until redis-server process is ready
-    sleep 3
+    sleep 2
 
     if [ $PET_ORDINAL -lt $NUM_SHARDS ]; then
       # Set up primary nodes. Divide slots into equal(ish) contiguous blocks
@@ -85,7 +86,9 @@ data:
     else
       # Set up a replica
       PEER_IP=$(perl -MSocket -e "print inet_ntoa(scalar(gethostbyname(\"redis-cluster-$MY_SHARD.redis-cluster.$POD_NAMESPACE.svc.cluster.local\")))")
-      redis-cli --cluster add-node localhost:6379 $PEER_IP:6379 --cluster-slave
+      redis-cli --cluster fix localhost:6379 --cluster-yes -a Lannengkeji@2022
+      redis-cli --cluster add-node localhost:6379 $PEER_IP:6379 --cluster-slave -a Lannengkeji@2022
+
     fi
 
     wait
@@ -99,7 +102,7 @@ metadata:
 spec:
   podManagementPolicy: OrderedReady # default
   serviceName: redis-cluster
-  replicas: 3 # 如果均匀分配反亲和度的话 数量根据Node数量设置
+  replicas: 6 # 如果均匀分配反亲和度的话 数量根据Node数量设置
   selector:
     matchLabels:
       app: redis-cluster # has to match .spec.template.metadata.labels
@@ -172,7 +175,7 @@ spec:
                 fieldRef:
                   fieldPath: spec.nodeName
             - name: NUM_SHARDS
-              value: "3"  # If you modify this value, make sure there are at least 2 times the number of replicas
+              value: "3"  # 如果修改这个值，确保至少有2倍的副本数  副本数起码分片值是2倍
           volumeMounts:
             - name: conf
               mountPath: /conf
