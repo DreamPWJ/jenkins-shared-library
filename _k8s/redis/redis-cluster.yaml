@@ -86,9 +86,8 @@ data:
     else
       # Set up a replica
       PEER_IP=$(perl -MSocket -e "print inet_ntoa(scalar(gethostbyname(\"redis-cluster-$MY_SHARD.redis-cluster.$POD_NAMESPACE.svc.cluster.local\")))")
-      redis-cli --cluster fix localhost:6379 --cluster-yes -a Lannengkeji@2022
+      redis-cli --cluster reshard  $PEER_IP:6379 --cluster-yes -a Lannengkeji@2022
       redis-cli --cluster add-node localhost:6379 $PEER_IP:6379 --cluster-slave -a Lannengkeji@2022
-
     fi
 
     wait
@@ -163,7 +162,7 @@ spec:
                 - sh
                 - -c
                 - "redis-cli -h $(hostname) ping"
-            initialDelaySeconds: 20
+            initialDelaySeconds: 60
             periodSeconds: 3
           env:
             - name: POD_NAMESPACE
