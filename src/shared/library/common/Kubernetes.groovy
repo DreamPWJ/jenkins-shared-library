@@ -1,11 +1,9 @@
 package shared.library.common
 
-//import groovy.json.JsonSlurper
-import shared.library.Utils
 import shared.library.GlobalVars
-import shared.library.common.Docker
-import shared.library.common.Helm
+import shared.library.Utils
 
+//import groovy.json.JsonSlurper
 
 /**
  * @author 潘维吉
@@ -257,6 +255,7 @@ class Kubernetes implements Serializable {
         // 默认Kubelet会在节点驱逐信号触发和Image对应的Filesystem空间不足的情况下删除冗余的镜像
         // node节点 cat /etc/kubernetes/kubelet 镜像占用磁盘空间的比例超过高水位（可以通过参数ImageGCHighThresholdPercent 进行配置），kubelet 就会清理不用的镜像
         // ctx.sh "whoami && docker version &&  docker rmi \$(docker image ls -f dangling=true -q) --no-prune || true"
+        // 在机器上设置定时任务 保留多少天  如 docker image prune -a --force --filter "until=720h"
     }
 
 }
