@@ -56,7 +56,7 @@ data:
     appendonly yes
     # Other cluster members need to be able to connect
     protected-mode no
-    requirepass Lannengkeji@2022
+    # requirepass Lannengkeji@2022
   #
   # A script to bootstrap Stateful Set members as they initialize
   #
@@ -81,15 +81,18 @@ data:
       START_SLOT=$(( $NUM_SLOTS * $MY_SHARD + ($MY_SHARD < $REMAINDER ? $MY_SHARD : $REMAINDER) ))
       END_SLOT=$(( $NUM_SLOTS * ($MY_SHARD+1) + ($MY_SHARD+1 < $REMAINDER ? $MY_SHARD+1 : $REMAINDER) - 1 ))
 
-      PEER_IP=$(perl -MSocket -e "print inet_ntoa(scalar(gethostbyname(\"redis-cluster-$MY_SHARD.redis-cluster.$POD_NAMESPACE.svc.cluster.local\")))")
+      PEER_IP=$(perl -MSocket -e "print inet_ntoa(scalar(gethostbyname(\"redis-cluster-0.redis-cluster.$POD_NAMESPACE.svc.cluster.local\")))")
       redis-cli cluster meet $PEER_IP 6379
-      redis-cli cluster addslots {$START_SLOT..$END_SLOT}
+      redis-cli cluster addslots $(seq $START_SLOT $END_SLOT)
     else
       # Set up a replica
       PEER_IP=$(perl -MSocket -e "print inet_ntoa(scalar(gethostbyname(\"redis-cluster-$MY_SHARD.redis-cluster.$POD_NAMESPACE.svc.cluster.local\")))")
-      NEW_PEER_IP=$(perl -MSocket -e "print inet_ntoa(scalar(gethostbyname(\"redis-cluster-$PET_ORDINAL.redis-cluster.$POD_NAMESPACE.svc.cluster.local\")))")
-      redis-cli --cluster add-node $NEW_PEER_IP:6379 $PEER_IP:6379 --cluster-slave
-      redis-cli --cluster reshard  $PEER_IP:6379 --cluster-yes
+      #NEW_PEER_IP=$(perl -MSocket -e "print inet_ntoa(scalar(gethostbyname(\"redis-cluster-$PET_ORDINAL.redis-cluster.$POD_NAMESPACE.svc.cluster.local\")))")
+      #redis-cli --cluster fix  $PEER_IP:6379 --cluster-yes
+      #redis-cli --cluster check  $PEER_IP:6379
+      redis-cli --cluster add-node localhost:6379 $PEER_IP:6379 --cluster-slave
+      # redis-cli --cluster reshard  $PEER_IP:6379 --cluster-yes
+ 
     fi
 
     wait
@@ -150,7 +153,7 @@ spec:
                 - sh
                 - -c
                 - "redis-cli -h $(hostname) ping"
-            initialDelaySeconds: 10
+            initialDelaySeconds: 5
             timeoutSeconds: 5
 
           securityContext:
