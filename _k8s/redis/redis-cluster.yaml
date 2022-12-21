@@ -106,7 +106,7 @@ metadata:
 spec:
   podManagementPolicy: OrderedReady # default
   serviceName: redis-cluster
-  replicas: 6 # 如果均匀分配反亲和度的话 数量根据Node数量设置
+  replicas: 2 # 如果均匀分配反亲和度的话 数量根据Node数量设置
   selector:
     matchLabels:
       app: redis-cluster # has to match .spec.template.metadata.labels
@@ -179,7 +179,7 @@ spec:
                 fieldRef:
                   fieldPath: spec.nodeName
             - name: NUM_SHARDS
-              value: "3"  # 如果修改这个值，确保至少有2倍的副本数  副本数起码分片值是2倍
+              value: "1"  # 如果修改这个值，确保至少有2倍的副本数  副本数起码分片值是2倍
           volumeMounts:
             - name: conf
               mountPath: /conf
