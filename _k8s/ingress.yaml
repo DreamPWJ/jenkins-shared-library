@@ -4,6 +4,7 @@ metadata:
   name: gray-release-canary
   namespace: default
   annotations:
+    kubernetes.io/Ingress.class: nginx
     # 开启金丝雀Canary。
     nginx.ingress.kubernetes.io/canary: "true"
     # Http Header请求头为version。
@@ -40,6 +41,10 @@ spec:
                 port:
                   number: {HOST_PORT}
             pathType: ImplementationSpecific
+  tls: # SSL安全证书
+    - hosts:
+        - new-version.com
+    - secretName: tls-secret-name # 证书存储名称
 #    - host: old-version.com
 #      http:
 #        paths:
