@@ -1,9 +1,9 @@
-# 创建一个集群级的签发机构
+# 创建一个集群级的签发机构 仅需一次
 apiVersion: cert-manager.io/v1alpha2
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-prod
-  namespace: default
+  namespace: cert-manager
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory  # ACME 协议的服务端
@@ -21,7 +21,7 @@ apiVersion: cert-manager.io/v1alpha2
 kind: Certificate
 metadata:
   name: dns-cert-manager-tls
-  namespace: default
+  namespace: cert-manager
 spec:
   issuerRef:
     kind: ClusterIssuer
