@@ -3,10 +3,9 @@ apiVersion: cert-manager.io/v1alpha2
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-prod
-  namespace: cert-manager
 spec:
   acme:
-    server: https://acme-v02.api.letsencrypt.org/directory  # ACME 协议的服务端
+    server: https://acme-staging-v02.api.letsencrypt.org/directory  # ACME 协议的服务端  acme-staging-v02测试证书没有限制
     email: 406798106@qq.com  # 证书快过期的时候会有邮件提醒
     privateKeySecretRef:
       name: letsencrypt-prod  # 私钥
@@ -21,7 +20,6 @@ apiVersion: cert-manager.io/v1alpha2
 kind: Certificate
 metadata:
   name: dns-cert-manager-tls
-  namespace: cert-manager
 spec:
   issuerRef:
     kind: ClusterIssuer
