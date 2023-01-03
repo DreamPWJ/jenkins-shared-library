@@ -80,8 +80,7 @@ spec:         #必选，Pod中容器的详细定义
 - kubectl create namespace cert-manager
 - helm repo update
 - helm repo add jetstack https://charts.jetstack.io
-- kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.9.1/cert-manager.crds.yaml
-- helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.9.1 --set installCRDs=true
+- helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.9.1 --set startupapicheck.timeout=5m --set installCRDs=true
 - kubectl get pods --namespace cert-manager
 - helm uninstall cert-manager -n cert-manager
   
