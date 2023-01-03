@@ -56,6 +56,8 @@ data:
     appendonly yes
     # Other cluster members need to be able to connect
     protected-mode no
+    # masterauth Lannengkeji@2022
+    # requirepass Lannengkeji@2022
   #
   # A script to bootstrap Stateful Set members as they initialize
   #
@@ -71,7 +73,7 @@ data:
     redis-server /conf/redis.conf &
     
     # TODO: Wait until redis-server process is ready
-    sleep 2
+    sleep 1
 
     if [ $PET_ORDINAL -lt $NUM_SHARDS ]; then
       # Set up primary nodes. Divide slots into equal(ish) contiguous blocks
@@ -81,13 +83,17 @@ data:
       END_SLOT=$(( $NUM_SLOTS * ($MY_SHARD+1) + ($MY_SHARD+1 < $REMAINDER ? $MY_SHARD+1 : $REMAINDER) - 1 ))
 
       PEER_IP=$(perl -MSocket -e "print inet_ntoa(scalar(gethostbyname(\"redis-cluster-0.redis-cluster.$POD_NAMESPACE.svc.cluster.local\")))")
-      # redis-cli --cluster fix  $PEER_IP:6379 --cluster-yes --cluster-search-multiple-owners -a Lannengkeji@2022
-      redis-cli cluster meet $PEER_IP 6379 -a Lannengkeji@2022
-      redis-cli cluster addslots $(seq $START_SLOT $END_SLOT) -a Lannengkeji@2022
+      redis-cli cluster meet $PEER_IP 6379
+      redis-cli cluster addslots $(seq $START_SLOT $END_SLOT)
     else
       # Set up a replica
       PEER_IP=$(perl -MSocket -e "print inet_ntoa(scalar(gethostbyname(\"redis-cluster-$MY_SHARD.redis-cluster.$POD_NAMESPACE.svc.cluster.local\")))")
-      redis-cli --cluster add-node localhost:6379 $PEER_IP:6379 --cluster-slave -a Lannengkeji@2022
+      #NEW_PEER_IP=$(perl -MSocket -e "print inet_ntoa(scalar(gethostbyname(\"redis-cluster-$PET_ORDINAL.redis-cluster.$POD_NAMESPACE.svc.cluster.local\")))")
+      #redis-cli --cluster fix  $PEER_IP:6379 --cluster-yes
+      #redis-cli --cluster check  $PEER_IP:6379
+      redis-cli --cluster add-node localhost:6379 $PEER_IP:6379 --cluster-slave
+      # redis-cli --cluster reshard  $PEER_IP:6379 --cluster-yes
+ 
     fi
 
     wait
@@ -101,7 +107,7 @@ metadata:
 spec:
   podManagementPolicy: OrderedReady # default
   serviceName: redis-cluster
-  replicas: 6 # 如果均匀分配反亲和度的话 数量根据Node数量设置
+  replicas: 2 # 如果均匀分配反亲和度的话 数量根据Node数量设置
   selector:
     matchLabels:
       app: redis-cluster # has to match .spec.template.metadata.labels
@@ -135,7 +141,7 @@ spec:
           lifecycle:
             postStart:
               exec:
-                command: [ "/bin/sh", "-c", "redis-cli config set requirepass Lannengkeji@2022" ]
+                command: [ "/bin/sh"] # , "-c", "redis-cli config set requirepass Lannengkeji@2022"
           command:
             - sh
           args:
@@ -148,7 +154,7 @@ spec:
                 - sh
                 - -c
                 - "redis-cli -h $(hostname) ping"
-            initialDelaySeconds: 10
+            initialDelaySeconds: 5
             timeoutSeconds: 5
 
           securityContext:
@@ -162,8 +168,8 @@ spec:
                 - sh
                 - -c
                 - "redis-cli -h $(hostname) ping"
-            initialDelaySeconds: 60
-            periodSeconds: 3
+            initialDelaySeconds: 20
+            periodSeconds: 5
           env:
             - name: POD_NAMESPACE
               valueFrom:
@@ -174,7 +180,7 @@ spec:
                 fieldRef:
                   fieldPath: spec.nodeName
             - name: NUM_SHARDS
-              value: "3"  # 如果修改这个值，确保至少有2倍的副本数  副本数起码分片值是2倍
+              value: "1"  # 如果修改这个值，确保至少有2倍的副本数  副本数起码分片值是2倍
           volumeMounts:
             - name: conf
               mountPath: /conf
