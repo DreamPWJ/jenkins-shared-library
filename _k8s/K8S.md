@@ -76,6 +76,15 @@ spec:         #必选，Pod中容器的详细定义
         - key: string
 
 
+### K8s集群使用 cert-manager基于 ACME 协议与 Let's Encrypt 签发免费SSL证书 [文档](https://help.aliyun.com/document_detail/409430.html)
+- kubectl create namespace cert-manager
+- helm repo update
+- helm repo add jetstack https://charts.jetstack.io
+- kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.9.1/cert-manager.crds.yaml
+- helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.9.1 --set installCRDs=true
+- kubectl get pods --namespace cert-manager
+- helm uninstall cert-manager -n cert-manager
+  
 ### 基于Ansible自动部署K8S集群 [项目](https://github.com/lizhenliang/ansible-install-k8s)
 
 ### 通过kubectl创建简单nginx服务 [文档](https://docs.ksyun.com/documents/5517)

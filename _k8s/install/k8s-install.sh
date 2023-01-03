@@ -55,7 +55,7 @@ ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 echo 'Asia/Shanghai' /etc/timezone
 
 echo "创建一个守护程序文件 docker与k8s一致 使用systemd"
-cat <<EOF >/etc/docker/daemon.json
+sudo cat <<EOF >/etc/docker/daemon.json
 {
   "exec-opts": ["native.cgroupdriver=systemd"],
   "log-driver": "json-file",

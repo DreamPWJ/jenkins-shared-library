@@ -1,0 +1,62 @@
+# 创建一个集群级的签发机构 仅需一次
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory  # ACME 协议的服务端  acme-staging-v02测试证书没有限制
+    email: 406798106@qq.com  # 证书快过期的时候会有邮件提醒
+    privateKeySecretRef:
+      name: letsencrypt-prod  # 私钥
+    solvers:
+      - http01: # 签发机构使用 HTTP-01 的方式进行 acme 协议 (还可用 DNS 方式，acme 协议的目的是证明机器和域名都是属于你的，然后才准许颁发证书)
+          ingress:
+            class: lanneng-k8s-ingress   # 指定自动创建的 Ingress 的 ingress class
+
+---
+# 创建一个证书
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: dns-cert-manager-tls
+spec:
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod # 引用 Issuer
+  secretName: pengbocloud-tls  # 最终签发出来的证书会保存在这个 Secret 里面
+  dnsNames:
+    - admin.pengbocloud.com # 要签发证书的域名
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cert-manager-ingress
+  namespace: default
+  annotations:
+    # 指定使用nginx做代理
+    kubernetes.io/ingress.class: "lanneng-k8s-ingress"
+    # add an annotation indicating the issuer to use.
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  rules:
+    #自定义域名
+    - host: admin.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: openpark-saas-admin-web-service
+                #服务端口
+                port:
+                  number: 8025
+            pathType: Prefix
+  tls:
+    - hosts:
+        #自定义域名
+        - admin.pengbocloud.com
+      secretName: pengbocloud-tls
