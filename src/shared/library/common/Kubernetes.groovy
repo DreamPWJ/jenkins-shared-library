@@ -2,6 +2,8 @@ package shared.library.common
 
 import shared.library.GlobalVars
 import shared.library.Utils
+import shared.library.common.Docker
+import shared.library.common.Helm
 
 //import groovy.json.JsonSlurper
 
