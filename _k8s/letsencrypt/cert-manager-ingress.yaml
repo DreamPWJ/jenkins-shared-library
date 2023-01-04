@@ -3,9 +3,10 @@ apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-prod
+  namespace: cert-manager
 spec:
   acme:
-    server: https://acme-staging-v02.api.letsencrypt.org/directory  # ACME 协议的服务端  acme-staging-v02测试证书没有限制
+    server: https://acme-v02.api.letsencrypt.org/directory  # ACME 协议的服务端  acme-staging-v02测试证书没有限制
     email: 406798106@qq.com  # 证书快过期的时候会有邮件提醒
     privateKeySecretRef:
       name: letsencrypt-prod  # 私钥
@@ -27,17 +28,17 @@ spec:
 ---
 
 # 创建一个证书
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: dns-cert-manager-tls
-spec:
-  secretName: pengbocloud-tls  # 最终签发出来的证书会保存在这个 Secret 里面
-  issuerRef:
-    kind: ClusterIssuer
-    name: letsencrypt-prod # 引用 Issuer
-  dnsNames:
-    - admin.pengbocloud.com # 要签发证书的域名
+#apiVersion: cert-manager.io/v1
+#kind: Certificate
+#metadata:
+#  name: dns-cert-manager-tls
+#spec:
+#  secretName: pengbocloud-tls  # 最终签发出来的证书会保存在这个 Secret 里面
+#  issuerRef:
+#    kind: ClusterIssuer
+#    name: letsencrypt-prod # 引用 Issuer
+#  dnsNames:
+#    - admin.pengbocloud.com # 要签发证书的域名
 
 ---
 
@@ -48,7 +49,7 @@ metadata:
   namespace: default
   annotations:
     # 指定使用nginx做代理
-    kubernetes.io/ingress.class: "lanneng-k8s-ingress"
+    kubernetes.io/ingress.class: lanneng-k8s-ingress
     # add an annotation indicating the issuer to use.
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
@@ -70,4 +71,4 @@ spec:
     - hosts:
         #自定义域名
         - admin.pengbocloud.com
-      secretName: pengbocloud-tls
+      secretName: letsencrypt-prod

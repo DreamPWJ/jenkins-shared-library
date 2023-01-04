@@ -2,13 +2,13 @@ network:
   ethernets:
     enp1s0: #配置的网卡的名称 ip addr命令查看
       addresses:
-        - 192.168.1.200/24    #配置的静态ip地址和掩码
+        - 192.168.0.200/24    #配置的静态ip地址和掩码
       dhcp4: false            #是否DHCP
       dhcp6: false            #是否DHCPv6
       optional: true
       routes:
         - to: default
-          via: 192.168.1.1    #网关地址 注意根据具体网络正确配置 否则无法访问公网
+          via: 192.168.0.1    #网关地址 注意根据具体网络正确配置 否则无法访问公网
       nameservers:
         addresses: [ 114.114.114.114, 8.8.8.8, 223.5.5.5, 223.6.6.6 ]  #DNS服务器地址，多个DNS服务器地址需要用英文逗号分隔开
   version: 2
