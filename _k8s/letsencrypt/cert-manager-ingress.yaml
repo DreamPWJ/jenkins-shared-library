@@ -12,7 +12,24 @@ spec:
     solvers:
       - http01: # 签发机构使用 HTTP-01 的方式进行 acme 协议 (还可用 DNS 方式，acme 协议的目的是证明机器和域名都是属于你的，然后才准许颁发证书)
           ingress:
+            #serviceType: ClusterIP
             class: lanneng-k8s-ingress   # 指定自动创建的 Ingress 的 ingress class
+
+#---
+#
+## 创建一个证书
+#apiVersion: cert-manager.io/v1
+#kind: Certificate
+#metadata:
+#  name: dns-cert-manager-tls
+#spec:
+#  secretName: pengbocloud-tls  # 最终签发出来的证书会保存在这个 Secret 里面
+#  issuerRef:
+#    kind: ClusterIssuer
+#    name: letsencrypt-prod # 引用 Issuer
+#  dnsNames:
+#    - admin.pengbocloud.com # 要签发证书的域名
+
 
 ---
 
@@ -26,6 +43,10 @@ metadata:
     kubernetes.io/ingress.class: lanneng-k8s-ingress
     # add an annotation indicating the issuer to use.
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    #acme.cert-manager.io/http01-edit-in-place: "true"
+    #acme.cert-manager.io/http01-override-ingress-class: lanneng-k8s-ingress
+    #cert-manager.io/issue-temporary-certificate: "true"
+
 spec:
   rules:
     #自定义域名
