@@ -12,8 +12,7 @@ sudo docker run -d --restart=always -p 80:80 -p 443:443 --name proxy-nginx  -v /
 docker pull redis:latest
 
 #### redis docker容器启动 -d开启 守护进程Daemon模式 -v指定数据持久化存储宿主机位置 --requirepass "mypassword"设置密码 --appendonly yes数据持久化
-sudo docker run -d --restart=always -p 6379:6379 --name redis -v /my/redis/data:/data -v /etc/localtime:/etc/localtime:
-ro   \
+sudo docker run -d --restart=always -p 6379:6379 --name redis -v /my/redis/data:/data -v /etc/localtime:/etc/localtime:ro  \
 redis:latest redis-server --appendonly yes --requirepass "panweiji2020"
 
 #### 从Docker Hub里拉取RabbitMQ镜像来部署
@@ -39,7 +38,10 @@ docker run -d --restart=always  -p 2181:2181 \
 #### EMQX物联网MQTT服务器 Dashboard地址http://127.0.0.1:18083  用户名 admin 与默认密码 public
 docker pull emqx/emqx:latest
 
+docker volume create mqtt-emqx && docker inspect mqtt-emqx
+
 docker run -d --restart=always  -p 18083:18083 -p 1883:1883 -p 8083:8083  \
+-v mqtt-emqx:/opt/emqx  \
 -e TZ="Asia/Shanghai" \
 --log-opt max-size=1024m --log-opt max-file=1 \
 --name emqx  emqx/emqx:latest
