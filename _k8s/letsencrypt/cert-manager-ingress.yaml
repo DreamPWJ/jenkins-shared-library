@@ -66,4 +66,4 @@ spec:
     - hosts:
         #自定义域名
         - admin.pengbocloud.com
-      secretName: pengbocloud-prod-tls
+      secretName: letsencrypt-prod
