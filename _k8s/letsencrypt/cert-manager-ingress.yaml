@@ -42,7 +42,7 @@ metadata:
     # 指定使用nginx做代理
     kubernetes.io/ingress.class: lanneng-k8s-ingress
     # add an annotation indicating the issuer to use.
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
     #acme.cert-manager.io/http01-edit-in-place: "true"
     #acme.cert-manager.io/http01-override-ingress-class: lanneng-k8s-ingress
     #cert-manager.io/issue-temporary-certificate: "true"
