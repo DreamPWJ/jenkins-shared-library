@@ -4,7 +4,7 @@ metadata:
   name: gray-release-canary
   namespace: default
   annotations:
-    kubernetes.io/Ingress.class: nginx
+    kubernetes.io/Ingress.class: nginx  # 已弃用 使用 spec.ingressClassName代替
     # 开启金丝雀Canary。
     nginx.ingress.kubernetes.io/canary: "true"
     # Http Header请求头为version。
