@@ -194,7 +194,7 @@ def call(String type = 'desktop', Map map) {
                                 }
                             }
                         }
-                        stage('Docker For Electron') {
+                        stage('Electron构建 In Docker') {
                             when {
                                 beforeAgent true   // 只有在 when 条件验证为真时才会进入 agent
                                 expression {

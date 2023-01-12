@@ -235,7 +235,7 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                stage('Docker For JavaScript构建') {
+                stage('JavaScript构建 In Docker') {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
@@ -276,7 +276,7 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                stage('Docker For Java构建') {
+                stage('Java构建 In Docker') {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
@@ -327,7 +327,7 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                /*  stage('Docker For Python构建') {
+                /*  stage('Python构建 In Docker') {
                       when {
                           beforeAgent true
                           environment name: 'DEPLOY_MODE', value: GlobalVars.release
