@@ -9,6 +9,10 @@ sudo vim /etc/docker/daemon.json
 "http://registry.docker-cn.com",
 "http://docker.mirrors.ustc.edu.cn",
 "http://hub-mirror.c.163.com"
+],
+"dns" : [
+"114.114.114.114",
+"8.8.8.8"
 ]
 }
 sudo systemctl daemon-reload && sudo systemctl restart docker
