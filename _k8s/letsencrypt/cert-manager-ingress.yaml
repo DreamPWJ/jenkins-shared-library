@@ -3,17 +3,18 @@ apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-prod
+  namespace: default
 spec:
   acme:
     server: https://acme-staging-v02.api.letsencrypt.org/directory  # ACME 协议的服务端  acme-staging-v02测试证书没有限制
     email: 406798106@qq.com  # 证书快过期的时候会有邮件提醒
     privateKeySecretRef:
-      name: letsencrypt-prod  # 私钥
+      name: letsencrypt-prod  # 私钥 kubectl delete Secret letsencrypt-prod --namespace cert-manager
     solvers:
       - http01: # 签发机构使用 HTTP-01 的方式进行 acme 协议 (还可用 DNS 方式，acme 协议的目的是证明机器和域名都是属于你的，然后才准许颁发证书)
           ingress:
             #serviceType: ClusterIP
-            class: lanneng-k8s-ingress   # 指定自动创建的 Ingress 的 ingress class
+            name: pengbocloud-k8s-ingress  # 这个匹配是关键！！！  指定自动创建的 Ingress 的 ingress class
 
 #---
 #
@@ -36,7 +37,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: cert-manager-ingress
+  name: pengbocloud-k8s-ingress
   namespace: default
   annotations:
     # 指定使用nginx做代理
@@ -49,6 +50,11 @@ metadata:
 
 spec:
   ingressClassName: lanneng-k8s-ingress
+  tls:
+    - hosts:
+        #自定义域名
+        - admin.pengbocloud.com
+      secretName: letsencrypt-prod-lts
   rules:
     #自定义域名
     - host: admin.pengbocloud.com
@@ -63,8 +69,3 @@ spec:
                 port:
                   number: 8025
             pathType: Prefix
-  tls:
-    - hosts:
-        #自定义域名
-        - admin.pengbocloud.com
-      secretName: letsencrypt-prod

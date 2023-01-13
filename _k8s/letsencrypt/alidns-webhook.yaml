@@ -175,7 +175,7 @@ metadata:
   labels:
     app: alidns-webhook
 spec:
-  replicas: 1
+  replicas:
   selector:
     matchLabels:
       app: alidns-webhook
