@@ -44,7 +44,7 @@ metadata:
     #kubernetes.io/ingress.class: lanneng-k8s-ingress  # 已弃用 使用 spec.ingressClassName代替
     # add an annotation indicating the issuer to use
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    #acme.cert-manager.io/http01-edit-in-place: "true"
+    acme.cert-manager.io/http01-edit-in-place: "true"
     #acme.cert-manager.io/http01-override-ingress-class: lanneng-k8s-ingress
     #cert-manager.io/issue-temporary-certificate: "true"
 
@@ -54,7 +54,7 @@ spec:
     - hosts:
         #自定义域名
         - admin.pengbocloud.com
-      secretName: letsencrypt-prod-lts
+      secretName: letsencrypt-prod
   rules:
     #自定义域名
     - host: admin.pengbocloud.com
