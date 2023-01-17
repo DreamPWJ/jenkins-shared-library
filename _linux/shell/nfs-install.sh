@@ -63,8 +63,8 @@ cat /var/lib/nfs/etab
 # sudo apt-get install -y nfs-common
 # sudo yum install nfs-utils -y
 # 创建一个用于nfs共享目录的挂载点
-# sudo mkdir -p /mnt/nfs_shared_client
-# 挂在共享目录到客户端
-# sudo mount -t nfs -o nolock NFSServerIP:/mnt/nfs_shared_server /mnt/nfs_shared_client
+# sudo mkdir -p /mnt/nfs_client_shared
+# 挂在共享目录到客户端  在 /ect/fstab 内保存重启等永久有效
+# sudo mount -t nfs -o nolock nfs_server_ip:/mnt/nfs_server_shared /mnt/nfs_client_shared
 # 卸载共享目录到客户端
-# umount -f /mnt/nfs_shared_client
+# umount -f /mnt/nfs_client_shared
