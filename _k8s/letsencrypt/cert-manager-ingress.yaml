@@ -9,7 +9,7 @@ spec:
     server: https://acme-staging-v02.api.letsencrypt.org/directory  # ACME 协议的服务端  acme-staging-v02测试证书没有限制
     email: 406798106@qq.com  # 证书快过期的时候会有邮件提醒
     privateKeySecretRef:
-      name: letsencrypt-prod  # 私钥秘密必须与cert-manager服务在同一个命名空间中才能工作 kubectl delete Secret letsencrypt-prod --namespace cert-manager
+      name: letsencrypt-prod-key  # 私钥秘密必须与cert-manager服务在同一个命名空间中才能工作 kubectl delete Secret letsencrypt-prod --namespace cert-manager
     solvers:
       - http01: # 签发机构使用 HTTP-01 的方式进行 acme 协议 (还可用 DNS 方式，acme 协议的目的是证明机器和域名都是属于你的，然后才准许颁发证书)
           ingress:
@@ -45,11 +45,11 @@ metadata:
     # add an annotation indicating the issuer to use
     cert-manager.io/cluster-issuer: letsencrypt-prod
     acme.cert-manager.io/http01-edit-in-place: "true"
-#   kubernetes.io/tls-acme: "true"
-#   ingress.kubernetes.io/ssl-redirect: "false"
-#   nginx.ingress.kubernetes.io/enable-cors: "true"
-#   nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS"
-#   nginx.ingress.kubernetes.io/rewrite-target: /
+    #kubernetes.io/tls-acme: "true"
+    #ingress.kubernetes.io/ssl-redirect: "false"
+    #nginx.ingress.kubernetes.io/enable-cors: "true"
+    #nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS"
+    #nginx.ingress.kubernetes.io/rewrite-target: /
     #cert-manager.io/issue-temporary-certificate: "true"
     #acme.cert-manager.io/http01-override-ingress-class: lanneng-k8s-ingress
     #cert-manager.io/issue-temporary-certificate: "true"
@@ -59,11 +59,11 @@ spec:
   tls:
     - hosts:
         #自定义域名
-        - admin.pengbocloud.com
+        - saas.pengbocloud.com
       secretName: letsencrypt-prod-tls
   rules:
     #自定义域名
-    - host: admin.pengbocloud.com
+    - host: saas.pengbocloud.com
       http:
         paths:
           - path: /
