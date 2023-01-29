@@ -9,12 +9,12 @@ spec:
     server: https://acme-staging-v02.api.letsencrypt.org/directory  # ACME 协议的服务端  acme-staging-v02测试证书没有限制
     email: 406798106@qq.com  # 证书快过期的时候会有邮件提醒
     privateKeySecretRef:
-      name: letsencrypt-prod-key  # 私钥秘密必须与cert-manager服务在同一个命名空间中才能工作 kubectl delete Secret letsencrypt-prod --namespace cert-manager
+      name: letsencrypt-prod-key  # 私钥秘密必须与cert-manager服务在同一个命名空间中才能工作 kubectl delete Secret letsencrypt-prod-key --namespace cert-manager
     solvers:
       - http01: # 签发机构使用 HTTP-01 的方式进行 acme 协议 (还可用 DNS 方式，acme 协议的目的是证明机器和域名都是属于你的，然后才准许颁发证书)
           ingress:
             #serviceType: ClusterIP
-            name: pengbocloud-k8s-ingress  # 这个匹配是关键！！！  指定自动创建的 Ingress 的 ingress class
+            name: pengbocloud-k8s-ingress  # 这个匹配是关键！！！  1. class是指定自动创建的 Ingress 的 ingress class  2. name是指定被自动修改的 Ingress 名称
 
 #---
 #
@@ -22,14 +22,14 @@ spec:
 #apiVersion: cert-manager.io/v1
 #kind: Certificate
 #metadata:
-#  name: dns-cert-manager-tls
+#  name: cert-manager-tls
 #spec:
-#  secretName: pengbocloud-tls  # 最终签发出来的证书会保存在这个 Secret 里面
+#  secretName: saas.pengbocloud.com-tls  # 最终签发出来的证书会保存在这个 Secret 里面
 #  issuerRef:
 #    kind: ClusterIssuer
 #    name: letsencrypt-prod # 引用 Issuer
 #  dnsNames:
-#    - admin.pengbocloud.com # 要签发证书的域名
+#    - saas.pengbocloud.com # 要签发证书的域名
 
 
 ---
@@ -60,7 +60,7 @@ spec:
     - hosts:
         #自定义域名
         - saas.pengbocloud.com
-      secretName: letsencrypt-prod-tls
+      secretName: saas.pengbocloud.com-tls
   rules:
     #自定义域名
     - host: saas.pengbocloud.com
