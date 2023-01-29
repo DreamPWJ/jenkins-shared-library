@@ -23,6 +23,7 @@ spec:
 #kind: Certificate
 #metadata:
 #  name: cert-manager-tls
+#  namespace: cert-manager
 #spec:
 #  secretName: saas.pengbocloud.com-tls  # 最终签发出来的证书会保存在这个 Secret 里面
 #  issuerRef:
@@ -30,7 +31,6 @@ spec:
 #    name: letsencrypt-prod # 引用 Issuer
 #  dnsNames:
 #    - saas.pengbocloud.com # 要签发证书的域名
-
 
 ---
 
