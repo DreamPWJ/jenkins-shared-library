@@ -76,11 +76,11 @@ spec:         #必选，Pod中容器的详细定义
         - key: string
 
 
-### K8s集群使用 cert-manager基于 ACME 协议与 Let's Encrypt 签发免费SSL证书 [文档](https://help.aliyun.com/document_detail/409430.html)
+### K8S集群使用 cert-manager基于 ACME 协议与 Let's Encrypt 自动签发与续签免费的SSL证书 [文档](https://help.aliyun.com/document_detail/409430.html)
 - kubectl create namespace cert-manager
 - helm repo update
 - helm repo add jetstack https://charts.jetstack.io
-#### 注意cert-manager版本要和K8S版本配套  比如1.7.0以上开启ServerSideApply影响Secret证书生成  ServerSideApply是k8s的1.22版本生产可用
+#### 注意cert-manager版本要和K8S版本配套  比如1.7.0以上开启ServerSideApply影响Secret证书生成  ServerSideApply是k8s的v1.22版本生产可用
 - helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.6.3 --set startupapicheck.timeout=5m --set installCRDs=true
 - kubectl get pods --namespace cert-manager
 - helm uninstall cert-manager -n cert-manager

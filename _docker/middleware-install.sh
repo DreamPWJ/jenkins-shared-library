@@ -26,7 +26,7 @@ Y | y)
     --log-opt max-size=1024m --log-opt max-file=1 \
     -v /my/nginx/logs:/var/log/nginx nginx
 
-  echo "安装Certbot客户端"
+  echo "安装Let's Encrypt客户端Certbot"
   sudo apt-get install -y certbot || true
   sudo yum install -y certbot || true
   certbot --version

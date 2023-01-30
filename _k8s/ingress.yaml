@@ -30,6 +30,11 @@ metadata:
     nginx.ingress.kubernetes.io/session-cookie-name: "route"
 
 spec:
+  #ingressClassName: k8s-ingress
+  tls: # SSL安全证书
+    - hosts:
+        - new-version.com
+    - secretName: tls-secret-name # Secret证书存储名称
   rules:
     - host: new-version.com
       http:
@@ -40,22 +45,9 @@ spec:
                 name: {APP_NAME}-service
                 port:
                   number: {HOST_PORT}
-            pathType: ImplementationSpecific
-  tls: # SSL安全证书
-    - hosts:
-        - new-version.com
-    - secretName: tls-secret-name # 证书存储名称
-#    - host: old-version.com
-#      http:
-#        paths:
-#          - path: /
-#            backend:
-#              service:
-#                name: oldServiceName
-#                port:
-#                  number: 80
-#            pathType: ImplementationSpecific
+            pathType: Prefix
 
-
+# 获取Ingress
+# kubectl get ing
 # 删除Ingress
 # kubectl delete ingress ingress-name
