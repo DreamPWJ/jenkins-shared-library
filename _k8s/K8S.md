@@ -80,7 +80,7 @@ spec:         #必选，Pod中容器的详细定义
 - kubectl create namespace cert-manager
 - helm repo update
 - helm repo add jetstack https://charts.jetstack.io
-#### 注意cert-manager版本要和K8S版本配套  比如1.7.0以上开启ServerSideApply影响Secret证书生成  ServerSideApply是k8s的v1.22版本生产可用
+#### ！！！注意cert-manager版本要和K8S版本匹配  比如1.7.0以上开启ServerSideApply影响Secret证书生成  ServerSideApply是k8s的v1.22版本生产可用
 - helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.6.3 --set startupapicheck.timeout=5m --set installCRDs=true
 - kubectl get pods --namespace cert-manager
 - helm uninstall cert-manager -n cert-manager

@@ -1,3 +1,6 @@
+# Author: 潘维吉
+# Description: 云原生K8S应用QPS弹性扩缩容
+
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:

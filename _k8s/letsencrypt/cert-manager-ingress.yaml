@@ -1,3 +1,6 @@
+# Author: 潘维吉
+# Description: 云原生K8S中使用cert-manager基于 ACME 协议与 Let's Encrypt 自动签发与续签免费的SSL证书
+
 # 创建一个集群级的签发机构 仅需一次
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -26,6 +29,8 @@ spec:
 #  namespace: cert-manager
 #spec:
 #  secretName: saas.pengbocloud.com-tls  # 最终签发出来的证书会保存在这个 Secret 里面
+#  duration: 2160h  # 证书有效期时长
+#  renewBefore: 360h # 距离证书过期还有多久重新自动续签
 #  issuerRef:
 #    kind: ClusterIssuer
 #    name: letsencrypt-prod # 引用 Issuer

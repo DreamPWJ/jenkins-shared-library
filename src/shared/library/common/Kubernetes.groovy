@@ -187,6 +187,7 @@ class Kubernetes implements Serializable {
 
         // 部署七层负载和灰度发布配置
         ctx.sh "kubectl apply -f ${yamlName}"
+        //ctx.sh "kubectl get ing"
     }
 
     /**
