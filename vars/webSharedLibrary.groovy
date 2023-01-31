@@ -805,14 +805,14 @@ def nodeBuildProject() {
                 retry(2) {
                     println("安装依赖 📥")
                     // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱
-                    sh "npm ci || npm i || yarn install --frozen-lockfile" // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
+                    sh "npm ci || npm install || yarn install || pnpm install" // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
                 }
             }
 
             timeout(time: 10, unit: 'MINUTES') {
                 try {
                     // >/dev/null为Shell脚本运行程序不输出日志到终端 2>&1是把出错输出也定向到标准输出
-                    println("执行npm构建 🏗️  ")
+                    println("执行Node构建 🏗️  ")
                     sh "npm run '${NPM_RUN_PARAMS}' " // >/dev/null 2>&1
                 } catch (e) {
                     println(e.getMessage())

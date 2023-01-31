@@ -246,7 +246,7 @@ def call(String type = 'web-java', Map map) {
                         docker {
                             // Node环境  构建完成自动删除容器
                             //image "node:${NODE_VERSION.replace('Node', '')}"
-                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}"
+                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
                             // 使用自定义Dockerfile的node环境 加速monorepo依赖构建内置lerna等相关依赖
                             reuseNode true // 使用根节点
                         }
@@ -734,9 +734,9 @@ def getInitParams(map) {
     PROJECT_NAME = jsonParams.PROJECT_NAME ? jsonParams.PROJECT_NAME.trim() : ""
     SHELL_PARAMS = jsonParams.SHELL_PARAMS ? jsonParams.SHELL_PARAMS.trim() : "" // shell传入前端或后端参数
 
-    JDK_VERSION = jsonParams.JDK_VERSION ? jsonParams.JDK_VERSION.trim() : "${map.jdk}" // JDK版本
+    JDK_VERSION = jsonParams.JDK_VERSION ? jsonParams.JDK_VERSION.trim() : "${map.jdk}" // 自定义JDK版本
+    NODE_VERSION = jsonParams.NODE_VERSION ? jsonParams.NODE_VERSION.trim() : "${map.nodejs}" // 自定义Node版本
     // npm包管理工具类型 如:  npm、yarn、pnpm
-    NODE_VERSION = jsonParams.NODE_VERSION ? jsonParams.NODE_VERSION.trim() : "${map.nodejs}" // nodejs版本
     NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [test]的前端项目参数
 
@@ -754,6 +754,8 @@ def getInitParams(map) {
     IS_MAVEN_SINGLE_MODULE = jsonParams.IS_MAVEN_SINGLE_MODULE ? jsonParams.IS_MAVEN_SINGLE_MODULE : false
     // K8s集群业务应用是否使用Session 做亲和度关联
     IS_USE_SESSION = jsonParams.IS_USE_SESSION ? jsonParams.IS_USE_SESSION : false
+    // 是否是NextJs服务端React框架
+    IS_NEXT_JS = jsonParams.IS_NEXT_JS ? jsonParams.IS_NEXT_JS : false
 
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
@@ -1087,15 +1089,22 @@ def nodeBuildProject() {
                 retry(2) {
                     println("安装依赖 📥")
                     // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱
-                    sh "npm ci || npm i || yarn install --frozen-lockfile" // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
+                    sh "npm ci || npm install || yarn install || pnpm install"
+                    // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
                 }
             }
 
             timeout(time: 10, unit: 'MINUTES') {
                 try {
                     // >/dev/null为Shell脚本运行程序不输出日志到终端 2>&1是把出错输出也定向到标准输出
-                    println("执行npm构建 🏗️  ")
-                    sh "npm run '${NPM_RUN_PARAMS}' " // >/dev/null 2>&1
+                    println("执行Node构建 🏗️  ")
+                    // 如果是服务端SSR框架如 NextJS框架  1.部署到NodeJs服务  2.导出静态HTML部署
+                    def nextJSScript = ""
+                    if ("${IS_NEXT_JS}" == 'true') {
+                        // 导出静态HTML方式部署 可复用Nginx部署脚本
+                        nextJSScript = " && next export && rm -rf ${NPM_PACKAGE_FOLDER} && mv out ${NPM_PACKAGE_FOLDER} "
+                    }
+                    sh "npm run '${NPM_RUN_PARAMS}' ${nextJSScript} " // >/dev/null 2>&1
                 } catch (e) {
                     println(e.getMessage())
                     sh "rm -rf node_modules"
