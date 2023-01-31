@@ -113,20 +113,6 @@ sharedLibrary(map)
 
 /*
 
-htc-epark-h5-prod
-好停车H5 Web前端 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/rzhtc.git" ,
-    "BRANCH_NAME" : "rizhao" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "rzhtc" ,
-    "SHELL_PARAMS" : "rzhtc h5 9000 80 prod" ,
-    "NPM_RUN_PARAMS" : "build:rizhao",
-    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf"
-}
-REMOTE_IP: 172.16.99.51
-
 htc-epark-server-prod
 好停车epark平台服务端
 JSON_PARAMS
@@ -142,6 +128,20 @@ JSON_PARAMS
    "SOURCE_TARGET_CONFIG_DIR" : "resources/rizhao,resources",
    "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/root/apache-tomcat-7.0.70/webapps/FileUpload:/usr/local/tomcat/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
 }
+
+htc-epark-h5-prod
+好停车H5 Web前端 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "http://47.102.214.33/lanneng_develop/rzhtc.git" ,
+    "BRANCH_NAME" : "rizhao" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "rzhtc" ,
+    "SHELL_PARAMS" : "rzhtc h5 9000 80 prod" ,
+    "NPM_RUN_PARAMS" : "build:rizhao",
+    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf"
+}
+REMOTE_IP: 172.16.99.51
 
 htc-park-coupon-h5-prod
 好停车优惠券H5 Web前端 ❤️

@@ -1,5 +1,5 @@
 # Author: 潘维吉
-# Description: 云原生K8S部署应用yaml核心通用配置文件
+# Description: 云原生K8S部署应用yaml核心通用配置文件   同时部署Deployment与Service服务
 
 apiVersion: apps/v1
 kind: Deployment
@@ -49,7 +49,13 @@ spec:
             value: "{CONTAINER_PORT}"
 #          - name: JAVA_OPTS
 #            value: -Xms256m -Xmx1024m
-
+        # 优雅停机  Pod被删除时，状态置为 Terminating 。 kube-proxy 更新转发规则，将 Pod 从 service 的 endpoint 列表中摘除掉，新的流量不再转发到该 Pod
+        lifecycle:
+          preStop:
+            exec:
+              command:
+                - sleep
+                - 5s   # 等待 kube-proxy 完成规则同步再开始停止容器内进程
 #        volumeMounts:
 #          - name: nfs-storage
 #            mountPath: {NFS_HOST_PATH}

@@ -124,6 +124,9 @@ with open(k8s_yaml_file, mode='w', encoding='utf-8') as file:
     file.write("\n---\n")
     yaml.dump(yamlContent[1], file)
 
+
+
+
 # yamlText = """\
 # # example
 # name:
