@@ -8,6 +8,10 @@ lsof -i:8080
 
 ps aux | grep tomcat
 
+#### 内存最多的10个进程
+
+ps -aux | sort -k4nr | head -10
+
 #### 查IP地址
 
 ifconfig
