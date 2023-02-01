@@ -756,6 +756,8 @@ def getInitParams(map) {
     IS_USE_SESSION = jsonParams.IS_USE_SESSION ? jsonParams.IS_USE_SESSION : false
     // 是否是NextJs服务端React框架
     IS_NEXT_JS = jsonParams.IS_NEXT_JS ? jsonParams.IS_NEXT_JS : false
+    // 服务器部署时不同机器的代码配置是否相同
+    IS_SAME_CONF_IN_DIFF_MACHINES = jsonParams.IS_SAME_CONF_IN_DIFF_MACHINES ? jsonParams.IS_SAME_CONF_IN_DIFF_MACHINES : false
 
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
@@ -1230,7 +1232,7 @@ def buildImage(map) {
     Docker.build(this, "${dockerBuildImageName}")
 
     // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
-    if ("${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+    if ("${IS_SAME_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
         def deployNum = 2  // 暂时区分两个不同环境文件 实际还存在每一个部署服务的环境配置文件都不一样
         mavenBuildProject(map, deployNum) // 需要mvn jdk构建环境
         // Docker多阶段镜像构建处理
@@ -1561,7 +1563,7 @@ def scrollToDeploy(map) {
                 uploadRemote("${archivePath}")
             } else {
                 // 如果配置多节点动态替换不同的配置文件重新执行maven构建打包或者直接替换部署服务器文件
-                if ("${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+                if ("${IS_SAME_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
                     mavenBuildProject(map) // 需要mvn jdk构建环境
                 }
                 uploadRemote(Utils.getShEchoResult(this, "pwd"))
@@ -1608,7 +1610,7 @@ def k8sDeploy(map) {
     // 执行k8s集群部署
     Kubernetes.deploy(this, map)
     // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
-    if ("${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+    if ("${IS_SAME_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
         println("K8S集群部署相同应用不同环境的部署节点")
         Kubernetes.deploy(this, map, 2)
     }

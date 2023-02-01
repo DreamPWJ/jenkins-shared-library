@@ -125,6 +125,7 @@ JSON_PARAMS
    "IS_ROLL_DEPLOY" : true,
    "IS_MAVEN_SINGLE_MODULE" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
+   "IS_SAME_CONF_IN_DIFF_MACHINES": true,
    "SOURCE_TARGET_CONFIG_DIR" : "resources/rizhao,resources",
    "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/root/apache-tomcat-7.0.70/webapps/FileUpload:/usr/local/tomcat/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
 }

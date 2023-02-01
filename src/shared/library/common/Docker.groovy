@@ -79,7 +79,7 @@ class Docker implements Serializable {
         }
         def localImageTag = imageTag
         // 自动替换相同应用不同分布式部署节点的环境文件
-        if ("${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "" && deployNum != 0) {
+        if ("${ctx.IS_SAME_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "" && deployNum != 0) {
             localImageTag += imageNodeTag + deployNum // 重新定义镜像标签 区分不同节点不同配置情况
         }
         //ctx.pullCIRepo()

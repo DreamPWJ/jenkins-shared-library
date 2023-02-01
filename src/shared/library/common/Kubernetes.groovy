@@ -107,7 +107,7 @@ class Kubernetes implements Serializable {
             nfsServerPath = "${ctx.NFS_MOUNT_PATHS}".split(",")[1]
         }
         // 不同配置环境的相同应用
-        if ("${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
+        if ("${ctx.IS_SAME_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
             if (deployNum != 0) { // k8s内相同应用不同容器镜像标签部署
                 appName += "-node"
                 imageTag += Docker.imageNodeTag + deployNum
