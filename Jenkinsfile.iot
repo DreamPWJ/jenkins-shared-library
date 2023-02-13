@@ -51,27 +51,24 @@ iotSharedLibrary(map)
 
 /*
 
-test-embedded-monorepo
-测试IoT物联网嵌入式项目
-
-/*
+car-lock-embedded-monorepo
+车位锁控制器嵌入式项目
 
 JSON_PARAMS
 {
     "REPO_URL" : "http://47.102.214.33/lanneng_develop/embedded-monorepo.git" ,
     "BRANCH_NAME" : "develop" ,
     "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "esp32-demo" ,
-    "PROJECT_CHINESE_NAME" : "测试ESP32单片机" ,
-    "ENV_TYPE" : "sit" ,
+    "PROJECT_NAME" : "car-lock" ,
+    "PROJECT_CHINESE_NAME" : "车位锁控制器" ,
+    "ENV_TYPE" : "prod" ,
     "IS_MONO_REPO" : true ,
     "IS_UPLOAD_OSS" : true ,
-    "IS_OTA" : true ,
+    "IS_OTA" : true
 }
 
 ground-lock-embedded-monorepo
 地锁控制器嵌入式项目
-/*
 
 JSON_PARAMS
 {
@@ -85,6 +82,22 @@ JSON_PARAMS
     "IS_UPLOAD_OSS" : true ,
     "IS_OTA" : true ,
     "IS_OTA_DIFF" : true ,
+}
+
+test-embedded-monorepo
+测试IoT物联网嵌入式项目
+
+JSON_PARAMS
+{
+    "REPO_URL" : "http://47.102.214.33/lanneng_develop/embedded-monorepo.git" ,
+    "BRANCH_NAME" : "develop" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "esp32-demo" ,
+    "PROJECT_CHINESE_NAME" : "测试ESP32单片机" ,
+    "ENV_TYPE" : "sit" ,
+    "IS_MONO_REPO" : true ,
+    "IS_UPLOAD_OSS" : true ,
+    "IS_OTA" : true ,
 }
 
 */
