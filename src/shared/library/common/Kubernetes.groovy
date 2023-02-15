@@ -154,8 +154,7 @@ class Kubernetes implements Serializable {
 
     /**
      * 基于QPS部署pod水平扩缩容
-     * 参考文档：https://piotrminkowski.com/2020/11/05/spring-boot-autoscaling-on-kubernetes/
-     * https://github.com/stefanprodan/k8s-prom-hpa
+     * 参考文档：https://imroc.cc/k8s/best-practice/custom-metrics-hpa
      */
     static def deployHPA(ctx, map) {
         // 安装k8s-prometheus-adpater

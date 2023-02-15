@@ -64,9 +64,24 @@ spec:
     - hosts:
         - pengbocloud.com
       secretName: pengbocloud.com-tls
+    - hosts:
+        - www.pengbocloud.com
+      secretName: www.pengbocloud.com-tls
   rules:
     #自定义域名
     - host: pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: landing-page-web-service
+                #服务端口
+                port:
+                  number: 8000
+            pathType: Prefix
+    - host: www.pengbocloud.com
       http:
         paths:
           - path: /
