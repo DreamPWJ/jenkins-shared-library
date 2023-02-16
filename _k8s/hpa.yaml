@@ -8,12 +8,12 @@ metadata:
   namespace: monitoring
 
 spec:
-  minReplicas: {K8S_POD_REPLICAS}
-  maxReplicas: 100
+  minReplicas: {K8S_POD_REPLICAS}    # 缩容最小节点数
+  maxReplicas: 100                   # 扩容最大节点数
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {APP_NAME}-deployment
+    name: {APP_COMMON_NAME}
   metrics:
     - type: Pods
       pods:
@@ -22,6 +22,7 @@ spec:
         target:
           type: AverageValue
           averageValue: 10  # 当每个业务Pod的QPS指标平均值高于时，触发自动进行扩容
+
 #    - type: Resource
 #      resource:
 #        name: "cpu"

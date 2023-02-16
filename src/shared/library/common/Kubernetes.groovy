@@ -163,7 +163,7 @@ class Kubernetes implements Serializable {
 
             def yamlName = "hpa.yaml"
             ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
-                    " s#{K8S_POD_REPLICAS}#${ctx.K8S_POD_REPLICAS}#g; " +
+                    " s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g; s#{K8S_POD_REPLICAS}#${ctx.K8S_POD_REPLICAS}#g; " +
                     " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
             ctx.sh " cat ${yamlName} "
 
