@@ -1,12 +1,12 @@
 rules:
   default: false
   custom:
-    - seriesQuery: 'httpserver_requests_total'  # 指标名称确认存在
+    - seriesQuery: 'http_server_requests_seconds_count'  # 指标名称确认存在  Spring Boot2的http_server_requests_seconds_count是http请求总数 只要Prometheus服务端不重启就一直累加
       resources:
         template: <<.Resource>>
       name:
-        matches: "httpserver_requests_total"
-        as: "httpserver_requests_qps" # PromQL 计算出来的 QPS 指标
+        matches: "http_server_requests_seconds_count"
+        as: "http_server_requests_qps" # PromQL 计算出来的 QPS 指标  以每多少分钟为时间段计算为qps
       metricsQuery: sum(rate(<<.Series>>{<<.LabelMatchers>>}[1m])) by (<<.GroupBy>>)
 
 prometheus:

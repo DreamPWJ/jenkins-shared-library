@@ -18,7 +18,7 @@ spec:
     - type: Pods
       pods:
         metric:
-          name: httpserver_requests_qps  # 基于QPS自动伸缩 安装 prometheus-adapter 来实现基于自定义指标的 Pod 弹性伸缩
+          name: http_server_requests_qps  # 基于QPS自动伸缩 安装 prometheus-adapter 来实现基于自定义指标的 Pod 弹性伸缩
         target:
           type: AverageValue
           averageValue: 10  # 当每个业务Pod的QPS指标平均值高于时，触发自动进行扩容
