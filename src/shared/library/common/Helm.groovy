@@ -38,7 +38,7 @@ class Helm implements Serializable {
 
         // 若已安装 prometheus-operator，则可通过创建 ServiceMonitor 的 CRD 对象配置 Prometheus
         def yamlName = "prometheus-service-monitor.yaml"
-        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g; " +
+        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g; s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/prometheus/${yamlName} > ${yamlName} "
         // ctx.sh " cat ${yamlName} "
 
