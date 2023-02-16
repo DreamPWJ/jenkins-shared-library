@@ -5,7 +5,7 @@ apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {APP_NAME}-hpa
-  namespace: monitoring
+  namespace: default
 
 spec:
   minReplicas: {K8S_POD_REPLICAS}    # 缩容最小节点数
@@ -13,7 +13,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {APP_COMMON_NAME}
+    name: {APP_NAME}-deployment
   metrics:
     - type: Pods
       pods:

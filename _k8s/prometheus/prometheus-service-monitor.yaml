@@ -11,7 +11,7 @@ spec:
       interval: 5s
   namespaceSelector:
     matchNames:
-      - monitoring
+      - default
   selector:
     matchLabels:
       app: {APP_NAME}-hpa
