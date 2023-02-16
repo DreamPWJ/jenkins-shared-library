@@ -1,3 +1,6 @@
+# Author: 潘维吉
+# Description: 若已安装 prometheus-operator，则可通过创建 ServiceMonitor 的 CRD 对象配置 Prometheus
+
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -8,7 +11,7 @@ spec:
       interval: 5s
   namespaceSelector:
     matchNames:
-      - httpserver
+      - monitoring
   selector:
     matchLabels:
       app: {APP_NAME}-hpa

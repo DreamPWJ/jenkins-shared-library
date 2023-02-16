@@ -1,3 +1,5 @@
+# Author: 潘维吉
+# Description: 实现基于QPS自定义Prometheus指标的 Pod 弹性伸缩
 rules:
   default: false
   custom:

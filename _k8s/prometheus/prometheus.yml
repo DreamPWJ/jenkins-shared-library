@@ -1,4 +1,6 @@
-# 全局配置
+# Author: 潘维吉
+# Description: 全局配置Prometheus
+
 global:
   scrape_interval:     15s   # 多久 收集 一次数据
   evaluation_interval: 15s   # 多久评估一次 规则

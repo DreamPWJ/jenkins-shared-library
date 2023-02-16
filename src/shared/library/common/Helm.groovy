@@ -42,9 +42,10 @@ class Helm implements Serializable {
                 " ' ${ctx.WORKSPACE}/ci/_k8s/prometheus/${yamlName} > ${yamlName} "
         // ctx.sh " cat ${yamlName} "
 
+        ctx.sh " helm install prometheus-operator --set rbacEnable=true ${mirrorSourceName}/prometheus-operator -n monitoring "
         ctx.sh " kubectl apply -f ${yamlName} "
 
-        //ctx.sh " helm install ack-prometheus-operator aliyunhub/ack-prometheus-operator -n ${namespace}  || true "
+
         //ctx.sh " helm list -n ${namespace} "
         //ctx.sh " kubectl get pod -n ${namespace} "
         //ctx.sh " kubectl get apiservice "

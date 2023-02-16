@@ -5,7 +5,7 @@ apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {APP_NAME}-hpa
-  namespace: httpserver
+  namespace: monitoring
 
 spec:
   minReplicas: 1
