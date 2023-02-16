@@ -126,6 +126,7 @@ JSON_PARAMS
     "IS_MONO_REPO": true,
     "IS_K8S_DEPLOY" : true,
     "K8S_POD_REPLICAS" : "3",
+    "APPLICATION_DOMAIN" : "https://charge.pengbocloud.com",
 }
 
 pellet-charging-app-k8s-prod
@@ -138,7 +139,7 @@ JSON_PARAMS
    "PROJECT_NAME" : "pellet-charging-app" ,
    "SHELL_PARAMS" : "pellet-charging app 8080 8080 prod",
    "IS_K8S_DEPLOY" : true,
-   "APPLICATION_DOMAIN" : "https://charge-app-api.ggjtss.cn",
+   "APPLICATION_DOMAIN" : "https://charge-app-api.pengbocloud.com",
    "CUSTOM_HEALTH_CHECK_PATH" : "/healthyCheck",
 }
 

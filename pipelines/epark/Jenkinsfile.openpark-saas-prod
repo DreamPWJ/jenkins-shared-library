@@ -123,7 +123,7 @@ JSON_PARAMS
    "PROJECT_NAME" : "openpark-saas-app" ,
    "SHELL_PARAMS" : "openpark-saas app 8085 9000 prod",
    "IS_K8S_DEPLOY" : true,
-   "APPLICATION_DOMAIN" : "http://saas-admin-api.ggjtss.cn",
+   "APPLICATION_DOMAIN" : "https://saasadmin.pengbocloud.com",
    "CUSTOM_HEALTH_CHECK_PATH" : "/healthyCheck",
 }
 
@@ -153,7 +153,7 @@ JSON_PARAMS
     "NPM_RUN_PARAMS" : "build",
     "IS_K8S_DEPLOY" : true,
     "K8S_POD_REPLICAS" : "3",
-    "APPLICATION_DOMAIN" : "https://saas.ggjtss.cn",
+    "APPLICATION_DOMAIN" : "https://saas.pengbocloud.com",
 }
 
 */
