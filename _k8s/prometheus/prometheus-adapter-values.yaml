@@ -1,0 +1,15 @@
+rules:
+  default: false
+  custom:
+    - seriesQuery: 'httpserver_requests_total'  # 指标名称确认存在
+      resources:
+        template: <<.Resource>>
+      name:
+        matches: "httpserver_requests_total"
+        as: "httpserver_requests_qps" # PromQL 计算出来的 QPS 指标
+      metricsQuery: sum(rate(<<.Series>>{<<.LabelMatchers>>}[1m])) by (<<.GroupBy>>)
+
+prometheus:
+  url: http://120.92.140.217 # 替换安装的 Prometheus服务地址 (不写端口) 并设置好 prometheus.yml文件要关联监听的服务 保证服务targets正常运行
+  port: 9090
+  path: ""

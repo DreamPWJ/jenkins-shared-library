@@ -34,7 +34,15 @@ class Helm implements Serializable {
         // 安装k8s-prometheus
         // ctx.sh " helm install prometheus ${mirrorSourceName}/prometheus "
         // prometheus-adapter安装文档: https://artifacthub.io/packages/helm/prometheus-community/prometheus-adapter
-        ctx.sh " helm install prometheus-adapter ${mirrorSourceName}/prometheus-adapter -f ${ctx.WORKSPACE}/ci/_k8s/prometheus/prometheus-adapter.yaml --namespace ${namespace} "
+        ctx.sh " helm install prometheus-adapter ${mirrorSourceName}/prometheus-adapter -f ${ctx.WORKSPACE}/ci/_k8s/prometheus/prometheus-adapter-values.yaml --namespace ${namespace} "
+
+        // 若已安装 prometheus-operator，则可通过创建 ServiceMonitor 的 CRD 对象配置 Prometheus
+        def yamlName = "prometheus-service-monitor.yaml"
+        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g; " +
+                " ' ${ctx.WORKSPACE}/ci/_k8s/prometheus/${yamlName} > ${yamlName} "
+        // ctx.sh " cat ${yamlName} "
+
+        ctx.sh " kubectl apply -f ${ctx.WORKSPACE}/ci/_k8s/prometheus/${yamlName} "
 
         //ctx.sh " helm install ack-prometheus-operator aliyunhub/ack-prometheus-operator -n ${namespace}  || true "
         //ctx.sh " helm list -n ${namespace} "
