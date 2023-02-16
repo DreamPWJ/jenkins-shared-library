@@ -18,12 +18,12 @@ class Helm implements Serializable {
         // 安装前需要删除已经注册的 Custom Metrics API 每次更新完rule文件后，需要重启custom-metrics-apiserver服务才可以生效
         ctx.sh " kubectl delete apiservice v1beta1.custom.metrics.k8s.io || true "
 
-        def mirrorSourceName = "prometheus-community"
+        def mirrorSourceName = "stable"
         if (!Utils.getShEchoResult(ctx, "helm repo ls").contains(mirrorSourceName)) {
             // 使用镜像的adapter的
-            ctx.sh " helm repo add ${mirrorSourceName} https://prometheus-community.github.io/helm-charts "
+            //  ctx.sh " helm repo add ${mirrorSourceName} https://prometheus-community.github.io/helm-charts "
             // ctx.sh " helm repo add aliyunhub https://aliacs-app-catalog.oss-cn-hangzhou.aliyuncs.com/charts-incubator/ "
-            // ctx.sh " helm repo add stable https://charts.helm.sh/stable "
+            ctx.sh " helm repo add stable https://charts.helm.sh/stable "
             ctx.sh " helm repo update "
         }
 
@@ -43,8 +43,11 @@ class Helm implements Serializable {
         // ctx.sh " cat ${yamlName} "
 
         // ctx.sh " kubectl create namespace ${namespace}"
+        if (!Utils.getShEchoResult(ctx, "helm list").contains("prometheus-operator")) {
+
+        }
         ctx.sh " helm delete -n ${namespace} prometheus-operator || true "
-        ctx.sh " helm install prometheus-operator --set rbacEnable=true ${mirrorSourceName}/prometheus-operator -n ${namespace} || true "
+        ctx.sh " helm install prometheus-operator --set rbacEnable=true ${mirrorSourceName}/prometheus-operator -n ${namespace}  "
         ctx.sh " kubectl apply -f ${yamlName} "
 
 
