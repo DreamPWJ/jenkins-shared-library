@@ -123,6 +123,7 @@ JSON_PARAMS
    "PROJECT_NAME" : "openpark-saas-app" ,
    "SHELL_PARAMS" : "openpark-saas app 8085 9000 prod",
    "IS_K8S_DEPLOY" : true,
+   "IS_K8S_HPA_QPS" : true,
    "APPLICATION_DOMAIN" : "https://saasadmin.pengbocloud.com",
    "CUSTOM_HEALTH_CHECK_PATH" : "/healthyCheck",
 }

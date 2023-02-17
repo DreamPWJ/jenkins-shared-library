@@ -53,8 +53,8 @@ class Kubernetes implements Serializable {
                 // 七层负载和灰度发布配置部署ingress
                 // ingressNginxDeploy(ctx, map)
 
-                // 部署pod水平扩缩容 基于QPS自动伸缩  只需要初始化一次
-                if ("${ctx.IS_K8S_HPA_OPS}" == 'true') {
+                // 部署Pod弹性水平扩缩容 基于QPS自动伸缩  只需要初始化一次
+                if ("${ctx.IS_K8S_HPA_QPS}" == 'true') {
                     deployHPA(ctx, map)
                 }
 
