@@ -29,8 +29,9 @@ class Helm implements Serializable {
 
         // Helm 3安装k8s-prometheus
         // ctx.sh " helm version "
-        def namespace = "default"  // 命名空间 不同空间是隔离的
-        ctx.sh " kubectl config set-context \$(kubectl config current-context) --namespace=${namespace} "  // 切换空间
+        def namespace = "monitoring"  // 命名空间 不同空间是隔离的  default
+        // ctx.sh " kubectl config set-context \$(kubectl config current-context) --namespace=${namespace} "  // 切换空间
+
         if (!Utils.getShEchoResult(ctx, "helm list").contains("prometheus-adapter")) {
             ctx.sh " helm delete -n ${namespace} prometheus-adapter || true "
             // 安装k8s-prometheus
@@ -41,8 +42,7 @@ class Helm implements Serializable {
 
         // 若已安装 prometheus-operator，则可通过创建 ServiceMonitor 的 CRD 对象配置 Prometheus
         def yamlName = "prometheus-service-monitor.yaml"
-        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g; s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g; " + 
-                " ' ${ctx.WORKSPACE}/ci/_k8s/prometheus/${yamlName} > ${yamlName} "
+        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g; s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/prometheus/${yamlName} > ${yamlName} "
         // ctx.sh " cat ${yamlName} "
 
