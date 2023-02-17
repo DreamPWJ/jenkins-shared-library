@@ -54,7 +54,9 @@ class Kubernetes implements Serializable {
                 // ingressNginxDeploy(ctx, map)
 
                 // 部署pod水平扩缩容 基于QPS自动伸缩  只需要初始化一次
-                deployHPA(ctx, map)
+                if ("${ctx.IS_K8S_HPA_OPS}" == 'true') {
+                    deployHPA(ctx, map)
+                }
 
                 // 删除服务
                 // ctx.sh "kubectl delete -f ${k8sYAMLFile}"

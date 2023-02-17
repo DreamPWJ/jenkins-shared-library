@@ -758,6 +758,8 @@ def getInitParams(map) {
     IS_NEXT_JS = jsonParams.IS_NEXT_JS ? jsonParams.IS_NEXT_JS : false
     // 服务器部署时不同机器的代码配置是否相同
     IS_SAME_CONF_IN_DIFF_MACHINES = jsonParams.IS_SAME_CONF_IN_DIFF_MACHINES ? jsonParams.IS_SAME_CONF_IN_DIFF_MACHINES : false
+    // 是否开启基于QPS自定义指标的K8S水平弹性扩缩容
+    IS_K8S_HPA_OPS = jsonParams.IS_K8S_HPA_OPS ? jsonParams.IS_K8S_HPA_OPS : false
 
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
