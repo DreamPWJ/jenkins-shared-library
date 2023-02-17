@@ -12,7 +12,8 @@ import shared.library.Utils
 class Helm implements Serializable {
 
     /**
-     * 安装k8s-prometheus*/
+     * 安装k8s-prometheus
+     * */
     static def installPrometheus(ctx) {
         // 安装前需要删除已经注册的 Custom Metrics API 每次更新完rule文件后，需要重启custom-metrics-apiserver服务才可以生效
         // ctx.sh " kubectl delete apiservice v1beta1.custom.metrics.k8s.io || true "
@@ -29,7 +30,7 @@ class Helm implements Serializable {
         // Helm 3安装k8s-prometheus
         // ctx.sh " helm version "
         def namespace = "default"  // 命名空间 不同空间是隔离的
-        ctx.sh " kubens  ${namespace} "  // 切换空间
+        ctx.sh " kubectl config set-context \$(kubectl config current-context) --namespace=${namespace} "  // 切换空间
         if (!Utils.getShEchoResult(ctx, "helm list").contains("prometheus-adapter")) {
             ctx.sh " helm delete -n ${namespace} prometheus-adapter || true "
             // 安装k8s-prometheus
@@ -40,7 +41,9 @@ class Helm implements Serializable {
 
         // 若已安装 prometheus-operator，则可通过创建 ServiceMonitor 的 CRD 对象配置 Prometheus
         def yamlName = "prometheus-service-monitor.yaml"
-        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g; s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g; " + " ' ${ctx.WORKSPACE}/ci/_k8s/prometheus/${yamlName} > ${yamlName} "
+        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g; s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g; " + 
+                " ' ${ctx.WORKSPACE}/ci/_k8s/prometheus/${yamlName} > ${yamlName} "
+                " ' ${ctx.WORKSPACE}/ci/_k8s/prometheus/${yamlName} > ${yamlName} "
         // ctx.sh " cat ${yamlName} "
 
         // ctx.sh " kubectl create namespace ${namespace}"
@@ -58,7 +61,8 @@ class Helm implements Serializable {
     }
 
     /**
-     * 下载包*/
+     * 下载包
+     * */
     static def install(ctx) {
         ctx.sh " helm version "
         ctx.sh " helm install "
