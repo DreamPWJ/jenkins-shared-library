@@ -34,6 +34,9 @@ tail -f /var/log/cron
 - du -lh --max-depth=1 查看当前目录子目录占用情况
 - ls -lh 查看每个文件的占用情况
 
+#### 创建虚拟网卡IP命令
+ifconfig eth0:1 192.168.8.5 netmask 255.255.255.0 up
+
 #### 建立免密连接
 - ssh-keygen -t rsa   root用户在/root/.ssh/id_rsa.pub
 - 公钥放在远程访问服务的/root/.ssh/authorized_keys里  执行 ssh root@ip 命令访问确认
