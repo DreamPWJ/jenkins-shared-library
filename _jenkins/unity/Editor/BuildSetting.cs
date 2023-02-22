@@ -17,7 +17,7 @@ public class BuildSetting
     public Place Place = Place.None;
     //多线程渲染
     public bool MTRendering = true;
-    //是否IL2CPP 程序运行效率提升
+    //是否IL2CPP引擎 程序运行效率提升 或者Mono引擎
     public bool IL2CPP = true;
     //是否开启动态合批
     public bool DynamicBatching = false;

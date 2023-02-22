@@ -1977,7 +1977,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                         text: [
                                 "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL})",
                                 "#### · CI构建CD部署完成 👌",
-                                "#### · 服务端项目启动运行${msg}",
+                                "#### · 服务端启动运行${msg}",
                                 "###### ${rollbackTag}",
                                 "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
                                 "###### 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
