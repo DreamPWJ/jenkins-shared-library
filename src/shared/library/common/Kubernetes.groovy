@@ -251,8 +251,11 @@ class Kubernetes implements Serializable {
      * K8s健康探测
      */
     static def healthDetection(ctx) {
-        // Pod通过两类探针来检查容器的健康状态。分别是LivenessProbe（存活探测）和 ReadinessProbe（就绪探测）
-        ctx.sh "kubectl get pods **** -o custom-columns=NAME:.metadata.name,FINISHED:.metadata.creationTimestamp"
+        // Pod通过两类探针来检查容器的健康状态。分别是ReadinessProbe（就绪探测） 和 LivenessProbe（存活探测）
+        ctx.sh "kubectl get pod -l app=***  -o jsonpath=\"{.items[0].metadata.name} "  // kubectl获取新pod名称
+        ctx.sh "kubectl get pods podName*** -o yaml "  // yaml内容中包含初始化时间和启动完成时间
+        ctx.sh "kubectl -n default get pods podName*** -o yaml | yq e '.items[].status.conditions[] | select('.type' == \"PodScheduled\" or '.type' == \"Ready\") | '.lastTransitionTime'' - | xargs -n 2 bash -c 'echo \$(( \$(date -d \"\$0\" \"+%s\") - \$(date -d \"\$1\" \"+%s\") ))' "
+        ctx.sh "kubectl get pods podName**** -o custom-columns=NAME:.metadata.name,FINISHED:.metadata.creationTimestamp "
     }
 
     /**
