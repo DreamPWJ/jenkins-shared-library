@@ -64,6 +64,9 @@ spec:
     - hosts:
         - etc-api.pengbocloud.com
       secretName: etc-api.pengbocloud.com-tls
+    - hosts:
+        - etc-admin.pengbocloud.com
+      secretName: etc-admin.pengbocloud.com-tls
 
   rules:
     #自定义域名
@@ -78,4 +81,16 @@ spec:
                 #服务端口
                 port:
                   number: 8087
+            pathType: Prefix
+    - host: etc-admin.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: epark-etc-web-service
+                #服务端口
+                port:
+                  number: 9001
             pathType: Prefix

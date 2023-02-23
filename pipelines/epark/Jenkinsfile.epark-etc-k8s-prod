@@ -128,6 +128,21 @@ JSON_PARAMS
    "CUSTOM_HEALTH_CHECK_PATH" : "/etc",
 }
 
+epark-etc-web-k8s-prod
+好停车ETC收费 Web前端-k8s集群 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "http://47.102.214.33/lanneng_develop/etc-web.git" ,
+    "BRANCH_NAME" : "main" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "epark-etc-web" ,
+    "SHELL_PARAMS" : "epark-etc web 9001 80 prod" ,
+    "NPM_RUN_PARAMS" : "build",
+    "CUSTOM_NGINX_CONFIG" : "config/default.conf",
+    "IS_K8S_DEPLOY" : true,
+    "NODE_VERSION" : "10",
+    "APPLICATION_DOMAIN" : "https://etc-admin.pengbocloud.com",
+}
 
 */
 
