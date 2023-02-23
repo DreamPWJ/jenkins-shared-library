@@ -132,7 +132,7 @@ epark-etc-web-k8s-prod
 好停车ETC收费 Web前端-k8s集群 ❤️
 JSON_PARAMS
 {
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/etc-web.git" ,
+    "REPO_URL" : "http://47.102.214.33/lanneng_develop/etc-admin-web.git" ,
     "BRANCH_NAME" : "main" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "epark-etc-web" ,
