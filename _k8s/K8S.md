@@ -85,6 +85,17 @@ spec:         #必选，Pod中容器的详细定义
 - kubectl get pods --namespace cert-manager
 - helm uninstall cert-manager -n cert-manager
   
+### K8S集群安装 Prometheus与安装 Grafana监控
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+helm install prometheus prometheus-community/prometheus
+
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+
+helm install grafana grafana/grafana --set persistence.enabled=false --set service.type=NodePort --set service.nodePort=30000
+
 ### 基于Ansible自动部署K8S集群 [项目](https://github.com/lizhenliang/ansible-install-k8s)
 
 ### 通过kubectl创建简单nginx服务 [文档](https://docs.ksyun.com/documents/5517)
