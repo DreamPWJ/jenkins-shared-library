@@ -1108,7 +1108,7 @@ def nodeBuildProject() {
                         // 导出静态HTML方式部署 可复用Nginx部署脚本  可配置到package.json内script 使用npm run执行
                         // nextJSScript = " && next export && rm -rf ${NPM_PACKAGE_FOLDER} && mv out ${NPM_PACKAGE_FOLDER} "
                     }
-                    sh "rm -rf ${NPM_PACKAGE_FOLDER} || true"
+                    sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
                     sh " npm run '${NPM_RUN_PARAMS}' ${nextJSScript} " // >/dev/null 2>&1
                 } catch (e) {
                     println(e.getMessage())
