@@ -43,6 +43,7 @@ class Deploy implements Serializable {
         }
 
         if ("${ctx.IS_SAME_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
+            // 多个服务器配置文件不同
             // 获取不同机器的数字号 不同机器替换不同的机器特定配置文件
             def machineNum = deployNum == 0 ? "${ctx.MACHINE_TAG.replace("号机", "")}".toInteger() : deployNum
 
@@ -63,7 +64,7 @@ class Deploy implements Serializable {
             // 重命名后整体批量复制替换多个文件
             ctx.sh "cp -r ${projectDir}/${sourceFilePath}/* ${projectDir}/${targetFilePath}/"
             // 替换文件应该放在部署服务器上面 或 重新打包部署
-        } else if ("${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
+        } else if ("${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {   // 多个服务器配置文件相同
             // 重命名后整体批量复制替换多个文件   针对服务器配置文件相同的情况  但代码内没做多环境  使用配置文件目录区分
             ctx.sh "cp -r ${projectDir}/${sourceFilePath}/* ${projectDir}/${targetFilePath}/"
         }
