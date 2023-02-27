@@ -31,9 +31,11 @@ class Deploy implements Serializable {
     static def replaceEnvFile(ctx, deployNum = 0) {
         // 源文件和多个目标文件可放在代码里面维护 部署时候根据配置自动替换到目标服务器
         // 或者项目源码仓库内的配置文件替换CI仓库的默认文件等
+        def sourceFilePath = ""  // 源文件目录 真正的配置文件
+        def targetFilePath = ""  // 目标文件目录 要替换的配置文件
         if ("${ctx.IS_SAME_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
-            def sourceFilePath = "${ctx.SOURCE_TARGET_CONFIG_DIR}".split(",")[0] // 源文件目录 真正的配置文件
-            def targetFilePath = "${ctx.SOURCE_TARGET_CONFIG_DIR}".split(",")[1]  // 目标文件目录 要替换的配置文件
+            sourceFilePath = "${ctx.SOURCE_TARGET_CONFIG_DIR}".split(",")[0]
+            targetFilePath = "${ctx.SOURCE_TARGET_CONFIG_DIR}".split(",")[1]
             ctx.println("自动替换不同分布式部署节点的环境文件")
             // 获取不同机器的数字号 不同机器替换不同的机器特定配置文件
             def machineNum = deployNum == 0 ? "${ctx.MACHINE_TAG.replace("号机", "")}".toInteger() : deployNum
