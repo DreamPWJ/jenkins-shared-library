@@ -138,7 +138,7 @@ JSON_PARAMS
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "open-epark-server" ,
-   "SHELL_PARAMS" : "open-epark server 8081 8080 prod",
+   "SHELL_PARAMS" : "open-epark server 8082 8080 prod",
    "IS_ROLL_DEPLOY" : true,
    "IS_MAVEN_SINGLE_MODULE" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",

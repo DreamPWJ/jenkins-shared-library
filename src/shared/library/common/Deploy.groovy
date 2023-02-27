@@ -57,6 +57,9 @@ class Deploy implements Serializable {
             // 重命名后整体批量复制替换多个文件
             ctx.sh "cp -r ${projectDir}/${sourceFilePath}/* ${projectDir}/${targetFilePath}/"
             // 替换文件应该放在部署服务器上面 或 重新打包部署
+        } else if ("${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
+            // 重命名后整体批量复制替换多个文件   针对服务器配置文件相同的情况  但代码内没做多环境  使用配置文件目录区分
+            ctx.sh "cp -r ${projectDir}/${sourceFilePath}/* ${projectDir}/${targetFilePath}/"
         }
     }
 
