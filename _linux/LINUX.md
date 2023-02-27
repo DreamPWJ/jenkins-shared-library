@@ -34,8 +34,10 @@ tail -f /var/log/cron
 - du -lh --max-depth=1 查看当前目录子目录占用情况
 - ls -lh 查看每个文件的占用情况
 
-#### 创建虚拟网卡IP命令
-ifconfig eth0:1 192.168.8.5 netmask 255.255.255.0 up
+#### 创建虚拟IP命令 基于ARP是地址解析协议 每台主机中都有一个ARP高速缓存 操作系统会自动维护这个缓存 IP漂移Keepalived完成主备切换
+ip addr
+arp -a
+ifconfig eth0:1 192.168.8.5 netmask 255.255.255.255 up
 
 #### 建立免密连接
 - ssh-keygen -t rsa   root用户在/root/.ssh/id_rsa.pub
