@@ -7,7 +7,7 @@ metadata:
   name: gray-release-canary
   namespace: default
   annotations:
-    kubernetes.io/Ingress.class: nginx  # 已弃用 使用 spec.ingressClassName代替
+    #kubernetes.io/Ingress.class: nginx  # 已弃用 使用 spec.ingressClassName代替
     # 开启金丝雀Canary。
     nginx.ingress.kubernetes.io/canary: "true"
     # Http Header请求头为version。
@@ -36,13 +36,13 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-max-temp-file-size: 2048m
 
 spec:
-  #ingressClassName: k8s-ingress
+  ingressClassName: k8s-ingress
   tls: # SSL安全证书
     - hosts:
-        - new-version.com
-    - secretName: tls-secret-name # Secret证书存储名称
+        - panweiji.com
+    - secretName: panweiji-tls-secret # Secret证书存储名称
   rules:
-    - host: new-version.com
+    - host: panweiji.com
       http:
         paths:
           - path: /
@@ -52,6 +52,7 @@ spec:
                 port:
                   number: {HOST_PORT}
             pathType: Prefix
+
 
 # 获取Ingress
 # kubectl get ing

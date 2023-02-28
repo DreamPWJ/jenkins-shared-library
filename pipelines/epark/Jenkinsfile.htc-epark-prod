@@ -143,7 +143,7 @@ JSON_PARAMS
    "IS_MAVEN_SINGLE_MODULE" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
    "SOURCE_TARGET_CONFIG_DIR" : "resource/rizhao,resource",
-   "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
+   "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server-open-epark.xml:/usr/local/tomcat/conf/server.xml"
 }
 
 htc-epark-h5-prod
