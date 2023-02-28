@@ -50,13 +50,9 @@ metadata:
     # add an annotation indicating the issuer to use
     cert-manager.io/cluster-issuer: letsencrypt-prod
     acme.cert-manager.io/http01-edit-in-place: "true"
-    #cert-manager.io/issue-temporary-certificate: "true"
-    #kubernetes.io/tls-acme: "true"
-    #ingress.kubernetes.io/ssl-redirect: "false"
-    #nginx.ingress.kubernetes.io/enable-cors: "true"
-    #nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS"
-    #nginx.ingress.kubernetes.io/rewrite-target: /
-    #acme.cert-manager.io/http01-override-ingress-class: lanneng-k8s-ingress
+    # 后端大文件上传大小
+    nginx.ingress.kubernetes.io/client-body-buffer-size: 1024m
+    nginx.ingress.kubernetes.io/proxy-max-temp-file-size: 2048m
 
 spec:
   ingressClassName: lanneng-k8s-ingress

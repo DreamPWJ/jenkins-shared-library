@@ -19,24 +19,6 @@ spec:
             #serviceType: ClusterIP
             name: pengbocloud-k8s-ingress-etc # 这个匹配是关键！！！  1. class是指定自动创建的 Ingress 的 ingress class  2. name是指定被自动修改的 Ingress 名称
 
-#---
-#
-## 创建一个证书
-#apiVersion: cert-manager.io/v1
-#kind: Certificate
-#metadata:
-#  name: cert-manager-tls
-#  namespace: cert-manager
-#spec:
-#  secretName: saas.pengbocloud.com-tls  # 最终签发出来的证书会保存在这个 Secret 里面
-#  duration: 2160h  # 证书有效期时长
-#  renewBefore: 360h # 距离证书过期还有多久重新自动续签
-#  issuerRef:
-#    kind: ClusterIssuer
-#    name: letsencrypt-prod # 引用 Issuer
-#  dnsNames:
-#    - saas.pengbocloud.com # 要签发证书的域名
-
 ---
 
 apiVersion: networking.k8s.io/v1
@@ -50,13 +32,9 @@ metadata:
     # add an annotation indicating the issuer to use
     cert-manager.io/cluster-issuer: letsencrypt-prod-etc
     acme.cert-manager.io/http01-edit-in-place: "true"
-    #cert-manager.io/issue-temporary-certificate: "true"
-    #kubernetes.io/tls-acme: "true"
-    #ingress.kubernetes.io/ssl-redirect: "false"
-    #nginx.ingress.kubernetes.io/enable-cors: "true"
-    #nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS"
-    #nginx.ingress.kubernetes.io/rewrite-target: /
-    #acme.cert-manager.io/http01-override-ingress-class: lanneng-k8s-ingress
+    # 后端大文件上传大小
+    nginx.ingress.kubernetes.io/client-body-buffer-size: 1024m
+    nginx.ingress.kubernetes.io/proxy-max-temp-file-size: 2048m
 
 spec:
   ingressClassName: lanneng-k8s-ingress
