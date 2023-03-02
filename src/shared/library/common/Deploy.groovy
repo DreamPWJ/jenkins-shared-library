@@ -42,8 +42,8 @@ class Deploy implements Serializable {
             projectDir = "${ctx.env.WORKSPACE}" + ("${ctx.IS_MAVEN_SINGLE_MODULE}" == 'true' ? "" : ("${ctx.MAVEN_ONE_LEVEL}" == "" ? "/${ctx.PROJECT_NAME}" : "/${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME}"))
         }
 
+        // 多个服务器配置文件不同
         if ("${ctx.IS_SAME_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
-            // 多个服务器配置文件不同
             // 获取不同机器的数字号 不同机器替换不同的机器特定配置文件
             def machineNum = deployNum == 0 ? "${ctx.MACHINE_TAG.replace("号机", "")}".toInteger() : deployNum
 
@@ -57,6 +57,8 @@ class Deploy implements Serializable {
                         def newConfigName = "${item.name.replace(machineFlag, "")}"
                         //ctx.println(newConfigName)
                         ctx.sh "mv ${item.name} ${newConfigName}"
+                    } else if (machineNum >= 3) {  // 针对3台以上部署机器 但配置只有两种不同的  第一台机器一个配置  其它所有机器一个配置的情况
+                        //  默认第三台机器以后 使用的都是第二台机器的配置即可
                     }
                 }
             }

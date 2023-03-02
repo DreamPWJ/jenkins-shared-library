@@ -33,5 +33,5 @@ EOF
 done <hosts.txt
 
 # 透传跳板机实现自动登录授权
-# 主要思路是 1. 客户端执行机器先免密到跳板机 2. 跳板机再免密到目标机 3. 最后将客户端的公钥/root/.ssh/id_rsa.pub放到内网目标机/root/.ssh/authorized_keys授信
+# 主要思路是 1. 客户端执行机器先免密到跳板机 2. 跳板机再免密到目标机 3. 最后将客户端的公钥/root/.ssh/id_rsa.pub放到内网目标机/root/.ssh/authorized_keys授信  systemctl restart sshd.service
 # 在执行SSH跳板命令生效:  ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22
