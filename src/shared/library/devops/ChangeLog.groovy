@@ -41,11 +41,12 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
                         fixChangeLog += combinationMsg
                     } else {
                         // 过滤无需生成的变更日志类型
-                        // if ((combinationMsg.contains("revert") || combinationMsg.contains("chore") || combinationMsg.contains("test"))) {
-                        // combinationMsg = ""
-                        // } else {
-                        otherChangeLog += combinationMsg
-                        //  }
+                        // combinationMsg.contains("revert") || combinationMsg.contains("chore") || combinationMsg.contains("test")
+                        if (combinationMsg.contains("docs(changelog)")) {
+                            combinationMsg = ""
+                        } else {
+                            otherChangeLog += combinationMsg
+                        }
                     }
                 }
                 changeLog += combinationMsg
