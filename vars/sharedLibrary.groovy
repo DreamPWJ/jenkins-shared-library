@@ -733,6 +733,8 @@ def getInitParams(map) {
     // 项目名 获取部署资源位置和指定构建模块名等
     PROJECT_NAME = jsonParams.PROJECT_NAME ? jsonParams.PROJECT_NAME.trim() : ""
     SHELL_PARAMS = jsonParams.SHELL_PARAMS ? jsonParams.SHELL_PARAMS.trim() : "" // shell传入前端或后端参数
+    // 分布式部署独立扩展服务器 基于通用配置的基础上 再扩展的服务器IP集合 逗号分割
+    EXPAND_SERVER_IPS = jsonParams.EXPAND_SERVER_IPS ? jsonParams.EXPAND_SERVER_IPS.trim() : ""
 
     JDK_VERSION = jsonParams.JDK_VERSION ? jsonParams.JDK_VERSION.trim() : "${map.jdk}" // 自定义JDK版本
     NODE_VERSION = jsonParams.NODE_VERSION ? jsonParams.NODE_VERSION.trim() : "${map.nodejs}" // 自定义Node版本
@@ -757,8 +759,8 @@ def getInitParams(map) {
     IS_USE_SESSION = jsonParams.IS_USE_SESSION ? jsonParams.IS_USE_SESSION : false
     // 是否是NextJs服务端React框架
     IS_NEXT_JS = jsonParams.IS_NEXT_JS ? jsonParams.IS_NEXT_JS : false
-    // 服务器部署时不同机器的代码配置是否相同
-    IS_SAME_CONF_IN_DIFF_MACHINES = jsonParams.IS_SAME_CONF_IN_DIFF_MACHINES ? jsonParams.IS_SAME_CONF_IN_DIFF_MACHINES : false
+    // 服务器部署时不同机器的代码配置是否不相同
+    IS_DIFF_CONF_IN_DIFF_MACHINES = jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES ? jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES : false
     // 是否开启基于QPS自定义指标的K8S水平弹性扩缩容
     IS_K8S_HPA_QPS = jsonParams.IS_K8S_HPA_QPS ? jsonParams.IS_K8S_HPA_QPS : false
 
@@ -1236,7 +1238,7 @@ def buildImage(map) {
     Docker.build(this, "${dockerBuildImageName}")
 
     // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
-    if ("${IS_SAME_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+    if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
         def deployNum = 2  // 暂时区分两个不同环境文件 实际还存在每一个部署服务的环境配置文件都不一样
         mavenBuildProject(map, deployNum) // 需要mvn jdk构建环境
         // Docker多阶段镜像构建处理
@@ -1567,7 +1569,7 @@ def scrollToDeploy(map) {
                 uploadRemote("${archivePath}")
             } else {
                 // 如果配置多节点动态替换不同的配置文件重新执行maven构建打包或者直接替换部署服务器文件
-                if ("${IS_SAME_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+                if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
                     mavenBuildProject(map) // 需要mvn jdk构建环境
                 }
                 uploadRemote(Utils.getShEchoResult(this, "pwd"))
@@ -1614,7 +1616,7 @@ def k8sDeploy(map) {
     // 执行k8s集群部署
     Kubernetes.deploy(this, map)
     // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
-    if ("${IS_SAME_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+    if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
         println("K8S集群部署相同应用不同环境的部署节点")
         Kubernetes.deploy(this, map, 2)
     }

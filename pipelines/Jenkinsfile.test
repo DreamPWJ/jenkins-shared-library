@@ -163,32 +163,6 @@ JSON_PARAMS
    "JAVA_FRAMEWORK_TYPE" : "2",
    "DOCKER_VOLUME_MOUNT" : "/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
 }
-{
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark.git" ,
-   "BRANCH_NAME" : "develop" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "epark-server" ,
-   "SHELL_PARAMS" : "epark server 8097 8080 sit",
-   "IS_MAVEN_SINGLE_MODULE" : true,
-   "JAVA_FRAMEWORK_TYPE" : "2",
-   "IS_SAME_CONF_IN_DIFF_MACHINES": true,
-   "SOURCE_TARGET_CONFIG_DIR" : "resources/juxian,resources",
-   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/nfsdata/ParkPicture:/usr/local/tomcat/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
-}
-
-test-open-park-saas
-测试OpenPark SAAS框架
-JSON_PARAMS
-{
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/openpark_saas_backend" ,
-   "BRANCH_NAME" : "panweiji-test" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "openpark-saas" ,
-   "SHELL_PARAMS" : "openpark saas 8096 9000 sit",
-   "IS_MAVEN_SINGLE_MODULE" : true
-}
-
-REMOTE_IP: 120.92.155.194
 
 */
 

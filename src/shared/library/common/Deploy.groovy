@@ -43,7 +43,7 @@ class Deploy implements Serializable {
         }
 
         // 多个服务器配置文件不同
-        if ("${ctx.IS_SAME_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
+        if ("${ctx.IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
             // 获取不同机器的数字号 不同机器替换不同的机器特定配置文件
             def machineNum = deployNum == 0 ? "${ctx.MACHINE_TAG.replace("号机", "")}".toInteger() : deployNum
 
