@@ -31,7 +31,7 @@ map.put('build_num_keep', 2)
 
 // Docker相关参数
 // JVM内存设置
-map.put('docker_java_opts', '-Xmx2600m')
+map.put('docker_java_opts', '-Xmx2800m')
 // docker内存限制
 map.put('docker_memory', '3G')
 // docker日志限制
@@ -155,8 +155,9 @@ JSON_PARAMS
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "epark-pay-service" ,
    "SHELL_PARAMS" : "epark-pay-service server 8002 8001 prod",
+   "IS_ROLL_DEPLOY" : true,
+   "DOCKER_VOLUME_MOUNT" : "",
 }
-REMOTE_IP: 172.16.99.74
 
 htc-video-server-prod
 好停车路测视频桩服务端
@@ -167,9 +168,10 @@ JSON_PARAMS
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "video-service" ,
    "SHELL_PARAMS" : "video-service server 2234 2234 prod",
-   "IS_MAVEN_SINGLE_MODULE" : true
+   "IS_MAVEN_SINGLE_MODULE" : true,
+   "IS_ROLL_DEPLOY" : true,
+   "DOCKER_VOLUME_MOUNT" : "",
 }
-REMOTE_IP: 172.16.99.74
 
 htc-epark-h5-prod
 好停车H5 Web前端 ❤️
