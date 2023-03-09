@@ -73,7 +73,7 @@ while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:y:z:" opt; do
     ;;
   q)
     echo "java_framework_type=$OPTARG"
-    java_framework_type=$OPTARG # java框架类型 1. Spring Boot 2. Spring MVC
+    java_framework_type=$OPTARG # Java框架类型 1. Spring Boot 2. Spring MVC
     ;;
   y)
     echo "remote_debug_port=$OPTARG"

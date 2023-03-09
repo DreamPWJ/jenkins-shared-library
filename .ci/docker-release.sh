@@ -7,7 +7,7 @@ echo -e "\033[32m执行Docker部署Java语言脚本  👇 \033[0m"
 # 可采用$0,$1,$2..等方式获取脚本命令行传入的参数  执行脚本  sudo ./docker-release.sh
 
 echo "使用getopts的方式进行shell参数传递"
-while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:y:z:" opt; do
+while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:y:z:" opt; do
   case $opt in
   a)
     echo "project_name_prefix=$OPTARG"
@@ -73,7 +73,11 @@ while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:y:z:" opt; do
     ;;
   q)
     echo "java_framework_type=$OPTARG"
-    java_framework_type=$OPTARG # java框架类型 1. Spring Boot 2. Spring MVC
+    java_framework_type=$OPTARG # Java框架类型 1. Spring Boot 2. Spring MVC
+    ;;
+  r)
+    echo "tomcat_version=$OPTARG"
+    tomcat_version=$OPTARG # 自定义Tomcat版本
     ;;
   y)
     echo "remote_debug_port=$OPTARG"
@@ -190,7 +194,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
   docker build -t ${docker_image_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg PROJECT_NAME=${project_name} \
     --build-arg EXPOSE_PORT="${build_expose_ports}" --build-arg JDK_VERSION=${jdk_version} \
-    -f /${deploy_folder}/${docker_file_name} . --no-cache
+    --build-arg TOMCAT_VERSION=${tomcat_version} -f /${deploy_folder}/${docker_file_name} . --no-cache
 else
   docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}-${project_type}-${env_mode}
 fi
