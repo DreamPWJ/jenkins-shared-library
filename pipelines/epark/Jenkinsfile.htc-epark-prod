@@ -31,7 +31,7 @@ map.put('build_num_keep', 2)
 
 // Docker相关参数
 // JVM内存设置
-map.put('docker_java_opts', '-Xmx2600m')
+map.put('docker_java_opts', '-Xmx2800m')
 // docker内存限制
 map.put('docker_memory', '3G')
 // docker日志限制
@@ -144,6 +144,33 @@ JSON_PARAMS
    "JAVA_FRAMEWORK_TYPE" : "2",
    "SOURCE_TARGET_CONFIG_DIR" : "resource/rizhao,resource",
    "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server-open-epark.xml:/usr/local/tomcat/conf/server.xml"
+}
+
+htc-pay-server-prod
+好停车支付平台服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark_pay.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "epark-pay-service" ,
+   "SHELL_PARAMS" : "epark-pay-service server 8002 8001 prod",
+   "IS_ROLL_DEPLOY" : true,
+   "DOCKER_VOLUME_MOUNT" : "",
+}
+
+htc-video-server-prod
+好停车路测视频桩服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "http://47.102.214.33/lanneng_develop/video.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "video-service" ,
+   "SHELL_PARAMS" : "video-service server 2234 2234 prod",
+   "IS_MAVEN_SINGLE_MODULE" : true,
+   "IS_ROLL_DEPLOY" : true,
+   "DOCKER_VOLUME_MOUNT" : "",
 }
 
 htc-epark-h5-prod

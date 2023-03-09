@@ -21,10 +21,10 @@ def call(String type = 'web', Map map) {
 
     remote = [:]
     try {
-        remote.host = "${REMOTE_IP}" // 部署应用程序服务器IP 动态参数 可配置在独立的job中
+        remote.host = "${REMOTE_IP}" // 部署应用程序服务器IP 动态字符参数 可配置在独立的job中
     } catch (exception) {
         // println exception.getMessage()
-        remote.host = "${map.remote_ip}" // 部署应用程序服务器IP  不传参数 使用默认值
+        remote.host = "${map.remote_ip}" // 部署应用程序服务器IP  不传字符参数 使用默认值
     }
     remote.user = "${map.remote_user_name}"
     remote_worker_ips = readJSON text: "${map.remote_worker_ips}"  // 分布式部署工作服务器地址 同时支持N个服务器
