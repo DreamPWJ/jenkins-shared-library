@@ -146,6 +146,31 @@ JSON_PARAMS
    "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server-open-epark.xml:/usr/local/tomcat/conf/server.xml"
 }
 
+htc-pay-server-prod
+好停车支付平台服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark_pay.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "epark-pay-service" ,
+   "SHELL_PARAMS" : "epark-pay-service server 8002 8001 prod",
+}
+REMOTE_IP: 172.16.99.74
+
+htc-video-server-prod
+好停车路测视频桩服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "http://47.102.214.33/lanneng_develop/video.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "video-service" ,
+   "SHELL_PARAMS" : "video-service server 2234 2234 prod",
+   "IS_MAVEN_SINGLE_MODULE" : true
+}
+REMOTE_IP: 172.16.99.74
+
 htc-epark-h5-prod
 好停车H5 Web前端 ❤️
 JSON_PARAMS
