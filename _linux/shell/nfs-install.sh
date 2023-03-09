@@ -64,7 +64,9 @@ cat /var/lib/nfs/etab
 # sudo yum install nfs-utils -y
 # 创建一个用于nfs共享目录的挂载点
 # sudo mkdir -p /mnt/nfs_client_shared
-# 挂在共享目录到客户端  在 /ect/fstab 内保存重启等永久有效
+# 挂在共享目录到客户端  在 /ect/fstab 内保存重启等永久有效  如果是内网域名 在/etc/hosts下配置
 # sudo mount -t nfs -o nolock nfs_server_ip:/mnt/nfs_server_shared /mnt/nfs_client_shared
 # 卸载共享目录到客户端
 # umount -f /mnt/nfs_client_shared
+# 查看客户端挂载情况
+# mount -l | grep nfs
