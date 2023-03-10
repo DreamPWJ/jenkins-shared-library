@@ -1,5 +1,6 @@
 package shared.library.common
 
+import shared.library.GlobalVars
 import shared.library.Utils
 
 /**
@@ -69,6 +70,20 @@ class Deploy implements Serializable {
         } else if ("${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {   // 多个服务器配置文件相同
             // 重命名后整体批量复制替换多个文件   针对服务器配置文件相同的情况  但代码内没做多环境  使用配置文件目录区分
             ctx.sh "cp -r ${projectDir}/${sourceFilePath}/* ${projectDir}/${targetFilePath}/"
+        }
+    }
+
+    /**
+     * 不同分布式部署节点使用不同的yaml环境文件
+     * 如 application-prod-1.yaml 、application-prod-2.yaml
+     */
+    static def changeEnvModeYamlFile(ctx, deployNum = 0) {
+        if ("${ctx.IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
+            // 获取不同机器的数字号 不同机器替换不同的机器特定配置文件
+            def machineNum = deployNum == 0 ? "${ctx.MACHINE_TAG.replace("号机", "")}".toInteger() : deployNum
+            def machineFlag = "-${machineNum}"
+            ctx.SHELL_ENV_MODE = "${ctx.SHELL_ENV_MODE}" + machineFlag
+            ctx.println("${ctx.SHELL_ENV_MODE}")
         }
     }
 

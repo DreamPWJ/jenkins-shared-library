@@ -47,6 +47,8 @@ spec:
             value: {SPRING_PROFILE}
           - name: EXTEND_PORT
             value: "{CONTAINER_PORT}"
+          - name: HOSTNAME
+            value: $(KUBERNETES_SERVICE_HOST)
 #          - name: JAVA_OPTS
 #            value: -Xms256m -Xmx1024m
         # 优雅停机  Pod被删除时，状态置为 Terminating 。 kube-proxy 更新转发规则，将 Pod 从 service 的 endpoint 列表中摘除掉，新的流量不再转发到该 Pod

@@ -167,10 +167,10 @@ JSON_PARAMS
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "video-service" ,
-   "SHELL_PARAMS" : "video-service server 2234 2234 prod",
+   "SHELL_PARAMS" : "video-service server 2234 2234 dev",
    "IS_MAVEN_SINGLE_MODULE" : true,
    "IS_ROLL_DEPLOY" : true,
-   "DOCKER_VOLUME_MOUNT" : "",
+   "DOCKER_VOLUME_MOUNT" : "/mnt/stor1:/usr/local/tomcat/webapps/FileUpload/stor1",
 }
 
 htc-epark-h5-prod
