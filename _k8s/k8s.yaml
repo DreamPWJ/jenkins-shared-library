@@ -47,7 +47,7 @@ spec:
             value: {SPRING_PROFILE}
           - name: EXTEND_PORT
             value: "{CONTAINER_PORT}"
-          - name: HOSTNAME
+          - name: HOST_NAME
             value: $(KUBERNETES_SERVICE_HOST)
 #          - name: JAVA_OPTS
 #            value: -Xms256m -Xmx1024m
