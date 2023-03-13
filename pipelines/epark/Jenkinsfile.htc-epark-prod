@@ -154,9 +154,9 @@ JSON_PARAMS
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "epark-pay-service" ,
-   "SHELL_PARAMS" : "epark-pay-service server 8002 8001 prod",
+   "SHELL_PARAMS" : "epark-pay-service server 8001 8001 prod",
    "IS_ROLL_DEPLOY" : true,
-   "DOCKER_VOLUME_MOUNT" : "",
+   "DOCKER_VOLUME_MOUNT" : "/root/cert:/root/cert",
 }
 
 htc-video-server-prod
@@ -167,7 +167,7 @@ JSON_PARAMS
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "video-service" ,
-   "SHELL_PARAMS" : "video-service server 2234 2234 dev",
+   "SHELL_PARAMS" : "video-service server 1234 2234 dev",
    "IS_MAVEN_SINGLE_MODULE" : true,
    "IS_ROLL_DEPLOY" : true,
    "DOCKER_VOLUME_MOUNT" : "/mnt/stor1:/usr/local/tomcat/webapps/FileUpload/stor1",
