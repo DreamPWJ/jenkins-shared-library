@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Author: 潘维吉
-# Description: API文档管理平台 YApi私有化部署
+# Description: API文档管理平台 YApi私有化部署  ApiFox也不错
 
 cd /my
 
@@ -18,7 +18,7 @@ docker run -d --restart=always -p 27017:27017 \
   mongo
 
 echo "下载YApi镜像"
-docker pull yapipro/yapi:latest
+docker pull jayfong/yapi:latest
 
 echo "自定义配置文件yapi-config.json"
 sudo cat <<EOF >yapi-config.json
@@ -52,7 +52,7 @@ docker run -d --rm \
   --name yapi-init \
   --link mongodb:mongo \
   -v $PWD/yapi-config.json:/yapi/config.json \
-  yapipro/yapi \
+  jayfong/yapi \
   server/install.js
 
 sleep 1s
@@ -61,17 +61,16 @@ echo "启动YApi服务"
 docker run -d --restart=always \
   --name yapi \
   --link mongodb:mongo \
-  -p 6006:6006 \
+  -p 6006:3000 \
   -v $PWD/yapi-config.json:/yapi/config.json \
-  yapipro/yapi \
-  server/app.js
+  jayfong/yapi
 
-sleep 2s
+sleep 3s
 
 echo "在服务器上验证YApi启动是否成功"
-curl localhost:6006
+curl 127.0.0.1:6006
 
 # 管理员登录账号
 # 访问地址  http://ip:6006
 # 登录账号: 406798106@qq.com
-# 密码: ymfe.org or yapi.pro
+# 密码: ymfe.org
