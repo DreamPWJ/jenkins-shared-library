@@ -1844,7 +1844,7 @@ def gitTagLog() {
         def gitChangeLog = changeLog.genChangeLog(this, 100)
         def latestTag = ""
         try {
-            sh ' git fetch --tags ' // 拉取远程分支上所有的tags
+            // sh ' git fetch --tags ' // 拉取远程分支上所有的tags 需要设置用户名密码
             // 获取本地当前分支最新tag名称 git describe --abbrev=0 --tags  获取远程仓库最新tag命令 git ls-remote   获取所有分支的最新tag名称命令 git describe --tags `git rev-list --tags --max-count=1`
             latestTag = Utils.getShEchoResult(this, "git describe --tags `git rev-list --tags --max-count=1`")  // 不同分支下的独立打的tag可能导致tag版本错乱的情况
         } catch (error) {
