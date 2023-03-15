@@ -123,7 +123,7 @@ JSON_PARAMS
    "PROJECT_NAME" : "epark-pay-service" ,
    "SHELL_PARAMS" : "epark-pay-service server 8001 8001 prod",
    "IS_ROLL_DEPLOY" : true,
-   "DOCKER_VOLUME_MOUNT" : "/root/cert:/root/cert",
+   "DOCKER_VOLUME_MOUNT" : "/root/cert:/root/cert,/my/openjdk-11/java.security:/usr/local/openjdk-11/conf/security/java.security",
 }
 
 htc-video-server-prod
