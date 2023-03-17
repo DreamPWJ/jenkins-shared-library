@@ -40,8 +40,8 @@ echo "生成域名相关的SSL证书"
 apt install -y python3-pip && pip3 install certbot-dns-aliyun
 # https://ram.console.aliyun.com/ 申请key和秘钥  并确保您的 RAM 帐户有AliyunDNSFullAccess权限 确保生成证书域名在当前阿里云账号管理
 sudo cat <<EOF >/my/credentials.ini
-certbot_dns_aliyun:dns_aliyun_access_key =
-certbot_dns_aliyun:dns_aliyun_access_key_secret =
+certbot_dns_aliyun:dns_aliyun_access_key = LTAI5t7ggrMqAztoQo1h5CTU
+certbot_dns_aliyun:dns_aliyun_access_key_secret = SlVKGrddYfKFExDFBuOUrzxgjIN9bj
 EOF
 chmod 600 /my/credentials.ini
 
@@ -50,7 +50,7 @@ certbot certonly -a certbot-dns-aliyun:dns-aliyun \
   --certbot-dns-aliyun:dns-aliyun-credentials /my/credentials.ini \
   --certbot-dns-aliyun:dns-aliyun-propagation-seconds 60 \
   --email 406798106@qq.com \
-  -d app-api.panweiji.com
+  -d git.pengbocloud.com
  # -d "*.panweiji.com"
 
 echo "查看生成的SSL证书"
@@ -62,7 +62,7 @@ echo "查看生成的SSL证书"
 # ssl_certificate /etc/letsencrypt/live/domain.com/fullchain.pem;
 # ssl_certificate_key /etc/letsencrypt/live/domain.com/privkey.pem;
 
-cd /etc/letsencrypt/live/ && ls -l
+cd /etc/letsencrypt/live/ || true && ls -l
 
 
 # 如果出现生成失败 如archive directory exists for domain.com-0001 执行删除操作
