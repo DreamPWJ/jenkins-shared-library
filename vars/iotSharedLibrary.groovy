@@ -698,7 +698,7 @@ def uploadOss(map) {
     // 源文件地址
     def sourceFile = "${env.WORKSPACE}/${iotPackageLocation}"
     // 目标文件
-    def targetFile = "iot/${PROJECT_NAME}/${ENV_TYPE}/firmware.${iotPackageType}"
+    def targetFile = "iot/${PROJECT_NAME}/${PLATFORMIO_ENV}/${ENV_TYPE}/firmware.${iotPackageType}"
     iotOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
     println "${iotOssUrl}"
     Tools.printColor(this, "上传固件文件到OSS成功 ✅")
@@ -762,7 +762,7 @@ def otaDiff(map) {
             // 源文件地址
             def sourceFile = "${env.WORKSPACE}/${iotPatchPackageLocation}"
             // 目标文件
-            def targetFile = "iot/${PROJECT_NAME}/${ENV_TYPE}/firmware.${iotPackageType}"
+            def targetFile = "iot/${PROJECT_NAME}/${PLATFORMIO_ENV}/${ENV_TYPE}/firmware.${iotPackageType}"
             iotOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
             println "${iotOssUrl}"
             Tools.printColor(this, "上传差分固件文件到OSS成功 ✅")
@@ -788,7 +788,7 @@ def otaUpgrade(map) {
     // 将固件包上传到OTA服务器、上传设置版本号和新固件地址的JSON升级文件  嵌入式设备会自动检测升级
     // try {
     def sourceJsonFile = "${env.WORKSPACE}/${VERSION_FILE}"
-    def targetJsonFile = "iot/${PROJECT_NAME}/${ENV_TYPE}/${VERSION_FILE}"
+    def targetJsonFile = "iot/${PROJECT_NAME}/${PLATFORMIO_ENV}/${ENV_TYPE}/${VERSION_FILE}"
     otaOssUrl = AliYunOSS.upload(this, map, sourceJsonFile, targetJsonFile)
     println "${otaOssUrl}"
     Tools.printColor(this, "上传OTA固件升级文件到OSS成功 ✅")

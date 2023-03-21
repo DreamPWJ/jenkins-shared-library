@@ -22,13 +22,13 @@ map.put('project_tag', 'IoT物联网')
 // 是否开启OTA空中升级功能
 map.put('is_ota_upgrade', true)
 // 是否是生产环境
-map.put('is_prod', false)
+map.put('is_prod', true)
 // 是否Pipeline内脚本钉钉通知  总开关
 map.put('is_ding_notice', true)
 // 是否通知变更记录
 map.put('is_notice_change_log', true)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', true)
+map.put('is_git_tag', false)
 
 // jenkins分布式构建节点label名称
 map.put('jenkins_node', 'master')
@@ -47,24 +47,59 @@ iotSharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  Jenkinsfile.iot
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.iot-car-lock-prod
 
 /*
 
-test-embedded-monorepo
-测试IoT物联网嵌入式项目
+car-lock-embedded-monorepo
+车位锁控制器嵌入式项目
 
 JSON_PARAMS
 {
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/embedded-monorepo.git" ,
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/embedded-monorepo.git" ,
     "BRANCH_NAME" : "develop" ,
     "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "esp32-demo" ,
-    "PROJECT_CHINESE_NAME" : "测试ESP32单片机" ,
-    "ENV_TYPE" : "sit" ,
+    "PROJECT_NAME" : "car-lock" ,
+    "PROJECT_CHINESE_NAME" : "车位锁控制器" ,
+    "PLATFORMIO_ENV" : "rizhao",
+    "ENV_TYPE" : "prod" ,
+    "IS_MONO_REPO" : true ,
+    "IS_UPLOAD_OSS" : true ,
+    "IS_OTA" : true
+}
+
+juxian-car-lock-embedded-monorepo
+莒县车位锁控制器嵌入式项目
+
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/embedded-monorepo.git" ,
+    "BRANCH_NAME" : "develop" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "car-lock" ,
+    "PROJECT_CHINESE_NAME" : "莒县车位锁" ,
+    "PLATFORMIO_ENV" : "juxian",
+    "ENV_TYPE" : "prod" ,
+    "IS_MONO_REPO" : true ,
+    "IS_UPLOAD_OSS" : true ,
+    "IS_OTA" : true
+}
+
+ground-lock-embedded-monorepo
+地锁控制器嵌入式项目
+
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/embedded-monorepo.git" ,
+    "BRANCH_NAME" : "develop" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "ground-lock" ,
+    "PROJECT_CHINESE_NAME" : "地锁控制器" ,
+    "ENV_TYPE" : "prod" ,
     "IS_MONO_REPO" : true ,
     "IS_UPLOAD_OSS" : true ,
     "IS_OTA" : true ,
+    "IS_OTA_DIFF" : true ,
 }
 
 */
