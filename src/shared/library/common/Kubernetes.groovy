@@ -17,7 +17,7 @@ import shared.library.common.Helm
 class Kubernetes implements Serializable {
 
     static def k8sYAMLFile = "k8s.yaml" // k8s集群应用部署yaml定义文件
-    static def pythonYamlFile = "K8sYaml.py" // 使用Python动态处理Yaml文件
+    static def pythonYamlFile = "k8s_yaml.py" // 使用Python动态处理Yaml文件
 
     /**
      * 声明式执行k8s集群部署

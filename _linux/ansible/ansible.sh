@@ -14,6 +14,8 @@ yum install ansible -y || true
 apt-get install ansible -y || true
 apt-get install sshpass -y || true # 需要hosts设置用户名密码情况 如 ansible_ssh_user=root ansible_ssh_pass=123456
 
+ansible --version
+
 # 查看帮助命令  ansible-doc -l
 ansible groupName -m ping
 ansible groupName -m command -a "pwd"

@@ -47,7 +47,7 @@ iotSharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/embedded/Jenkinsfile.iot-car-lock-prod
+// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/embedded/Jenkinsfile.iot-car-lock-prod
 
 /*
 
