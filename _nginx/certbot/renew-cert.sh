@@ -7,7 +7,7 @@ if [[ ! $(command -v certbot) ]]; then
   # Certbot 目前需要在类 UNIX 操作系统上运行 Python 3.6+。默认情况下，它需要 root 访问权限才能写入 /etc/letsencrypt
   sudo apt-get install -y certbot || true
   sudo yum install -y certbot || true
-  # sudo pip3 install certbot-dns-aliyun
+  # sudo pip install certbot-dns-aliyun
   certbot --version
 fi
 
@@ -18,8 +18,9 @@ find / -type f -name ".certbot.lock" -exec rm {} \;
 # 可用ansible将文件同步到所有服务器
 # 如果提示未到期，cert not due for renewal，可以强制更新 --force-renew  测试90天后续签情况执行添加参数 --dry-run
 # 如果距离过期不到30天 默认不会重新生成证书
-# 出现0001等新目录情况 指定DNS源 -a certbot-dns-aliyun:dns-aliyun  --certbot-dns-aliyun:dns-aliyun-credentials /my/credentials.ini
-certbot renew --certbot-dns-aliyun:dns-aliyun-propagation-seconds 120
+# 出现0001等新目录情况 指定DNS源
+certbot renew
+
 # 重新加载nginx配置才会生效
 docker exec proxy-nginx nginx -t -c /etc/nginx/nginx.conf
 docker exec proxy-nginx nginx -s reload || true
