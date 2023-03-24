@@ -109,7 +109,7 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.pellet-charging-prod
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.pellet-charging-prod
 
 /*
 
@@ -117,7 +117,7 @@ pellet-charging-web-k8s-prod
 颗粒计费Web前端-k8s集群 ❤️
 JSON_PARAMS
 {
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/react-frontend-monorepo.git" ,
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/react-frontend-monorepo.git" ,
     "BRANCH_NAME" : "main" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "pellet-charging-admin" ,
@@ -133,7 +133,7 @@ pellet-charging-app-k8s-prod
 颗粒计费App服务端-k8s集群
 JSON_PARAMS
 {
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/java-backend-monorepo.git" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pellet-charging-app" ,
@@ -147,7 +147,7 @@ pellet-charging-job-k8s-prod
 颗粒计费Job服务端-k8s集群
 JSON_PARAMS
 {
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/java-backend-monorepo.git" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pellet-charging-job" ,

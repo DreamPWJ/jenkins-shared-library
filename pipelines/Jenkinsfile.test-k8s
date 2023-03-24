@@ -109,7 +109,7 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/Jenkinsfile.test-k8s
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/Jenkinsfile.test-k8s
 
 /*
 
@@ -117,7 +117,7 @@ test-k8s-web
 测试K8S集群Web前端 ❤️
 JSON_PARAMS
 {
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/react-frontend-monorepo.git" ,
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/react-frontend-monorepo.git" ,
     "BRANCH_NAME" : "dev" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "pellet-charging-admin" ,

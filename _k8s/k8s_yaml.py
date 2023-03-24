@@ -12,12 +12,12 @@ from ruamel.yaml import YAML
   pip install ruamel.yaml
 """
 
-# 传递参数  执行示例  python K8sYaml.py 1,2,3
+# 传递参数  执行示例  python k8s_yaml.py 1,2,3
 # arg1 = sys.argv[1]
 # argArray = [int(arg1.split(","))]
 # print arg1
 
-# 传递参数  执行示例  python K8sYaml.py  --nfs_params=A,B,C --volume_mounts=AAA/name:BBB/path,CCC:BBB,DDD:BBB
+# 传递参数  执行示例  python k8s_yaml.py  --nfs_params=A,B,C --volume_mounts=AAA/name:BBB/path,CCC:BBB,DDD:BBB
 parser = argparse.ArgumentParser(description='manual to this script')
 parser.add_argument('--k8s_yaml_file', type=str, default="k8s.yaml")
 parser.add_argument('--volume_mounts', type=str, default=None)

@@ -422,6 +422,8 @@ def getInitParams(map) {
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
     // 嵌入式框架类型 1. Arduino  2. ESP-IDF
     IOT_FRAMEWORK_TYPE = jsonParams.IOT_FRAMEWORK_TYPE ? jsonParams.IOT_FRAMEWORK_TYPE.trim() : "1"
+    // PlatformIO的多环境名称 platformio.ini配置
+    PLATFORMIO_ENV = jsonParams.PLATFORMIO_ENV ? jsonParams.PLATFORMIO_ENV.trim() : ""
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
@@ -696,7 +698,7 @@ def uploadOss(map) {
     // 源文件地址
     def sourceFile = "${env.WORKSPACE}/${iotPackageLocation}"
     // 目标文件
-    def targetFile = "iot/${PROJECT_NAME}/${ENV_TYPE}/firmware.${iotPackageType}"
+    def targetFile = "iot/${PROJECT_NAME}/${PLATFORMIO_ENV}/${ENV_TYPE}/firmware.${iotPackageType}"
     iotOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
     println "${iotOssUrl}"
     Tools.printColor(this, "上传固件文件到OSS成功 ✅")
@@ -760,7 +762,7 @@ def otaDiff(map) {
             // 源文件地址
             def sourceFile = "${env.WORKSPACE}/${iotPatchPackageLocation}"
             // 目标文件
-            def targetFile = "iot/${PROJECT_NAME}/${ENV_TYPE}/firmware.${iotPackageType}"
+            def targetFile = "iot/${PROJECT_NAME}/${PLATFORMIO_ENV}/${ENV_TYPE}/firmware.${iotPackageType}"
             iotOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
             println "${iotOssUrl}"
             Tools.printColor(this, "上传差分固件文件到OSS成功 ✅")
@@ -786,7 +788,7 @@ def otaUpgrade(map) {
     // 将固件包上传到OTA服务器、上传设置版本号和新固件地址的JSON升级文件  嵌入式设备会自动检测升级
     // try {
     def sourceJsonFile = "${env.WORKSPACE}/${VERSION_FILE}"
-    def targetJsonFile = "iot/${PROJECT_NAME}/${ENV_TYPE}/${VERSION_FILE}"
+    def targetJsonFile = "iot/${PROJECT_NAME}/${PLATFORMIO_ENV}/${ENV_TYPE}/${VERSION_FILE}"
     otaOssUrl = AliYunOSS.upload(this, map, sourceJsonFile, targetJsonFile)
     println "${otaOssUrl}"
     Tools.printColor(this, "上传OTA固件升级文件到OSS成功 ✅")

@@ -21,9 +21,9 @@ docker pull rabbitmq:management
 #### RabbitMQ docker容器启动 -d开启 守护进程Daemon模式 指定--hostname默认为主机名存储数据 image启动容器的时候会自动生成hostname
 #### 5672端口对应的是amqp，25672端口对应的是clustering，15672端口对应的是http（也就是登录RabbitMQ后台管理端口）
 
-sudo docker run -d --restart=always -p 5672:5672 -p 15672:15672 --name rabbitmq -v /my/rabbitmq:/var/lib/rabbitmq -v
-/etc/localtime:/etc/localtime:ro \
---log-opt max-size=1024m --log-opt max-file=1   \
+sudo docker run -d --restart=always -p 5672:5672 -p 15672:15672 --name rabbitmq \
+-v /my/rabbitmq:/var/lib/rabbitmq -v /etc/localtime:/etc/localtime:ro \
+--log-opt max-size=1024m --log-opt max-file=1 \
 -e RABBITMQ_DEFAULT_USER=root -e RABBITMQ_DEFAULT_PASS=panweiji2020 rabbitmq:management
 
 #### ZooKeeper分布式应用程序调度服务
@@ -58,20 +58,20 @@ docker run -d --restart=always -p 8081:8080  \
 #### RocketMQ消息队列服务  官方文档： https://github.com/apache/rocketmq-docker
 docker pull apache/rocketmq:latest
 
-sudo chmod 777  /my/rocketmq/ -R && mkdir -p /my/rocketmq/broker/conf
+mkdir -p /my/rocketmq/broker/conf && sudo chmod 777  /my/rocketmq/ -R
 
-docker run -d -p 9876:9876 \
+docker run -d --restart=always -p 9876:9876 \
 -v /my/rocketmq/server/logs:/home/rocketmq/logs \
 -e TZ="Asia/Shanghai" -e "JAVA_OPT_EXT=-Xms1024M -Xmx1024M -Xmn128m"  \
 --name rocketmq-server  apache/rocketmq:latest  \
 sh mqnamesrv
 
-docker run -d -p 10909:10909 -p 10911:10911 -p 10912:10912 \
+docker run -d --restart=always -p 10909:10909 -p 10911:10911 -p 10912:10912 \
 -v /my/rocketmq/broker/conf:/home/rocketmq/conf  -v /my/rocketmq/broker/logs:/home/rocketmq/logs -v /my/rocketmq/broker/store:/home/rocketmq/store \
 -e "NAMESRV_ADDR=172.31.3.120:9876"  --privileged=true \
 --name rocketmq-broker  apache/rocketmq:latest  \
 sh mqbroker -c /home/rocketmq/conf/broker.conf
 
-docker run -d -t -p 6765:8080  \
+docker run -d --restart=always -p 6765:8080  \
 -e "JAVA_OPTS=-Drocketmq.namesrv.addr=172.31.3.120:9876" \
 --name rocketmq-dashboard  apacherocketmq/rocketmq-dashboard:latest

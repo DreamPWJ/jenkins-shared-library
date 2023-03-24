@@ -84,7 +84,7 @@ map.put('jenkins_node_front_end', 'master')
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node14')
 map.put('maven', 'Maven3.6')
-map.put('jdk', '8')
+map.put('jdk', '11')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
@@ -109,7 +109,7 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.htc-epark-test
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.htc-epark-test
 
 /*
 
@@ -117,7 +117,7 @@ htc-epark-server-test
 好停车epark平台服务端
 JSON_PARAMS
 {
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark.git" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/epark.git" ,
    "BRANCH_NAME" : "feature/aliyun-mysql" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "epark-server" ,
@@ -131,7 +131,7 @@ htc-open-epark-server-test
 好停车epark转发平台服务端
 JSON_PARAMS
 {
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/openEpark.git" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/openEpark.git" ,
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "open-epark-server" ,
@@ -145,19 +145,19 @@ htc-epark-pay-server-test
 好停车epark支付服务端
 JSON_PARAMS
 {
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark_pay.git" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/epark_pay.git" ,
    "BRANCH_NAME" : "develop" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "epark-pay-service" ,
    "SHELL_PARAMS" : "epark-pay app 8001 8001 dev",
-   "DOCKER_VOLUME_MOUNT" : "/root/cert/app/cert:/root/cert/app/cert"
+   "DOCKER_VOLUME_MOUNT" : "/root/cert:/root/cert,/my/openjdk-11/java.security:/usr/local/openjdk-11/conf/security/java.security",
 }
 
 htc-epark-h5-test
 好停车H5 Web前端 ❤️
 JSON_PARAMS
 {
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/rzhtc.git" ,
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/rzhtc.git" ,
     "BRANCH_NAME" : "rizhao" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "rzhtc" ,

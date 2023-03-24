@@ -74,7 +74,7 @@ appSharedLibrary(map)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.epark-mobile
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.epark-mobile
 
 /*
 
@@ -86,7 +86,7 @@ induction-screen-android-app
 JSON_PARAMS:
 {
     "PROJECT_TYPE" : "1",
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/induction_screen_android.git"
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/induction_screen_android.git"
 }
 
 */

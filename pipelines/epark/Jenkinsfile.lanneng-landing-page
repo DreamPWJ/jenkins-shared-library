@@ -111,7 +111,7 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.lanneng-landing-page
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.lanneng-landing-page
 
 /*
 
@@ -119,7 +119,7 @@ landing-page-k8s-prod
 智慧停车官网Web前端-k8s集群 ❤️
 JSON_PARAMS
 {
-    "REPO_URL" : "http://47.102.214.33/pan.weiji/astrowind-ui.git" ,
+    "REPO_URL" : "https://git.pengbocloud.com/pan.weiji/astrowind-ui.git" ,
     "BRANCH_NAME" : "master" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "landing-page" ,
