@@ -46,7 +46,7 @@ EOF
 
 chmod 600 /my/credentials.ini
 
-# Certbot阿里云DNS自动校验方式生成证书  动手执行 配置
+# Certbot阿里云DNS自动校验方式生成证书  动手执行生成配置
 certbot certonly --email 406798106@qq.com  -d "panweiji.com"
 
 echo "查看生成的SSL证书"

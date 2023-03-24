@@ -805,7 +805,8 @@ def nodeBuildProject() {
                 retry(2) {
                     println("安装依赖 📥")
                     // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱
-                    sh "npm ci || npm install || yarn install || pnpm install" // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
+                    sh "npm ci || npm install || yarn install || pnpm install"
+                    // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
                 }
             }
 
@@ -1124,7 +1125,8 @@ def gitTagLog() {
         try {
             // sh ' git fetch --tags ' // 拉取远程分支上所有的tags 需要设置用户名密码
             // 获取本地当前分支最新tag名称 git describe --abbrev=0 --tags  获取远程仓库最新tag命令 git ls-remote   获取所有分支的最新tag名称命令 git describe --tags `git rev-list --tags --max-count=1`
-            latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")  // 不同分支下的独立打的tag可能导致tag版本错乱的情况
+            // 不同分支下的独立打的tag可能导致tag版本错乱的情况
+            latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")
         } catch (error) {
             println "没有获取到最新的git tag标签"
             println error.getMessage()
