@@ -1832,7 +1832,7 @@ def alwaysPost() {
 }
 
 /**
- * 生成tag和变更日志
+ * 生成版本tag和变更日志
  */
 def gitTagLog() {
     // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行一次jenkins任务才能生效
@@ -1846,20 +1846,22 @@ def gitTagLog() {
         def latestTag = ""
         try {
             if ("${params.VERSION_NUM}".trim() != "") { // 自定义版本号
-                latestTag = "${params.VERSION_NUM}".trim()
+                tagVersion = "${params.VERSION_NUM}".trim()
             } else {
                 // sh ' git fetch --tags ' // 拉取远程分支上所有的tags 需要设置用户名密码
                 // 获取本地当前分支最新tag名称 git describe --abbrev=0 --tags  获取远程仓库最新tag命令 git ls-remote   获取所有分支的最新tag名称命令 git describe --tags `git rev-list --tags --max-count=1`
                 // 不同分支下的独立打的tag可能导致tag版本错乱的情况
                 latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")
+
+                // 生成语义化版本号
+                tagVersion = Utils.genSemverVersion(latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
+                        GlobalVars.gitCommitFeature : GlobalVars.gitCommitFix)
             }
         } catch (error) {
-            println "没有获取到最新的git tag标签"
+            println "生成tag语义化版本号失败"
             println error.getMessage()
         }
-        // 生成语义化版本号
-        tagVersion = Utils.genSemverVersion(latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
-                GlobalVars.gitCommitFeature : GlobalVars.gitCommitFix)
+
         // 生成tag和变更日志
         gitTagLog.genTagAndLog(this, tagVersion, gitChangeLog, "${REPO_URL}", "${GIT_CREDENTIALS_ID}")
     }
