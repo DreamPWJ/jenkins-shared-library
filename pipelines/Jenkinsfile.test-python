@@ -109,7 +109,7 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/Jenkinsfile.test-python
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/Jenkinsfile.test-python
 
 
 /*
@@ -118,7 +118,7 @@ test-python
 测试Python语言流水线
 JSON_PARAMS
 {
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/rsu_controller.git" ,
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/rsu_controller.git" ,
     "BRANCH_NAME" : "main" ,
     "PROJECT_TYPE" : "2" ,
     "COMPUTER_LANGUAGE" : "3" ,

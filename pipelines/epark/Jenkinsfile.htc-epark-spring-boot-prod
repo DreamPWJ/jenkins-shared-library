@@ -109,7 +109,7 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.htc-epark-spring-boot-prod
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.htc-epark-spring-boot-prod
 
 /*
 
@@ -117,7 +117,7 @@ htc-pay-server-prod
 好停车支付平台服务端
 JSON_PARAMS
 {
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark_pay.git" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/epark_pay.git" ,
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "epark-pay-service" ,
@@ -130,7 +130,7 @@ htc-video-server-prod
 好停车路测视频桩服务端
 JSON_PARAMS
 {
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/video.git" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/video.git" ,
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "video-service" ,

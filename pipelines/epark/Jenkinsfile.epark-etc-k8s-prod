@@ -109,7 +109,7 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.epark-etc-k8s-prod
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.epark-etc-k8s-prod
 
 /*
 
@@ -117,7 +117,7 @@ epark-etc-k8s-prod
 好停车ETC收费服务端-k8s集群
 JSON_PARAMS
 {
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/etc.git" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/etc.git" ,
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "epark-etc-app" ,
@@ -132,7 +132,7 @@ epark-etc-web-k8s-prod
 好停车ETC收费 Web前端-k8s集群 ❤️
 JSON_PARAMS
 {
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/etc-admin-web.git" ,
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/etc-admin-web.git" ,
     "BRANCH_NAME" : "main" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "epark-etc-web" ,

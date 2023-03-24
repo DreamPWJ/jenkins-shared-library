@@ -109,7 +109,7 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// http://47.102.214.33/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.htc-epark-k8s-prod
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.htc-epark-k8s-prod
 
 /*
 
@@ -117,7 +117,7 @@ htc-epark-server-k8s-prod
 好停车epark平台服务端-k8s集群
 JSON_PARAMS
 {
-   "REPO_URL" : "http://47.102.214.33/lanneng_develop/epark.git" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/epark.git" ,
    "BRANCH_NAME" : "feature/k8s" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "epark-server" ,
@@ -136,7 +136,7 @@ htc-epark-h5-k8s-prod
 好停车H5 Web前端-k8s集群 ❤️
 JSON_PARAMS
 {
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/rzhtc.git" ,
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/rzhtc.git" ,
     "BRANCH_NAME" : "rizhao" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "rzhtc" ,
@@ -150,7 +150,7 @@ htc-park-coupon-h5-k8s-prod
 好停车优惠券H5 Web前端-k8s集群 ❤️
 JSON_PARAMS
 {
-    "REPO_URL" : "http://47.102.214.33/lanneng_develop/park_coupon.git" ,
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/park_coupon.git" ,
     "BRANCH_NAME" : "master" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "park-coupon" ,
