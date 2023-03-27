@@ -1,7 +1,7 @@
 package shared.library.devops
 
 import shared.library.GlobalVars
-import shared.library.common
+import shared.library.common.*
 
 /**
  * @author 潘维吉
