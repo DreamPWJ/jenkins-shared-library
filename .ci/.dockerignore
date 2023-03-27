@@ -1,5 +1,6 @@
 */log*
 */logs*
+*/tomcat*
 .git
 *.md
 */tomcat*

@@ -80,7 +80,7 @@ labels:      #自定义标签
           items:
         - key: string
 
-### 安装kubectl命令访问k8s集群  环境变量Path中 路径为kubectl.exe所在的文件夹目录
+### 安装kubectl命令访问k8s集群  环境变量Path中 路径为kubectl.exe所在的文件夹目录并双击运行kubectl.exe
 
 - https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/
