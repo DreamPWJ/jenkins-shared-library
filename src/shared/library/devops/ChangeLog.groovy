@@ -1,6 +1,7 @@
 package shared.library.devops
 
 import shared.library.GlobalVars
+import shared.library.common
 
 /**
  * @author 潘维吉
@@ -53,7 +54,12 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
             }
         }
         if (!changeLog) {
-            changeLog = GlobalVars.noChangeLog
+            // 获取GIT某个时间段的提交记录
+            changeLog = Git.getGitLogByTime(ctx)
+            // println "${changeLog}"
+            if (changeLog == "") {
+                changeLog = GlobalVars.noChangeLog
+            }
         } else {
             // 重新组合变更记录
             if (featChangeLog) {
