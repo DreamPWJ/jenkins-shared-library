@@ -22,7 +22,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
             sh("""
                    git config --global user.email "406798106@qq.com"
                    git config --global user.name ${GIT_USERNAME}
-                   git stash
+                   git stash || true
                    git checkout ${ctx.BRANCH_NAME}
                    git pull ${userPassWordUrl}
                    """)
