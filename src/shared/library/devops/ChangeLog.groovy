@@ -56,14 +56,12 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
             }
         }
         if (!changeLog) {
-            // 获取GIT某个时间段的提交记录
-            def gitLogs = Git.getGitLogByTime(ctx)
-            ctx.println "${changeLog}"
-            if ("${changeLog}".trim() == "") {
-                changeLog = GlobalVars.noChangeLog
-            } else {
-                changeLog = gitLogs
-            }
+            // 获取GIT某个时间段的提交记录 防止Jenkins日志多次相同构建导致为空
+            /*     changeLog = Git.getGitLogByTime(ctx)
+                 ctx.println "${changeLog}"
+                 if ("${changeLog}".trim() == "") {*/
+            changeLog = GlobalVars.noChangeLog
+            // }
         } else {
             // 重新组合变更记录
             if (featChangeLog) {
