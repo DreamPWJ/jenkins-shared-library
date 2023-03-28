@@ -71,14 +71,15 @@ class Git implements Serializable {
      * 获取GIT某个时间段的提交记录，并且去除merge信息
      * --since 为时间戳或者日期格式
      */
+    @NonCPS
     static def getGitLogByTime(ctx) {
         try {
             // 如 git log --pretty=format:"%s" --graph --since='2023-03-27 15:55:00' --no-merges
             def jenkins = Jenkins.instance.getItem(ctx.env.JOB_NAME)
-            def lsb = jenkins.getLastSuccessfulBuild()
+            def lsb = jenkins.getLastSuccessfulBuild()  // 上次成功的构建
             def lsbTime = lsb.getTime().format("yyyy-MM-dd HH:mm:ss")
             ctx.println lsbTime
-            return ctx.sh(script: "git log --pretty=format:\"%s\" --graph --since=${lsbTime} --no-merges", returnStatus: true)
+            return ctx.sh(script: "git log --pretty=format:\"%s\" --graph --since='${lsbTime}' --no-merges", returnStatus: true)
         } catch (error) {
             ctx.println "获取GIT某个时间段的提交记录失败"
             ctx.println error.getMessage()
