@@ -57,7 +57,7 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
             // 获取GIT某个时间段的提交记录
             changeLog = Git.getGitLogByTime(ctx)
             println "${changeLog}"
-            if ("${changeLog}".trim() == "") {
+            if ("${changeLog}".trim() == "0" || "${changeLog}".trim() == "") {
                 changeLog = GlobalVars.noChangeLog
             }
         } else {
