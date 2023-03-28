@@ -1,6 +1,7 @@
 package shared.library.common
 
-import shared.library.common.Jenkins
+import shared.library.Utils
+import shared.library.common.*
 import jenkins.model.Jenkins
 
 /**
@@ -79,7 +80,7 @@ class Git implements Serializable {
             def lsb = jenkins.getLastSuccessfulBuild()  // 上次成功的构建
             def lsbTime = lsb.getTime().format("yyyy-MM-dd HH:mm:ss")
             ctx.println lsbTime
-            return ctx.sh(script: "git log --pretty=format:\"%s\" --graph --since='${lsbTime}' --no-merges", returnStatus: true)
+            return Utils.getShEchoResult(ctx, "git log --pretty=format:\"%s\" --graph --since='${lsbTime}' --no-merges")
         } catch (error) {
             ctx.println "获取GIT某个时间段的提交记录失败"
             ctx.println error.getMessage()
