@@ -59,8 +59,8 @@
 
 ### 流水线核心技术
 
-- Jenkins Pipeline、Groovy
-- Docker、Shell、Node、C#、Playwright
+- Jenkins Pipeline、Groovy、Python
+- Kubernetes、Docker、Shell、Node、C#、Playwright
 - Fastlane、Ruby
 
 ### 核心贡献者

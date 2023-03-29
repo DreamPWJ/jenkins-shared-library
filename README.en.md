@@ -59,8 +59,8 @@ Design a general and fully automated DevOps to improve the efficiency and qualit
 
 ### Pipeline core technology
 
-- Jenkins Pipeline, Groovy
-- Docker, Shell, Node, C#, Playwright
+- Jenkins Pipeline, Groovy、Python
+- Kubernetes、Docker, Shell, Node, C#, Playwright
 - Fastlane, Ruby
 
 ### Core contributors
