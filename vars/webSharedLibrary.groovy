@@ -1128,8 +1128,9 @@ def gitTagLog() {
             // 不同分支下的独立打的tag可能导致tag版本错乱的情况
             latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")
         } catch (error) {
-            println "没有获取到最新的git tag标签"
+            println "生成tag语义化版本号失败"
             println error.getMessage()
+            tagVersion = Utils.formatDate() // 获取版本号失败 使用时间格式作为tag
         }
         // 生成语义化版本号
         tagVersion = Utils.genSemverVersion(latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
