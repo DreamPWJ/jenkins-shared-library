@@ -35,10 +35,13 @@ metadata:
     # 后端大文件上传大小
     nginx.ingress.kubernetes.io/client-body-buffer-size: 1024m
     nginx.ingress.kubernetes.io/proxy-max-temp-file-size: 2048m
+    # 开启CORS跨域请求
     nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, DELETE, PATCH, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, DELETE, PATCH, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    # 同时配置http和https都可以访问应用
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 
 spec:
   ingressClassName: lanneng-k8s-ingress
