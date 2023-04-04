@@ -23,12 +23,12 @@ class Utils implements Serializable {
      * 获取 shell 命令输出内容方法
      */
     static def getShEchoResult(ctx, cmd) {
-        def getShEchoResultCmd = "ECHO_RESULT=`${cmd}`\necho  -e \${ECHO_RESULT}"
+        def getShEchoResultCmd = "ECHO_RESULT=`${cmd}`\necho \${ECHO_RESULT}"
         return ctx.sh(
                 script: getShEchoResultCmd,
                 returnStdout: true,
                 encoding: 'UTF-8'
-        ).trim()
+        )
     }
 
     /**
