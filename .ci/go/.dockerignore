@@ -1,4 +1,5 @@
 */*.log
+*/*.log*
 */log*
 */logs*
 .git
