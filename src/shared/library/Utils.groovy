@@ -28,7 +28,7 @@ class Utils implements Serializable {
                 script: getShEchoResultCmd,
                 returnStdout: true,
                 encoding: 'UTF-8'
-        )
+        ).trim()
     }
 
     /**
