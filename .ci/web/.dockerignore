@@ -1,3 +1,4 @@
+*/*.log
 .git
 node_modules*
 *.md
