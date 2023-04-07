@@ -73,7 +73,7 @@ map.put('is_before_deploy_notice', false)
 // 是否通知变更记录
 map.put('is_notice_change_log', true)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', true)
+map.put('is_git_tag', false)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
@@ -114,27 +114,27 @@ sharedLibrary(map)
 /*
 
 htc-pay-server-k8s-prod
-好停车支付平台服务端
+好停车支付平台服务端-k8s集群
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/epark_pay.git" ,
-   "BRANCH_NAME" : "main" ,
+   "BRANCH_NAME" : "develop" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "epark-pay-service" ,
-   "SHELL_PARAMS" : "epark-pay-service server 8001 8001 prod",
+   "SHELL_PARAMS" : "epark-pay-service server 8001 8001 k8s-prod",
    "IS_K8S_DEPLOY" : true,
    "DOCKER_VOLUME_MOUNT" : "/root/cert:/root/cert,/my/openjdk-11/java.security:/usr/local/openjdk-11/conf/security/java.security",
 }
 
 htc-video-server-k8s-prod
-好停车路测视频桩服务端
+好停车路测视频桩服务端-k8s集群
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/video.git" ,
-   "BRANCH_NAME" : "main" ,
+   "BRANCH_NAME" : "develop" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "video-service" ,
-   "SHELL_PARAMS" : "video-service server 1234 2234 prod",
+   "SHELL_PARAMS" : "video-service server 1234 2234 k8s-prod",
    "IS_MAVEN_SINGLE_MODULE" : true,
    "IS_K8S_DEPLOY" : true,
    "NFS_SERVER" : "58.58.179.242",
