@@ -29,25 +29,25 @@ map.put('default_git_branch', ' ')
 // 保持构建的最大个数
 map.put('build_num_keep', 2)
 
-/// Docker相关参数
- // JVM内存设置
- map.put('docker_java_opts', '-Xmx2600m')
- // docker内存限制
- map.put('docker_memory', '3G')
- // docker日志限制
- map.put('docker_log_opts', 'max-size=150m') // --log-opt max-size=50m --log-opt max-file=3
- // docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
- map.put('docker_volume_mount', '')
- // Dockerfile多阶段构建 镜像名称
- map.put('docker_multistage_build_images', ' ')
- // 是否上传镜像到docker容器仓库
- map.put('is_push_docker_repo', true)
- // docker容器镜像仓库账号信任id
- map.put('docker_repo_credentials_id', '73f6b3b0-4580-4acf-b04a-63892fcf9ba8')
- // docker镜像仓库注册地址
- map.put('docker_repo_registry', 'hub-cn-shanghai-2.kce.ksyun.com')
- // docker仓库命名空间名称
- map.put('docker_repo_namespace', 'lanneng')
+// Docker相关参数
+// JVM内存设置
+map.put('docker_java_opts', '-Xmx2600m')
+// docker内存限制
+map.put('docker_memory', '3G')
+// docker日志限制
+map.put('docker_log_opts', 'max-size=150m') // --log-opt max-size=50m --log-opt max-file=3
+// docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
+map.put('docker_volume_mount', '')
+// Dockerfile多阶段构建 镜像名称
+map.put('docker_multistage_build_images', ' ')
+// 是否上传镜像到docker容器仓库
+map.put('is_push_docker_repo', true)
+// docker容器镜像仓库账号信任id
+map.put('docker_repo_credentials_id', '73f6b3b0-4580-4acf-b04a-63892fcf9ba8')
+// docker镜像仓库注册地址
+map.put('docker_repo_registry', 'hub-cn-shanghai-2.kce.ksyun.com')
+// docker仓库命名空间名称
+map.put('docker_repo_namespace', 'lanneng')
 
 // K8S集群相关参数
 // K8S集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins凭据设置界面，类型选择为“Secret file”配置

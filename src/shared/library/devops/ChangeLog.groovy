@@ -57,11 +57,11 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
         }
         if (!changeLog) {
             // 获取Git某个时间段的提交记录 防止Jenkins日志失败构建导致为空
-            changeLog = Git.getGitLogByTime(ctx)
+            changeLog = Git.getGitLogByTime(ctx, maxRecordsNum)  // @NonCPS方法无直接返回值
             if ("${changeLog}".trim() == "") {
                 changeLog = GlobalVars.noChangeLog
             } else {
-                changeLog = changeLog.replaceAll("\\;", " \n ")
+                changeLog = changeLog.toString().replaceAll("\\;", " \n ")
             }
             ctx.println "${changeLog}"
         } else {
