@@ -109,13 +109,7 @@ class Kubernetes implements Serializable {
             yamlDefaultPort = " --default_port=${ctx.SHELL_HOST_PORT} "
             ctx.println("应用服务扩展端口: " + containerPort)
         }
-        // 判断是否存在NFS网络文件服务挂载信息
-        def nfsHostPath = ""    // NFS宿主机文件路径(NFS应用容器内的路径)
-        def nfsServerPath = ""  // NFS服务器文件路径
-        if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") {
-            nfsHostPath = "${ctx.NFS_MOUNT_PATHS}".split(",")[0]
-            nfsServerPath = "${ctx.NFS_MOUNT_PATHS}".split(",")[1]
-        }
+
         // 不同配置环境的相同应用
         if ("${ctx.IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
             if (deployNum != 0) { // k8s内相同应用不同容器镜像标签部署
@@ -145,17 +139,16 @@ class Kubernetes implements Serializable {
         if ("${ctx.DOCKER_VOLUME_MOUNT}".trim() != "") { // 容器挂载映射
             yamlVolumeMounts = "  --volume_mounts=${ctx.DOCKER_VOLUME_MOUNT} "
         }
-        if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") { // NFS服务等
-            yamlNfsParams = "  --nfs_params=${nfsHostPath},${ctx.NFS_SERVER},${nfsServerPath} "
+        if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") { // NFS服务
+            yamlNfsParams = " --nfs_server=${ctx.NFS_SERVER}  --nfs_params=${ctx.NFS_MOUNT_PATHS} "
         }
 
         pythonYamlParams = isYamlUseSession + yamlVolumeMounts + yamlNfsParams + yamlDefaultPort
         if ("${pythonYamlParams}".trim() != "") {
             ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
-                // 使用Python动态处理Yaml文件
+                ctx.println("使用Python的ruamel包动态配置K8S的Yaml文件: " + pythonYamlParams)
                 // ctx.sh " python --version "
                 // ctx.sh " pip install ruamel.yaml "
-                // 使用Python动态处理Yaml文件
                 ctx.sh " python ${pythonYamlFile} --k8s_yaml_file=${ctx.env.WORKSPACE}/${k8sYAMLFile}  ${pythonYamlParams} "
             }
         }

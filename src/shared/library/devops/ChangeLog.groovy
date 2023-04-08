@@ -1,6 +1,9 @@
 package shared.library.devops
 
 import shared.library.GlobalVars
+import shared.library.common.*
+import shared.library.Utils
+import jenkins.model.Jenkins
 
 /**
  * @author 潘维吉
@@ -30,9 +33,9 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
             }
             for (int j = entriesLength - 1; j >= 0; j--) {
                 def entry = entries[j]
-                // ${new Date(entry.timestamp)  ${entry.commitId}
+                // ${new Date(entry.timestamp)  ${entry.affectedPaths}
                 def truncatedMsg = entry.msg.take(60)  // 提交记录长度截取
-                def combinationMsg = "- ${truncatedMsg} " + "([${entry.commitId.substring(0, 7)}](${ctx.REPO_URL.replace('.git', '')}/commit/${entry.commitId})) " + "@${entry.author} \n"
+                def combinationMsg = "- ${truncatedMsg} " + "([${entry.commitId.substring(0, 7)}](${ctx.REPO_URL.replace('.git', '')}/commit/${entry.commitId})) " + "@${entry.author.fullName} \n"
                 // 提交记录信息去重
                 if (!(featChangeLog.contains("${combinationMsg}") || fixChangeLog.contains("${combinationMsg}") || otherChangeLog.contains("${combinationMsg}"))) {
                     if (truncatedMsg.toString().startsWith(GlobalVars.gitCommitFeature)) {
@@ -53,7 +56,14 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
             }
         }
         if (!changeLog) {
-            changeLog = GlobalVars.noChangeLog
+            // 获取Git某个时间段的提交记录 防止Jenkins日志失败构建导致为空
+            changeLog = Git.getGitLogByTime(ctx, maxRecordsNum)  // @NonCPS方法无直接返回值
+            if ("${changeLog}".trim() == "") {
+                changeLog = GlobalVars.noChangeLog
+            } else {
+                changeLog = changeLog.toString().replaceAll("\\;", " \n ")
+            }
+            ctx.println "${changeLog}"
         } else {
             // 重新组合变更记录
             if (featChangeLog) {
@@ -66,11 +76,11 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
                 otherChangeLog = "#### 其它变更 \n" + otherChangeLog
             }
             changeLog = featChangeLog + fixChangeLog + otherChangeLog
-            // println "${changeLog}"
+            // ctx.println "${changeLog}"
         }
         return changeLog
     } catch (e) {
-        println "获取git提交变更记录异常"
-        println e.getMessage()
+        ctx.println "获取Git提交变更记录异常"
+        ctx.println e.getMessage()
     }
 }

@@ -1,6 +1,4 @@
 #!groovy
-package pipelines.epark
-
 @Library('jenkins-shared-library@master') _
 
 /**
@@ -102,7 +100,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', 'openpark-saas')
+map.put('maven_one_level', ' ')
 // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
 map.put('maven_setting_xml', ' ')
 

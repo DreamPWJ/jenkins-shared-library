@@ -84,7 +84,7 @@ map.put('jenkins_node_front_end', 'master')
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node14')
 map.put('maven', 'Maven3.6')
-map.put('jdk', '8')
+map.put('jdk', '11')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
@@ -109,74 +109,36 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.htc-epark-k8s-prod
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.htc-epark-spring-boot-k8s-prod
 
 /*
 
-htc-epark-server-k8s-prod
-好停车epark平台服务端-k8s集群
+htc-pay-server-k8s-prod
+好停车支付平台服务端-k8s集群
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/epark.git" ,
-   "BRANCH_NAME" : "feature/k8s" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "epark-server" ,
-   "SHELL_PARAMS" : "epark server 8090 8080 prod",
-   "IS_MAVEN_SINGLE_MODULE" : true,
-   "JAVA_FRAMEWORK_TYPE" : "2",
-   "IS_DIFF_CONF_IN_DIFF_MACHINES": true,
-   "SOURCE_TARGET_CONFIG_DIR" : "resources/rizhao-k8s,resources",
-   "NFS_SERVER" : "58.58.179.242",
-   "NFS_MOUNT_PATHS" : "/usr/local/tomcat/webapps/FileUpload/stor:/mnt/stor,/usr/local/tomcat/webapps/FileUpload/stor1:/mnt/stor1,/usr/local/tomcat/webapps/FileUpload/vpaas_m2m/epark/stor1/epark/thirdParkImgs:/mnt/stor/vpaas_m2m/epark/stor1/epark/thirdParkImgs",
-   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml,/my/tomcat/context.xml:/usr/local/tomcat/conf/context.xml" ,
-   "IS_K8S_DEPLOY" : true,
-   "APPLICATION_DOMAIN" : "http://epark.ggjtss.cn",
-}
-
-htc-open-epark-server-k8s-prod
-好停车open epark平台服务端-k8s集群
-JSON_PARAMS
-{
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/openEpark.git" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/epark_pay.git" ,
    "BRANCH_NAME" : "develop" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "open-epark-server" ,
-   "SHELL_PARAMS" : "open-epark server 8091 8080 prod",
+   "PROJECT_NAME" : "epark-pay-service" ,
+   "SHELL_PARAMS" : "epark-pay-service server 8001 8001 k8s-prod",
+   "IS_K8S_DEPLOY" : true,
+   "DOCKER_VOLUME_MOUNT" : "/root/cert:/root/cert,/my/openjdk-11/java.security:/usr/local/openjdk-11/conf/security/java.security",
+}
+
+htc-video-server-k8s-prod
+好停车路测视频桩服务端-k8s集群
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/video.git" ,
+   "BRANCH_NAME" : "develop" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "video-service" ,
+   "SHELL_PARAMS" : "video-service server 1234 2234 k8s-prod",
    "IS_MAVEN_SINGLE_MODULE" : true,
    "IS_K8S_DEPLOY" : true,
-   "JAVA_FRAMEWORK_TYPE" : "2",
-   "SOURCE_TARGET_CONFIG_DIR" : "resource/rizhao-k8s,resource",
-   "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server-open-epark.xml:/usr/local/tomcat/conf/server.xml"
-}
-
-
-
-htc-epark-h5-k8s-prod
-好停车H5 Web前端-k8s集群 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/rzhtc.git" ,
-    "BRANCH_NAME" : "rizhao" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "rzhtc" ,
-    "SHELL_PARAMS" : "rzhtc h5 9000 80 prod" ,
-    "NPM_RUN_PARAMS" : "build:rizhao",
-    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf",
-    "IS_K8S_DEPLOY" : true,
-}
-
-htc-park-coupon-h5-k8s-prod
-好停车优惠券H5 Web前端-k8s集群 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/park_coupon.git" ,
-    "BRANCH_NAME" : "master" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "park-coupon" ,
-    "SHELL_PARAMS" : "park-coupon h5 8008 80 prod" ,
-    "NPM_RUN_PARAMS" : "build",
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf",
-    "IS_K8S_DEPLOY" : true,
+   "NFS_SERVER" : "58.58.179.242",
+   "NFS_MOUNT_PATHS" : "/usr/local/tomcat/webapps/FileUpload/stor1:/mnt/stor1",
 }
 
 */

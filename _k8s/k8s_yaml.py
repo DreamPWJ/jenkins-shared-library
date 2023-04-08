@@ -23,6 +23,7 @@ parser.add_argument('--k8s_yaml_file', type=str, default="k8s.yaml")
 parser.add_argument('--volume_mounts', type=str, default=None)
 parser.add_argument('--cpu_shares', type=str, default=None)
 parser.add_argument('--memory', type=str, default=None)
+parser.add_argument('--nfs_server', type=str, default=None)
 parser.add_argument('--nfs_params', type=str, default=None)
 parser.add_argument('--default_port', type=int, default=None)
 parser.add_argument('--remote_debug_port', type=int, default=None)
@@ -48,19 +49,21 @@ if volume_mounts is not None:
         volume_host_mounts_yaml.append({"name": volume_mounts_name, "hostPath": {"path": volume_mounts_host_path}})
 
 # NFS网络文件系统参数
+nfs_server = args.nfs_server
 nfs_params = args.nfs_params
-nsf_mount_yaml = None
-nsf_server_yaml = None
+nsf_mount_yaml = []
+nsf_server_yaml = []
 if nfs_params is not None:
     print(nfs_params)
-    nfs_array = nfs_params.split(",")
-    nfs_mount_path = nfs_array[0]
-    nfs_server = nfs_array[1]
-    nfs_server_path = nfs_array[2]
-    nfs_name = "nfs-storage"
-    nsf_mount_yaml = {"name": nfs_name, "mountPath": nfs_mount_path}
-    # readOnly设置False 而 NFS服务器是只读模式 可能导致Pod无法启动
-    nsf_server_yaml = {"name": nfs_name, "nfs": {"server": nfs_server, "path": nfs_server_path, "readOnly": False}}
+    nfs_params_array = nfs_params.split(",")
+    for index in range(len(nfs_params_array)):
+        nfs_name = "nfs-storage-"+ str(index) # 数组方式做多NFS目录映射
+        nfs_path_array = nfs_params_array[index].strip().split(":")
+        nfs_mount_path = nfs_path_array[0]
+        nfs_server_path = nfs_path_array[1]
+        nsf_mount_yaml.append({"name": nfs_name, "mountPath": nfs_mount_path})
+        # readOnly设置False 而 NFS服务器是只读模式 可能导致Pod无法启动
+        nsf_server_yaml.append({"name": nfs_name, "nfs": {"server": nfs_server, "path": nfs_server_path, "readOnly": False}})
 
 # 业务应用是否使用Session
 is_use_session = args.is_use_session
@@ -99,10 +102,10 @@ if volume_mounts is not None:
 # NFS网络文件系统参数处理
 if nfs_params is not None:
     yaml_volume_mounts.extend(
-        [nsf_mount_yaml]
+        [*nsf_mount_yaml]
     )
     yaml_volume.extend(
-        [nsf_server_yaml]
+        [*nsf_server_yaml]
     )
 
 # 业务应用是否使用Session处理

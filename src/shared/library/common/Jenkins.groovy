@@ -12,7 +12,7 @@ class Jenkins implements Serializable {
      * 获取当前构建的Git变更文件集合
      */
     static def getChangedFilesList(ctx) {
-       def changedFiles = []
+        def changedFiles = []
         for (changeLogSet in ctx.currentBuild.changeSets) {
             for (entry in changeLogSet.getItems()) { // 对于检测到的更改中的每个提交
                 for (file in entry.getAffectedFiles()) {
@@ -21,6 +21,27 @@ class Jenkins implements Serializable {
             }
         }
         return changedFiles
+    }
+
+    /**
+     * 获取变更的模块 用于自动发布指定模块
+     */
+    def getAutoPublishModule(pathPrefix) {
+        // 使用Set容器去重，保证待发布模块只有一份
+        def modulePaths = new HashSet<String>();
+        for (def filePath in getChangedFilesList()) {
+            // 忽略非模块的文件，比如 Jenkinsfile 等
+            if (filePath.startsWith(pathPrefix)) {
+                // 从超过模块前缀长度的下标开始，获取下一个/的位置。即分串位置
+                int index = filePath.indexOf('/', pathPrefix.length() + 1)
+                // 分串得到模块路径，比如 develop/panweiji/app
+                def modulePath = filePath.substring(0, index)
+                // println 'add module path: ' + modulePath
+                modulePaths.add(modulePath)
+            }
+        }
+        println '自动获取变更发布模块列表：' + modulePaths
+        return modulePaths;
     }
 
     /**

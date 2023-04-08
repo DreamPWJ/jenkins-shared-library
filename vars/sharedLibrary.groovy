@@ -53,7 +53,7 @@ def call(String type = 'web-java', Map map) {
                 gitParameter(name: 'GIT_TAG', type: 'PT_TAG', defaultValue: GlobalVars.noGit, selectedValue: GlobalVars.noGit,
                         useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*',
                         description: "DEPLOY_MODE基于" + GlobalVars.release + "部署方式, 可选择指定Git Tag版本标签构建, 默认不选择是获取指定分支下的最新代码, 选择后按tag代码而非分支代码构建⚠️, 同时可作为一键回滚版本使用 🔙 ")
-                string(name: 'VERSION_NUM', defaultValue: "", description: '选填 自定义设置语义化版本号x.y.z 如1.0.0 (默认不填写 自动生成的版本号并且语义化自增) 🖊 ')
+                string(name: 'VERSION_NUM', defaultValue: "", description: '选填 自定义语义化版本号x.y.z 如1.0.0 (默认不填写 自动生成的版本号并且语义化自增) 🖊 ')
                 string(name: 'ROLLBACK_BUILD_ID', defaultValue: '0', description: "DEPLOY_MODE基于" + GlobalVars.rollback + "部署方式, 输入对应保留的回滚构建记录ID, " +
                         "默认0是回滚到上一次连续构建, 当前归档模式的回滚仅适用于在master节点构建的任务")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
@@ -786,7 +786,7 @@ def getInitParams(map) {
     APPLICATION_DOMAIN = jsonParams.APPLICATION_DOMAIN ? jsonParams.APPLICATION_DOMAIN.trim() : ""
     // NFS网络文件服务地址
     NFS_SERVER = jsonParams.NFS_SERVER ? jsonParams.NFS_SERVER.trim() : ""
-    // 挂载宿主机路径与NFS服务器文件路径映射关系 NFS宿主机文件路径 NFS服务器文件路径  逗号,分割
+    // 挂载宿主机路径与NFS服务器文件路径映射关系 NFS宿主机文件路径 NFS服务器文件路径 映射关系:冒号分割 多个逗号,分割
     NFS_MOUNT_PATHS = jsonParams.NFS_MOUNT_PATHS ? jsonParams.NFS_MOUNT_PATHS.trim() : ""
     // 自定义健康探测HTTP路径Path  默认根目录 /
     CUSTOM_HEALTH_CHECK_PATH = jsonParams.CUSTOM_HEALTH_CHECK_PATH ? jsonParams.CUSTOM_HEALTH_CHECK_PATH.trim() : "/"
@@ -1842,7 +1842,7 @@ def gitTagLog() {
     // 构建成功后生产环境并发布类型自动打tag和变更记录  指定tag方式不再重新打tag
     if (params.IS_GIT_TAG == true && "${IS_PROD}" == 'true' && params.GIT_TAG == GlobalVars.noGit) {
         // 获取变更记录
-        def gitChangeLog = changeLog.genChangeLog(this, 100)
+        def gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", " \n ")
         def latestTag = ""
         try {
             if ("${params.VERSION_NUM}".trim() != "") { // 自定义版本号
@@ -1860,6 +1860,7 @@ def gitTagLog() {
         } catch (error) {
             println "生成tag语义化版本号失败"
             println error.getMessage()
+            tagVersion = Utils.formatDate() // 获取版本号失败 使用时间格式作为tag
         }
 
         // 生成tag和变更日志
@@ -2018,7 +2019,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             )
         } else if (type == 3) { // 变更记录
             if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
-                def gitChangeLog = changeLog.genChangeLog(this, 10)
+                def gitChangeLog = changeLog.genChangeLog(this, 10).replaceAll("\\;", " \n ")
                 if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
                     def titlePrefix = "${PROJECT_TAG} BUILD#${env.BUILD_NUMBER}"
                     try {
