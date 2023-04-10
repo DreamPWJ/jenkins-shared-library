@@ -197,10 +197,8 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         // 生产环境不进行代码分析 缩减构建时间
-                        anyOf {
-                            branch 'develop'
-                            branch 'feature*'
-                        }
+                        branch 'develop'
+                        //branch 'feature*'
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             // 是否进行代码质量分析  && fileExists("sonar-project.properties") == true 代码根目录配置sonar-project.properties文件才进行代码质量分析
@@ -514,7 +512,6 @@ def call(String type = 'web-java', Map map) {
 
                 stage('灰度发布') {
                     when {
-                        // branch 'master'
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
@@ -562,7 +559,6 @@ def call(String type = 'web-java', Map map) {
 
                 stage('Serverless工作流') {
                     when {
-                        // branch 'master'
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
@@ -606,7 +602,6 @@ def call(String type = 'web-java', Map map) {
 
                 stage('制品仓库') {
                     when {
-                        // branch 'master'
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             return false  // 是否进行制品仓库
@@ -621,7 +616,6 @@ def call(String type = 'web-java', Map map) {
 
                 stage('Prometheus运维') {
                     when {
-                        // branch 'master'
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             return false  // 是否进行部署监控
