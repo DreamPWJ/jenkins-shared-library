@@ -198,7 +198,7 @@ def call(String type = 'web-java', Map map) {
                         beforeAgent true
                         // 生产环境不进行代码分析 缩减构建时间
                         // branch 'develop'
-                        //branch 'feature*'
+                        // branch 'feature*'
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             // 是否进行代码质量分析  && fileExists("sonar-project.properties") == true 代码根目录配置sonar-project.properties文件才进行代码质量分析
@@ -216,7 +216,7 @@ def call(String type = 'web-java', Map map) {
                         docker {
                             // js、jvm、php、jvm-android、python、php。 jvm-community是免费版
                             image 'jetbrains/qodana-jvm'
-                            args " --entrypoint='' -v ${env.WORKSPACE}/qodana/:/data/project/ -v ${env.WORKSPACE}/qodana/:/data/results/ -v $HOME/.m2/:/root/.m2/ "
+                            args " --entrypoint='' -v ${env.WORKSPACE}:/data/project/ -v ${env.WORKSPACE}/qodana/:/data/results/ -v $HOME/.m2/:/root/.m2/ "
                             reuseNode true // 使用根节点
                         }
                     }
