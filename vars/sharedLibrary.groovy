@@ -197,11 +197,9 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         // 生产环境不进行代码分析 缩减构建时间
-                        not {
-                            anyOf {
-                                branch 'develop'
-                                branch 'feature*'
-                            }
+                        anyOf {
+                            branch 'develop'
+                            branch 'feature*'
                         }
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
@@ -219,7 +217,7 @@ def call(String type = 'web-java', Map map) {
                            }*/
                         docker {
                             // js、jvm、php、jvm-android、python、php。 jvm-community是免费版
-                            image 'jetbrains/qodana-jvm-community'
+                            image 'jetbrains/qodana-jvm'
                             args " --entrypoint='' -v ${env.WORKSPACE}/qodana/:/data/project/ -v ${env.WORKSPACE}/qodana/:/data/results/ -v $HOME/.m2/:/root/.m2/ "
                             reuseNode true // 使用根节点
                         }
