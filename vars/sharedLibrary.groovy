@@ -197,7 +197,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         // 生产环境不进行代码分析 缩减构建时间
-                        branch 'develop'
+                        // branch 'develop'
                         //branch 'feature*'
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
