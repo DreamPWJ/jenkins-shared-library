@@ -18,7 +18,7 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
     // 思路: 可以在上次构建失败后获取到变更日志存储, 等下次构建发现无变更日志时候再获取, 获取成功后再删除日志存储
     try {
         ctx.println("开始生成自定义变更日志")
-        def changeLog = ""
+        def changeLogs = ""
         def featChangeLog = ""
         def fixChangeLog = ""
         def otherChangeLog = ""
@@ -52,18 +52,18 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
                         }
                     }
                 }
-                changeLog += combinationMsg
+                changeLogs += combinationMsg
             }
         }
-        if (!changeLog) {
+        if (!changeLogs) {
             // 获取Git某个时间段的提交记录 防止Jenkins日志失败构建导致为空
-            changeLog = Git.getGitLogByTime(ctx, maxRecordsNum)  // @NonCPS方法无直接返回值
-            if ("${changeLog}".trim() == "") {
-                changeLog = GlobalVars.noChangeLog
+            changeLogs = Git.getGitLogByTime(ctx, maxRecordsNum)  // @NonCPS方法无直接返回值
+            if ("${changeLogs}".trim() == "") {
+                changeLogs = GlobalVars.noChangeLog
             } else {
-                changeLog = changeLog.toString().replaceAll("\\;", " \n ")
+                changeLogs = changeLogs.toString().replaceAll("\\;", " \n ")
             }
-            ctx.println "${changeLog}"
+            println "${changeLogs}"
         } else {
             // 重新组合变更记录
             if (featChangeLog) {
@@ -75,12 +75,12 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
             if (otherChangeLog) {
                 otherChangeLog = "#### 其它变更 \n" + otherChangeLog
             }
-            changeLog = featChangeLog + fixChangeLog + otherChangeLog
-            // ctx.println "${changeLog}"
+            changeLogs = featChangeLog + fixChangeLog + otherChangeLog
+            // println "${changeLogs}"
         }
-        return changeLog
+        return changeLogs
     } catch (e) {
-        ctx.println "获取Git提交变更记录异常"
-        ctx.println e.getMessage()
+        println "获取Git提交变更记录异常"
+        println e.getMessage()
     }
 }

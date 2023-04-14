@@ -14,7 +14,9 @@ class Qodana implements Serializable {
      * 文档: https://www.jetbrains.com/help/qodana/jenkins.html
      */
     static def analyse(ctx) {
-        // CLI 应该从具有qodana.yaml
+        ctx.sh " qodana --show-report "
+
+/*        // CLI 应该从具有qodana.yaml
         def qodanaFile = "${ctx.env.WORKSPACE}/ci/_jenkins/qodana/qodana.yaml"
         // ctx.sh "export QODANA=${qodanaFile}"
         // 质量门是 Qdana 可以在不导致 CI/CD 工作流或管道失败的情况下检测到的最大问题数量 一旦达到质量门限，Qodana 就会以退出代码 255 终止
@@ -22,7 +24,7 @@ class Qodana implements Serializable {
         // 执行分析命令
         ctx.sh "mkdir -p qodana-reports"
         ctx.sh "chmod +x qodana-reports"
-        ctx.sh "qodana --save-report ${qualityGate}"
+        ctx.sh "qodana --show-report ${qualityGate}"*/
 
         // 展示HTML报告
   /*      sh "mkdir -p /var/www/qodana/${config.qodana_path}"
