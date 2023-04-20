@@ -1,0 +1,70 @@
+#!/bin/bash
+# Author: 潘维吉
+# Description: 自定义git hook提交信息规范 文件提交权限 代码格式化等
+# 启动Spring Boot服务后 将自动复制本文件到本地项目.git/hooks目录下 才能生效
+
+# Git提交信息
+MSG=$(awk '{printf("%s",$0)}' $1)
+
+(git diff --cached --name-status | while read status file; do
+  if [[ ${file} =~ CodeGenerator.java || ${file} =~ MavenGenerator.java || ${file} =~ ApiGenerator.java || ${file} =~ .ftl ]]; then
+    if [[ $(git config user.name) == panweiji ]]; then
+      echo "超级管理员具有全部文件提交权限!"
+    elif [[ $MSG =~ Merge\d* ]]; then
+      echo -e " Git自动Merge合并的信息跳过 ✅ "
+    else
+      echo "您没有${file}代码生成文件的提交权限, 请联系超级管理员!!!"
+      exit 1
+    fi
+  fi
+
+  if [[ ${file} =~ athena ]]; then
+    #  管理员姓名为本地git用户名
+    if [[ $(git config user.name) == panweiji || $(git config user.name) == Dream ]]; then
+      echo "管理员具有核心文件提交权限!"
+    elif [[ $MSG =~ Merge\d* ]]; then
+      echo -e " Git自动Merge合并的信息跳过 ✅ "
+    else
+      echo "您没有${file}核心athena文件的提交权限, 请联系超级管理员!!!"
+      exit 1
+    fi
+  fi
+
+done) && (
+  types="feat|fix|test|refactor|docs|style|chore|build|perf|ci|revert|release"
+
+  if [[ $MSG =~ ^(${types}):' '.*$ || $MSG =~ ^(${types})\(.*\):' '.*$ ]]; then
+    # 判断git提交记录类型和描述是否一致
+    if [[ $MSG =~ feat ]]; then
+      feat_error_keyword="修复|修改|bug|删除|是否|合并|优化|重构|异常|测试|调试|说明|文档|回滚|样式|调整|BUG|Bug"
+      if [[ $MSG =~ ${feat_error_keyword} ]]; then
+        echo -e " ❌ Git提交信息不符合规范, 提交记录类型feat和描述不一致, 错误关键字: ${feat_error_keyword}"
+        exit 1
+      fi
+    fi
+    echo -e " Git提交成功 ✅ "
+  elif [[ $MSG =~ Merge\d* ]]; then
+    echo -e " Git自动合并的信息跳过 ✅ "
+    #    if [[ $MSG =~ origin/dev ]]; then
+    #      echo -e " 自动去除多余的Merge branch提交记录 使Git提交记录更简洁 "
+    #      git rebase origin/dev
+    #    fi
+  else
+    echo -e " ❌ Git提交信息不符合规范 , 类型必须是其中之一 [${types}], 英文:冒号后加单空格 再加提交说明 。"
+    echo -e " 示例: feat(app): 用户登录功能 "
+    exit 1
+  fi
+)
+
+#mkdir -p .cache
+#cd .idea
+#format_version=1.7
+#if [ ! -f google-java-format-${format_version}-all-deps.jar ]; then
+#  curl -LJO "https://github.com/google/google-java-format/releases/download/google-java-format-${format_version}/google-java-format-${format_version}-all-deps.jar"
+#  chmod 755 google-java-format-${format_version}-all-deps.jar
+#fi
+#cd ..
+#
+#changed_java_files=$(git diff --cached --name-only --diff-filter=ACMR | grep ".*java$")
+#echo $changed_java_files
+#java -jar .idea/google-java-format-${format_version}-all-deps.jar --replace $changed_java_files
