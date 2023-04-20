@@ -55,7 +55,7 @@ map.put('docker_repo_registry', 'registry.cn-qingdao.aliyuncs.com')
 map.put('docker_repo_namespace', 'lexiang')
 
 // K8S集群相关参数
-// K8S集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins凭据设置界面，类型选择为“Secret file”配置
+// K8S集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
 map.put('k8s_credentials_ids', ' ')
 // K8S集群私有镜像仓库拉取密钥 在集群内使用kubectl create secret命令生成
 map.put('k8s_image_pull_secrets', ' ')
@@ -95,7 +95,7 @@ map.put('jdk', '11')
 map.put('ci_git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
 map.put('git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
 map.put('ding_talk_credentials_id', 'ba0ebec7-73ad-4a26-af8b-d15c470b1328')
-// OSS对象存储访问凭据配置 Jenkins凭据设置界面，类型选择为“Secret file”配置
+// OSS对象存储访问凭据配置 Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
 map.put('oss_credentials_id', ' ')
 
 // 服务器上部署所在的文件夹名称
