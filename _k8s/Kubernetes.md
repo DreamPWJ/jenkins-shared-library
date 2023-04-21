@@ -100,6 +100,7 @@ labels:      #自定义标签
 - helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.6.3 --set startupapicheck.timeout=5m --set installCRDs=true
 - kubectl get pods --namespace cert-manager
 - helm uninstall cert-manager -n cert-manager
+- kubectl get cert  和  kubectl get cert  CERT-NAME -o yaml
 
 ### K8S集群安装 Prometheus与安装 Grafana监控
 
