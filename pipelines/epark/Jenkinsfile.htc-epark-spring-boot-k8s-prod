@@ -124,10 +124,11 @@ JSON_PARAMS
    "SHELL_PARAMS" : "epark-pay-service server 8001 8001 k8s-prod",
    "IS_K8S_DEPLOY" : true,
    "DOCKER_VOLUME_MOUNT" : "/root/cert:/root/cert,/my/openjdk-11/java.security:/usr/local/openjdk-11/conf/security/java.security",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check",
 }
 
 htc-video-server-k8s-prod
-好停车路测视频桩服务端-k8s集群
+好停车路侧视频桩服务端-k8s集群
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/video.git" ,
@@ -139,6 +140,7 @@ JSON_PARAMS
    "IS_K8S_DEPLOY" : true,
    "NFS_SERVER" : "58.58.179.242",
    "NFS_MOUNT_PATHS" : "/usr/local/tomcat/webapps/FileUpload/stor1:/mnt/stor1",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check",
 }
 
 */
