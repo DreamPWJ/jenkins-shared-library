@@ -31,13 +31,13 @@ spec:
       - name: {APP_COMMON_NAME}
         image: {IMAGE_URL}:{IMAGE_TAG}
         imagePullPolicy: Always       # 强制拉取线上镜像
-#        resources:
+        resources:
 #          requests:
 #            cpu: 300m
 #            memory: 512Mi
-#          limits:
+          limits:
 #            cpu: 600m
-#            memory: 2048Mi
+           memory: {MAX_MEMORY_SIZE}i
         ports:
         - containerPort: {CONTAINER_PORT}
         env:
