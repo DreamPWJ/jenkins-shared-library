@@ -130,7 +130,7 @@ JSON_PARAMS
    "NFS_MOUNT_PATHS" : "/usr/local/tomcat/webapps/FileUpload/stor:/mnt/stor,/usr/local/tomcat/webapps/FileUpload/stor1:/mnt/stor1,/usr/local/tomcat/webapps/FileUpload/vpaas_m2m/epark/stor1/epark/thirdParkImgs:/mnt/stor/vpaas_m2m/epark/stor1/epark/thirdParkImgs",
    "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml,/my/tomcat/context.xml:/usr/local/tomcat/conf/context.xml" ,
    "IS_K8S_DEPLOY" : true,
-   "APPLICATION_DOMAIN" : "http://epark.ggjtss.cn",
+   "APPLICATION_DOMAIN" : "https://epark.pengbocloud.com",
 }
 
 htc-open-epark-server-k8s-prod
@@ -146,9 +146,9 @@ JSON_PARAMS
    "IS_K8S_DEPLOY" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
    "SOURCE_TARGET_CONFIG_DIR" : "resource/rizhao-k8s,resource",
-   "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server-open-epark.xml:/usr/local/tomcat/conf/server.xml"
+   "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server-open-epark.xml:/usr/local/tomcat/conf/server.xml",
+   "APPLICATION_DOMAIN" : "https://open-epark-api.pengbocloud.com",
 }
-
 
 
 htc-epark-h5-k8s-prod
@@ -163,6 +163,7 @@ JSON_PARAMS
     "NPM_RUN_PARAMS" : "build:rizhao",
     "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf",
     "IS_K8S_DEPLOY" : true,
+    "APPLICATION_DOMAIN" : "https://epark-h5.pengbocloud.com",
 }
 
 htc-park-coupon-h5-k8s-prod
