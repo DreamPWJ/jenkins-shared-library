@@ -32,6 +32,12 @@ metadata:
     # add an annotation indicating the issuer to use
     cert-manager.io/cluster-issuer: letsencrypt-prod-epark
     acme.cert-manager.io/http01-edit-in-place: "true"
+    # 负载均衡算法 如ip_hash
+    nginx.ingress.kubernetes.io/upstream-hash-by: "$host"
+    # Session保持配置
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/affinity-mode: "persistent"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
     # 后端大文件上传大小
     nginx.ingress.kubernetes.io/client-body-buffer-size: 1024m
     nginx.ingress.kubernetes.io/proxy-max-temp-file-size: 2048m
@@ -41,7 +47,7 @@ metadata:
     nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, DELETE, PATCH, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
     # 同时配置http和https都可以访问应用
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 
 spec:
   ingressClassName: lanneng-park
