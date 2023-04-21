@@ -36,7 +36,7 @@ spec:
 #            cpu: 300m
 #            memory: 512Mi
           limits:
-#            cpu: 600m
+           #cpu: 800m  # m是千分之一  100m是0.1个CPU
            memory: {MAX_MEMORY_SIZE}i
         ports:
         - containerPort: {CONTAINER_PORT}
