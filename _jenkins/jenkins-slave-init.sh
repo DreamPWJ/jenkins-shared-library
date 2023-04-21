@@ -12,10 +12,11 @@ fi
 if [[ ! $(command -v java) ]]; then
   echo "安装jdk"
   # yum install -y java-11-openjdk-devel.x86_64 # java-1.8.0-openjdk-devel.x86_64
-  # sudo apt update
+  sudo apt update || true
   sudo apt install -y openjdk-11-jdk || true
   java -version
   which java
+  # apt-get remove openjdk*
 fi
 
 if [[ ! $(command -v node) ]]; then

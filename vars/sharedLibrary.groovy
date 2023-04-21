@@ -1648,6 +1648,8 @@ def syncScript() {
             Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
             // scp -r  递归复制整个目录 复制部署脚本和配置文件到服务器
             sh " chmod -R 777 .ci && scp ${proxyJumpSCPText} -r .ci/*  ${remote.user}@${remote.host}:/${DEPLOY_FOLDER}/ "
+            // 处理 .dockerignore文件被忽略了
+            sh " chmod -R 777 .ci && scp ${proxyJumpSCPText} .ci/.dockerignore  ${remote.user}@${remote.host}:/${DEPLOY_FOLDER}/ "
         } catch (error) {
             println "复制部署脚本和配置文件到服务器失败 ❌"
             println error.getMessage()

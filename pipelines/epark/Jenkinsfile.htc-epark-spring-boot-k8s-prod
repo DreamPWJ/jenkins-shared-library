@@ -11,7 +11,7 @@
 def map = [:]
 
 // 远程服务器地址 k8s集群方式可填空或填公网代理负载IP
-map.put('remote_ip', '120.92.140.41')
+map.put('remote_ip', '120.92.149.246')
 // 工作服务器地址 同时支持N个服务器自动化分布式部署
 map.put('remote_worker_ips', [])
 // 远程服务器用户名
@@ -50,8 +50,8 @@ map.put('docker_repo_registry', 'hub-cn-shanghai-2.kce.ksyun.com')
 map.put('docker_repo_namespace', 'lanneng')
 
 // K8S集群相关参数
-// K8S集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins凭据设置界面，类型选择为“Secret file”配置
-map.put('k8s_credentials_ids', '74a3d376-cb4c-4a20-9bf7-7300a5eaa84d')
+// K8S集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
+map.put('k8s_credentials_ids', 'a1d2642d-296f-47a2-8d1a-087b46e3255e')
 // K8S集群私有镜像仓库拉取密钥 在集群内使用kubectl create secret命令生成
 map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
@@ -90,7 +90,7 @@ map.put('jdk', '11')
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
 map.put('git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
 map.put('ding_talk_credentials_id', 'd33ae0ba-e531-41c8-8983-d9734e53a25a')
-// OSS对象存储访问凭据配置 Jenkins凭据设置界面，类型选择为“Secret file”配置
+// OSS对象存储访问凭据配置 Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
 map.put('oss_credentials_id', ' ')
 
 // 服务器上部署所在的文件夹名称
@@ -124,10 +124,11 @@ JSON_PARAMS
    "SHELL_PARAMS" : "epark-pay-service server 8001 8001 k8s-prod",
    "IS_K8S_DEPLOY" : true,
    "DOCKER_VOLUME_MOUNT" : "/root/cert:/root/cert,/my/openjdk-11/java.security:/usr/local/openjdk-11/conf/security/java.security",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check",
 }
 
 htc-video-server-k8s-prod
-好停车路测视频桩服务端-k8s集群
+好停车路侧视频桩服务端-k8s集群
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/video.git" ,
@@ -139,6 +140,7 @@ JSON_PARAMS
    "IS_K8S_DEPLOY" : true,
    "NFS_SERVER" : "58.58.179.242",
    "NFS_MOUNT_PATHS" : "/usr/local/tomcat/webapps/FileUpload/stor1:/mnt/stor1",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check",
 }
 
 */
