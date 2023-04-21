@@ -125,3 +125,7 @@ kubectl run my-nginx --image=nginx --replicas=3 --port=80
 
 kubectl create secret docker-registry <name> --docker-server=DOCKER_REGISTRY_SERVER --docker-username=DOCKER_USER
 --docker-password=DOCKER_PASSWORD --docker-email=DOCKER_EMAIL
+
+### 在IDEA内查看K8S容器日志乱码问题
+
+idea64.exe.vmoptions配置文件中添加 -Dfile.encoding=UTF-8 即可解决
