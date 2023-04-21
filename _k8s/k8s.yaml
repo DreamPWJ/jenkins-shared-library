@@ -43,8 +43,6 @@ spec:
         env:
           - name: TZ
             value: Asia/Shanghai
-          - name: LC_ALL
-            value: zh_CN.utf8
           - name: SPRING_PROFILES_ACTIVE
             value: {SPRING_PROFILE}
           - name: EXTEND_PORT
