@@ -31,13 +31,14 @@ spec:
       - name: {APP_COMMON_NAME}
         image: {IMAGE_URL}:{IMAGE_TAG}
         imagePullPolicy: Always       # 强制拉取线上镜像
-#        resources:  # 合理设置内存 防止内存溢出 导致整个服务器宕机
+        resources:  # 合理设置内存 防止内存溢出 导致整个服务器宕机
 #          requests:
 #            cpu: 300m
 #            memory: 512Mi
-#          limits:
+
+          limits:
            #cpu: 800m  # m是千分之一  100m是0.1个CPU
-           #memory: {MAX_MEMORY_SIZE}i
+           memory: {MAX_MEMORY_SIZE}i
         ports:
         - containerPort: {CONTAINER_PORT}
         env:
