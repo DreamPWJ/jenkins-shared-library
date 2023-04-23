@@ -126,9 +126,9 @@ kubectl run my-nginx --image=nginx --replicas=3 --port=80
 kubectl create secret docker-registry <name> --docker-server=DOCKER_REGISTRY_SERVER --docker-username=DOCKER_USER
 --docker-password=DOCKER_PASSWORD --docker-email=DOCKER_EMAIL
 
-### 使用K8S集群内全域名访问 K8S内置Core DNS  因为集群内网ClusterIP如果Service被删除会变化
+### 使用K8S集群内全域名访问 K8S内置Core DNS解析  因为集群内网ClusterIP如果Service被删除会变化 域名可应对变化
 
-示例 如 http://server-service.default.svc.cluster.local:8090
+示例 如 http://k8s-service.default.svc.cluster.local:8080
 
 ### 在IDEA内查看K8S容器日志乱码问题
 
