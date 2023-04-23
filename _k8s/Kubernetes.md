@@ -100,7 +100,7 @@ labels:      #自定义标签
 - helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.6.3 --set startupapicheck.timeout=5m --set installCRDs=true
 - kubectl get pods --namespace cert-manager
 - helm uninstall cert-manager -n cert-manager
-- kubectl get cert  和  kubectl get cert  CERT-NAME -o yaml
+- kubectl get cert 和 kubectl get cert CERT-NAME -o yaml
 
 ### K8S集群安装 Prometheus与安装 Grafana监控
 
@@ -125,6 +125,10 @@ kubectl run my-nginx --image=nginx --replicas=3 --port=80
 
 kubectl create secret docker-registry <name> --docker-server=DOCKER_REGISTRY_SERVER --docker-username=DOCKER_USER
 --docker-password=DOCKER_PASSWORD --docker-email=DOCKER_EMAIL
+
+### 使用K8S集群内全域名访问 K8S内置Core DNS  因为集群内网ClusterIP如果Service被删除会变化
+
+示例 如 http://server-service.default.svc.cluster.local:8090
 
 ### 在IDEA内查看K8S容器日志乱码问题
 
