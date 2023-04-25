@@ -875,7 +875,7 @@ def gitTagLog() {
         // 获取变更记录
         def gitChangeLog = ""
         if ("${Constants.IOT_DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESC) {
-            gitChangeLog = changeLog.genChangeLog(this, 100)
+            gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", " \n ")
         } else {
             // 使用自定义文案
             gitChangeLog = "${params.VERSION_DESC}"
@@ -984,7 +984,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
 
         } else if (type == 3) { // 变更记录
             if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
-                def gitChangeLog = changeLog.genChangeLog(this, 10)
+                def gitChangeLog = changeLog.genChangeLog(this, 10).replaceAll("\\;", " \n ")
                 if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
                     dingtalk(
                             robot: "${DING_TALK_CREDENTIALS_ID}",
