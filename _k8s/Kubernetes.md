@@ -128,7 +128,7 @@ kubectl create secret docker-registry <name> --docker-server=DOCKER_REGISTRY_SER
 
 ### 使用K8S集群内全域名访问 K8S内置Core DNS解析  因为集群内网ClusterIP如果Service被删除会变化 域名可应对变化
 
-示例 如 http://k8s-service.default.svc.cluster.local:8080
+示例 如 http://k8s-service-name.default.svc.cluster.local:8080
 
 ### 在IDEA内查看K8S容器日志乱码问题
 

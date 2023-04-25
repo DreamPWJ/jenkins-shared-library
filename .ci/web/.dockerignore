@@ -1,5 +1,7 @@
 */*.log
 */*.log*
+*/log/*
+*/logs/*
 .git
 node_modules*
 *.md
