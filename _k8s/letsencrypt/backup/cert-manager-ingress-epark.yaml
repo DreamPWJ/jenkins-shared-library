@@ -63,8 +63,10 @@ spec:
       secretName: open-epark-api.pengbocloud.com-tls
     - hosts:
         - epark-video-api.pengbocloud.com
-        - eparkvideo.pengbocloud.com
       secretName: epark-video-api.pengbocloud.com-tls
+    - hosts:
+        - eparkvideo.pengbocloud.com
+      secretName: eparkvideo.pengbocloud.com-tls
     - hosts:
         - epark-pay-api.pengbocloud.com
       secretName: epark-pay-api.pengbocloud.com-tls
