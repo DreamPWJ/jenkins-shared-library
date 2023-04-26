@@ -63,6 +63,7 @@ spec:
       secretName: open-epark-api.pengbocloud.com-tls
     - hosts:
         - epark-video-api.pengbocloud.com
+        - eparkvideo.pengbocloud.com
       secretName: epark-video-api.pengbocloud.com-tls
     - hosts:
         - epark-pay-api.pengbocloud.com
@@ -105,6 +106,18 @@ spec:
                 #服务端口
                 port:
                   number: 8091
+            pathType: Prefix
+    - host: eparkvideo.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: video-service-server-service
+                #服务端口
+                port:
+                  number: 1234
             pathType: Prefix
     - host: epark-video-api.pengbocloud.com
       http:
