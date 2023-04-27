@@ -32,11 +32,9 @@ metadata:
     # add an annotation indicating the issuer to use
     cert-manager.io/cluster-issuer: letsencrypt-prod-epark
     acme.cert-manager.io/http01-edit-in-place: "true"
-
     # 后端大文件上传大小
     nginx.ingress.kubernetes.io/client-body-buffer-size: 1024m
     nginx.ingress.kubernetes.io/proxy-max-temp-file-size: 2048m
-
     # 配置是否同时支持http和https访问应用
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 
