@@ -1129,6 +1129,8 @@ def nodeBuildProject() {
     if ("${IS_MONO_REPO}" == 'true') {
         sh "cd ${monoRepoProjectDir} && tar -zcvf ${NPM_PACKAGE_FOLDER}.tar.gz ${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 "
     } else {
+        // 代码内微信认证文件复制
+        // sh " cp MP_verify_*.txt ${NPM_PACKAGE_FOLDER} "
         sh "tar -zcvf ${NPM_PACKAGE_FOLDER}.tar.gz ${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 "
     }
 

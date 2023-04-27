@@ -31,13 +31,14 @@ spec:
       - name: {APP_COMMON_NAME}
         image: {IMAGE_URL}:{IMAGE_TAG}
         imagePullPolicy: Always       # 强制拉取线上镜像
-#        resources:
+#        resources:  # 合理设置内存 防止内存溢出 导致整个服务器宕机 如0/3 nodes are available: 3 Insufficient memory
 #          requests:
 #            cpu: 300m
 #            memory: 512Mi
-#          limits:
-#            cpu: 600m
-#            memory: 2048Mi
+          #limits:
+           #cpu: 800m  # m是千分之一  100m是0.1个CPU
+           # 设置memory应用最大使用内存 限制防止雪崩现象导致其它服务不可用
+           #memory: {MAX_MEMORY_SIZE}i
         ports:
         - containerPort: {CONTAINER_PORT}
         env:
@@ -49,8 +50,8 @@ spec:
             value: "{CONTAINER_PORT}"
           - name: HOST_NAME
             value: $(KUBERNETES_SERVICE_HOST)
-#          - name: JAVA_OPTS
-#            value: -Xms256m -Xmx1024m
+          - name: JAVA_OPTS
+            value: -Xms128m {JAVA_OPTS_XMX} # 最大堆内存 如 -Xmx1024m
         # 优雅停机  Pod被删除时，状态置为 Terminating 。 kube-proxy 更新转发规则，将 Pod 从 service 的 endpoint 列表中摘除掉，新的流量不再转发到该 Pod
         lifecycle:
           preStop:

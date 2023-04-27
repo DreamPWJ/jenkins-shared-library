@@ -40,7 +40,7 @@ metadata:
     nginx.ingress.kubernetes.io/cors-allow-origin: "*"
     nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, DELETE, PATCH, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
-    # 同时配置http和https都可以访问应用
+    # 配置是否同时支持http和https访问应用
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 
 spec:

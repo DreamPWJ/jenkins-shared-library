@@ -85,22 +85,22 @@ labels:      #自定义标签
 - https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/
 
-### 安装Helm包管理工具
+### 安装Helm包管理工具  设置环境变量在helm.exe目录
 
 - https://github.com/helm/helm/releases
 
 ### K8S集群使用 cert-manager基于 ACME 协议与 Let's Encrypt 自动签发与续签免费的SSL证书 [文档](https://help.aliyun.com/document_detail/409430.html)
 
 - kubectl create namespace cert-manager
-- helm repo update
 - helm repo add jetstack https://charts.jetstack.io
+- helm repo update
 
 ##### ！！！注意cert-manager版本要和K8S版本匹配  比如1.7.0以上开启ServerSideApply影响Secret证书生成  ServerSideApply是k8s的v1.22版本生产可用
 
-- helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.6.3 --set
-  startupapicheck.timeout=5m --set installCRDs=true
+- helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.6.3 --set startupapicheck.timeout=5m --set installCRDs=true
 - kubectl get pods --namespace cert-manager
 - helm uninstall cert-manager -n cert-manager
+- kubectl get cert 和 kubectl get cert CERT-NAME -o yaml
 
 ### K8S集群安装 Prometheus与安装 Grafana监控
 
@@ -125,3 +125,11 @@ kubectl run my-nginx --image=nginx --replicas=3 --port=80
 
 kubectl create secret docker-registry <name> --docker-server=DOCKER_REGISTRY_SERVER --docker-username=DOCKER_USER
 --docker-password=DOCKER_PASSWORD --docker-email=DOCKER_EMAIL
+
+### 使用K8S集群内全域名访问 K8S内置Core DNS解析  因为集群内网ClusterIP如果Service被删除会变化 域名可应对变化
+
+示例 如 http://k8s-service-name.default.svc.cluster.local:8080
+
+### 在IDEA内查看K8S容器日志乱码问题
+
+idea64.exe.vmoptions配置文件中添加 -Dfile.encoding=UTF-8 即可解决

@@ -118,7 +118,7 @@ htc-epark-server-test
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/epark.git" ,
-   "BRANCH_NAME" : "feature/aliyun-mysql" ,
+   "BRANCH_NAME" : "develop" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "epark-server" ,
    "SHELL_PARAMS" : "epark server 8086 8080 test",
@@ -132,13 +132,13 @@ htc-open-epark-server-test
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/openEpark.git" ,
-   "BRANCH_NAME" : "main" ,
+   "BRANCH_NAME" : "develop" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "open-epark-server" ,
    "SHELL_PARAMS" : "open-epark server 8087 8080 test",
    "IS_MAVEN_SINGLE_MODULE" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
-   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
+   "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server-open-epark.xml:/usr/local/tomcat/conf/server.xml"
 }
 
 htc-epark-pay-server-test
