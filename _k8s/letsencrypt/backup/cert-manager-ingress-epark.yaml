@@ -62,6 +62,9 @@ spec:
     - hosts:
         - open-epark-api.pengbocloud.com
       secretName: open-epark-api.pengbocloud.com-tls
+    - hosts:
+        - epark-coupon.pengbocloud.com
+      secretName: epark-coupon.pengbocloud.com-tls
 
   rules:
     #自定义域名
@@ -100,4 +103,16 @@ spec:
                 #服务端口
                 port:
                   number: 8091
+            pathType: Prefix
+    - host: epark-coupon.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: park-coupon-web-service
+                #服务端口
+                port:
+                  number: 9002
             pathType: Prefix
