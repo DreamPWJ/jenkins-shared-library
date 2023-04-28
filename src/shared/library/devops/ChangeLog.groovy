@@ -61,7 +61,7 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
             if ("${changeLogs}".trim() == "") {
                 changeLogs = GlobalVars.noChangeLog
             } else {
-                changeLogs = changeLogs.toString().replaceAll("\\;", " \n ")
+                changeLogs = changeLogs.toString().replaceAll("\\;", "\n")
             }
             println "${changeLogs}"
         } else {
