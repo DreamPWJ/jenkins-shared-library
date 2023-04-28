@@ -1,9 +1,7 @@
-*/*.log
-*/*.log*
-*/log*
-*/logs*
-*/log/*
-*/logs/*
-*/tomcat*
+**/*.log
+**/*.log*
+**/log/**
+**/logs/**
+**/tomcat/**
 .git
 *.md

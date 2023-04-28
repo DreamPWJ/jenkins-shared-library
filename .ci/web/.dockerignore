@@ -1,7 +1,7 @@
-*/*.log
-*/*.log*
-*/log/*
-*/logs/*
+**/*.log
+**/*.log*
+**/log/**
+**/logs/**
 .git
-node_modules*
+**/node_modules/**
 *.md
