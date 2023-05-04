@@ -1120,7 +1120,7 @@ def gitTagLog() {
     // 构建成功后生产环境并发布类型自动打tag和变更记录 指定tag方式不再重新打tag
     if (params.IS_GIT_TAG == true && "${IS_PROD}" == 'true' && params.GIT_TAG == GlobalVars.noGit) {
         // 获取变更记录
-        def gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", " \n ")
+        def gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", "\n")
         def latestTag = ""
         try {
             // sh ' git fetch --tags ' // 拉取远程分支上所有的tags 需要设置用户名密码
@@ -1133,7 +1133,7 @@ def gitTagLog() {
             tagVersion = Utils.formatDate() // 获取版本号失败 使用时间格式作为tag
         }
         // 生成语义化版本号
-        tagVersion = Utils.genSemverVersion(latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
+        tagVersion = Utils.genSemverVersion(this, latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
                 GlobalVars.gitCommitFeature : GlobalVars.gitCommitFix)
         // 生成tag和变更日志
         gitTagLog.genTagAndLog(this, tagVersion, gitChangeLog, "${REPO_URL}", "${GIT_CREDENTIALS_ID}")
@@ -1241,7 +1241,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             )
         } else if (type == 3) { // 变更记录
             if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
-                def gitChangeLog = changeLog.genChangeLog(this, 10).replaceAll("\\;", " \n ")
+                def gitChangeLog = changeLog.genChangeLog(this, 10).replaceAll("\\;", "\n")
                 if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
                     def titlePrefix = "${PROJECT_TAG} BUILD#${env.BUILD_NUMBER}"
                     try {

@@ -645,7 +645,7 @@ def getVersion() {
                 // println(versionJson.version)
                 // println(versionJson.file)
                 // 自增版本号
-                def newVersion = Utils.genSemverVersion(versionJson.version)
+                def newVersion = Utils.genSemverVersion(this, versionJson.version)
                 println("自增版本号: " + newVersion)
                 IOT_VERSION_NUM = newVersion
                 // 写入本地版本文件
@@ -875,7 +875,7 @@ def gitTagLog() {
         // 获取变更记录
         def gitChangeLog = ""
         if ("${Constants.IOT_DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESC) {
-            gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", " \n ")
+            gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", "\n")
         } else {
             // 使用自定义文案
             gitChangeLog = "${params.VERSION_DESC}"
@@ -984,7 +984,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
 
         } else if (type == 3) { // 变更记录
             if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
-                def gitChangeLog = changeLog.genChangeLog(this, 10).replaceAll("\\;", " \n ")
+                def gitChangeLog = changeLog.genChangeLog(this, 10).replaceAll("\\;", "\n")
                 if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
                     dingtalk(
                             robot: "${DING_TALK_CREDENTIALS_ID}",

@@ -1,8 +1,6 @@
-*/*.log
-*/*.log*
-*/log*
-*/logs*
-*/log/*
-*/logs/*
+**/*.log
+**/*.log*
+**/log/**
+**/logs/**
 .git
 *.md

@@ -1837,7 +1837,7 @@ def gitTagLog() {
     // 构建成功后生产环境并发布类型自动打tag和变更记录  指定tag方式不再重新打tag
     if (params.IS_GIT_TAG == true && "${IS_PROD}" == 'true' && params.GIT_TAG == GlobalVars.noGit) {
         // 获取变更记录
-        def gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", " \n ")
+        def gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", "\n")
         def latestTag = ""
         try {
             if ("${params.VERSION_NUM}".trim() != "") { // 自定义版本号
@@ -1845,11 +1845,11 @@ def gitTagLog() {
             } else {
                 // sh ' git fetch --tags ' // 拉取远程分支上所有的tags 需要设置用户名密码
                 // 获取本地当前分支最新tag名称 git describe --abbrev=0 --tags  获取远程仓库最新tag命令 git ls-remote   获取所有分支的最新tag名称命令 git describe --tags `git rev-list --tags --max-count=1`
-                // 不同分支下的独立打的tag可能导致tag版本错乱的情况
+                // 不同分支下的独立打的tag可能导致tag版本错乱的情况  过滤掉非语义化版本的tag版本号
                 latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")
 
                 // 生成语义化版本号
-                tagVersion = Utils.genSemverVersion(latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
+                tagVersion = Utils.genSemverVersion(this, latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
                         GlobalVars.gitCommitFeature : GlobalVars.gitCommitFix)
             }
         } catch (error) {
@@ -2014,7 +2014,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             )
         } else if (type == 3) { // 变更记录
             if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
-                def gitChangeLog = changeLog.genChangeLog(this, 10).replaceAll("\\;", " \n ")
+                def gitChangeLog = changeLog.genChangeLog(this, 10).replaceAll("\\;", "\n")
                 if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
                     def titlePrefix = "${PROJECT_TAG} BUILD#${env.BUILD_NUMBER}"
                     try {

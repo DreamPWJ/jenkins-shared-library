@@ -145,6 +145,7 @@ JSON_PARAMS
    "IS_MAVEN_SINGLE_MODULE" : true,
    "IS_K8S_DEPLOY" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
+   "K8S_POD_REPLICAS" : "6",
    "SOURCE_TARGET_CONFIG_DIR" : "resource/rizhao-k8s,resource",
    "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server-open-epark.xml:/usr/local/tomcat/conf/server.xml",
    "APPLICATION_DOMAIN" : "https://open-epark-api.pengbocloud.com",
@@ -174,10 +175,11 @@ JSON_PARAMS
     "BRANCH_NAME" : "master" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "park-coupon" ,
-    "SHELL_PARAMS" : "park-coupon h5 8008 80 prod" ,
+    "SHELL_PARAMS" : "park-coupon web 9002 80 prod" ,
     "NPM_RUN_PARAMS" : "build",
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf",
+    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao-k8s.conf",
     "IS_K8S_DEPLOY" : true,
+    "APPLICATION_DOMAIN" : "https://epark-coupon.pengbocloud.com",
 }
 
 */

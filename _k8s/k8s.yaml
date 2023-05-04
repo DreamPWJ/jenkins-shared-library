@@ -85,8 +85,8 @@ spec:
           httpGet:
             path: {CUSTOM_HEALTH_CHECK_PATH}
             port: {DEFAULT_CONTAINER_PORT}
-          initialDelaySeconds: 120
-          periodSeconds: 30
+          initialDelaySeconds: 180
+          periodSeconds: 60
           timeoutSeconds: 2
           successThreshold: 1      # 连续探测1次成功表示成功
           failureThreshold: 3
@@ -111,11 +111,11 @@ spec:
       # kubectl create secret docker-registry panweiji2022 --docker-server=registry.cn-qingdao.aliyuncs.com  --docker-username=2000160180 --docker-password=panweiji@2022--docker-email=406798106@qq.com --namespace=default
       imagePullSecrets:
         - name: {K8S_IMAGE_PULL_SECRETS}
-  # 部署更新策略
+  # K8S部署更新策略
 #  strategy:
 #    type: RollingUpdate  # 滚动更新 “RollingUpdate”是默认值   Recreate类型在创建新 Pod 之前，所有现有的 Pod 会被杀死
 #    rollingUpdate:  # 滚动更新速率控制
-#      maxSurge: 25%   # 过期望副本数最大比例或最大值  值越小，越能保证服务稳定，更新越平滑
+#      maxSurge: 25%   # 过期望副本数最大比例或最大值  值越小，越能保证服务稳定，更新越平滑  可为整数（比如 3），也可是百分百，向上取整。 maxSurge 默认值为 25%
 #      maxUnavailable: 25%  # 最大不可用副本数最大比例或最大值  值调的越大，副本更新速度越快
 
 ---

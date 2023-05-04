@@ -615,7 +615,7 @@ def setVersion() {
         if ("${params.VERSION_NUM}".trim() == "") { // 没有手动输入版本号情况
             if (params.GIT_TAG == GlobalVars.noGit) {
                 // 自增版本号
-                def newVersion = Utils.genSemverVersion(versionJson.version)
+                def newVersion = Utils.genSemverVersion(this, versionJson.version)
                 println("自增版本号: " + newVersion)
                 DESKTOP_VERSION_NUM = newVersion
             } else { // 回滚版本情况
@@ -925,7 +925,7 @@ def gitTagLog() {
         // 获取变更记录
         def gitChangeLog = ""
         if ("${Constants.DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESCRIPTION) {
-            gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", " \n ")
+            gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", "\n")
         } else {
             // 使用自定义文案
             gitChangeLog = "${params.VERSION_DESCRIPTION}"
@@ -1005,7 +1005,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                 if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
                     def gitChangeLog = ""
                     if ("${Constants.DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESCRIPTION) {
-                        gitChangeLog = changeLog.genChangeLog(this, 10).replaceAll("\\;", " \n ")
+                        gitChangeLog = changeLog.genChangeLog(this, 10).replaceAll("\\;", "\n")
                     } else {
                         // 使用自定义文案
                         gitChangeLog = "${params.VERSION_DESCRIPTION}".replace("\\n", "\\n ##### ")

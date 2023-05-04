@@ -44,10 +44,11 @@ metadata:
     # 开启CORS跨域请求
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-max-age: "64800"
     nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, DELETE, PATCH, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
     # 配置是否同时支持http和https访问应用
-    # nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 
 spec:
   ingressClassName: lanneng-park
@@ -61,6 +62,9 @@ spec:
     - hosts:
         - open-epark-api.pengbocloud.com
       secretName: open-epark-api.pengbocloud.com-tls
+    - hosts:
+        - epark-coupon.pengbocloud.com
+      secretName: epark-coupon.pengbocloud.com-tls
 
   rules:
     #自定义域名
@@ -99,4 +103,16 @@ spec:
                 #服务端口
                 port:
                   number: 8091
+            pathType: Prefix
+    - host: epark-coupon.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: park-coupon-web-service
+                #服务端口
+                port:
+                  number: 9002
             pathType: Prefix
