@@ -41,14 +41,22 @@ class Utils implements Serializable {
     /**
      * 语义化版本自动生成器
      */
-    static def genSemverVersion(String versionNum = '1.0.0', type = GlobalVars.gitCommitFix) {
+    static def genSemverVersion(ctx, String versionNum = '1.0.0', type = GlobalVars.gitCommitFix) {
         /*  语义化主版本 major 版本Git提交必须以 BREAKING CHANGE:开头
             语义化次版本 minor 版本Git提交必须以 feat: 开头
-            语义化补丁版 patch 版本Git提交必须以 fix: 开头
+            语义化补丁版 patch 版本Git提交必须以 fix: 开头0
             语义化测试版 如 2.1.0-beta.2 , Git提交必须含有alpha、beta、rc */
         try {
             versionNum = versionNum.replaceAll("v", "").replaceAll("V", "") // 去掉前缀
             def regex = '^(([0-9]|([1-9]([0-9]*))).){2}([0-9]|([1-9]([0-9]*)))([-](([0-9A-Za-z]|([1-9A-Za-z]([0-9A-Za-z]*)))[.]){0,}([0-9A-Za-z]|([1-9A-Za-z]([0-9A-Za-z]*)))){0,1}([+](([0-9A-Za-z]{1,})[.]){0,}([0-9A-Za-z]{1,})){0,1}$'
+            if (!isRegexMatcher(regex, versionNum)) {
+                int index = 0
+                while (isRegexMatcher(regex, versionNum)) {  // 查询到符合语义化版本的Tag  防止tag不符合标准导致生成版本号无法连续
+                    index++
+                    versionNum = getShEchoResult(ctx, "git describe --abbrev=$index --tags")
+                }
+                ctx.println("循环查询到符合语义化版本的Tag为: " + versionNum)
+            }
             if (isRegexMatcher(regex, versionNum)) {
                 def version = versionNum.split("\\.")
                 if (type.contains("BREAKING CHANGE")) { // 主版本 major

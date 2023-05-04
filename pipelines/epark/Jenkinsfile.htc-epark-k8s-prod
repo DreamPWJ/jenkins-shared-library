@@ -145,6 +145,7 @@ JSON_PARAMS
    "IS_MAVEN_SINGLE_MODULE" : true,
    "IS_K8S_DEPLOY" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
+   "K8S_POD_REPLICAS" : "6",
    "SOURCE_TARGET_CONFIG_DIR" : "resource/rizhao-k8s,resource",
    "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server-open-epark.xml:/usr/local/tomcat/conf/server.xml",
    "APPLICATION_DOMAIN" : "https://open-epark-api.pengbocloud.com",

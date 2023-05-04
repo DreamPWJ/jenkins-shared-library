@@ -615,7 +615,7 @@ def setVersion() {
         if ("${params.VERSION_NUM}".trim() == "") { // 没有手动输入版本号情况
             if (params.GIT_TAG == GlobalVars.noGit) {
                 // 自增版本号
-                def newVersion = Utils.genSemverVersion(versionJson.version)
+                def newVersion = Utils.genSemverVersion(this, versionJson.version)
                 println("自增版本号: " + newVersion)
                 DESKTOP_VERSION_NUM = newVersion
             } else { // 回滚版本情况

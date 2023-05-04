@@ -50,12 +50,12 @@ spec:
     - hosts:
         - epark-pay-api.pengbocloud.com
       secretName: epark-pay-api.pengbocloud.com-tls
-    - hosts:
-        - traffic-api.pengbocloud.com
-      secretName: traffic-api.pengbocloud.com-tls
-    - hosts:
-        - traffic.pengbocloud.com
-      secretName: traffic.pengbocloud.com-tls
+#    - hosts:
+#        - traffic-api.pengbocloud.com
+#      secretName: traffic-api.pengbocloud.com-tls
+#    - hosts:
+#        - traffic.pengbocloud.com
+#      secretName: traffic.pengbocloud.com-tls
 
   rules:
     #自定义域名
@@ -95,27 +95,27 @@ spec:
                 port:
                   number: 8001
             pathType: Prefix
-    - host: traffic-api.pengbocloud.com
-      http:
-        paths:
-          - path: /
-            backend:
-              #服务名称
-              service:
-                name: traffic-server-service
-                #服务端口
-                port:
-                  number: 8083
-            pathType: Prefix
-    - host: traffic.pengbocloud.com
-      http:
-        paths:
-          - path: /
-            backend:
-              #服务名称
-              service:
-                name: traffic-web-service
-                #服务端口
-                port:
-                  number: 8009
-            pathType: Prefix
+#    - host: traffic-api.pengbocloud.com
+#      http:
+#        paths:
+#          - path: /
+#            backend:
+#              #服务名称
+#              service:
+#                name: traffic-server-service
+#                #服务端口
+#                port:
+#                  number: 8083
+#            pathType: Prefix
+#    - host: traffic.pengbocloud.com
+#      http:
+#        paths:
+#          - path: /
+#            backend:
+#              #服务名称
+#              service:
+#                name: traffic-web-service
+#                #服务端口
+#                port:
+#                  number: 8009
+#            pathType: Prefix

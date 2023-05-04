@@ -1133,7 +1133,7 @@ def gitTagLog() {
             tagVersion = Utils.formatDate() // 获取版本号失败 使用时间格式作为tag
         }
         // 生成语义化版本号
-        tagVersion = Utils.genSemverVersion(latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
+        tagVersion = Utils.genSemverVersion(this, latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
                 GlobalVars.gitCommitFeature : GlobalVars.gitCommitFix)
         // 生成tag和变更日志
         gitTagLog.genTagAndLog(this, tagVersion, gitChangeLog, "${REPO_URL}", "${GIT_CREDENTIALS_ID}")

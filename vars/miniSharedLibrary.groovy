@@ -555,7 +555,7 @@ def getVersion() {
                 // println(versionJson.version)
                 // println(versionJson.versionDesc)
                 // 自增版本号
-                def newVersion = Utils.genSemverVersion(versionJson.version)
+                def newVersion = Utils.genSemverVersion(this, versionJson.version)
                 println("自增版本号: " + newVersion)
                 MINI_VERSION_NUM = newVersion
                 // 写入本地版本文件
