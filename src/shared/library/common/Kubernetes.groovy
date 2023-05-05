@@ -78,13 +78,15 @@ class Kubernetes implements Serializable {
                 ctx.println("K8S集群部署完成 ✅")
             }
         }
+
+        ctx.println("等待K8S集群所有节点全部启动完成...")
         // K8S滚动部署需要时间 延迟等待 防止钉钉已经通知部署完成 但是新服务没有真正启动完成
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
             ctx.sleep(time: 15, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
         }
         ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date()) // 计算应用启动时间
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-            ctx.sleep(time: 30, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
+            ctx.sleep(time: Integer.parseInt(ctx.K8S_POD_REPLICAS) * 12, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
         }
         ctx.sleep(time: 15, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
     }
