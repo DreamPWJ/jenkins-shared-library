@@ -771,7 +771,7 @@ def getInitParams(map) {
     SOURCE_TARGET_CONFIG_DIR = jsonParams.SOURCE_TARGET_CONFIG_DIR ? jsonParams.SOURCE_TARGET_CONFIG_DIR.trim() : ""
     // 不同项目通过文件目录区分放在相同的仓库中 设置Git代码项目文件夹名称 用于找到相关应用源码
     GIT_PROJECT_FOLDER_NAME = jsonParams.GIT_PROJECT_FOLDER_NAME ? jsonParams.GIT_PROJECT_FOLDER_NAME.trim() : ""
-    // k8s集群 Pod初始化副本数量 默认值3个节点
+    // k8s集群 Pod初始化副本数量 默认值3个节点  分布式2n+1容灾性
     K8S_POD_REPLICAS = jsonParams.K8S_POD_REPLICAS ? jsonParams.K8S_POD_REPLICAS.trim() : 3
     // 应用服务访问完整域名或代理服务器IP 带https或http前缀 用于反馈显示等
     APPLICATION_DOMAIN = jsonParams.APPLICATION_DOMAIN ? jsonParams.APPLICATION_DOMAIN.trim() : ""
@@ -996,7 +996,7 @@ def pullProjectCode() {
     }
 
     // 获取应用打包代码
-    if (params.GIT_TAG == GlobalVars.noGit) {
+    if (params.GIT_TAG == GlobalVars.noGit) { // 基于分支最新代码构建
         // 自定义选择指定分支 不使用配置好的分支情况
         if ("${BRANCH_NAME}" != "${params.GIT_BRANCH}") {
             BRANCH_NAME = "${params.GIT_BRANCH}"  // Git分支
@@ -1012,7 +1012,7 @@ def pullProjectCode() {
                   gitTool          : 'Default',
                   userRemoteConfigs: [[credentialsId: "${GIT_CREDENTIALS_ID}", url: "${REPO_URL}"]]
         ])
-    } else {
+    } else {  // 基于Git标签代码构建
         println "Git构建标签是: ${params.GIT_TAG} 📇"
         checkout([$class                           : 'GitSCM',
                   branches                         : [[name: "${params.GIT_TAG}"]],
