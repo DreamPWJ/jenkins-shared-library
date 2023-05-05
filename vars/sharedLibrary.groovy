@@ -996,7 +996,7 @@ def pullProjectCode() {
     }
 
     // 获取应用打包代码
-    if (params.GIT_TAG == GlobalVars.noGit) {
+    if (params.GIT_TAG == GlobalVars.noGit) { // 基于分支最新代码构建
         // 自定义选择指定分支 不使用配置好的分支情况
         if ("${BRANCH_NAME}" != "${params.GIT_BRANCH}") {
             BRANCH_NAME = "${params.GIT_BRANCH}"  // Git分支
@@ -1012,7 +1012,7 @@ def pullProjectCode() {
                   gitTool          : 'Default',
                   userRemoteConfigs: [[credentialsId: "${GIT_CREDENTIALS_ID}", url: "${REPO_URL}"]]
         ])
-    } else {
+    } else {  // 基于Git标签代码构建
         println "Git构建标签是: ${params.GIT_TAG} 📇"
         checkout([$class                           : 'GitSCM',
                   branches                         : [[name: "${params.GIT_TAG}"]],
