@@ -85,7 +85,8 @@ class Kubernetes implements Serializable {
         }
         ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date()) // 计算应用启动时间
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-            ctx.sleep(time: Integer.parseInt(ctx.K8S_POD_REPLICAS.toString()) * 10, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
+            ctx.sleep(time: Integer.parseInt(ctx.K8S_POD_REPLICAS.toString()) * 10, unit: "SECONDS")
+            // 暂停pipeline一段时间，单位为秒
         }
         ctx.sleep(time: 15, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
     }
@@ -247,6 +248,16 @@ class Kubernetes implements Serializable {
         // 启动服务
         ctx.sh "minikube service ${deploymentName}"
         // ctx.sh "kubectl port-forward service/${deploymentName} 8080:8080" // 使用 kubectl 转发端口  kubectl port-forward 不会返回
+    }
+
+    /**
+     * 基于K8s内置的回滚功能
+     */
+    static def rollback(ctx) {
+        // 回滚上一个版本
+        ctx.sh " kubectl rollout undo deployment/deployment名称  -n default "
+        // 回滚到指定版本
+        ctx.sh " kubectl rollout undo deployment/deployment名称 --revision=2 -n default "
     }
 
     /**
