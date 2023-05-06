@@ -9,6 +9,7 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     acme.cert-manager.io/http01-edit-in-place: "true"
+
     # 开启金丝雀Canary。
     nginx.ingress.kubernetes.io/canary: "true"
     # Http Header请求头为version。
@@ -43,18 +44,21 @@ metadata:
 
 spec:
   ingressClassName: k8s-ingress
-  tls: # SSL安全证书
+  tls: # TLS安全
     - hosts:
         - panweiji.com
-    - secretName: panweiji-tls-secret # Secret证书存储名称
+    - secretName: panweiji-tls-secret # Secret证书存储名称 存放HTTPS证书
+
   rules:
     - host: panweiji.com
       http:
         paths:
           - path: /
             backend:
+              #服务名称
               service:
                 name: {APP_NAME}-service
+              #服务端口
                 port:
                   number: {HOST_PORT}
             pathType: Prefix
