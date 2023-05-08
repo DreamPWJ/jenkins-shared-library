@@ -57,8 +57,9 @@ class Utils implements Serializable {
                 }
                 ctx.println("循环查询到符合语义化版本的Tag为: " + versionNum)
             }
+            def version = ""
             if (isRegexMatcher(regex, versionNum)) {
-                def version = versionNum.split("\\.")
+                version = versionNum.split("\\.")
                 if (type.contains("BREAKING CHANGE")) { // 主版本 major
                     version[0] = version[0].toInteger() + 1
                     version[1] = 0
@@ -73,6 +74,12 @@ class Utils implements Serializable {
             } else {
                 return "1.0.0"
             }
+            // 根据自动生成的版本号查询是否有重复的Tag 如果有重复的 版本号再进行自增 Git Tag防止重复版本号 导致代码被覆盖
+            if (getShEchoResult(ctx, "git tag").toString().contains(version)) {
+                // 递归调用 重新执行一遍
+                genSemverVersion(ctx, version, type)
+            }
+
         } catch (e) {
             return "1.0.0"
         }
