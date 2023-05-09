@@ -54,6 +54,10 @@ ifconfig eth0:1 192.168.99.1 netmask 255.255.255.255 up
 - ssh-keygen -t rsa root用户在/root/.ssh/id_rsa.pub
 - 公钥放在远程访问服务的/root/.ssh/authorized_keys里 执行 ssh root@ip 命令访问确认
 
+#### 设置Linux服务器DNS服务 如 144.144.144.144 , 223.5.5.5, 223.6.6.6, 8.8.8.8
+
+- sudo vim /etc/resolv.conf
+
 #### 安装Ubuntu服务器系统 大部分按F12可以进入USB启动引导盘安装 (不同电脑快捷键不一样 有EFI源文件安装)
 
 - 首先将系统版本的ISO镜像下载到U盘 , 使用Rufus软件制作的USB的启动引导盘安装
