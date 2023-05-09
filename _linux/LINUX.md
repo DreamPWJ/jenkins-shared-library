@@ -38,7 +38,7 @@ tail -f /var/log/cron
 #### Linux扩容磁盘步骤  在线不停机扩容磁盘设置LVM逻辑卷管理
 
 - 查看所有设备挂载情况 :  lsblk 或 lsblk -f 
-- dev设备下新sdb磁盘分区 (fdisk支持2TB大小分区) :  fdisk /dev/sdb
+- dev设备下新sdb磁盘分区 (fdisk支持2TB大小内分区 新的空GPT分区表解决) :  fdisk /dev/sdb
 - dev/sdb下sdb1格式化新分区 ext4分区类型 :  mkfs -t ext4 /dev/sdb1
 - 分区挂载到目录才能生效 mount 设备名称 挂载目录 :  mount /dev/sdb1 /my  
 - 卸载目录 :  umount /dev/sdb1

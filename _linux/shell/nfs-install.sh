@@ -16,14 +16,14 @@ sudo apt install -y nfs-kernel-server || true
 sudo yum install -y rpcbind nfs-util || true
 
 # 创建要共享的目录
-mkdir -p /my/nfs/data/
+mkdir -p /mnt/nfs_data/
 # 设置文件夹权限否则可能导致PVC创建失败
-chmod -R 777 /my/nfs/data/
+chmod -R 777 /mnt/nfs_data/
 
 # 编辑NFS配置并加入以下内容  允许访问NFS服务器的网段，也可以写 * ，表示所有地址都可以访问NFS服务和权限
 # secure 选项要求mount客户端请求源端口小于1024  非法端口号可能导致挂载被拒绝  客户端访问端口大于1024添加insecure才能访问
 sudo cat <<EOF >>/etc/exports
-/my/nfs/data/ *(insecure,rw,sync,no_all_squash,no_subtree_check)
+/mnt/nfs_data/ *(insecure,rw,sync,no_all_squash,no_subtree_check)
 EOF
 
 # reload载入配置生效
@@ -63,10 +63,10 @@ cat /var/lib/nfs/etab
 # sudo apt-get install -y nfs-common
 # sudo yum install nfs-utils -y
 # 创建一个用于nfs共享目录的挂载点
-# sudo mkdir -p /mnt/nfs_client_shared
+# sudo mkdir -p /mnt/nfs_client_data 
 # 挂在共享目录到客户端  在 /ect/fstab 内保存重启等永久有效  如果是内网域名 在/etc/hosts下配置
-# sudo mount -t nfs -o nolock nfs_server_ip:/mnt/nfs_server_shared /mnt/nfs_client_shared
+# sudo mount -t nfs -o nolock nfs_server_ip:/mnt/nfs_server_data /mnt/nfs_client_data 
 # 卸载共享目录到客户端
-# umount -f /mnt/nfs_client_shared
+# umount -f /mnt/nfs_client_data 
 # 查看客户端挂载情况
 # mount -l | grep nfs
