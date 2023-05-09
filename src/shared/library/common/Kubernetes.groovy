@@ -43,10 +43,9 @@ class Kubernetes implements Serializable {
                     kubectl apply -f ${k8sYAMLFile}
                     """
 
-                // 查看个组件的状态
+                // 查看个组件的状态  如 kubectl get svc
                 ctx.sh """ 
                     kubectl get pod
-                    kubectl get svc
                     kubectl top nodes
                     """
 
@@ -69,10 +68,10 @@ class Kubernetes implements Serializable {
                 // 查看node节点当前的节点资源占用情况
                 // ctx.sh "kubectl top nodes"
 
-                // K8S健康检查
+                // K8S健康检查 K8S默认有健康探测策略
                 // healthDetection(ctx)
 
-                // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用
+                // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用  K8S默认有容器清理策略
                 // cleanDockerImages(ctx)
 
                 ctx.println("K8S集群部署完成 ✅")
@@ -86,7 +85,8 @@ class Kubernetes implements Serializable {
         }
         ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date()) // 计算应用启动时间
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-            ctx.sleep(time: Integer.parseInt(ctx.K8S_POD_REPLICAS.toString()) * 12, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
+            // 根据部署的节点数延迟等待
+            ctx.sleep(time: Integer.parseInt(ctx.K8S_POD_REPLICAS.toString()) * 10, unit: "SECONDS")
         }
         ctx.sleep(time: 15, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
     }
@@ -248,6 +248,16 @@ class Kubernetes implements Serializable {
         // 启动服务
         ctx.sh "minikube service ${deploymentName}"
         // ctx.sh "kubectl port-forward service/${deploymentName} 8080:8080" // 使用 kubectl 转发端口  kubectl port-forward 不会返回
+    }
+
+    /**
+     * 基于K8s内置的回滚功能
+     */
+    static def rollback(ctx) {
+        // 回滚上一个版本
+        ctx.sh " kubectl rollout undo deployment/deployment名称  -n default "
+        // 回滚到指定版本
+        ctx.sh " kubectl rollout undo deployment/deployment名称 --revision=2 -n default "
     }
 
     /**
