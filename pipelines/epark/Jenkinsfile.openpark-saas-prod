@@ -56,7 +56,7 @@ map.put('k8s_credentials_ids', '74a3d376-cb4c-4a20-9bf7-7300a5eaa84d')
 map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
 // 项目标签或项目简称
-map.put('project_tag', '停车场Saas')
+map.put('project_tag', '停车SaaS')
 
 // 是否是生产环境
 map.put('is_prod', true)
@@ -114,7 +114,7 @@ sharedLibrary(map)
 /*
 
 openpark-saas-app-k8s-prod
-停车场Saas平台App服务端-k8s集群
+停车SaaS平台App服务端-k8s集群
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
@@ -129,7 +129,7 @@ JSON_PARAMS
 }
 
 openpark-saas-job-k8s-prod
-停车场Saas平台Job服务端-k8s集群
+停车SaaS平台Job服务端-k8s集群
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
@@ -143,7 +143,7 @@ JSON_PARAMS
 }
 
 openpark-saas-web-k8s-prod
-停车场Saas平台Web前端-k8s集群 ❤️
+停车SaaS平台Web前端-k8s集群 ❤️
 JSON_PARAMS
 {
     "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/openpark_saas_frontend.git" ,
