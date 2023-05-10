@@ -38,9 +38,9 @@ tail -f /var/log/cron
 #### Linux扩容磁盘步骤  在线不停机扩容磁盘设置LVM逻辑卷管理
 
 - 查看所有设备挂载情况 :  lsblk 或 lsblk -f 
-- dev设备下新sdb磁盘分区 (fdisk支持2TB大小内分区 新的空GPT分区表解决) :  fdisk /dev/sdb
+- dev设备下新sdb磁盘分区 分别选m n p w (fdisk支持2TB大小内分区 新的空GPT分区表解决) :  fdisk /dev/sdb
 - dev/sdb下sdb1格式化新分区 ext4分区类型 :  mkfs -t ext4 /dev/sdb1
-- 分区挂载到目录才能生效 mount 设备名称 挂载目录 :  mount /dev/sdb1 /my  
+- 分区挂载到目录才能生效 mount 设备名称 挂载目录 :  mount /dev/sdb1 /my
 - 卸载目录 :  umount /dev/sdb1
 
 #### 创建虚拟IP命令 基于ARP是地址解析协议 每台主机中都有一个ARP高速缓存 存储同一个网络内的IP地址与MAC地址的对应关系 操作系统会自动维护这个缓存 IP漂移Keepalived完成主备切换
