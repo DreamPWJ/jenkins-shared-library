@@ -12,8 +12,13 @@ if [[ ! $(command -v certbot) ]]; then
   echo "安装Certbot客户端"
   # Certbot 目前需要在类 UNIX 操作系统上运行 Python 3.6+。默认情况下，它需要 root 访问权限才能写入 /etc/letsencrypt
   sudo apt-get install -y certbot || true
-  sudo yum install -y certbot || true
-  # sudo pip install certbot-dns-aliyun
+  # sudo yum update -y
+  sudo yum install -y certbot || true  # 如果certbot不存在 设置yum镜像源/etc/yum.repos.d
+  # Python包方式安装  非标准的CentOS或Ubuntu系统
+  # python3 -m venv venv #在certbot目录创建python工作环境
+  # source venv/bin/activate
+  # sudo pip install certbot certbot-dns-aliyun || true
+  # sudo ln -s /my/letsencrypt/venv/bin/certbot /usr/bin/certbot #创建软链，以便可以直接执行certbot
   certbot --version
 fi
 

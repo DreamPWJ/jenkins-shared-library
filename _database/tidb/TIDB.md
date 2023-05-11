@@ -17,6 +17,13 @@ tiup cluster stop  tidb-prod
 - 查看TiDB集群
 tiup cluster display tidb-prod
 
+- 检测TiDB集群模版有效性
+tiup cluster check ./topology.yaml
+
 ### TiUP扩容缩容TiDB集群
 
+tiup cluster scale-out <cluster-name> scale-out.yml [-p] [-i /home/root/.ssh/gcp_rsa]
+
 ### TiDB 备份与恢复
+
+- 基于 Raft 协议和合理的部署拓扑规划，TiDB 实现了集群的高可用，当集群中少数节点挂掉时，集群依然能对外提供服务

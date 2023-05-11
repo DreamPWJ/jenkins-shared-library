@@ -29,6 +29,7 @@ Y | y)
   echo "安装Let's Encrypt客户端Certbot"
   sudo apt-get install -y certbot || true
   sudo yum install -y certbot || true
+  # sudo pip install certbot || true
   certbot --version
 
   echo "基于Docker安装部署Redis"
