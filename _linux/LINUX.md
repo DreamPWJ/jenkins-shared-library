@@ -38,9 +38,9 @@ tail -f /var/log/cron
 #### Linux扩容磁盘步骤  在线不停机扩容磁盘设置LVM逻辑卷管理
 
 - 查看所有设备挂载情况 :  lsblk 或 lsblk -f 
-- dev设备下新sdb磁盘分区 (fdisk支持2TB大小分区) :  fdisk /dev/sdb
+- dev设备下新sdb磁盘分区 分别选m n p w (fdisk支持2TB大小内分区 新的空GPT分区表解决) :  fdisk /dev/sdb
 - dev/sdb下sdb1格式化新分区 ext4分区类型 :  mkfs -t ext4 /dev/sdb1
-- 分区挂载到目录才能生效 mount 设备名称 挂载目录 :  mount /dev/sdb1 /my  
+- 分区挂载到目录才能生效 mount 设备名称 挂载目录 :  mount /dev/sdb1 /my
 - 卸载目录 :  umount /dev/sdb1
 
 #### 创建虚拟IP命令 基于ARP是地址解析协议 每台主机中都有一个ARP高速缓存 存储同一个网络内的IP地址与MAC地址的对应关系 操作系统会自动维护这个缓存 IP漂移Keepalived完成主备切换
@@ -53,6 +53,10 @@ ifconfig eth0:1 192.168.99.1 netmask 255.255.255.255 up
 
 - ssh-keygen -t rsa root用户在/root/.ssh/id_rsa.pub
 - 公钥放在远程访问服务的/root/.ssh/authorized_keys里 执行 ssh root@ip 命令访问确认
+
+#### 设置Linux服务器DNS服务 如 144.144.144.144 , 223.5.5.5, 223.6.6.6, 8.8.8.8
+
+- sudo vim /etc/resolv.conf
 
 #### 安装Ubuntu服务器系统 大部分按F12可以进入USB启动引导盘安装 (不同电脑快捷键不一样 有EFI源文件安装)
 

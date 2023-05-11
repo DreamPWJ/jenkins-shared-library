@@ -20,7 +20,7 @@ Y | y)
   echo "基于Docker安装部署Nginx"
   docker pull nginx
   # 放开端口范围  -p 7000-8000:7000-8000  -p 8080:443
-  sudo docker run -d --restart=always -p 80:80 -p 443:443 --name proxy-nginx -v /etc/localtime:/etc/localtime:ro \
+  sudo docker run -d --restart=always -p 80:80 -p 443:443 -p 4000:4000 --name proxy-nginx -v /etc/localtime:/etc/localtime:ro \
     -v /my/nginx/config/nginx.conf:/etc/nginx/nginx.conf:ro -v /my/nginx/config/default.conf:/etc/nginx/conf.d/default.conf:ro \
     -v /my/nginx/ssl:/etc/nginx/ssl -v /my/nginx/html:/usr/share/nginx/html -v /etc/letsencrypt:/etc/letsencrypt \
     --log-opt max-size=1024m --log-opt max-file=1 \
@@ -29,6 +29,7 @@ Y | y)
   echo "安装Let's Encrypt客户端Certbot"
   sudo apt-get install -y certbot || true
   sudo yum install -y certbot || true
+  # sudo pip install certbot || true
   certbot --version
 
   echo "基于Docker安装部署Redis"
