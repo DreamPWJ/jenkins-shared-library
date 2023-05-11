@@ -65,7 +65,7 @@ cat /var/lib/nfs/etab
 # 创建一个用于nfs共享目录的挂载点
 # sudo mkdir -p /mnt/nfs_data
 # 挂在共享目录到客户端  在 /ect/fstab 内保存重启等永久有效  如果是内网域名 在/etc/hosts下配置
-# sudo mount -t nfs -o nolock nfs_server_ip:/mnt/nfs_data /mnt/nfs_data
+# sudo mount -t nfs -o nolock 192.168.0.17:/mnt/nfs_data /mnt/nfs_data
 # 卸载共享目录到客户端
 # umount -f /mnt/nfs_data
 # 查看客户端挂载情况
