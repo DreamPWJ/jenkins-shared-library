@@ -17,7 +17,8 @@ if [[ ! $(command -v certbot) ]]; then
   # Python包方式安装  非标准的CentOS或Ubuntu系统
   # python3 -m venv venv #在certbot目录创建python工作环境
   # source venv/bin/activate
-  # sudo pip install certbot certbot-dns-aliyun || true
+  # sudo pip install certbot || true
+  # sudo pip install certbot-dns-aliyun==0.38.1 || true
   # sudo ln -s /my/letsencrypt/venv/bin/certbot /usr/bin/certbot #创建软链，以便可以直接执行certbot
   certbot --version
 fi
