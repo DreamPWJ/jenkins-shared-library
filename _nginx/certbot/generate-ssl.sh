@@ -20,6 +20,13 @@ if [[ ! $(command -v certbot) ]]; then
   # sudo pip install certbot || true
   # sudo pip install certbot-dns-aliyun==0.38.1 || true
   # sudo ln -s /my/letsencrypt/venv/bin/certbot /usr/bin/certbot #创建软链，以便可以直接执行certbot
+
+  # Docker服务之间安装  https://hub.docker.com/r/certbot/certbot
+  # docker pull certbot/certbot
+#  sudo docker run -it --rm --name certbot \
+#              -v "/etc/letsencrypt:/etc/letsencrypt" \
+#              -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
+#              certbot/certbot certonly
   certbot --version
 fi
 
