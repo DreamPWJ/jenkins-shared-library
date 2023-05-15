@@ -10,3 +10,7 @@
 - systemctl status keepalived
 
 ##### 设置keepalived的虚拟主机，配置文件 /etc/keepalived/keepalived.conf
+
+#### 查看日志
+
+cat /var/log/messages

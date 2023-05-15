@@ -16,7 +16,7 @@ if [ $A -eq 0 ]; then
 fi
 
 
-# 创建定时任务 检测nginx是否存活来控制keepalived切换
+# 创建定时任务 检测nginx是否存活来控制keepalived切换  ！！！在keepalived.conf已经配置了检测机制 无需再做定时任务
 # sudo crontab -e
 # 每多少秒 * * * * * sleep 5;  每分钟 */1 * * * *
 # * * * * * sleep 5; /bin/bash /etc/keepalived/nginx_check.sh >/etc/keepalived/crontab.log 2>&1
