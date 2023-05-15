@@ -14,3 +14,13 @@ if [ $A -eq 0 ]; then
     systemctl stop keepalived
   fi
 fi
+
+
+# 创建定时任务 检测nginx是否存活来控制keepalived切换
+# sudo crontab -e
+# 每多少秒 * * * * * sleep 5;  每分钟 */1 * * * *
+# * * * * * sleep 5; /bin/bash /etc/keepalived/nginx_check.sh >/etc/keepalived/crontab.log 2>&1
+# service crond restart , Ubuntu 使用 sudo service cron start # 重启crond生效
+# crontab -l # 查看crond列表
+# chmod +x nginx_check.sh  给shell脚本执行文件可执行权限
+# GNU nano编辑器CTRL+O 再 CTRL+X 保存退出
