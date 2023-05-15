@@ -2,9 +2,9 @@
 # Author: 潘维吉
 # Description: Keepalived+Nginx高可用 Keepalived是以VRRP（Virtual Router Redundancy Protocol，虚拟路由冗余协议）协议
 
-cat /etc/redhat-release
+cat /etc/redhat-release || true
 
-yum -y update
+yum -y update || true
 
 echo "安装keepalived"
 yum -y install keepalived
