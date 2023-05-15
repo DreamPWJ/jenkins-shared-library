@@ -12,8 +12,11 @@ yum -y install keepalived
 # vim /etc/keepalived/keepalived.conf
 
 echo "启动keepalived"
+systemctl enable keepalived   # 开机自启动
 systemctl start keepalived
-systemctl enable keepalived
+
+echo "查看keepalived是否安装成功"
+rpm -q -a keepalived
 
 echo "查看网卡及IP"
 ip addr show | grep inet
