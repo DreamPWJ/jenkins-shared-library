@@ -11,6 +11,9 @@
 
 - systemctl daemon-reload
 
+- systemctl status firewalld.service
+- systemctl stop firewalld.service
+
 ##### 设置keepalived的虚拟主机，配置文件 /etc/keepalived/keepalived.conf
 
 ##### 查看虚拟IP
