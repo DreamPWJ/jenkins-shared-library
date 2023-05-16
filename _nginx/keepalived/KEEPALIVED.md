@@ -13,6 +13,10 @@
 
 ##### 设置keepalived的虚拟主机，配置文件 /etc/keepalived/keepalived.conf
 
+##### 查看虚拟IP
+
+ip addr
+
 ##### 查看日志
 
 tail -f /var/log/messages
