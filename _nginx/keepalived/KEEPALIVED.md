@@ -15,4 +15,4 @@
 
 ##### 查看日志
 
-cat /var/log/messages
+tail -f /var/log/messages
