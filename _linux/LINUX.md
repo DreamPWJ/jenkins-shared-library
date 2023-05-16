@@ -48,9 +48,9 @@ tail -f /var/log/cron
 ip addr
 arp -a
 ifconfig eth0 192.168.0.199 broadcast 192.168.0.255 netmask 255.255.255.0 up  # 在一台机器设置即可会自动IP漂移 添加一个VIP地址  eth0表示这个VIP绑定的目标网卡设备
-route add -host 192.168.0.199 dev eth0                  # 通过route命令，在路由表上添加对这个VIP的路由信息
+route add -host 192.168.0.199 dev eth0                    # 通过route命令，在路由表上添加对这个VIP的路由信息
 ping 192.168.0.199                                        # 测试虚拟VIP是否成功
-/sbin/ip addr del 192.168.0.199/24 dev eth0             # 删除虚拟IP
+/sbin/ip addr del 192.168.0.199/24 dev eth0               # 删除虚拟IP
 
 #### 建立免密连接
 
