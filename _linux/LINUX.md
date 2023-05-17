@@ -58,8 +58,9 @@ sudo ip neigh flush 192.168.0.199/24                        # 清除ARP本机缓
 
 - systemctl status firewalld.service
 - systemctl stop firewalld.service  # 重启还会打开防火墙
-- systemctl disable --now firewalld.service # 永久禁用
-- iptables -F   # 清空防火墙配置规则
+- systemctl disable --now firewalld.service # 永久禁用防火墙
+- systemctl disable --now iptables  # 永久禁用防火墙配置表
+- iptables -F   # 清空防火墙配置规则 设置
 
 #### 建立免密连接
 
