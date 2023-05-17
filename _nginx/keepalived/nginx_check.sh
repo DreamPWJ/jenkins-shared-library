@@ -3,13 +3,13 @@
 # Description: 定时检测Nginx的服务状态，如果Nginx停止，会尝试重新启动Nginx，如果启动失败，会将Keepalived服务停止，使IP漂移到备用节点上
 
 # 检测nginx是否启动  容器化检测设置  pidof nginx
-pids=$(pidof nginx)
-if [ "${pids}" == "" ]; then
+pids=$(pidof nginx) && echo $pids
+if [[ ! ${pids} ]]; then
   # /usr/sbin/nginx  # 宿主机启动
   # systemctl start nginx
   docker start proxy-nginx
   sleep 3
-  if [ "${pids}" == "" ]; then
+  if [[ ! ${pids} ]]; then
     # /usr/sbin/keepalived -s stop
     systemctl stop keepalived
   fi
