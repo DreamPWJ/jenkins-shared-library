@@ -9,7 +9,7 @@
 
 - systemctl stop firewalld.service  # 重启还会打开防火墙
 
-- systemctl disable firewalld.service # 永久禁用
+- systemctl disable --now firewalld.service # 永久禁用
 
 - iptables -F   # 清空防火墙配置规则
 
