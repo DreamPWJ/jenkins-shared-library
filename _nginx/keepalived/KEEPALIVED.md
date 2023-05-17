@@ -1,11 +1,11 @@
 ### Keepalived是一个基于VRRP虚拟路由冗余协议来实现的服务高可用方案, 可利用其来避免IP单点故障 使用虚拟IP漂移
 
 
-#####  Keepalived配置详解
+#####  Keepalived配置详解  注意关闭防火墙 防止keepalived之间组播报文通讯失效 无法IP漂移等！！！
 
 - https://blog.51cto.com/u_13710166/5288506
 
-##### 操作命令 注意关闭防火墙 防止组播报文通讯失效！！！
+##### 操作命令
 
 - systemctl start keepalived
 
