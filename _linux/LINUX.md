@@ -47,11 +47,19 @@ tail -f /var/log/cron
 
 ip addr
 arp -a
-ifconfig eth0:1 192.168.0.199 broadcast 192.168.0.255 netmask 255.255.255.0 up      # 只一台主机器设置即可会自动IP漂移 添加一个VIP地址  eth0:1表示这个VIP绑定的目标网卡设备
+- 注意keepalived会自动配置无需手动配置虚拟IP  手动只一台主机器设置即可会自动IP漂移 添加一个VIP地址  eth0:1表示这个VIP绑定的目标网卡设备
+ifconfig eth0:1 192.168.0.199 broadcast 192.168.0.255 netmask 255.255.255.0 up
 route add -host 192.168.0.199 dev eth0:1                    # 通过route命令，在路由表上添加对这个VIP的路由信息
 ping 192.168.0.199                                          # 测试虚拟VIP是否成功
 /sbin/ip addr del 192.168.0.199/24 dev eth0:1               # 删除虚拟IP
 sudo ip neigh flush 192.168.0.199/24                        # 清除ARP本机缓存
+
+####  防火墙相关命令
+
+- systemctl status firewalld.service
+- systemctl stop firewalld.service  # 重启还会打开防火墙
+- systemctl disable --now firewalld.service # 永久禁用
+- iptables -F   # 清空防火墙配置规则
 
 #### 建立免密连接
 
