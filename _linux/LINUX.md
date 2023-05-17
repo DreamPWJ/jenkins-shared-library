@@ -51,13 +51,14 @@ ifconfig eth0:1 192.168.0.199 broadcast 192.168.0.255 netmask 255.255.255.0 up  
 route add -host 192.168.0.199 dev eth0:1                    # 通过route命令，在路由表上添加对这个VIP的路由信息
 ping 192.168.0.199                                          # 测试虚拟VIP是否成功
 /sbin/ip addr del 192.168.0.199/24 dev eth0:1               # 删除虚拟IP
+sudo ip neigh flush 192.168.0.199/24                        # 清除ARP本机缓存
 
 #### 建立免密连接
 
 - ssh-keygen -t rsa root用户在/root/.ssh/id_rsa.pub
 - 公钥放在远程访问服务的/root/.ssh/authorized_keys里 执行 ssh root@ip 命令访问确认
 
-#### 设置Linux服务器DNS服务 如 144.144.144.144 , 223.5.5.5, 223.6.6.6, 8.8.8.8
+#### 设置Linux服务器DNS服务 如 144.144.144.144, 223.5.5.5, 223.6.6.6, 8.8.8.8
 
 - sudo vim /etc/resolv.conf
 
