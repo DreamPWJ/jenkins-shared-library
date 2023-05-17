@@ -22,11 +22,11 @@ if [[ ! $(command -v certbot) ]]; then
   # sudo ln -s /my/letsencrypt/venv/bin/certbot /usr/bin/certbot #创建软链，以便可以直接执行certbot
 
   # Docker服务之间安装  https://hub.docker.com/r/certbot/certbot
-  # docker pull certbot/certbot:latest
-  #  sudo docker run -it --rm --name certbot \
-  #              -v "/etc/letsencrypt:/etc/letsencrypt" \
-  #              -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
-  #              certbot/certbot certonly
+  docker pull certbot/certbot:latest
+  sudo docker run -it --rm --name certbot \
+               -v "/etc/letsencrypt:/etc/letsencrypt" \
+               -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
+               certbot/certbot certonly --email 406798106@qq.com  -d "panweiji.com"
   certbot --version
 fi
 
