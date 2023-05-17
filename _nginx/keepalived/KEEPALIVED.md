@@ -9,6 +9,8 @@
 
 - systemctl stop firewalld.service
 
+- iptables -F   # 清空防火墙配置规则
+
 ##### 操作命令
 
 - systemctl start keepalived
@@ -29,3 +31,7 @@ ip addr
 ##### 查看日志
 
 tail -f /var/log/messages
+
+### 处理网络不通问题
+
+systemctl restart network  &&  systemctl restart docker
