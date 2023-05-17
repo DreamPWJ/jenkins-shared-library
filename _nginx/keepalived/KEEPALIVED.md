@@ -5,6 +5,10 @@
 
 - https://blog.51cto.com/u_13710166/5288506
 
+- systemctl status firewalld.service
+
+- systemctl stop firewalld.service
+
 ##### 操作命令
 
 - systemctl start keepalived
@@ -15,8 +19,6 @@
 
 - systemctl daemon-reload
 
-- systemctl status firewalld.service
-- systemctl stop firewalld.service
 
 ##### 设置keepalived的虚拟主机，配置文件 /etc/keepalived/keepalived.conf
 
