@@ -5,7 +5,7 @@
 
 - https://blog.51cto.com/u_13710166/5288506
 
-##### 操作命令
+##### 操作命令 注意关闭防火墙 防止组播报文通讯失效！！！
 
 - systemctl start keepalived
 
