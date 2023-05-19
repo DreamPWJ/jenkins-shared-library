@@ -79,6 +79,8 @@ class Kubernetes implements Serializable {
         }
 
         ctx.println("等待K8S集群所有Pod节点全部启动完成中 ...")
+        // yaml内容中包含初始化时间和启动完成时间 shell中自动解析所有内容，建议yq进行实际的YAML解析
+        // ctx.sh "kubectl get pods podName*** -o yaml"
         // K8S滚动部署需要时间 延迟等待 防止钉钉已经通知部署完成 但是新服务没有真正启动完成
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
             ctx.sleep(time: 15, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
@@ -174,7 +176,7 @@ class Kubernetes implements Serializable {
 
             // 部署pod水平扩缩容
             ctx.sh "kubectl apply -f ${yamlName}"
-            // 若安装正确，可用执行以下命令查询自定义指标 查看到 Custom Metrics API 返回配置的 QPS 相关指标  可能需要等待几分钟才能查询到
+            // 若安装正确，可用执行以下命令查询自定义指标 查看到 Custom Metrics API 返回配置的 QPS 相关指标 可能需要等待几分钟才能查询到
             ctx.sh " kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 || true "
             // kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/default/pods/*/http_server_requests_qps"
 
@@ -266,7 +268,8 @@ class Kubernetes implements Serializable {
     static def healthDetection(ctx) {
         // Pod通过两类探针来检查容器的健康状态。分别是ReadinessProbe（就绪探测） 和 LivenessProbe（存活探测）
         ctx.sh "kubectl get pod -l app=***  -o jsonpath=\"{.items[0].metadata.name} "  // kubectl获取新pod名称
-        ctx.sh "kubectl get pods podName*** -o yaml "  // yaml内容中包含初始化时间和启动完成时间
+        // yaml内容中包含初始化时间和启动完成时间  shell中自动解析所有内容, 建议yq进行实际的YAML解析
+        ctx.sh "kubectl get pods podName*** -o yaml"
         ctx.sh "kubectl -n default get pods podName*** -o yaml | yq e '.items[].status.conditions[] | select('.type' == \"PodScheduled\" or '.type' == \"Ready\") | '.lastTransitionTime'' - | xargs -n 2 bash -c 'echo \$(( \$(date -d \"\$0\" \"+%s\") - \$(date -d \"\$1\" \"+%s\") ))' "
         ctx.sh "kubectl get pods podName**** -o custom-columns=NAME:.metadata.name,FINISHED:.metadata.creationTimestamp "
     }
