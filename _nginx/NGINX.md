@@ -4,7 +4,7 @@
 
 ### 静态资源配置
 server {
-location ~ .*\.(gif|jpg|pdf|jpeg|png)$ {
+location ~ .*\.(gif|jpg|jpeg|png|ico|cur|heic|webp|doc)$ {
     root /usr/share/nginx/html/images/;
     expires 30d;
     access_log off;
