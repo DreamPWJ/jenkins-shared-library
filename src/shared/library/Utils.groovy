@@ -50,17 +50,17 @@ class Utils implements Serializable {
             versionNum = versionNum.replaceAll("v", "").replaceAll("V", "") // 去掉前缀
             def regex = '^(([0-9]|([1-9]([0-9]*))).){2}([0-9]|([1-9]([0-9]*)))([-](([0-9A-Za-z]|([1-9A-Za-z]([0-9A-Za-z]*)))[.]){0,}([0-9A-Za-z]|([1-9A-Za-z]([0-9A-Za-z]*)))){0,1}([+](([0-9A-Za-z]{1,})[.]){0,}([0-9A-Za-z]{1,})){0,1}$'
             // if (!isRegexMatcher(regex, versionNum)) {
-                ctx.timeout(time: 2, unit: 'MINUTES') {
-                    // 查询到符合语义化版本的Tag  防止tag不符合标准 导致生成的版本号无法连续 又重新1.0.0开始
-                    def versionNumArray = getShEchoResult(ctx, "git tag").toString().split(" ") as ArrayList
-                    for (int i = 0; i < versionNumArray.size(); i++) {
-                        if (isRegexMatcher(regex, versionNumArray[i])) {
-                            versionNum = versionNumArray[i]  // 查找到最大的语义化版本号
-                            // ctx.println("查找到最大的语义化版本号为: " + versionNum)
-                        }
+            ctx.timeout(time: 2, unit: 'MINUTES') {
+                // 查询到符合语义化版本的Tag  防止tag不符合标准 导致生成的版本号无法连续 又重新1.0.0开始
+                def versionNumArray = getShEchoResult(ctx, "git tag").toString().split(" ") as ArrayList
+                for (int i = 0; i < versionNumArray.size(); i++) {
+                    if (isRegexMatcher(regex, versionNumArray[i])) {
+                        versionNum = versionNumArray[i]  // 查找到最大的语义化版本号
+                        ctx.println("查找到最大的语义化版本号为: " + versionNum)
                     }
                 }
-           // }
+            }
+            // }
             def version = ""
             if (isRegexMatcher(regex, versionNum)) {
                 version = versionNum.split("\\.")
@@ -84,8 +84,8 @@ class Utils implements Serializable {
 //                ctx.println("自动生成的语义化版本号v" + version + "已存在Git Tag中, 执行重新生成方法")
 //                version = genSemverVersion(ctx, version, type)
 //            } else {
-                ctx.println("自动生成的语义化版本为: " + version)
-                return version
+            ctx.println("自动生成的语义化版本为: " + version)
+            return version
 //           }
         } catch (e) {
             return "1.0.0"
