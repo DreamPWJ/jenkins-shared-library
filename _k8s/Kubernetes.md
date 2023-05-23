@@ -133,3 +133,8 @@ kubectl create secret docker-registry <name> --docker-server=DOCKER_REGISTRY_SER
 ### 在IDEA内查看K8S容器日志乱码问题
 
 idea64.exe.vmoptions配置文件中添加 -Dfile.encoding=UTF-8 即可解决
+
+### K8S扩缩容和重启Pod命令
+
+kubectl scale deployment deploymentName --replicas=0
+kubectl scale deployment deploymentName --replicas=3
