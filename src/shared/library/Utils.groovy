@@ -50,10 +50,14 @@ class Utils implements Serializable {
             versionNum = versionNum.replaceAll("v", "").replaceAll("V", "") // 去掉前缀
             def regex = '^(([0-9]|([1-9]([0-9]*))).){2}([0-9]|([1-9]([0-9]*)))([-](([0-9A-Za-z]|([1-9A-Za-z]([0-9A-Za-z]*)))[.]){0,}([0-9A-Za-z]|([1-9A-Za-z]([0-9A-Za-z]*)))){0,1}([+](([0-9A-Za-z]{1,})[.]){0,}([0-9A-Za-z]{1,})){0,1}$'
             if (!isRegexMatcher(regex, versionNum)) {
-                int index = 1
-                while (!isRegexMatcher(regex, versionNum)) {  // 查询到符合语义化版本的Tag  防止tag不符合标准 导致生成的版本号无法连续 又重新1.0.0开始
-                    versionNum = getShEchoResult(ctx, "git describe --abbrev=$index --tags")
-                    index++
+                ctx.timeout(time: 1, unit: 'MINUTES') {
+                    // 查询到符合语义化版本的Tag  防止tag不符合标准 导致生成的版本号无法连续 又重新1.0.0开始
+                    def versionNumArray = getShEchoResult(ctx, "git tag") as ArrayList
+                    for (int i = 0; i < versionNumArray.size(); i++) {
+                        if (isRegexMatcher(regex, versionNumArray[i])) {
+                            versionNum = versionNumArray[i]
+                        }
+                    }
                 }
             }
             def version = ""
