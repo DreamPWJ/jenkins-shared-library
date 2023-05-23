@@ -73,17 +73,20 @@ class Utils implements Serializable {
                 } else if (type == GlobalVars.gitCommitFix) { // 补丁版 patch
                     version[2] = version[2].toInteger() + 1
                 }
-                return version.join(".")
+                version = version.join(".")
+
+                // 根据自动生成的版本号查询是否有重复的Tag 如果有重复的 版本号再进行自增 Git Tag防止重复版本号 导致代码被覆盖
+                if (getShEchoResult(ctx, "git tag").toString().contains(version)) {
+                    // 递归调用 重新执行一遍
+                    ctx.println("自动生成的语义化版本号v" + version + "已存在Git Tag中, 执行重新生成方法")
+                    genSemverVersion(ctx, version, type)
+                }
+                ctx.println("自动生成的语义化版本为: " + version)
+
+                return version
             } else {
                 return "1.0.0"
             }
-            // 根据自动生成的版本号查询是否有重复的Tag 如果有重复的 版本号再进行自增 Git Tag防止重复版本号 导致代码被覆盖
-            if (getShEchoResult(ctx, "git tag").toString().contains(version)) {
-                // 递归调用 重新执行一遍
-                ctx.println("自动生成的语义化版本号v" + version + "已存在Git Tag中, 执行重新生成方法")
-                genSemverVersion(ctx, version, type)
-            }
-            ctx.println("自动生成的语义化版本为: " + version)
         } catch (e) {
             return "1.0.0"
         }
