@@ -52,7 +52,7 @@ class Utils implements Serializable {
             // if (!isRegexMatcher(regex, versionNum)) {
                 ctx.timeout(time: 2, unit: 'MINUTES') {
                     // 查询到符合语义化版本的Tag  防止tag不符合标准 导致生成的版本号无法连续 又重新1.0.0开始
-                    def versionNumArray = getShEchoResult(ctx, "git tag") as ArrayList
+                    def versionNumArray = getShEchoResult(ctx, "git tag").split("\n") as ArrayList
                     for (int i = 0; i < versionNumArray.size(); i++) {
                         if (isRegexMatcher(regex, versionNumArray[i])) {
                             versionNum = versionNumArray[i]
@@ -78,14 +78,14 @@ class Utils implements Serializable {
                 version = "1.0.0"
             }
             // 根据自动生成的版本号查询是否有重复的Tag 如果有重复的 版本号再进行自增 Git Tag防止重复版本号 导致代码被覆盖
-            if (getShEchoResult(ctx, "git tag").toString().contains(version)) {
-                // 递归调用 重新执行一遍
-                ctx.println("自动生成的语义化版本号v" + version + "已存在Git Tag中, 执行重新生成方法")
-                version = genSemverVersion(ctx, version, type)
-            } else {
+//            if (getShEchoResult(ctx, "git tag").toString().contains(version)) {
+//                // 递归调用 重新执行一遍
+//                ctx.println("自动生成的语义化版本号v" + version + "已存在Git Tag中, 执行重新生成方法")
+//                version = genSemverVersion(ctx, version, type)
+//            } else {
                 ctx.println("自动生成的语义化版本为: " + version)
                 return version
-            }
+//           }
         } catch (e) {
             return "1.0.0"
         }
