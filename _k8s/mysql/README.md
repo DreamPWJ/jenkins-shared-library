@@ -1,4 +1,4 @@
-## 创建所需资源
+#### 创建所需资源
 
 - 创建configMap
 kubectl apply -f mysql-config-map.yaml
@@ -8,7 +8,7 @@ kubectl apply -f mysql-services.yaml
 kubectl apply -f mysql-stateful-set.yaml
 
 
-## 扩缩容
+#### 扩缩容
 
 - 扩容至6副本
 kubectl scale statefulset mysql --replicas=6
@@ -16,6 +16,7 @@ kubectl scale statefulset mysql --replicas=6
 kubectl scale statefulset mysql --replicas=2
 
 
-## 清理
+#### 清理
+
 kubectl delete statefulset mysql
 kubectl delete configmap,service,pvc -l app=mysql
