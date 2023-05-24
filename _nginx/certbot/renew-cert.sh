@@ -13,7 +13,7 @@ fi
 
 # 续签SSL证书
 # Another instance of Certbot is already running
-find / -type f -name ".certbot.lock" -exec rm {} \;
+#find / -type f -name ".certbot.lock" -exec rm {} \  || true;
 
 # 可用ansible将文件同步到所有服务器
 # 如果提示未到期，cert not due for renewal，可以强制更新 --force-renew  测试90天后续签情况执行添加参数 --dry-run
