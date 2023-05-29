@@ -82,5 +82,6 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
     } catch (e) {
         println "获取Git提交变更记录异常"
         println e.getMessage()
+        return ""
     }
 }
