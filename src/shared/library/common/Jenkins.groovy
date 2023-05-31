@@ -26,10 +26,10 @@ class Jenkins implements Serializable {
     /**
      * 获取变更的模块 用于自动发布指定模块
      */
-    def getAutoPublishModule(pathPrefix) {
+    def getAutoPublishModule(ctx, pathPrefix) {
         // 使用Set容器去重，保证待发布模块只有一份
         def modulePaths = new HashSet<String>();
-        for (def filePath in getChangedFilesList()) {
+        for (def filePath in getChangedFilesList(ctx)) {
             // 忽略非模块的文件，比如 Jenkinsfile 等
             if (filePath.startsWith(pathPrefix)) {
                 // 从超过模块前缀长度的下标开始，获取下一个/的位置。即分串位置
