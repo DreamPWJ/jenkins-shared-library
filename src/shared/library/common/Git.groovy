@@ -72,7 +72,7 @@ class Git implements Serializable {
      * 获取GIT某个时间段的提交记录，并且去除merge信息
      * --since 为时间戳或者日期格式
      */
-    @NonCPS
+    // @NonCPS
     static def getGitLogByTime(ctx, int maxRecordsNum = 100) {
         def gitLogs = ""
         try {
