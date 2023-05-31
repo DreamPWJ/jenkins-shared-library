@@ -5,7 +5,7 @@
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-prod-landing-page
+  name: letsencrypt-prod-lanneng-landing-page
   namespace: cert-manager
 spec:
   acme:
@@ -37,7 +37,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-max-temp-file-size: 2048m
 
 spec:
-  ingressClassName: lanneng-k8s-ingress
+  ingressClassName: lanneng-park
   tls:
     - hosts:
         - lannengtech.com
