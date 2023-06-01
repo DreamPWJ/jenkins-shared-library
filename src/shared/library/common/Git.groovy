@@ -49,7 +49,7 @@ class Git implements Serializable {
      */
     static boolean isExistsChangeFile(ctx, fileName = "package.json", lockFileName = "package-lock.json") {
         try {
-            def changedFiles = Jenkins.getChangedFilesList(ctx)
+            def changedFiles = JenkinsCI.getChangedFilesList(ctx)
             if (changedFiles.isEmpty()) { // 无变更文件 可判断是否初始化过依赖 防止重复安装浪费资源和时间
                 return true
             } else {
