@@ -53,7 +53,7 @@ class Utils implements Serializable {
             if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd || "${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
                 ctx.timeout(time: 1, unit: 'MINUTES') {
                     // 查询到符合语义化版本的Tag  防止tag不符合标准 导致生成的版本号无法连续 又重新1.0.0开始
-                    def versionNumArray = getShEchoResult(ctx, "git tag").toString().split(" ") as ArrayList
+                    def versionNumArray = getShEchoResult(ctx, "git tag --sort=taggerdate").toString().split(" ") as ArrayList
                     for (int i = 0; i < versionNumArray.size(); i++) {
                         if (isRegexMatcher(regex, versionNumArray[i])) {
                             versionNum = versionNumArray[i]  // 查找到最大的语义化版本号

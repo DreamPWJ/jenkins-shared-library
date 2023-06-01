@@ -101,6 +101,7 @@ labels:      #自定义标签
 - kubectl get pods --namespace cert-manager
 - helm uninstall cert-manager -n cert-manager
 - kubectl get cert 和 kubectl get cert CERT-NAME -o yaml
+- 如果SSL证书不生效删除ClusterIssuer重新再创建
 
 ### K8S集群安装 Prometheus与安装 Grafana监控
 

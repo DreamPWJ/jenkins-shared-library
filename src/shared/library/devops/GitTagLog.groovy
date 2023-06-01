@@ -24,7 +24,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                    git config --global user.name ${GIT_USERNAME}
                    git stash || true
                    git checkout ${ctx.BRANCH_NAME}
-                   git pull ${userPassWordUrl}
+                   git pull ${userPassWordUrl} || true
                    """)
 
             try {
@@ -62,7 +62,6 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                     sh("""
                           git add ${changeLogFileName}
                           git commit ${changeLogFileName}  -m "docs(changelog): 发布 v${tagVersion}" 
-                          git pull ${userPassWordUrl}
                           git push ${userPassWordUrl}
                            """)
                 } catch (e) {
