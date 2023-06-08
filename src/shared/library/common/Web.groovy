@@ -57,9 +57,9 @@ class Web implements Serializable {
             ctx.println("执行MonoRepo仓库构建 🏗️  ")
             if (Git.isExistsChangeFile(ctx)) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
                 try {
-                    ctx.retry(2) {
+                    ctx.retry(3) {
                         // 全部下载依赖 更通用 bootstrap不仅是下载依赖资源 还建立多包之间的依赖软链
-                        // Turborepo解决Monorepo多项目构建缓慢问题 充分利用CPU性能并发构建提速  同时新版Lerna v5.1集成Nx实现加速构建
+                        // TurboRepo解决Monorepo多项目构建缓慢问题 充分利用CPU性能并发构建提速  同时新版Lerna v5.1集成Nx实现加速构建
                         ctx.sh "lerna bootstrap --ci"  // --ci 选项调用npm ci而不是npm install
                         // lerna bootstrap指定作用域 加速下载依赖  --scope 限制 lerna bootstrap 在哪些包起作用 包的package.json文件中名称
                         // ctx.sh "lerna bootstrap --include-dependents --include-dependencies --scope ${ctx.PROJECT_NAME}"
