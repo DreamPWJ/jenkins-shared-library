@@ -802,7 +802,7 @@ def nodeBuildProject() {
                 Web.needSass(this)
             }
             if (Git.isExistsChangeFile(this)) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
-                retry(2) {
+                retry(3) {
                     println("安装依赖 📥")
                     // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱
                     sh "npm ci || pnpm install || npm install || yarn install"
@@ -814,7 +814,10 @@ def nodeBuildProject() {
                 try {
                     // >/dev/null为Shell脚本运行程序不输出日志到终端 2>&1是把出错输出也定向到标准输出
                     println("执行Node构建 🏗️  ")
-                    sh "npm run '${NPM_RUN_PARAMS}' " // >/dev/null 2>&1
+                    sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
+                    retry(2) {
+                        sh "npm run '${NPM_RUN_PARAMS}' " // >/dev/null 2>&1
+                    }
                 } catch (e) {
                     println(e.getMessage())
                     sh "rm -rf node_modules"
