@@ -1844,6 +1844,7 @@ def gitTagLog() {
         try {
             if ("${params.VERSION_NUM}".trim() != "") { // 自定义版本号
                 tagVersion = "${params.VERSION_NUM}".trim()
+                println "手填的自定义版本号为: ${tagVersion} "
             } else {
                 // sh ' git fetch --tags ' // 拉取远程分支上所有的tags 需要设置用户名密码
                 // 获取本地当前分支最新tag名称 git describe --abbrev=0 --tags  获取远程仓库最新tag命令 git ls-remote   获取所有分支的最新tag名称命令 git describe --tags `git rev-list --tags --max-count=1`
