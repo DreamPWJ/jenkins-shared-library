@@ -1,0 +1,7 @@
+tidb_servers:
+  - host: 10.0.1.5
+    ssh_port: 22
+    port: 4000
+    status_port: 10080
+    deploy_dir: /tidb-deploy/tidb-4000
+    log_dir: /tidb-deploy/tidb-4000/log

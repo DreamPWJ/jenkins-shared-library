@@ -1,8 +1,8 @@
 ### TiDB分布式数据库
 
-- 使用TiUP初始化部署TiDB集群步骤: https://docs.pingcap.com/zh/tidb/stable/production-deployment-using-tiup
+-  使用TiUP初始化部署TiDB集群步骤: https://docs.pingcap.com/zh/tidb/stable/production-deployment-using-tiup
 
-- 参考文章: https://blog.csdn.net/weixin_40592911/article/details/126997741
+-  参考文章: https://blog.csdn.net/weixin_40592911/article/details/126997741
 
 -  执行部署TiDB集群(设置ssh免密登录): cd /my && tiup cluster deploy tidb-prod v7.1.0 ./topology.yaml --user root 
 -  重复部署的情况， 注意数据库名称重复冲突
@@ -21,7 +21,7 @@ tiup cluster display tidb-prod
 - 检测TiDB集群模版有效性
 tiup cluster check ./topology.yaml
 
-#### TiUP扩容缩容TiDB集群
+#### TiUP在不中断线上服务的情况扩容缩容TiDB集群 https://docs.pingcap.com/zh/tidb/stable/scale-tidb-using-tiup
 
 tiup cluster scale-out <cluster-name> scale-out.yml [-p] [-i /home/root/.ssh/gcp_rsa]
 
