@@ -118,7 +118,7 @@ class Docker implements Serializable {
                 if ("${ctx.CUSTOM_DOCKERFILE_NAME}" != "") {
                     webDockerFileName = "${ctx.CUSTOM_DOCKERFILE_NAME}"
                     // 如Node构建环境 SSR方式等
-                    ctx.sh """ pwd && \
+                    ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} && pwd && \
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
                             -f ${ctx.env.WORKSPACE}/ci/.ci/web/${webDockerFileName} . --no-cache \
                             ${dockerPushDiffStr}

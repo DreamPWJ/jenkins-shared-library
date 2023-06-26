@@ -19,7 +19,7 @@ WORKDIR /app
 COPY . .
 
 # 安装项目依赖包  RUN和CMD都是执行命令，他们的差异在于RUN中定义的命令会在执行docker build命令创建镜像时执行，而CMD中定义的命令会在执行docker run命令运行镜像时执行
-RUN npm install && npm run build
+# RUN pnpm install && npm run build
 
 # 配置环境变量
 ENV HOST 0.0.0.0
