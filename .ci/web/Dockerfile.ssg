@@ -1,0 +1,38 @@
+# Author: 潘维吉
+# Version 1.0.0
+# Description: 自定义构建SSR服务器端渲染
+# 参考文档: https://docs.astro.build/zh-cn/recipes/docker/#ssr
+
+# 依赖基础镜像
+FROM node:lts AS runtime
+
+# 指定切换用户
+USER root
+
+# 设置时区
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+
+# RUN npm install
+# RUN npm run build
+
+# 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
+ARG DEPLOY_FOLDER
+ARG NPM_PACKAGE_FOLDER
+ARG PROJECT_NAME
+ARG WEB_STRIP_COMPONENTS
+
+# 拷贝部署文件到nginx
+COPY  ${NPM_PACKAGE_FOLDER}.tar.gz  .
+# 解压文件到当前文件夹下并删除压缩文件
+RUN  tar -xzvf ${NPM_PACKAGE_FOLDER}.tar.gz --strip-components ${WEB_STRIP_COMPONENTS} >/dev/null 2>&1 \
+ && rm -f ${NPM_PACKAGE_FOLDER}.tar.gz
+
+ENV HOST=0.0.0.0
+ENV PORT=80
+EXPOSE 80
+
+# 启动运行
+CMD node ./dist/server/entry.mjs
+#CMD ["npm", "start"]
