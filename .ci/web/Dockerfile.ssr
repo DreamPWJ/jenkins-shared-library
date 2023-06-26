@@ -3,7 +3,7 @@
 # Description: 自定义构建SSR服务器端渲染
 
 # 依赖基础镜像  默认值变量方式 ${NODE_VERSON:18}
-FROM node:18 as runtime
+FROM node:lts AS runtime
 
 # 指定切换用户
 USER root
