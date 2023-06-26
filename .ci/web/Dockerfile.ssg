@@ -23,9 +23,9 @@ ARG PROJECT_NAME
 ARG WEB_STRIP_COMPONENTS
 
 # 拷贝部署文件到nginx
-COPY  ${NPM_PACKAGE_FOLDER}.tar.gz  .
+COPY  ${NPM_PACKAGE_FOLDER}.tar.gz  /
 # 解压文件到当前文件夹下并删除压缩文件
-RUN  tar -xzvf ${NPM_PACKAGE_FOLDER}.tar.gz --strip-components ${WEB_STRIP_COMPONENTS} >/dev/null 2>&1 \
+RUN  tar -xzvf ${NPM_PACKAGE_FOLDER}.tar.gz /${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 \
  && rm -f ${NPM_PACKAGE_FOLDER}.tar.gz
 
 ENV HOST 0.0.0.0
@@ -33,6 +33,6 @@ ENV PORT 80
 EXPOSE 80
 
 # 启动运行
-CMD node ./dist/server/entry.mjs
+CMD node ./${NPM_PACKAGE_FOLDER}/server/entry.mjs
 
 #CMD ["npm", "start"]
