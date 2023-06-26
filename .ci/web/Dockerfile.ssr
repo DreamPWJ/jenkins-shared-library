@@ -27,7 +27,7 @@ ENV PORT 3000
 # 容器对外暴露的端口号
 EXPOSE 3000
 
-# 启动运行
+# 启动运行 需要node_modules目录文件才能运行
 CMD node ./dist/server/entry.mjs
 
 #CMD ["npm", "start"]
