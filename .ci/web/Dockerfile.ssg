@@ -3,8 +3,15 @@
 # Description: 自定义构建SSR服务器端渲染
 # 参考文档: https://docs.astro.build/zh-cn/recipes/docker/#ssr
 
-# 依赖基础镜像
-FROM node:18
+# 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
+ARG NODE_VERSON
+ARG DEPLOY_FOLDER
+ARG NPM_PACKAGE_FOLDER
+ARG PROJECT_NAME
+ARG WEB_STRIP_COMPONENTS
+
+# 依赖基础镜像  默认值变量方式 ${NODE_VERSON:18}
+FROM node:lts
 
 # 指定切换用户
 USER root
@@ -15,12 +22,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # RUN npm install
 # RUN npm run build
-
-# 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
-ARG DEPLOY_FOLDER
-ARG NPM_PACKAGE_FOLDER
-ARG PROJECT_NAME
-ARG WEB_STRIP_COMPONENTS
 
 # 拷贝部署文件到nginx
 COPY  ${NPM_PACKAGE_FOLDER}.tar.gz  /
