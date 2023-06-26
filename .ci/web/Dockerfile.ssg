@@ -4,7 +4,7 @@
 # 参考文档: https://docs.astro.build/zh-cn/recipes/docker/#ssr
 
 # 依赖基础镜像
-FROM node:lts AS runtime
+FROM node:18
 
 # 指定切换用户
 USER root
@@ -12,7 +12,6 @@ USER root
 # 设置时区
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
 
 # RUN npm install
 # RUN npm run build
@@ -29,10 +28,11 @@ COPY  ${NPM_PACKAGE_FOLDER}.tar.gz  .
 RUN  tar -xzvf ${NPM_PACKAGE_FOLDER}.tar.gz --strip-components ${WEB_STRIP_COMPONENTS} >/dev/null 2>&1 \
  && rm -f ${NPM_PACKAGE_FOLDER}.tar.gz
 
-ENV HOST=0.0.0.0
-ENV PORT=80
+ENV HOST 0.0.0.0
+ENV PORT 80
 EXPOSE 80
 
 # 启动运行
 CMD node ./dist/server/entry.mjs
+
 #CMD ["npm", "start"]
