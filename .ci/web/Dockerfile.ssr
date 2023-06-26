@@ -1,0 +1,33 @@
+# Author: 潘维吉
+# Version 1.0.0
+# Description: 自定义构建SSR服务器端渲染
+
+# 依赖基础镜像  默认值变量方式 ${NODE_VERSON:18}
+FROM node:lts AS runtime
+
+# 指定切换用户
+USER root
+
+# 设置时区
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# cd到app文件夹下
+WORKDIR /app
+
+# 将根目录下的源码文件都copy到docker容器文件系统的app文件夹下
+COPY . .
+
+# 安装项目依赖包  RUN和CMD都是执行命令，他们的差异在于RUN中定义的命令会在执行docker build命令创建镜像时执行，而CMD中定义的命令会在执行docker run命令运行镜像时执行
+# RUN pnpm install && npm run build
+
+# 配置环境变量
+ENV HOST 0.0.0.0
+ENV PORT 3000
+# 容器对外暴露的端口号
+EXPOSE 3000
+
+# 启动运行 需要node_modules目录文件才能运行
+CMD node ./dist/server/entry.mjs
+
+#CMD ["npm", "start"]
