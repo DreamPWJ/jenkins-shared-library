@@ -23,7 +23,7 @@ Design a general and fully automated DevOps to improve the efficiency and qualit
   ![avatar](./docs/images/mini.png)
 - Desktop client Electron, Unity (Windows, MacOS, Linux)
   ![avatar](./docs/images/desktop.png)
-- Web Technology Project Type 1. Npm Ecology and Static Web Project 2. Flutter For Web 3. React Native For Web 4. Unity For Web 5. WebAssembly
+- Web Technology Project Type 1. Npm Ecology and Static Web Project、SSR  2. Flutter For Web 3. React Native For Web 4. Unity For Web 5. WebAssembly
   ![avatar](./docs/images/web.png)
 - IoT Project 1. Embedded 2. VR AR XR 3. MetaVerse
   ![avatar](./docs/images/iot.png)
