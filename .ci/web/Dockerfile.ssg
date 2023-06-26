@@ -27,7 +27,7 @@ ARG WEB_STRIP_COMPONENTS
 # 拷贝部署文件到nginx
 COPY  ${NPM_PACKAGE_FOLDER}.tar.gz  .
 # 解压文件到当前文件夹下并删除压缩文件
-RUN mkdir -p /${NPM_PACKAGE_FOLDER} && tar -xzvf ${NPM_PACKAGE_FOLDER}.tar.gz /${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 \
+RUN tar -xzvf ${NPM_PACKAGE_FOLDER}.tar.gz >/dev/null 2>&1 \
  && rm -f ${NPM_PACKAGE_FOLDER}.tar.gz
 
 ENV HOST 0.0.0.0
