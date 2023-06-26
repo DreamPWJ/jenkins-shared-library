@@ -35,6 +35,6 @@ ENV PORT 80
 EXPOSE 80
 
 # 启动运行
-CMD node ./${NPM_PACKAGE_FOLDER}/server/entry.mjs
+CMD node ./$NPM_PACKAGE_FOLDER/server/entry.mjs
 
 #CMD ["npm", "start"]
