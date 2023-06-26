@@ -28,6 +28,6 @@ ENV PORT 3000
 EXPOSE 3000
 
 # 启动运行
-CMD node ./dist/server/entry.mjs
+#CMD node ./dist/server/entry.mjs
 
-#CMD ["npm", "start"]
+CMD ["npm", "start"]
