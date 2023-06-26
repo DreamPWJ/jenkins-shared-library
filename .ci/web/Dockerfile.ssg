@@ -5,10 +5,6 @@
 
 # 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
 ARG NODE_VERSON
-ARG DEPLOY_FOLDER
-ARG NPM_PACKAGE_FOLDER
-ARG PROJECT_NAME
-ARG WEB_STRIP_COMPONENTS
 
 # 依赖基础镜像  默认值变量方式 ${NODE_VERSON:18}
 FROM node:lts
@@ -23,10 +19,15 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # RUN npm install
 # RUN npm run build
 
+ARG DEPLOY_FOLDER
+ARG NPM_PACKAGE_FOLDER
+ARG PROJECT_NAME
+ARG WEB_STRIP_COMPONENTS
+
 # 拷贝部署文件到nginx
-COPY  ${NPM_PACKAGE_FOLDER}.tar.gz  /
+COPY  ${NPM_PACKAGE_FOLDER}.tar.gz  .
 # 解压文件到当前文件夹下并删除压缩文件
-RUN  tar -xzvf ${NPM_PACKAGE_FOLDER}.tar.gz /${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 \
+RUN mkdir -p /${NPM_PACKAGE_FOLDER} && tar -xzvf ${NPM_PACKAGE_FOLDER}.tar.gz /${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 \
  && rm -f ${NPM_PACKAGE_FOLDER}.tar.gz
 
 ENV HOST 0.0.0.0
