@@ -52,7 +52,7 @@ class Flutter implements Serializable {
             // 下载仓库依赖 可根据变更文件更新
             ctx.sh "flutter pub get"
             // 更新包依赖 解决缓存机制可能导致依赖不能更新
-            ctx.sh "flutter packages upgrade"
+            // ctx.sh "flutter packages upgrade"
         }
         // Flutter json_serializable自动生成.g.dart文件   --delete-conflicting-outputs 解决 pub finished with exit code 78 错误
         ctx.sh "flutter packages pub run build_runner build --delete-conflicting-outputs || true"
