@@ -555,6 +555,8 @@ def getInitParams(map) {
     IS_SERVERLESS_DEPLOY = jsonParams.IS_SERVERLESS_DEPLOY ? jsonParams.IS_SERVERLESS_DEPLOY : false // 是否Serverless发布
     IS_STATIC_RESOURCE = jsonParams.IS_STATIC_RESOURCE ? jsonParams.IS_STATIC_RESOURCE : false // 是否静态web资源
     IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
+    // K8s集群业务应用是否使用Session 做亲和度关联
+    IS_USE_SESSION = jsonParams.IS_USE_SESSION ? jsonParams.IS_USE_SESSION : false
     // 服务器部署时不同机器的代码配置是否不相同
     IS_DIFF_CONF_IN_DIFF_MACHINES = jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES ? jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES : false
     // 是否开启基于QPS自定义指标的K8S水平弹性扩缩容
@@ -563,14 +565,22 @@ def getInitParams(map) {
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
     AUTO_TEST_PARAM = jsonParams.AUTO_TEST_PARAM ? jsonParams.AUTO_TEST_PARAM.trim() : ""  // 自动化集成测试参数
+    // 自定义Docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
+    DOCKER_VOLUME_MOUNT = jsonParams.DOCKER_VOLUME_MOUNT ? jsonParams.DOCKER_VOLUME_MOUNT.trim() : "${map.docker_volume_mount}".trim()
     // 自定义特殊化的Nginx配置文件在项目源码中的路径  用于替换CI仓库的config默认标准配置文件
     CUSTOM_NGINX_CONFIG = jsonParams.CUSTOM_NGINX_CONFIG ? jsonParams.CUSTOM_NGINX_CONFIG.trim() : ""
+    // 不同项目通过文件目录区分放在相同的仓库中 设置Git代码项目文件夹名称 用于找到相关应用源码
+    GIT_PROJECT_FOLDER_NAME = jsonParams.GIT_PROJECT_FOLDER_NAME ? jsonParams.GIT_PROJECT_FOLDER_NAME.trim() : ""
     // 不同部署节点动态批量替换多个环境配置文件 源文件目录 目标文件目录 逗号,分割  如 resources/config,resources
     SOURCE_TARGET_CONFIG_DIR = jsonParams.SOURCE_TARGET_CONFIG_DIR ? jsonParams.SOURCE_TARGET_CONFIG_DIR.trim() : ""
     // k8s集群 Pod初始化副本数量 默认值3个节点  分布式2n+1容灾性
     K8S_POD_REPLICAS = jsonParams.K8S_POD_REPLICAS ? jsonParams.K8S_POD_REPLICAS.trim() : 3
     // 应用服务访问完整域名或代理服务器IP 带https或http前缀 用于反馈显示等
     APPLICATION_DOMAIN = jsonParams.APPLICATION_DOMAIN ? jsonParams.APPLICATION_DOMAIN.trim() : ""
+    // NFS网络文件服务地址
+    NFS_SERVER = jsonParams.NFS_SERVER ? jsonParams.NFS_SERVER.trim() : ""
+    // 挂载宿主机路径与NFS服务器文件路径映射关系 NFS宿主机文件路径 NFS服务器文件路径 映射关系:冒号分割 多个逗号,分割
+    NFS_MOUNT_PATHS = jsonParams.NFS_MOUNT_PATHS ? jsonParams.NFS_MOUNT_PATHS.trim() : ""
     // 自定义健康探测HTTP路径Path  默认根目录 /
     CUSTOM_HEALTH_CHECK_PATH = jsonParams.CUSTOM_HEALTH_CHECK_PATH ? jsonParams.CUSTOM_HEALTH_CHECK_PATH.trim() : "/"
     // 自定义部署Dockerfile名称 如 Dockerfile.xxx
@@ -1056,6 +1066,19 @@ def scrollToDeploy(map) {
                 healthCheck(map)
             }
         }
+    }
+}
+
+/**
+ * 云原生K8S部署大规模集群 弹性扩缩容
+ */
+def k8sDeploy(map) {
+    // 执行k8s集群部署
+    Kubernetes.deploy(this, map)
+    // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
+    if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+        println("K8S集群部署相同应用不同环境的部署节点")
+        Kubernetes.deploy(this, map, 2)
     }
 }
 

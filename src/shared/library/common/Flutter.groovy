@@ -43,6 +43,7 @@ class Flutter implements Serializable {
         // setPubspecGitAccount(ctx)
         // 清除修复缓存 缓存导致构建失败等
         // ctx.sh "rm -rf ${ctx.env.WORKSPACE}/build"
+
         if (Git.isExistsChangeFile(ctx, "pubspec.yaml", "pubspec.lock")) { // 依赖变更
             ctx.sh "flutter clean"
             // ctx.sh "flutter pub cache repair"
@@ -54,6 +55,7 @@ class Flutter implements Serializable {
             // 更新包依赖 解决缓存机制可能导致依赖不能更新
             // ctx.sh "flutter packages upgrade"
         }
+
         // Flutter json_serializable自动生成.g.dart文件   --delete-conflicting-outputs 解决 pub finished with exit code 78 错误
         ctx.sh "flutter packages pub run build_runner build --delete-conflicting-outputs || true"
 
@@ -147,7 +149,7 @@ class Flutter implements Serializable {
         // 可以分别包含--web-renderer html 或--web-renderer canvaskit在 HTML 或 CanvasKit 渲染器之间进行选择 auto（默认）- 自动选择要使用的渲染器。在应用程序在移动浏览器中运行时选择 HTML 渲染器，在应用程序在桌面浏览器中运行时选择 CanvasKit 渲染器
         // 解决Flutter Web首屏白屏过慢 CDN静态文件 需要加载canvaskit.wasm和canvaskit.js资源过大和国外存储导致 编译的时候使用--dart-define=FLUTTER_WEB_CANVASKIT_URL=https://cdn.jsdelivr.net/npm/canvaskit-wasm@0.32.0/bin/
         // Web首屏性能体验优化参考文章: https://www.jianshu.com/p/e61165cde5ab
-        ctx.sh " flutter build web --release  --dart-define=FLUTTER_WEB_CANVASKIT_URL=./canvaskit/ --web-renderer canvaskit "
+        ctx.sh "flutter build web --dart-define=FLUTTER_WEB_CANVASKIT_URL=https://unpkg.zhimg.com/canvaskit-wasm@0.32.0/bin/"
 
     }
 
