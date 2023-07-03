@@ -552,6 +552,8 @@ def getInitParams(map) {
     IS_SERVERLESS_DEPLOY = jsonParams.IS_SERVERLESS_DEPLOY ? jsonParams.IS_SERVERLESS_DEPLOY : false // 是否Serverless发布
     IS_STATIC_RESOURCE = jsonParams.IS_STATIC_RESOURCE ? jsonParams.IS_STATIC_RESOURCE : false // 是否静态web资源
     IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
+    // 服务器部署时不同机器的代码配置是否不相同
+    IS_DIFF_CONF_IN_DIFF_MACHINES = jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES ? jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES : false
     // 是否开启基于QPS自定义指标的K8S水平弹性扩缩容
     IS_K8S_HPA_QPS = jsonParams.IS_K8S_HPA_QPS ? jsonParams.IS_K8S_HPA_QPS : false
 
