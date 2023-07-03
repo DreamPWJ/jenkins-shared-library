@@ -251,6 +251,14 @@ def call(String type = 'web', Map map) {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.flutterWeb) }
                     }
+                    agent {
+                        docker {
+                            // flutter sdk环境  构建完成自动删除容器
+                            image "ghcr.io/cirruslabs/flutter:stable"
+                            args " -v ${PWD}:/build "
+                            reuseNode true // 使用根节点
+                        }
+                    }
                     steps {
                         script {
                             flutterBuildPackage(map)
