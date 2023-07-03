@@ -301,7 +301,7 @@ def call(String type = 'web', Map map) {
                         }
                     }
                 }
-                stage('Web构建打包 In Docker') {
+                stage('Web构建打包') {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
@@ -413,12 +413,6 @@ def call(String type = 'web', Map map) {
                             // args " -v /${env.WORKSPACE}:/tmp "
                             reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
                         }
-                        /*  docker {
-                              // kubectl 环境  构建完成自动删除容器
-                              image "dtzar/helm-kubectl:latest"
-                              // args " -v ~/.kube:/root/.kube"
-                              reuseNode true // 使用根节点
-                          } */
                     }
                     steps {
                         script {
