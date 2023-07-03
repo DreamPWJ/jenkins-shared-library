@@ -534,6 +534,8 @@ def getInitParams(map) {
     BRANCH_NAME = jsonParams.BRANCH_NAME ? jsonParams.BRANCH_NAME.trim() : GlobalVars.defaultBranch  // Git默认分支
     // 项目类型 1. Npm生态与静态Web项目 2. Flutter For Web 3. React Native For Web 4. Unity For Web  5. WebAssembly
     PROJECT_TYPE = jsonParams.PROJECT_TYPE ? jsonParams.PROJECT_TYPE.trim() : ""
+    // 计算机语言类型 1. Java  2. Go  3. Python  5. C++  6. JavaScript
+    COMPUTER_LANGUAGE = jsonParams.COMPUTER_LANGUAGE ? jsonParams.COMPUTER_LANGUAGE.trim() : "1"
     // 项目名 获取部署资源位置和指定构建模块名等
     PROJECT_NAME = jsonParams.PROJECT_NAME ? jsonParams.PROJECT_NAME.trim() : ""
     SHELL_PARAMS = jsonParams.SHELL_PARAMS ? jsonParams.SHELL_PARAMS.trim() : "" // shell传入前端或后端参数
