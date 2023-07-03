@@ -101,9 +101,9 @@ xi_che_flutter_web
 自动洗车机端Flutter For Web项目❤️
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/xiche-flutter" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/xiche-flutter.git" ,
    "BRANCH_NAME" : "main" ,
-   "PROJECT_TYPE" : "2" ,
+   "WEB_PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "xi-che" ,
    "SHELL_PARAMS" : "xi-che flutter-web 8017 80 prod",
    "IS_STATIC_RESOURCE" : true,

@@ -102,7 +102,7 @@ JSON_PARAMS
 {
    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-mobile/panweiji_life_manager.git" ,
    "BRANCH_NAME" : "dev" ,
-   "PROJECT_TYPE" : "2" ,
+   "WEB_PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "panweiji-life-manager" ,
    "SHELL_PARAMS" : "panweiji-life-manager flutter-web 8017 80 sit",
    "IS_STATIC_RESOURCE" : true
@@ -114,7 +114,7 @@ JSON_PARAMS
 {
    "REPO_URL" : "https://github.com/DreamPWJ/anjia/move_inspection_flutter.git" ,
    "BRANCH_NAME" : "dev" ,
-   "PROJECT_TYPE" : "2" ,
+   "WEB_PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "move-inspection" ,
    "SHELL_PARAMS" : "move-inspection flutter-web 8013 80 sit",
    "IS_STATIC_RESOURCE" : true

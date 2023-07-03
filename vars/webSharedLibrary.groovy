@@ -249,7 +249,7 @@ def call(String type = 'web', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.flutterWeb) }
+                        expression { return ("${WEB_PROJECT_TYPE}".toInteger() == GlobalVars.flutterWeb) }
                     }
                     agent {
                         docker {
@@ -269,7 +269,7 @@ def call(String type = 'web', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.reactNativeWeb) }
+                        expression { return ("${WEB_PROJECT_TYPE}".toInteger() == GlobalVars.reactNativeWeb) }
                     }
                     steps {
                         script {
@@ -292,7 +292,7 @@ def call(String type = 'web', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.unityWeb) }
+                        expression { return ("${WEB_PROJECT_TYPE}".toInteger() == GlobalVars.unityWeb) }
                     }
                     steps {
                         script {
@@ -532,8 +532,9 @@ def getInitParams(map) {
     // println "${jsonParams}"
     REPO_URL = jsonParams.REPO_URL ? jsonParams.REPO_URL.trim() : "" // Git源码地址
     BRANCH_NAME = jsonParams.BRANCH_NAME ? jsonParams.BRANCH_NAME.trim() : GlobalVars.defaultBranch  // Git默认分支
-    // 项目类型 1. Npm生态与静态Web项目 2. Flutter For Web 3. React Native For Web 4. Unity For Web  5. WebAssembly
-    PROJECT_TYPE = jsonParams.PROJECT_TYPE ? jsonParams.PROJECT_TYPE.trim() : ""
+    PROJECT_TYPE = jsonParams.PROJECT_TYPE ? jsonParams.PROJECT_TYPE.trim() : "1"  // 项目类型 1 前端项目 2 后端项目
+    // WEB项目类型 1. Npm生态与静态Web项目 2. Flutter For Web 3. React Native For Web 4. Unity For Web  5. WebAssembly
+    WEB_PROJECT_TYPE = jsonParams.WEB_PROJECT_TYPE ? jsonParams.WEB_PROJECT_TYPE.trim() : "1"
     // 计算机语言类型 1. Java  2. Go  3. Python  5. C++  6. JavaScript
     COMPUTER_LANGUAGE = jsonParams.COMPUTER_LANGUAGE ? jsonParams.COMPUTER_LANGUAGE.trim() : "1"
     // 项目名 获取部署资源位置和指定构建模块名等
@@ -612,7 +613,7 @@ def getInitParams(map) {
     FULL_PROJECT_NAME = "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}"
 
     // 目标系统类型 1. Npm生态与静态web项目 2. Flutter For Web 3. ReactNative For Web 4. Unity For Web
-    switch ("${PROJECT_TYPE}".toInteger()) {
+    switch ("${WEB_PROJECT_TYPE}".toInteger()) {
         case GlobalVars.npmWeb:
             SYSTEM_TYPE_NAME = "Web"
             break
@@ -857,7 +858,7 @@ def nodeBuildProject() {
 
     if ("${IS_STATIC_RESOURCE}" == 'true') { // 静态资源项目
         // 静态文件打包
-        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.npmWeb) {
+        if ("${WEB_PROJECT_TYPE}".toInteger() == GlobalVars.npmWeb) {
             if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
                 dir("${monoRepoProjectDir}") {
                     // MonoRepo静态文件打包

@@ -104,7 +104,7 @@ JSON_PARAMS
 {
    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-iot/flutter-demo.git" ,
    "BRANCH_NAME" : "master" ,
-   "PROJECT_TYPE" : "2" ,
+   "WEB_PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "flutter-demo" ,
    "SHELL_PARAMS" : "flutter-demo web 8015 80 sit",
    "IS_STATIC_RESOURCE" : true
@@ -116,7 +116,7 @@ JSON_PARAMS
 {
    "REPO_URL" : "https://github.com/DreamPWJ/unity.git" ,
    "BRANCH_NAME" : "master" ,
-   "PROJECT_TYPE" : "4" ,
+   "WEB_PROJECT_TYPE" : "4" ,
    "PROJECT_NAME" : "test-unity-web" ,
    "SHELL_PARAMS" : "test-unity web 8014 80 sit",
    "IS_STATIC_RESOURCE" : true
