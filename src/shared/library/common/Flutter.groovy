@@ -2,6 +2,7 @@ package shared.library.common
 
 import shared.library.GlobalVars
 import shared.library.Utils
+import shared.library.common.*
 
 /**
  * @author 潘维吉
@@ -45,12 +46,14 @@ class Flutter implements Serializable {
         // setPubspecGitAccount(ctx)
         // 清除修复缓存 缓存导致构建失败等
         // ctx.sh "rm -rf ${ctx.env.WORKSPACE}/build"
-        ctx.sh "flutter clean"
-        // ctx.sh "flutter pub cache repair"
-        // 下载仓库依赖
-        ctx.sh "flutter pub get"
-        // 更新包依赖 解决缓存机制可能导致依赖不能更新
-        ctx.sh "flutter packages upgrade"
+        if (Git.isExistsChangeFile(ctx, "pubspec.yaml", "pubspec.lock")) { // 依赖变更
+            ctx.sh "flutter clean"
+            // ctx.sh "flutter pub cache repair"
+            // 下载仓库依赖 可根据变更文件更新
+            ctx.sh "flutter pub get"
+            // 更新包依赖 解决缓存机制可能导致依赖不能更新
+            ctx.sh "flutter packages upgrade"
+        }
         // Flutter json_serializable自动生成.g.dart文件   --delete-conflicting-outputs 解决 pub finished with exit code 78 错误
         ctx.sh "flutter packages pub run build_runner build --delete-conflicting-outputs || true"
 
