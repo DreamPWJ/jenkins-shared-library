@@ -562,6 +562,8 @@ def getInitParams(map) {
     AUTO_TEST_PARAM = jsonParams.AUTO_TEST_PARAM ? jsonParams.AUTO_TEST_PARAM.trim() : ""  // 自动化集成测试参数
     // 自定义特殊化的Nginx配置文件在项目源码中的路径  用于替换CI仓库的config默认标准配置文件
     CUSTOM_NGINX_CONFIG = jsonParams.CUSTOM_NGINX_CONFIG ? jsonParams.CUSTOM_NGINX_CONFIG.trim() : ""
+    // 不同部署节点动态批量替换多个环境配置文件 源文件目录 目标文件目录 逗号,分割  如 resources/config,resources
+    SOURCE_TARGET_CONFIG_DIR = jsonParams.SOURCE_TARGET_CONFIG_DIR ? jsonParams.SOURCE_TARGET_CONFIG_DIR.trim() : ""
     // k8s集群 Pod初始化副本数量 默认值3个节点  分布式2n+1容灾性
     K8S_POD_REPLICAS = jsonParams.K8S_POD_REPLICAS ? jsonParams.K8S_POD_REPLICAS.trim() : 3
     // 应用服务访问完整域名或代理服务器IP 带https或http前缀 用于反馈显示等

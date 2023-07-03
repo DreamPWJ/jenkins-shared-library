@@ -39,9 +39,6 @@ class Flutter implements Serializable {
         // 第一次初始化Flutter 项目android目录下手动执行gradle wrapper命令 因为CI没有权限 允许在没有安装gradle的情况下运行Gradle任务 解决gradlew is not found (No such file or directory)
 
         ctx.println("Flutter构建依赖下载更新 📥 ")
-        // 使用官方国内镜像加速下载
-        ctx.sh " export PUB_HOSTED_URL=https://pub.flutter-io.cn "
-        ctx.sh " export FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn "
         // Flutter的 pubspec.yaml内直接引用代码库情况 新增仓库账号信息下载pub源码仓库包方式
         // setPubspecGitAccount(ctx)
         // 清除修复缓存 缓存导致构建失败等
@@ -49,6 +46,9 @@ class Flutter implements Serializable {
         if (Git.isExistsChangeFile(ctx, "pubspec.yaml", "pubspec.lock")) { // 依赖变更
             ctx.sh "flutter clean"
             // ctx.sh "flutter pub cache repair"
+            // 使用官方国内镜像加速下载
+            ctx.sh " export PUB_HOSTED_URL=https://pub.flutter-io.cn "
+            ctx.sh " export FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn "
             // 下载仓库依赖 可根据变更文件更新
             ctx.sh "flutter pub get"
             // 更新包依赖 解决缓存机制可能导致依赖不能更新
