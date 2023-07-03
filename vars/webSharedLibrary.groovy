@@ -301,25 +301,25 @@ def call(String type = 'web', Map map) {
                         }
                     }
                 }
-                stage('Web构建打包') {
+                stage('Web构建打包 In Docker') {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                    /*     agent {
-                             docker {
-                                 // Node环境  构建完成自动删除容器
-                                 image "node:${NODE_VERSION}"
-                                 reuseNode true // 使用根节点
-                             }
-                         }*/
-                    tools {
+                    agent {
+                        docker {
+                            // Node环境  构建完成自动删除容器
+                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                            reuseNode true // 使用根节点
+                        }
+                    }
+    /*                tools {
                         // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
                         // nodejs "${NODE_VERSION}"
-                        image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
-                    }
+                    }*/
                     steps {
                         script {
+                            echo "Docker环境内构建Node方式"
                             nodeBuildProject()
                         }
                     }
