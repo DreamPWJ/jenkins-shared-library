@@ -144,7 +144,7 @@ class Flutter implements Serializable {
         }*/
 
         ctx.println("执行Flutter打包Web应用 🚀")
-        ctx.sh "flutter config --enable-web" // 开启web配置
+        ctx.sh "flutter config --enable-web" // 开启Web配置
         // 构建使用 dart2js 方案  --dart-define 构建应用程序时传递环境变量  指定不同的dart文件 -t lib/main.dart
         // 可以分别包含--web-renderer html 或--web-renderer canvaskit在 HTML 或 CanvasKit 渲染器之间进行选择 auto（默认）- 自动选择要使用的渲染器。在应用程序在移动浏览器中运行时选择 HTML 渲染器，在应用程序在桌面浏览器中运行时选择 CanvasKit 渲染器
         // 解决Flutter Web首屏白屏过慢 CDN静态文件 需要加载canvaskit.wasm和canvaskit.js资源过大和国外存储导致 编译的时候使用--dart-define=FLUTTER_WEB_CANVASKIT_URL=https://cdn.jsdelivr.net/npm/canvaskit-wasm@0.32.0/bin/
