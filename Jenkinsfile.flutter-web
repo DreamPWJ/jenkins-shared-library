@@ -54,6 +54,8 @@ map.put('project_tag', ' ')
 map.put('is_prod', false)
 // 是否在同一台服务器蓝绿部署或滚动部署 非k8s集群方式设置
 map.put('is_same_server', true)
+// 是否进行服务启动健康探测  K8S集群类型设置false
+map.put('is_health_check', true)
 // 是否Pipeline内脚本钉钉通知  总开关
 map.put('is_ding_notice', true)
 // 是否进行部署前通知
@@ -100,7 +102,7 @@ JSON_PARAMS
 {
    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-mobile/panweiji_life_manager.git" ,
    "BRANCH_NAME" : "dev" ,
-   "PROJECT_TYPE" : "2" ,
+   "WEB_PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "panweiji-life-manager" ,
    "SHELL_PARAMS" : "panweiji-life-manager flutter-web 8017 80 sit",
    "IS_STATIC_RESOURCE" : true
@@ -112,7 +114,7 @@ JSON_PARAMS
 {
    "REPO_URL" : "https://github.com/DreamPWJ/anjia/move_inspection_flutter.git" ,
    "BRANCH_NAME" : "dev" ,
-   "PROJECT_TYPE" : "2" ,
+   "WEB_PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "move-inspection" ,
    "SHELL_PARAMS" : "move-inspection flutter-web 8013 80 sit",
    "IS_STATIC_RESOURCE" : true

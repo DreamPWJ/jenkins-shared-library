@@ -16,9 +16,6 @@ def call(String type = 'web', Map map) {
     changeLog = new ChangeLog()
     gitTagLog = new GitTagLog()
 
-    // 初始化参数
-    getInitParams(map)
-
     remote = [:]
     try {
         remote.host = "${REMOTE_IP}" // 部署应用程序服务器IP 动态字符参数 可配置在独立的job中
@@ -35,10 +32,14 @@ def call(String type = 'web', Map map) {
     // 自定义跳板机ssh和scp访问端口 默认22
     proxy_jump_port = "${map.proxy_jump_port}"
 
+    // 初始化参数
+    getInitParams(map)
+
     if (type == "web") { // 针对标准项目
         pipeline {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
-            agent { label "${map.jenkins_node}" }
+            agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_front_end}" : "${map.jenkins_node}"}" }
+            //agent { label "${map.jenkins_node}" }
 
             parameters {
                 choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback],
@@ -52,9 +53,10 @@ def call(String type = 'web', Map map) {
                 gitParameter(name: 'GIT_TAG', type: 'PT_TAG', defaultValue: GlobalVars.noGit, selectedValue: GlobalVars.noGit,
                         useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*',
                         description: "DEPLOY_MODE基于" + GlobalVars.release + "部署方式, 可选择指定Git Tag版本标签构建, 默认不选择是获取指定分支下的最新代码, 选择后按tag代码而非分支代码构建⚠️, 同时可作为一键回滚版本使用 🔙 ")
+                string(name: 'VERSION_NUM', defaultValue: "", description: '选填 自定义语义化版本号x.y.z 如1.0.0 (默认不填写 自动生成的版本号并且语义化自增) 🖊 ')
                 string(name: 'ROLLBACK_BUILD_ID', defaultValue: '0', description: "DEPLOY_MODE基于" + GlobalVars.rollback + "部署方式, 输入对应保留的回滚构建记录ID, " +
                         "默认0是回滚到上一次连续构建, 当前归档模式的回滚仅适用于在master节点构建的任务")
-                booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: true,
+                booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
                         description: '是否执行服务启动健康检测 否: 可大幅减少流水线持续时间 分布式部署不建议取消')
                 booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}",
                         description: '是否在生产环境中自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录')
@@ -116,6 +118,7 @@ def call(String type = 'web', Map map) {
                 MACHINE_TAG = "1号机" // 部署机器标签
                 IS_PROD = "${map.is_prod}" // 是否是生产环境
                 IS_SAME_SERVER = "${map.is_same_server}" // 是否在同一台服务器分布式部署
+                IS_BEFORE_DEPLOY_NOTICE = "${map.is_before_deploy_notice}" // 是否进行部署前通知
                 IS_NEED_SASS = "${map.is_need_sass}" // 是否需要css预处理器sass
                 IS_AUTO_TRIGGER = false // 是否是自动触发构建
                 IS_GEN_QR_CODE = false // 生成二维码 方便手机端扫描
@@ -219,21 +222,25 @@ def call(String type = 'web', Map map) {
                         }
                     }
                 }
-/*                stage('Docker环境') {
+/*         stage('JavaScript构建 In Docker') {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression { return (IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) }
                     }
                     agent {
+                        // label "linux"
                         docker {
                             // Node环境  构建完成自动删除容器
-                            image "node:${NODE_VERSION}"
+                            //image "node:${NODE_VERSION.replace('Node', '')}"
+                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                            // 使用自定义Dockerfile的node环境 加速monorepo依赖构建内置lerna等相关依赖
                             reuseNode true // 使用根节点
                         }
                     }
-
                     steps {
                         script {
+                            echo "Docker环境内构建Node方式"
                             nodeBuildProject()
                         }
                     }
@@ -242,7 +249,15 @@ def call(String type = 'web', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.flutterWeb) }
+                        expression { return ("${WEB_PROJECT_TYPE}".toInteger() == GlobalVars.flutterWeb) }
+                    }
+                    agent {
+                        docker {
+                            // flutter sdk环境  构建完成自动删除容器
+                            image "ghcr.io/cirruslabs/flutter:stable"
+                            args " -v ${PWD}:/build "
+                            reuseNode true // 使用根节点
+                        }
                     }
                     steps {
                         script {
@@ -254,7 +269,7 @@ def call(String type = 'web', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.reactNativeWeb) }
+                        expression { return ("${WEB_PROJECT_TYPE}".toInteger() == GlobalVars.reactNativeWeb) }
                     }
                     steps {
                         script {
@@ -277,7 +292,7 @@ def call(String type = 'web', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.unityWeb) }
+                        expression { return ("${WEB_PROJECT_TYPE}".toInteger() == GlobalVars.unityWeb) }
                     }
                     steps {
                         script {
@@ -291,19 +306,20 @@ def call(String type = 'web', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                    /*     agent {
-                             docker {
-                                 // Node环境  构建完成自动删除容器
-                                 image "node:${NODE_VERSION}"
-                                 reuseNode true // 使用根节点
-                             }
-                         }*/
-                    tools {
-                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
-                        nodejs "${NODE_VERSION}"
+                    agent {
+                        docker {
+                            // Node环境  构建完成自动删除容器
+                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                            reuseNode true // 使用根节点
+                        }
                     }
+    /*                tools {
+                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
+                        // nodejs "${NODE_VERSION}"
+                    }*/
                     steps {
                         script {
+                            echo "Docker环境内构建Node方式"
                             nodeBuildProject()
                         }
                     }
@@ -326,6 +342,9 @@ def call(String type = 'web', Map map) {
                 stage('上传云端') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            return (IS_K8S_DEPLOY == false)  // k8s集群部署 镜像方式无需上传到服务器
+                        }
                     }
                     steps {
                         script {
@@ -338,12 +357,12 @@ def call(String type = 'web', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (IS_BLUE_GREEN_DEPLOY == false)  // 非蓝绿部署 蓝绿部署有单独步骤
+                            return (IS_BLUE_GREEN_DEPLOY == false && IS_K8S_DEPLOY == false)  // 非蓝绿和k8s集群部署 都有单独步骤
                         }
                     }
                     steps {
                         script {
-                            runProject()
+                            runProject(map)
                         }
                     }
                 }
@@ -364,6 +383,7 @@ def call(String type = 'web', Map map) {
 
                 stage('滚动部署') {
                     when {
+                        beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             return (IS_ROLL_DEPLOY == true) // 是否进行滚动部署
@@ -373,6 +393,31 @@ def call(String type = 'web', Map map) {
                         script {
                             // 滚动部署实现多台服务按顺序更新 分布式零停机
                             scrollToDeploy(map)
+                        }
+                    }
+                }
+
+                stage('Kubernetes云原生') {
+                    when {
+                        beforeAgent true
+                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            return (IS_K8S_DEPLOY == true)  // 是否进行云原生K8S集群部署
+                        }
+                    }
+                    agent { // agent语法文档： https://www.jenkins.io/doc/book/pipeline/syntax/#agent
+                        dockerfile {
+                            filename 'Dockerfile.k8s' // 在WORKSPACE工作区代码目录
+                            dir "${env.WORKSPACE}/ci"
+                            // additionalBuildArgs  '--build-arg version=1.0.2'
+                            // args " -v /${env.WORKSPACE}:/tmp "
+                            reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
+                        }
+                    }
+                    steps {
+                        script {
+                            // 云原生K8s部署大规模集群
+                            k8sDeploy(map)
                         }
                     }
                 }
@@ -465,6 +510,7 @@ def call(String type = 'web', Map map) {
                 }
             }
         }
+
     } else if (type == "web-2") {  // 注意！！！ 差异性较大的Pipeline建议区分groovy文件维护
 
     }
@@ -480,8 +526,11 @@ def getInitParams(map) {
     // println "${jsonParams}"
     REPO_URL = jsonParams.REPO_URL ? jsonParams.REPO_URL.trim() : "" // Git源码地址
     BRANCH_NAME = jsonParams.BRANCH_NAME ? jsonParams.BRANCH_NAME.trim() : GlobalVars.defaultBranch  // Git默认分支
-    // 项目类型 1. Npm生态与静态Web项目 2. Flutter For Web 3. React Native For Web 4. Unity For Web  5. WebAssembly
-    PROJECT_TYPE = jsonParams.PROJECT_TYPE ? jsonParams.PROJECT_TYPE.trim() : ""
+    PROJECT_TYPE = jsonParams.PROJECT_TYPE ? jsonParams.PROJECT_TYPE.trim() : "1"  // 项目类型 1 前端项目 2 后端项目
+    // WEB项目类型 1. Npm生态与静态Web项目 2. Flutter For Web 3. React Native For Web 4. Unity For Web  5. WebAssembly
+    WEB_PROJECT_TYPE = jsonParams.WEB_PROJECT_TYPE ? jsonParams.WEB_PROJECT_TYPE.trim() : "1"
+    // 计算机语言类型 1. Java  2. Go  3. Python  5. C++  6. JavaScript
+    COMPUTER_LANGUAGE = jsonParams.COMPUTER_LANGUAGE ? jsonParams.COMPUTER_LANGUAGE.trim() : "1"
     // 项目名 获取部署资源位置和指定构建模块名等
     PROJECT_NAME = jsonParams.PROJECT_NAME ? jsonParams.PROJECT_NAME.trim() : ""
     SHELL_PARAMS = jsonParams.SHELL_PARAMS ? jsonParams.SHELL_PARAMS.trim() : "" // shell传入前端或后端参数
@@ -492,28 +541,57 @@ def getInitParams(map) {
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [test]的前端项目参数
 
     // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
-    IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD ? jsonParams.IS_DOCKER_BUILD : true
+    IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true
     IS_BLUE_GREEN_DEPLOY = jsonParams.IS_BLUE_GREEN_DEPLOY ? jsonParams.IS_BLUE_GREEN_DEPLOY : false // 是否蓝绿部署
     IS_ROLL_DEPLOY = jsonParams.IS_ROLL_DEPLOY ? jsonParams.IS_ROLL_DEPLOY : false // 是否滚动部署
     IS_GRAYSCALE_DEPLOY = jsonParams.IS_GRAYSCALE_DEPLOY ? jsonParams.IS_GRAYSCALE_DEPLOY : false // 是否灰度发布
-    IS_K8S_DEPLOY = jsonParams.IS_K8S_DEPLOY ? jsonParams.IS_K8S_DEPLOY : false // 是否K8s集群部署
+    IS_K8S_DEPLOY = jsonParams.IS_K8S_DEPLOY ? jsonParams.IS_K8S_DEPLOY : false // 是否K8S集群部署
     IS_SERVERLESS_DEPLOY = jsonParams.IS_SERVERLESS_DEPLOY ? jsonParams.IS_SERVERLESS_DEPLOY : false // 是否Serverless发布
     IS_STATIC_RESOURCE = jsonParams.IS_STATIC_RESOURCE ? jsonParams.IS_STATIC_RESOURCE : false // 是否静态web资源
     IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
+    // K8s集群业务应用是否使用Session 做亲和度关联
+    IS_USE_SESSION = jsonParams.IS_USE_SESSION ? jsonParams.IS_USE_SESSION : false
+    // 服务器部署时不同机器的代码配置是否不相同
+    IS_DIFF_CONF_IN_DIFF_MACHINES = jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES ? jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES : false
+    // 是否开启基于QPS自定义指标的K8S水平弹性扩缩容
+    IS_K8S_HPA_QPS = jsonParams.IS_K8S_HPA_QPS ? jsonParams.IS_K8S_HPA_QPS : false
+
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
     AUTO_TEST_PARAM = jsonParams.AUTO_TEST_PARAM ? jsonParams.AUTO_TEST_PARAM.trim() : ""  // 自动化集成测试参数
+    // 自定义Docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
+    DOCKER_VOLUME_MOUNT = jsonParams.DOCKER_VOLUME_MOUNT ? jsonParams.DOCKER_VOLUME_MOUNT.trim() : "${map.docker_volume_mount}".trim()
     // 自定义特殊化的Nginx配置文件在项目源码中的路径  用于替换CI仓库的config默认标准配置文件
     CUSTOM_NGINX_CONFIG = jsonParams.CUSTOM_NGINX_CONFIG ? jsonParams.CUSTOM_NGINX_CONFIG.trim() : ""
+    // 不同项目通过文件目录区分放在相同的仓库中 设置Git代码项目文件夹名称 用于找到相关应用源码
+    GIT_PROJECT_FOLDER_NAME = jsonParams.GIT_PROJECT_FOLDER_NAME ? jsonParams.GIT_PROJECT_FOLDER_NAME.trim() : ""
+    // 不同部署节点动态批量替换多个环境配置文件 源文件目录 目标文件目录 逗号,分割  如 resources/config,resources
+    SOURCE_TARGET_CONFIG_DIR = jsonParams.SOURCE_TARGET_CONFIG_DIR ? jsonParams.SOURCE_TARGET_CONFIG_DIR.trim() : ""
+    // k8s集群 Pod初始化副本数量 默认值3个节点  分布式2n+1容灾性
+    K8S_POD_REPLICAS = jsonParams.K8S_POD_REPLICAS ? jsonParams.K8S_POD_REPLICAS.trim() : 3
+    // 应用服务访问完整域名或代理服务器IP 带https或http前缀 用于反馈显示等
+    APPLICATION_DOMAIN = jsonParams.APPLICATION_DOMAIN ? jsonParams.APPLICATION_DOMAIN.trim() : ""
+    // NFS网络文件服务地址
+    NFS_SERVER = jsonParams.NFS_SERVER ? jsonParams.NFS_SERVER.trim() : ""
+    // 挂载宿主机路径与NFS服务器文件路径映射关系 NFS宿主机文件路径 NFS服务器文件路径 映射关系:冒号分割 多个逗号,分割
+    NFS_MOUNT_PATHS = jsonParams.NFS_MOUNT_PATHS ? jsonParams.NFS_MOUNT_PATHS.trim() : ""
+    // 自定义健康探测HTTP路径Path  默认根目录 /
+    CUSTOM_HEALTH_CHECK_PATH = jsonParams.CUSTOM_HEALTH_CHECK_PATH ? jsonParams.CUSTOM_HEALTH_CHECK_PATH.trim() : "/"
+    // 自定义部署Dockerfile名称 如 Dockerfile.xxx
+    CUSTOM_DOCKERFILE_NAME = jsonParams.CUSTOM_DOCKERFILE_NAME ? jsonParams.CUSTOM_DOCKERFILE_NAME.trim() : ""
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
         BRANCH_NAME = "${map.default_git_branch}"
     }
+    // 启动时间长的服务是否进行部署前通知  具体job级别设置优先
+    if (jsonParams.IS_BEFORE_DEPLOY_NOTICE ? jsonParams.IS_BEFORE_DEPLOY_NOTICE.toBoolean() : false) {
+        IS_BEFORE_DEPLOY_NOTICE = true
+    }
 
     // 统一前端monorepo仓库到一个job中, 减少构建依赖缓存大小和jenkins job维护成本
     MONOREPO_PROJECT_NAMES = ""
-    if ("${IS_MONO_REPO}" == 'true') {
+    if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && "${IS_MONO_REPO}" == 'true') {
         MONOREPO_PROJECT_NAMES = PROJECT_NAME.trim().replace(",", "\n")
         def projectNameArray = "${PROJECT_NAME}".split(",") as ArrayList
         def projectNameIndex = projectNameArray.indexOf(params.MONOREPO_PROJECT_NAME)
@@ -539,7 +617,7 @@ def getInitParams(map) {
     FULL_PROJECT_NAME = "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}"
 
     // 目标系统类型 1. Npm生态与静态web项目 2. Flutter For Web 3. ReactNative For Web 4. Unity For Web
-    switch ("${PROJECT_TYPE}".toInteger()) {
+    switch ("${WEB_PROJECT_TYPE}".toInteger()) {
         case GlobalVars.npmWeb:
             SYSTEM_TYPE_NAME = "Web"
             break
@@ -570,6 +648,16 @@ def getInitParams(map) {
         println(e.getMessage())
     }
 
+    // 健康检测url地址
+    healthCheckUrl = ""
+    healthCheckDomainUrl = ""
+    // 使用域名或机器IP地址
+    if ("${APPLICATION_DOMAIN}".trim() == "") {
+        healthCheckUrl = "http://${remote.host}:${SHELL_HOST_PORT}"
+    } else {
+        healthCheckDomainUrl = "${APPLICATION_DOMAIN}"
+    }
+
     // tag版本变量定义
     tagVersion = ""
     // 扫描二维码地址
@@ -580,8 +668,7 @@ def getInitParams(map) {
     isHealthCheckFail = false
     // 计算应用启动时间
     healthCheckTimeDiff = "未知"
-    // 健康检测url地址
-    healthCheckUrl = ""
+
 }
 
 /**
@@ -595,6 +682,7 @@ def initInfo() {
     //echo sh(returnStdout: true, script: 'env')
     //sh 'printenv'
     //println "${env.PATH}"
+    //println currentBuild
     try {
         echo "$git_event_name"
         IS_AUTO_TRIGGER = true
@@ -671,6 +759,7 @@ def pullProjectCode() {
         if ("${BRANCH_NAME}" != "${params.GIT_BRANCH}") {
             BRANCH_NAME = "${params.GIT_BRANCH}"  // Git分支
         }
+
         println "Git构建分支是: ${BRANCH_NAME} 📇"
         // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
         // println "${git}"
@@ -681,8 +770,8 @@ def pullProjectCode() {
                   gitTool          : 'Default',
                   userRemoteConfigs: [[credentialsId: "${GIT_CREDENTIALS_ID}", url: "${REPO_URL}"]]
         ])
-    } else { // 基于Git标签代码构建
-        println "Git构建标签是: ${params.GIT_TAG}} 📇"
+    } else {  // 基于Git标签代码构建
+        println "Git构建标签是: ${params.GIT_TAG} 📇"
         checkout([$class                           : 'GitSCM',
                   branches                         : [[name: "${params.GIT_TAG}"]],
                   doGenerateSubmoduleConfigurations: false,
@@ -773,7 +862,7 @@ def nodeBuildProject() {
 
     if ("${IS_STATIC_RESOURCE}" == 'true') { // 静态资源项目
         // 静态文件打包
-        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.npmWeb) {
+        if ("${WEB_PROJECT_TYPE}".toInteger() == GlobalVars.npmWeb) {
             if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
                 dir("${monoRepoProjectDir}") {
                     // MonoRepo静态文件打包
@@ -801,6 +890,7 @@ def nodeBuildProject() {
                 // 是否需要css预处理器sass处理
                 Web.needSass(this)
             }
+
             if (Git.isExistsChangeFile(this)) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
                 retry(3) {
                     println("安装依赖 📥")
@@ -816,7 +906,7 @@ def nodeBuildProject() {
                     println("执行Node构建 🏗️  ")
                     sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
                     retry(2) {
-                        sh "npm run '${NPM_RUN_PARAMS}' " // >/dev/null 2>&1
+                        sh " npm run '${NPM_RUN_PARAMS}' " // >/dev/null 2>&1
                     }
                 } catch (e) {
                     println(e.getMessage())
@@ -884,7 +974,7 @@ def uploadRemote(filePath) {
 /**
  * 部署运行项目
  */
-def runProject() {
+def runProject(map) {
     // 初始化docker
     initDocker()
     try {
@@ -918,7 +1008,7 @@ def healthCheck(map, params = '') { // 可选参数
                 script: "ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/ && ./health-check.sh ${healthCheckParams} '",
                 returnStdout: true).trim()
     }
-    healthCheckTimeDiff = Utils.getTimeDiff(healthCheckStart, new Date()) // 计算启动时间
+    healthCheckTimeDiff = Utils.getTimeDiff(healthCheckStart, new Date()) // 计算应用启动时间
 
     if ("${healthCheckMsg}".contains("成功")) {
         Tools.printColor(this, "${healthCheckMsg} ✅")
@@ -926,13 +1016,13 @@ def healthCheck(map, params = '') { // 可选参数
     } else if ("${healthCheckMsg}".contains("失败")) { // shell返回echo信息包含值
         isHealthCheckFail = true
         Tools.printColor(this, "${healthCheckMsg} ❌", "red")
-        println("👉 健康检测失败原因分析: 首选排除CI服务器和应用服务器网络和端口是否连通, 再查看应用服务启动日志是否失败")
+        println("👉 健康检测失败原因分析: 首选排除CI服务器和应用服务器网络是否连通、应用服务器端口是否开放, 再查看应用服务启动日志是否失败")
         // 钉钉失败通知
         dingNotice(map, 1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
         // 打印应用服务启动失败日志 方便快速排查错误
-        Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动日志开始 START 👇 ------------", "red")
+        Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志开始 START 👇 ------------", "red")
         sh " ssh  ${remote.user}@${remote.host} 'docker logs ${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}' "
-        Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动日志结束 END 👆 ------------", "red")
+        Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志结束 END 👆 ------------", "red")
         if ("${IS_ROLL_DEPLOY}" == 'true' || "${IS_BLUE_GREEN_DEPLOY}" == 'true') {
             println '分布式部署情况, 服务启动失败, 自动中止取消job, 防止继续部署导致其他应用服务挂掉 。'
             IS_ROLL_DEPLOY = false
@@ -948,11 +1038,11 @@ def healthCheck(map, params = '') { // 可选参数
  * 滚动部署
  */
 def scrollToDeploy(map) {
-    // 负载均衡和滚动更新worker应用服务
+    // 主从架构与双主架构等  负载均衡和滚动更新worker应用服务
     if ("${IS_SAME_SERVER}" == 'false') {   // 不同服务器滚动部署
         def machineNum = 1
         if (remote_worker_ips.isEmpty()) {
-            error("多机滚动部署, 请先在相关的Jenkinsfile.x配置从服务器ip数组remote_worker_ips参数 ❌")
+            error("多机滚动部署, 请先在相关的Jenkinsfile.x文件配置其它服务器ip数组remote_worker_ips参数 ❌")
         }
         // 循环串行执行多机分布式部署
         remote_worker_ips.each { ip ->
@@ -974,6 +1064,19 @@ def scrollToDeploy(map) {
 }
 
 /**
+ * 云原生K8S部署大规模集群 弹性扩缩容
+ */
+def k8sDeploy(map) {
+    // 执行k8s集群部署
+    Kubernetes.deploy(this, map)
+    // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
+    if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+        println("K8S集群部署相同应用不同环境的部署节点")
+        Kubernetes.deploy(this, map, 2)
+    }
+}
+
+/**
  * 自动设置免密连接 用于CI/CD服务器和应用部署服务器免密通信  避免手动批量设置繁琐重复劳动
  */
 def autoSshLogin() {
@@ -988,7 +1091,7 @@ def syncScript() {
         // 自动创建服务器部署目录
         // ssh登录概率性失败 连接数超报错: kex_exchange_identification
         // 解决vim /etc/ssh/sshd_config中 MaxSessions与MaxStartups改大2000 默认10 重启生效 systemctl restart sshd.service
-        sh " ssh  ${remote.user}@${remote.host} 'mkdir -p /${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}' "
+        sh " ssh ${remote.user}@${remote.host} 'mkdir -p /${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}' "
     } catch (error) {
         println "访问目标服务器失败, 首先检查jenkins服务器和应用服务器的ssh免密连接是否生效 ❌"
         println error.getMessage()
@@ -1039,7 +1142,7 @@ def rollbackVersion(map) {
     //该/var/jenkins_home/**路径只适合在master节点执行的项目 不适合slave节点的项目
     archivePath = "/var/jenkins_home/jobs/${env.JOB_NAME}/builds/${ROLLBACK_BUILD_ID}/archive/"
     uploadRemote("${archivePath}")
-    runProject()
+    runProject(map)
     if (params.IS_HEALTH_CHECK == true) {
         healthCheck(map)
     }
@@ -1102,42 +1205,50 @@ def alwaysPost() {
     // cleanWs()  // 清空工作空间
     try {
         def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
-        currentBuild.description = "<img src=${qrCodeOssUrl} width=250 height=250 >" +
-                "<br/> <a href='http://${remote.host}:${SHELL_HOST_PORT}'> 👉URL访问地址</a> " +
+        def noticeHealthCheckUrl = "${APPLICATION_DOMAIN == "" ? healthCheckUrl : healthCheckDomainUrl}"
+        currentBuild.description = "${IS_GEN_QR_CODE == 'true' ? "<img src=${qrCodeOssUrl} width=250 height=250 > <br/> " : ""}" +
+                "<a href='${noticeHealthCheckUrl}'> 👉URL访问地址</a> " +
                 "<br/> 项目: ${PROJECT_NAME}" +
                 "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
-                "<br/> 大小: ${webPackageSize} <br/> 分支: ${BRANCH_NAME} <br/>  环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
+                "<br/> 大小: ${webPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
     } catch (error) {
         println error.getMessage()
     }
 }
 
 /**
- * 生成tag和变更日志
+ * 生成版本tag和变更日志
  */
 def gitTagLog() {
-    // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行jenkins任务才能生效
+    // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行一次jenkins任务才能生效
     if (!params.IS_GIT_TAG && params.IS_GIT_TAG != false) {
         params.IS_GIT_TAG = true
     }
-    // 构建成功后生产环境并发布类型自动打tag和变更记录 指定tag方式不再重新打tag
+    // 构建成功后生产环境并发布类型自动打tag和变更记录  指定tag方式不再重新打tag
     if (params.IS_GIT_TAG == true && "${IS_PROD}" == 'true' && params.GIT_TAG == GlobalVars.noGit) {
         // 获取变更记录
         def gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", "\n")
         def latestTag = ""
         try {
-            // sh ' git fetch --tags ' // 拉取远程分支上所有的tags 需要设置用户名密码
-            // 获取本地当前分支最新tag名称 git describe --abbrev=0 --tags  获取远程仓库最新tag命令 git ls-remote   获取所有分支的最新tag名称命令 git describe --tags `git rev-list --tags --max-count=1`
-            // 不同分支下的独立打的tag可能导致tag版本错乱的情况
-            latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")
+            if ("${params.VERSION_NUM}".trim() != "") { // 自定义版本号
+                tagVersion = "${params.VERSION_NUM}".trim()
+                println "手填的自定义版本号为: ${tagVersion} "
+            } else {
+                // sh ' git fetch --tags ' // 拉取远程分支上所有的tags 需要设置用户名密码
+                // 获取本地当前分支最新tag名称 git describe --abbrev=0 --tags  获取远程仓库最新tag命令 git ls-remote   获取所有分支的最新tag名称命令 git describe --tags `git rev-list --tags --max-count=1`
+                // 不同分支下的独立打的tag可能导致tag版本错乱的情况  过滤掉非语义化版本的tag版本号
+                latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")
+
+                // 生成语义化版本号
+                tagVersion = Utils.genSemverVersion(this, latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
+                        GlobalVars.gitCommitFeature : GlobalVars.gitCommitFix)
+            }
         } catch (error) {
             println "生成tag语义化版本号失败"
             println error.getMessage()
             tagVersion = Utils.formatDate() // 获取版本号失败 使用时间格式作为tag
         }
-        // 生成语义化版本号
-        tagVersion = Utils.genSemverVersion(this, latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
-                GlobalVars.gitCommitFeature : GlobalVars.gitCommitFix)
+
         // 生成tag和变更日志
         gitTagLog.genTagAndLog(this, tagVersion, gitChangeLog, "${REPO_URL}", "${GIT_CREDENTIALS_ID}")
     }
@@ -1172,7 +1283,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             rollbackTag = "**Git Tag构建版本: ${params.GIT_TAG}**" // Git Tag版本添加标识
         }
         def monorepoProjectName = ""
-        if ("${IS_MONO_REPO}" == 'true') {
+        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && "${IS_MONO_REPO}" == 'true') {
             monorepoProjectName = "MonoRepo项目: ${PROJECT_NAME}"   // 单体仓库区分项目
         }
         def projectTypeName = "前端"
@@ -1181,6 +1292,8 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             envTypeMark = "正式版"
         }
         def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
+        def noticeHealthCheckUrl = "${APPLICATION_DOMAIN == "" ? healthCheckUrl : healthCheckDomainUrl}"
+
         if (type == 0) { // 失败
             if (!isHealthCheckFail) {
                 dingtalk(
@@ -1216,7 +1329,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             "${monorepoProjectName}",
                             "###### ${rollbackTag}",
                             "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
-                            "###### 访问URL: [${healthCheckUrl}](${healthCheckUrl})",
+                            "###### 访问URL: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl})",
                             "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
                             "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
                             "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
@@ -1224,7 +1337,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                     btns: [
                             [
                                     title    : "直接访问URL地址",
-                                    actionUrl: "${healthCheckUrl}"
+                                    actionUrl: "${noticeHealthCheckUrl}"
                             ]
                     ],
                     at: [isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone)]

@@ -47,6 +47,12 @@ spec:
     - hosts:
         - www.lannengtech.com
       secretName: www.lannengtech.com-tls
+    - hosts:
+        - website-admin.lannengtech.com
+      secretName: website-admin.lannengtech.com-tls
+    - hosts:
+        - website-admin-api.lannengtech.com
+      secretName: website-admin-api.lannengtech.com-tls
   rules:
     #自定义域名
     - host: lannengtech.com
@@ -72,4 +78,28 @@ spec:
                 #服务端口
                 port:
                   number: 8000
+            pathType: Prefix
+    - host: website-admin.lannengtech.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: lanneng-landing-page-admin-web-service
+                #服务端口
+                port:
+                  number: 8002
+            pathType: Prefix
+    - host: website-admin-api.lannengtech.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: yudao-server-admin-service
+                #服务端口
+                port:
+                  number: 8092
             pathType: Prefix

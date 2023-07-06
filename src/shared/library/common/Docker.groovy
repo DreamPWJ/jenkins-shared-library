@@ -124,6 +124,7 @@ class Docker implements Serializable {
                             ${dockerPushDiffStr}
                             """
                 } else {
+                    // 前端静态资源部署
                     ctx.sh """  cp -p ${ctx.env.WORKSPACE}/ci/.ci/web/default.conf ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} &&
                             cd ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} && pwd && \
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \

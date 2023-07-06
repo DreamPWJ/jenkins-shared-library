@@ -56,6 +56,8 @@ map.put('project_tag', ' ')
 map.put('is_prod', false)
 // 是否在同一台服务器蓝绿部署或滚动部署 非k8s集群方式设置
 map.put('is_same_server', true)
+// 是否进行服务启动健康探测  K8S集群类型设置false
+map.put('is_health_check', true)
 // 是否Pipeline内脚本钉钉通知  总开关
 map.put('is_ding_notice', false)
 // 是否进行部署前通知
@@ -102,7 +104,7 @@ JSON_PARAMS
 {
    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-iot/flutter-demo.git" ,
    "BRANCH_NAME" : "master" ,
-   "PROJECT_TYPE" : "2" ,
+   "WEB_PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "flutter-demo" ,
    "SHELL_PARAMS" : "flutter-demo web 8015 80 sit",
    "IS_STATIC_RESOURCE" : true
@@ -114,7 +116,7 @@ JSON_PARAMS
 {
    "REPO_URL" : "https://github.com/DreamPWJ/unity.git" ,
    "BRANCH_NAME" : "master" ,
-   "PROJECT_TYPE" : "4" ,
+   "WEB_PROJECT_TYPE" : "4" ,
    "PROJECT_NAME" : "test-unity-web" ,
    "SHELL_PARAMS" : "test-unity web 8014 80 sit",
    "IS_STATIC_RESOURCE" : true
