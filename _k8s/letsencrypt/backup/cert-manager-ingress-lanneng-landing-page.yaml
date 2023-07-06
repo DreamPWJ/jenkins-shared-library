@@ -98,7 +98,7 @@ spec:
             backend:
               #服务名称
               service:
-                name: lanneng-landing-page-admin-service
+                name: yudao-server-admin-service
                 #服务端口
                 port:
                   number: 8092
