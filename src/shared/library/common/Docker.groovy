@@ -174,7 +174,7 @@ class Docker implements Serializable {
     static def push(ctx, imageName) {
         def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${imageTag}"
         ctx.withCredentials([ctx.usernamePassword(credentialsId: "${ctx.DOCKER_REPO_CREDENTIALS_ID}", usernameVariable: 'DOCKER_HUB_USER_NAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
-            ctx.retry(3) {
+            ctx.retry(3) {  // 网络问题 重试机制
                 ctx.sh """  docker login ${ctx.DOCKER_REPO_REGISTRY} --username=${ctx.DOCKER_HUB_USER_NAME} --password=${ctx.DOCKER_HUB_PASSWORD}
                         docker push ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}
                         docker rmi ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --no-prune
