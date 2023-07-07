@@ -422,6 +422,19 @@ def call(String type = 'web', Map map) {
                     }
                 }
 
+                stage('钉钉通知') {
+                    when {
+                        expression { return true }
+                    }
+                    steps {
+                        script {
+                            if ("${params.IS_DING_NOTICE}" == 'true' && params.IS_HEALTH_CHECK == false) {
+                                dingNotice(map, 1, "**成功 ✅**") // ✅
+                            }
+                        }
+                    }
+                }
+
                 stage('发布日志') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
