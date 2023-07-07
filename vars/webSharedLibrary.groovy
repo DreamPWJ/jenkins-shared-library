@@ -1246,8 +1246,8 @@ def gitTagLog() {
         } catch (error) {
             println "生成tag语义化版本号失败"
             println error.getMessage()
-            // tagVersion = Utils.formatDate() // 获取版本号失败 使用时间格式作为tag
-            tagVersion = "1.0.0"
+            // tagVersion = Utils.formatDate("yyyy-MM-dd") // 获取版本号失败 使用时间格式作为tag
+            tagVersion = "1.0.0" // 默认初始化版本
         }
 
         // 生成tag和变更日志
