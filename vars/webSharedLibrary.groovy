@@ -53,7 +53,7 @@ def call(String type = 'web', Map map) {
                 gitParameter(name: 'GIT_TAG', type: 'PT_TAG', defaultValue: GlobalVars.noGit, selectedValue: GlobalVars.noGit,
                         useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*',
                         description: "DEPLOY_MODE基于" + GlobalVars.release + "部署方式, 可选择指定Git Tag版本标签构建, 默认不选择是获取指定分支下的最新代码, 选择后按tag代码而非分支代码构建⚠️, 同时可作为一键回滚版本使用 🔙 ")
-                string(name: 'VERSION_NUM', defaultValue: "", description: '选填 自定义语义化版本号x.y.z 如1.0.0 (默认不填写 自动生成的版本号并且语义化自增) 🖊 ')
+                string(name: 'VERSION_NUM', defaultValue: "", description: '选填 自定义语义化版本号x.y.z 如1.0.0 (默认不填写  自动生成的版本号并且语义化自增 生产环境设置有效) 🖊 ')
                 string(name: 'ROLLBACK_BUILD_ID', defaultValue: '0', description: "DEPLOY_MODE基于" + GlobalVars.rollback + "部署方式, 输入对应保留的回滚构建记录ID, " +
                         "默认0是回滚到上一次连续构建, 当前归档模式的回滚仅适用于在master节点构建的任务")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
