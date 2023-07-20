@@ -884,7 +884,8 @@ def gitTagLog() {
         tagVersion = "${IOT_VERSION_NUM}"
         // monorepo单体式仓库 独立版本号Tag重复处理
         if ("${IS_MONO_REPO}" == "true") {
-            tagVersion = tagVersion + "-" + "${PROJECT_NAME}".toLowerCase()
+            // tagVersion = tagVersion + "-" + "${PROJECT_NAME}".toLowerCase()
+            tagVersion = tagVersion
         }
         // 生成tag和变更日志
         gitTagLog.genTagAndLog(this, tagVersion, gitChangeLog, "${REPO_URL}", "${GIT_CREDENTIALS_ID}")
