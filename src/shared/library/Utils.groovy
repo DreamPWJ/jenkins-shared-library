@@ -56,7 +56,7 @@ class Utils implements Serializable {
                     def versionNumArray = getShEchoResult(ctx, "git tag --sort=taggerdate").toString().split(" ") as ArrayList
                     for (int i = 0; i < versionNumArray.size(); i++) {
                         if (isRegexMatcher(regex, versionNumArray[i])) {
-                            versionNum = versionNumArray[i]  // 查找到最大的语义化版本号
+                            versionNum = versionNumArray[i].split("-")[0].trim() // 查找到最大的语义化版本号
                             // ctx.println("查找到最大的语义化版本号为: " + versionNum)
                         }
                     }
