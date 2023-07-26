@@ -169,7 +169,7 @@ JSON_PARAMS
     "BRANCH_NAME" : "master" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "park-coupon" ,
-    "SHELL_PARAMS" : "park-coupon h5 80 80 prod" ,
+    "SHELL_PARAMS" : "park-coupon h5 8008 80 prod" ,
     "NPM_RUN_PARAMS" : "build",
     "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf"
 }
