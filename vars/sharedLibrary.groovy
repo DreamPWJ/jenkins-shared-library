@@ -1276,7 +1276,7 @@ def uploadOss(map) {
 def uploadRemote(filePath) {
     // ssh免密登录检测和设置
     autoSshLogin()
-    timeout(time: 1, unit: 'MINUTES') {
+    timeout(time: 2, unit: 'MINUTES') {
         // 同步脚本和配置到部署服务器
         syncScript()
     }

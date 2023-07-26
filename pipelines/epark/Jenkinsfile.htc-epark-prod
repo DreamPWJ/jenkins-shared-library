@@ -157,7 +157,7 @@ JSON_PARAMS
     "PROJECT_NAME" : "rzhtc" ,
     "SHELL_PARAMS" : "rzhtc h5 9000 80 prod" ,
     "NPM_RUN_PARAMS" : "build:rizhao",
-    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao-k8s.conf"
+    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf"
 }
 REMOTE_IP: 172.16.99.51
 
@@ -169,9 +169,9 @@ JSON_PARAMS
     "BRANCH_NAME" : "master" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "park-coupon" ,
-    "SHELL_PARAMS" : "park-coupon h5 8008 80 prod" ,
+    "SHELL_PARAMS" : "park-coupon h5 80 80 prod" ,
     "NPM_RUN_PARAMS" : "build",
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
+    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf"
 }
 REMOTE_IP: 172.16.99.51
 
