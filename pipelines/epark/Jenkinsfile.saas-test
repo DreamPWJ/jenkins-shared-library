@@ -113,7 +113,7 @@ sharedLibrary(map)
 
 /*
 
-park-saas-app-prod
+park-saas-app-test
 停车SaaS平台App服务端
 JSON_PARAMS
 {
@@ -121,7 +121,7 @@ JSON_PARAMS
    "BRANCH_NAME" : "develop" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "openpark-saas-app" ,
-   "SHELL_PARAMS" : "openpark-saas app 8088 9000 sit",
+   "SHELL_PARAMS" : "openpark-saas app 8188 9000 sit",
 }
 
 
