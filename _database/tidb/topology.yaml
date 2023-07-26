@@ -2,7 +2,7 @@ global:
   user: "root"
   ssh_port: 22
   deploy_dir: "/tidb-deploy"
-  data_dir: "/tidb-data"
+  data_dir: "/tidb-data"  #  基于Raft协议同步复制  所有节点数据保持一致
 
 server_configs:
   tidb:

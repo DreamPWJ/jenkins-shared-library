@@ -68,6 +68,23 @@ JSON_PARAMS
     "IS_OTA" : true
 }
 
+xiaozhuang-car-lock-embedded-monorepo
+小桩车位锁控制器嵌入式项目
+
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/embedded-monorepo.git" ,
+    "BRANCH_NAME" : "develop-xiaozhuang" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "car-lock" ,
+    "PROJECT_CHINESE_NAME" : "车位锁控制器" ,
+    "PLATFORMIO_ENV" : "xiaozhuang",
+    "ENV_TYPE" : "prod" ,
+    "IS_MONO_REPO" : true ,
+    "IS_UPLOAD_OSS" : true ,
+    "IS_OTA" : true
+}
+
 juxian-car-lock-embedded-monorepo
 莒县车位锁控制器嵌入式项目
 
