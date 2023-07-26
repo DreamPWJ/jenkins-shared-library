@@ -9,7 +9,7 @@
 
 #### TiDB运维命令
 
-- 启动TiDB集群
+- 启动TiDB集群  重启机器后需要执行start命令 不会自动重启tidb集群服务  复制数据备份  cp -r /tidb-data /root/tidb-data
 tiup cluster start tidb-prod
 
 - 停止TiDB集群
