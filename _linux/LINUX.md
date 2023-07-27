@@ -41,7 +41,7 @@ tail -f /var/log/cron
 - dev设备下新sdb磁盘分区 分别选m n p w (fdisk支持2TB大小内分区 新的空GPT分区表解决) :  fdisk /dev/sdb
 - dev/sdb下sdb1格式化新分区 ext4分区类型 :  mkfs -t ext4 /dev/sdb1
 - 分区挂载到目录才能生效 mount 设备名称 挂载目录 :  mount /dev/sdb1 /tidb-data
-- 注意重启系统后磁盘挂载会失效 自动挂载配置 :  vi /etc/fstab  执行blkid命令查看UUID和文件类型 最后一行添加 如 UUID= /tidb-data ext4 defaults 0 0
+- 注意重启系统后磁盘挂载会失效 自动挂载配置 :  vi /etc/fstab  执行 blkid 命令查看UUID和文件类型 最后一行添加 如 UUID= /tidb-data ext4 defaults 1 1
 - 卸载目录命令 :  umount /dev/sdb1
 
 #### 创建虚拟IP命令 基于ARP是地址解析协议 每台主机中都有一个ARP高速缓存 存储同一个网络内的IP地址与MAC地址的对应关系 操作系统会自动维护这个缓存 IP漂移Keepalived完成主备切换
@@ -57,10 +57,10 @@ sudo ip neigh flush 192.168.0.199/24                        # 清除ARP本机缓
 
 ####  防火墙相关命令
 
-- systemctl status firewalld.service
-- systemctl stop firewalld.service  # 重启还会打开防火墙
+- systemctl status firewalld.service # 查看防火墙状态
+- systemctl stop firewalld.service   # 重启还会打开防火墙
 - systemctl disable --now firewalld.service # 永久禁用防火墙
-- systemctl disable --now iptables  # 永久禁用防火墙配置表
+- systemctl disable --now iptables   # 永久禁用防火墙配置表
 - iptables -F   # 清空防火墙配置规则 设置
 
 #### 建立免密连接
