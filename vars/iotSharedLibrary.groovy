@@ -985,7 +985,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
 
         } else if (type == 3) { // 变更记录
             if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
-                def gitChangeLog = changeLog.genChangeLog(this, 10).replaceAll("\\;", "\n")
+                def gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
                 if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
                     dingtalk(
                             robot: "${DING_TALK_CREDENTIALS_ID}",

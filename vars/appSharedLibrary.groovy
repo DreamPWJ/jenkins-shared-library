@@ -2039,7 +2039,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                 if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
                     def gitChangeLog = ""
                     if ("${Constants.APP_DEFAULT_VERSION_COPYWRITING}" == params.APP_VERSION_DESCRIPTION) {
-                        gitChangeLog = changeLog.genChangeLog(this, 10).replaceAll("\\;", "\n")
+                        gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
                     } else {
                         // 使用自定义文案
                         gitChangeLog = "${params.APP_VERSION_DESCRIPTION}".replace("\\n", "\\n ##### ")
