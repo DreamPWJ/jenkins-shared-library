@@ -41,4 +41,4 @@
 192.168.3.140  ansible_ssh_user=root ansible_ssh_pass=orangepi
 
 [panweiji]
-192.168.0.100 ansible_ssh_user=root ansible_ssh_pass=panweiji
+192.168.0.100 ansible_ssh_user=root ansible_ssh_pass=panweiji666
