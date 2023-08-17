@@ -1,8 +1,6 @@
-#
-数据库表设计 本文件不要提交到远程仓库 只用于设计编写!!!
+# 数据库表设计 本文件不要提交到远程仓库 只用于设计编写!!!
 use database_name_design;
-show
-tables;
+show tables;
 
 drop table if exists base_table;
 create table base_table
