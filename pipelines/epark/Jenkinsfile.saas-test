@@ -113,6 +113,19 @@ sharedLibrary(map)
 
 /*
 
+park-saas-web-test
+停车SaaS平台Web前端 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/openpark_saas_frontend.git" ,
+    "BRANCH_NAME" : "main" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "openpark-saas-admin" ,
+    "SHELL_PARAMS" : "openpark-saas-admin web 8025 80 test" ,
+    "NPM_RUN_PARAMS" : "build:test",
+    "NODE_VERSION": "14" ,
+}
+
 park-saas-app-test
 停车SaaS平台App服务端
 JSON_PARAMS
