@@ -1276,7 +1276,7 @@ def uploadOss(map) {
 def uploadRemote(filePath) {
     // ssh免密登录检测和设置
     autoSshLogin()
-    timeout(time: 1, unit: 'MINUTES') {
+    timeout(time: 2, unit: 'MINUTES') {
         // 同步脚本和配置到部署服务器
         syncScript()
     }
@@ -2020,7 +2020,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             )
         } else if (type == 3) { // 变更记录
             if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
-                def gitChangeLog = changeLog.genChangeLog(this, 10).replaceAll("\\;", "\n")
+                def gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
                 if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
                     def titlePrefix = "${PROJECT_TAG} BUILD#${env.BUILD_NUMBER}"
                     try {

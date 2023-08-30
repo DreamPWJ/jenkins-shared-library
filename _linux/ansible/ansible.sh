@@ -17,14 +17,14 @@ apt-get install sshpass -y || true # 需要hosts设置用户名密码情况 如 
 ansible --version
 
 # 查看帮助命令  ansible-doc -l
-ansible groupName -m ping
-ansible groupName -m command -a "pwd"
+ansible GROUP_NAME -m ping
+ansible GROUP_NAME -m command -a "pwd"
 
 # src指定本地的文件 dest指定远程主机的目录或者文件
-ansible groupName -m copy -a " src=/home/panweiji/test.zip dest=/home/orangepi/ "
-ansible groupName -m command -a " unzip -o -d /home/orangepi/test /home/orangepi/test.zip "
-# ansible groupName -m command -a " /usr/sbin/reboot "
+ansible GROUP_NAME -m copy -a " src=/home/panweiji/test.zip dest=/home/panweiji/ "
+ansible GROUP_NAME -m command -a " unzip -o -d /home/panweiji/test /home/panweiji/test.zip "
+# ansible GROUP_NAME -m command -a " /usr/sbin/reboot "
 
 # 把脚本下发到所有的服务器，然后再运行脚本。相当于copy+shell+delete
 chmod a+x /usr/local/src/script
-ansible testgroup -m script -a "/usr/local/src/script"
+ansible GROUP_NAME -m script -a "/usr/local/src/script"

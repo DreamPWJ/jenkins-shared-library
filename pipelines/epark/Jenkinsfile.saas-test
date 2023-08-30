@@ -11,17 +11,17 @@
 def map = [:]
 
 // 远程服务器地址 k8s集群方式可填空或填公网代理负载IP
-map.put('remote_ip', '172.16.99.53')
+map.put('remote_ip', '192.168.1.128')
 // 工作服务器地址 同时支持N个服务器自动化分布式部署
-map.put('remote_worker_ips', ['172.16.99.63','172.16.99.74'])
+map.put('remote_worker_ips', [])
 // 远程服务器用户名
 map.put('remote_user_name', 'root')
 // 代理机或跳板机外网ip用于透传部署到内网目标机器 选填 目标机器外部无法直接访问情况填写内网ip
-map.put('proxy_jump_ip', '58.58.179.242')
+map.put('proxy_jump_ip', '58.59.49.122')
 // 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
 map.put('proxy_jump_user_name', 'root')
 // 自定义跳板机ssh和scp访问端口 默认22
-map.put('proxy_jump_port', '19861')
+map.put('proxy_jump_port', '3900')
 
 // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
 map.put('default_git_branch', ' ')
@@ -31,7 +31,7 @@ map.put('build_num_keep', 2)
 
 // Docker相关参数
 // JVM内存设置
-map.put('docker_java_opts', '-Xmx2800m')
+map.put('docker_java_opts', '-Xmx2600m')
 // docker内存限制
 map.put('docker_memory', '3G')
 // docker日志限制
@@ -56,10 +56,10 @@ map.put('k8s_credentials_ids', ' ')
 map.put('k8s_image_pull_secrets', ' ')
 
 // 项目标签或项目简称
-map.put('project_tag', '日照好停车')
+map.put('project_tag', '停车SaaS')
 
 // 是否是生产环境
-map.put('is_prod', true)
+map.put('is_prod', false)
 // 是否在同一台服务器蓝绿部署或滚动部署 非k8s集群方式设置
 map.put('is_same_server', false)
 // 是否进行优雅停机
@@ -82,9 +82,9 @@ map.put('jenkins_node', 'master')
 map.put('jenkins_node_front_end', 'master')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
-map.put('nodejs', 'Node14')
+map.put('nodejs', 'Node18')
 map.put('maven', 'Maven3.6')
-map.put('jdk', '8')
+map.put('jdk', '11')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
@@ -100,7 +100,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', ' ')
+map.put('maven_one_level', 'openpark-saas')
 // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
 map.put('maven_setting_xml', ' ')
 
@@ -109,71 +109,46 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.htc-epark-prod
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.saas-test
 
 /*
 
-htc-epark-server-prod
-好停车epark平台服务端
+park-saas-web-test
+停车SaaS平台Web前端 ❤️
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/epark.git" ,
-   "BRANCH_NAME" : "main" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "epark-server" ,
-   "SHELL_PARAMS" : "epark server 8080 8080 prod",
-   "IS_ROLL_DEPLOY" : true,
-   "IS_MAVEN_SINGLE_MODULE" : true,
-   "JAVA_FRAMEWORK_TYPE" : "2",
-   "IS_DIFF_CONF_IN_DIFF_MACHINES": true,
-   "SOURCE_TARGET_CONFIG_DIR" : "resources/rizhao,resources",
-   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/mnt/stor:/usr/local/tomcat/webapps/FileUpload,/mnt/stor1:/usr/local/tomcat/webapps/FileUpload/stor1,/mnt/stor/vpaas_m2m/epark/stor1/epark/thirdParkImgs:/usr/local/tomcat/webapps/FileUpload/vpaas_m2m/epark/stor1/epark/thirdParkImgs,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml,/my/tomcat/context.xml:/usr/local/tomcat/conf/context.xml"
-}
-
-htc-open-epark-server-prod
-好停车open epark平台服务端
-JSON_PARAMS
-{
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/openEpark.git" ,
-   "BRANCH_NAME" : "main" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "open-epark-server" ,
-   "SHELL_PARAMS" : "open-epark server 8082 8080 prod",
-   "IS_ROLL_DEPLOY" : true,
-   "IS_MAVEN_SINGLE_MODULE" : true,
-   "JAVA_FRAMEWORK_TYPE" : "2",
-   "SOURCE_TARGET_CONFIG_DIR" : "resource/rizhao,resource",
-   "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server-open-epark.xml:/usr/local/tomcat/conf/server.xml"
-}
-
-
-htc-epark-h5-prod
-好停车H5 Web前端 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/rzhtc.git" ,
-    "BRANCH_NAME" : "rizhao" ,
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/openpark_saas_frontend.git" ,
+    "BRANCH_NAME" : "main" ,
     "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "rzhtc" ,
-    "SHELL_PARAMS" : "rzhtc h5 9000 80 prod" ,
-    "NPM_RUN_PARAMS" : "build:rizhao",
-    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf"
+    "PROJECT_NAME" : "openpark-saas-admin" ,
+    "SHELL_PARAMS" : "openpark-saas-admin web 8025 80 test" ,
+    "NPM_RUN_PARAMS" : "build:test",
+    "NODE_VERSION": "14" ,
 }
-REMOTE_IP: 172.16.99.51
 
-htc-park-coupon-h5-prod
-好停车优惠券H5 Web前端 ❤️
+park-saas-app-test
+停车SaaS平台App服务端
 JSON_PARAMS
 {
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/park_coupon.git" ,
-    "BRANCH_NAME" : "master" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
+   "BRANCH_NAME" : "develop" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "openpark-saas-app" ,
+   "SHELL_PARAMS" : "openpark-saas app 8188 9000 sit",
+}
+
+
+park-saas-admin-web-test
+停车Saas平台 Web前端 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/smart-parking/parking-admin.git" ,
+    "BRANCH_NAME" : "main" ,
     "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "park-coupon" ,
-    "SHELL_PARAMS" : "park-coupon h5 8008 80 prod" ,
+    "PROJECT_NAME" : "parking-admin" ,
+    "SHELL_PARAMS" : "parking-saas-admin web 9009 80 test" ,
     "NPM_RUN_PARAMS" : "build",
-    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf"
 }
-REMOTE_IP: 172.16.99.51
 
 */
 
