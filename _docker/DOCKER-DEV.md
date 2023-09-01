@@ -19,6 +19,11 @@ sudo vim /etc/docker/daemon.json
 }
 sudo systemctl daemon-reload && sudo systemctl restart docker
 
+#### 还原Docker容器的启动run命令完整参数
+get_command_4_run_container（完美方案）
+docker pull cucker/get_command_4_run_container
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock cucker/get_command_4_run_container [容器名称]/[容器ID]
+
 #### 从Docker Hub里拉取mysql镜像来部署
 docker pull mysql
 

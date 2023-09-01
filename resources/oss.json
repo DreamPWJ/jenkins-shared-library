@@ -1,6 +1,6 @@
 {
-  "AccessKeyId": "111",
-  "AccessKeySecret": "222",
+  "AccessKeyId": "key",
+  "AccessKeySecret": "secret",
   "BucketName": "archive-artifacts-pipeline",
   "Endpoint": "oss-cn-shanghai.aliyuncs.com"
 }
