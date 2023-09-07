@@ -85,7 +85,7 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
                 fixChangeLog = "#### 修复问题 \n" + fixChangeLog
             }
             if (styleChangeLog) {
-                styleChangeLog = "#### 样式优化 \n" + styleChangeLog
+                styleChangeLog = "#### 风格优化 \n" + styleChangeLog
             }
             if (perfChangeLog) {
                 perfChangeLog = "#### 性能提升 \n" + perfChangeLog
