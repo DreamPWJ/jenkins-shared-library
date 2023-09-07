@@ -77,6 +77,8 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                           git merge ${tempBranch}
                           git push ${userPassWordUrl}
                           git branch -d ${tempBranch} 
+                          git merge --abort || true
+                          git reset --merge || true
                            """)
                 }
                 //}
