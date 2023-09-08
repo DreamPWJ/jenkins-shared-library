@@ -200,7 +200,7 @@ class Kubernetes implements Serializable {
     }
 
     /**
-     * 灰度发布
+     * 灰度发布  金丝雀发布  A/B测试
      * 参考文档: https://help.aliyun.com/document_detail/200941.html
      */
     static def ingressDeploy(ctx, map) {
