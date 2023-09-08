@@ -205,7 +205,7 @@ class Kubernetes implements Serializable {
      */
     static def ingressDeploy(ctx, map) {
         // 需要提供一下几个参数：
-        // 灰度发布匹配的方式  1、 header  2、 cookie
+        // 灰度发布匹配的方式  1、 header  2、 cookie   3. weight
         // yaml文件中灰度匹配的名称version  灰度匹配的值new  。 version=new 表示新版本
         // 灰度发布初始化流量权重 当时灰度部署完成后的新版流量权重 如20%访问流量到新版本
         // 新版发布后启动等待时间, 每隔多长时间更改流量规则, 单位秒  逐渐提高新版流量权重实现灰度发布
@@ -231,7 +231,7 @@ class Kubernetes implements Serializable {
     static def blueGreenDeploy(ctx, map) {
         // 蓝绿发布是为新版本创建一个与老版本完全一致的生产环境，在不影响老版本的前提下，按照一定的规则把部分流量切换到新版本，
         // 当新版本试运行一段时间没有问题后，将用户的全量流量从老版本迁移至新版本。
-        ctx.sh ""
+        ctx.sh " "
     }
 
     /**
