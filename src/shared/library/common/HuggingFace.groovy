@@ -21,7 +21,7 @@ class HuggingFace implements Serializable {
         pip install tensorflow
         """
         // 初始化
-        ctx.sh " python -m pip install huggingface_hub"
+        ctx.sh " python -m pip install huggingface_hub "
     }
 
 }
