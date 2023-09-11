@@ -14,11 +14,12 @@ network:
   version: 2
   renderer: networkd    #指定后端采用systemd-networkd或者Network Manager，可不填写则默认使用systemd-workd
 
-# 1.查看网卡设备号  ip addr 并配置网卡名称
+# 1. 查看网卡设备号  ip addr 并配置网卡名称
 # 2. 配置网络yaml文件  sudo nano /etc/netplan/00-installer-config.yaml    GNU nano编辑器CTRL+X 保存退出
-# 3.让配置生效  sudo netplan apply
+# 3. 让配置生效  sudo netplan apply
 
 # 默认配置
+
 #network:
 #  ethernets:
 #    ens33:
