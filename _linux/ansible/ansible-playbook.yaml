@@ -6,3 +6,18 @@
     - name: test copy
       copy: src=/tmp/a dest=/usr/local/src/
       #when: inventory_hostname == "host1IP"
+
+- name: Upload files to hosts with the same IP
+  hosts: web1
+  gather_facts: no
+  tasks:
+    - name: Upload files
+      ansible.builtin.copy:
+        src: /root/tmp.txt  # 本地文件路径
+        dest: /home/linaro
+      delegate_to: "{{ item.host }}"
+      vars:
+        ansible_port: "{{ item.port }}"
+      with_items:
+        - { host: 'IP地址', port: '端口号1' }
+        - { host: 'IP地址', port: '端口号2' }
