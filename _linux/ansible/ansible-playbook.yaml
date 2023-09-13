@@ -1,4 +1,5 @@
-# PlayBook提供更强大更灵活的批量多任务 执行 ansible-playbook  ansible-playbook.yaml
+## PlayBook提供更强大更灵活的批量多任务 执行 ansible-playbook  ansible-playbook.yaml
+
 - hosts: testgroup
   tasks:
     - name: test ansible
@@ -8,13 +9,13 @@
       #when: inventory_hostname == "host1IP"
 
 - name: Upload files to hosts with the same IP
-  hosts: web1
+  hosts: testgroup2
   gather_facts: no
   tasks:
     - name: Upload files
       ansible.builtin.copy:
         src: /root/tmp.txt  # 本地文件路径
-        dest: /home/linaro
+        dest: /home/panweiji
       delegate_to: "{{ item.host }}"
       vars:
         ansible_port: "{{ item.port }}"
