@@ -125,6 +125,13 @@ class Kubernetes implements Serializable {
             }
         }
 
+        // 灰度发布  金丝雀发布  A/B测试
+        if ("${ctx.IS_K8S_CANARY_DEPLOY}" == 'true') {
+            // 只发布一个新的pod服务用于验证服务, 老服务不变, 验证完成后取消灰度发布, 重新发布全量服务
+            appName += "-canary"
+            k8sPodReplicas = 1  // 只部署一个服务测试  也可以根据pod做百分比计算
+        }
+
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
                 " s#{APP_NAME}#${appName}#g;s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g;s#{DEFAULT_CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
