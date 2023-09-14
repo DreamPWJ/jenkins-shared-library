@@ -108,7 +108,7 @@ def call(String type = 'web', Map map) {
                 DEPLOY_FOLDER = "${map.deploy_folder}" // 服务器上部署所在的文件夹名称
                 NPM_PACKAGE_FOLDER = "${map.npm_package_folder}" // Web项目NPM打包代码所在的文件夹名称
                 WEB_STRIP_COMPONENTS = "${map.web_strip_components}" // Web项目解压到指定目录层级
-                MAVEN_ONE_LEVEL = "${map.maven_one_level}"// 如果Maven模块化存在二级模块目录 设置一级模块目录名称
+                MAVEN_ONE_LEVEL = "${map.maven_one_level}" // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
                 IS_PUSH_DOCKER_REPO = "${map.is_push_docker_repo}" // 是否上传镜像到docker容器仓库
                 DOCKER_REPO_CREDENTIALS_ID = "${map.docker_repo_credentials_id}" // docker容器镜像仓库账号信任id
                 DOCKER_REPO_REGISTRY = "${map.docker_repo_registry}" // docker镜像仓库注册地址
@@ -557,7 +557,8 @@ def getInitParams(map) {
     IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true
     IS_BLUE_GREEN_DEPLOY = jsonParams.IS_BLUE_GREEN_DEPLOY ? jsonParams.IS_BLUE_GREEN_DEPLOY : false // 是否蓝绿部署
     IS_ROLL_DEPLOY = jsonParams.IS_ROLL_DEPLOY ? jsonParams.IS_ROLL_DEPLOY : false // 是否滚动部署
-    IS_GRAYSCALE_DEPLOY = jsonParams.IS_GRAYSCALE_DEPLOY ? jsonParams.IS_GRAYSCALE_DEPLOY : false // 是否灰度发布
+    // 是否灰度发布  金丝雀发布  A/B测试
+    IS_K8S_CANARY_DEPLOY = jsonParams.IS_K8S_CANARY_DEPLOY ? jsonParams.IS_K8S_CANARY_DEPLOY : false
     IS_K8S_DEPLOY = jsonParams.IS_K8S_DEPLOY ? jsonParams.IS_K8S_DEPLOY : false // 是否K8S集群部署
     IS_SERVERLESS_DEPLOY = jsonParams.IS_SERVERLESS_DEPLOY ? jsonParams.IS_SERVERLESS_DEPLOY : false // 是否Serverless发布
     IS_STATIC_RESOURCE = jsonParams.IS_STATIC_RESOURCE ? jsonParams.IS_STATIC_RESOURCE : false // 是否静态web资源

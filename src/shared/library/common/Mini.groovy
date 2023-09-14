@@ -12,7 +12,7 @@ class Mini implements Serializable {
      * 小程序提交审核后创建定时检测任务 审核状态的变化后通知
      */
     static def miniCheckState(ctx) {
-        ctx.sh ""
+        ctx.sh " "
     }
 
 

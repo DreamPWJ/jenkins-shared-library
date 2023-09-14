@@ -6,7 +6,7 @@ import shared.library.Utils
  * @author 潘维吉
  * @date 2022/1/9 13:22
  * @email 406798106@qq.com
- * @description HuggingFace人工智能AI预训练集大仓库
+ * @description HuggingFace是人工智能AI大语言模型预训练集开源大仓库
  */
 class HuggingFace implements Serializable {
 
@@ -21,7 +21,7 @@ class HuggingFace implements Serializable {
         pip install tensorflow
         """
         // 初始化
-        ctx.sh " python -m pip install huggingface_hub"
+        ctx.sh " python -m pip install huggingface_hub "
     }
 
 }

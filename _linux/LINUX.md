@@ -17,7 +17,7 @@ ps -aux | sort -k4nr | head -10
 ifconfig
 curl cip.cc
 
-#### 查看linux内核
+#### 查看Linux内核
 
 lsb_release -a
 

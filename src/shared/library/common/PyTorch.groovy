@@ -13,7 +13,7 @@ class PyTorch implements Serializable {
      * 文档：https://www.tensorflow.org/tfx/guide/understanding_tfx_pipelines
      */
     static def execute(ctx) {
-        ctx.sh ""
+        ctx.sh " pip install torch "
     }
 
 }

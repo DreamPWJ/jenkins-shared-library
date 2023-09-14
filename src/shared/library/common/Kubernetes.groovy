@@ -24,9 +24,6 @@ class Kubernetes implements Serializable {
      */
     static def deploy(ctx, map, deployNum = 0) {
         def k8sStartTime = new Date()
-        // 动态替换k8s yaml声明式部署文件
-        setYamlConfig(ctx, map, deployNum)
-
         // 多个K8s集群同时循环滚动部署
         "${map.k8s_credentials_ids}".trim().split(",").each { k8s_credentials_id ->
             // KUBECONFIG变量为k8s中kubectl命令的yaml配置授权访问文件内容 数据保存为Jenkins的“Secret file”类型的凭据，用credentials方法从凭据中获取
@@ -37,6 +34,9 @@ class Kubernetes implements Serializable {
                 // 若您之前配置过KUBECONFIG环境变量，kubectl会优先加载KUBECONFIG环境变量，而不是$HOME/.kube/config，使用时请注意
                 // ctx.println("k8s集群访问配置：${ctx.KUBECONFIG}")
                 // ctx.sh "kubectl version"
+
+                // 动态替换k8s yaml声明式部署文件
+                setYamlConfig(ctx, map, deployNum)
 
                 // 部署应用 相同应用不同环境配置 需循环执行不同的镜像 指定命名空间--namespace=
                 ctx.sh """ 
@@ -125,6 +125,19 @@ class Kubernetes implements Serializable {
             }
         }
 
+        // 灰度发布  金丝雀发布  A/B测试
+        def canaryFlag = "canary"
+        if ("${ctx.IS_K8S_CANARY_DEPLOY}" == 'true') {
+            // 只发布一个新的pod服务用于验证服务, 老服务不变, 验证完成后取消灰度发布, 重新发布全量服务
+            appName += "-" + canaryFlag
+            k8sPodReplicas = 1  // 只部署一个服务测试  也可以根据pod做百分比计算
+        } else {
+            // 全量部署同时删除上次canary灰度部署服务
+            def deploymentName = appName + "-" + canaryFlag + "-deployment"
+            // ctx.sh "kubectl scale deployment ${deploymentName} --replicas=0 || true"
+            ctx.sh "kubectl delete deployment ${deploymentName} || true"
+        }
+
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
                 " s#{APP_NAME}#${appName}#g;s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g;s#{DEFAULT_CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
@@ -200,12 +213,12 @@ class Kubernetes implements Serializable {
     }
 
     /**
-     * 灰度发布
+     * 灰度发布  金丝雀发布  A/B测试
      * 参考文档: https://help.aliyun.com/document_detail/200941.html
      */
     static def ingressDeploy(ctx, map) {
         // 需要提供一下几个参数：
-        // 灰度发布匹配的方式  1、 header  2、 cookie
+        // 灰度发布匹配的方式  1、 header  2、 cookie   3. weight
         // yaml文件中灰度匹配的名称version  灰度匹配的值new  。 version=new 表示新版本
         // 灰度发布初始化流量权重 当时灰度部署完成后的新版流量权重 如20%访问流量到新版本
         // 新版发布后启动等待时间, 每隔多长时间更改流量规则, 单位秒  逐渐提高新版流量权重实现灰度发布
@@ -231,7 +244,7 @@ class Kubernetes implements Serializable {
     static def blueGreenDeploy(ctx, map) {
         // 蓝绿发布是为新版本创建一个与老版本完全一致的生产环境，在不影响老版本的前提下，按照一定的规则把部分流量切换到新版本，
         // 当新版本试运行一段时间没有问题后，将用户的全量流量从老版本迁移至新版本。
-        ctx.sh ""
+        ctx.sh " "
     }
 
     /**

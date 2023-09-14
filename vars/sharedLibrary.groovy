@@ -61,6 +61,7 @@ def call(String type = 'web-java', Map map) {
                 booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}",
                         description: '是否在生产环境中自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录')
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 📢 ")
+                booleanParam(name: 'IS_K8S_CANARY_DEPLOY', defaultValue: false, description: "是否执行K8S灰度发布、金丝雀发布、A/B测试实现多版本共存机制 ")
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
                 //booleanParam(name: 'IS_DEPLOY_MULTI_ENV', defaultValue: false, description: '是否同时部署当前job项目多环境 如dev test等')
             }
@@ -109,7 +110,7 @@ def call(String type = 'web-java', Map map) {
                 DEPLOY_FOLDER = "${map.deploy_folder}" // 服务器上部署所在的文件夹名称
                 NPM_PACKAGE_FOLDER = "${map.npm_package_folder}" // Web项目NPM打包代码所在的文件夹名称
                 WEB_STRIP_COMPONENTS = "${map.web_strip_components}" // Web项目解压到指定目录层级
-                MAVEN_ONE_LEVEL = "${map.maven_one_level}"// 如果Maven模块化存在二级模块目录 设置一级模块目录名称
+                MAVEN_ONE_LEVEL = "${map.maven_one_level}" // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
                 DOCKER_JAVA_OPTS = "${map.docker_java_opts}" // JVM内存设置
                 DOCKER_MEMORY = "${map.docker_memory}" // docker内存限制
                 DOCKER_LOG_OPTS = "${map.docker_log_opts}" // docker日志限制
@@ -515,12 +516,19 @@ def call(String type = 'web-java', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (IS_GRAYSCALE_DEPLOY == true) // 是否进行灰度发布
+                            return (IS_K8S_DEPLOY == true && IS_K8S_CANARY_DEPLOY == true) // 是否进行灰度发布
+                        }
+                    }
+                    agent { // agent语法文档： https://www.jenkins.io/doc/book/pipeline/syntax/#agent
+                        dockerfile {
+                            filename 'Dockerfile.k8s' // 在WORKSPACE工作区代码目录
+                            dir "${env.WORKSPACE}/ci"
+                            reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
                         }
                     }
                     steps {
                         script {
-                            // 基于Nginx Ingress 灰度发布  实现多版本共存 非强制更新提升用户体验
+                            // 灰度发布  金丝雀发布  A/B测试  基于Nginx Ingress 灰度发布  实现多版本共存 非强制更新提升用户体验
                             grayscaleDeploy(map)
                         }
                     }
@@ -531,7 +539,7 @@ def call(String type = 'web-java', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (IS_K8S_DEPLOY == true)  // 是否进行云原生K8S集群部署
+                            return (IS_K8S_DEPLOY == true && IS_K8S_CANARY_DEPLOY == false)  // 是否进行云原生K8S集群部署
                         }
                     }
                     agent { // agent语法文档： https://www.jenkins.io/doc/book/pipeline/syntax/#agent
@@ -739,7 +747,8 @@ def getInitParams(map) {
     IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true
     IS_BLUE_GREEN_DEPLOY = jsonParams.IS_BLUE_GREEN_DEPLOY ? jsonParams.IS_BLUE_GREEN_DEPLOY : false // 是否蓝绿部署
     IS_ROLL_DEPLOY = jsonParams.IS_ROLL_DEPLOY ? jsonParams.IS_ROLL_DEPLOY : false // 是否滚动部署
-    IS_GRAYSCALE_DEPLOY = jsonParams.IS_GRAYSCALE_DEPLOY ? jsonParams.IS_GRAYSCALE_DEPLOY : false // 是否灰度发布
+    // 是否灰度发布  金丝雀发布  A/B测试
+    IS_K8S_CANARY_DEPLOY = jsonParams.IS_K8S_CANARY_DEPLOY ? jsonParams.IS_K8S_CANARY_DEPLOY : params.IS_K8S_CANARY_DEPLOY
     IS_K8S_DEPLOY = jsonParams.IS_K8S_DEPLOY ? jsonParams.IS_K8S_DEPLOY : false // 是否K8S集群部署
     IS_SERVERLESS_DEPLOY = jsonParams.IS_SERVERLESS_DEPLOY ? jsonParams.IS_SERVERLESS_DEPLOY : false // 是否Serverless发布
     IS_STATIC_RESOURCE = jsonParams.IS_STATIC_RESOURCE ? jsonParams.IS_STATIC_RESOURCE : false // 是否静态web资源
@@ -1600,11 +1609,13 @@ def scrollToDeploy(map) {
 }
 
 /**
+ * 灰度发布  金丝雀发布  A/B测试
  * 基于Nginx Ingress 灰度发布  实现多版本并存 非强制用户更新提升用户体验
  */
 def grayscaleDeploy(map) {
-    // Nginx-ingress 是使用 Nginx 作为反向代理和负载平衡器的 Kubernetes 的 Ingress 控制器
-    Kubernetes.ingressDeploy(this, map)
+    // 灰度发布  金丝雀发布  A/B测试  Nginx-ingress 是使用 Nginx 作为反向代理和负载平衡器的 Kubernetes 的 Ingress 控制器
+    // Kubernetes.ingressDeploy(this, map)
+    Kubernetes.deploy(this, map)
 }
 
 /**
