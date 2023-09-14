@@ -68,10 +68,10 @@ class Kubernetes implements Serializable {
                 // 查看node节点当前的节点资源占用情况
                 // ctx.sh "kubectl top nodes"
 
-                // K8S健康检查 K8S默认有健康探测策略
+                // K8S健康检查 K8S默认有健康探测策略  k8s.yaml文件实现
                 // healthDetection(ctx)
 
-                // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用  K8S默认有容器清理策略
+                // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用  K8S默认有容器清理策略 无需手动处理
                 // cleanDockerImages(ctx)
 
                 ctx.println("K8S集群部署完成 ✅")
