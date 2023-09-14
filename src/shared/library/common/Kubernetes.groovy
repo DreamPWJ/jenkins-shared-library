@@ -18,6 +18,7 @@ class Kubernetes implements Serializable {
 
     static def k8sYAMLFile = "k8s.yaml" // k8s集群应用部署yaml定义文件
     static def pythonYamlFile = "k8s_yaml.py" // 使用Python动态处理Yaml文件
+    static def canaryFlag = "canary"  // 金丝雀发布标志
 
     /**
      * 声明式执行k8s集群部署
@@ -79,6 +80,12 @@ class Kubernetes implements Serializable {
         }
 
         ctx.println("等待K8S集群所有Pod节点全部启动完成中 ...")
+        if ("${ctx.IS_K8S_CANARY_DEPLOY}" == 'false') {
+            // 全量部署同时删除上次canary灰度部署的服务
+            def deploymentName = "${ctx.FULL_PROJECT_NAME}" + "-" + canaryFlag + "-deployment"
+            // ctx.sh "kubectl scale deployment ${deploymentName} --replicas=0 || true"
+            ctx.sh "kubectl delete deployment ${deploymentName} || true"
+        }
         // yaml内容中包含初始化时间和启动完成时间 shell中自动解析所有内容，建议yq进行实际的YAML解析
         // ctx.sh "kubectl get pods podName*** -o yaml"
         // K8S滚动部署需要时间 延迟等待 防止钉钉已经通知部署完成 但是新服务没有真正启动完成
@@ -126,17 +133,10 @@ class Kubernetes implements Serializable {
         }
 
         // 灰度发布  金丝雀发布  A/B测试
-        def canaryFlag = "canary"
         if ("${ctx.IS_K8S_CANARY_DEPLOY}" == 'true') {
             // 只发布一个新的pod服务用于验证服务, 老服务不变, 验证完成后取消灰度发布, 重新发布全量服务
             appName += "-" + canaryFlag
             k8sPodReplicas = 1  // 只部署一个服务测试  也可以根据pod做百分比计算
-        } else {
-            // 全量部署同时删除上次canary灰度服务
-            def deploymentName = appName + "-" + canaryFlag + "-deployment"
-            ctx.sleep(time: 2, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
-            // ctx.sh "kubectl scale deployment ${deploymentName} --replicas=0 || true"
-            ctx.sh "kubectl delete deployment ${deploymentName} || true"
         }
 
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerBuildImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
