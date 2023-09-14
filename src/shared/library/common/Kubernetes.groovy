@@ -134,6 +134,7 @@ class Kubernetes implements Serializable {
         } else {
             // 全量部署同时删除上次canary灰度服务
             def deploymentName = appName + "-" + canaryFlag + "-deployment"
+            ctx.sleep(time: 2, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
             // ctx.sh "kubectl scale deployment ${deploymentName} --replicas=0 || true"
             ctx.sh "kubectl delete deployment ${deploymentName} || true"
         }
