@@ -68,10 +68,10 @@ class Kubernetes implements Serializable {
                 // 查看node节点当前的节点资源占用情况
                 // ctx.sh "kubectl top nodes"
 
-                // K8S健康检查 K8S默认有健康探测策略
+                // K8S健康检查 K8S默认有健康探测策略  k8s.yaml文件实现
                 // healthDetection(ctx)
 
-                // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用  K8S默认有容器清理策略
+                // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用  K8S默认有容器清理策略 无需手动处理
                 // cleanDockerImages(ctx)
 
                 ctx.println("K8S集群部署完成 ✅")
@@ -130,11 +130,15 @@ class Kubernetes implements Serializable {
         if ("${ctx.IS_K8S_CANARY_DEPLOY}" == 'true') {
             // 只发布一个新的pod服务用于验证服务, 老服务不变, 验证完成后取消灰度发布, 重新发布全量服务
             appName += "-" + canaryFlag
-            k8sPodReplicas = 1  // 只部署一个服务测试  也可以根据pod做百分比计算
+            k8sPodReplicas = 1  // 只部署一个服务测试
+            // k8sPodReplicas= ctx.K8S_CANARY_DEPLOY_PERCENTAGE * Integer.parseInt(k8sPodReplicas)  // 也可以根据pod做百分比计算
+            // 新增了canary测试节点同时减少老旧pod节点数
+/*          def oldDeploymentName = appName + "-deployment"
+            def newK8sPodReplicas = Integer.parseInt(k8sPodReplicas) - 1
+            ctx.sh "kubectl scale deployment ${oldDeploymentName} --replicas=${newK8sPodReplicas} || true"   */
         } else {
             // 全量部署同时删除上次canary灰度部署服务
             def deploymentName = appName + "-" + canaryFlag + "-deployment"
-            // ctx.sh "kubectl scale deployment ${deploymentName} --replicas=0 || true"
             ctx.sh "kubectl delete deployment ${deploymentName} || true"
         }
 
