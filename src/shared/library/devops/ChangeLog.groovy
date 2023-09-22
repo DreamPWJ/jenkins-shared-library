@@ -52,12 +52,13 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
                         perfChangeLog += combinationMsg
                     } else if (truncatedMsg.toString().startsWith(GlobalVars.gitCommitRefactor)) { // 重构代码标识
                         refactorChangeLog += combinationMsg
-                    } else if (truncatedMsg.toString().startsWith(GlobalVars.gitCommitDocs)) { // 文档标识
+                    } else if (truncatedMsg.toString().startsWith(GlobalVars.gitCommitDocs) && !combinationMsg.contains(GlobalVars.gitCommitChangeLogDocs)) {
+                        // 文档标识
                         docsChangeLog += combinationMsg
                     } else {
                         // 过滤无需生成的变更日志类型
                         // combinationMsg.contains("revert") || combinationMsg.contains("chore") || combinationMsg.contains("test")
-                        if (combinationMsg.contains("docs(changelog)")) {
+                        if (combinationMsg.contains(GlobalVars.gitCommitChangeLogDocs)) {
                             combinationMsg = ""
                         } else {
                             otherChangeLog += combinationMsg
