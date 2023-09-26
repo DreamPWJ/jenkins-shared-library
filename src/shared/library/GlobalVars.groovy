@@ -132,5 +132,6 @@ class GlobalVars implements Serializable {
     static String gitCommitPerf = "perf"  // 性能优化标识
     static String gitCommitRefactor = "refactor"  // 重构代码标识
     static String gitCommitDocs = "docs"  // 文档标识
+    static String gitCommitChangeLogDocs = "docs(changelog)"  // 版本文档标识
 
 }
