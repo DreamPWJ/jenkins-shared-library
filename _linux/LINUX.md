@@ -39,7 +39,7 @@ tail -f /var/log/cron
 
 - 查看所有设备挂载情况 :  lsblk 或 lsblk -f 
 - dev设备下新sdb磁盘分区 分别选m n p w (fdisk支持2TB大小内分区 新的空GPT分区表解决) :  fdisk /dev/sdb
-- dev/sdb下sdb1格式化新分区 ext4分区类型 :  mkfs -t ext4 /dev/sdb1
+- dev/sdb下sdb1格式化新分区 ext4分区类型 :  mkfs -t ext4 /dev/sdb1   全部清空格式化: mkfs.xfs /dev/sda1
 - 分区挂载到目录才能生效 mount 设备名称 挂载目录 :  mount /dev/sdb1 /mnt/nfs_data
 - 注意重启系统后磁盘挂载会失效 自动挂载配置 :  vim /etc/fstab  执行 blkid 命令查看UUID和文件类型 最后一行添加 如 UUID= /tidb-data ext4 defaults 1 1   执行 systemctl daemon-reload
 - 卸载目录命令 :  umount /dev/sdb1
