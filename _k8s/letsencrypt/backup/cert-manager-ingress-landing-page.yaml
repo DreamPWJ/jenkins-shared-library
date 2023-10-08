@@ -37,6 +37,8 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-max-temp-file-size: 2048m
     # 数据传输大小
     nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+    # 配置是否同时支持http和https访问应用
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 
 spec:
   ingressClassName: lanneng-k8s-ingress
@@ -56,10 +58,10 @@ spec:
             backend:
               #服务名称
               service:
-                name: landing-page-web-service
+                name: openpark-saas-admin-web-service
                 #服务端口
                 port:
-                  number: 8000
+                  number: 8025
             pathType: Prefix
     - host: www.pengbocloud.com
       http:
@@ -68,8 +70,8 @@ spec:
             backend:
               #服务名称
               service:
-                name: landing-page-web-service
+                name: openpark-saas-admin-web-service
                 #服务端口
                 port:
-                  number: 8000
+                  number: 8025
             pathType: Prefix
