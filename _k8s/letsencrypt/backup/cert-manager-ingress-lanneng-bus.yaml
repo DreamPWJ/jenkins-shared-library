@@ -59,3 +59,16 @@ spec:
                 port:
                   number: 8003
             pathType: Prefix
+    #自定义域名
+    - host: bus.lannengtech.com
+      http:
+        paths:
+          - path: /mobile
+            backend:
+              #服务名称
+              service:
+                name: lanneng-bus-web-service
+                #服务端口
+                port:
+                  number: 8003
+            pathType: Prefix

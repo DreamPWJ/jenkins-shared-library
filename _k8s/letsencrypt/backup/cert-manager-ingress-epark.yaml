@@ -82,6 +82,18 @@ spec:
                 port:
                   number: 8090
             pathType: Prefix
+    - host: epark.pengbocloud.com
+      http:
+        paths:
+          - path: /h5
+            backend:
+              #服务名称
+              service:
+                name: rzhtc-h5-service
+                #服务端口
+                port:
+                  number: 9000
+            pathType: Prefix
     - host: epark-h5.pengbocloud.com
       http:
         paths:
