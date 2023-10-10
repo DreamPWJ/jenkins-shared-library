@@ -37,31 +37,33 @@ tail -f /var/log/cron
 
 #### Linux扩容磁盘步骤  在线不停机扩容磁盘设置LVM逻辑卷管理
 
-- 查看所有设备挂载情况 :  lsblk 或 lsblk -f 
+- 查看所有设备挂载情况 :  lsblk 或 lsblk -f
 - dev设备下新sdb磁盘分区 分别选m n p w (fdisk支持2TB大小内分区 新的空GPT分区表解决) :  fdisk /dev/sdb
-- dev/sdb下sdb1格式化新分区 ext4分区类型 :  mkfs -t ext4 /dev/sdb1   全部清空格式化: mkfs.xfs /dev/sda1
+- dev/sdb下sdb1格式化新分区 ext4分区类型 :  mkfs -t ext4 /dev/sdb1 全部清空格式化: mkfs.xfs /dev/sda1
 - 分区挂载到目录才能生效 mount 设备名称 挂载目录 :  mount /dev/sdb1 /mnt/nfs_data
-- 注意重启系统后磁盘挂载会失效 自动挂载配置 :  vim /etc/fstab  执行 blkid 命令查看UUID和文件类型 最后一行添加 如 UUID= /tidb-data ext4 defaults 1 1   执行 systemctl daemon-reload
+- 注意重启系统后磁盘挂载会失效 自动挂载配置 :  vim /etc/fstab 执行 blkid 命令查看UUID和文件类型 最后一行添加 如 UUID=
+  /tidb-data ext4 defaults 1 1 执行 systemctl daemon-reload
 - 卸载目录命令 :  umount /dev/sdb1
 
 #### 创建虚拟IP命令 基于ARP是地址解析协议 每台主机中都有一个ARP高速缓存 存储同一个网络内的IP地址与MAC地址的对应关系 操作系统会自动维护这个缓存 IP漂移Keepalived完成主备切换
 
 ip addr
 arp -a
-- 注意keepalived会自动配置无需手动配置虚拟IP  手动只一台主机器设置即可会自动IP漂移 添加一个VIP地址  eth0:1表示这个VIP绑定的目标网卡设备
-ifconfig eth0:1 192.168.0.199 broadcast 192.168.0.255 netmask 255.255.255.0 up
-route add -host 192.168.0.199 dev eth0:1                    # 通过route命令，在路由表上添加对这个VIP的路由信息
-ping 192.168.0.199                                          # 测试虚拟VIP是否成功
-/sbin/ip addr del 192.168.0.199/24 dev eth0:1               # 删除虚拟IP
-sudo ip neigh flush 192.168.0.199/24                        # 清除ARP本机缓存
 
-####  防火墙相关命令
+- 注意keepalived会自动配置无需手动配置虚拟IP 手动只一台主机器设置即可会自动IP漂移 添加一个VIP地址 eth0:1表示这个VIP绑定的目标网卡设备
+  ifconfig eth0:1 192.168.0.199 broadcast 192.168.0.255 netmask 255.255.255.0 up
+  route add -host 192.168.0.199 dev eth0:1 # 通过route命令，在路由表上添加对这个VIP的路由信息
+  ping 192.168.0.199 # 测试虚拟VIP是否成功
+  /sbin/ip addr del 192.168.0.199/24 dev eth0:1 # 删除虚拟IP
+  sudo ip neigh flush 192.168.0.199/24 # 清除ARP本机缓存
+
+#### 防火墙相关命令
 
 - systemctl status firewalld.service # 查看防火墙状态
-- systemctl stop firewalld.service   # 重启还会打开防火墙
+- systemctl stop firewalld.service # 重启还会打开防火墙
 - systemctl disable --now firewalld.service # 永久禁用防火墙
-- systemctl disable --now iptables   # 永久禁用防火墙配置表
-- iptables -F   # 清空防火墙配置规则 设置
+- systemctl disable --now iptables # 永久禁用防火墙配置表
+- iptables -F # 清空防火墙配置规则 设置
 
 #### 建立免密连接
 
@@ -76,11 +78,13 @@ sudo ip neigh flush 192.168.0.199/24                        # 清除ARP本机缓
 
 - 首先将系统版本的ISO镜像下载到U盘 , 使用Rufus软件制作的USB的启动引导盘安装
 - 安装参考文章: https://bynss.com/howto/633952.html
-- Ubuntu系统设置固定静态IP地址: _linux/network目录下有配置 参考文章：https://ld246.com/article/1593929878472
-- CentOS系统设置固定静态IP地址: 在 /etc/sysconfig/network-scripts/ifcfg-* 配置 参考文章：https://cloud.tencent.com/developer/article/1721181
+- Ubuntu系统设置固定静态IP地址: _linux/network目录下有配置 参考文章: https://ld246.com/article/1593929878472
+- CentOS系统设置固定静态IP地址: 在 /etc/sysconfig/network-scripts/ifcfg-* 配置  在VMware中使用NAT配置的网关和IP网段并设置自定义网络
+  参考文章: https://cloud.tencent.com/developer/article/1721181
 - 固定IP可在路由器上设置静态地址 防止被DHCP动态分配
-- 开启Ubuntu系统 root用户访问ssh远程访问权限(sudo passwd root)  : https://blog.csdn.net/boonya/article/details/121256380
-   su root 再执行 sudo vim /etc/ssh/sshd_config 添加 PermitRootLogin yes  生效 sudo systemctl restart sshd  切换到root用户命令 sudo -i
+- 开启Ubuntu系统 root用户访问ssh远程访问权限(sudo passwd root) : https://blog.csdn.net/boonya/article/details/121256380
+  su root 再执行 sudo vim /etc/ssh/sshd_config 添加 PermitRootLogin yes 生效 sudo systemctl restart sshd 
+  切换到root用户命令 sudo -i
 
 ##### 在Ubuntu上安装图形化界面
 
