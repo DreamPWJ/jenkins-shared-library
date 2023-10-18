@@ -1926,6 +1926,17 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && "${IS_MONO_REPO}" == 'true') {
             monorepoProjectName = "MonoRepo项目: ${PROJECT_NAME}"   // 单体仓库区分项目
         }
+        // K8S部署方式
+        def deployType = ""
+        def k8sPodContent = ""
+        if ("${IS_K8S_DEPLOY}" == "true") {
+            deployType = "部署方式: K8S集群滚动发布"
+            if ("${IS_K8S_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
+                deployType = "部署方式: K8S集群金丝雀发布"
+            } else {
+                k8sPodContent = "K8S集群部署Pod节点数: ${K8S_POD_REPLICAS}个"
+            }
+        }
         def projectTypeName = ""
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             projectTypeName = "前端"
@@ -1974,6 +1985,8 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                 "- Node版本: ${NODE_VERSION}   包大小: ${webPackageSize}",
                                 "${monorepoProjectName}",
                                 "###### ${rollbackTag}",
+                                "###### ${deployType}",
+                                "###### ${k8sPodContent}",
                                 "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
                                 "###### 访问URL: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl})",
                                 "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
@@ -2005,6 +2018,8 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                 "#### · CI构建CD部署完成 👌",
                                 "#### · 服务端启动运行${msg}",
                                 "###### ${rollbackTag}",
+                                "###### ${deployType}",
+                                "###### ${k8sPodContent}",
                                 "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
                                 "###### 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
                                 "###### ${javaInfo}",
