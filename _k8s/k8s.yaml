@@ -10,9 +10,9 @@ metadata:
     app: {APP_COMMON_NAME}     # Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
 
 spec:
-  replicas: {K8S_POD_REPLICAS}       #replicas默认值是1
-  #minReplicas: 1                    #最小副本数
-  #maxReplicas: 10                   #最大副本数
+  replicas: {K8S_POD_REPLICAS}       # replicas默认值是1
+  #minReplicas: 1                    # 最小副本数
+  #maxReplicas: 10                   # 最大副本数
   selector:
     matchLabels:
       app: {APP_COMMON_NAME}
