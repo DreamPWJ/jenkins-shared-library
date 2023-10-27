@@ -1,6 +1,6 @@
 network:
   ethernets:
-    enp1s0: #配置的网卡的名称 ip addr命令查看
+    ens33: #配置的网卡的名称 ip addr命令查看
       addresses:
         - 192.168.0.200/24    #配置的静态ip地址和掩码
       dhcp4: false            #是否DHCP

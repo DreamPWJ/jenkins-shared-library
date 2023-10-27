@@ -2,7 +2,7 @@
 
 # Author: 潘维吉
 # Description:  初始化磁盘相当于Linux恢复出厂设置  先安装expect，yum -y install expect
-# 参考文档: https://segmentfault.com/a/1190000021700495
+# 参考文档: https://blog.51cto.com/u_15077549/4387837
 
 # 执行 fdisk -l 命令查看磁盘信息
 expect<<-EOF

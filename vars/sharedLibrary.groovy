@@ -57,7 +57,7 @@ def call(String type = 'web-java', Map map) {
                 string(name: 'ROLLBACK_BUILD_ID', defaultValue: '0', description: "DEPLOY_MODE基于" + GlobalVars.rollback + "部署方式, 输入对应保留的回滚构建记录ID, " +
                         "默认0是回滚到上一次连续构建, 当前归档模式的回滚仅适用于在master节点构建的任务")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
-                        description: '是否执行服务启动健康检测 否: 可大幅减少流水线持续时间 分布式部署不建议取消')
+                        description: '是否执行服务启动健康检测 否: 可大幅减少流水线持续时间 分布式部署不建议取消  K8S使用默认的健康探测')
                 booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}",
                         description: '是否在生产环境中自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录')
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 📢 ")
@@ -780,7 +780,7 @@ def getInitParams(map) {
     SOURCE_TARGET_CONFIG_DIR = jsonParams.SOURCE_TARGET_CONFIG_DIR ? jsonParams.SOURCE_TARGET_CONFIG_DIR.trim() : ""
     // 不同项目通过文件目录区分放在相同的仓库中 设置Git代码项目文件夹名称 用于找到相关应用源码
     GIT_PROJECT_FOLDER_NAME = jsonParams.GIT_PROJECT_FOLDER_NAME ? jsonParams.GIT_PROJECT_FOLDER_NAME.trim() : ""
-    // k8s集群 Pod初始化副本数量 默认值3个节点  分布式2n+1容灾性
+    // K8S集群 Pod初始化副本数量 默认值3个节点  分布式2n+1容灾性   K8S中yaml不配置的replicas默认值是1
     K8S_POD_REPLICAS = jsonParams.K8S_POD_REPLICAS ? jsonParams.K8S_POD_REPLICAS.trim() : 3
     // 应用服务访问完整域名或代理服务器IP 带https或http前缀 用于反馈显示等
     APPLICATION_DOMAIN = jsonParams.APPLICATION_DOMAIN ? jsonParams.APPLICATION_DOMAIN.trim() : ""
@@ -1172,10 +1172,10 @@ def mavenBuildProject(map, deployNum = 0) {
             MAVEN_ONE_LEVEL = ""
             // 在pom.xml文件目录下执行 规范是pom.xml在代码根目录
             // def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
-            sh "mvn clean install -Dmaven.test.skip=true"
+            sh "mvn clean install -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         } else {  // 多模块情况
-            // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码
-            sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.test.skip=true"
+            // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
+            sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         }
     } else {
         // 基于自定义setting.xml文件方式打包 如私有包等
@@ -1926,6 +1926,17 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && "${IS_MONO_REPO}" == 'true') {
             monorepoProjectName = "MonoRepo项目: ${PROJECT_NAME}"   // 单体仓库区分项目
         }
+        // K8S部署方式
+        def deployType = ""
+        def k8sPodContent = ""
+        if ("${IS_K8S_DEPLOY}" == "true") {
+            deployType = "部署方式: K8S集群滚动发布"
+            if ("${IS_K8S_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
+                deployType = "部署方式: K8S集群金丝雀发布"
+            } else {
+                k8sPodContent = "K8S集群部署Pod节点数: ${K8S_POD_REPLICAS}个"
+            }
+        }
         def projectTypeName = ""
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             projectTypeName = "前端"
@@ -1973,6 +1984,8 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                 "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
                                 "- Node版本: ${NODE_VERSION}   包大小: ${webPackageSize}",
                                 "${monorepoProjectName}",
+                                "##### ${deployType}",
+                                "##### ${k8sPodContent}",
                                 "###### ${rollbackTag}",
                                 "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
                                 "###### 访问URL: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl})",
@@ -2004,6 +2017,8 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                 "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL})",
                                 "#### · CI构建CD部署完成 👌",
                                 "#### · 服务端启动运行${msg}",
+                                "##### ${deployType}",
+                                "##### ${k8sPodContent}",
                                 "###### ${rollbackTag}",
                                 "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
                                 "###### 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
