@@ -1172,10 +1172,10 @@ def mavenBuildProject(map, deployNum = 0) {
             MAVEN_ONE_LEVEL = ""
             // 在pom.xml文件目录下执行 规范是pom.xml在代码根目录
             // def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
-            sh "mvn  clean install -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true"
+            sh "mvn clean install -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         } else {  // 多模块情况
             // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
-            sh "mvn  clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true"
+            sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         }
     } else {
         // 基于自定义setting.xml文件方式打包 如私有包等
