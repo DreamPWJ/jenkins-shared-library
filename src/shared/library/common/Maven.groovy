@@ -23,9 +23,9 @@ class Maven implements Serializable {
         /* ctx.configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
              ctx.sh "mvn -s $MAVEN_SETTINGS clean install -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am -Dmaven.test.skip=true"
          }*/
-        // -s settings.xml文件路径
+        // -s settings.xml文件路径  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
         def settingsFile = "${ctx.env.WORKSPACE}/ci/_jenkins/maven/${ctx.MAVEN_SETTING_XML}"
-        ctx.sh "mvn -s ${settingsFile} clean install -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am -Dmaven.test.skip=true"
+        ctx.sh "mvn -s ${settingsFile} -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am -T 1C -Dmaven.compile.fork=true clean install -Dmaven.test.skip=true"
     }
 
     /**
