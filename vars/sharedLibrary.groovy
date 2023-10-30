@@ -54,6 +54,8 @@ def call(String type = 'web-java', Map map) {
                         useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*',
                         description: "DEPLOY_MODE基于" + GlobalVars.release + "部署方式, 可选择指定Git Tag版本标签构建, 默认不选择是获取指定分支下的最新代码, 选择后按tag代码而非分支代码构建⚠️, 同时可作为一键回滚版本使用 🔙 ")
                 string(name: 'VERSION_NUM', defaultValue: "", description: '选填 自定义语义化版本号x.y.z 如1.0.0 (默认不填写  自动生成的版本号并且语义化自增 生产环境设置有效) 🖊 ')
+                text(name: 'VERSION_DESCRIPTION', defaultValue: "${Constants.DEFAULT_VERSION_COPYWRITING}",
+                        description: "填写服务版本描述文案 (不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊 ")
                 string(name: 'ROLLBACK_BUILD_ID', defaultValue: '0', description: "DEPLOY_MODE基于" + GlobalVars.rollback + "部署方式, 输入对应保留的回滚构建记录ID, " +
                         "默认0是回滚到上一次连续构建, 当前归档模式的回滚仅适用于在master节点构建的任务")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
@@ -717,6 +719,13 @@ def call(String type = 'web-java', Map map) {
     }
 }
 
+/**
+ * 常量定义类型
+ */
+class Constants {
+    // 默认版本描述文案
+    static final String DEFAULT_VERSION_COPYWRITING = '1. 优化了一些细节体验\n2. 修复了一些已知问题'
+}
 
 /**
  *  获取初始化参数方法
@@ -1852,7 +1861,13 @@ def gitTagLog() {
     // 构建成功后生产环境并发布类型自动打tag和变更记录  指定tag方式不再重新打tag
     if (params.IS_GIT_TAG == true && "${IS_PROD}" == 'true' && params.GIT_TAG == GlobalVars.noGit) {
         // 获取变更记录
-        def gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", "\n")
+        def gitChangeLog = ""
+        if ("${Constants.DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESCRIPTION) {
+            gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", "\n")
+        } else {
+            // 使用自定义文案
+            gitChangeLog = "${params.VERSION_DESCRIPTION}"
+        }
         def latestTag = ""
         try {
             if ("${params.VERSION_NUM}".trim() != "") { // 自定义版本号
@@ -2046,7 +2061,13 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             )
         } else if (type == 3) { // 变更记录
             if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
-                def gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
+                def gitChangeLog = ""
+                if ("${Constants.DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESCRIPTION) {
+                    gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
+                } else {
+                    // 使用自定义文案
+                    gitChangeLog = "${params.VERSION_DESCRIPTION}"
+                }
                 if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
                     def titlePrefix = "${PROJECT_TAG} BUILD#${env.BUILD_NUMBER}"
                     try {
