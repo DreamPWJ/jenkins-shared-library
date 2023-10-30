@@ -1864,6 +1864,9 @@ def gitTagLog() {
         def gitChangeLog = ""
         if ("${Constants.DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESCRIPTION) {
             gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", "\n")
+            if ("${gitChangeLog}".trim() == "") {
+                gitChangeLog = "${Constants.DEFAULT_VERSION_COPYWRITING}"
+            }
         } else {
             // 使用自定义文案
             gitChangeLog = "${params.VERSION_DESCRIPTION}"
@@ -2064,6 +2067,9 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                 def gitChangeLog = ""
                 if ("${Constants.DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESCRIPTION) {
                     gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
+                    if ("${gitChangeLog}".trim() == "") {
+                        gitChangeLog = "${Constants.DEFAULT_VERSION_COPYWRITING}"
+                    }
                 } else {
                     // 使用自定义文案
                     gitChangeLog = "${params.VERSION_DESCRIPTION}"
