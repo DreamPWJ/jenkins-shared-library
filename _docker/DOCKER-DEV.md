@@ -126,7 +126,7 @@ tar -xzvf my.tar.gz && rm -f my.tar.gz
   docker system df -v    查看更详细信息
 
 - /var/lib/docker/containers/ID目录，如果容器使用了默认的日志模式，他的所有日志都会以JSON形式保存到此目录下。
-- /var/lib/docker/overlay2 目录下含有容器的读写层，如果容器使用自己的文件系统保存了数据，那么就会写到此目录下
+- /var/lib/docker/overlay 目录下含有容器的读写层，如果容器使用自己的文件系统保存了数据，那么就会写到此目录下
 
 - 当停止容器后，容器占用的空间就会变为可回收的
 - 一键删除所有已经停止的容器 删除容器时会删除其关联的读写层占用的空间
