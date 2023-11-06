@@ -6,6 +6,7 @@ kind: Ingress
 metadata:
   name: gray-release-canary
   namespace: default
+  # Annotations属性文档:  https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/nginx-configuration/annotations.md
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     acme.cert-manager.io/http01-edit-in-place: "true"
@@ -16,6 +17,8 @@ metadata:
     nginx.ingress.kubernetes.io/canary-by-header: "version"
     # 请求头version=v2.0.0时，请求才会被路由到新版本服务中。
     nginx.ingress.kubernetes.io/canary-by-header-value: "v2.0.0"
+    #nginx.ingress.kubernetes.io/canary-by-header-pattern: ""
+    #nginx.ingress.kubernetes.io/canary-by-cookie: ""
     # 在满足上述匹配规则的基础上仅允许百分比的流量会被路由到新版本服务中。
     nginx.ingress.kubernetes.io/canary-weight: "100"
 
