@@ -121,12 +121,12 @@ JSON_PARAMS
     "BRANCH_NAME" : "main" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "lanneng-car-wash" ,
-    "SHELL_PARAMS" : "lanneng-ca-wash web 8004 80 prod" ,
+    "SHELL_PARAMS" : "lanneng-car-wash web 8004 80 prod" ,
     "NODE_VERSION": "18" ,
     "NPM_RUN_PARAMS" : "build",
     "IS_K8S_DEPLOY" : true,
     "K8S_POD_REPLICAS" : "2",
-    "APPLICATION_DOMAIN" : "https://car-wash.lannengtech.com",
+    "APPLICATION_DOMAIN" : "https://car-wash.pengbocloud.com",
 }
 
 */

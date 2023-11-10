@@ -42,12 +42,12 @@ spec:
   ingressClassName: lanneng-park
   tls:
     - hosts:
-        - car-wash.lannengtech.com
-      secretName: car-wash.lannengtech.com-tls
+        - car-wash.pengbocloud.com
+      secretName: car-wash.pengbocloud.com-tls
 
   rules:
     #自定义域名
-    - host: car-wash.lannengtech.com
+    - host: car-wash.pengbocloud.com
       http:
         paths:
           - path: /
