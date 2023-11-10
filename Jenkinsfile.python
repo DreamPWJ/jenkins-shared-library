@@ -60,7 +60,7 @@ map.put('project_tag', ' ')
 
 // 是否是生产环境
 map.put('is_prod', false)
-// 是否在同一台服务器分布式部署
+// 是否在同一台服务器蓝绿部署或滚动部署 非k8s集群方式设置
 map.put('is_same_server', true)
 // 是否进行优雅停机
 map.put('is_grace_shutdown', false)
@@ -81,7 +81,7 @@ map.put('is_need_sass', false)
 map.put('jenkins_node', 'linux')
 map.put('jenkins_node_front_end', 'panweiji')
 
-// 构建环境变量
+// 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node14')
 map.put('maven', 'Maven3.6')
 map.put('jdk', '11')
@@ -109,7 +109,7 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://github.com/DreamPWJ/jenkins-shared-library.git  Jenkinsfile.python
+// https://github.com/DreamPWJ/jenkins-shared-library.git  pipelines/Jenkinsfile.python
 
 /*
 
