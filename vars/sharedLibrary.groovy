@@ -349,7 +349,14 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return (IS_DOCKER_BUILD == false && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) }
+                        expression { return (IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) }
+                    }
+                    agent {
+                        docker {
+                            // Python打包环境  构建完成自动删除容器
+                            image "cdrx/pyinstaller-linux:python3" // cdrx/pyinstaller-windows
+                            reuseNode true // 使用根节点
+                        }
                     }
                     steps {
                         script {
