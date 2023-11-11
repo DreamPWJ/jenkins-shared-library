@@ -44,6 +44,9 @@ spec:
     - hosts:
         - car-wash.pengbocloud.com
       secretName: car-wash.pengbocloud.com-tls
+    - hosts:
+        - car-wash-api.pengbocloud.com
+      secretName: car-wash-api.pengbocloud.com-tls
 
   rules:
     #自定义域名
@@ -58,4 +61,17 @@ spec:
                 #服务端口
                 port:
                   number: 8004
+            pathType: Prefix
+    #自定义域名
+    - host: car-wash-api.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: python-flask-demo-service
+                #服务端口
+                port:
+                  number: 8199
             pathType: Prefix

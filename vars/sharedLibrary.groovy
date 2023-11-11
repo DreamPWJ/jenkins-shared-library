@@ -1129,7 +1129,7 @@ def nodeBuildProject() {
                     }
                 } catch (e) {
                     println(e.getMessage())
-                    sh "rm -rf node_modules"
+                    sh "rm -rf node_modules && rm -f *-lock.json"
                     error("Web打包失败, 终止当前Pipeline运行 ❌")
                 }
             }
