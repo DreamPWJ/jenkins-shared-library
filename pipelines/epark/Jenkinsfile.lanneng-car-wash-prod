@@ -1,9 +1,9 @@
 #!groovy
-@Library('jenkins-shared-library@master') _
+@Library('jenkins-shared-library@dev') _
 
 /**
  * @author 潘维吉
- * @description 核心Pipeline代码 针对Web项目和JAVA项目CI/CD的脚本
+ * @description 核心Pipeline代码 针对Python语言项目CI/CD的脚本
  * 注意 本文件在Git位置和名称不能随便改动 配置在jenkins里
  */
 
