@@ -349,7 +349,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ( "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) }
+                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) }
                     }
                     steps {
                         script {
@@ -1227,8 +1227,9 @@ def pythonBuildProject() {
     dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
         // Python.build(this)  // 是否需要打包Python应用  不打包情况可直接用源码运行
         // 压缩源码文件 加速传输
-        sh "rm -rf *.tar.gz"
-        sh " tar --warning=no-file-changed -zcvf python.tar.gz --exclude '*.md' --exclude '*.pyc' --exclude .git --exclude ci --exclude ci@tmp --exclude '*.log' --exclude '*.docx' --exclude '*.xlsx' * >/dev/null 2>&1 "
+        def pythonPackageName = "python.tar.gz"
+        sh " rm -rf *.tar.gz "
+        sh " tar --warning=no-file-changed -zcvf ${pythonPackageName} --exclude '*.md' --exclude '*.pyc' --exclude .git --exclude ci --exclude ci@tmp --exclude '*.log' --exclude '*.docx' --exclude '*.xlsx' * >/dev/null 2>&1 "
     }
     Tools.printColor(this, "Python语言构建成功 ✅")
 }
