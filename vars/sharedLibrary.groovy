@@ -2029,6 +2029,10 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                         javaInfo = javaInfo + "\n [直接下载构建${javaPackageType}包](${javaOssUrl})  👈"
                     }
                 }
+                def pythonInfo = ""
+                if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
+                    pythonInfo = "构建版本: Python ${CUSTOM_PYTHON_VERSION} "
+                }
                 dingtalk(
                         robot: "${DING_TALK_CREDENTIALS_ID}",
                         type: 'MARKDOWN',
@@ -2043,6 +2047,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                 "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
                                 "###### 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
                                 "###### ${javaInfo}",
+                                "###### ${pythonInfo}",
                                 "###### API地址: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl})",
                                 "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
                                 "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
