@@ -1963,7 +1963,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             if ("${IS_K8S_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
                 deployType = "部署方式: K8S集群金丝雀发布"
             } else {
-                k8sPodContent = "K8S集群部署Pod节点数: ${K8S_POD_REPLICAS}个"
+                k8sPodContent = "K8S集群部署Pod节点数: **${K8S_POD_REPLICAS}**个"
             }
         }
         def projectTypeName = ""
@@ -2040,7 +2040,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                 }
                 def pythonInfo = ""
                 if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-                    pythonInfo = "构建版本: Python ${CUSTOM_PYTHON_VERSION} "
+                    pythonInfo = "运行版本: Python ${CUSTOM_PYTHON_VERSION} "
                 }
                 dingtalk(
                         robot: "${DING_TALK_CREDENTIALS_ID}",
