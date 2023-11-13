@@ -5,11 +5,13 @@
 # 参考文档: https://docs.docker.com/language/python/build-images/
 
 # 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
+ARG PYTHON_VERSION
 ARG PROJECT_NAME
 ARG EXPOSE_PORT
+ARG PYTHON_START_FILE
 
 # 依赖基础镜像
-FROM python:3.10.0-slim
+FROM python:$PYTHON_VERSION-slim
 
 # Docker 将此路径用作所有后续命令的默认位置
 WORKDIR /app
@@ -37,5 +39,5 @@ EXPOSE $EXPOSE_PORT
 
 # 启动命令
 #CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
-# 根据主文件名称app.py
-CMD [ "python3", "app.py"]
+# 根据主文件默认名称 app.py
+CMD [ "python3", "$PYTHON_START_FILE"]

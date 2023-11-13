@@ -39,7 +39,7 @@ class Python implements Serializable {
         // 生成了两个新目录: build 和 dist
         // dist 目录下生成了一个可执行程序 app 执行(运行不再需python环境)  包服务启动 ./app  开发启动 python3 app.py
         // -F 打包一个单个文件
-        ctx.sh " pyinstaller -F app.py "
+        ctx.sh " pyinstaller -F ${ctx.CUSTOM_PYTHON_START_FILE} "
     }
 
 
