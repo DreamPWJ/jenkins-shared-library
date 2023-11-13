@@ -948,6 +948,15 @@ def getShellParams(map) {
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION}"
         }
+
+        // Python项目参数
+        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
+            SHELL_PARAMS_GETOPTS = " -a ${SHELL_PROJECT_NAME} -b ${SHELL_PROJECT_TYPE} -c ${SHELL_HOST_PORT} " +
+                    "-d ${SHELL_EXPOSE_PORT} -e ${SHELL_ENV_MODE}  -f ${IS_PROD} -g ${CUSTOM_PYTHON_VERSION} -h ${DOCKER_MEMORY} " +
+                    "-i ${DOCKER_LOG_OPTS}  -k ${DEPLOY_FOLDER} -l ${CUSTOM_PYTHON_START_FILE} -m ${IS_PUSH_DOCKER_REPO} " +
+                    "-n ${DOCKER_REPO_REGISTRY}/${DOCKER_REPO_NAMESPACE} "
+        }
+
         // 是否存在容器挂载
         if ("${DOCKER_VOLUME_MOUNT}") {
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -o ${DOCKER_VOLUME_MOUNT} "
