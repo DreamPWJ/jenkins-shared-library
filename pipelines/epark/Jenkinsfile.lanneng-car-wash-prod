@@ -11,7 +11,7 @@
 def map = [:]
 
 // 远程服务器地址 k8s集群方式可填空或填公网代理负载IP
-map.put('remote_ip', '101.200.54.165')
+map.put('remote_ip', '120.92.149.246')
 // 工作服务器地址 同时支持N个服务器自动化分布式部署
 map.put('remote_worker_ips', [])
 // 远程服务器用户名
@@ -21,75 +21,75 @@ map.put('proxy_jump_ip', ' ')
 // 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
 map.put('proxy_jump_user_name', 'root')
 // 自定义跳板机ssh和scp访问端口 默认22
-map.put('proxy_jump_port', '22')
+map.put('proxy_jump_port', ' ')
 
 // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
 map.put('default_git_branch', ' ')
 
 // 保持构建的最大个数
-map.put('build_num_keep', 1)
+map.put('build_num_keep', 2)
 
 // Docker相关参数
 // JVM内存设置
-map.put('docker_java_opts', '-Xmx1000m')
+map.put('docker_java_opts', '-Xmx2600m')
 // docker内存限制
-map.put('docker_memory', '1G')
+map.put('docker_memory', '3G')
 // docker日志限制
-map.put('docker_log_opts', 'max-size=50m') // --log-opt max-size=50m --log-opt max-file=3
-// docker挂载映射  docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
+map.put('docker_log_opts', 'max-size=150m') // --log-opt max-size=50m --log-opt max-file=3
+// docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
 map.put('docker_volume_mount', '')
 // Dockerfile多阶段构建 镜像名称
 map.put('docker_multistage_build_images', ' ')
 // 是否上传镜像到docker容器仓库
-map.put('is_push_docker_repo', false)
+map.put('is_push_docker_repo', true)
 // docker容器镜像仓库账号信任id
-map.put('docker_repo_credentials_id', '9a7c8e37-cb19-4e5c-a7a0-635517b1eb74')
+map.put('docker_repo_credentials_id', '73f6b3b0-4580-4acf-b04a-63892fcf9ba8')
 // docker镜像仓库注册地址
-map.put('docker_repo_registry', 'registry.cn-qingdao.aliyuncs.com')
+map.put('docker_repo_registry', 'hub-cn-shanghai-2.kce.ksyun.com')
 // docker仓库命名空间名称
-map.put('docker_repo_namespace', 'panweiji')
+map.put('docker_repo_namespace', 'lanneng')
 
 // K8S集群相关参数
 // K8S集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
-map.put('k8s_credentials_ids', ' ')
+map.put('k8s_credentials_ids', 'a1d2642d-296f-47a2-8d1a-087b46e3255e')
 // K8S集群私有镜像仓库拉取密钥 在集群内使用kubectl create secret命令生成
-map.put('k8s_image_pull_secrets', ' ')
+map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
 // 项目标签或项目简称
-map.put('project_tag', ' ')
+map.put('project_tag', '洗车')
 
 // 是否是生产环境
-map.put('is_prod', false)
+map.put('is_prod', true)
 // 是否在同一台服务器蓝绿部署或滚动部署 非k8s集群方式设置
-map.put('is_same_server', true)
+map.put('is_same_server', false)
 // 是否进行优雅停机
 map.put('is_grace_shutdown', false)
 // 是否进行服务启动健康探测 K8S集群类型设置false
-map.put('is_health_check', true)
+map.put('is_health_check', false)
 // 是否Pipeline内脚本钉钉通知  总开关
-map.put('is_ding_notice', false)
+map.put('is_ding_notice', true)
 // 是否进行部署前通知
 map.put('is_before_deploy_notice', false)
 // 是否通知变更记录
-map.put('is_notice_change_log', false)
+map.put('is_notice_change_log', true)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', false)
+map.put('is_git_tag', true)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
-map.put('jenkins_node', 'linux')
-map.put('jenkins_node_front_end', 'panweiji')
+map.put('jenkins_node', 'master')
+map.put('jenkins_node_front_end', 'master')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
-map.put('nodejs', 'Node14')
+map.put('nodejs', 'Node18')
 map.put('maven', 'Maven3.6')
 map.put('jdk', '11')
 
 // 相关信任标识
-map.put('ci_git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
-map.put('git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
-map.put('ding_talk_credentials_id', 'ba0ebec7-73ad-4a26-af8b-d15c470b1328')
+map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
+map.put('git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
+map.put('ding_talk_credentials_id', 'd33ae0ba-e531-41c8-8983-d9734e53a25a')
 // OSS对象存储访问凭据配置 Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
 map.put('oss_credentials_id', ' ')
 
@@ -109,21 +109,41 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://github.com/DreamPWJ/jenkins-shared-library.git  pipelines/Jenkinsfile.python
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.lanneng-car-wash-prod
 
 /*
 
-test-python
-测试Python语言流水线
+lanneng-car-wash-web-k8s-prod
+蓝能洗车Web前端-k8s集群 ❤️
 JSON_PARAMS
 {
-    "REPO_URL" : "https://github.com/DreamPWJ/python-demo.git" ,
-    "BRANCH_NAME" : "master" ,
-    "PROJECT_TYPE" : "2" ,
-    "COMPUTER_LANGUAGE" : "3" ,
-    "PROJECT_NAME" : "test-python" ,
-    "SHELL_PARAMS" : "test-python demo 8079 5000 sit",
-    "IS_BLUE_GREEN_DEPLOY" : true
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/car_wash.git" ,
+    "BRANCH_NAME" : "main" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "lanneng-car-wash" ,
+    "SHELL_PARAMS" : "lanneng-car-wash web 8004 80 prod" ,
+    "NODE_VERSION": "18" ,
+    "NPM_RUN_PARAMS" : "build",
+    "IS_K8S_DEPLOY" : true,
+    "K8S_POD_REPLICAS" : "2",
+    "APPLICATION_DOMAIN" : "https://car-wash.pengbocloud.com",
+}
+
+
+lanneng-car-wash-server-k8s-prod
+蓝能洗车服务端-k8s集群
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/pan.weiji/python-flask-demo.git" ,
+   "BRANCH_NAME" : "master" ,
+   "PROJECT_TYPE" : "2" ,
+   "COMPUTER_LANGUAGE" : "3" ,
+   "PROJECT_NAME" : "python-flask-demo" ,
+   "SHELL_PARAMS" : "python-flask demo 8199 8000 prod",
+   "IS_K8S_DEPLOY" : true,
+   "K8S_POD_REPLICAS" : "2",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check",
+   "APPLICATION_DOMAIN" : "https://car-wash-api.pengbocloud.com"
 }
 
 */
