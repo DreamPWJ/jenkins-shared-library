@@ -30,7 +30,7 @@ COPY python.tar.gz .
 # 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包
 RUN  tar -xzvf python.tar.gz >/dev/null 2>&1 \
  && rm -f *.tar.gz \
- && mv requirement.txt requirements.txt && pip3 install -r requirements.txt || true
+ && mv requirement.txt requirements.txt || true && pip3 install -r requirements.txt || true
 
 # 暴露端口
 EXPOSE $EXPOSE_PORT
