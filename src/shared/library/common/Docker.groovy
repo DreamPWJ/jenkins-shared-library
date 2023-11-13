@@ -153,6 +153,13 @@ class Docker implements Serializable {
                             --build-arg JDK_VERSION=${ctx.JDK_VERSION}  -f ${ctx.env.WORKSPACE}/ci/.ci/${dockerFileName} . --no-cache \
                             ${dockerPushDiffStr}
                             """
+                } else if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
+                    ctx.sh """ cd ${ctx.env.WORKSPACE}/ && pwd &&
+                            docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
+                            --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg EXPOSE_PORT="${exposePort}"  \
+                            --build-arg PYTHON_VERSION=3.10.0 -f ${ctx.env.WORKSPACE}/ci/.ci/python/Dockerfile . --no-cache \
+                            ${dockerPushDiffStr}
+                            """
                 }
             }
             // 非buildkit构建 推送镜像到远程仓库
