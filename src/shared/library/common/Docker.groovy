@@ -158,7 +158,7 @@ class Docker implements Serializable {
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg EXPOSE_PORT="${exposePort}"  \
                             --build-arg PYTHON_VERSION=${ctx.CUSTOM_PYTHON_VERSION} --build-arg PYTHON_START_FILE=${ctx.CUSTOM_PYTHON_START_FILE} \
-                             -f ${ctx.env.WORKSPACE}/ci/.ci/python/Dockerfile . --no-cache \
+                            -f ${ctx.env.WORKSPACE}/ci/.ci/python/Dockerfile . --no-cache \
                             ${dockerPushDiffStr}
                             """
                 }

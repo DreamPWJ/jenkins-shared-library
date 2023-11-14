@@ -948,6 +948,15 @@ def getShellParams(map) {
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION}"
         }
+
+        // Python项目参数
+        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
+            SHELL_PARAMS_GETOPTS = " -a ${SHELL_PROJECT_NAME} -b ${SHELL_PROJECT_TYPE} -c ${SHELL_HOST_PORT} " +
+                    "-d ${SHELL_EXPOSE_PORT} -e ${SHELL_ENV_MODE}  -f ${IS_PROD} -g ${CUSTOM_PYTHON_VERSION} -h ${DOCKER_MEMORY} " +
+                    "-i ${DOCKER_LOG_OPTS}  -k ${DEPLOY_FOLDER} -l ${CUSTOM_PYTHON_START_FILE} -m ${IS_PUSH_DOCKER_REPO} " +
+                    "-n ${DOCKER_REPO_REGISTRY}/${DOCKER_REPO_NAMESPACE} "
+        }
+
         // 是否存在容器挂载
         if ("${DOCKER_VOLUME_MOUNT}") {
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -o ${DOCKER_VOLUME_MOUNT} "
@@ -1954,7 +1963,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             if ("${IS_K8S_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
                 deployType = "部署方式: K8S集群金丝雀发布"
             } else {
-                k8sPodContent = "K8S集群部署Pod节点数: ${K8S_POD_REPLICAS}个"
+                k8sPodContent = "K8S集群部署Pod节点数: **${K8S_POD_REPLICAS}**个"
             }
         }
         def projectTypeName = ""
@@ -2031,7 +2040,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                 }
                 def pythonInfo = ""
                 if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-                    pythonInfo = "构建版本: Python ${CUSTOM_PYTHON_VERSION} "
+                    pythonInfo = "运行版本: Python ${CUSTOM_PYTHON_VERSION} "
                 }
                 dingtalk(
                         robot: "${DING_TALK_CREDENTIALS_ID}",
