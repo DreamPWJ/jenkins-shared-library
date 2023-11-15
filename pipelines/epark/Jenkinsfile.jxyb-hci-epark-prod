@@ -18,7 +18,7 @@ map.put('remote_worker_ips', ['172.16.100.176'])
 map.put('remote_user_name', 'root')
 // 代理机或跳板机外网ip用于透传部署到内网目标机器 选填 目标机器外部无法直接访问情况填写内网ip
 map.put('proxy_jump_ip', '61.162.222.203')
-// 自定义跳板机用户名 可精细控制权限 默认root
+// 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
 map.put('proxy_jump_user_name', 'root')
 // 自定义跳板机ssh和scp访问端口 默认22
 map.put('proxy_jump_port', '3000')
@@ -65,7 +65,7 @@ map.put('is_same_server', false)
 // 是否进行优雅停机
 map.put('is_grace_shutdown', false)
 // 是否进行服务启动健康探测 K8S集群类型设置false
-map.put('is_health_check', true)
+map.put('is_health_check', false)
 // 是否Pipeline内脚本钉钉通知  总开关
 map.put('is_ding_notice', false)
 // 是否进行部署前通知
@@ -77,7 +77,7 @@ map.put('is_git_tag', false)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
-// jenkins分布式构建节点label名称
+// jenkins分布式构建节点label名称  预配置在jenkins节点管理内
 map.put('jenkins_node', 'master')
 map.put('jenkins_node_front_end', 'master')
 
@@ -156,7 +156,7 @@ JSON_PARAMS
     "NPM_RUN_PARAMS" : "build",
     "CUSTOM_NGINX_CONFIG" : "config/default.conf"
 }
-REMOTE_IP: 172.16.0.91
+REMOTE_IP: 172.16.100.177
 
 jxyb-hci-induction-screen-server-prod
 莒县云泊科技停车诱导屏服务端
@@ -184,6 +184,23 @@ JSON_PARAMS
     "NPM_RUN_PARAMS" : "build",
     "CUSTOM_NGINX_CONFIG" : "config/default.conf"
 }
+REMOTE_IP: 172.16.100.177
+
+jxyb-hci-rsu-controller-prod
+莒县云泊科技停车ETC控制器-Python版
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/rsu_controller.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "COMPUTER_LANGUAGE" : "3" ,
+   "PROJECT_NAME" : "rsu-controller" ,
+   "SHELL_PARAMS" : "rsu-controller python 7199 7199 prod",
+   "GIT_PROJECT_FOLDER_NAME" : "rsu_controller_luce",
+   "CUSTOM_PYTHON_VERSION" : "3.12.0",
+   "CUSTOM_PYTHON_START_FILE" : "main.py"
+}
+
 REMOTE_IP: 172.16.100.177
 
 */
