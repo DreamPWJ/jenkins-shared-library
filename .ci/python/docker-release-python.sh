@@ -34,7 +34,8 @@ while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:y:z:" opt; do
     is_prod=$OPTARG # 是否生产环境
     ;;
   g)
-    echo ""
+    echo "python_version=$OPTARG"
+    python_version=$OPTARG # Python版本号
     ;;
   h)
     echo "docker_memory=$OPTARG"
@@ -49,8 +50,9 @@ while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:y:z:" opt; do
     deploy_folder=$OPTARG # 服务器上部署所在的文件夹名称
     ;;
   l)
-    echo ""
-    ;;
+    echo "python_start_file=$OPTARG"
+    python_start_file=$OPTARG # Python启动文件名称
+     ;;
   m)
     echo "is_push_docker_repo=$OPTARG"
     is_push_docker_repo=$OPTARG # 是否上传镜像到docker容器仓库
@@ -151,7 +153,10 @@ if [[ ${is_push_docker_repo} == false ]]; then
   echo "🏗️  开始构建Docker镜像(无缓存构建)"
   docker build -t ${docker_image_name} \
     --build-arg PROJECT_NAME=${project_name} \
+    --build-arg DEPLOY_FOLDER=${deploy_folder} \
     --build-arg EXPOSE_PORT="${build_expose_ports}" \
+    --build-arg PYTHON_VERSION="${python_version}" \
+    --build-arg PYTHON_START_FILE="${python_start_file}" \
     -f /${deploy_folder}/python/Dockerfile . --no-cache
 else
   docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}-${project_type}-${env_mode}

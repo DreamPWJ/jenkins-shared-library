@@ -59,8 +59,8 @@ class Docker implements Serializable {
                 // 上传docker初始化脚本
                 ctx.sh " scp ${ctx.proxyJumpSCPText} -r ./_docker/${dockerFileName}  ${ctx.remote.user}@${ctx.remote.host}:/${ctx.DEPLOY_FOLDER}/ "
                 // 给shell脚本执行权限
-                ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} 'chmod +x /${ctx.DEPLOY_FOLDER}/${dockerFileName} ' "
-                retry(2) { // 重试几次
+                ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} 'chmod +x /${ctx.DEPLOY_FOLDER}/${dockerFileName} ' || true "
+                ctx.retry(2) { // 重试几次
                     ctx.println "初始化Docker引擎环境  执行Docker初始化脚本"
                     ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} 'cd /${ctx.DEPLOY_FOLDER} && ./${dockerFileName} ' "
                 }
@@ -158,7 +158,7 @@ class Docker implements Serializable {
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg EXPOSE_PORT="${exposePort}"  \
                             --build-arg PYTHON_VERSION=${ctx.CUSTOM_PYTHON_VERSION} --build-arg PYTHON_START_FILE=${ctx.CUSTOM_PYTHON_START_FILE} \
-                             -f ${ctx.env.WORKSPACE}/ci/.ci/python/Dockerfile . --no-cache \
+                            -f ${ctx.env.WORKSPACE}/ci/.ci/python/Dockerfile . --no-cache \
                             ${dockerPushDiffStr}
                             """
                 }

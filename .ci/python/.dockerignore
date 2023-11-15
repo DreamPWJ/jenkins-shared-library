@@ -2,5 +2,7 @@
 **/*.log*
 **/log/**
 **/logs/**
+**/logs/*.log
+**/logs/*.txt
 .git
 *.md

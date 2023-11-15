@@ -4,7 +4,7 @@
 # !!!注意当前机器先执行 ssh-keygen -t rsa
 # 安全性高和定制化的数据建议保存为Jenkins的“Secret file”类型的凭据并获取 无需放在代码中
 
-# 建立免密连接 流水线已实现自动设置免密登录  如需手动设置步骤如下
+# 建立免密连接 流水线已实现自动设置免密登录  A访问B 需要把A的公钥放在B的授权列表里  然后重启ssh服务即可 如需手动设置步骤如下
 # 需要在Jenkins Docker ``容器内而非宿主机`` ssh-keygen -t rsa   root用户在/root/.ssh/id_rsa.pub
 # 公钥放在远程访问服务的/root/.ssh/authorized_keys里  在jenkins容器里执行 ssh root@ip 命令访问确认
 # 如果有跳板机情况 可手动将构建机器的公钥分别添加外网跳板机和内网目标机authorized_keys内实现免密登录 touch authorized_keys
@@ -32,6 +32,8 @@ while read host; do
 EOF
 done <hosts.txt
 
-# 透传跳板机实现自动登录授权
-# 主要思路是 1. 客户端执行机器先免密到跳板机 2. 跳板机再免密到目标机 3. 最后将客户端的公钥 cat /root/.ssh/id_rsa.pub 放到内网目标机 vim /root/.ssh/authorized_keys 授信  systemctl restart sshd.service
+# 透传跳板机实现自动登录授权 主要思路是： A访问B 需要把A的公钥放在B的授权列表里  然后重启ssh服务即可
+# 1. 客户端执行机器先免密到跳板机 用户在cat /root/.ssh/id_rsa.pub 公钥放在远程要访问服务的vim /root/.ssh/authorized_keys里
+# 2. 跳板机再免密到目标机 同理1
+# 3. 最后将客户端的公钥 cat /root/.ssh/id_rsa.pub 放到内网目标机 vim /root/.ssh/authorized_keys 授信  systemctl restart sshd
 # 在执行SSH跳板命令生效:  ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22
