@@ -120,15 +120,15 @@ JSON_PARAMS
     "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/rzhtc.git" ,
     "BRANCH_NAME" : "juxian" ,
     "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "rzhtc" ,
-    "SHELL_PARAMS" : "rzhtc h5 8010 80 prod" ,
+    "PROJECT_NAME" : "jxyb" ,
+    "SHELL_PARAMS" : "jxyb h5 8010 80 prod" ,
     "NPM_RUN_PARAMS" : "build:juxian",
     "IS_ROLL_DEPLOY" : true,
     "CUSTOM_NGINX_CONFIG" : "config/default.conf"
 }
 
 jxyb-hci-epark-server-prod
-莒县云泊科技停车epark平台服务端
+莒县云泊科技停车epark服务端
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/epark.git" ,
@@ -169,7 +169,7 @@ JSON_PARAMS
    "SHELL_PARAMS" : "induction-screen server 8082 8082 prod-juxian",
    "IS_MAVEN_SINGLE_MODULE" : true
 }
-REMOTE_IP: 172.16.0.91
+REMOTE_IP: 172.16.100.177
 
 jxyb-hci-induction-screen-web-prod
 莒县云泊科技停车诱导屏 Web前端 ❤️
@@ -184,7 +184,7 @@ JSON_PARAMS
     "NPM_RUN_PARAMS" : "build",
     "CUSTOM_NGINX_CONFIG" : "config/default.conf"
 }
-REMOTE_IP: 172.16.0.91
+REMOTE_IP: 172.16.100.177
 
 */
 
