@@ -38,9 +38,10 @@ RUN  tar -xzvf python.tar.gz >/dev/null 2>&1 \
 # 暴露端口
 EXPOSE $EXPOSE_PORT
 
+# 根据主文件默认名称 app.py
+CMD [ "python", "$PYTHON_START_FILE"]
+
 # Flask部署 启动命令
 #CMD [ "python", "-m" , "flask", "run", "--host=0.0.0.0"]
 # FastAPI部署 启动命令
 #CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${EXPOSE_PORT}"]
-# 根据主文件默认名称 app.py
-CMD [ "python", "app/$PYTHON_START_FILE"]
