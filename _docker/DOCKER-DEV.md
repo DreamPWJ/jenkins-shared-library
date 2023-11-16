@@ -1,4 +1,4 @@
-#### 设置镜像源  解决pull下载慢卡住问题
+#### 设置镜像源  解决pull下载慢卡住问题  注意：镜像源不维护了可能导致latest不是最新的版本
 docker info
 sudo vim /etc/docker/daemon.json
 {
