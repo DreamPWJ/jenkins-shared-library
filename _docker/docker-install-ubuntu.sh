@@ -47,12 +47,10 @@ echo "设置国内镜像源 加速docker pull速度"
 sudo cat <<EOF >/etc/docker/daemon.json
 {
   "registry-mirrors": [
-   "https://e6x18rmb.mirror.aliyuncs.com",
-   "https://em1sutsj.mirror.aliyuncs.com",
-   "https://mirror.ccs.tencentyun.com",
    "http://registry.docker-cn.com",
-   "http://docker.mirrors.ustc.edu.cn",
-   "http://hub-mirror.c.163.com"
+   "https://e6x18rmb.mirror.aliyuncs.com",
+   "https://mirror.ccs.tencentyun.com",
+   "http://docker.mirrors.ustc.edu.cn"
   ]
 }
 EOF
