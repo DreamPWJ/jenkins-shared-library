@@ -43,7 +43,6 @@ sudo cat <<EOF >/etc/docker/daemon.json
 {
   "registry-mirrors": [
    "http://registry.docker-cn.com",
-   "https://e6x18rmb.mirror.aliyuncs.com",
    "https://mirror.ccs.tencentyun.com",
    "http://docker.mirrors.ustc.edu.cn"
   ]
