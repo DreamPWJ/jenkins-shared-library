@@ -32,7 +32,8 @@ COPY python.tar.gz .
 # 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包
 RUN  tar -xzvf python.tar.gz >/dev/null 2>&1 \
  && rm -f *.tar.gz \
- && mv requirement.txt requirements.txt || true && pip3 install --no-cache-dir --upgrade -r requirements.txt || true
+ && mv requirement.txt requirements.txt || true \
+ && pip3 install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple || true
 
 # 暴露端口
 EXPOSE $EXPOSE_PORT
@@ -40,6 +41,6 @@ EXPOSE $EXPOSE_PORT
 # Flask部署 启动命令
 #CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
 # FastAPI部署 启动命令
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "$EXPOSE_PORT"]
+#CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${EXPOSE_PORT}"]
 # 根据主文件默认名称 app.py
-#CMD [ "python3", "$PYTHON_START_FILE"]
+CMD [ "python3", "$PYTHON_START_FILE"]
