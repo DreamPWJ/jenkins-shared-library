@@ -70,7 +70,7 @@ docker run -d --restart=always -p 10909:10909 -p 10911:10911 -p 10912:10912 \
 -v /my/rocketmq/broker/conf:/home/rocketmq/conf  -v /my/rocketmq/broker/logs:/home/rocketmq/logs -v /my/rocketmq/broker/store:/home/rocketmq/store \
 -e "NAMESRV_ADDR=172.31.3.120:9876"  --privileged=true \
 --name rocketmq-broker  apache/rocketmq:latest  \
-sh mqbroker -c /home/rocketmq/conf/broker.conf
+sh mqbroker -c /home/rocketmq/conf/broker.conf  && sudo chmod 777  /my/rocketmq/ -R
 
 docker run -d --restart=always -p 6765:8080  \
 -e "JAVA_OPTS=-Drocketmq.namesrv.addr=172.31.3.120:9876" \

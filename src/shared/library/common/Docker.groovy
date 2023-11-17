@@ -60,7 +60,7 @@ class Docker implements Serializable {
                 ctx.sh " scp ${ctx.proxyJumpSCPText} -r ./_docker/${dockerFileName}  ${ctx.remote.user}@${ctx.remote.host}:/${ctx.DEPLOY_FOLDER}/ "
                 // 给shell脚本执行权限
                 ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} 'chmod +x /${ctx.DEPLOY_FOLDER}/${dockerFileName} ' || true "
-                ctx.retry(2) { // 重试几次
+                ctx.retry(3) { // 重试几次
                     ctx.println "初始化Docker引擎环境  执行Docker初始化脚本"
                     ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} 'cd /${ctx.DEPLOY_FOLDER} && ./${dockerFileName} ' "
                 }
