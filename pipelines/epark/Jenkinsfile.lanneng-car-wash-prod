@@ -56,7 +56,7 @@ map.put('k8s_credentials_ids', 'a1d2642d-296f-47a2-8d1a-087b46e3255e')
 map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
 // 项目标签或项目简称
-map.put('project_tag', '洗车')
+map.put('project_tag', '洗车机')
 
 // 是否是生产环境
 map.put('is_prod', true)

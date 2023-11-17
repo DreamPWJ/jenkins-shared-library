@@ -2,6 +2,7 @@
 # Author: 潘维吉
 
 echo -e "\033[32mUbuntu系统Docker初始化安装  📥 \033[0m"
+# chmod +x docker-install-ubuntu.sh　给shell脚本执行文件可执行权限
 
 if [[ $(command -v docker) ]]; then
   echo -e "\033[34mDocker版本： $(docker --version) ，已经初始化 退出安装  ✘ \033[0m"
@@ -46,12 +47,9 @@ echo "设置国内镜像源 加速docker pull速度"
 sudo cat <<EOF >/etc/docker/daemon.json
 {
   "registry-mirrors": [
-   "https://e6x18rmb.mirror.aliyuncs.com",
-   "https://em1sutsj.mirror.aliyuncs.com",
-   "https://mirror.ccs.tencentyun.com",
    "http://registry.docker-cn.com",
-   "http://docker.mirrors.ustc.edu.cn",
-   "http://hub-mirror.c.163.com"
+   "https://mirror.ccs.tencentyun.com",
+   "http://docker.mirrors.ustc.edu.cn"
   ]
 }
 EOF
