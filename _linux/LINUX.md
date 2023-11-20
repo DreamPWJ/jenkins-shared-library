@@ -44,6 +44,9 @@ tail -f /var/log/cron
 - 注意重启系统后磁盘挂载会失效 自动挂载配置 :  vim /etc/fstab 执行 blkid 命令查看UUID和文件类型 
 - 最后一行添加  如 UUID=xxxxx /tidb-data ext4 defaults 0 1  保持重启挂载生效 执行 systemctl daemon-reload
 - 卸载目录命令 :  umount /dev/sdb1
+- 设置LVM逻辑卷管理 安装sudo apt-get install lvm2 :  pvcreate /dev/sdb1  # 新建一个物理卷 pvdisplay 查看所有物理卷信息
+  vgcreate vg_data /dev/sdb1  # 新建一个卷组 vgdisplay 查看所有卷组信息
+  lvcreate -L 10G -n lv_data vg_data  # 新建一个逻辑卷 lvdisplay 查看所有逻辑卷信息
 
 #### 创建虚拟IP命令 基于ARP是地址解析协议 每台主机中都有一个ARP高速缓存 存储同一个网络内的IP地址与MAC地址的对应关系 操作系统会自动维护这个缓存 IP漂移Keepalived完成主备切换
 
@@ -68,7 +71,7 @@ arp -a
 #### 建立免密连接
 
 - ssh-keygen -t rsa root用户在/root/.ssh/id_rsa.pub
-- 公钥放在远程访问服务的/root/.ssh/authorized_keys里 执行 ssh root@ip 命令访问确认
+- 公钥放在远程访问服务的/root/.ssh/authorized_keys里 重启sshd服务生效 执行 ssh root@ip 命令访问确认
 
 #### 设置Linux服务器DNS服务 如 144.144.144.144, 223.5.5.5, 223.6.6.6, 8.8.8.8
 
@@ -85,6 +88,7 @@ arp -a
 - 开启Ubuntu系统 root用户访问ssh远程访问权限(sudo passwd root) : https://blog.csdn.net/boonya/article/details/121256380
   su root 再执行 sudo vim /etc/ssh/sshd_config 添加 PermitRootLogin yes 生效 sudo systemctl restart sshd
   切换到root用户命令 sudo -i
-- 设置时区 sudo timedatectl set-timezone Asia/Shanghai # 设置时区
-  设置NTP时间同步 sudo timedatectl set-ntp true # 设置NTP时间同步
+-  同步时间操作
+   sudo timedatectl set-timezone Asia/Shanghai  # 设置时区
+   sudo timedatectl set-ntp true  # 设置NTP时间同步
 
