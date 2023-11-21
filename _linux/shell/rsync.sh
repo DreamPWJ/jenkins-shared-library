@@ -1,6 +1,6 @@
 #!/bin/bash
 # Author: 潘维吉
-# Description:  使用rsync工具迁移数据 全量+增量都支持  chmod +x rsync.sh
+# Description:  使用rsync工具远程迁移数据 全量+增量同步都支持
 
 # 安装迁移工具 传输的双方都必须安装rsync  rsync是负责执行复制的工具  tmux是帮助查看进度的工具
 sudo apt-get install -y rsync tmux
