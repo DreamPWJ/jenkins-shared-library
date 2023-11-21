@@ -46,7 +46,7 @@ tail -f /var/log/cron
 - 卸载目录命令 :  umount /dev/sdb1
 - 设置LVM逻辑卷管理 安装sudo apt-get install lvm2 :  pvcreate /dev/sdb1  # 新建一个物理卷 pvdisplay 查看所有物理卷信息
   vgcreate vg_data /dev/sdb1  # 新建一个卷组 vgdisplay 查看所有卷组信息
-  lvcreate -L 10G -n lv_data vg_data  # 新建一个逻辑卷 在执行格式化和挂载操作 lvdisplay 查看所有逻辑卷信息
+  lvcreate -L 1000G -n lv_data vg_data  # 新建一个逻辑卷 在执行格式化和挂载操作 lvdisplay 查看所有逻辑卷信息
   vgextend vg_data /dev/sdc # 扩展VG到新磁盘
 
 #### 创建虚拟IP命令 基于ARP是地址解析协议 每台主机中都有一个ARP高速缓存 存储同一个网络内的IP地址与MAC地址的对应关系 操作系统会自动维护这个缓存 IP漂移Keepalived完成主备切换
