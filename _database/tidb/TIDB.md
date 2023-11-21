@@ -2,8 +2,8 @@
 
 -  PD为总调度中心  TiDB整个项目分为两层，TiDB 作为SQL 层，采用Go 语言开发， TiKV 作为下边的分布式存储引擎，采用Rust 语言开发
 -  使用TiUP初始化部署TiDB集群步骤: https://docs.pingcap.com/zh/tidb/stable/production-deployment-using-tiup
--  执行部署TiDB集群(首先设置ssh免密登录) tiup list tidb 来查看 TiUP 支持的最新可用版本: 
-   cd /my && tiup cluster deploy tidb-prod v7.1.2 ./topology.yaml --user root && tiup cluster start tidb-prod --init
+-  执行部署TiDB分布式集群(首先设置ssh免密登录) : 
+   cd /my && tiup cluster deploy tidb-prod v7.1.2 ./topology.yaml --user root 和 tiup cluster start tidb-prod --init
 -  重复部署的情况， 注意数据库名称重复冲突
 
 #### TiDB运维命令
