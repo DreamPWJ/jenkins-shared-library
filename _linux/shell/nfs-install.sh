@@ -26,6 +26,8 @@ sudo cat <<EOF >>/etc/exports
 /mnt/nfs_data/ *(insecure,rw,sync,no_all_squash,no_subtree_check)
 EOF
 
+# NFS挂载目录永久配置 在 vim /etc/fstab 内保存 nfs_host_ip:/mnt/ /mnt/ nfs defaults 0 0 重启等永久有效!!!  systemctl daemon-reload
+
 # reload载入配置生效
 exportfs -rv
 
