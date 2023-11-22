@@ -36,6 +36,14 @@ mount /dev/vg_data/lv_data /mnt/nfs_data
 vim /etc/fstab
 systemctl daemon-reload
 
+# 卸载分区
+umount /mnt/data
 
-# 设置LVM逻辑卷管理 :
-# vgextend vg_data /dev/sdc # 扩展VG到新磁盘
+
+# 扩容硬盘  重新挂载新磁盘
+fdisk /dev/sdc # fdisk分区 分别选m n p t(t代表LVM分区表 code设置8e) p w
+pvcreate /dev/sdc1 # 创建新物理卷
+vgextend vg_data /dev/sdc1 # 扩展VG到新磁盘
+lvextend -L +2046G /dev/vg_data/lv_data # 扩容逻辑卷
+xfs_growfs /dev/vg_data/lv_data # 扩容文件系统
+df -h  # 查看扩容后分区大小
