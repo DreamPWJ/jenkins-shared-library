@@ -40,8 +40,8 @@ RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
 # 暴露端口
 EXPOSE $EXPOSE_PORT
 
-# 根据主文件默认名称 app.py
-CMD ["python", "$PYTHON_START_FILE"]
+# 根据主文件默认名称 app.py  "$PYTHON_START_FILE"在运行变量 无法获取
+CMD ["python", "main.py"]
 
 # Flask部署 启动命令
 #CMD [ "python", "-m" , "flask", "run", "--host=0.0.0.0"]

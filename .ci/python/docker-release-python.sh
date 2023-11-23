@@ -156,7 +156,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     --build-arg DEPLOY_FOLDER=${deploy_folder} \
     --build-arg EXPOSE_PORT="${build_expose_ports}" \
     --build-arg PYTHON_VERSION="${python_version}" \
-    -e PYTHON_START_FILE="${python_start_file}" \
+    --build-arg PYTHON_START_FILE="${python_start_file}" \
     -f /${deploy_folder}/python/Dockerfile . --no-cache
 else
   docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}-${project_type}-${env_mode}
