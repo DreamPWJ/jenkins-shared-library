@@ -29,9 +29,9 @@ class Kubernetes implements Serializable {
             // KUBECONFIG变量为k8s中kubectl命令的yaml配置授权访问文件内容 数据保存为Jenkins的“Secret file”类型的凭据，用credentials方法从凭据中获取
             ctx.withCredentials([ctx.file(credentialsId: "${k8s_credentials_id}", variable: 'KUBECONFIG')]) {
                 // 安装kubectl命令访问k8s集群: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/ 或 https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/
-                // kubectl命令Windows下配置到环境变量Path中 路径为kubectl.exe所在的文件夹目录
+                // kubectl命令Windows下配置到环境变量Path中 路径为kubectl.exe所在的文件夹目录 不包括exe文件
                 // 下载集群的配置文件，复制到本地计算机的 $HOME/.kube/config（kubectl的默认路径）
-                // 若您之前配置过KUBECONFIG环境变量，kubectl会优先加载KUBECONFIG环境变量，而不是$HOME/.kube/config，使用时请注意
+                // 若您之前配置过KUBECONFIG环境变量，kubectl会优先加载KUBECONFIG环境变量包括文件路径，而不是$HOME/.kube/config，使用时请注意
                 // ctx.println("k8s集群访问配置：${ctx.KUBECONFIG}")
                 // ctx.sh "kubectl version"
 
