@@ -30,3 +30,8 @@ tiup cluster scale-out <cluster-name> scale-out.yml [-p] [-i /home/root/.ssh/gcp
 #### TiDB 备份与恢复
 
 - 基于 Raft 协议和合理的部署拓扑规划，TiDB 实现了集群的高可用，当集群中少数节点挂掉时，集群依然能对外提供服务
+
+#### 连接到 TiDB 控制台
+
+sudo apt-get install -y mysql-client
+mysql --host 172.16.100.183 --port 4000 -u root -p --comments
