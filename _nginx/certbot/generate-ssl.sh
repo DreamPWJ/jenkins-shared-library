@@ -46,7 +46,7 @@ echo "生成域名相关的SSL证书"
 # 命令方式开始制作证书  -n 非交互式 --agree-tos 同意服务协议  --staging 测试模式限制更松 不是正式证书
 # --dry-run 使用 Test "renew" or "certonly" without saving any certificates
 #certbot certonly --manual --agree-tos --preferred-challenges dns \
-#  --email 406798106@qq.com -d pdf-js.panweiji.com
+#  --email 406798106@qq.com -d name.panweiji.com
 
 # certonly阿里云自动生成二级域名的DNS验证  renew续签也需要DNS 动态添加 TXT 记录 不需要手动创建  https://github.com/tengattack/certbot-dns-aliyun
 # certbot 提供了一个 hook，可以编写一个 Shell 脚本，让脚本调用 DNS 服务商的 API 接口，动态添加 TXT 记录
