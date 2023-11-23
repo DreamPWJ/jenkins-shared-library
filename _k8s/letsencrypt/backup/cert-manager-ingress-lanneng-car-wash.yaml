@@ -70,7 +70,7 @@ spec:
             backend:
               #服务名称
               service:
-                name: xieche-backend-python-service
+                name: xiche-backend-python-service
                 #服务端口
                 port:
                   number: 8199
