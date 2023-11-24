@@ -19,10 +19,12 @@ systemctl stop keepalived
 
 systemctl status keepalived
 
+systemctl restart keepalived
+
 systemctl daemon-reload
 
 
-##### 设置keepalived的虚拟主机，配置文件 /etc/keepalived/keepalived.conf
+##### 设置keepalived的虚拟主机，配置文件 /etc/keepalived/keepalived.conf  注意查看ifconfig配置网卡名配置interface参数！！！
 
 ##### 查看虚拟IP
 

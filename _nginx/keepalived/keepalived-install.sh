@@ -4,22 +4,27 @@
 
 cat /etc/redhat-release || true
 
-yum -y update || true
+yum update -y  || true
+sudo apt-get update -y || true
 
 echo "安装keepalived"
-yum -y install keepalived
+yum  install -y keepalived
+sudo apt-get install -y keepalived
 
+# 先配置keepalived文件  再启动keepalived  注意查看ifconfig配置网卡名配置interface参数！！！
 # vim /etc/keepalived/keepalived.conf
 
 echo "启动keepalived"
 systemctl enable keepalived   # 开机自启动
 systemctl start keepalived
 
-echo "查看keepalived是否安装成功"
-rpm -q -a keepalived
+echo "查看keepalived状态"
+systemctl status keepalived
 
 echo "查看网卡及IP"
 ip addr show | grep inet
 
 # 卸载keepalived
 # sudo yum -y remove keepalived
+# sudo apt-get remove -y keepalived
+# sudo apt-get remove --auto-remove -y keepalived
