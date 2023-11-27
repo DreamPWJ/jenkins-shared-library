@@ -28,7 +28,7 @@ systemctl daemon-reload
 
 ##### 查看虚拟IP
 
-ip addr
+ip addr 或 ip a
 
 ##### 查看日志
 

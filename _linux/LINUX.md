@@ -48,7 +48,7 @@ tail -f /var/log/cron
 
 #### 创建虚拟IP命令 基于ARP是地址解析协议 每台主机中都有一个ARP高速缓存 存储同一个网络内的IP地址与MAC地址的对应关系 操作系统会自动维护这个缓存 IP漂移Keepalived完成主备切换
 
-ip addr
+ip addr 或 ip a
 arp -a
 
 - 注意keepalived会自动配置无需手动配置虚拟IP 手动只一台主机器设置即可会自动IP漂移 添加一个VIP地址 eth0:1表示这个VIP绑定的目标网卡设备
