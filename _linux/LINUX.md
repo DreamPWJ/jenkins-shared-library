@@ -60,9 +60,9 @@ arp -a
 
 #### 防火墙相关命令
 
-- systemctl status firewalld.service # 查看防火墙状态
-- systemctl stop firewalld.service # 重启还会打开防火墙
-- systemctl disable --now firewalld.service # 永久禁用防火墙
+- systemctl status firewalld.service 或 sudo ufw status  # 查看防火墙状态
+- systemctl stop firewalld.service 或 sudo ufw disable   # 重启还会打开防火墙
+- systemctl disable --now firewalld.service 或 sudo ufw reset # 永久禁用防火墙
 - systemctl disable --now iptables # 永久禁用防火墙配置表
 - iptables -F # 清空防火墙配置规则 设置
 
