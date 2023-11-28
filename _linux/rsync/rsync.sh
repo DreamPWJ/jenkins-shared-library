@@ -10,7 +10,7 @@ rsync --version
 # 基本示例 -r表示递归，即包含子目录  source表示源目录 target表示目标目录
 rsync -r /source/ /target/
 
-# 全量将远程内容同步到本地  --bwlimit=1000 限速单位KB/s  --partial允许恢复中断的传输
+# 全量将远程内容同步到本地  --bwlimit=1000 限速单位KB/s  -P允许恢复中断的传输和显示进度
 # nohup输入密码后按ctrl+z 中断进程 紧接着输入bg后台运行(需要实现ssh免密登录才不会中断) tail -f nohup.out
 nohup rsync -avzP --bwlimit=5120 --exclude "1" root@119.188.90.222:/nfsdata/ParkPicture/stor1/2023/ /mnt/nfs_data/ParkPicture/stor1/2023/
 
@@ -28,12 +28,15 @@ rsync --daemon
 kill $(cat /var/run/rsyncd.pid)
 
 
+
+# 多线程rsync同步 亲测有效！！！  rsync命令中的源路径结尾必须带有/，否则同步后数据路径不能匹配
+# 文档地址: https://help.aliyun.com/zh/nas/user-guide/migrate-data-by-using-the-rsync-command-line-tool
+threads=5 # 线程数
+source=/nfsdata/ParkPicture/stor1/2022/  # 源路径
+target=/mnt/nfs_data/ParkPicture/stor1/2022/  #目标路径
+nohup rsync -avzP --bwlimit=5120 -f"+ */" -f"- *" root@119.188.90.222:$source $target && (ssh root@119.188.90.222 "cd ${source} && find . -type f" | xargs -n1 -P$threads -I% nohup rsync -avzP --bwlimit=5120 % $target/% )
+
+
 # 多线程rsync同步 -P线程数
-
-ssh root@119.188.90.222 'ls /nfsdata/ParkPicture/stor1/2022/' | xargs -n1 -P5 -I% nohup rsync -avzP --bwlimit=5120 % root@119.188.90.222:/nfsdata/ParkPicture/stor1/2022/ /mnt/nfs_data/ParkPicture/stor1/2022/
-
-# 同一机器多线程rsync同步
-#threads=5;
-#source=/abc/;
-#target=/mnt1/;
-#nohup rsync -av  -f"+ */" -f"- *" $source $target && (cd $source && find . -type f | xargs -n1 -P$threads -I% rsync -av % $target/% )
+cd  /mnt/nfs_data/ParkPicture/stor1/2022
+ssh root@119.188.90.222 'ls /nfsdata/ParkPicture/stor1/2022' | xargs -n1 -P5 -I% nohup rsync -avzP --bwlimit=5120 % root@119.188.90.222:/nfsdata/ParkPicture/stor1/2022
