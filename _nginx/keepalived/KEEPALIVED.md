@@ -5,9 +5,9 @@
 
 - https://blog.51cto.com/u_13710166/5288506
 
-- systemctl status firewalld.service
-- systemctl stop firewalld.service  # 重启还会打开防火墙
-- systemctl disable --now firewalld.service # 永久禁用防火墙
+- systemctl status firewalld.service 或 sudo ufw status  # 查看防火墙状态
+- systemctl stop firewalld.service 或 sudo ufw disable   # 重启还会打开防火墙
+- systemctl disable --now firewalld.service 或 sudo ufw reset # 永久禁用防火墙
 - systemctl disable --now iptables  # 永久禁用防火墙配置表
 - iptables -F   # 清空防火墙配置规则 设置 
  
@@ -19,14 +19,16 @@ systemctl stop keepalived
 
 systemctl status keepalived
 
+systemctl restart keepalived
+
 systemctl daemon-reload
 
 
-##### 设置keepalived的虚拟主机，配置文件 /etc/keepalived/keepalived.conf
+##### 设置keepalived的虚拟主机，配置文件 /etc/keepalived/keepalived.conf  注意查看ifconfig配置网卡名配置interface参数！！！
 
 ##### 查看虚拟IP
 
-ip addr
+ip addr 或 ip a
 
 ##### 查看日志
 
