@@ -13,8 +13,9 @@ if [[ check_res -eq 0 ]]; then
    # systemctl start nginx
    # Docker容器启动
    docker restart proxy-nginx
-   #sleep 2
-  if [[ check_res -eq 0 ]]; then
+   sleep 2
+   check_res2=$(ps -C nginx --no-header | wc -l)
+  if [[ check_res2 -eq 0 ]]; then
     # /usr/sbin/keepalived -s stop
     echo $(date) "nginx is down, kill all keepalived..." >> /etc/keepalived/check_nginx.log
     systemctl stop keepalived
