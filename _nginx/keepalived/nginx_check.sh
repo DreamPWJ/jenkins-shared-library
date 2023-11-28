@@ -1,18 +1,24 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Author: 潘维吉
 # Description: 定时检测Nginx的服务状态，如果Nginx停止，会尝试重新启动Nginx，如果启动失败，会将Keepalived服务停止，使IP漂移到备用节点上
-
 # 检测nginx是否启动  容器化检测设置  pidof nginx   多个节点的Nginx服务同时启动着
-res=$(ps -C nginx --no-header | wc -l)
 
-if [[ $res -eq 0 ]]; then
-  # /usr/sbin/nginx  # 宿主机启动
-  systemctl start nginx
-  # docker start proxy-nginx
-  sleep 2
-  if [[ $res -eq 0 ]]; then
+# 检测服务是否正常或存在  0 不正常不存在
+check_res=$(ps -C nginx --no-header | wc -l)
+
+if [[ check_res -eq 0 ]]; then
+   echo $(date)  "nginx is not running, restarting..." >> /etc/keepalived/check_nginx.log
+   # 宿主机启动
+   # /usr/sbin/nginx
+   # systemctl start nginx
+   # Docker容器启动
+   docker restart proxy-nginx
+   #sleep 2
+  if [[ check_res -eq 0 ]]; then
     # /usr/sbin/keepalived -s stop
+    echo $(date) "nginx is down, kill all keepalived..." >> /etc/keepalived/check_nginx.log
     systemctl stop keepalived
+    # killall keepalived
   fi
 fi
 
