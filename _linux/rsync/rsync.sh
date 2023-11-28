@@ -26,3 +26,14 @@ sudo rsync -rvn /mnt/volumeA/ /mnt/volumeB/
 rsync --daemon
 # 停止rsync命令
 kill $(cat /var/run/rsyncd.pid)
+
+
+# 多线程rsync同步 -P线程数
+
+ssh root@119.188.90.222 'ls /nfsdata/ParkPicture/stor1/2022/' | xargs -n1 -P5 -I% nohup rsync -avzP --bwlimit=5120 % root@119.188.90.222:/nfsdata/ParkPicture/stor1/2022/ /mnt/nfs_data/ParkPicture/stor1/2022/
+
+# 同一机器多线程rsync同步
+#threads=5;
+#source=/abc/;
+#target=/mnt1/;
+#nohup rsync -av  -f"+ */" -f"- *" $source $target && (cd $source && find . -type f | xargs -n1 -P$threads -I% rsync -av % $target/% )
