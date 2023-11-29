@@ -134,7 +134,7 @@ JSON_PARAMS
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "video-service" ,
-   "SHELL_PARAMS" : "video-service server 1234 2234 juxian-prod",
+   "SHELL_PARAMS" : "video-service server 8002 8002 juxian-prod",
    "IS_MAVEN_SINGLE_MODULE" : true,
    "IS_ROLL_DEPLOY" : true,
    "DOCKER_VOLUME_MOUNT" : "/mnt/stor1:/usr/local/tomcat/webapps/FileUpload/stor1",
