@@ -34,7 +34,7 @@ mkdir /mnt/data
 mount /dev/vg_data/lv_data /tidb-data
 
 # 挂载永久生效  在 vim /etc/fstab内保存 重启等永久有效!!!
-# /dev/mapper/vg_data-lv_data /tidb-data xfs defaults 0 0
+# /dev/mapper/vg_data-lv_data /tidb-data xfs defaults 0 1
 vim /etc/fstab
 systemctl daemon-reload
 
@@ -47,6 +47,7 @@ lsblk
 fdisk /dev/sdc # fdisk分区 分别选m n p t(t代表LVM分区表 code设置8e) p w
 pvcreate /dev/sdc1 # 创建新物理卷
 vgextend vg_data /dev/sdc1 # 扩展VG到新磁盘
-lvextend -L +299G /dev/vg_data/lv_data # 扩容逻辑卷  -L 参数小于分区存储容量
-xfs_growfs /dev/vg_data/lv_data # 扩容文件系统
+
+lvextend -L +299G /dev/vg_data/lv_data # 扩容逻辑卷  -L 参数小于分区存储容量   系统盘默认设置了LVM扩容从这步开始
+xfs_growfs /dev/vg_data/lv_data # xfs扩容文件系统 和 ext格式扩容 resize2fs /dev/ubuntu-vg/ubuntu-lv
 df -h  # 查看扩容后分区大小

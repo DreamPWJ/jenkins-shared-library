@@ -114,7 +114,7 @@ sharedLibrary(map)
 /*
 
 jxyb-hci-pay-server-prod
-莒县云泊停车支付平台服务端
+莒县云泊停车pay支付平台服务端
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/epark_pay.git" ,

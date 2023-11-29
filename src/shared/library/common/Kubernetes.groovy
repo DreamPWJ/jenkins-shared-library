@@ -46,6 +46,7 @@ class Kubernetes implements Serializable {
                 // 查看个组件的状态  如 kubectl get svc
                 ctx.sh """ 
                     kubectl get pod
+                    kubectl top pod
                     kubectl top nodes
                     """
 
@@ -65,6 +66,8 @@ class Kubernetes implements Serializable {
 
                 // 查看命名空间下pod在哪些node节点运行
                 // ctx.sh "kubectl get pod -n default -o wide"
+                // 查看pod节点当前的节点资源占用情况
+                // ctx.sh "kubectl top pod"
                 // 查看node节点当前的节点资源占用情况
                 // ctx.sh "kubectl top nodes"
 
