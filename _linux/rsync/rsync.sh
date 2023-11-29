@@ -10,8 +10,8 @@ rsync --version
 # 基本示例 -r表示递归，即包含子目录  source表示源目录 target表示目标目录
 rsync -r /source/ /target/
 
-# 全量将远程内容同步到本地  --bwlimit=1000 限速单位KB/s  -P允许恢复中断的传输和显示进度
-# nohup输入密码后按ctrl+z 中断进程 紧接着输入bg后台运行(需要实现ssh免密登录才不会中断) tail -f nohup.out
+# 全量将远程内容同步到本地  --bwlimit=1000 限速单位KB/s  -P允许恢复中断的传输和显示进度  多线程只需在不同目录执行同步不同目录的rsync命令即可！！！
+# nohup输入密码后按ctrl+z 中断进程 紧接着输入bg后台运行(需要实现ssh免密登录才不会中断) 退出执行exit保证任务后台正常运行！！！  tail -f nohup.out查看日志
 nohup rsync -avzP --bwlimit=5120 --exclude "1" root@119.188.90.222:/nfsdata/ParkPicture/stor1/2023/ /mnt/nfs_data/ParkPicture/stor1/2023/
 
 # 增量同步  rsync 的最大特点就是它可以完成增量备份，也就是默认只复制有变动的文件 rsync命令会先扫描源路径，所以即使增量数据不多，也可能需要较长的时间完成
@@ -29,11 +29,11 @@ kill $(cat /var/run/rsyncd.pid)
 
 
 
-# 多线程rsync同步 亲测有效！！！  rsync命令中的源路径结尾必须带有/，否则同步后数据路径不能匹配
+# 多线程rsync同步  rsync命令中的源路径结尾必须带有/，否则同步后数据路径不能匹配
 # 文档地址: https://help.aliyun.com/zh/nas/user-guide/migrate-data-by-using-the-rsync-command-line-tool
-threads=5 # 线程数
-source=/nfsdata/ParkPicture/stor1/2022/  # 源路径
-target=/mnt/nfs_data/ParkPicture/stor1/2022/  #目标路径
+threads=5; # 线程数
+source=/nfsdata/ParkPicture/stor1/2022/;  # 源路径
+target=/mnt/nfs_data/ParkPicture/stor1/2022/;  #目标路径
 nohup rsync -avzP --bwlimit=5120 -f"+ */" -f"- *" root@119.188.90.222:$source $target && (ssh root@119.188.90.222 "cd ${source} && find . -type f" | xargs -n1 -P$threads -I% nohup rsync -avzP --bwlimit=5120 % $target/% )
 
 
