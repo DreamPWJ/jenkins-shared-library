@@ -31,7 +31,7 @@ map.put('build_num_keep', 2)
 
 // Docker相关参数
 // JVM内存设置
-map.put('docker_java_opts', '-Xmx2600m')
+map.put('docker_java_opts', '-Xmx2800m')
 // docker内存限制
 map.put('docker_memory', '3G')
 // docker日志限制
@@ -73,18 +73,18 @@ map.put('is_before_deploy_notice', false)
 // 是否通知变更记录
 map.put('is_notice_change_log', true)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', true)
+map.put('is_git_tag', false)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
-// jenkins分布式构建节点label名称
+// jenkins分布式构建节点label名称  预配置在jenkins节点管理内
 map.put('jenkins_node', 'master')
 map.put('jenkins_node_front_end', 'master')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node14')
 map.put('maven', 'Maven3.6')
-map.put('jdk', '8')
+map.put('jdk', '11')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
@@ -109,98 +109,36 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.jxyb-epark-prod
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.jxyb-spring-boot-prod
 
 /*
 
-jxyb-epark-h5-prod
-莒县云泊停车H5前端 ❤️
+jxyb-pay-server-prod
+莒县云泊停车pay支付平台服务端
 JSON_PARAMS
 {
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/rzhtc.git" ,
-    "BRANCH_NAME" : "juxian" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "rzhtc" ,
-    "SHELL_PARAMS" : "rzhtc h5 8010 80 prod" ,
-    "NPM_RUN_PARAMS" : "build:juxian",
-    "IS_ROLL_DEPLOY" : true,
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
-}
-
-jxyb-epark-server-prod
-莒县云泊停车epark平台服务端
-JSON_PARAMS
-{
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/epark.git" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/epark_pay.git" ,
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "epark-server" ,
-   "SHELL_PARAMS" : "epark server 8080 8080 prod",
+   "PROJECT_NAME" : "epark-pay-service" ,
+   "SHELL_PARAMS" : "epark-pay-service server 8001 8001 juxian-prod",
    "IS_ROLL_DEPLOY" : true,
-   "IS_MAVEN_SINGLE_MODULE" : true,
-   "JAVA_FRAMEWORK_TYPE" : "2",
-   "IS_DIFF_CONF_IN_DIFF_MACHINES": true,
-   "SOURCE_TARGET_CONFIG_DIR" : "resources/juxian,resources",
-   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/nfsdata/ParkPicture:/usr/local/tomcat/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
+   "DOCKER_VOLUME_MOUNT" : "/root/cert:/root/cert,/my/openjdk-11/java.security:/usr/local/openjdk-11/conf/security/java.security",
 }
 
-jxyb-open-epark-server-prod
-莒县云泊停车open epark平台服务端
+jxyb-video-server-prod
+莒县云泊停车路测视频桩服务端
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/openEpark.git" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/video.git" ,
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "open-epark-server" ,
-   "SHELL_PARAMS" : "open-epark server 8081 8080 prod",
+   "PROJECT_NAME" : "video-service" ,
+   "SHELL_PARAMS" : "video-service server 8002 8002 juxian-prod",
+   "IS_MAVEN_SINGLE_MODULE" : true,
    "IS_ROLL_DEPLOY" : true,
-   "IS_MAVEN_SINGLE_MODULE" : true,
-   "JAVA_FRAMEWORK_TYPE" : "2",
-   "SOURCE_TARGET_CONFIG_DIR" : "resource/juxian,resource",
-   "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server-open-epark.xml:/usr/local/tomcat/conf/server.xml"
+   "DOCKER_VOLUME_MOUNT" : "/mnt/stor1:/usr/local/tomcat/webapps/FileUpload/stor1",
 }
-
-jxyb-park-coupon-h5-prod
-莒县云泊停车优惠券H5前端 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/park_coupon.git" ,
-    "BRANCH_NAME" : "master" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "park-coupon" ,
-    "SHELL_PARAMS" : "park-coupon h5 8008 80 prod" ,
-    "NPM_RUN_PARAMS" : "build",
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
-}
-REMOTE_IP: 172.16.0.91
-
-jxyb-induction-screen-server-prod
-莒县云泊停车诱导屏服务端
-JSON_PARAMS
-{
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/traffic.git" ,
-   "BRANCH_NAME" : "main" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "induction-screen" ,
-   "SHELL_PARAMS" : "induction-screen server 8082 8082 prod-juxian",
-   "IS_MAVEN_SINGLE_MODULE" : true
-}
-REMOTE_IP: 172.16.0.91
-
-jxyb-induction-screen-web-prod
-莒县云泊停车诱导屏 Web前端 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/parktraffic-vue.git" ,
-    "BRANCH_NAME" : "main" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "induction-screen" ,
-    "SHELL_PARAMS" : "induction-screen web 8009 80 prod" ,
-    "NODE_VERSION" : "10",
-    "NPM_RUN_PARAMS" : "build",
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
-}
-REMOTE_IP: 172.16.0.91
 
 */
 
