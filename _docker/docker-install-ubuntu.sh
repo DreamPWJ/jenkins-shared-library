@@ -15,7 +15,7 @@ lsb_release -a
 
 echo "更新包管理器 安装程序包 添加软件源信息"
 sudo apt-get update -y || true
-sudo add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable" || true
+# sudo add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable" || true
 # Ubuntu 20以后 出现The following signatures couldn't be verified because the public key is not available: NO_PUBKEY
 # 执行 sudo apt-key adv --keyserver  hkp://keyserver.ubuntu.com:80 --recv-keys 7EA0A9C3F273FCD8  将公钥添加到服务器
 # sudo vim /etc/apt/sources.list 存储镜像源
