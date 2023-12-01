@@ -31,7 +31,7 @@ map.put('build_num_keep', 2)
 
 // Docker相关参数
 // JVM内存设置
-map.put('docker_java_opts', '-Xmx2600m')
+map.put('docker_java_opts', '-Xmx2800m')
 // docker内存限制
 map.put('docker_memory', '3G')
 // docker日志限制
@@ -142,6 +142,22 @@ JSON_PARAMS
    "IS_DIFF_CONF_IN_DIFF_MACHINES": true,
    "SOURCE_TARGET_CONFIG_DIR" : "resources/juxian,resources",
    "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/nfsdata/ParkPicture:/usr/local/tomcat/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
+}
+
+jxyb-open-epark-server-prod
+莒县云泊停车open epark平台服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/openEpark.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "open-epark-server" ,
+   "SHELL_PARAMS" : "open-epark server 8081 8080 prod",
+   "IS_ROLL_DEPLOY" : true,
+   "IS_MAVEN_SINGLE_MODULE" : true,
+   "JAVA_FRAMEWORK_TYPE" : "2",
+   "SOURCE_TARGET_CONFIG_DIR" : "resource/juxian,resource",
+   "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server-open-epark.xml:/usr/local/tomcat/conf/server.xml"
 }
 
 jxyb-park-coupon-h5-prod

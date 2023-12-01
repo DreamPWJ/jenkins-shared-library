@@ -3,7 +3,7 @@
 # https://github.com/Nyr/openvpn-install
 #
 # Copyright (c) 2013 Nyr. Released under the MIT License.
-
+# 执行 ./openvpn-install.sh 即可 初始化和生成证书文件等
 
 # Detect Debian users running the script with "sh" instead of bash
 if readlink /proc/$$/exe | grep -q "dash"; then

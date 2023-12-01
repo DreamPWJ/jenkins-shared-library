@@ -21,7 +21,7 @@ tiup cluster display tidb-prod
 tiup cluster check /my/topology.yaml
 
 - 销毁TiDB集群！！！
-  tiup cluster destroy tidb-prod
+tiup cluster destroy tidb-prod
 
 #### TiUP在不中断线上服务的情况扩容缩容TiDB集群 https://docs.pingcap.com/zh/tidb/stable/scale-tidb-using-tiup
 
@@ -31,7 +31,8 @@ tiup cluster scale-out <cluster-name> scale-out.yml [-p] [-i /home/root/.ssh/gcp
 
 - 基于 Raft 协议和合理的部署拓扑规划，TiDB 实现了集群的高可用，当集群中少数节点挂掉时，集群依然能对外提供服务
 
-#### 连接到 TiDB 控制台
+#### 连接到 TiDB 控制台 用于查看和备份等
 
 sudo apt-get install -y mysql-client
-mysql --host 172.16.100.183 --port 4000 -u root -p --comments
+
+mysql --host 172.0.0.1 --port 4000 -u root -p 123456 --comments
