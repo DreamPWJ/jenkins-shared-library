@@ -137,7 +137,7 @@ JSON_PARAMS
    "SHELL_PARAMS" : "video-service server 8002 8002 juxian-prod",
    "IS_MAVEN_SINGLE_MODULE" : true,
    "IS_ROLL_DEPLOY" : true,
-   "DOCKER_VOLUME_MOUNT" : "/mnt/stor1:/usr/local/tomcat/webapps/FileUpload/stor1",
+   "DOCKER_VOLUME_MOUNT" : "/nfsdata/ParkPicture/stor1:/usr/local/tomcat/webapps/FileUpload/stor1",
 }
 
 */
