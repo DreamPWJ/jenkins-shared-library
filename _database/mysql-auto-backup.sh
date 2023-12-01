@@ -7,9 +7,9 @@
 # 防止和系统环境变量冲突 ，变量命名规则 下划线分割 如果它是你的变量，小写它。如果你导出它，大写它，而${}这种方式引用，使引用变量更明确，以减少不必要的麻烦
 
 HOST="127.0.0.1"                                         #数据库连接ip
-DATABASE="test"                            #数据库名
-USER_NAME="test"                           #数据库用户名
-PASSWORD="panweiji2021!@#"                              #数据库密码
+DATABASE="test"                                          #数据库名
+USER_NAME="test"                                         #数据库用户名
+PASSWORD="panweiji2021!@#"                               #数据库密码
 ADMINISTRATOR="406798106@qq.com"                         #管理员
 
 date=$(date '+%Y%m%d-%H%M')                              #日期格式（作为文件名）
