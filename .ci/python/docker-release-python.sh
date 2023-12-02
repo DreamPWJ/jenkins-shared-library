@@ -203,6 +203,8 @@ docker run -d --restart=always -p ${host_port}:${expose_port} \
   -v /${deploy_folder}/${project_name}/logs:/logs \
   --name ${docker_container_name} ${docker_image_name}
 
+set +x # 关闭shell命令打印模式
+
 # 根据镜像名称获取所有ID并删除镜像
 cd /${deploy_folder} && ./docker-common.sh remove_docker_image ${docker_image_ids}
 

@@ -241,6 +241,8 @@ docker run -d --restart=always -p ${host_port}:${expose_port} --privileged=true 
   -v /${deploy_folder}/${project_name}/logs:/logs \
   --name ${docker_container_name} ${docker_image_name}
 
+set +x # 关闭shell命令打印模式
+
 #docker_exited_container=$(docker ps --all -q -f status=exited)
 #if [[ ${docker_exited_container} ]]; then
 #  echo "删除具有exited状态的容器"
