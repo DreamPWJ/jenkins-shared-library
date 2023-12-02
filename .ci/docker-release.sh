@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Author: 潘维吉
 # Description: 执行Docker发布部署shell脚本
 
@@ -194,7 +194,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
   docker build -t ${docker_image_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg PROJECT_NAME=${project_name} \
     --build-arg EXPOSE_PORT="${build_expose_ports}" --build-arg JDK_VERSION=${jdk_version} \
-    --build-arg TOMCAT_VERSION=${tomcat_version} -f /${deploy_folder}/${docker_file_name} . --no-cache | echo
+    --build-arg TOMCAT_VERSION=${tomcat_version} -f /${deploy_folder}/${docker_file_name} . --no-cache
 else
   docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}-${project_type}-${env_mode}
 fi
@@ -231,13 +231,14 @@ if [[ ${is_prod} == false && ${remote_debug_port} ]]; then
 fi
 
 echo "👨‍💻 启动运行Docker容器 环境: ${env_mode} 映射端口: ${host_port}:${expose_port}"
+set -x # 打开打印模式
 # 动态修改数据库连接 -e PARAMS="--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/health?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true  --spring.datasource.username=root"
 docker run -d --restart=always -p ${host_port}:${expose_port} --privileged=true \
   -e "SPRING_PROFILES_ACTIVE=${env_mode}" -e "PROJECT_NAME=${project_name}" \
   -e "JAVA_OPTS=-Xms128m ${docker_java_opts}" -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1 ${dynamic_run_args} \
   -e "REMOTE_DEBUGGING_PARAM=${remote_debugging_param}" -e HOST_NAME=$(hostname) \
   -v /${deploy_folder}/${project_name}/logs:/logs \
-  --name ${docker_container_name} ${docker_image_name}  | echo
+  --name ${docker_container_name} ${docker_image_name}
 
 #docker_exited_container=$(docker ps --all -q -f status=exited)
 #if [[ ${docker_exited_container} ]]; then
