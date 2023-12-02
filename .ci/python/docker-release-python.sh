@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Author: 潘维吉
 # Description: 执行Docker发布部署shell脚本
 
@@ -147,6 +147,8 @@ echo "远程调试参数: ${remote_debugging_param}"
 
 # 根据镜像名称查询镜像ID 用于删除无效的镜像
 docker_image_ids=$(docker images -q --filter reference=${docker_image_name})
+
+set -x # 打开打印模式
 
 # 是否是远程镜像仓库方式
 if [[ ${is_push_docker_repo} == false ]]; then

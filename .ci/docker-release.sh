@@ -183,6 +183,8 @@ docker_image_ids=$(docker images -q --filter reference=${docker_image_name})
 # 获取系统CPU使用率 如果CPU占用高 则排队延迟部署 避免并发部署等导致资源阻塞
 cd /${deploy_folder} && ./docker-common.sh get_cpu_rate && cd /${deploy_file}
 
+set -x # 打开打印模式
+
 # 是否是远程镜像仓库方式
 if [[ ${is_push_docker_repo} == false ]]; then
   echo "🏗️  开始构建Docker镜像(无缓存构建)"
@@ -231,7 +233,6 @@ if [[ ${is_prod} == false && ${remote_debug_port} ]]; then
 fi
 
 echo "👨‍💻 启动运行Docker容器 环境: ${env_mode} 映射端口: ${host_port}:${expose_port}"
-set -x # 打开打印模式
 # 动态修改数据库连接 -e PARAMS="--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/health?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true  --spring.datasource.username=root"
 docker run -d --restart=always -p ${host_port}:${expose_port} --privileged=true \
   -e "SPRING_PROFILES_ACTIVE=${env_mode}" -e "PROJECT_NAME=${project_name}" \
