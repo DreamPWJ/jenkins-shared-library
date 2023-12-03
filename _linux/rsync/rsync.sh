@@ -15,7 +15,7 @@ rsync -r /source/ /target/
 # --include='*.txt' 将包括所有txt文件  --exclude='*.log' 将排除所有log文件
 nohup rsync -avzP  --delete --bwlimit=5120  root@119.188.90.222:/nfsdata/ParkPicture/stor1/2023/10/ /mnt/nfs_data/ParkPicture/stor1/2023/10/
 nohup rsync -avzP --bwlimit=5120  root@119.188.90.222:/nfsdata/ParkPicture/stor1/epark/ /mnt/nfs_data/ParkPicture/stor1/epark/
-nohup rsync -avzP  --include "9/" --include "8/" --exclude "/*"  root@119.188.90.222:/nfsdata/ParkPicture/stor1/epark/ /mnt/nfs_data/ParkPicture/stor1/epark/
+nohup rsync -avzP --bwlimit=5120 --include "9/" --include "8/" --exclude "/*"  root@119.188.90.222:/nfsdata/ParkPicture/stor1/2023/ /mnt/nfs_data/ParkPicture/stor1/2023/
 
 # 增量同步  rsync 的最大特点就是它可以完成增量备份，也就是默认只复制有变动的文件 rsync命令会先扫描源路径，所以即使增量数据不多，也可能需要较长的时间完成
 # -delete参数删除只存在于目标目录、不存在于源目标的文件，即保证目标目录是源目标的镜像
