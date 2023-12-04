@@ -31,6 +31,9 @@ rsync --daemon
 kill $(cat /var/run/rsyncd.pid)
 
 
+# 查看运行的rsync进程  kill -9 PID 停止rsync命令
+ps -ef | grep rsync
+
 
 # 多线程rsync同步  rsync命令中的源路径结尾必须带有/，否则同步后数据路径不能匹配
 # 文档地址: https://help.aliyun.com/zh/nas/user-guide/migrate-data-by-using-the-rsync-command-line-tool
