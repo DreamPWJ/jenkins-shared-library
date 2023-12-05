@@ -13,7 +13,7 @@ rsync -r /source/ /target/
 # 全量将远程内容同步到本地  --bwlimit=1000 限速单位KB/s  -P允许恢复中断的传输和显示进度  多线程只需在不同目录执行同步不同目录的rsync命令即可！！！
 # nohup输入密码后按ctrl+z 中断进程 紧接着输入bg后台运行(需要实现ssh免密登录才不会中断) 退出执行exit保证任务后台正常运行！！！  tail -f nohup.out查看日志
 # --include='*.txt' 将包括所有txt文件  --exclude='*.log' 将排除所有log文件
-nohup rsync -avzP  --delete --bwlimit=5120  root@119.188.90.222:/nfsdata/ParkPicture/stor1/2023/10/ /mnt/nfs_data/ParkPicture/stor1/2023/10/
+nohup rsync -avzP --bwlimit=5120  root@119.188.90.222:/nfsdata/ParkPicture/stor1/2023/10/ /mnt/nfs_data/ParkPicture/stor1/2023/10/
 nohup rsync -avzP --bwlimit=5120  root@119.188.90.222:/nfsdata/ParkPicture/stor1/epark/ /mnt/nfs_data/ParkPicture/stor1/epark/
 nohup rsync -avzP --bwlimit=5120 --include "9/" --include "8/" --exclude "/*"  root@119.188.90.222:/nfsdata/ParkPicture/stor1/2023/ /mnt/nfs_data/ParkPicture/stor1/2023/
 

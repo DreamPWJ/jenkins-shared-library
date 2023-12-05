@@ -29,8 +29,8 @@ sudo mysqldump ${mysql_options} | gzip >${backup_dir}/${dump_file}.gz
 sudo mysqldump -u${USER_NAME} -p${PASSWORD} mysql user db tables_priv -t --skip-extended-insert >${backup_dir}/user_info.sql
 #sudo docker exec mysql mysqldump -u${USER_NAME} -p${PASSWORD} mysql user db tables_priv -t --skip-extended-insert >${backup_dir}/user_info.sql
 
-# 删除7天之前的备份文件
-find ${backup_dir} -name "*.sql.gz" -type f -mtime +7 -exec rm -rf {} \; >/dev/null 2>&1
+# 删除-mtime是几天之前的备份文件
+find ${backup_dir} -name "*.sql.gz" -type f -mtime +5 -exec rm -rf {} \; >/dev/null 2>&1
 
 # crontab -e
 # MySQL数据库自动化定时备份

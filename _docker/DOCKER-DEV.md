@@ -1,20 +1,14 @@
 #### 设置镜像源  解决pull下载慢卡住问题  注意：镜像源不维护了可能导致latest不是最新的版本
 docker info
-sudo vim /etc/docker/daemon.json
+sudo cat <<EOF >/etc/docker/daemon.json
 {
 "registry-mirrors": [
 "http://registry.docker-cn.com",
 "https://mirror.ccs.tencentyun.com",
 "http://docker.mirrors.ustc.edu.cn"
 ]
-
-"dns" : [
-"114.114.114.114",
-"223.5.5.5",
-"223.6.6.6",
-"8.8.8.8"
-]
 }
+EOF
 sudo systemctl daemon-reload && sudo systemctl restart docker
 
 #### 还原Docker容器的启动run命令完整参数
