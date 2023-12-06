@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Author: 潘维吉
-# Description: 宿主机版mysql安装
+# Description: CentOS宿主机版mysql安装
 
 echo "CentOS安装MySQL8.0"
 
