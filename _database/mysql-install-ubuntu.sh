@@ -16,7 +16,6 @@ sudo cat <<EOF >/etc/mysql/my.cnf
 [mysqld]
 port=3306
 bind-address=0.0.0.0
-socket=/var/lib/mysql/mysql.sock
 datadir=/var/lib/mysql
 user=mysql
 
@@ -43,7 +42,6 @@ sudo cat <<EOF >/etc/mysql/my.cnf
 [mysqld]
 port=3306
 bind-address=0.0.0.0
-socket=/var/lib/mysql/mysql.sock
 datadir=/var/lib/mysql
 user=mysql
 
