@@ -48,6 +48,8 @@ user=mysql
 # 主从复制-从机配置
 # 从服务器唯一ID
 server-id=2
+# 开启二进制日志功能，以备Slave作为的Master时使用
+log-bin=mysql-slave-bin
 # 启用中继日志
 relay-log=mysql-relay
 
