@@ -54,7 +54,7 @@ server-id=2
 relay-log=mysql-relay
 
 default-authentication-plugin=caching_sha2_password
-skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0
+#skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0
 
 group_concat_max_len=1024000000
 max_connections=2000
@@ -81,9 +81,6 @@ systemctl status mysql.service
 sudo netstat -tap | grep mysql
 lsof -i:3306
 
-# 卸载Mysql
-sudo apt-get remove -y mysql.service
-
 #echo "修改账号密码并创建数据库"
 # 进入MySQL shell  修改密码 新建数据库
 # mysql -u root
@@ -93,13 +90,13 @@ sudo apt-get remove -y mysql.service
 # SHOW VARIABLES LIKE 'validate_password%';
 # set global validate_password_policy=0;
 
-# ALTER USER 'root'@'localhost' IDENTIFIED WITH CACHING_SHA2_PASSWORD BY 'j+4_*9@pQ8x6c1hDv2';
-# CREATE database if NOT EXISTS database_name_dev;
+# ALTER USER 'root'@'%' IDENTIFIED WITH MYSQL_NATIVE_PASSWORD BY 'panweiji2021';
+# CREATE database if NOT EXISTS database_name_test;
 # show databases;
 
 # echo "新建远程用户"
-# CREATE USER IF NOT EXISTS 'epark'@'%' IDENTIFIED WITH CACHING_SHA2_PASSWORD BY 'j+4_*9@pQ8x6c1hDv2';
-# GRANT all privileges ON *.* TO 'epark'@'%';
+# CREATE USER IF NOT EXISTS 'user_name'@'%' IDENTIFIED WITH MYSQL_NATIVE_PASSWORD BY 'panweiji2021';
+# GRANT all privileges ON *.* TO 'user_name'@'%';
 # flush privileges;
 
 # 处理端口问题
@@ -112,7 +109,6 @@ sudo apt-get remove -y mysql.service
 # systemctl restart mysql.service && systemctl status mysql.service
 
 # sudo tail -f /var/log/mysql/error.log
-
 # sudo mkdir -p /var/log/mysql/ && sudo chown mysql:mysql -R /var/log/mysql
 
 # sudo apt reinstall mysql-server
