@@ -11,15 +11,15 @@ if [[ check_res -ne 0 ]]; then
      # 如果keepalived服务不存在 启动keepalived服务  因为当前keepalived已停止无法再检测
      keepalived_check_res=$(ps -C keepalived --no-header | wc -l)
      if [[ keepalived_check_res -eq 0 ]]; then
-        echo $(date)  "keepalived is not running, start..." >> /etc/keepalived/check_nginx.log
+        echo $(date)  "keepalived is not running, start..." >> /etc/keepalived/check_keepalived.log
         systemctl start keepalived
         # systemctl status keepalived
      fi
 fi
 
 # sudo crontab -e
-# 每多少秒 * * * * * sleep 5;  每分钟 */1 * * * *
-# * * * * * sleep 5; /bin/bash /etc/keepalived/keppalived_check.sh >/etc/keepalived/check_keepalived.log 2>&1
+# 每多少秒 * * * * * sleep 10;  每分钟 */1 * * * *
+# * * * * * sleep 10; /bin/bash /etc/keepalived/keppalived_check.sh
 # service crond restart , Ubuntu 使用 sudo service cron start # 重启crond生效
 # crontab -l # 查看crond列表
 # chmod 755 /etc/keepalived/keppalived_check.sh 给shell脚本执行文件可执行权限
