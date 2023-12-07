@@ -31,7 +31,7 @@ map.put('build_num_keep', 2)
 
 // Docker相关参数
 // JVM内存设置
-map.put('docker_java_opts', '-Xmx2000m')
+map.put('docker_java_opts', '-Xmx2200m')
 // docker内存限制
 map.put('docker_memory', '2.5G')
 // docker日志限制
