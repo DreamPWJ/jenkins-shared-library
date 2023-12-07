@@ -119,3 +119,5 @@ lsof -i:3306
 # start slave;
 # 查询Slave状态
 # show slave status\G
+# 查看是否配置成功
+# 查看参数 Slave_IO_Running 和 Slave_SQL_Running 是否都为yes，则证明配置成功。若为no，则需要查看对应的 Last_IO_Error 或 Last_SQL_Error 的异常值。
