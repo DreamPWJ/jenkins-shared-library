@@ -18,8 +18,8 @@ if [[ check_res -ne 0 ]]; then
 fi
 
 # sudo crontab -e
-# 每多少秒 * * * * * sleep 10;  每分钟 */1 * * * *
-# * * * * * sleep 10; /bin/bash /etc/keepalived/keppalived_check.sh
+# 每多少秒 * * * * * sleep 5;  每分钟 */1 * * * *
+# * * * * * sleep 5; /bin/bash /etc/keepalived/keppalived_check.sh
 # service crond restart , Ubuntu 使用 sudo service cron start # 重启crond生效
 # crontab -l # 查看crond列表
 # chmod 755 /etc/keepalived/keppalived_check.sh 给shell脚本执行文件可执行权限
