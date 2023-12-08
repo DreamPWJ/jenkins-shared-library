@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Author: 潘维吉
 # Description: 执行Docker发布部署shell脚本 同一台服务器主从分布式部署
 
@@ -136,6 +136,7 @@ fi
 cd /${deploy_folder} && ./docker-common.sh get_cpu_rate && cd /${deploy_file}
 
 echo "👨‍💻 启动运行Docker容器 环境: ${env_mode} 映射端口: ${host_port}:${expose_port}"
+set -x # 开启shell命令打印模式
 docker run -d --restart=always -p ${host_port}:${expose_port} \
   -e "SPRING_PROFILES_ACTIVE=${env_mode}" -e "PROJECT_NAME=${project_name}" -e HOST_NAME=$(hostname)  \
   -e "JAVA_OPTS=-Xms128m ${docker_java_opts}" -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1 ${dynamic_run_args} \

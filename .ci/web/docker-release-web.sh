@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Author: 潘维吉
 # Description: 执行Docker发布部署shell脚本
 
@@ -96,6 +96,8 @@ docker_image_ids=$(docker images -q --filter reference=${docker_image_name})
 # 获取系统CPU使用率 如果CPU占用高 则排队延迟部署 避免并发部署等导致资源阻塞
 cd /${deploy_folder} && ./docker-common.sh get_cpu_rate && cd /${deploy_file}
 
+set -x # 开启shell命令打印模式
+
 # 是否是远程镜像仓库方式
 if [[ ${is_push_docker_repo} == false ]]; then
   echo "🏗️  开始构建Docker镜像(无缓存构建)"
@@ -132,6 +134,8 @@ fi
 echo "👨‍💻 启动运行Docker容器  映射端口: ${host_port}:${expose_port}"
 docker run -d --restart=always -p ${host_port}:${expose_port} \
   --name ${docker_container_name} ${docker_image_name}
+
+set +x # 关闭shell命令打印模式
 
 #docker_exited_container=$(docker ps --all -q -f status=exited)
 #if [[ ${docker_exited_container} ]]; then

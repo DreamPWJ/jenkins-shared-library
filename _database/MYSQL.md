@@ -1,3 +1,7 @@
+#### MYSQL一主一从复制和双主双从配置
+
+- 文档地址: https://www.cnblogs.com/cao-lei/p/13603043.html
+
 #### 慢SQL优化最佳实战
 
 - 文档地址: https://help.aliyun.com/document_detail/290038.html

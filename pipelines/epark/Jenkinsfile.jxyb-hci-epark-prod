@@ -31,7 +31,7 @@ map.put('build_num_keep', 2)
 
 // Docker相关参数
 // JVM内存设置
-map.put('docker_java_opts', '-Xmx2600m')
+map.put('docker_java_opts', '-Xmx2800m')
 // docker内存限制
 map.put('docker_memory', '3G')
 // docker日志限制
@@ -124,7 +124,7 @@ JSON_PARAMS
     "SHELL_PARAMS" : "jxyb h5 8010 80 prod" ,
     "NPM_RUN_PARAMS" : "build:juxian",
     "IS_ROLL_DEPLOY" : true,
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
+    "CUSTOM_NGINX_CONFIG" : "config/default-hci.conf"
 }
 
 jxyb-hci-epark-server-prod
@@ -152,7 +152,7 @@ JSON_PARAMS
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "open-epark-server" ,
-   "SHELL_PARAMS" : "open-epark server 8082 8080 prod",
+   "SHELL_PARAMS" : "open-epark server 8081 8080 prod",
    "IS_ROLL_DEPLOY" : true,
    "IS_MAVEN_SINGLE_MODULE" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
@@ -170,7 +170,7 @@ JSON_PARAMS
     "PROJECT_NAME" : "park-coupon" ,
     "SHELL_PARAMS" : "park-coupon h5 8008 80 prod" ,
     "NPM_RUN_PARAMS" : "build",
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
+    "CUSTOM_NGINX_CONFIG" : "config/default-hci.conf"
 }
 REMOTE_IP: 172.16.100.177
 
@@ -182,7 +182,7 @@ JSON_PARAMS
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "induction-screen" ,
-   "SHELL_PARAMS" : "induction-screen server 8082 8082 prod-juxian",
+   "SHELL_PARAMS" : "induction-screen server 8082 8082 juxian-prod",
    "IS_MAVEN_SINGLE_MODULE" : true
 }
 REMOTE_IP: 172.16.100.177
@@ -198,7 +198,7 @@ JSON_PARAMS
     "SHELL_PARAMS" : "induction-screen web 8009 80 prod" ,
     "NODE_VERSION" : "10",
     "NPM_RUN_PARAMS" : "build",
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
+    "CUSTOM_NGINX_CONFIG" : "config/default-hci.conf"
 }
 REMOTE_IP: 172.16.100.177
 
