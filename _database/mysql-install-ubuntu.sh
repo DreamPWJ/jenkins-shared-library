@@ -29,7 +29,7 @@ default-authentication-plugin=caching_sha2_password
 #skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0
 
 group_concat_max_len=1024000000
-max_connections=2000
+max_connections=6000
 #lower_case_table_names=1
 
 [mysqld_safe]
@@ -57,7 +57,7 @@ default-authentication-plugin=caching_sha2_password
 #skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0
 
 group_concat_max_len=1024000000
-max_connections=2000
+max_connections=6000
 #lower_case_table_names=1
 
 [mysqld_safe]
