@@ -4,6 +4,7 @@
 #
 # Copyright (c) 2013 Nyr. Released under the MIT License.
 # 执行 ./openvpn-install.sh 即可 初始化和生成证书文件等
+# VPN证书在root目录下  .ovpn格式  直接给客户端导入即可
 
 # Detect Debian users running the script with "sh" instead of bash
 if readlink /proc/$$/exe | grep -q "dash"; then

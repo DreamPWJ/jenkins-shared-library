@@ -6,15 +6,15 @@
 # 本地变量 全部小写 声明局部变量以确保其只在函数内部和子函数中可见。避免污染全局命名空间和不经意间设置可能具有函数之外重要性的变量
 # 防止和系统环境变量冲突 ，变量命名规则 下划线分割 如果它是你的变量，小写它。如果你导出它，大写它，而${}这种方式引用，使引用变量更明确，以减少不必要的麻烦
 
-HOST="127.0.0.1"                                         #数据库连接ip
-DATABASE="--all-databases"                               #数据库名 备份所有数据库使用 --all-databases 参数
-USER_NAME="root"                                         #数据库用户名
-PASSWORD="password"                                      #数据库密码
-ADMINISTRATOR="406798106@qq.com"                         #管理员
+HOST="127.0.0.1"                                         # 数据库连接ip
+DATABASE="--all-databases"                               # 数据库名 备份所有数据库使用 --all-databases 参数
+USER_NAME="root"                                         # 数据库用户名
+PASSWORD="password"                                      # 数据库密码
+ADMINISTRATOR="406798106@qq.com"                         # 管理员
 
-date=$(date '+%Y%m%d-%H%M')                              #日期格式（作为文件名）
-backup_dir=/my/backup                                    #备份文件存储路径
-dump_file=${DATABASE}-${date}.sql                        #备份文件名(数据库名+备份时间)
+date=$(date '+%Y%m%d-%H%M')                              # 日期格式（作为文件名）
+backup_dir=/my/backup                                    # 备份文件存储路径
+dump_file=${DATABASE}-${date}.sql                        # 备份文件名(数据库名+备份时间)
 mysql_options="-h${HOST} -u${USER_NAME} -p${PASSWORD} ${DATABASE} --lock-tables=false" #备份参数组合
 
 # 宿主机方式压缩备份
