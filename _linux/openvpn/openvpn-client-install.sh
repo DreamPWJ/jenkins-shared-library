@@ -17,5 +17,5 @@ sudo openvpn --daemon --config /etc/openvpn/client.ovpn --log-append /var/log/op
 # 查看相关日志
 tail -f /var/log/openvpn.log
 
-# 杀死进出  kill -9 PID
+# 关闭openvpn服务 kill -9 PID
 ps -ef | grep openvpn
