@@ -4,7 +4,18 @@
 
 
 # 安装openvpn
-apt-get install -y openvpn
+sudo apt-get install -y openvpn
 
-# 客户端配置证书信息  有权限问题执行  udo openvpn client.ovpn
-sudo openvpn  --config /etc/openvpn/config/client.ovpn --daemon --log-append /var/log/openvpn.log
+sudo yum -y install openvpn
+
+# 查看版本号
+openvpn --version
+
+# 客户端配置证书信息  client.ovpn是服务端分配的  有权限问题执行 sudo openvpn client.ovpn
+sudo openvpn --daemon --config /etc/openvpn/client.ovpn --log-append /var/log/openvpn.log
+
+# 查看相关日志
+tail -f /var/log/openvpn.log
+
+# 杀死进出  kill -9 PID
+ps -ef | grep openvpn
