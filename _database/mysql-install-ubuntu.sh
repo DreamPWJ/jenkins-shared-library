@@ -114,7 +114,7 @@ lsof -i:3306
 # sudo apt reinstall mysql-server
 
 # 从库执行命令 做主从复制  先在主库节点上执行 show master status\G   获取下面master_log_file和master_log_pos参数信息
-# change master to master_host ='172.16.100.185',master_port =3306,master_user ='root',master_password ='password',master_log_file ='mysql-bin.000001',master_log_pos =156;
+# change master to master_host ='172.16.100.185',master_port =3306,master_user ='root',master_password ='password',master_log_file ='mysql-bin.000013',master_log_pos =157;
 # 开始同步
 # start slave;
 # 查询Slave状态

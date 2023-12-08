@@ -124,7 +124,7 @@ JSON_PARAMS
     "SHELL_PARAMS" : "jxyb h5 8010 80 prod" ,
     "NPM_RUN_PARAMS" : "build:juxian",
     "IS_ROLL_DEPLOY" : true,
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
+    "CUSTOM_NGINX_CONFIG" : "config/default-hci.conf"
 }
 
 jxyb-hci-epark-server-prod
@@ -170,7 +170,7 @@ JSON_PARAMS
     "PROJECT_NAME" : "park-coupon" ,
     "SHELL_PARAMS" : "park-coupon h5 8008 80 prod" ,
     "NPM_RUN_PARAMS" : "build",
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
+    "CUSTOM_NGINX_CONFIG" : "config/default-hci.conf"
 }
 REMOTE_IP: 172.16.100.177
 
@@ -198,7 +198,7 @@ JSON_PARAMS
     "SHELL_PARAMS" : "induction-screen web 8009 80 prod" ,
     "NODE_VERSION" : "10",
     "NPM_RUN_PARAMS" : "build",
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
+    "CUSTOM_NGINX_CONFIG" : "config/default-hci.conf"
 }
 REMOTE_IP: 172.16.100.177
 
