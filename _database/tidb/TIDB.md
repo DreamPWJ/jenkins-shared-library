@@ -5,6 +5,7 @@
 -  执行部署TiDB分布式集群(首先设置ssh免密登录) : 
    cd /my && tiup cluster deploy tidb-prod v7.5.0 ./topology.yaml --user root 和 tiup cluster start tidb-prod --init
 -  重复部署的情况， 注意数据库名称重复冲突
+-  MYSQL迁移TiDB兼容性问题(TiDB不支持函数、存储过程、触发器等): https://docs.pingcap.com/zh/tidb/stable/mysql-compatibility
 
 #### TiDB运维命令
 
