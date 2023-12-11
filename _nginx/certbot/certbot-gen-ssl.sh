@@ -83,3 +83,6 @@ cd /etc/letsencrypt/live/ || true && ls -l
 # rm -rf /etc/letsencrypt/archives/domain.com-0001
 # rm -rf /etc/letsencrypt/live/domain.com-0001
 # rm -f /etc/letsencrypt/renewal/domain.com-0001.conf
+
+
+# SSL 状态检测  访问 https://myssl.com

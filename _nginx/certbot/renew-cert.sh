@@ -16,7 +16,6 @@ sudo certbot renew
 docker exec proxy-nginx nginx -t -c /etc/nginx/nginx.conf
 docker exec proxy-nginx nginx -s reload || true
 
-# SSL 状态检测  访问 https://myssl.com
 
 # 创建定时任务 自动续期SSL证书 默认证书有效期是90天
 # sudo crontab -e
