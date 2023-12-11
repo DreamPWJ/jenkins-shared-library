@@ -2,15 +2,6 @@
 # Author: 潘维吉
 # Description: 自动续签SSL证书
 
-if [[ ! $(command -v certbot) ]]; then
-  echo "安装Certbot客户端"
-  # Certbot 目前需要在类 UNIX 操作系统上运行 Python 3.6+。默认情况下，它需要 root 访问权限才能写入 /etc/letsencrypt
-  sudo apt-get install -y certbot || true
-  sudo yum install -y certbot || true
-  # sudo pip install certbot-dns-aliyun
-  certbot --version
-fi
-
 # 续签SSL证书
 # Another instance of Certbot is already running
 #find / -type f -name ".certbot.lock" -exec rm {} \  || true;
