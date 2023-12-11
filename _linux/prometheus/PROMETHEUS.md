@@ -1,6 +1,8 @@
 #### 安装Prometheus监控 https://prometheus.io/docs/prometheus/latest/installation/
 
-##### 安装前确保prometheus的配置yaml文件放在挂载目录下
+##### 安装前确保prometheus的配置prometheus.yml文件放在挂载目录下
+
+mkdir -p /my/prometheus/
 
 docker run -d --restart=always -p 9090:9090 \
 -v /my/prometheus/:/etc/prometheus/  \
@@ -9,6 +11,14 @@ docker run -d --restart=always -p 9090:9090 \
 #### 安装Grafana监控 默认用户和密码均为admin  https://grafana.com/docs/grafana/latest/installation/docker/
 
 sudo docker run -d --restart=always -p 3000:3000 --name grafana grafana/grafana
+
+##### Prometheus监控MySQL
+
+- 参考文档: https://zhuanlan.zhihu.com/p/337715590
+
+##### Prometheus监控Nginx
+
+- 参考文档: https://blog.51cto.com/cuiyingfeng/4371773
 
 #### Spring Boot集成Prometheus监控
 
