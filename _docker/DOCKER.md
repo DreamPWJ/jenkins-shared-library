@@ -46,7 +46,7 @@ docker run -d --restart=always  -p 18083:18083 -p 1883:1883 -p 8083:8083  \
 --log-opt max-size=1024m --log-opt max-file=1 \
 --name emqx  emqx/emqx:latest
 
-#### 安装 分布式任务调度平台XXL-JOB服务 在浏览器中使用http://47.105.198.77:8081/xxl-job-admin/ 默认用户名和密码 admin 123456
+#### 安装 分布式任务调度平台XXL-JOB服务 在浏览器中使用http://ip:8081/xxl-job-admin/ 默认用户名 admin 密码 123456
 docker pull xuxueli/xxl-job-admin:2.1.2
 
 docker run -d --restart=always -p 8081:8080  \
