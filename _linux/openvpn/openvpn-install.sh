@@ -6,9 +6,8 @@
 # 执行 ./openvpn-install.sh 即可 初始化和生成证书文件等
 # VPN证书在root目录下  .ovpn格式  直接给客户端导入即可
 # 在服务端设置生成客户端ovpn证书的有效期  vim /etc/openvpn/server/easy-rsa/pki/vars 中 set_var EASYRSA_CERT_EXPIRE	3650  默认825
-# 测试UDP服务连通性  nc -vuz 172.16.100.177 19271
-# 设置版本号  sudo apt-get install -y openvpn=2.4.12
-# 查看服务器连接情况 cat /run/openvpn-server/status-server.log  查看进行  ps -ef | grep openvpn
+# 测试UDP服务连通性 如果UDP无效可选择TCP协议  nc -vuz 172.16.100.177 19271
+# 查看服务器连接情况 cat /run/openvpn-server/status-server.log  查看进程  ps -ef | grep openvpn
 
 # Detect Debian users running the script with "sh" instead of bash
 if readlink /proc/$$/exe | grep -q "dash"; then
