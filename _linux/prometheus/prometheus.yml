@@ -20,16 +20,25 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-  # Spring Boot应用配置
-  - job_name: 'property-sales-app'
-    scrape_interval: 5s
-    metrics_path: '/actuator/prometheus'
+  - job_name: 'node_exporter'
     static_configs:
-      - targets: ['172.31.88.89:8096']
+      - targets: ['172.16.100.185:9100']
 
-  # Spring Boot应用配置
-  - job_name: 'property-sales-mapp'
-    scrape_interval: 15s
-    metrics_path: '/actuator/prometheus'
+  - job_name: 'mysql_node_exporter'
     static_configs:
-      - targets: ['172.31.88.89:8095']
+      - targets: ['172.16.100.185:9104']
+
+
+#  # Spring Boot应用配置
+#  - job_name: 'property-sales-app'
+#    scrape_interval: 5s
+#    metrics_path: '/actuator/prometheus'
+#    static_configs:
+#      - targets: ['172.31.88.89:8096']
+#
+#  # Spring Boot应用配置
+#  - job_name: 'property-sales-mapp'
+#    scrape_interval: 15s
+#    metrics_path: '/actuator/prometheus'
+#    static_configs:
+#      - targets: ['172.31.88.89:8095']

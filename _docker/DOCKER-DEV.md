@@ -29,7 +29,7 @@ docker pull mysql
 sudo docker run -d --restart=always -p 3306:3306 --name mysql \
 -e MYSQL_DATABASE=design -e MYSQL_ROOT_PASSWORD=panweiji2020 -v /etc/localtime:/etc/localtime:ro -v /my/mysql/data:
 /var/lib/mysql \
-mysql --group_concat_max_len=1024000000 --max_connections=2000 --lower_case_table_names=1
+mysql --group_concat_max_len=1024000000 --max_connections=6000 --lower_case_table_names=1
 
 #### 安装postgres数据库
 docker pull postgres

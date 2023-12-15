@@ -2,15 +2,6 @@
 # Author: 潘维吉
 # Description: 自动续签SSL证书
 
-if [[ ! $(command -v certbot) ]]; then
-  echo "安装Certbot客户端"
-  # Certbot 目前需要在类 UNIX 操作系统上运行 Python 3.6+。默认情况下，它需要 root 访问权限才能写入 /etc/letsencrypt
-  sudo apt-get install -y certbot || true
-  sudo yum install -y certbot || true
-  # sudo pip install certbot-dns-aliyun
-  certbot --version
-fi
-
 # 续签SSL证书
 # Another instance of Certbot is already running
 #find / -type f -name ".certbot.lock" -exec rm {} \  || true;
@@ -25,7 +16,6 @@ sudo certbot renew
 docker exec proxy-nginx nginx -t -c /etc/nginx/nginx.conf
 docker exec proxy-nginx nginx -s reload || true
 
-# SSL 状态检测  访问 https://myssl.com
 
 # 创建定时任务 自动续期SSL证书 默认证书有效期是90天
 # sudo crontab -e
