@@ -18,7 +18,7 @@ spec:
           value: health
         - name: MYSQL_ROOT_PASSWOR
           value: panweiji2019
-      args: [ "--group_concat_max_len=102400","--max_connections=2000","--lower_case_table_names=1" ]
+      args: [ "--group_concat_max_len=102400","--max_connections=6000","--lower_case_table_names=1" ]
 
     - name: nginx
       image: nginx

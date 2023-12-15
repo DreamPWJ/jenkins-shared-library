@@ -31,27 +31,27 @@ monitored:
   blackbox_exporter_port: 9115
 
 pd_servers:
-  - host: 192.168.0.9
-  - host: 192.168.0.13
+  - host: 172.16.0.9
+  - host: 172.16.0.13
 
 tidb_servers:
-  - host: 192.168.0.10
-  - host: 192.168.0.11
-  - host: 192.168.0.12
+  - host: 172.16.0.10
+  - host: 172.16.0.11
+  - host: 172.16.0.12
 
 tikv_servers:
-  - host: 192.168.0.10
-  - host: 192.168.0.11
-  - host: 192.168.0.12
+  - host: 172.16.0.10
+  - host: 172.16.0.11
+  - host: 172.16.0.12
 
 monitoring_servers:
-  - host: 192.168.0.9
-    port: 9190 # prometheus端口 默认9090
+  - host: 172.16.0.9
+    port: 9090 # prometheus端口 默认9090
     ng_port: 21183
 
 grafana_servers:
-  - host: 192.168.0.9
+  - host: 172.16.0.9
     # port: 3000  # grafana端口 默认3000
 
 alertmanager_servers:
-  - host: 192.168.0.9
+  - host: 172.16.0.9

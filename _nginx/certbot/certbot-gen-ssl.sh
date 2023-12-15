@@ -11,6 +11,8 @@ cd /my/letsencrypt
 if [[ ! $(command -v certbot) ]]; then
   echo "安装Certbot客户端"
   # Certbot 目前需要在类 UNIX 操作系统上运行 Python 3.6+。默认情况下，它需要 root 访问权限才能写入 /etc/letsencrypt
+  sudo apt-get update -y || true
+  sudo apt-get upgrade -y || true # 更新软件
   sudo apt-get install -y certbot || true
   # sudo yum update -y
   sudo yum install -y certbot || true  # 如果certbot不存在 设置yum镜像源/etc/yum.repos.d
@@ -50,7 +52,9 @@ echo "生成域名相关的SSL证书"
 
 # certonly阿里云自动生成二级域名的DNS验证  renew续签也需要DNS 动态添加 TXT 记录 不需要手动创建  https://github.com/tengattack/certbot-dns-aliyun
 # certbot 提供了一个 hook，可以编写一个 Shell 脚本，让脚本调用 DNS 服务商的 API 接口，动态添加 TXT 记录
-apt install -y python3-pip && pip install certbot-dns-aliyun
+
+sudo apt install -y python3-pip && pip install certbot-dns-aliyun
+
 # https://ram.console.aliyun.com/ 申请key和秘钥  并确保您的 RAM 帐户有AliyunDNSFullAccess权限 确保生成证书域名在当前阿里云账号管理
 sudo cat <<EOF >/my/credentials.ini
 dns_aliyun_access_key  =
@@ -60,7 +64,8 @@ EOF
 chmod 600 /my/credentials.ini
 
 # Certbot阿里云DNS自动校验方式生成证书  动手执行生成配置
-certbot certonly --email 406798106@qq.com  -d "panweiji.com"
+certbot certonly --authenticator=dns-aliyun --dns-aliyun-credentials='/my/credentials.ini' \
+--email 406798106@qq.com  -d "panweiji.com"
 
 echo "查看生成的SSL证书"
 # certbot certificates
@@ -79,3 +84,6 @@ cd /etc/letsencrypt/live/ || true && ls -l
 # rm -rf /etc/letsencrypt/archives/domain.com-0001
 # rm -rf /etc/letsencrypt/live/domain.com-0001
 # rm -f /etc/letsencrypt/renewal/domain.com-0001.conf
+
+
+# SSL 状态检测  访问 https://myssl.com
