@@ -30,6 +30,10 @@ if [[ ! $(command -v certbot) ]]; then
                -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
                certbot/certbot certonly --email 406798106@qq.com  -d "panweiji.com"
   certbot --version
+
+  # 初始化阿里云域名DNS验证插件  固定版本  pip install certbot-dns-aliyun==0.38.1
+  sudo apt install -y python3-pip && pip install certbot-dns-aliyun
+
 fi
 
 echo "生成域名相关的SSL证书"
