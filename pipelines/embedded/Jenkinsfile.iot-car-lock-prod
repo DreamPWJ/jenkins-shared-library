@@ -119,6 +119,24 @@ JSON_PARAMS
     "IS_OTA_DIFF" : true ,
 }
 
+
+parking-space-gate-embedded-monorepo
+车位道闸嵌入式项目
+
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/embedded-monorepo.git" ,
+    "BRANCH_NAME" : "develop" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "parking-space-gate" ,
+    "PROJECT_CHINESE_NAME" : "车位道闸" ,
+    "PLATFORMIO_ENV" : "rizhao",
+    "ENV_TYPE" : "prod" ,
+    "IS_MONO_REPO" : true ,
+    "IS_UPLOAD_OSS" : true ,
+    "IS_OTA" : true
+}
+
 */
 
 
