@@ -3,13 +3,17 @@
 # Description:  rsync+nohup定时任务同步数据
 
 cd /mnt/nfs_data/ParkPicture/stor1/2023/12/
+
 nohup rsync -avzP --bwlimit=5120 --include "12/" --exclude "/*"  root@119.188.90.222:/nfsdata/ParkPicture/stor1/2023/ /mnt/nfs_data/ParkPicture/stor1/2023/ > nohup.out 2>&1 &
 
-sleep 10
+#cd /mnt/nfs_data/ParkPicture/stor1/2024/1/
+#nohup rsync -avzP --bwlimit=5120 --include "1/" --exclude "/*"  root@119.188.90.222:/nfsdata/ParkPicture/stor1/2024/ /mnt/nfs_data/ParkPicture/stor1/2024/
+
+sleep 30
 
 cd /mnt/nfs_data/ParkPicture/stor1/epark/
-nohup rsync -avzP --bwlimit=5120  root@119.188.90.222:/nfsdata/ParkPicture/stor1/epark/ /mnt/nfs_data/ParkPicture/stor1/epark/ > nohup.out 2>&1 &
 
+nohup rsync -avzP --bwlimit=5120  root@119.188.90.222:/nfsdata/ParkPicture/stor1/epark/ /mnt/nfs_data/ParkPicture/stor1/epark/ > nohup.out 2>&1 &
 
 
 # 创建定时任务 
