@@ -37,7 +37,8 @@ ps -ef | grep rsync
 
 
 # 多线程rsync同步  rsync命令中的源路径结尾必须带有/，否则同步后数据路径不能匹配
+# 文档地址: https://www.opshub.cn/2023/11/16/rsync-duo-jin-cheng-bing-fa-chuan-shu-z6pmta.html
 # 文档地址: https://help.aliyun.com/zh/nas/user-guide/migrate-data-by-using-the-rsync-command-line-tool
 # 多线程rsync同步 -P线程数
 ssh root@$A_ip "cd /$src_dir;find  . -type f -print0" | xargs -0 -I%  -P5 rsync -avuP  root@$A_ip:/$src_dir/% /$dest_dir/
-# https://www.opshub.cn/2023/11/16/rsync-duo-jin-cheng-bing-fa-chuan-shu-z6pmta.html
+
