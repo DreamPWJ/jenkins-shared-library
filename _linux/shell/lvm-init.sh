@@ -43,11 +43,11 @@ systemctl daemon-reload
 umount /dev/vg_data/lv_data
 
 
-# 在线扩容硬盘  重新挂载新磁盘 从这直接开始
+# 在线扩容硬盘  重新挂载新磁盘 从这直接开始  注意区分设置的vg和lv名称
 lsblk
 fdisk /dev/sdc # fdisk分区 分别选m n p t(t代表LVM分区表 code设置8e) p w
 pvcreate /dev/sdc1 # 创建新物理卷
-vgextend vg_data /dev/sdc1 # 扩展VG到新磁盘 将新盘添加到VG卷管理中
+vgextend vg_data /dev/sdc1 # 扩展VG到新磁盘 将新盘添加到VG卷管理中  或ubuntu-vg
 
 lvextend -L +299G /dev/vg_data/lv_data # 扩容逻辑卷  -L 参数小于分区存储容量   系统盘默认设置了LVM扩容从这步开始
 xfs_growfs /dev/vg_data/lv_data # xfs扩容文件系统 和 ext格式扩容 resize2fs /dev/ubuntu-vg/ubuntu-lv

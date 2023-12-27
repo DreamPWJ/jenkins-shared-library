@@ -33,4 +33,4 @@ CMD ["nginx", "-g", "daemon off;"]
 
 
 # 构建镜像
-# docker build -t nginx/custom  -f /my/Dockerfile.nginx . --no-cache --load
+# docker build -t nginx/custom  -f /my/Dockerfile.nginx .
