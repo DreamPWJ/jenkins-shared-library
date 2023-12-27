@@ -18,6 +18,6 @@ chmod -R 777 /tidb-data/backup
 # sudo crontab -e
 # 每月执行一次 0 0 1 * *  每天凌晨2点执行一次 0 2 * * *
 # 0 2 * * * /bin/bash /my/scheduled-rsync.sh >/my/rsync-crontab.log 2>&1
-# service crond restart , Ubuntu 使用 sudo service cron start # 重启crond生效
+# service crond restart , Ubuntu 使用 sudo service cron restart # 重启crond生效
 # crontab -l # 查看crond列表
 # GNU nano编辑器CTRL+O 再 CTRL+X 保存退出
