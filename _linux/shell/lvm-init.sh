@@ -10,6 +10,7 @@ lsblk
 # 安装
 sudo apt-get install lvm2
 
+# 第一次分LVM区设置 执行下面步骤
 # 分区磁盘 分别选m n p t(t代表LVM分区表 code设置8e) p w  (fdisk支持2TB大小内分区 新的空GPT分区表解决)
 fdisk /dev/sdb
 
@@ -42,7 +43,7 @@ systemctl daemon-reload
 umount /dev/vg_data/lv_data
 
 
-# 在线扩容硬盘  重新挂载新磁盘
+# 在线扩容硬盘  重新挂载新磁盘 从这直接开始
 lsblk
 fdisk /dev/sdc # fdisk分区 分别选m n p t(t代表LVM分区表 code设置8e) p w
 pvcreate /dev/sdc1 # 创建新物理卷
