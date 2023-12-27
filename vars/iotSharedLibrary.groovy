@@ -796,6 +796,7 @@ def otaUpgrade(map) {
         println e.getMessage()
         println "OTA固件升级JSON文件上传失败"
     }*/
+    // 连接MQTT平台 执行OTA升级指令
 }
 
 /**
