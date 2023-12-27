@@ -15,6 +15,8 @@ sudo docker run -d --restart=always -p 3000:3000 --name grafana grafana/grafana
 ##### Prometheus监控MySQL
 
 - 参考文档: https://zhuanlan.zhihu.com/p/337715590
+- 启动监控服务 nohup /opt/node_exporter/node_exporter & 
+- nohup /opt/mysqld_exporter/mysqld_exporter --config.my-cnf=/opt/mysqld_exporter/.my.cnf &
 
 ##### Prometheus监控Nginx
 
