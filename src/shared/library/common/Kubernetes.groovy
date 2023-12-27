@@ -12,7 +12,7 @@ import shared.library.common.Helm
  * @date 2021/8/18 13:22
  * @email 406798106@qq.com
  * @description 部署Kubernetes云原生应用
- * Kubernetes 是一个开源系统，用于容器化应用的自动部署、自动容器编排、自动扩缩与自动修复等管理。它将构成应用的容器按逻辑单位进行分组以便于管理和发现。
+ * Kubernetes 是一个开源容器编排系统，用于容器化应用的自动部署、自动容器编排、自动扩缩与自动修复等管理。它将构成应用的容器按逻辑单位进行分组以便于管理和发现。
  */
 class Kubernetes implements Serializable {
 
