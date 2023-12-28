@@ -1,10 +1,11 @@
 # Author: 潘维吉
 # Version 1.0.0
 # Description: 自定义构建Nginx镜像  新增nginx_vts监控等功能
+# 参考文档: https://github.com/vozlt/nginx-module-vts
 
-FROM nginx:1.25.3
+FROM nginx:1.22.1
 
-ENV NGINX_VERSION     "1.25.3"
+ENV NGINX_VERSION     "1.22.1"
 ENV NGINX_VTS_VERSION "0.2.2"
 
 RUN apt-get update && apt-get install -y gnupg2 && curl http://nginx.org/packages/keys/nginx_signing.key | apt-key add -
