@@ -127,7 +127,7 @@ JSON_PARAMS
    "JAVA_FRAMEWORK_TYPE" : "2",
    "IS_DIFF_CONF_IN_DIFF_MACHINES": true,
    "SOURCE_TARGET_CONFIG_DIR" : "resources/rizhao,resources",
-   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/mnt/stor:/usr/local/tomcat/webapps/FileUpload,/mnt/stor1:/usr/local/tomcat/webapps/FileUpload/stor1,/mnt/stor/vpaas_m2m/epark/stor1/epark/thirdParkImgs:/usr/local/tomcat/webapps/FileUpload/vpaas_m2m/epark/stor1/epark/thirdParkImgs,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml,/my/tomcat/context.xml:/usr/local/tomcat/conf/context.xml"
+   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/mnt/stor:/usr/local/tomcat/webapps/FileUpload,/mnt/stor1:/usr/local/tomcat/webapps/FileUpload/stor1,/mnt/stor/vpaas_m2m/epark/stor1/epark/thirdParkImgs:/usr/local/tomcat/webapps/FileUpload/vpaas_m2m/epark/stor1/epark/thirdParkImgs,/mnt/stor/vpaas_m2m/epark/stor1/epark/invoice:/usr/local/tomcat/webapps/FileUpload/vpaas_m2m/epark/stor1/epark/invoice,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml,/my/tomcat/context.xml:/usr/local/tomcat/conf/context.xml"
 }
 
 htc-open-epark-server-prod
