@@ -6,7 +6,8 @@ lsof -i:8080
 
 #### 查看详细进程
 
-ps aux | grep tomcat
+ps -ef | grep rsync
+ps aux | grep tomcat 
 
 #### 内存最多的10个进程
 
