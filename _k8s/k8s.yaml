@@ -27,6 +27,7 @@ spec:
         prometheus.io/port: "{CONTAINER_PORT}"      # /metric接口的端口
 
     spec:
+      hostPID: true  # 使用宿主机命名空间 方便容器获取宿主机所有进程 解决多个docker节点RocketMQ重复消费消息等问题 默认false
       containers:
       - name: {APP_COMMON_NAME}
         image: {IMAGE_URL}:{IMAGE_TAG}
