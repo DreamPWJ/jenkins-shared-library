@@ -23,7 +23,7 @@ chmod -R 777 /mnt/nfs_data/
 # 编辑NFS配置并加入以下内容  允许访问NFS服务器的网段，也可以写 * ，表示所有地址都可以访问NFS服务和权限
 # secure 选项要求mount客户端请求源端口小于1024  非法端口号可能导致挂载被拒绝  客户端访问端口大于1024添加insecure才能访问
 sudo cat <<EOF >>/etc/exports
-/mnt/nfs_data/ *(insecure,rw,sync,no_all_squash,no_subtree_check)
+/mnt/nfs_data/ *(insecure,rw,sync,no_all_squash,no_root_squash,no_subtree_check)
 EOF
 
 # NFS挂载目录永久配置 在 vim /etc/fstab 内保存 nfs_host_ip:/mnt/ /mnt/ nfs defaults 0 1 重启等永久有效!!!  systemctl daemon-reload
@@ -69,6 +69,7 @@ cat /var/lib/nfs/etab
 # 挂在共享目录到客户端  在 vim /etc/fstab 内保存 nfs_host_ip:/mnt/ /mnt/ nfs defaults 0 1 重启等永久有效!!!  systemctl daemon-reload生效
 # 如果是内网域名 在 cat /etc/hosts 下配置
 # sudo mount -t nfs -o nolock nfs_host_ip:/mnt/nfs_data /mnt/nfs_data
+# sudo chmod -R 777 /mnt/nfs_data/
 # 卸载共享目录到客户端
 # umount -f /mnt/nfs_data
 # 查看客户端挂载情况
