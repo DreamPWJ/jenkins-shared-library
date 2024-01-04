@@ -63,7 +63,7 @@ sudo docker run -d --restart=always -p 8000:8080 -p 50000:50000 \
 docker pull gitlab/gitlab-ce
 
 #### 启动运行容器
-sudo docker run -d --restart=always -p 8000:80  --name gitlab-ce \
+sudo docker run -d --restart=always -p 8000:80  -m 4096m --name gitlab-ce \
 -v /my/gitlab/config:/etc/gitlab -v /my/gitlab/logs:/var/log/gitlab -v /my/gitlab/data:/var/opt/gitlab  \
 gitlab/gitlab-ce:latest
 
@@ -72,7 +72,7 @@ gitlab/gitlab-ce:latest
 docker pull idoop/zentao:latest
 
 #### 启动运行容器 禅道初始化账号admin,密码123456 MySQL root账号密码是123456 BIND_ADDRESS如果设置值为false, Mysql服务器将不会绑定地址 /opt/zbox/bin/mysql -h127.0.0.1 -uroot -p123456进入数据库
-sudo docker run -d --restart=always -p 8080:80 -p 3308:3306 --name zentao-server \
+sudo docker run -d --restart=always -p 8080:80 -p 3308:3306 -m 2048m --name zentao-server \
 -e BIND_ADDRESS="false" -v /my/zentao:/opt/zbox  idoop/zentao:latest
  
 #### 安装 sonar代码质量检测服务 默认用户名密码都是admin  如果docker启动报错宿主机执行 sysctl -w vm.max_map_count=262144 
