@@ -26,7 +26,7 @@ lsb_release -a
 
 crontab -e
 crontab -l
-service crond restart , Ubuntu 使用 sudo service cron start
+service crond restart , Ubuntu 使用 sudo service cron restart
 tail -f /var/log/cron
 
 #### Linux磁盘空间分析

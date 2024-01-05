@@ -21,7 +21,7 @@ docker exec proxy-nginx nginx -s reload || true
 # sudo crontab -e
 # 每月执行一次 0 0 1 * *  每天凌晨2点执行一次 0 2 * * *
 # 0 2 * * * /bin/bash /my/renew-cert.sh >/my/crontab.log 2>&1
-# service crond restart , Ubuntu 使用 sudo service cron start # 重启crond生效
+# service crond restart , Ubuntu 使用 sudo service cron restart # 重启crond生效
 # crontab -l # 查看crond列表
 # chmod +x renew-cert.sh  给shell脚本执行文件可执行权限
 # GNU nano编辑器CTRL+O 再 CTRL+X 保存退出

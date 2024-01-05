@@ -9,6 +9,6 @@ cd /my && rm -rf /*/logs
 
 # crontab -e
 # 0 2 * * *  /bin/bash /my/docker-logs-clean.sh
-# service crond restart , Ubuntu 使用 sudo service cron start # 重启crond生效
+# service crond restart , Ubuntu 使用 sudo service cron restart # 重启crond生效
 # crontab -l # 查看crond列表
 # GNU nano编辑器CTRL+O 再 CTRL+X 保存退出
