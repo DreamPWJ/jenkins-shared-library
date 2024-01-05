@@ -34,10 +34,10 @@ sudo mysqldump -u${USER_NAME} -h${HOST} -p${PASSWORD} mysql user db tables_priv 
 find ${backup_dir} -name "*.sql.gz" -type f -mtime +3 -exec rm -rf {} \; >/dev/null 2>&1
 
 # crontab -e
-# MySQL数据库自动化定时备份  注意数据库备份频率和大小会影响系统稳定性
-# 0 */2 * * * /bin/bash /my/backup/mysql-auto-backup.sh
+# MySQL数据库自动化定时备份  注意数据库备份频率和大小会影响系统稳定性  每几个小时执行 0 */2 * * *
+# 0 2 * * * /bin/bash /my/backup/mysql-auto-backup.sh
 # 0 0,12 * * * /bin/bash /my/backup/mysql-auto-backup.sh
-# service cron restart # 重启crond生效
+# service crond restart  , Ubuntu 使用 sudo service cron restart # 重启crond生效
 # crontab -l # 查看crond列表
 # GNU nano编辑器CTRL+O 再 CTRL+X 保存退出
 
