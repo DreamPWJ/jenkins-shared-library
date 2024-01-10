@@ -39,6 +39,6 @@ done
 #0 */1 * * *  /bin/bash /my/health-check-prod.sh  用户APP服务端  https://app-api.panweiji.com
 #0 */1 * * *  /bin/bash /my/health-check-prod.sh  管理APP服务端  https://mapp-api.panweiji.com
 #0 */1 * * *  /bin/bash /my/health-check-prod.sh  平台服务端  https://admin-api.panweiji.com
-# service crond restart , Ubuntu 使用 sudo service cron start # 重启crond生效
+# service crond restart , Ubuntu 使用 sudo service cron restart # 重启crond生效
 # crontab -l # 查看crond列表
 # tail -f /var/log/cron  如果定时任务执行失败通过以下命令查看任务日志

@@ -8,7 +8,7 @@ export COMMON_PASSWORD=
 
 # 统一提交配置 统一重启生效
 crontab crontab.cron  # 提交到配置
-service crond restart # Ubuntu 使用 sudo service cron start 重启crond生效
+service crond restart # Ubuntu 使用 sudo service cron restart 重启crond生效
 crontab -l            # 查看crond列表
 
 # crontab -e

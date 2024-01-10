@@ -36,14 +36,14 @@ Y | y)
   docker pull redis:latest
 
   sudo docker run -d --restart=always -p 6379:6379 --name redis -v /my/redis/data:/data -v /etc/localtime:/etc/localtime:ro \
-    --log-opt max-size=1024m --log-opt max-file=1 \
+    -m 4096m --log-opt max-size=1024m --log-opt max-file=1 \
     redis:latest redis-server --appendonly yes --requirepass "panweiji2020"
 
   echo "基于Docker安装部署RabbitMQ"
   docker pull rabbitmq:3.8-management
 
   sudo docker run -d --restart=always -p 5672:5672 -p 15672:15672 --name rabbitmq -v /my/rabbitmq:/var/lib/rabbitmq -v /etc/localtime:/etc/localtime:ro \
-    --log-opt max-size=1024m --log-opt max-file=1 \
+    -m 2048m --log-opt max-size=1024m --log-opt max-file=1 \
     -e RABBITMQ_DEFAULT_VHOST=/ -e RABBITMQ_DEFAULT_USER=root -e RABBITMQ_DEFAULT_PASS=panweiji2020 rabbitmq:3.8-management
 
   echo "基于Docker安装部署Zookeeper"
@@ -52,7 +52,7 @@ Y | y)
   docker run -d --restart=always -p 2181:2181 \
     -e "ZOO_INIT_LIMIT=10" -e TZ="Asia/Shanghai" \
     -v /my/zookeeper/data:/data \
-    --log-opt max-size=1024m --log-opt max-file=1 \
+    -m 2048m --log-opt max-size=1024m --log-opt max-file=1 \
     --privileged=true --name zookeeper zookeeper:latest
 
   echo "基于Docker安装部署分布式任务调度平台XXL-JOB"
@@ -62,7 +62,7 @@ Y | y)
   docker run -d --restart=always -p 8081:8080 \
     -e PARAMS="--spring.config.location=/application.properties" \
     -v /my/xxl-job/applogs:/data/applogs -v /my/xxl-job/application.properties:/application.properties \
-    --log-opt max-size=1024m --log-opt max-file=1 \
+    -m 2048m --log-opt max-size=1024m --log-opt max-file=1 \
     --name xxl-job-admin xuxueli/xxl-job-admin:2.1.2
 
   echo -e "\033[32m中间件服务全部安装结束  ✔ \033[0m"

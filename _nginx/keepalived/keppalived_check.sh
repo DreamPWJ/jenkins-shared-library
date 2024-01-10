@@ -20,7 +20,7 @@ fi
 # sudo crontab -e
 # 每多少秒 * * * * * sleep 5;  每分钟 */1 * * * *
 # * * * * * sleep 5; /bin/bash /etc/keepalived/keppalived_check.sh
-# service crond restart , Ubuntu 使用 sudo service cron start # 重启crond生效
+# service crond restart , Ubuntu 使用 sudo service cron restart # 重启crond生效
 # crontab -l # 查看crond列表
 # chmod 755 /etc/keepalived/keppalived_check.sh 给shell脚本执行文件可执行权限
 # GNU nano编辑器CTRL+O 再 CTRL+X 保存退出

@@ -14,9 +14,7 @@ rsync -r /source/ /target/
 # nohup输入密码后按ctrl+z 中断进程 紧接着输入bg后台运行(需要实现ssh免密登录才不会中断) 退出执行exit保证任务后台正常运行！！！ tail -f nohup.out查看日志 不要删除日志断点续传用
 # --include='*.txt' 将包括所有txt文件  --exclude='*.log' 将排除所有log文件   rsync命令中的源路径结尾必须带有/，否则同步后数据路径不能匹配
 nohup rsync -avzP --bwlimit=5120 --include "1/" --exclude "/*"  root@119.188.90.222:/nfsdata/ParkPicture/stor1/2024/ /mnt/nfs_data/ParkPicture/stor1/2024/
-nohup rsync -avzP --bwlimit=5120 --include "12/" --exclude "/*"  root@119.188.90.222:/nfsdata/ParkPicture/stor1/2023/ /mnt/nfs_data/ParkPicture/stor1/2023/
 nohup rsync -avzP --bwlimit=5120  root@119.188.90.222:/nfsdata/ParkPicture/stor1/epark/ /mnt/nfs_data/ParkPicture/stor1/epark/
-nohup rsync -avzP --bwlimit=5120  root@119.188.90.222:/nfsdata/ParkPicture/ocr/ /mnt/nfs_data/ParkPicture/ocr/
 
 # 增量同步  rsync 的最大特点就是它可以完成增量备份，也就是默认只复制有变动的文件 rsync命令会先扫描源路径，所以即使增量数据不多，也可能需要较长的时间完成
 # -delete参数删除只存在于目标目录、不存在于源目标的文件，即保证目标目录是源目标的镜像
