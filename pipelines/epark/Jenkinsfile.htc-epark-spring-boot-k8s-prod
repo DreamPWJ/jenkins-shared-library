@@ -133,7 +133,7 @@ htc-video-server-k8s-prod
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/video.git" ,
-   "BRANCH_NAME" : "develop" ,
+   "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "video-service" ,
    "SHELL_PARAMS" : "video-service server 1234 2234 k8s-prod",

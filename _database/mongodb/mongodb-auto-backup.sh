@@ -58,5 +58,5 @@ find $TAR_DIR/ -mtime +$DAYS -delete
 # crontab -e
 # MySQL数据库自动化定时备份
 # 0 */1 * * * /bin/bash /my/backup/mongodb-auto-backup.sh
-# service crond restart , Ubuntu 使用 sudo service cron start # 重启crond生效
+# service crond restart , Ubuntu 使用 sudo service cron restart # 重启crond生效
 # crontab -l # 查看crond列表
