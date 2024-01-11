@@ -118,7 +118,7 @@ htc-epark-server-k8s-prod
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/epark.git" ,
-   "BRANCH_NAME" : "feature/k8s" ,
+   "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "epark-server" ,
    "SHELL_PARAMS" : "epark server 8090 8080 prod",
