@@ -35,12 +35,12 @@ spec:
         imagePullPolicy: Always       # 强制拉取线上镜像
 #        resources:  # 合理设置内存 防止内存溢出 导致整个服务器宕机 如0/3 nodes are available: 3 Insufficient memory
 #          requests:
-#            cpu: 300m
-#            memory: 512Mi
+#            cpu: "300m"
+#            memory: "512Mi"
           #limits:
-           #cpu: 800m  # m是千分之一  100m是0.1个CPU
+           #cpu: "800m"  # m是千分之一  100m是0.1个CPU
            # 设置memory应用最大使用内存 限制防止雪崩现象导致其它服务不可用
-           #memory: {MAX_MEMORY_SIZE}i
+           #memory: "{MAX_MEMORY_SIZE}i"
         ports:
         - containerPort: {CONTAINER_PORT}
         env:
