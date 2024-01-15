@@ -1,6 +1,6 @@
 #!/bin/bash
 # Author: 潘维吉
-# Description: 执行自动化发布部署shell脚本 用于独立部署的项目或无外网的项目 主动触发升级
+# Description: 执行自动化发布部署shell脚本 用于独立部署的项目或无外网的项目或大量的终端部署项目情况 主动触发升级部署
 
 echo -e "\033[32m执行自动化部署Java语言脚本  👇 \033[0m"
 
@@ -19,7 +19,7 @@ git pull origin "$GIT_BRANCH"
 
 # 使用Maven进行构建，包括清理、编译、测试与打包
 MVN_HOME="/opt/mvn/bin"
-$MVN_HOME/mvn clean install -P prod
+$MVN_HOME/mvn clean install
 
 # 停止当前运行的Java应用（假设是通过PID）
 APP_PID=$(pgrep -f "java -jar my-app.jar")
