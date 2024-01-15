@@ -1313,6 +1313,7 @@ def uploadRemote(filePath) {
         syncScript()
     }
     Tools.printColor(this, "上传部署文件到远程云端 🚀 ")
+    // 基于scp或rsync同步文件到远程服务器
     def projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
     if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
