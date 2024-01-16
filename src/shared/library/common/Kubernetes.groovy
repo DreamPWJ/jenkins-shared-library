@@ -78,29 +78,28 @@ class Kubernetes implements Serializable {
                 // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用  K8S默认有容器清理策略 无需手动处理
                 // cleanDockerImages(ctx)
 
-                ctx.println("K8S集群部署完成 ✅")
+                ctx.println("K8S集群执行部署完成 ✅")
+
+                ctx.println("等待K8S集群所有Pod节点全部启动完成中 ...")
+                // yaml内容中包含初始化时间和启动完成时间 shell中自动解析所有内容，建议yq进行实际的YAML解析
+                // ctx.sh "kubectl get pods podName*** -o yaml"
+                // K8S滚动部署需要时间 延迟等待 防止钉钉已经通知部署完成 但是新服务没有真正启动完成
+    /*        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
+                ctx.sleep(time: 12, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
+            }
+            ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date()) // 计算应用启动时间
+            if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
+                // 根据部署的节点数延迟等待
+                ctx.sleep(time: Integer.parseInt(ctx.K8S_POD_REPLICAS.toString()) * 10, unit: "SECONDS")
+            }
+            ctx.sleep(time: 10, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒 */
+
+                // K8S部署验证是否成功
+                def k8sDeploymentName = "${ctx.FULL_PROJECT_NAME}" + "-deployment"
+                verifyDeployment(ctx, k8sDeploymentName)
+                ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date()) // 计算应用启动时间
             }
         }
-
-        ctx.println("等待K8S集群所有Pod节点全部启动完成中 ...")
-        // yaml内容中包含初始化时间和启动完成时间 shell中自动解析所有内容，建议yq进行实际的YAML解析
-        // ctx.sh "kubectl get pods podName*** -o yaml"
-        // K8S滚动部署需要时间 延迟等待 防止钉钉已经通知部署完成 但是新服务没有真正启动完成
-/*        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-            ctx.sleep(time: 12, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
-        }
-        ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date()) // 计算应用启动时间
-        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-            // 根据部署的节点数延迟等待
-            ctx.sleep(time: Integer.parseInt(ctx.K8S_POD_REPLICAS.toString()) * 10, unit: "SECONDS")
-        }
-        ctx.sleep(time: 10, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒 */
-
-        // K8S部署验证是否成功
-        def k8sDeploymentName = "${ctx.FULL_PROJECT_NAME}" + "-deployment"
-        verifyDeployment(ctx, k8sDeploymentName)
-        ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date()) // 计算应用启动时间
-
     }
 
     /**
