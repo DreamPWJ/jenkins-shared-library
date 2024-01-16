@@ -95,8 +95,7 @@ class Kubernetes implements Serializable {
             ctx.sleep(time: 10, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒 */
 
                 // K8S部署验证是否成功
-                def k8sDeploymentName = "${ctx.FULL_PROJECT_NAME}" + "-deployment"
-                verifyDeployment(ctx, k8sDeploymentName)
+                verifyDeployment(ctx)
                 ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date()) // 计算应用启动时间
             }
         }
@@ -292,7 +291,7 @@ class Kubernetes implements Serializable {
      * K8S验证部署是否成功
      */
     static def verifyDeployment(ctx, k8sDeploymentName) {
-        def deploymentName = k8sDeploymentName
+        def deploymentName = "${ctx.FULL_PROJECT_NAME}" // labels.app标签值
         def namespace = k8sNameSpace
         ctx.sleep 3 // 等待检测
         // 等待所有Pod达到Ready状态
