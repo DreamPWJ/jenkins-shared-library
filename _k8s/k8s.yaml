@@ -39,7 +39,7 @@ spec:
 #            memory: "512Mi"
           #limits:
            #cpu: "800m"  # m是千分之一  100m是0.1个CPU
-           # 设置memory应用最大使用内存 限制防止雪崩现象导致其它服务不可用
+           # 设置memory应用最大使用内存 限制防止雪崩现象导致其它服务不可用  K8S默认对占用高资源会有驱逐机制
            #memory: "{MAX_MEMORY_SIZE}i"
         ports:
         - containerPort: {CONTAINER_PORT}
