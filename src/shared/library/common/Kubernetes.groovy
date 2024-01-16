@@ -290,12 +290,12 @@ class Kubernetes implements Serializable {
     }
 
     /**
-     * K8s验证部署是否成功
+     * K8S验证部署是否成功
      */
     static def verifyDeployment(ctx, k8sDeploymentName) {
         def deploymentName = k8sDeploymentName
         def namespace = k8sNameSpace
-        ctx.sleep 2 // 等待检测
+        ctx.sleep 3 // 等待检测
         // 等待所有Pod达到Ready状态
         ctx.timeout(time: 10, unit: 'MINUTES') { // 设置超时时间
             def podsAreReady = false
@@ -310,7 +310,7 @@ class Kubernetes implements Serializable {
                     podsAreReady = true
                 } else {
                     ctx.echo "Waiting for all pods to be ready. Currently Ready: $readyCount / Total: $totalPods"
-                    ctx.sleep 30 // 每隔30秒检查一次
+                    ctx.sleep 10 // 每隔多少秒检查一次
                 }
             }
             ctx.echo "All pods are now in Ready state."
