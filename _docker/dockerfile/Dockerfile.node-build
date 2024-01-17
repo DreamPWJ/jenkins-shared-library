@@ -6,7 +6,7 @@
 # ARG EXPOSE_PORT
 
 # 基础镜像
-FROM node:18
+FROM node:20
 
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
 #LABEL author="潘维吉"
@@ -32,6 +32,6 @@ RUN node -v && npm -v && npm install -g yarn && npm install -g pnpm && npm confi
 # EXPOSE  $EXPOSE_PORT
 
 # 构建镜像
-# docker build -t panweiji/node:18  -f /my/Dockerfile.node-build . --no-cache --load
+# docker build -t panweiji/node:20  -f /my/Dockerfile.node-build . --no-cache --load
 # 上传镜像
-# docker push panweiji/node:18
+# docker push panweiji/node:20
