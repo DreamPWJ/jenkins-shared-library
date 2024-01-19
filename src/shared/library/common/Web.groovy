@@ -42,6 +42,7 @@ class Web implements Serializable {
 
     /**
      * 基于Lerna管理的Monorepo仓库打包
+     * 基于pnpm-workspace的新的monorepo单仓多包方案
      */
     static def monorepoBuild(ctx) {
         // 初始化monorepo仓库依赖环境
