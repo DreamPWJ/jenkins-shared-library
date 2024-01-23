@@ -3,15 +3,16 @@
 stages:
   - sync
 
-sync_to_github:
-  stage: sync
+# 提交后触发的任务
+on_push_sync:
   only:
-    - schedules
-   # - branches: [master]  # 只在具体分支上执行此作业
+    - branches
+  on:
+    push:
+      branches: [master,main]  # 只在具体分支上执行此作业
   except:
     changes:
       - .gitlab-ci.yml  # 避免因为此CI文件的更改而触发同步
-
   script:
     # 设置Git用户信息（替换为你的GitHub用户名和邮箱）
     - git config --global user.email "406798106@qq.com"
@@ -36,14 +37,6 @@ sync_to_github:
     # 推送到GitHub，这里假设你希望强制更新（注意这会重写GitHub上的历史记录）
     - git push --force-with-lease github master
 
-  environment:
-    name: github-sync
-    url: https://github.com/DreamPWJ/jenkins-shared-library
-
-  when: on_success
-  schedule:
-    # 每天凌晨1点执行一次 0 1 * * *（根据需要调整cron表达式） "0 * * * *"  # 每小时执行一次，根据需求修改cron表达式
-    - cron: "0 * * * *"
 
   # 如果使用GitHub Personal Access Token而不是CI_JOB_TOKEN，请取消注释并替换
   # variables:
