@@ -1,15 +1,15 @@
 # .gitlab-ci.yml
+stages:
+  - sync
+
+only:
+  - master # 如果将来还会支持其他主分支，则可以扩展为一个数组，例如 - master - main
 
 # 提交后触发的任务
-on_push_sync:
-  only:
-    - master # 如果将来还会支持其他主分支，则可以扩展为一个数组，例如 - master - main
-  on:
-    push: {}
-
+sync_code:
   environment:
     variables:
-      GH_TOKEN: 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 # 这里使用 GitLab 项目级别的 SSH 密钥
+      GH_TOKEN: "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" # 这里使用 GitLab 项目级别的 SSH 密钥
 
   script:
     # 设置Git用户信息（替换为你的GitHub用户名和邮箱）
