@@ -3,21 +3,23 @@
 # 提交后触发的任务
 on_push_sync:
   only:
-    - branches
+    - master # 如果将来还会支持其他主分支，则可以扩展为一个数组，例如 - master - main
   on:
-    push:
-      branches: ['master','main']  # 只在具体分支上执行此作业
+    push: {}
+
+  environment:
+    variables:
+      GH_TOKEN: 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 # 这里使用 GitLab 项目级别的 SSH 密钥
 
   script:
     # 设置Git用户信息（替换为你的GitHub用户名和邮箱）
     - git config --global user.email "406798106@qq.com"
     - git config --global user.name "DreamPWJ"
-    - export GH_TOKEN="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"
 
     # 克隆当前项目到临时目录
     - mkdir temp_repo
     - cd temp_repo
-    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_REPOSITORY_URL} .
+    - git clone https://gitlab-ci-token:${GH_TOKEN}@gitlab.com/$CI_PROJECT_NAMESPACE/. .
     - cd ..
 
     # 添加GitHub作为远程仓库
@@ -32,7 +34,8 @@ on_push_sync:
     # 推送到GitHub，这里假设你希望强制更新（注意这会重写GitHub上的历史记录）
     - git push --force-with-lease github master
 
-
+    - rm -rf temp_repo # 清理临时目录
+    -
   # 如果使用GitHub Personal Access Token而不是CI_JOB_TOKEN，请取消注释并替换
   # variables:
   #   GH_TOKEN: "your-github-personal-access-token"
