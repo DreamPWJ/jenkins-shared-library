@@ -1,18 +1,13 @@
 # .gitlab-ci.yml
 
-stages:
-  - sync
-
 # 提交后触发的任务
 on_push_sync:
   only:
     - branches
   on:
     push:
-      branches: [master,main]  # 只在具体分支上执行此作业
-  except:
-    changes:
-      - .gitlab-ci.yml  # 避免因为此CI文件的更改而触发同步
+      branches: [master]  # 只在具体分支上执行此作业
+
   script:
     # 设置Git用户信息（替换为你的GitHub用户名和邮箱）
     - git config --global user.email "406798106@qq.com"
