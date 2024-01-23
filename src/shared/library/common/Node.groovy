@@ -40,12 +40,12 @@ class Node implements Serializable {
             ctx.sh "npm install -g pnpm || true"
         }
 
-        // 设置镜像源 加速下载  国内镜像源可能不稳定
-//        ctx.sh "npm config set registry https://registry.npm.taobao.org"
-//        ctx.sh "yarn config set registry https://registry.npm.taobao.org"
-//        ctx.sh "npm config set sass_binary_site https://npm.taobao.org/mirrors/node-sass/"
-//        ctx.sh "npm config set electron_mirror https://npm.taobao.org/mirrors/electron/"
-//        ctx.sh "yarn config set electron_mirror https://npm.taobao.org/mirrors/electron/"
+        // 设置镜像源 加速下载
+        ctx.sh "npm config set registry https://registry.npm.taobao.org"
+        ctx.sh "yarn config set registry https://registry.npm.taobao.org"
+        ctx.sh "npm config set sass_binary_site https://npm.taobao.org/mirrors/node-sass/"
+        ctx.sh "npm config set electron_mirror https://npm.taobao.org/mirrors/electron/"
+        ctx.sh "yarn config set electron_mirror https://npm.taobao.org/mirrors/electron/"
     }
 
     /**
