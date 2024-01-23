@@ -39,7 +39,7 @@ while read host; do
     jump_port=$(echo "$host" | jq -r '.jump_port')
     echo "jump_host: $jump_host"
   expect <<EOF
-        spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub  $jump_user_name@$jump_host -p $jump_port
+        spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $jump_port $jump_user_name@$jump_host
         expect {
                 "yes/no" {send "yes\n";exp_continue}
                 "password" {send "$jump_password\n"}
@@ -61,7 +61,7 @@ EOF
 
         # 建立跳板机到目标机的免密连接
   expect <<EOF
-        spawn ssh $jump_user_name@$jump_host:$jump_port 'ssh-copy-id -i $HOME/.ssh/id_rsa.pub  -p $target_port $target_user_name@$target_host'
+        spawn ssh $jump_user_name@$jump_host -p $jump_port 'ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $target_port $target_user_name@$target_host'
         expect {
                 "yes/no" {send "yes\n";exp_continue}
                 "password" {send "$target_password\n"}
