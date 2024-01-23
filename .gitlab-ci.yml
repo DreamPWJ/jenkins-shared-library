@@ -6,7 +6,7 @@ only:
   - master # 如果将来还会支持其他主分支，则可以扩展为一个数组，例如 - master - main
 
 # 提交后触发的任务
-sync_code:
+sync_job:
   environment:
     variables:
       GH_TOKEN: "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" # 这里使用 GitLab 项目级别的 SSH 密钥
