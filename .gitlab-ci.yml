@@ -6,7 +6,7 @@ on_push_sync:
     - branches
   on:
     push:
-      branches: [master]  # 只在具体分支上执行此作业
+      branches: ['master','main']  # 只在具体分支上执行此作业
 
   script:
     # 设置Git用户信息（替换为你的GitHub用户名和邮箱）
