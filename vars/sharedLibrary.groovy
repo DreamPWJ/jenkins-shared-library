@@ -244,8 +244,8 @@ def call(String type = 'web-java', Map map) {
                         // label "linux"
                         docker {
                             // Node环境  构建完成自动删除容器
-                            //image "node:${NODE_VERSION.replace('Node', '')}"
-                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                            image "node:${NODE_VERSION.replace('Node', '')}"
+                            //image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
                             // 使用自定义Dockerfile的node环境 加速monorepo依赖构建内置lerna等相关依赖
                             reuseNode true // 使用根节点
                         }
