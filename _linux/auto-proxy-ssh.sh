@@ -1,6 +1,6 @@
 #!/bin/bash
 # Author: 潘维吉
-# Description:  跳板机方式自动批量执行SSH ProxyCommand免密登录 chmod +x auto-proxy-ssh.sh  在proxy_jump_hosts.json内批量设置机器的ip 用户名 密码
+# Description:  跳板机方式自动批量执行SSH ProxyJump免密登录 chmod +x auto-proxy-ssh.sh  在proxy_jump_hosts.json内批量设置机器的ip 用户名 密码
 # !!!注意当前机器先执行 ssh-keygen -t rsa
 # 安全性高和定制化的数据建议保存为Jenkins的“Secret file”类型的凭据并获取 无需放在代码中
 
@@ -10,7 +10,7 @@
 # 3. 最后将客户端的公钥 cat /root/.ssh/id_rsa.pub 放到内网目标机 vim /root/.ssh/authorized_keys 授信  systemctl restart sshd
 # 在执行SSH跳板命令生效:  ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22
 
-echo "跳板机方式自动批量执行SSH ProxyCommand免密登录"
+echo "跳板机方式自动批量执行SSH ProxyJump免密登录"
 
 if [[ ! $(command -v jq) ]]; then
   sudo apt install -y jq || true

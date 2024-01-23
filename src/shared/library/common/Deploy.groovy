@@ -12,7 +12,7 @@ import shared.library.Utils
 class Deploy implements Serializable {
 
     /**
-     * SSH 通过堡垒机/跳板机 访问目标机器 利用ssh的高级的ProxyJump最方便或中级的ProxyCommand或者ssh tunnel功能来透过跳板机
+     * SSH 通过堡垒机/跳板机 访问目标机器 利用ssh的高级的ProxyJump最方便或中级的ProxyJump或者ssh tunnel功能来透过跳板机
      */
     static def sshProxy(ctx) {
         // SSH客户端执行访问的机器通过跳板机直接访问目标机器

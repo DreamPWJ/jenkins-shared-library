@@ -35,7 +35,8 @@ on_push_sync:
     - git push --force-with-lease github master
 
     - rm -rf temp_repo # 清理临时目录
-    -
+
+
   # 如果使用GitHub Personal Access Token而不是CI_JOB_TOKEN，请取消注释并替换
   # variables:
   #   GH_TOKEN: "your-github-personal-access-token"
