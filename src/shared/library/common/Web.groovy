@@ -27,7 +27,7 @@ class Web implements Serializable {
             ctx.sh "npm install -g yarn" // 动态配置或固定yarn版本号 防止版本变化兼容性问题
         }
         // yarn镜像源
-        // ctx.sh "yarn config set registry http://registry.npm.taobao.org"
+        // ctx.sh "yarn config set registry https://registry.npmmirror.com"
         try {
             ctx.sh "dotenv --help"
         } catch (error) {
