@@ -1,0 +1,54 @@
+# .gitlab-ci.yml
+
+stages:
+  - sync
+
+sync_to_github:
+  stage: sync
+  only:
+    - schedules
+    - branches: [master]  # 只在具体分支上执行此作业
+  except:
+    changes:
+      - .gitlab-ci.yml  # 避免因为此CI文件的更改而触发同步
+
+  script:
+    # 设置Git用户信息（替换为你的GitHub用户名和邮箱）
+    - git config --global user.email "406798106@qq.com"
+    - git config --global user.name "DreamPWJ"
+    - export GH_TOKEN="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"
+
+    # 克隆当前项目到临时目录
+    - mkdir temp_repo
+    - cd temp_repo
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_REPOSITORY_URL} .
+    - cd ..
+
+    # 添加GitHub作为远程仓库
+    - cd temp_repo
+    - git remote add github https://github.com/DreamPWJ/jenkins-shared-library.git
+    - git fetch github
+
+    # 切换到分支并确保是最新的
+    - git checkout master
+    - git pull origin master
+
+    # 推送到GitHub，这里假设你希望强制更新（注意这会重写GitHub上的历史记录）
+    - git push --force-with-lease github master
+
+  environment:
+    name: github-sync
+    url: https://github.com/DreamPWJ/jenkins-shared-library
+
+  when: on_success
+  schedule:
+    # 每天凌晨1点执行一次 0 1 * * *（根据需要调整cron表达式） "0 * * * *"  # 每小时执行一次，根据需求修改cron表达式
+    - cron: "0 * * * *"
+
+  # 如果使用GitHub Personal Access Token而不是CI_JOB_TOKEN，请取消注释并替换
+  # variables:
+  #   GH_TOKEN: "your-github-personal-access-token"
+
+  # 注意：为了安全起见，不建议在`.gitlab-ci.yml`中直接写入个人访问令牌。
+  # 更安全的做法是将此令牌存储为GitLab CI/CD变量并在推送命令中引用它。
+
