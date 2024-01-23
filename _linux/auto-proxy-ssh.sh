@@ -13,9 +13,15 @@
 echo "跳板机方式自动批量执行SSH ProxyCommand免密登录"
 
 if [[ ! $(command -v jq) ]]; then
-sudo apt install -y jq || true
-sudo yum install -y jq || true
-jq --version
+  sudo apt install -y jq || true
+  sudo yum install -y jq || true
+  jq --version
+fi
+
+if [[ ! $(command -v expect) ]]; then
+  yum install -y expect || true
+  apt-get install -y expect || true
+  brew install expect || true
 fi
 
 # 指定要读取的文件名
@@ -33,7 +39,7 @@ while read host; do
     jump_port=$(echo "$host" | jq -r '.jump_port')
     echo "jump_host: $jump_host"
   expect <<EOF
-        spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub  $jump_user_name@$jump_host
+        spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub  $jump_user_name@$jump_host -p $jump_port
         expect {
                 "yes/no" {send "yes\n";exp_continue}
                 "password" {send "$jump_password\n"}
@@ -52,6 +58,18 @@ EOF
 
         # 通过跳板机登录目标主机 ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22 '命令'
         # spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub  $target_user_name@$target_host
+
+        # 建立跳板机到目标机的免密连接
+  expect <<EOF
+        spawn ssh $jump_user_name@$jump_host:$jump_port 'ssh-copy-id -i $HOME/.ssh/id_rsa.pub  -p $target_port $target_user_name@$target_host'
+        expect {
+                "yes/no" {send "yes\n";exp_continue}
+                "password" {send "$target_password\n"}
+        }
+        expect eof
+EOF
+
+    # 建立访问机器通过跳板机到目标机的免密连接
   expect <<EOF
         spawn ssh -J $jump_user_name@$jump_host:$jump_port $target_user_name@$target_host -p $target_port 'ssh-copy-id -i $HOME/.ssh/id_rsa.pub'
         expect {
@@ -63,4 +81,7 @@ EOF
   done <<< "$(echo "$host" | jq -c '.target_hosts[]')"
 
 done  <<< "$(cat "$json_file" | jq -c '.[]')"
+
+
+# 在目标机器中查看 cat /root/.ssh/authorized_keys
 

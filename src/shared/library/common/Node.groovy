@@ -32,12 +32,12 @@ class Node implements Serializable {
         try {
             ctx.sh "yarn --version"
         } catch (error) {
-            ctx.sh "npm install -g yarn" // 动态配置或固定yarn版本号 防止版本变化兼容性问题
+            ctx.sh "npm install -g yarn || true" // 动态配置或固定yarn版本号 防止版本变化兼容性问题
         }
         try {
             ctx.sh "pnpm --version"
         } catch (error) {
-            ctx.sh "npm install -g pnpm"
+            ctx.sh "npm install -g pnpm || true"
         }
 
         // 设置镜像源 加速下载
