@@ -6,7 +6,8 @@ stages:
 sync_to_github:
   stage: sync
   only:
-    - branches: [master,main]  # 只在具体分支上执行此作业
+    - schedules
+   # - branches: [master]  # 只在具体分支上执行此作业
   except:
     changes:
       - .gitlab-ci.yml  # 避免因为此CI文件的更改而触发同步
