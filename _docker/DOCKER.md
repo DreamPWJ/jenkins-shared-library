@@ -68,11 +68,11 @@ sh mqnamesrv
 
 docker run -d --restart=always -p 10909:10909 -p 10911:10911 -p 10912:10912 \
 -v /my/rocketmq/broker/conf:/home/rocketmq/conf  -v /my/rocketmq/broker/logs:/home/rocketmq/logs -v /my/rocketmq/broker/store:/home/rocketmq/store \
--e "NAMESRV_ADDR=172.31.3.120:9876"  --privileged=true \
+-e TZ="Asia/Shanghai" -e "NAMESRV_ADDR=172.31.3.120:9876"  --privileged=true \
 -e "JAVA_OPT_EXT=-Xms128m -Xmx1500m" -m 1548m \
---name rocketmq-broker  apache/rocketmq:latest  \
+--name rocketmq-broker  apache/rocketmq:latest \
 sh mqbroker -c /home/rocketmq/conf/broker.conf  && sudo chmod 777  /my/rocketmq/ -R
 
 docker run -d --restart=always -p 6765:8080 \
--e "JAVA_OPTS=-Drocketmq.namesrv.addr=172.31.3.120:9876 -Xms128m -Xmx512m" -m 1024m \
+-e TZ="Asia/Shanghai" -e "JAVA_OPTS=-Drocketmq.namesrv.addr=172.31.3.120:9876 -Xms128m -Xmx512m" -m 1024m \
 --name rocketmq-dashboard  apacherocketmq/rocketmq-dashboard:latest
