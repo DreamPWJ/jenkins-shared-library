@@ -74,13 +74,15 @@ EOF
                  "password" {send "$target_password\n"}
          }
 
+        send "exit\r"
+
         # 等待命令执行完成
         expect eof
 EOF
 
        # 建立访问机器通过跳板机到目标机的免密连接
    expect <<EOF
-         spawn ssh -J $jump_user_name@$jump_host:$jump_port $target_user_name@$target_host -p $target_port 'ssh-copy-id -i $HOME/.ssh/id_rsa.pub'
+         spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $target_port -o "ProxyCommand ssh -W %h:%p $jump_user_name@$jump_host -p $jump_port" $target_user_name@$target_host
          expect {
                  "yes/no" {send "yes\n";exp_continue}
                  "password" {send "$target_password\n"}
