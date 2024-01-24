@@ -35,7 +35,7 @@ map.put('pgyer_api_key', "a06ee74d4063eb58b7fed20e7fde6306")
 map.put('jenkins_node', 'master')
 
 // 构建环境变量
-map.put('jdk', '8')
+map.put('jdk', '11')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
