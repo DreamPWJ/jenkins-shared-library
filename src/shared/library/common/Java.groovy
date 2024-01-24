@@ -48,8 +48,10 @@ class Java implements Serializable {
     static def switchJDKByDocker(ctx) {
         try {
             def pathStr = ""
+            def jdkVersion = "${ctx.JDK_VERSION}"
             if ("${ctx.JDK_VERSION}".toInteger() <= 10) {
                 pathStr = "jre/"  // 新版本JDK中无jre目录
+                jdkVersion="1." + ctx.JDK_VERSION
             }
             // 对于使用容器方式切换JDK版本  https://github.com/mingchen/docker-android-build-box
             def jdkPlatform = "amd64" // 架构为x86_64
@@ -62,7 +64,7 @@ class Java implements Serializable {
             ctx.sh "update-alternatives --set java /usr/lib/jvm/java-${ctx.JDK_VERSION}-openjdk-${jdkPlatform}/${pathStr}bin/java"
 
             ctx.sh "jenv versions"
-            ctx.sh "jenv global ${ctx.JDK_VERSION}"
+            ctx.sh "jenv global ${jdkVersion}"
 
             ctx.sh "java -version"
         } catch (e) {
