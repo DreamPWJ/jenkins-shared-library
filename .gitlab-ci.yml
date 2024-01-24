@@ -1,0 +1,9 @@
+stages:
+  - deploy
+
+deploy-job:
+  tags:
+    - prod
+  stage: deploy
+  script:
+    - echo "hello world!!!"
