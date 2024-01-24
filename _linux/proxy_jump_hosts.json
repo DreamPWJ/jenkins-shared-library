@@ -1,20 +1,40 @@
 [
   {
-    "jump_host": "61.162.222.203",
+    "jump_host": "172.16.0.1",
     "jump_user_name": "root",
-    "jump_password": "jxyb@2023",
-    "jump_port": 3000,
+    "jump_password": "123456",
+    "jump_port": 22,
     "target_hosts": [
       {
-        "target_host": "172.16.100.177",
-        "target_user_name": "root",
-        "target_password": "jxyb@2023",
+        "target_host": "172.16.0.2",
+        "target_user_name": "root1",
+        "target_password": "123456",
         "target_port": 22
       },
       {
-        "target_host": "172.16.100.180",
-        "target_user_name": "root",
-        "target_password": "jxyb@2023",
+        "target_host": "172.16.0.3",
+        "target_user_name": "root2",
+        "target_password": "123456",
+        "target_port": 22
+      }
+    ]
+  },
+  {
+    "jump_host": "172.16.1.100",
+    "jump_user_name": "root",
+    "jump_password": "123456",
+    "jump_port": 22,
+    "target_hosts": [
+      {
+        "target_host": "172.16.1.101",
+        "target_user_name": "root3",
+        "target_password": "123456",
+        "target_port": 22
+      },
+      {
+        "target_host": "172.16.1.102",
+        "target_user_name": "root4",
+        "target_password": "123456",
         "target_port": 22
       }
     ]

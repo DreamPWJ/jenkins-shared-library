@@ -45,6 +45,8 @@ class SecureShell implements Serializable {
                     try {
                         // 执行免密登录脚本
                         ctx.sh " cd _linux && chmod +x auto-ssh.sh && ./auto-ssh.sh "
+                        // 执行跳板机免密登录脚本
+                        ctx.sh " cd _linux && chmod +x auto-proxy-ssh.sh && ./auto-proxy-ssh.sh "
                     } catch (e) {
                         ctx.println e.getMessage()
                     }
