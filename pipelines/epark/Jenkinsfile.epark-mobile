@@ -89,4 +89,14 @@ JSON_PARAMS:
     "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/induction_screen_android.git"
 }
 
+
+xinchuxing-android-app
+新出行Android APP流水线
+JSON_PARAMS:
+{
+    "PROJECT_TYPE" : "1",
+    "REPO_URL" : "https://git.pengbocloud.com/new-travel/xinchuxing.git",
+   "DEFAULT_GIT_BRANCH" : "main",
+}
+
 */
