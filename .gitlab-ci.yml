@@ -5,9 +5,7 @@ sync-job:
   tags:
     - prod
   stage: sync
-  environment:
-    variables:
-      GH_TOKEN: "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" # 这里使用 GitLab 项目级别的 SSH 密钥
+
   script:
     # 设置Git用户信息（替换为你的GitHub用户名和邮箱）
     - git config --global user.email "406798106@qq.com"
