@@ -36,7 +36,10 @@ class Gradle implements Serializable {
         // ctx.sh "brew install gradle && gradle -v"
         // 自动失败可手动执行gradle wrapper命令
         try {
-            ctx.sh "gradle wrapper && chmod +x ./gradlew && ./gradlew -v"
+            ctx.println("初始化Gradle项目")
+            ctx.retry(3) { // 闭包内脚本重复执行次数
+                ctx.sh "gradle wrapper && chmod +x ./gradlew && ./gradlew -v"
+            }
         } catch (e) {
             /*   ctx.println("初始化Gradle安装")
                  ctx.sh """
