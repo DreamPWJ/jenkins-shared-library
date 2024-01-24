@@ -57,28 +57,36 @@ EOF
         echo "target_host: $target_host ,  target_user_name: $target_user_name"
 
         # 通过跳板机登录目标主机 ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22 '命令'
-        # spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub  $target_user_name@$target_host
 
         # 建立跳板机到目标机的免密连接
   expect <<EOF
-        spawn ssh $jump_user_name@$jump_host -p $jump_port 'ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $target_port $target_user_name@$target_host'
-        expect {
-                "yes/no" {send "yes\n";exp_continue}
-                "password" {send "$target_password\n"}
-        }
+        # 启动spawn命令来启动一个新的进程 建立跳板机到目标机的免密连接 使用 -J 参数通过跳板机连接目标主机
+        spawn ssh $jump_user_name@$jump_host -p $jump_port
+
+        # 在目标主机上执行 ssh-copy-id 命令
+        send "ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $target_port $target_user_name@$target_host \r"
+
+        # 处理可能的交互
+         expect {
+                 "yes/no" {send "yes\n";exp_continue}
+                 "password" {send "$target_password\n"}
+         }
+
+        # 等待命令执行完成
         expect eof
 EOF
 
-    # 建立访问机器通过跳板机到目标机的免密连接
-  expect <<EOF
-        spawn ssh -J $jump_user_name@$jump_host:$jump_port $target_user_name@$target_host -p $target_port 'ssh-copy-id -i $HOME/.ssh/id_rsa.pub'
-        expect {
-                "yes/no" {send "yes\n";exp_continue}
-                "password" {send "$target_password\n"}
-        }
-        expect eof
+       # 建立访问机器通过跳板机到目标机的免密连接
+   expect <<EOF
+         spawn ssh -J $jump_user_name@$jump_host:$jump_port $target_user_name@$target_host -p $target_port 'ssh-copy-id -i $HOME/.ssh/id_rsa.pub'
+         expect {
+                 "yes/no" {send "yes\n";exp_continue}
+                 "password" {send "$target_password\n"}
+         }
+         expect eof
 EOF
-  done <<< "$(echo "$host" | jq -c '.target_hosts[]')"
+
+ done <<< "$(echo "$host" | jq -c '.target_hosts[]')"
 
 done  <<< "$(cat "$json_file" | jq -c '.[]')"
 
