@@ -8,6 +8,4 @@ sync-job:
 
   script:
     # 设置Git用户信息（替换为你的GitHub用户名和邮箱）
-    - git config --global user.email "406798106@qq.com"
-    - git config --global user.name "DreamPWJ"
     - echo "hello world!!!"
