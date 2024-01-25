@@ -43,6 +43,16 @@ class SecureShell implements Serializable {
                 }
                 ctx.dir("${ctx.env.WORKSPACE}/ci") {
                     try {
+                        // 安全性高和定制化的数据建议保存为Jenkins的“Secret file”类型的凭据并获取 无需放在代码中
+                        if ("${map.proxy_jump_hosts_id}".trim() != "") {
+                            ctx.withCredentials([ctx.file(credentialsId: "${map.proxy_jump_hosts_id}", variable: 'PROXY_JUMP_HOSTS')]) {
+                                def jsonData = ctx.readFile(file: "${ctx.PROXY_JUMP_HOSTS}")
+                                def json = ctx.readJSON text: "${jsonData}"
+                                def filePath = "_linux/proxy_jump_hosts.json"
+                                // 使用 Groovy 代码写入文件
+                                ctx.writeFile file: filePath, text: json
+                            }
+                        }
                         // 执行免密登录脚本
                         ctx.sh " cd _linux && chmod +x auto-ssh.sh && ./auto-ssh.sh "
                         // 执行跳板机方式免密登录脚本

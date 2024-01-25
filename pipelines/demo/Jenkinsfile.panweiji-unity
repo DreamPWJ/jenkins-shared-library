@@ -44,6 +44,8 @@ map.put('git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
 map.put('ding_talk_credentials_id', '0d24aab8-f1ec-44eb-8e4f-71de9ecd25d5') // 支持多个群通知 逗号,分割 不要空格
 // OSS对象存储访问凭据配置 Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
 map.put('oss_credentials_id', ' ')
+// 跳板机方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接
+map.put('proxy_jump_hosts_id', ' ')
 
 // Android应用商店渠道号
 map.put('android_store_identify', "lexiang\nhuawei\nxiaomi\noppo\nvivo\nsansumg\nmeizu")

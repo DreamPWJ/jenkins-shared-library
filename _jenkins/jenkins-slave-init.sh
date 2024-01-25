@@ -4,14 +4,15 @@
 
 if [[ ! $(command -v git) ]]; then
   echo "安装git"
-  yum install -y git
+  sudo yum install -y git || true
+  sudo apt-get install -y git || true
   git --version
   which git
 fi
 
 if [[ ! $(command -v java) ]]; then
   echo "安装jdk"
-  # yum install -y java-11-openjdk-devel.x86_64 # java-1.8.0-openjdk-devel.x86_64
+  sudo yum install -y java-11-openjdk-devel.x86_64  || true # java-1.8.0-openjdk-devel.x86_64
   sudo apt update || true
   sudo apt install -y openjdk-11-jdk || true
   java -version
@@ -22,7 +23,7 @@ fi
 if [[ ! $(command -v node) ]]; then
   echo "安装nodejs"
   # curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-  curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
+  curl -sL https://rpm.nodesource.com/setup_18.x | sudo bash -
   yum install -y nodejs || true
   sudo apt install -y nodejs || true
   node -v && npm -v
