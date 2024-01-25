@@ -8,4 +8,4 @@ sync-job:
 
   script:
     # 设置Git用户信息（替换为你的GitHub用户名和邮箱）
-    - echo "hello world!!!"
+    - echo "Hello GitLab Runner!!!"
