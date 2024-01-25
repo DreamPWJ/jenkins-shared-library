@@ -302,7 +302,7 @@ class Kubernetes implements Serializable {
                         ctx.sleep 10 // 每隔多少秒检查一次
                     }
                     if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-                        ctx.sleep 3 // 每隔多少秒检查一次
+                        ctx.sleep 6 // 每隔多少秒检查一次
                     }
                 }
             }
