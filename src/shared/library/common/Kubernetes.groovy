@@ -332,6 +332,8 @@ class Kubernetes implements Serializable {
         // node节点 cat /etc/kubernetes/kubelet 镜像占用磁盘空间的比例超过高水位（可以通过参数ImageGCHighThresholdPercent 进行配置），kubelet 就会清理不用的镜像
         // ctx.sh "whoami && docker version &&  docker rmi \$(docker image ls -f dangling=true -q) --no-prune || true"
         // 在机器上设置定时任务 保留多少天  如 docker image prune -a --force --filter "until=720h"
+        // 因占用资源被K8S驱逐的pod   删除所有状态为Evicted的Pod
+        ctx.sh "kubectl get pods --namespace default | grep Evicted | awk '{print \$1}' | xargs kubectl delete pod -n default\n"
     }
 
 }
