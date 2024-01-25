@@ -7,5 +7,4 @@ sync-job:
   stage: sync
 
   script:
-    # 设置Git用户信息（替换为你的GitHub用户名和邮箱）
     - echo "Hello GitLab Runner!!!"
