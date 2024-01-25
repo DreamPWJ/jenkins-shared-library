@@ -41,6 +41,8 @@ map.put('git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
 map.put('ding_talk_credentials_id', 'd33ae0ba-e531-41c8-8983-d9734e53a25a')
 // OSS对象存储访问凭据配置 Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
 map.put('oss_credentials_id', 'f4eb7b7d-b7b2-41f1-9314-ae8a7d9346db')
+// 直连方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接
+map.put('ssh_hosts_id', ' ')
 // 跳板机方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接
 map.put('proxy_jump_hosts_id', ' ')
 
