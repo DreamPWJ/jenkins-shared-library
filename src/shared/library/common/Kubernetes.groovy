@@ -299,7 +299,7 @@ class Kubernetes implements Serializable {
                     // yaml内容中包含初始化时间和启动完成时间 shell中自动解析所有内容，建议yq进行实际的YAML解析
                     ctx.echo "Waiting for all pods to be ready. Currently Ready: $readyCount / Total: $totalPods"
                     if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-                        ctx.sleep 10 // 每隔多少秒检查一次
+                        ctx.sleep 12 // 每隔多少秒检查一次
                     }
                     if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
                         ctx.sleep 6 // 每隔多少秒检查一次
