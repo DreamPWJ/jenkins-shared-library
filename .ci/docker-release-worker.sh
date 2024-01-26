@@ -139,6 +139,6 @@ echo "👨‍💻 启动运行Docker容器 环境: ${env_mode} 映射端口: ${h
 set -x # 开启shell命令打印模式
 docker run -d --restart=always -p ${host_port}:${expose_port} \
   -e "SPRING_PROFILES_ACTIVE=${env_mode}" -e "PROJECT_NAME=${project_name}" -e HOST_NAME=$(hostname)  \
-  -e "JAVA_OPTS=-Xms128m ${docker_java_opts}" -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1 ${dynamic_run_args} \
+  -e "JAVA_OPTS=-Xms128m ${docker_java_opts}" --cpus=0.8 -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1 ${dynamic_run_args} \
   -v /${deploy_folder}/${project_name}/logs:/logs \
   --name ${docker_container_name} ${docker_image_name}
