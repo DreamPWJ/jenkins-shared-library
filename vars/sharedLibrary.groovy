@@ -165,7 +165,16 @@ def call(String type = 'web-java', Map map) {
 
                 stage('获取代码') {
                     when {
+                        beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                    }
+                    agent {
+                        // label "linux"
+                        docker {
+                            // Git环境  完成自动删除容器
+                            image "bitnami/git:latest"
+                            reuseNode true // 使用根节点
+                        }
                     }
                 /*    tools {
                         git "Default"
