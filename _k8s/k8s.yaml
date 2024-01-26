@@ -4,23 +4,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: { APP_NAME }-deployment
+  name: {APP_NAME}-deployment
   namespace: default
   labels:
-    app: { APP_COMMON_NAME }     # Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
+    app: {APP_COMMON_NAME}     # Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
 
 spec:
-  replicas: { K8S_POD_REPLICAS }       # replicas默认值是1
+  replicas: {K8S_POD_REPLICAS}       # replicas默认值是1
   #minReplicas: 1                    # 最小副本数
   #maxReplicas: 10                   # 最大副本数
   selector:
     matchLabels:
-      app: { APP_COMMON_NAME }
+      app: {APP_COMMON_NAME}
 
   template:
     metadata:
       labels:
-        app: { APP_COMMON_NAME }
+        app: {APP_COMMON_NAME}
       annotations:
         prometheus.io/scrape: "true"                # 让prometheus自动发现
         prometheus.io/path: /actuator/prometheus    # /metric路径是集成内提供的 Prometheus 监控接口 或利用 exporter 服务来为 Prometheus 提供指标数据
@@ -30,23 +30,24 @@ spec:
       #privileged: true  # 允许特权模式的Pod
       hostPID: true  # 使用宿主机命名空间 方便容器获取宿主机所有进程 解决多个docker节点RocketMQ重复消费消息等问题 默认false
       containers:
-        - name: { APP_COMMON_NAME }
-          image: { IMAGE_URL }:{IMAGE_TAG}
+        - name: {APP_COMMON_NAME}
+          image: {IMAGE_URL}:{IMAGE_TAG}
           imagePullPolicy: Always       # 强制拉取线上镜像
-#          resources: # 合理设置内存 防止内存溢出 导致整个服务器宕机 如0/3 nodes are available: 3 Insufficient memory
-#            requests:
-#              cpu: 300m
-#              memory: 512Mi
-#            limits:
-#              cpu: 800m  # m是千分之一  100m是0.1个CPU   最大资源限制 防止服务器全部被cpu资源耗尽 导致全部停机
-#              # 设置memory应用最大使用内存 限制防止雪崩现象导致其它服务不可用  K8S默认对占用高资源会有驱逐机制 memory: 3Gi
+            #        resources:  # 合理设置内存 防止内存溢出 导致整个服务器宕机 如0/3 nodes are available: 3 Insufficient memory
+            #          requests:
+            #            cpu: "300m"
+            #            memory: "512Mi"
+            #limits:
+            #cpu: "800m"  # m是千分之一  100m是0.1个CPU
+            # 设置memory应用最大使用内存 限制防止雪崩现象导致其它服务不可用  K8S默认对占用高资源会有驱逐机制
+          #memory: "{MAX_MEMORY_SIZE}i"
           ports:
-            - containerPort: { CONTAINER_PORT }
+            - containerPort: {CONTAINER_PORT}
           env:
             - name: TZ
               value: Asia/Shanghai
             - name: SPRING_PROFILES_ACTIVE
-              value: { SPRING_PROFILE }
+              value: {SPRING_PROFILE}
             - name: EXTEND_PORT
               value: "{CONTAINER_PORT}"
             - name: HOST_NAME
@@ -73,9 +74,9 @@ spec:
 
           # 对节点（就绪探测）服务可用性进行检测， initialDelaySeconds启动多少秒后开始，periodSeconds每多少秒检测一次，timeoutSeconds超时时间秒
           readinessProbe: #  Pod 未就绪时，它会从服务负载均衡器中删除   Readiness探针在容器的整个生命周期内运行在容器上
-            httpGet: # 任何大于或等于 200 且小于 400 的代码都表示成功。任何其他代码表示失败
-              path: { CUSTOM_HEALTH_CHECK_PATH }
-              port: { DEFAULT_CONTAINER_PORT }
+            httpGet:  # 任何大于或等于 200 且小于 400 的代码都表示成功。任何其他代码表示失败
+              path: {CUSTOM_HEALTH_CHECK_PATH}
+              port: {DEFAULT_CONTAINER_PORT}
             initialDelaySeconds: 2   # 探针在容器启动后的多少秒才开始执行
             periodSeconds: 10        # 探针执行频率。默认是10秒，最小1秒
             timeoutSeconds: 1        # 探测超时时间。默认1秒，最小1秒
@@ -84,8 +85,8 @@ spec:
           # LivenessProbe（存活探测） 对Pod内个容器健康检查的设置，当探测无响应几次后将自动重启该容器
           livenessProbe:
             httpGet:
-              path: { CUSTOM_HEALTH_CHECK_PATH }
-              port: { DEFAULT_CONTAINER_PORT }
+              path: {CUSTOM_HEALTH_CHECK_PATH}
+              port: {DEFAULT_CONTAINER_PORT}
             initialDelaySeconds: 180
             periodSeconds: 60
             timeoutSeconds: 2
@@ -104,14 +105,14 @@ spec:
                     - key: app            # node节点标签方式 kubectl get nodes --show-labels 与 kubectl label nodes <your-node-name> nodeLabelName=node1
                       operator: In        # NotIn 和 DoesNotExist 可用来实现节点反亲和性行为。 你也可以使用节点污点 将 Pod 从特定节点上驱逐
                       values:
-                        - { APP_COMMON_NAME }
+                        - {APP_COMMON_NAME}
                 namespaces:
                   - default
                 topologyKey: kubernetes.io/hostname         # pod不会调度到同一节点 在节点上起作用
       # 私有镜像拉取密钥配置   参考文档：https://kubernetes.io/docs/concepts/containers/images/#creating-a-secret-with-a-docker-config
       # kubectl create secret docker-registry panweiji2022 --docker-server=registry.cn-qingdao.aliyuncs.com  --docker-username=2000160180 --docker-password=panweiji@2022--docker-email=406798106@qq.com --namespace=default
       imagePullSecrets:
-        - name: { K8S_IMAGE_PULL_SECRETS }
+        - name: {K8S_IMAGE_PULL_SECRETS}
   # K8S部署更新策略
 #  strategy:
 #    type: RollingUpdate  # 滚动更新 “RollingUpdate”是默认值   Recreate类型在创建新 Pod 之前，所有现有的 Pod 会被杀死
@@ -125,10 +126,10 @@ apiVersion: v1
 kind: Service
 
 metadata:
-  name: { APP_COMMON_NAME }-service
+  name: {APP_COMMON_NAME}-service
   namespace: default
   labels:
-    app: { APP_COMMON_NAME }-service
+    app: {APP_COMMON_NAME}-service
   annotations:
     prometheus.io/scrape: "true"                # 让prometheus自动发现
     prometheus.io/path: /actuator/prometheus    # /metric路径是集成内提供的 Prometheus 监控接口 或利用 exporter 服务来为 Prometheus 提供指标数据
@@ -137,11 +138,11 @@ metadata:
 spec:
   type: LoadBalancer                   # 规格类型ClusterIP、NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡
   selector:
-    app: { APP_COMMON_NAME }             # 通过Pod的labels指定Pod 建立关联  Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
+    app: {APP_COMMON_NAME}             # 通过Pod的labels指定Pod 建立关联  Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
   ports:
-    - name: { APP_COMMON_NAME }
-      port: { HOST_PORT }                # 指定Service接收请求的端口
-      targetPort: { CONTAINER_PORT }     # 请求转发的端口 容器内部端口
+    - name: {APP_COMMON_NAME}
+      port: {HOST_PORT}                # 指定Service接收请求的端口
+      targetPort: {CONTAINER_PORT}     # 请求转发的端口 容器内部端口
       #nodePort: {HOST_PORT}           # NodePort类型端口区间 30000–32767 不指定端口，系统将分配一个随机端口
       protocol: TCP                    # 定义通信协议
 
