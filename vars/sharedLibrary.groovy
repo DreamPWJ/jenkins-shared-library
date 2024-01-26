@@ -168,14 +168,14 @@ def call(String type = 'web-java', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                    agent {
+    /*                agent {
                         // label "linux"
                         docker {
                             // Git环境  完成自动删除容器
                             image "bitnami/git:latest"
                             reuseNode true // 使用根节点
                         }
-                    }
+                    }*/
                 /*    tools {
                         git "Default"
                     }*/
