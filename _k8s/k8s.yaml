@@ -39,8 +39,7 @@ spec:
 #              memory: 512Mi
 #            limits:
 #              cpu: 800m  # m是千分之一  100m是0.1个CPU   最大资源限制 防止服务器全部被cpu资源耗尽 导致全部停机
-#              # 设置memory应用最大使用内存 限制防止雪崩现象导致其它服务不可用  K8S默认对占用高资源会有驱逐机制
-#              memory: 3Gi
+#              # 设置memory应用最大使用内存 限制防止雪崩现象导致其它服务不可用  K8S默认对占用高资源会有驱逐机制 memory: 3Gi
           ports:
             - containerPort: { CONTAINER_PORT }
           env:
