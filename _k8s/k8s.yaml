@@ -35,11 +35,11 @@ spec:
           imagePullPolicy: Always       # 强制拉取线上镜像
           resources: # 合理设置内存 防止内存溢出 导致整个服务器宕机 如0/3 nodes are available: 3 Insufficient memory
             requests:
-              cpu: 500m  # cpu请求，容器启动的初始可用数量
+              cpu: 900m  # cpu请求，容器启动的初始可用数量
               memory: 512Mi # 内存请求，容器启动的初始可用数量
             limits:
               # m是千分之一  100m是0.1个CPU  限制最大cpu防止资源溢出 导致整个集群全部不可用
-              cpu: 800m
+              cpu: 1800m
               # 设置memory应用最大使用内存 限制防止雪崩现象导致其它服务不可用  K8S默认对占用高资源会有驱逐机制
               memory: 4Gi
           ports:
