@@ -1024,9 +1024,9 @@ def pullProjectCode() {
         // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
         // println "${git}"
         sh "git --version"
-        sh "which git"
+        // sh "which git"
         // https仓库下载报错处理 The certificate issuer's certificate has expired.  Check your system date and time.
-        sh "git config --global http.sslVerify false"
+        // sh "git config --global http.sslVerify false"
         // 对于大体积仓库或网络不好情况 自定义代码下载超时时间 默认10分钟
         checkout([$class           : 'GitSCM',
                   branches         : [[name: "*/${BRANCH_NAME}"]],
