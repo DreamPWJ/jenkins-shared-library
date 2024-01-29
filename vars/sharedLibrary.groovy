@@ -386,32 +386,17 @@ def call(String type = 'web-java', Map map) {
                         expression { return ("${IS_PUSH_DOCKER_REPO}" == 'true') }
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                    /*             agent {
-                                      docker {
-                                          // JDK MAVEN 环境  构建完成自动删除容器
-                                          image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
-                                          args " -v /var/cache/maven/.m2:/root/.m2 "
-                                          reuseNode true // 使用根节点
-                                      }
-                                  }*/
+                    agent {
+                        docker {
+                            // JDK MAVEN 环境  构建完成自动删除容器
+                            image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
+                            args " -v /var/run/docker.sock:/var/run/docker.sock  -v /var/cache/maven/.m2:/root/.m2 "
+                            reuseNode true // 使用根节点
+                        }
+                    }
                     //agent { label "slave-jdk11-prod" }
                     steps {
                         script {
-                            // 根据条件决定使用的agent类型
-                            if (true) {
-                                agent {
-                                    docker {
-                                        // JDK MAVEN 环境  构建完成自动删除容器
-                                        image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
-                                        args " -v /var/cache/maven/.m2:/root/.m2 "
-                                        reuseNode true // 使用根节点
-                                    }
-                                }
-                                sh "mvn -v && java -version"
-                            } else {
-                                // 使用默认的Jenkins节点作为agent
-                                agent any
-                            }
                             buildImage(map)
                         }
                     }
