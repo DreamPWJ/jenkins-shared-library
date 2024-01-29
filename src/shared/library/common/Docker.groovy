@@ -24,6 +24,7 @@ class Docker implements Serializable {
         try {
             //println(Utils.getShEchoResult(this, "whoami"))
             //def dockerPath = tool 'Docker' //全局配置里 名称Docker 位置/usr/local  使用系统安装好的docker引擎
+            // ctx.println("初始化Docker环境变量")
             ctx.env.PATH = "${ctx.env.PATH}:/usr/local/bin:/usr/local/go/bin:/usr/bin/docker" //添加了系统环境变量上
         } catch (e) {
             ctx.println("初始化Docker环境变量失败")
@@ -85,6 +86,7 @@ class Docker implements Serializable {
         //ctx.pullCIRepo()
         def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${localImageTag}"
         ctx.withCredentials([ctx.usernamePassword(credentialsId: "${ctx.DOCKER_REPO_CREDENTIALS_ID}", usernameVariable: 'DOCKER_HUB_USER_NAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+            Docker.initEnv(ctx)
             ctx.sh """      
                    docker login ${ctx.DOCKER_REPO_REGISTRY} --username=${ctx.DOCKER_HUB_USER_NAME} --password=${ctx.DOCKER_HUB_PASSWORD}
                    """
