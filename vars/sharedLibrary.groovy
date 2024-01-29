@@ -397,6 +397,20 @@ def call(String type = 'web-java', Map map) {
                     //agent { label "slave-jdk11-prod" }
                     steps {
                         script {
+                            // 根据条件决定使用的agent类型
+                            if (true) {
+                                agent {
+                                    docker {
+                                        // JDK MAVEN 环境  构建完成自动删除容器
+                                        image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
+                                        args " -v /var/cache/maven/.m2:/root/.m2 "
+                                        reuseNode true // 使用根节点
+                                    }
+                                }
+                            } else {
+                                // 使用默认的Jenkins节点作为agent
+                                agent any
+                            }
                             buildImage(map)
                         }
                     }
