@@ -184,9 +184,9 @@ def call(String type = 'web-java', Map map) {
                                 reuseNode true // 使用根节点
                             }
                                    }*/
-                    tools {
+              /*      tools {
                         git "Default"
-                    }
+                    }*/
                     steps {
                         script {
                             pullProjectCode()
@@ -388,6 +388,7 @@ def call(String type = 'web-java', Map map) {
                     }
 /*                    agent {
                         docker {
+
                             // JDK MAVEN 环境  构建完成自动删除容器
                             image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
                             // label 'master'  // 如果有特定标签的节点用于运行Docker容器
@@ -399,7 +400,6 @@ def call(String type = 'web-java', Map map) {
                     tools {
                         // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
                         maven "${map.maven}"
-                        jdk "${JDK_VERSION}"
                     }
                     steps {
                         script {
