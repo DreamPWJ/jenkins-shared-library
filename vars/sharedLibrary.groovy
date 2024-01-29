@@ -386,14 +386,14 @@ def call(String type = 'web-java', Map map) {
                         expression { return ("${IS_PUSH_DOCKER_REPO}" == 'true') }
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-  /*                  agent {
+                   agent {
                         docker {
-                            // JDK MAVEN 环境  构建完成自动删除容器
-                            image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
-                            args " -v /var/cache/maven/.m2:/root/.m2 "
+                            // JDK MAVEN 环境  构建完成自动删除容器 需要Docker-in-Docker配置 docker:dind和 -u root
+                            image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}:dind"
+                            args " -u root -v /var/cache/maven/.m2:/root/.m2 "
                             reuseNode true // 使用根节点
                         }
-                    }*/
+                    }
                     //agent { label "slave-jdk11-prod" }
                     steps {
                         script {
