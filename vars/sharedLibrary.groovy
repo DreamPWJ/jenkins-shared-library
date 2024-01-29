@@ -311,7 +311,7 @@ def call(String type = 'web-java', Map map) {
                         expression { return (IS_DOCKER_BUILD == false && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
                     }
                     tools {
-                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
+                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中  如果有node节点 工具位置也要配置HOME路径
                         maven "${map.maven}"
                         jdk "${JDK_VERSION}"
                     }
@@ -398,7 +398,7 @@ def call(String type = 'web-java', Map map) {
                     }*/
                     //agent { label "slave-jdk11-prod" }
                     tools {
-                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
+                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中  如果有node节点 工具位置也要配置HOME路径
                         maven "${map.maven}"
                     }
                     steps {
@@ -522,7 +522,7 @@ def call(String type = 'web-java', Map map) {
                                }
                            }*/
                     tools {
-                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
+                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中 如果有node节点 工具位置也要配置HOME路径
                         maven "${map.maven}"
                     }
                     steps {
