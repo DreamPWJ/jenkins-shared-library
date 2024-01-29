@@ -62,8 +62,8 @@ class SecureShell implements Serializable {
                                 def jsonData = ctx.readFile(file: "${ctx.PROXY_JUMP_HOSTS}")
                                 def json = ctx.readJSON text: "${jsonData}"
                                 def filePath = "_linux/proxy_jump_hosts.json"
-                                // 使用 Groovy 代码写入文件
-                                ctx.writeFile file: filePath, text: json
+                                // 使用 Groovy 代码写入文件   .join('\n') 将ArrayList的内容合并成一个多行字符串
+                                ctx.writeFile file: filePath, text: json.join('\n')
                             }
                         }
 
