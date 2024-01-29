@@ -7,7 +7,7 @@ if [[ ! $(command -v git) ]]; then
   sudo yum install -y git || true
   sudo apt-get install -y git || true
   git --version
-  which git
+  which git  # 在node节点工具位置选项配置 !!!
 fi
 
 if [[ ! $(command -v java) ]]; then
