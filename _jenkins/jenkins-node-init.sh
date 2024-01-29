@@ -32,21 +32,28 @@ fi
 
 if [[ ! $(command -v mvn) ]]; then
   echo "安装maven" # export HOMEBREW_BOTTLE_DOMAIN=''
-  mkdir -p /opt/maven && cd /opt/maven && wget --no-check-certificate https://mirror.its.dal.ca/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+  mkdir -p /opt/maven && cd /opt/maven
+  wget https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
   tar -xzvf apache-maven-3.6.3-bin.tar.gz
+
   # 写入数据到文件输出重定向 双 >> 是追加 , 单 > 是覆盖
   # export JAVA_HOME=/usr/bin/java
+  # JAVA_HOME配置是有bin目录的层级文件夹
   echo '
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.21.0.9-1.el7_9.x86_64
 export JRE_HOME=$JAVA_HOME/jre
 export CLASSPATH=$JAVA_HOME/lib:$JRE_HOME/lib:$CLASSPATH
 export MAVEN_HOME=/opt/maven/apache-maven-3.6.3
 export PATH=$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH
 ' >>/etc/profile
+
   . /etc/profile
-  mvn -version
+
+  mvn -v
+
+  echo $MAVEN_HOME && echo $JAVA_HOME && echo $PATH
 fi
-echo $MAVEN_HOME && echo $JAVA_HOME && echo $PATH
+
 
 if [[ ! $(command -v adb) ]]; then
   echo "安装Android SDK"
@@ -77,8 +84,10 @@ if [[ ! $(command -v adb) ]]; then
   cp $ANDROID_HOME/platforms/android-30/data/api-versions.xml $ANDROID_HOME/platform-tools/api/
 
   sdkmanager --update
+
+  echo $ANDROID_HOME && echo $JAVA_HOME && echo $PATH
 fi
-echo $ANDROID_HOME && echo $JAVA_HOME && echo $PATH
+
 
 # MacOS jenkins节点管理远程工作目录 为 MacOS设置./jenkins  Linux设置/my/jenkins
 # Flutter官网安装文档: https://docs.flutter.dev/get-started/install
