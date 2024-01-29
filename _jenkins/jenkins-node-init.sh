@@ -4,6 +4,9 @@
 
 if [[ ! $(command -v git) ]]; then
   echo "安装git"
+  sudo yum update || true
+  # sudo yum search git | grep -i 'git2'
+  # sudo yum install -y libgit2.x86_64 || true
   sudo yum install -y git || true
   sudo apt-get install -y git || true
   git --version
