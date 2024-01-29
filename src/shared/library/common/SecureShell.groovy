@@ -20,7 +20,7 @@ class SecureShell implements Serializable {
     /**
      * 自动设置免密连接 用于CI/CD服务器和应用部署服务器免密通信  避免手动批量设置繁琐重复劳动
      */
-    static def autoSshLogin(ctx) {
+    static def autoSshLogin(ctx,map) {
         try {
             if ("${ctx.remote.user}".trim() == "" || "${ctx.remote.host}".trim() == "") {
                 ctx.currentBuild.result = 'FAILURE'
@@ -49,8 +49,8 @@ class SecureShell implements Serializable {
                 ctx.dir("${ctx.env.WORKSPACE}/ci") {
                     try {
                         // 安全性高和定制化的数据建议保存为Jenkins的“Secret file”类型的凭据并获取 无需放在代码中
-                        if ("${ctx.map.ssh_hosts_id}".trim() != "") {
-                            ctx.withCredentials([ctx.file(credentialsId: "${ctx.map.ssh_hosts_id}", variable: 'SSH_HOSTS')]) {
+                        if ("${map.ssh_hosts_id}".trim() != "") {
+                            ctx.withCredentials([ctx.file(credentialsId: "${map.ssh_hosts_id}", variable: 'SSH_HOSTS')]) {
                                 def textData = ctx.readFile(file: "${ctx.SSH_HOSTS}")
                                 def filePath = "_linux/hosts.txt"
                                 // 使用 Groovy 代码写入文件
@@ -58,7 +58,7 @@ class SecureShell implements Serializable {
                             }
                         }
                         if ("${ctx.isProxyJumpType}" == "true") {
-                            ctx.withCredentials([ctx.file(credentialsId: "${ctx.map.proxy_jump_hosts_id}", variable: 'PROXY_JUMP_HOSTS')]) {
+                            ctx.withCredentials([ctx.file(credentialsId: "${map.proxy_jump_hosts_id}", variable: 'PROXY_JUMP_HOSTS')]) {
                                 def jsonData = ctx.readFile(file: "${ctx.PROXY_JUMP_HOSTS}")
                                 def json = ctx.readJSON text: "${jsonData}"
                                 def filePath = "_linux/proxy_jump_hosts.json"

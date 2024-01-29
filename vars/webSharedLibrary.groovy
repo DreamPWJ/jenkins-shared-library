@@ -313,10 +313,10 @@ def call(String type = 'web', Map map) {
                             reuseNode true // 使用根节点
                         }
                     }
-    /*                tools {
-                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
-                        // nodejs "${NODE_VERSION}"
-                    }*/
+                    /*                tools {
+                                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
+                                        // nodejs "${NODE_VERSION}"
+                                    }*/
                     steps {
                         script {
                             echo "Docker环境内构建Node方式"
@@ -348,7 +348,7 @@ def call(String type = 'web', Map map) {
                     }
                     steps {
                         script {
-                            uploadRemote(Utils.getShEchoResult(this, "pwd"))
+                            uploadRemote(Utils.getShEchoResult(this, "pwd"), map)
                         }
                     }
                 }
@@ -970,9 +970,9 @@ def buildImage() {
 /**
  * 上传部署文件到远程云端
  */
-def uploadRemote(filePath) {
+def uploadRemote(filePath, map) {
     // ssh免密登录检测和设置
-    autoSshLogin()
+    autoSshLogin(map)
     timeout(time: 2, unit: 'MINUTES') {
         // 同步脚本和配置到部署服务器
         syncScript()
@@ -1063,9 +1063,9 @@ def scrollToDeploy(map) {
             println ip
             remote.host = ip
             if (params.DEPLOY_MODE == GlobalVars.rollback) {
-                uploadRemote("${archivePath}")
+                uploadRemote("${archivePath}", map)
             } else {
-                uploadRemote(Utils.getShEchoResult(this, "pwd"))
+                uploadRemote(Utils.getShEchoResult(this, "pwd"), map)
             }
             runProject()
             if (params.IS_HEALTH_CHECK == true) {
@@ -1093,8 +1093,8 @@ def k8sDeploy(map) {
 /**
  * 自动设置免密连接 用于CI/CD服务器和应用部署服务器免密通信  避免手动批量设置繁琐重复劳动
  */
-def autoSshLogin() {
-    SecureShell.autoSshLogin(this)
+def autoSshLogin(map) {
+    SecureShell.autoSshLogin(this, map)
 }
 
 /**
@@ -1155,7 +1155,7 @@ def rollbackVersion(map) {
     //input message: "是否确认回滚到构建ID为${ROLLBACK_BUILD_ID}的版本", ok: "确认"
     //该/var/jenkins_home/**路径只适合在master节点执行的项目 不适合slave节点的项目
     archivePath = "/var/jenkins_home/jobs/${env.JOB_NAME}/builds/${ROLLBACK_BUILD_ID}/archive/"
-    uploadRemote("${archivePath}")
+    uploadRemote("${archivePath}", map)
     runProject(map)
     if (params.IS_HEALTH_CHECK == true) {
         healthCheck(map)
