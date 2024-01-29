@@ -313,7 +313,7 @@ def call(String type = 'web-java', Map map) {
                     tools {
                         // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中  如果有node节点 工具位置也要配置HOME路径
                         maven "${map.maven}"
-                        jdk "${JDK_VERSION}"
+                        jdk "${JDK_VERSION}"  // JDK高版本构建环境可以打包低版本代码项目
                     }
                     steps {
                         script {
