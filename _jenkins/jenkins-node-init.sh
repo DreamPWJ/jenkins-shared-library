@@ -23,7 +23,7 @@ fi
 if [[ ! $(command -v node) ]]; then
   echo "安装nodejs"
   # curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-  curl -sL https://rpm.nodesource.com/setup_18.x | sudo bash -
+  curl -sL https://rpm.nodesource.com/setup_20.x | sudo bash -
   yum install -y nodejs || true
   sudo apt install -y nodejs || true
   node -v && npm -v
