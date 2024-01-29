@@ -88,6 +88,9 @@ EOF
                  "yes/no" {send "yes\n";exp_continue}
                  "password" {send "$target_password\n"}
          }
+        expect {
+                "yes/no" {send "yes\n"}
+        }
          expect eof
 EOF
 
