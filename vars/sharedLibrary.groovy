@@ -390,7 +390,7 @@ def call(String type = 'web-java', Map map) {
                         docker {
                             // JDK MAVEN 环境  构建完成自动删除容器
                             image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
-                            args " -v /var/cache/maven/.m2:/root/.m2 "
+                            args " -v /var/cache/maven/.m2:/root/.m2 -v \$(which docker):/usr/bin/docker -v /var/run/docker.sock:/var/run/docker.sock"
                             reuseNode true // 使用根节点
                         }
                     }
