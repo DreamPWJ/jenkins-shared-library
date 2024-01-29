@@ -396,8 +396,14 @@ def call(String type = 'web-java', Map map) {
                         }
                     }*/
                     //agent { label "slave-jdk11-prod" }
+                    tools {
+                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
+                        maven "${map.maven}"
+                        jdk "${JDK_VERSION}"
+                    }
                     steps {
                         script {
+                            sh "mvn --version"
                             buildImage(map)
                         }
                     }
