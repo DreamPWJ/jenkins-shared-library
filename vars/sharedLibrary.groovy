@@ -390,9 +390,9 @@ def call(String type = 'web-java', Map map) {
                         docker {
                             // JDK MAVEN 环境  构建完成自动删除容器
                             image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
-                            label 'master'  // 如果有特定标签的节点用于运行Docker容器
-                            args " -v /var/cache/maven/.m2:/root/.m2 "
-                            // reuseNode true // 使用根节点
+                            // label 'master'  // 如果有特定标签的节点用于运行Docker容器
+                            args " --privileged -v /var/run/docker.sock:/var/run/docker.sock  -v /var/cache/maven/.m2:/root/.m2 "
+                            reuseNode true // 使用根节点
                         }
                     }
                     //agent { label "slave-jdk11-prod" }
@@ -511,9 +511,9 @@ def call(String type = 'web-java', Map map) {
                         docker {
                             // JDK MAVEN 环境  构建完成自动删除容器
                             image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
-                            label 'master'  // 如果有特定标签的节点用于运行Docker容器
+                            // label 'master'  // 如果有特定标签的节点用于运行Docker容器
                             args " -v /var/cache/maven/.m2:/root/.m2 "
-                            //reuseNode true // 使用根节点
+                            reuseNode true // 使用根节点
                         }
                     }
                     steps {
