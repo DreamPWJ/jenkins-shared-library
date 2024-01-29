@@ -20,7 +20,7 @@ class SecureShell implements Serializable {
     /**
      * 自动设置免密连接 用于CI/CD服务器和应用部署服务器免密通信  避免手动批量设置繁琐重复劳动
      */
-    static def autoSshLogin(ctx,map) {
+    static def autoSshLogin(ctx, map) {
         try {
             if ("${ctx.remote.user}".trim() == "" || "${ctx.remote.host}".trim() == "") {
                 ctx.currentBuild.result = 'FAILURE'
@@ -63,7 +63,7 @@ class SecureShell implements Serializable {
                                 def json = ctx.readJSON text: "${jsonData}"
                                 def filePath = "_linux/proxy_jump_hosts.json"
                                 // 使用 Groovy 代码写入文件   .join('\n') 将ArrayList的内容合并成一个多行字符串
-                                ctx.writeFile file: filePath, text: json.join('\n')
+                                ctx.writeFile file: filePath, text: "[" + json.join('\n') + "]"
                             }
                         }
 
