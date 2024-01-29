@@ -27,7 +27,7 @@ class SecureShell implements Serializable {
                 ctx.error("请配置部署服务器登录用户名或IP地址 ❌")
             }
             // 检测ssh免密连接是否成功 ssh/scp跳过首次连接远程主机的指纹fingerprint(防止中间人攻击)设置-o StrictHostKeyChecking=no
-            if ("${isProxyJumpType}" == "true") {
+            if ("${ctx.isProxyJumpType}" == "true") {
                 // 执行升级检测  在较新版本的OpenSSH 7.3及以上中( ssh -V 查看版本)，跳板机（jump host）-J 选项是存在的
                 ctx.sh " cd _linux/shell && chmod +x upgrade-ssh && ./upgrade-ssh.sh "
             }
