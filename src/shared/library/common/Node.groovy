@@ -45,8 +45,7 @@ class Node implements Serializable {
         } catch (error) {
             ctx.sh "npm install -g pnpm || true"
         }
-
-
+    }
 
     /**
      * Node环境设置Electron镜像并初始化包管理工具 如yarn、pnpm
