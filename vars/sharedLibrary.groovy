@@ -176,14 +176,14 @@ def call(String type = 'web-java', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-/*                  agent {
+                    agent {
                         // label "linux"
                         docker {
                             // Git环境  完成自动删除容器
-                            image "bitnami/git:latest"
+                            image "bitnami/git:2.43.0"
                             reuseNode true // 使用根节点
                         }
-                    }  */
+                    }
                     /*    tools {
                             git "Default"
                         }*/
@@ -507,15 +507,15 @@ def call(String type = 'web-java', Map map) {
                             return (IS_ROLL_DEPLOY == true) // 是否进行滚动部署
                         }
                     }
-             /*       agent {
-                        docker {
-                            // JDK MAVEN 环境  构建完成自动删除容器
-                            image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
-                            // label 'master'  // 如果有特定标签的节点用于运行Docker容器
-                            args " -v /var/cache/maven/.m2:/root/.m2 "
-                            reuseNode true // 使用根节点
-                        }
-                    }*/
+                    /*       agent {
+                               docker {
+                                   // JDK MAVEN 环境  构建完成自动删除容器
+                                   image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
+                                   // label 'master'  // 如果有特定标签的节点用于运行Docker容器
+                                   args " -v /var/cache/maven/.m2:/root/.m2 "
+                                   reuseNode true // 使用根节点
+                               }
+                           }*/
                     steps {
                         script {
                             // 滚动部署实现多台服务按顺序更新 分布式零停机
@@ -1049,7 +1049,7 @@ def pullProjectCode() {
         println "Git构建分支是: ${BRANCH_NAME} 📇"
         // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
         // println "${git}"
-        sh "git --version"
+        sh "git --version"  // 使用git 2.0以上的高级版本  否则有兼容性问题
         // sh "which git"
         // https仓库下载报错处理 The certificate issuer's certificate has expired.  Check your system date and time.
         sh "git config --global http.sslVerify false"
