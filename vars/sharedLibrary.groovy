@@ -403,7 +403,6 @@ def call(String type = 'web-java', Map map) {
                     }
                     steps {
                         script {
-                            sh "mvn --version"
                             buildImage(map)
                         }
                     }
@@ -522,6 +521,10 @@ def call(String type = 'web-java', Map map) {
                                    reuseNode true // 使用根节点
                                }
                            }*/
+                    tools {
+                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
+                        maven "${map.maven}"
+                    }
                     steps {
                         script {
                             // 滚动部署实现多台服务按顺序更新 分布式零停机
