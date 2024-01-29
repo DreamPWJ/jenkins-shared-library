@@ -29,6 +29,12 @@ class Node implements Serializable {
     static def setMirror(ctx) {
         // 每次流水线执行都将执行 会产生无效的浪费  后面优化一下
         ctx.sh "node -v && npm -v"  // node和npm版本信息
+
+        // 设置镜像源 加速下载
+        ctx.sh "npm config set registry https://registry.npmmirror.com"
+        ctx.sh "yarn config set registry https://registry.npmmirror.com"
+        ctx.sh "pnpm config set registry https://registry.npmmirror.com"
+
         try {
             ctx.sh "yarn --version"
         } catch (error) {
@@ -40,11 +46,7 @@ class Node implements Serializable {
             ctx.sh "npm install -g pnpm || true"
         }
 
-        // 设置镜像源 加速下载 
-        ctx.sh "npm config set registry https://registry.npmmirror.com"
-        ctx.sh "yarn config set registry https://registry.npmmirror.com"
-        ctx.sh "pnpm config set registry https://registry.npmmirror.com"
-    }
+
 
     /**
      * Node环境设置Electron镜像并初始化包管理工具 如yarn、pnpm
