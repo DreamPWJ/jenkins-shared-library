@@ -407,6 +407,7 @@ def call(String type = 'web-java', Map map) {
                                         reuseNode true // 使用根节点
                                     }
                                 }
+                                sh "mvn -v && java -version"
                             } else {
                                 // 使用默认的Jenkins节点作为agent
                                 agent any
