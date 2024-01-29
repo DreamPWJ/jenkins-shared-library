@@ -386,15 +386,15 @@ def call(String type = 'web-java', Map map) {
                         expression { return ("${IS_PUSH_DOCKER_REPO}" == 'true') }
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                    agent {
+/*                    agent {
                         docker {
                             // JDK MAVEN 环境  构建完成自动删除容器
                             image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
                             // label 'master'  // 如果有特定标签的节点用于运行Docker容器
                             args " --privileged -v /var/run/docker.sock:/var/run/docker.sock  -v /var/cache/maven/.m2:/root/.m2 "
-                            // reuseNode true // 使用根节点
+                            reuseNode true // 使用根节点
                         }
-                    }
+                    }*/
                     //agent { label "slave-jdk11-prod" }
                     steps {
                         script {
@@ -507,7 +507,7 @@ def call(String type = 'web-java', Map map) {
                             return (IS_ROLL_DEPLOY == true) // 是否进行滚动部署
                         }
                     }
-                    agent {
+             /*       agent {
                         docker {
                             // JDK MAVEN 环境  构建完成自动删除容器
                             image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
@@ -515,7 +515,7 @@ def call(String type = 'web-java', Map map) {
                             args " -v /var/cache/maven/.m2:/root/.m2 "
                             reuseNode true // 使用根节点
                         }
-                    }
+                    }*/
                     steps {
                         script {
                             // 滚动部署实现多台服务按顺序更新 分布式零停机
