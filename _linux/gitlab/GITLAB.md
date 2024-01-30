@@ -19,7 +19,7 @@ gitlab_rails['backup_upload_connection'] = {
 # 如果bucket不是默认的公共读写权限，还需要提供endpoint和目录前缀
 
 'endpoint' => 'https://oss-cn-hangzhou.aliyuncs.com', # 根据实际区域更换
-'path' => 'gitlab/backups/', # 备份文件在OSS上的存储路径前缀
+'path' => 'gitlab/backup/', # 备份文件在OSS上的存储路径前缀
 }
 
 # 确保备份是启用的，并且配置了自动备份的时间间隔
