@@ -15,19 +15,18 @@ gitlab_rails['backup_upload_connection'] = {
 'aliyun_oss_bucket' => 'your_bucket_name',
 
 # 如果bucket不是默认的公共读写权限，还需要提供endpoint和目录前缀
-'endpoint' => 'https://oss-cn-shanghai.aliyuncs.com', # 根据实际区域更换
-'path' => 'gitlab/backup/', # 备份文件在OSS上的存储路径前缀
+'aliyun_oss_endpoint' => 'https://oss-cn-shanghai.aliyuncs.com', # 根据实际区域更换
+
 }
 
 # 确保备份是启用的，并且配置了自动备份的时间间隔
-
+gitlab_rails['backup_upload_remote_directory'] =  'gitlab/backup' # 备份文件在OSS上的存储路径前缀
 gitlab_rails['backup_keep_time'] = 604800 # 保留备份7天（以秒为单位，可根据需求调整）
-gitlab_rails['backup_schedule'] = "0 2 * * *" # 每天执行一次备份（cron格式，可自定义）
 
 3. 保存并退出配置文件后，运行以下命令应用新的配置：
    sudo gitlab-ctl reconfigure
 
-4. 执行一次备份任务 定时执行备份任务
+4. 执行一次备份任务 定时执行备份任务会自动执行配置的阿里云OSS存储桶中
    gitlab-rake gitlab:backup:create
    crontab -e
    0 1 * * * /bin/bash gitlab-rake gitlab:backup:create
