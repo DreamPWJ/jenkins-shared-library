@@ -80,7 +80,6 @@ class Kubernetes implements Serializable {
                 // cleanDockerImages(ctx)
 
                 ctx.println("K8S集群执行部署完成 ✅")
-                ctx.println("等待K8S集群所有Pod节点全部启动完成中 ...")
 
                 // K8S部署验证是否成功
                 verifyDeployment(ctx)
@@ -281,6 +280,7 @@ class Kubernetes implements Serializable {
      * K8S验证部署是否成功
      */
     static def verifyDeployment(ctx) {
+        ctx.println("K8S集群所有Pod节点健康探测中, 请耐心等待... 🚀")
         def deploymentName = "${ctx.FULL_PROJECT_NAME}" // labels.app标签值
         def namespace = k8sNameSpace
         ctx.sleep 3 // 等待检测
