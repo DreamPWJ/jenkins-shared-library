@@ -62,6 +62,9 @@ class Web implements Serializable {
                     def retryCount = 0
                     ctx.retry(3) {
                         retryCount++
+                        if (retryCount >= 2) {
+                            ctx.sh "rm -rf node_modules && rm -f *-lock.json && npm run clean:all"
+                        }
                         // 全部下载依赖 更通用 bootstrap不仅是下载依赖资源 还建立多包之间的依赖软链
                         // TurboRepo解决Monorepo多项目构建缓慢问题 充分利用CPU性能并发构建提速  同时新版Lerna v5.1集成Nx实现加速构建
                         // 基于pnpm-workspace的新的monorepo单仓多包方案
@@ -74,9 +77,6 @@ class Web implements Serializable {
                         ctx.sh "npm run build:all"
                         // 定位到具体业务包执行构建打包命令
                         ctx.sh "cd ${ctx.monoRepoProjectDir} && npm run ${ctx.NPM_RUN_PARAMS}" // >/dev/null 2>&1
-                        if (retryCount >= 2) {
-                            ctx.sh "rm -rf node_modules && rm -f *-lock.json && npm run clean:all"
-                        }
                     }
                 } catch (error) {
                     ctx.println(error.getMessage())
