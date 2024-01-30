@@ -2,7 +2,7 @@
 
 你需要配置GitLab的gitlab.rb配置文件。以下是基于你提供的信息和最新实践进行配置的大致步骤：
 
-1. 登录到你的GitLab服务器，并编辑GitLab配置文件，通常位于 /etc/gitlab/gitlab.rb。
+1. 登录到你的GitLab服务器，并编辑GitLab配置文件，通常位于 sudo vim /etc/gitlab/gitlab.rb
 
 2. 找到或添加与备份上传相关的配置项，按照阿里云OSS的要求设置如下参数：
 
@@ -15,9 +15,7 @@ gitlab_rails['backup_upload_connection'] = {
 'aliyun_oss_bucket' => 'your_bucket_name',
 
 # 如果需要指定region，可以添加下面这行（如果OSS bucket没有明确地区，则可能不需要）
-
 # 'region' => 'oss-cn-hangzhou', # 替换为你的OSS所在区域
-
 # 如果bucket不是默认的公共读写权限，还需要提供endpoint和目录前缀
 
 'endpoint' => 'https://oss-cn-hangzhou.aliyuncs.com', # 根据实际区域更换
@@ -27,7 +25,7 @@ gitlab_rails['backup_upload_connection'] = {
 # 确保备份是启用的，并且配置了自动备份的时间间隔
 
 gitlab_rails['backup_keep_time'] = 604800 # 保留备份7天（以秒为单位，可根据需求调整）
-gitlab_rails['backup_schedule'] = "0 * * * *" # 每天零点执行一次备份（cron格式，可自定义）
+gitlab_rails['backup_schedule'] = "0 0 * * *" # 每天零点执行一次备份（cron格式，可自定义）
 
 3. 保存并退出配置文件后，运行以下命令应用新的配置：
    sudo gitlab-ctl reconfigure
