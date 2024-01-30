@@ -27,7 +27,12 @@ gitlab_rails['backup_schedule'] = "0 2 * * *" # 每天执行一次备份（cron�
 3. 保存并退出配置文件后，运行以下命令应用新的配置：
    sudo gitlab-ctl reconfigure
 
-4. GitLab将会根据你设定的时间计划执行备份任务，并将备份文件上传至你在阿里云OSS中指定的存储桶
+4. 执行一次备份任务 定时执行备份任务
+   gitlab-rake gitlab:backup:create
+   crontab -e
+   0 1 * * * /bin/bash gitlab-rake gitlab:backup:create
+
+5. GitLab将会根据你设定的时间计划执行备份任务，并将备份文件上传至你在阿里云OSS中指定的存储桶  
 
 
 ### 执行GitLab的备份还原部署
