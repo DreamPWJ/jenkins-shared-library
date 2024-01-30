@@ -2,10 +2,9 @@ package shared.library.common
 
 import shared.library.GlobalVars
 import shared.library.Utils
-import shared.library.common.Docker
-import shared.library.common.Helm
+import shared.library.common.*
 
-//import groovy.json.JsonSlurper
+//import groovy.json.JsonOutput
 
 /**
  * @author 潘维吉
@@ -306,7 +305,7 @@ class Kubernetes implements Serializable {
                     }
                 }
             }
-            ctx.echo "K8S集群所有Pod现在都处于就绪状态 ✅ "
+            Tools.printColor(ctx, "K8S集群中所有Pod服务已处于启动状态 ✅")
         }
 
     }
