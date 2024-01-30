@@ -35,6 +35,8 @@ class Kubernetes implements Serializable {
                 // ctx.println("k8s集群访问配置：${ctx.KUBECONFIG}")
                 // ctx.sh "kubectl version"
 
+                ctx.println("开始部署Kubernetes云原生应用🏗️ ")
+
                 // 动态替换k8s yaml声明式部署文件
                 setYamlConfig(ctx, map, deployNum)
 
