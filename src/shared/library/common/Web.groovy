@@ -20,6 +20,7 @@ class Web implements Serializable {
         } catch (error) {
             // npm一般在root用户权限下
             ctx.sh "npm i -g lerna --unsafe-perm=true --allow-root"
+            ctx.sh "lerna --version"
         }
         try {
             ctx.sh "yarn --version"
