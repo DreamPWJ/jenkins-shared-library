@@ -47,7 +47,7 @@ class Web implements Serializable {
     static def monorepoBuild(ctx) {
         // 初始化monorepo仓库依赖环境
         initMonoRepoEnv(ctx)
-        ctx.timeout(time: 20, unit: 'MINUTES') {
+        ctx.timeout(time: 30, unit: 'MINUTES') {
             // ctx.sh " lerna clean -y "
             try {
                 ctx.sh " npm run clean:ts "
@@ -58,17 +58,22 @@ class Web implements Serializable {
             ctx.println("执行MonoRepo仓库构建 🏗️  ")
             if (Git.isExistsChangeFile(ctx)) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
                 try {
+                    def retryCount = 0
                     ctx.retry(3) {
+                        retryCount++
                         // 全部下载依赖 更通用 bootstrap不仅是下载依赖资源 还建立多包之间的依赖软链
                         // TurboRepo解决Monorepo多项目构建缓慢问题 充分利用CPU性能并发构建提速  同时新版Lerna v5.1集成Nx实现加速构建
                         ctx.sh "lerna bootstrap --ci"  // --ci 选项调用npm ci而不是npm install
                         // lerna bootstrap指定作用域 加速下载依赖  --scope 限制 lerna bootstrap 在哪些包起作用 包的package.json文件中名称
                         // ctx.sh "lerna bootstrap --include-dependents --include-dependencies --scope ${ctx.PROJECT_NAME}"
 
-                        // 执行基础通用包编译和自定义脚本处理工作  会有无效的包被编译 后期优化  可检测git提交是否包含核心通用模块文件变更 如果有才编译
+                        // 执行基础通用包编译和自定义脚本处理工作  会有无效的包被编译  可检测git提交是否包含核心通用模块文件变更 如果有才编译
                         ctx.sh "npm run build:all"
                         // 定位到具体业务包执行构建打包命令
                         ctx.sh "cd ${ctx.monoRepoProjectDir} && npm run ${ctx.NPM_RUN_PARAMS}" // >/dev/null 2>&1
+                        if (retryCount >= 2) {
+                            ctx.sh "rm -rf node_modules && rm -f *-lock.json && npm run clean:all"
+                        }
                     }
                 } catch (error) {
                     ctx.println(error.getMessage())

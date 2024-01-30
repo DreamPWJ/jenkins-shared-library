@@ -1161,7 +1161,7 @@ def nodeBuildProject() {
                 }
             }
 
-            timeout(time: 10, unit: 'MINUTES') {
+            timeout(time: 20, unit: 'MINUTES') {
                 try {
                     // >/dev/null为Shell脚本运行程序不输出日志到终端 2>&1是把出错输出也定向到标准输出
                     println("执行Node构建 🏗️  ")
@@ -1172,8 +1172,13 @@ def nodeBuildProject() {
                         // nextJSScript = " && next export && rm -rf ${NPM_PACKAGE_FOLDER} && mv out ${NPM_PACKAGE_FOLDER} "
                     }
                     sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
-                    retry(2) {
+                    def retryCount = 0
+                    retry(3) {
+                        retryCount++
                         sh " npm run '${NPM_RUN_PARAMS}' ${nextJSScript} " // >/dev/null 2>&1
+                        if (retryCount >= 2) {
+                            sh "rm -rf node_modules && rm -f *-lock.json"
+                        }
                     }
                 } catch (e) {
                     println(e.getMessage())
