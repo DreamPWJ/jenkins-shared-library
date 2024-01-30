@@ -36,7 +36,7 @@ if [[ ${project_type} == 1 ]]; then
     else
       result=$(curl --connect-timeout 120 --max-time 120 -I ${check_url} | grep OK)
       if [[ ${result} =~ OK ]]; then
-        echo "Web前端启动成功" # 必须包含"成功"字样 pipeline内判断
+        echo "Web前端应用启动成功" # 必须包含"成功"字样 pipeline内判断
         break
       fi
       sleep 2s
@@ -57,7 +57,7 @@ elif [[ ${project_type} == 2 ]]; then
       result=$(curl --connect-timeout 600 --max-time 600 --globoff "${check_url}" | grep -E "200|404|401|403|unauthorized|Bad Request")
       if [[ ${code} == 200 || ${result} ]]; then
         # echo "状态码: ${code} 响应结果: ${result}"
-        echo "服务端启动成功" # 必须包含"成功"字样 pipeline内判断
+        echo "服务端应用启动成功" # 必须包含"成功"字样 pipeline内判断
         break
       fi
       sleep 2s

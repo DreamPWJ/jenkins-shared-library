@@ -1352,7 +1352,7 @@ def uploadRemote(filePath, map) {
         // 同步脚本和配置到部署服务器
         syncScript()
     }
-    Tools.printColor(this, "上传部署文件到远程云端 🚀 ")
+    println("上传部署文件到部署服务器中... 🚀 ")
     // 基于scp或rsync同步文件到远程服务器
     def projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
     if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
@@ -1378,6 +1378,7 @@ def uploadRemote(filePath, map) {
             // C++语言打包产物 上传包到远程服务器
             sh "cd ${filePath} && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
         }
+        Tools.printColor(this, "上传部署文件到部署服务器完成 ✅")
     }
 }
 
@@ -1452,6 +1453,7 @@ def runProject(map) {
             sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/cpp " +
                     "&& ./docker-release-cpp.sh '${SHELL_PARAMS_GETOPTS}' '  "
         }
+        Tools.printColor(this, "执行应用部署完成 ✅")
     } catch (error) {
         println error.getMessage()
         currentBuild.result = 'FAILURE'
