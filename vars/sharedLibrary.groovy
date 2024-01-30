@@ -184,9 +184,9 @@ def call(String type = 'web-java', Map map) {
                                 reuseNode true // 使用根节点
                             }
                                    }*/
-              /*      tools {
-                        git "Default"
-                    }*/
+                    /*      tools {
+                              git "Default"
+                          }*/
                     steps {
                         script {
                             pullProjectCode()
@@ -605,6 +605,7 @@ def call(String type = 'web-java', Map map) {
 
                 stage('钉钉通知') {
                     when {
+                        beforeAgent true
                         expression { return true }
                     }
                     steps {
@@ -618,7 +619,16 @@ def call(String type = 'web-java', Map map) {
 
                 stage('发布日志') {
                     when {
+                        beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                    }
+                    agent {
+                        // label "linux"
+                        docker {
+                            // Git环境  完成自动删除容器
+                            image "bitnami/git:latest"
+                            reuseNode true // 使用根节点
+                        }
                     }
                     steps {
                         script {
