@@ -32,7 +32,6 @@ class Node implements Serializable {
 
         // 设置镜像源 加速下载
         ctx.sh "npm config set registry https://registry.npmmirror.com"
-        ctx.sh "yarn config set registry https://registry.npmmirror.com"
 
         try {
             ctx.sh "yarn --version"
@@ -44,6 +43,10 @@ class Node implements Serializable {
         } catch (error) {
             ctx.sh "npm install -g pnpm || true"
         }
+
+        // 设置镜像源 加速下载
+        ctx.sh "yarn config set registry https://registry.npmmirror.com"
+        ctx.sh "pnpm config set registry https://registry.npmmirror.com"
     }
 
     /**
