@@ -14,18 +14,15 @@ gitlab_rails['backup_upload_connection'] = {
 'aliyun_accesskey_secret' => 'your_access_key_secret',
 'aliyun_oss_bucket' => 'your_bucket_name',
 
-# 如果需要指定region，可以添加下面这行（如果OSS bucket没有明确地区，则可能不需要）
-# 'region' => 'oss-cn-hangzhou', # 替换为你的OSS所在区域
 # 如果bucket不是默认的公共读写权限，还需要提供endpoint和目录前缀
-
-'endpoint' => 'https://oss-cn-hangzhou.aliyuncs.com', # 根据实际区域更换
+'endpoint' => 'https://oss-cn-shanghai.aliyuncs.com', # 根据实际区域更换
 'path' => 'gitlab/backup/', # 备份文件在OSS上的存储路径前缀
 }
 
 # 确保备份是启用的，并且配置了自动备份的时间间隔
 
 gitlab_rails['backup_keep_time'] = 604800 # 保留备份7天（以秒为单位，可根据需求调整）
-gitlab_rails['backup_schedule'] = "0 0 * * *" # 每天零点执行一次备份（cron格式，可自定义）
+gitlab_rails['backup_schedule'] = "0 2 * * *" # 每天执行一次备份（cron格式，可自定义）
 
 3. 保存并退出配置文件后，运行以下命令应用新的配置：
    sudo gitlab-ctl reconfigure
