@@ -100,6 +100,7 @@ def call(String type = 'web-java', Map map) {
 
             environment {
                 // 系统环境变量
+                JAVA_TOOL_OPTIONS = "-Dfile.encoding=UTF-8" // 在全局系统设置或构建环境中设置 为了确保正确解析编码和颜色
                 NODE_OPTIONS = "--max_old_space_size=4096" // NODE内存调整 防止打包内存溢出
                 // jenkins节点java路径 适配不同版本jdk情况 /Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home
                 //JAVA_HOME = "/var/jenkins_home/tools/hudson.model.JDK/${JDK_VERSION}${JDK_VERSION == '11' ? '/jdk-11' : ''}"
