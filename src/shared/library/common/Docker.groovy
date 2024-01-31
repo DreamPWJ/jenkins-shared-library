@@ -145,6 +145,13 @@ class Docker implements Serializable {
                     def dockerFileName = ""
                     if ("${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
                         dockerFileName = "Dockerfile"
+                        if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
+                            // K8s中不会自动解析ENTRYPOINT环境变量 自动替换
+                            def dockerFilePath = "${ctx.env.WORKSPACE}/ci/.ci/${dockerFileName}"
+                            ctx.sh " sed -e 's#$JAVA_OPTS#-Xms128m ${ctx.DOCKER_JAVA_OPTS}#g;" +
+                                    " ' ${dockerFilePath} > ${dockerFileName}} "
+                            ctx.sh " cat ${dockerFileName} "
+                        }
                     } else if ("${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringMVC) {
                         dockerFileName = "Dockerfile.mvc"
                     }
