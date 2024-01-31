@@ -111,7 +111,7 @@ class Docker implements Serializable {
                 dockerBuildDiffStr = " buildx build --platform linux/amd64 "
                 dockerPushDiffStr = " --push "
             } else {
-                ctx.println("开始制作Docker镜像并上传远程仓库")
+                ctx.println("开始制作Docker镜像并上传远程仓库 🏗️ ")
             }
 
             if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
@@ -170,7 +170,7 @@ class Docker implements Serializable {
                     ctx.sh " docker push ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} "
                 }
             }
-            ctx.println("构建镜像上传容器仓库完成 ✅")
+            ctx.println("构建镜像并上传到容器仓库完成 ✅")
             // --no-prune : 不移除该镜像的过程镜像 默认移除 移除导致并发构建找不到父镜像层
             ctx.sh """
             docker rmi ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --no-prune || true
