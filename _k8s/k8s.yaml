@@ -49,12 +49,15 @@ spec:
               value: Asia/Shanghai
             - name: SPRING_PROFILES_ACTIVE
               value: {SPRING_PROFILE}
+            - name: JAVA_OPTS
+              value: "-Xms128m {JAVA_OPTS_XMX}" # 最大堆内存 如 -Xmx1024m
             - name: EXTEND_PORT
               value: "{CONTAINER_PORT}"
             - name: HOST_NAME
               value: $(KUBERNETES_SERVICE_HOST)
-            - name: JAVA_OPTS
-              value: "-Xms128m {JAVA_OPTS_XMX}" # 最大堆内存 如 -Xmx1024m
+          # 通过 YAML 文件中的 command 和 args 字段来指定启动命令和参数。可以覆盖或补充 Dockerfile中定义的 ENTRYPOINT和CMD启动命令
+          # command: [ "/bin/sh", "-c" ]
+          # args: [ "java $JAVA_OPTS -jar your-app.jar" ]
           # 优雅停机  Pod被删除时，状态置为 Terminating 。 kube-proxy 更新转发规则，将 Pod 从 service 的 endpoint 列表中摘除掉，新的流量不再转发到该 Pod
           lifecycle:
             preStop:
