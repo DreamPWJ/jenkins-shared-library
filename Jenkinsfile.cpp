@@ -32,7 +32,7 @@ map.put('build_num_keep', 1)
 // Docker相关参数
 // JVM内存设置
 map.put('docker_java_opts', '-Xmx1000m')
-// docker内存限制
+// docker内存限制 不支持小数点形式设置
 map.put('docker_memory', '1G')
 // docker日志限制
 map.put('docker_log_opts', 'max-size=50m') // --log-opt max-size=50m --log-opt max-file=3
