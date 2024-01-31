@@ -56,8 +56,8 @@ spec:
             - name: HOST_NAME
               value: $(KUBERNETES_SERVICE_HOST)
           # 通过 YAML 文件中的 command 和 args 字段来指定启动命令和参数。可以覆盖或补充 Dockerfile中定义的 ENTRYPOINT和CMD启动命令
-          # command: [ "/bin/sh", "-c" ]
-          args: ["JAVA_OPTS=-Xms128m {JAVA_OPTS_XMX}"]
+          # command: [ "/bin/sh", "-c" ] # 这里覆盖了 ENTRYPOINT 中的第一个元素（可选）
+          args: ["JAVA_OPTS=-Xms128m {JAVA_OPTS_XMX}"]  # 覆盖或追加了参数
           # 优雅停机  Pod被删除时，状态置为 Terminating 。 kube-proxy 更新转发规则，将 Pod 从 service 的 endpoint 列表中摘除掉，新的流量不再转发到该 Pod
           lifecycle:
             preStop:
