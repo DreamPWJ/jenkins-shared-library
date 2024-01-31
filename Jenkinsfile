@@ -38,7 +38,7 @@ map.put('build_num_keep', 1)
 // JVM内存设置
 map.put('docker_java_opts', '-Xmx600m')
 // docker内存限制
-map.put('docker_memory', '800m')
+map.put('docker_memory', '2G')
 // docker日志限制
 map.put('docker_log_opts', 'max-size=50m') // --log-opt max-size=50m --log-opt max-file=3
 // docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
