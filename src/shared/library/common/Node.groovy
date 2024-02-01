@@ -53,7 +53,7 @@ class Node implements Serializable {
      * 设置官方镜像
      */
     static def setOfficialMirror(ctx) {
-        // 设置镜官方像源  因为国内镜像有些包不存在导致404  关键字 ERR_PNPM_FETCH_404 或 Not Found - 404
+        // 设置镜官方像源  因为国内镜像有些包404不存在导致安装依赖失败 关键字 ERR_PNPM_FETCH_404 或 Not Found - 404
         // 获取工作空间中文件的内容
         def fileContent = ctx.readFile 'npm_install.log'
         // 检查文件内容是否包含特定关键字
