@@ -1165,7 +1165,7 @@ def nodeBuildProject() {
                                 Node.setOfficialMirror(this)
                             }
                             println("安装依赖 📥")
-                            // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱
+                            // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱但依赖lock文件
                             def npmLog = "npm_install.log"
                             sh " npm ci || pnpm install > ${npmLog} 2>&1 " +
                                     " || npm install >> ${npmLog} 2>&1 || yarn install >> ${npmLog} 2>&1  "
