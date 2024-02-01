@@ -163,7 +163,7 @@ class Kubernetes implements Serializable {
         }
         // 动态设置k8s yaml args参数
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java && "${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
-            setYamlArags = " --set_yaml_arags=JAVA_OPTS=-Xms128m ${map.docker_java_opts} "
+            setYamlArags = " --set_yaml_arags='JAVA_OPTS=-Xms128m ${map.docker_java_opts}' "
         }
 
         pythonYamlParams = isYamlUseSession + yamlVolumeMounts + yamlNfsParams + yamlDefaultPort + setYamlArags
