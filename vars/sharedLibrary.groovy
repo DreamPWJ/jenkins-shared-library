@@ -1154,7 +1154,12 @@ def nodeBuildProject() {
             }
 
             if (Git.isExistsChangeFile(this)) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
+                def installRetryCount = 0
                 retry(3) {
+                    installRetryCount++
+                    if (installRetryCount >= 2) {
+                        sh "rm -rf node_modules && rm -f *.lock.json"
+                    }
                     println("安装依赖 📥")
                     // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱
                     sh "npm ci || pnpm install || npm install || yarn install"
