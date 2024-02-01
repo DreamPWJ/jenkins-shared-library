@@ -36,7 +36,7 @@ spec:
           resources: # 合理设置内存 防止内存溢出 导致整个服务器宕机 如0/3 nodes are available: 3 Insufficient memory
             requests:
               cpu: 200m  # cpu请求，容器启动的初始可用数量
-              memory: 512Mi # 内存请求，容器启动的初始可用数量
+              memory: 256Mi # 内存请求，容器启动的初始可用数量  不能大于limits设置值
             limits:
               # m是千分之一  100m是0.1个CPU  限制最大cpu防止资源溢出 导致整个集群全部不可用
               cpu: 900m
