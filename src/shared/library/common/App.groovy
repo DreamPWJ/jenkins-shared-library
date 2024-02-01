@@ -18,6 +18,7 @@ class App implements Serializable {
         // 查看当前项目的依赖模块  查看全局依赖模块命令是 npm ls -g --depth 0
         def nodePackages = Utils.getShEchoResult(ctx, "npm ls --depth 0")
         if (!nodePackages.contains("yargs")) {
+            ctx.sh "npm config set registry https://registry.npmmirror.com"
             ctx.sh "npm i -D yargs"
             ctx.sh "npm install app-info-parser"
         }

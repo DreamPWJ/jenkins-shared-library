@@ -39,7 +39,7 @@ softwareupdate --install -a
   140.82.112.4 github.com 
   199.232.5.194 github.global.ssl.fastly.net 
   185.199.108.133 raw.githubusercontent.com
-  47.246.22.227 registry.npm.taobao.org 
+  47.246.22.227 registry.npmmirror.com 
   209.95.59.244 registry.npm.org
   172.67.129.60 raster.shields.io
   

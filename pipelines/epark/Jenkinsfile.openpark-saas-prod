@@ -32,8 +32,8 @@ map.put('build_num_keep', 2)
 // Docker相关参数
 // JVM内存设置
 map.put('docker_java_opts', '-Xmx2800m')
-// docker内存限制
-map.put('docker_memory', '3G')
+// docker内存限制 不支持小数点形式设置
+map.put('docker_memory', '4G')
 // docker日志限制
 map.put('docker_log_opts', 'max-size=150m') // --log-opt max-size=50m --log-opt max-file=3
 // docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
@@ -78,8 +78,8 @@ map.put('is_git_tag', true)
 map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
-map.put('jenkins_node', 'master')
-map.put('jenkins_node_front_end', 'master')
+map.put('jenkins_node', 'node-2')
+map.put('jenkins_node_front_end', 'node-2')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node14')
@@ -92,6 +92,10 @@ map.put('git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
 map.put('ding_talk_credentials_id', 'd33ae0ba-e531-41c8-8983-d9734e53a25a')
 // OSS对象存储访问凭据配置 Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
 map.put('oss_credentials_id', ' ')
+// 直连方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接
+map.put('ssh_hosts_id', ' ')
+// 跳板机方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接
+map.put('proxy_jump_hosts_id', '47226244-73ca-48b9-be2d-f3413f62701a')
 
 // 服务器上部署所在的文件夹名称
 map.put('deploy_folder', "my")
