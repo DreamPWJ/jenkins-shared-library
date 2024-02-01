@@ -6,6 +6,7 @@
 ARG TOMCAT_VERSION
 ARG JDK_VERSION
 ARG EXPOSE_PORT
+ARG JAVA_OPTS
 
 # Dockerfile多阶段构建 参考文档: https://docs.docker.com/develop/develop-images/multistage-build/
 # 示例 FROM golang:1.16 下行注释的KEY值动态替换
@@ -30,9 +31,6 @@ USER root
 # 设置时区
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-# 设置环境变量以配置Java堆栈大小和其他JVM参数
-ENV JAVA_OPTS="-Xss1024k -Xms128m -Xmx2048m"
 
 # 修改tomcat配置  或者 docker run -v /my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml
 # COPY server.xml /usr/local/tomcat/conf/
