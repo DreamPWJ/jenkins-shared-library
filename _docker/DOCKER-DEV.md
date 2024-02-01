@@ -23,7 +23,7 @@ docker pull mysql
 #### GROUP_CONCAT函数可拼接某个字段值成字符串 默认的分隔符是"," 默认最大长度为1024字节超过则会被截断 （-1为最大值或根据实际需求设置长度） 
 #### convert(数据,char) CONCAT解决乱码
 
-#### CREATE USER IF NOT EXISTS 'health'@'%' IDENTIFIED WITH MYSQL_NATIVE_PASSWORD BY 'panweiji2020' ;
+#### CREATE USER IF NOT EXISTS 'health'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji2020' ;
 #### GRANT all privileges ON *.* TO 'health'@'%' ; flush privileges;
 
 sudo docker run -d --restart=always -p 3306:3306 --name mysql \
