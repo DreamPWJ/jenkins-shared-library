@@ -50,6 +50,21 @@ class Node implements Serializable {
     }
 
     /**
+     * 设置官方镜像
+     */
+    static def setOfficialMirror(ctx) {
+        // 设置镜官方像源  因为国内镜像有些包不存在导致404  关键字 ERR_PNPM_FETCH_404 或 Not Found - 404
+        // 获取工作空间中文件的内容
+        def fileContent = ctx.readFile 'npm_install.log'
+        // 检查文件内容是否包含特定关键字
+        if (fileContent.contains('ERR_PNPM_FETCH_404') || fileContent.contains('Not Found - 404')) {
+            ctx.sh "npm config set registry https://registry.npmjs.org"
+            ctx.sh "yarn config set registry https://registry.npmjs.org"
+            ctx.sh "pnpm config set registry https://registry.npmjs.org || true"
+        }
+    }
+
+    /**
      * Node环境设置Electron镜像并初始化包管理工具 如yarn、pnpm
      */
     static def setElectronMirror(ctx) {

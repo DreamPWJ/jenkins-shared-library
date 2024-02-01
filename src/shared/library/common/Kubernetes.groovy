@@ -254,34 +254,6 @@ class Kubernetes implements Serializable {
     }
 
     /**
-     * 镜像方式部署
-     */
-    static def deployByImage(ctx, imageName, deploymentName, port) {
-        ctx.println("开始部署Kubernetes云原生应用")
-        // 创建示例部署并在端口 上公开它
-        ctx.sh "kubectl delete deployment ${deploymentName}"
-        ctx.sh "kubectl delete service ${deploymentName}"
-        ctx.sh "kubectl create deployment balanced  ${deploymentName} --image=${imageName}"
-        // 测试镜像: idoop/zentao:latest
-        ctx.sh "kubectl expose deployment balanced  ${deploymentName} --type=NodePort --port=${port} "
-        // 获取服务
-        ctx.sh "kubectl get services ${deploymentName} && kubectl get pod" // STATUS 为 Running
-        // 启动服务
-        ctx.sh "minikube service ${deploymentName}"
-        // ctx.sh "kubectl port-forward service/${deploymentName} 8080:8080" // 使用 kubectl 转发端口  kubectl port-forward 不会返回
-    }
-
-    /**
-     * 基于K8s内置的回滚功能
-     */
-    static def rollback(ctx) {
-        // 回滚上一个版本
-        ctx.sh " kubectl rollout undo deployment/deployment名称  -n ${k8sNameSpace} "
-        // 回滚到指定版本
-        ctx.sh " kubectl rollout undo deployment/deployment名称 --revision=2 -n ${k8sNameSpace} "
-    }
-
-    /**
      * K8S验证部署是否成功
      */
     static def verifyDeployment(ctx) {
@@ -308,7 +280,7 @@ class Kubernetes implements Serializable {
                         ctx.sleep 12 // 每隔多少秒检查一次
                     }
                     if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-                        ctx.sleep 6 // 每隔多少秒检查一次
+                        ctx.sleep 8 // 每隔多少秒检查一次
                     }
                 }
             }
@@ -320,6 +292,34 @@ class Kubernetes implements Serializable {
             Tools.printColor(ctx, "K8S集群中所有Pod服务已处于启动状态 ✅")
         }
 
+    }
+
+    /**
+     * 镜像方式部署
+     */
+    static def deployByImage(ctx, imageName, deploymentName, port) {
+        ctx.println("开始部署Kubernetes云原生应用")
+        // 创建示例部署并在端口 上公开它
+        ctx.sh "kubectl delete deployment ${deploymentName}"
+        ctx.sh "kubectl delete service ${deploymentName}"
+        ctx.sh "kubectl create deployment balanced  ${deploymentName} --image=${imageName}"
+        // 测试镜像: idoop/zentao:latest
+        ctx.sh "kubectl expose deployment balanced  ${deploymentName} --type=NodePort --port=${port} "
+        // 获取服务
+        ctx.sh "kubectl get services ${deploymentName} && kubectl get pod" // STATUS 为 Running
+        // 启动服务
+        ctx.sh "minikube service ${deploymentName}"
+        // ctx.sh "kubectl port-forward service/${deploymentName} 8080:8080" // 使用 kubectl 转发端口  kubectl port-forward 不会返回
+    }
+
+    /**
+     * 基于K8s内置的回滚功能
+     */
+    static def rollback(ctx) {
+        // 回滚上一个版本
+        ctx.sh " kubectl rollout undo deployment/deployment名称  -n ${k8sNameSpace} "
+        // 回滚到指定版本
+        ctx.sh " kubectl rollout undo deployment/deployment名称 --revision=2 -n ${k8sNameSpace} "
     }
 
     /**
