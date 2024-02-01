@@ -117,7 +117,7 @@ if is_use_session:
     service_spec['type'] = "NodePort"
     service_spec.update(session_yaml)  # update更新JSON数据
 
-# 默认应用端口
+# 默认应用端口 应用服务扩展端口
 default_port = args.default_port
 if default_port is not None:
     print(default_port)
@@ -130,6 +130,9 @@ with open(k8s_yaml_file, mode='w', encoding='utf-8') as file:
     file.write("\n---\n")
     yaml.dump(yamlContent[1], file)
 
+
+
+#  示例代码
 # yamlText = """\
 # # example
 # name:
