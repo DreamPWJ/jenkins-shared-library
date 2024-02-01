@@ -121,6 +121,11 @@ class Kubernetes implements Serializable {
                 k8sPodReplicas = 1  // 主节点只部署一个
             }
         }
+        // 动态设置k8s yaml args参数
+        def k8sYamlArags = ""
+        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java && "${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
+            k8sYamlArags = "JAVA_OPTS=-Xms128m ${map.docker_java_opts}"
+        }
 
         // 灰度发布  金丝雀发布  A/B测试
         def canaryFlag = "canary"
@@ -144,6 +149,7 @@ class Kubernetes implements Serializable {
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g;s#{DEFAULT_CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
                 " s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g;s#{MAX_MEMORY_SIZE}#${map.docker_memory}#g;s#{JAVA_OPTS_XMX}#${map.docker_java_opts}#g; " +
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g;s#{CUSTOM_HEALTH_CHECK_PATH}#${ctx.CUSTOM_HEALTH_CHECK_PATH}#g; " +
+                " s#{K8S_YAML_ARAGS}#${k8sYamlArags}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYAMLFile} > ${k8sYAMLFile} "
 
         def pythonYamlParams = ""
