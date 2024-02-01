@@ -58,7 +58,7 @@ class Node implements Serializable {
         def fileContent = ctx.readFile 'npm_install.log'
         // 检查文件内容是否包含特定关键字
         if (fileContent.contains('ERR_PNPM_FETCH_404') || fileContent.contains('Not Found - 404')
-                || fileContent.contains('No matching version found') || fileContent.contains('error Couldn\'t find any versions')) {  {
+                || fileContent.contains('No matching version found') || fileContent.contains('error Couldn\'t find any versions')) {
             ctx.sh "npm config set registry https://registry.npmjs.org"
             ctx.sh "yarn config set registry https://registry.npmjs.org"
             ctx.sh "pnpm config set registry https://registry.npmjs.org || true"
