@@ -13,7 +13,7 @@ ARG EXPOSE_PORT
 #FROM-MULTISTAGE-BUILD-IMAGES
 
 # JDK基础镜像 默认值变量方式 ${JDK_VERSION:-11}
-FROM openjdk:${JDK_VERSION}-jre
+FROM openjdk:${JDK_VERSION}
 
 # 多阶段构建镜像 从上一个镜像内复制环境到本镜像
 # 示例 COPY --from=0 / /   下行注释的KEY值动态替换

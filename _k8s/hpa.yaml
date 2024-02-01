@@ -9,7 +9,7 @@ metadata:
 
 spec:
   minReplicas: {K8S_POD_REPLICAS}    # 缩容最小节点数
-  maxReplicas: 100                   # 扩容最大节点数
+  maxReplicas: 10                    # 扩容最大节点数
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
@@ -21,7 +21,7 @@ spec:
           name: http_server_requests_qps  # 基于QPS自动伸缩 安装 prometheus-adapter 来实现基于自定义指标的 Pod 弹性伸缩
         target:
           type: AverageValue
-          averageValue: 10  # 当每个业务Pod的QPS指标平均值高于时，触发自动进行扩容
+          averageValue: 300  # 当每个业务Pod的QPS指标平均值高于时，触发自动进行扩容
 
 #    - type: Resource
 #      resource:

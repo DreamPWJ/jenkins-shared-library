@@ -24,6 +24,7 @@ class Docker implements Serializable {
         try {
             //println(Utils.getShEchoResult(this, "whoami"))
             //def dockerPath = tool 'Docker' //全局配置里 名称Docker 位置/usr/local  使用系统安装好的docker引擎
+            // ctx.println("初始化Docker环境变量")
             ctx.env.PATH = "${ctx.env.PATH}:/usr/local/bin:/usr/local/go/bin:/usr/bin/docker" //添加了系统环境变量上
         } catch (e) {
             ctx.println("初始化Docker环境变量失败")
@@ -110,7 +111,7 @@ class Docker implements Serializable {
                 dockerBuildDiffStr = " buildx build --platform linux/amd64 "
                 dockerPushDiffStr = " --push "
             } else {
-                ctx.println("开始制作Docker镜像并上传远程仓库")
+                ctx.println("开始制作Docker镜像并上传远程仓库 🏗️ ")
             }
 
             if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
@@ -149,8 +150,8 @@ class Docker implements Serializable {
                     }
                     ctx.sh """ cd ${ctx.mavenPackageLocationDir} && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
-                            --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg EXPOSE_PORT="${exposePort}" --build-arg TOMCAT_VERSION=${ctx.TOMCAT_VERSION} \
-                            --build-arg JDK_VERSION=${ctx.JDK_VERSION}  -f ${ctx.env.WORKSPACE}/ci/.ci/${dockerFileName} . --no-cache \
+                            --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}" --build-arg EXPOSE_PORT="${exposePort}" --build-arg TOMCAT_VERSION=${ctx.TOMCAT_VERSION} \
+                            --build-arg JDK_VERSION=${ctx.JDK_VERSION} --build-arg JAVA_OPTS="-Xms128m ${ctx.DOCKER_JAVA_OPTS}" -f ${ctx.env.WORKSPACE}/ci/.ci/${dockerFileName} . --no-cache \
                             ${dockerPushDiffStr}
                             """
                 } else if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
@@ -169,7 +170,7 @@ class Docker implements Serializable {
                     ctx.sh " docker push ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} "
                 }
             }
-            ctx.println("构建镜像上传完成并删除本地镜像")
+            ctx.println("构建镜像并上传到容器仓库完成 ✅")
             // --no-prune : 不移除该镜像的过程镜像 默认移除 移除导致并发构建找不到父镜像层
             ctx.sh """
             docker rmi ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --no-prune || true
@@ -204,6 +205,7 @@ class Docker implements Serializable {
                       'docker login ${ctx.DOCKER_REPO_REGISTRY} --username=${ctx.DOCKER_HUB_USER_NAME} --password=${ctx.DOCKER_HUB_PASSWORD} && \
                        docker pull ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}'
                     """
+            ctx.println("拉取远程仓库Docker镜像完成 ✅")
         }
     }
 

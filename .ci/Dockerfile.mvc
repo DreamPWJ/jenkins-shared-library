@@ -6,6 +6,7 @@
 ARG TOMCAT_VERSION
 ARG JDK_VERSION
 ARG EXPOSE_PORT
+ARG JAVA_OPTS
 
 # Dockerfile多阶段构建 参考文档: https://docs.docker.com/develop/develop-images/multistage-build/
 # 示例 FROM golang:1.16 下行注释的KEY值动态替换
@@ -34,8 +35,10 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # 修改tomcat配置  或者 docker run -v /my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml
 # COPY server.xml /usr/local/tomcat/conf/
 
-# 将旧部署文件删除和可能导致高危漏洞的文件
-RUN rm -Rf /usr/local/tomcat/webapps/ROOT* && rm -rf /usr/local/tomcat/examples/* && rm -rf /usr/local/tomcat/docs/*
+# 将旧部署文件删除和可能导致高危漏洞的文件 通过修改catalina.sh脚本来追加或覆盖默认的JAVA_OPTS环境变量
+RUN rm -Rf /usr/local/tomcat/webapps/ROOT* && rm -rf /usr/local/tomcat/examples/* && rm -rf /usr/local/tomcat/docs/* \
+ && echo '#!/bin/bash' > /usr/local/tomcat/bin/setenv.sh  && chmod +x /usr/local/tomcat/bin/setenv.sh \
+ && echo "export JAVA_OPTS=\"$JAVA_OPTS\"" >> /usr/local/tomcat/bin/setenv.sh
 
 # 将部署文件复制到docker内  ROOT是默认根目录  如实现同一个Tomcat下部署多个应用 可自定义其名称 访问路径多加目录名称访问
 COPY  *.war  /usr/local/tomcat/webapps/ROOT.war
@@ -43,5 +46,5 @@ COPY  *.war  /usr/local/tomcat/webapps/ROOT.war
 # 对外暴露端口
 EXPOSE  $EXPOSE_PORT
 
-# 运行启动命令
+# 启动Tomcat服务 运行启动命令
 CMD ["catalina.sh","run"]

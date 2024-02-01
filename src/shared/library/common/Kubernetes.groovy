@@ -2,10 +2,9 @@ package shared.library.common
 
 import shared.library.GlobalVars
 import shared.library.Utils
-import shared.library.common.Docker
-import shared.library.common.Helm
+import shared.library.common.*
 
-//import groovy.json.JsonSlurper
+//import groovy.json.JsonOutput
 
 /**
  * @author 潘维吉
@@ -18,6 +17,7 @@ class Kubernetes implements Serializable {
 
     static def k8sYAMLFile = "k8s.yaml" // k8s集群应用部署yaml定义文件
     static def pythonYamlFile = "k8s_yaml.py" // 使用Python动态处理Yaml文件
+    static def k8sNameSpace = "default" // k8s命名空间
 
     /**
      * 声明式执行k8s集群部署
@@ -34,6 +34,8 @@ class Kubernetes implements Serializable {
                 // 2. 若您之前配置过KUBECONFIG环境变量，kubectl会优先加载KUBECONFIG环境变量包括文件路径，而不是$HOME/.kube/config，使用时请注意
                 // ctx.println("k8s集群访问配置：${ctx.KUBECONFIG}")
                 // ctx.sh "kubectl version"
+
+                ctx.println("开始部署Kubernetes云原生应用 🏗️ ")
 
                 // 动态替换k8s yaml声明式部署文件
                 setYamlConfig(ctx, map, deployNum)
@@ -65,7 +67,7 @@ class Kubernetes implements Serializable {
                 // 查看详细信息   kubectl describe pod podName
 
                 // 查看命名空间下pod在哪些node节点运行
-                // ctx.sh "kubectl get pod -n default -o wide"
+                // ctx.sh "kubectl get pod -n ${k8sNameSpace} -o wide"
                 // 查看pod节点当前的节点资源占用情况
                 // ctx.sh "kubectl top pod"
                 // 查看node节点当前的节点资源占用情况
@@ -77,23 +79,15 @@ class Kubernetes implements Serializable {
                 // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用  K8S默认有容器清理策略 无需手动处理
                 // cleanDockerImages(ctx)
 
-                ctx.println("K8S集群部署完成 ✅")
+                ctx.println("K8S集群执行部署完成 ✅")
+
+                // K8S部署验证是否成功
+                verifyDeployment(ctx)
+
+                // 计算应用启动时间
+                ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date())
             }
         }
-
-        ctx.println("等待K8S集群所有Pod节点全部启动完成中 ...")
-        // yaml内容中包含初始化时间和启动完成时间 shell中自动解析所有内容，建议yq进行实际的YAML解析
-        // ctx.sh "kubectl get pods podName*** -o yaml"
-        // K8S滚动部署需要时间 延迟等待 防止钉钉已经通知部署完成 但是新服务没有真正启动完成
-        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-            ctx.sleep(time: 12, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
-        }
-        ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date()) // 计算应用启动时间
-        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-            // 根据部署的节点数延迟等待
-            ctx.sleep(time: Integer.parseInt(ctx.K8S_POD_REPLICAS.toString()) * 10, unit: "SECONDS")
-        }
-        ctx.sleep(time: 10, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
     }
 
     /**
@@ -156,6 +150,7 @@ class Kubernetes implements Serializable {
         def isYamlUseSession = ""
         def yamlVolumeMounts = ""
         def yamlNfsParams = ""
+        def setYamlArags = ""
         // 复杂参数动态组合配置yaml文件
         if ("${ctx.IS_USE_SESSION}" == "true") {   // k8s集群业务应用是否使用Session 做亲和度关联
             isYamlUseSession = " --is_use_session=true "
@@ -166,8 +161,12 @@ class Kubernetes implements Serializable {
         if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") { // NFS服务
             yamlNfsParams = " --nfs_server=${ctx.NFS_SERVER}  --nfs_params=${ctx.NFS_MOUNT_PATHS} "
         }
+        // 动态设置k8s yaml args参数
+        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java && "${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
+            setYamlArags = " --set_yaml_arags='JAVA_OPTS=-Xms128m ${map.docker_java_opts}' "
+        }
 
-        pythonYamlParams = isYamlUseSession + yamlVolumeMounts + yamlNfsParams + yamlDefaultPort
+        pythonYamlParams = isYamlUseSession + yamlVolumeMounts + yamlNfsParams + yamlDefaultPort + setYamlArags
         if ("${pythonYamlParams}".trim() != "") {
             ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
                 ctx.println("使用Python的ruamel包动态配置K8S的Yaml文件: " + pythonYamlParams)
@@ -198,7 +197,7 @@ class Kubernetes implements Serializable {
             ctx.sh "kubectl apply -f ${yamlName}"
             // 若安装正确，可用执行以下命令查询自定义指标 查看到 Custom Metrics API 返回配置的 QPS 相关指标 可能需要等待几分钟才能查询到
             ctx.sh " kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 || true "
-            // kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/default/pods/*/http_server_requests_qps"
+            // kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/${k8sNameSpace}/pods/*/http_server_requests_qps"
 
             // 并发测试ab（apache benchmark） CentOS环境 sudo yum -y install httpd-tools    Ubuntu环境 sudo apt-get update && sudo apt-get -y install apache2-utils
             // ab -c 100 -n 10000 -r http://120.92.49.178:8080/  // 并发数-c  总请求数-n  是否允许请求错误-r  总的请求数(n) = 次数 * 一次并发数(c)
@@ -255,6 +254,47 @@ class Kubernetes implements Serializable {
     }
 
     /**
+     * K8S验证部署是否成功
+     */
+    static def verifyDeployment(ctx) {
+        ctx.println("K8S集群所有Pod节点健康探测中, 请耐心等待... 🚀")
+        def deploymentName = "${ctx.FULL_PROJECT_NAME}" // labels.app标签值
+        def namespace = k8sNameSpace
+        ctx.sleep 3 // 等待检测
+        // 等待所有Pod达到Ready状态
+        ctx.timeout(time: 10, unit: 'MINUTES') { // 设置超时时间
+            def podsAreReady = false
+            while (!podsAreReady) {
+                def output = ctx.sh(script: "kubectl get pods -n $namespace -l app=$deploymentName -o json", returnStdout: true)
+                def podStatus = ctx.readJSON text: output
+
+                int readyCount = podStatus.items.findAll { it.status.containerStatuses.every { it.ready == true } }.size()
+                int totalPods = podStatus.items.size()
+
+                if (readyCount == totalPods) {
+                    podsAreReady = true
+                } else {
+                    // yaml内容中包含初始化时间和启动完成时间 shell中自动解析所有内容，建议yq进行实际的YAML解析
+                    ctx.echo "Waiting for all pods to be ready. Currently Ready: $readyCount / Total: $totalPods"
+                    if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
+                        ctx.sleep 12 // 每隔多少秒检查一次
+                    }
+                    if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
+                        ctx.sleep 8 // 每隔多少秒检查一次
+                    }
+                }
+            }
+            // 除了Running之外的状态  都不能算部署成功 Pod处于Pending状态也会通过上面的Ready状态检测代码 其实部署是失败的
+            // 如Pending由于资源不足或其他限制  Terminating器可能还在停止中或资源清理阶段  ContainerCreating 容器尚未创建完成
+            // Failed 如果Pod中的所有容器都因失败而退出，并且不会再重启，则Pod会进入Failed状态  CrashLoopBackOff 时，这意味着 Pod 中的主容器（或其中一个容器）反复启动并快速退出
+            // 示例 查询pod所有节点的状态  kubectl get pods --selector=app=my-app -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.phase}{"\n"}{end}'
+
+            Tools.printColor(ctx, "K8S集群中所有Pod服务已处于启动状态 ✅")
+        }
+
+    }
+
+    /**
      * 镜像方式部署
      */
     static def deployByImage(ctx, imageName, deploymentName, port) {
@@ -277,9 +317,9 @@ class Kubernetes implements Serializable {
      */
     static def rollback(ctx) {
         // 回滚上一个版本
-        ctx.sh " kubectl rollout undo deployment/deployment名称  -n default "
+        ctx.sh " kubectl rollout undo deployment/deployment名称  -n ${k8sNameSpace} "
         // 回滚到指定版本
-        ctx.sh " kubectl rollout undo deployment/deployment名称 --revision=2 -n default "
+        ctx.sh " kubectl rollout undo deployment/deployment名称 --revision=2 -n ${k8sNameSpace} "
     }
 
     /**
@@ -290,7 +330,7 @@ class Kubernetes implements Serializable {
         ctx.sh "kubectl get pod -l app=***  -o jsonpath=\"{.items[0].metadata.name} "  // kubectl获取新pod名称
         // yaml内容中包含初始化时间和启动完成时间  shell中自动解析所有内容, 建议yq进行实际的YAML解析
         ctx.sh "kubectl get pods podName*** -o yaml"
-        ctx.sh "kubectl -n default get pods podName*** -o yaml | yq e '.items[].status.conditions[] | select('.type' == \"PodScheduled\" or '.type' == \"Ready\") | '.lastTransitionTime'' - | xargs -n 2 bash -c 'echo \$(( \$(date -d \"\$0\" \"+%s\") - \$(date -d \"\$1\" \"+%s\") ))' "
+        ctx.sh "kubectl -n ${k8sNameSpace} get pods podName*** -o yaml | yq e '.items[].status.conditions[] | select('.type' == \"PodScheduled\" or '.type' == \"Ready\") | '.lastTransitionTime'' - | xargs -n 2 bash -c 'echo \$(( \$(date -d \"\$0\" \"+%s\") - \$(date -d \"\$1\" \"+%s\") ))' "
         ctx.sh "kubectl get pods podName**** -o custom-columns=NAME:.metadata.name,FINISHED:.metadata.creationTimestamp "
     }
 
@@ -303,6 +343,8 @@ class Kubernetes implements Serializable {
         // node节点 cat /etc/kubernetes/kubelet 镜像占用磁盘空间的比例超过高水位（可以通过参数ImageGCHighThresholdPercent 进行配置），kubelet 就会清理不用的镜像
         // ctx.sh "whoami && docker version &&  docker rmi \$(docker image ls -f dangling=true -q) --no-prune || true"
         // 在机器上设置定时任务 保留多少天  如 docker image prune -a --force --filter "until=720h"
+        // 因占用资源被K8S驱逐的pod   删除所有状态为Evicted的Pod
+        ctx.sh "kubectl get pods --namespace default | grep Evicted | awk '{print \$1}' | xargs kubectl delete pod -n default\n"
     }
 
 }

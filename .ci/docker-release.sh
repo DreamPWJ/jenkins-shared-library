@@ -196,7 +196,8 @@ if [[ ${is_push_docker_repo} == false ]]; then
   docker build -t ${docker_image_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg PROJECT_NAME=${project_name} \
     --build-arg EXPOSE_PORT="${build_expose_ports}" --build-arg JDK_VERSION=${jdk_version} \
-    --build-arg TOMCAT_VERSION=${tomcat_version} -f /${deploy_folder}/${docker_file_name} . --no-cache
+    --build-arg TOMCAT_VERSION=${tomcat_version} --build-arg JAVA_OPTS="-Xms128m ${docker_java_opts}" \
+    -f /${deploy_folder}/${docker_file_name} . --no-cache
 else
   docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}-${project_type}-${env_mode}
 fi
@@ -234,7 +235,7 @@ fi
 
 echo "👨‍💻 启动运行Docker容器 环境: ${env_mode} 映射端口: ${host_port}:${expose_port}"
 # --pid=host 使用宿主机命名空间 方便容器获取宿主机所有进程 解决多个docker节点RocketMQ重复消费消息等问题
-# 动态修改数据库连接 -e PARAMS="--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/health?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true  --spring.datasource.username=root"
+# 限制资源 --cpus=${docker_cpu} 防止整个服务器资源被占用停机
 docker run -d --restart=always -p ${host_port}:${expose_port} --privileged=true --pid=host \
   -e "SPRING_PROFILES_ACTIVE=${env_mode}" -e "PROJECT_NAME=${project_name}" \
   -e "JAVA_OPTS=-Xms128m ${docker_java_opts}" -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1 ${dynamic_run_args} \

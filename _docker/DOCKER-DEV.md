@@ -51,7 +51,7 @@ docker pull jenkins/jenkins:lts
 #### 添加挂载映射本地数据卷权限 sudo chown -R 1000:1000 /my/jenkins  将宿主机的docker命令挂载到容器中
 #### JDK11需要Oracle商业授权 JDK11配置使用jenkins/jenkins:jdk11镜像 使用openJDK
 sudo docker run -d --restart=always -p 8000:8080 -p 50000:50000 \
--u root -m 4096m -e JAVA_OPTS=-Duser.timezone=Asia/Shanghai \
+-u root --cpus=4 -m 4096m -e JAVA_OPTS=-Duser.timezone=Asia/Shanghai \
 -v /etc/localtime:/etc/localtime:ro -v $(which bash):/bin/bash  \
 -v $(which docker):/usr/bin/docker -v /var/run/docker.sock:/var/run/docker.sock \
 -v /my/jenkins:/var/jenkins_home -v /my/jenkins/ssh:/root/.ssh  \
@@ -63,7 +63,7 @@ sudo docker run -d --restart=always -p 8000:8080 -p 50000:50000 \
 docker pull gitlab/gitlab-ce
 
 #### 启动运行容器
-sudo docker run -d --restart=always -p 8000:80  -m 4096m --name gitlab-ce \
+sudo docker run -d --restart=always -p 8000:80  --cpus=2 -m 4096m --name gitlab-ce \
 -v /my/gitlab/config:/etc/gitlab -v /my/gitlab/logs:/var/log/gitlab -v /my/gitlab/data:/var/opt/gitlab  \
 gitlab/gitlab-ce:latest
 
@@ -72,13 +72,13 @@ gitlab/gitlab-ce:latest
 docker pull idoop/zentao:latest
 
 #### 启动运行容器 禅道初始化账号admin,密码123456 MySQL root账号密码是123456 BIND_ADDRESS如果设置值为false, Mysql服务器将不会绑定地址 /opt/zbox/bin/mysql -h127.0.0.1 -uroot -p123456进入数据库
-sudo docker run -d --restart=always -p 8080:80 -p 3308:3306 -m 2048m --name zentao-server \
+sudo docker run -d --restart=always -p 8080:80 -p 3308:3306 --cpus=2 -m 2048m --name zentao-server \
 -e BIND_ADDRESS="false" -v /my/zentao:/opt/zbox  idoop/zentao:latest
  
 #### 安装 sonar代码质量检测服务 默认用户名密码都是admin  如果docker启动报错宿主机执行 sysctl -w vm.max_map_count=262144 
 sudo docker pull sonarqube:community  
 
-sudo docker run -d --restart=always --name sonarqube -p 9000:9000   \
+sudo docker run -d --restart=always --name sonarqube -p 9000:9000 --cpus=2 -m 2048m \
 -e SONARQUBE_JDBC_USERNAME=root -e SONARQUBE_JDBC_PASSWORD=123456   \
 -e SONARQUBE_JDBC_URL="jdbc:postgresql://172.16.1.55:5432/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false"  \
 sonarqube:community &&  sysctl -w vm.max_map_count=262144

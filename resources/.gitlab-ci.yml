@@ -1,0 +1,11 @@
+# .gitlab-ci.yml
+stages:
+  - sync
+
+sync-job:
+  tags:
+    - prod
+  stage: sync
+
+  script:
+    - echo "Hello GitLab Runner!!!"

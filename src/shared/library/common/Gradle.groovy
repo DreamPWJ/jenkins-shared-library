@@ -33,19 +33,21 @@ class Gradle implements Serializable {
      */
     static def initProject(ctx) {
         // 执行gradle wrapper命令 允许在没有安装gradle的情况下运行Gradle任务 解决gradlew is not found (No such file or directory)
-        // ctx.sh "brew install gradle && gradle -v"
+        // ctx.sh "apt install gradle && gradle -v"
         // 自动失败可手动执行gradle wrapper命令
         try {
-            ctx.sh "gradle wrapper && chmod +x ./gradlew && ./gradlew -v"
+            ctx.println("初始化Gradle项目环境")
+            ctx.retry(3) { // 闭包内脚本重复执行次数
+                ctx.sh "gradle wrapper && chmod +x ./gradlew && ./gradlew -v"
+            }
         } catch (e) {
-            /*   ctx.println("初始化Gradle安装")
-                 ctx.sh """
+            ctx.println("初始化Gradle安装")
+            ctx.sh """
                  apt install -y gradle || true
                  yum install -y gradle || true
                  brew install gradle || true
                  gradle -v
                  """
-                 */
         }
     }
 

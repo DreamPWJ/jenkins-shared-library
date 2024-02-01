@@ -100,6 +100,7 @@ def call(String type = 'web-java', Map map) {
 
             environment {
                 // 系统环境变量
+                JAVA_TOOL_OPTIONS = "-Dfile.encoding=UTF-8" // 在全局系统设置或构建环境中设置 为了确保正确解析编码和颜色
                 NODE_OPTIONS = "--max_old_space_size=4096" // NODE内存调整 防止打包内存溢出
                 // jenkins节点java路径 适配不同版本jdk情况 /Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home
                 //JAVA_HOME = "/var/jenkins_home/tools/hudson.model.JDK/${JDK_VERSION}${JDK_VERSION == '11' ? '/jdk-11' : ''}"
@@ -114,7 +115,7 @@ def call(String type = 'web-java', Map map) {
                 WEB_STRIP_COMPONENTS = "${map.web_strip_components}" // Web项目解压到指定目录层级
                 MAVEN_ONE_LEVEL = "${map.maven_one_level}" // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
                 DOCKER_JAVA_OPTS = "${map.docker_java_opts}" // JVM内存设置
-                DOCKER_MEMORY = "${map.docker_memory}" // docker内存限制
+                DOCKER_MEMORY = "${map.docker_memory}" // docker内存限制 不支持小数点形式设置
                 DOCKER_LOG_OPTS = "${map.docker_log_opts}" // docker日志限制
                 IS_PUSH_DOCKER_REPO = "${map.is_push_docker_repo}" // 是否上传镜像到docker容器仓库
                 DOCKER_REPO_CREDENTIALS_ID = "${map.docker_repo_credentials_id}" // docker容器镜像仓库账号信任id
@@ -173,11 +174,20 @@ def call(String type = 'web-java', Map map) {
 
                 stage('获取代码') {
                     when {
+                        beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                    /*   tools {
-                               git "Default"
-                         } */
+                    /*    agent {
+                            // label "linux"
+                            docker {
+                                // Git环境  完成自动删除容器
+                                image "bitnami/git:latest"
+                                reuseNode true // 使用根节点
+                            }
+                                   }*/
+                    /*      tools {
+                              git "Default"
+                          }*/
                     steps {
                         script {
                             pullProjectCode()
@@ -302,9 +312,9 @@ def call(String type = 'web-java', Map map) {
                         expression { return (IS_DOCKER_BUILD == false && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
                     }
                     tools {
-                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
+                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中  如果有node节点 工具位置也要配置HOME路径
                         maven "${map.maven}"
-                        jdk "${JDK_VERSION}"
+                        jdk "${JDK_VERSION}"  // JDK高版本构建环境可以打包低版本代码项目
                     }
                     steps {
                         script {
@@ -377,15 +387,21 @@ def call(String type = 'web-java', Map map) {
                         expression { return ("${IS_PUSH_DOCKER_REPO}" == 'true') }
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                    agent {
+/*                    agent {
                         docker {
+
                             // JDK MAVEN 环境  构建完成自动删除容器
                             image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
-                            args " -v /var/cache/maven/.m2:/root/.m2 "
+                            // label 'master'  // 如果有特定标签的节点用于运行Docker容器
+                            args " --privileged -v /var/run/docker.sock:/var/run/docker.sock  -v /var/cache/maven/.m2:/root/.m2 "
                             reuseNode true // 使用根节点
                         }
-                    }
+                    }*/
                     //agent { label "slave-jdk11-prod" }
+                    tools {
+                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中  如果有node节点 工具位置也要配置HOME路径
+                        maven "${map.maven}"
+                    }
                     steps {
                         script {
                             buildImage(map)
@@ -402,7 +418,7 @@ def call(String type = 'web-java', Map map) {
                     }
                     steps {
                         script {
-                            uploadRemote(Utils.getShEchoResult(this, "pwd"))
+                            uploadRemote(Utils.getShEchoResult(this, "pwd"), map)
                         }
                     }
                 }
@@ -497,13 +513,18 @@ def call(String type = 'web-java', Map map) {
                             return (IS_ROLL_DEPLOY == true) // 是否进行滚动部署
                         }
                     }
-                    agent {
-                        docker {
-                            // JDK MAVEN 环境  构建完成自动删除容器
-                            image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
-                            args " -v /var/cache/maven/.m2:/root/.m2 "
-                            reuseNode true // 使用根节点
-                        }
+                    /*       agent {
+                               docker {
+                                   // JDK MAVEN 环境  构建完成自动删除容器
+                                   image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
+                                   // label 'master'  // 如果有特定标签的节点用于运行Docker容器
+                                   args " -v /var/cache/maven/.m2:/root/.m2 "
+                                   reuseNode true // 使用根节点
+                               }
+                           }*/
+                    tools {
+                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中 如果有node节点 工具位置也要配置HOME路径
+                        maven "${map.maven}"
                     }
                     steps {
                         script {
@@ -585,6 +606,7 @@ def call(String type = 'web-java', Map map) {
 
                 stage('钉钉通知') {
                     when {
+                        beforeAgent true
                         expression { return true }
                     }
                     steps {
@@ -598,7 +620,16 @@ def call(String type = 'web-java', Map map) {
 
                 stage('发布日志') {
                     when {
+                        beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                    }
+                    agent {
+                        // label "linux"
+                        docker {
+                            // Git环境  完成自动删除容器
+                            image "bitnami/git:latest"
+                            reuseNode true // 使用根节点
+                        }
                     }
                     steps {
                         script {
@@ -1038,6 +1069,11 @@ def pullProjectCode() {
         println "Git构建分支是: ${BRANCH_NAME} 📇"
         // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
         // println "${git}"
+        sh "git --version"  // 使用git 2.0以上的高级版本  否则有兼容性问题
+        // sh "which git"
+        // https仓库下载报错处理 The certificate issuer's certificate has expired.  Check your system date and time.
+        sh "git config --global http.sslVerify false"
+        // 在node节点工具位置选项配置 which git的路径 才能拉取代码!!!
         // 对于大体积仓库或网络不好情况 自定义代码下载超时时间 默认10分钟
         checkout([$class           : 'GitSCM',
                   branches         : [[name: "*/${BRANCH_NAME}"]],
@@ -1117,32 +1153,39 @@ def nodeBuildProject() {
                 Web.needSass(this)
             }
 
-            if (Git.isExistsChangeFile(this)) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
-                retry(3) {
-                    println("安装依赖 📥")
-                    // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱
-                    sh "npm ci || pnpm install || npm install || yarn install"
-                    // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
-                }
-            }
-
-            timeout(time: 10, unit: 'MINUTES') {
+            timeout(time: 30, unit: 'MINUTES') {
                 try {
-                    // >/dev/null为Shell脚本运行程序不输出日志到终端 2>&1是把出错输出也定向到标准输出
-                    println("执行Node构建 🏗️  ")
-                    // 如果是服务端SSR框架如 NextJS框架  1.部署到NodeJs服务  2.导出静态HTML部署
-                    def nextJSScript = ""
-                    if ("${IS_NEXT_JS}" == 'true') {
-                        // 导出静态HTML方式部署 可复用Nginx部署脚本  可配置到package.json内script 使用npm run执行
-                        // nextJSScript = " && next export && rm -rf ${NPM_PACKAGE_FOLDER} && mv out ${NPM_PACKAGE_FOLDER} "
-                    }
-                    sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
-                    retry(2) {
+                    if (Git.isExistsChangeFile(this)) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
+                        def retryCount = 0
+                        retry(3) {
+                            retryCount++
+                            if (retryCount >= 2) {
+                                sh "rm -rf node_modules && rm -f *.lock.*"
+                                // 如果包404下载失败  可以更换官方镜像源重新下载
+                                Node.setOfficialMirror(this)
+                            }
+                            println("安装依赖 📥")
+                            // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱但依赖lock文件
+                            def npmLog = "npm_install.log"
+                            sh " npm ci || pnpm install > ${npmLog} 2>&1  || npm install >> ${npmLog} 2>&1 || yarn install >> ${npmLog} 2>&1  "
+                            // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
+                            sh " cat ${npmLog} "
+                        }
+
+                        // >/dev/null为Shell脚本运行程序不输出日志到终端 2>&1是把出错输出也定向到标准输出
+                        println("执行Node构建 🏗️  ")
+                        // 如果是服务端SSR框架如 NextJS框架  1.部署到NodeJs服务  2.导出静态HTML部署
+                        def nextJSScript = ""
+                        if ("${IS_NEXT_JS}" == 'true') {
+                            // 导出静态HTML方式部署 可复用Nginx部署脚本  可配置到package.json内script 使用npm run执行
+                            // nextJSScript = " && next export && rm -rf ${NPM_PACKAGE_FOLDER} && mv out ${NPM_PACKAGE_FOLDER} "
+                        }
+                        sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
                         sh " npm run '${NPM_RUN_PARAMS}' ${nextJSScript} " // >/dev/null 2>&1
                     }
                 } catch (e) {
                     println(e.getMessage())
-                    sh "rm -rf node_modules && rm -f *-lock.json"
+                    sh "rm -rf node_modules && rm -f *.lock.*"
                     error("Web打包失败, 终止当前Pipeline运行 ❌")
                 }
             }
@@ -1305,14 +1348,15 @@ def uploadOss(map) {
 /**
  * 上传部署文件到远程云端
  */
-def uploadRemote(filePath) {
+def uploadRemote(filePath, map) {
     // ssh免密登录检测和设置
-    autoSshLogin()
+    autoSshLogin(map)
     timeout(time: 2, unit: 'MINUTES') {
         // 同步脚本和配置到部署服务器
         syncScript()
     }
-    Tools.printColor(this, "上传部署文件到远程云端 🚀 ")
+    println("上传部署文件到部署服务器中... 🚀 ")
+    // 基于scp或rsync同步文件到远程服务器
     def projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
     if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
@@ -1337,6 +1381,7 @@ def uploadRemote(filePath) {
             // C++语言打包产物 上传包到远程服务器
             sh "cd ${filePath} && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
         }
+        Tools.printColor(this, "上传部署文件到部署服务器完成 ✅")
     }
 }
 
@@ -1411,6 +1456,7 @@ def runProject(map) {
             sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/cpp " +
                     "&& ./docker-release-cpp.sh '${SHELL_PARAMS_GETOPTS}' '  "
         }
+        Tools.printColor(this, "执行应用部署完成 ✅")
     } catch (error) {
         println error.getMessage()
         currentBuild.result = 'FAILURE'
@@ -1517,9 +1563,9 @@ def blueGreenDeploy(map) {
             remote.host = ip
             blueServerIp = ip
             if (params.DEPLOY_MODE == GlobalVars.rollback) {
-                uploadRemote("${archivePath}")
+                uploadRemote("${archivePath}", map)
             } else {
-                uploadRemote(Utils.getShEchoResult(this, "pwd"))
+                uploadRemote(Utils.getShEchoResult(this, "pwd"), map)
             }
             runProject(map)
             if (params.IS_HEALTH_CHECK == true) {
@@ -1596,13 +1642,13 @@ def scrollToDeploy(map) {
             machineNum++
             MACHINE_TAG = "${machineNum}号机" // 动态计算是几号机
             if (params.DEPLOY_MODE == GlobalVars.rollback) {
-                uploadRemote("${archivePath}")
+                uploadRemote("${archivePath}", map)
             } else {
                 // 如果配置多节点动态替换不同的配置文件重新执行maven构建打包或者直接替换部署服务器文件
                 if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
                     mavenBuildProject(map) // 需要mvn jdk构建环境
                 }
-                uploadRemote(Utils.getShEchoResult(this, "pwd"))
+                uploadRemote(Utils.getShEchoResult(this, "pwd"), map)
             }
             runProject(map)
             if (params.IS_HEALTH_CHECK == true) {
@@ -1664,8 +1710,8 @@ def serverlessDeploy() {
 /**
  * 自动设置免密连接 用于CI/CD服务器和应用部署服务器免密通信  避免手动批量设置繁琐重复劳动
  */
-def autoSshLogin() {
-    SecureShell.autoSshLogin(this)
+def autoSshLogin(map) {
+    SecureShell.autoSshLogin(this, map)
 }
 
 /**
@@ -1748,7 +1794,7 @@ def rollbackVersion(map) {
     //input message: "是否确认回滚到构建ID为${ROLLBACK_BUILD_ID}的版本", ok: "确认"
     //该/var/jenkins_home/**路径只适合在master节点执行的项目 不适合slave节点的项目
     archivePath = "/var/jenkins_home/jobs/${env.JOB_NAME}/builds/${ROLLBACK_BUILD_ID}/archive/"
-    uploadRemote("${archivePath}")
+    uploadRemote("${archivePath}", map)
     runProject(map)
     if (params.IS_HEALTH_CHECK == true) {
         healthCheck(map)

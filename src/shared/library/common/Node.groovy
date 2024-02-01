@@ -29,23 +29,40 @@ class Node implements Serializable {
     static def setMirror(ctx) {
         // 每次流水线执行都将执行 会产生无效的浪费  后面优化一下
         ctx.sh "node -v && npm -v"  // node和npm版本信息
+
+        // 设置镜像源 加速下载
+        ctx.sh "npm config set registry https://registry.npmmirror.com"
+
         try {
             ctx.sh "yarn --version"
         } catch (error) {
-            ctx.sh "npm install -g yarn" // 动态配置或固定yarn版本号 防止版本变化兼容性问题
+            ctx.sh "npm install -g yarn || true" // 动态配置或固定yarn版本号 防止版本变化兼容性问题
         }
         try {
             ctx.sh "pnpm --version"
         } catch (error) {
-            ctx.sh "npm install -g pnpm"
+            ctx.sh "npm install -g pnpm || true"
         }
 
         // 设置镜像源 加速下载
-        ctx.sh "npm config set registry https://registry.npm.taobao.org"
-        ctx.sh "yarn config set registry https://registry.npm.taobao.org"
-        ctx.sh "npm config set sass_binary_site https://npm.taobao.org/mirrors/node-sass/"
-        ctx.sh "npm config set electron_mirror https://npm.taobao.org/mirrors/electron/"
-        ctx.sh "yarn config set electron_mirror https://npm.taobao.org/mirrors/electron/"
+        ctx.sh "yarn config set registry https://registry.npmmirror.com"
+        ctx.sh "pnpm config set registry https://registry.npmmirror.com || true"
+    }
+
+    /**
+     * 设置官方镜像
+     */
+    static def setOfficialMirror(ctx) {
+        // 设置镜官方像源  因为国内镜像有些包404不存在导致安装依赖失败 关键字 ERR_PNPM_FETCH_404 或 Not Found - 404
+        // 获取工作空间中文件的内容
+        def fileContent = ctx.readFile 'npm_install.log'
+        // 检查文件内容是否包含特定关键字
+        if (fileContent.contains('ERR_PNPM_FETCH_404') || fileContent.contains('Not Found - 404')
+                || fileContent.contains('No matching version found') || fileContent.contains('error Couldn\'t find any versions')) {
+            ctx.sh "npm config set registry https://registry.npmjs.org"
+            ctx.sh "yarn config set registry https://registry.npmjs.org"
+            ctx.sh "pnpm config set registry https://registry.npmjs.org || true"
+        }
     }
 
     /**
@@ -59,10 +76,10 @@ class Node implements Serializable {
         } catch (error) {
             ctx.sh "npm install -g yarn"  // 动态配置或固定yarn版本号 防止版本变化兼容性问题
         }
-        ctx.sh "npm config set registry https://registry.npm.taobao.org"
-        ctx.sh "yarn config set registry https://registry.npm.taobao.org"
-        ctx.sh "npm config set electron_mirror https://npm.taobao.org/mirrors/electron/"
-        ctx.sh "yarn config set electron_mirror https://npm.taobao.org/mirrors/electron/"
+        ctx.sh "npm config set registry https://registry.npmmirror.com"
+        ctx.sh "yarn config set registry https://registry.npmmirror.com"
+        ctx.sh "npm config set electron_mirror https://registry.npmmirror.com/electron/"
+        ctx.sh "yarn config set electron_mirror https://registry.npmmirror.com/electron/"
         // ctx.sh "yarn config set electron_mirror https://mirrors.huaweicloud.com/electron/"
         // ctx.sh "npm config set registry  https://mirrors.huaweicloud.com/repository/npm"
     }
