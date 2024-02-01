@@ -1153,43 +1153,35 @@ def nodeBuildProject() {
                 Web.needSass(this)
             }
 
-            if (Git.isExistsChangeFile(this)) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
-                def installRetryCount = 0
-                retry(3) {
-                    installRetryCount++
-                    if (installRetryCount >= 2) {
-                        sh "rm -rf node_modules && rm -f *.lock.json"
-                        // 如果包404下载失败  可以更换官方镜像源重新下载
-                        Node.setOfficialMirror(this)
-                    }
-                    println("安装依赖 📥")
-                    // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱
-                    def npmLog = "npm_install.log"
-                    sh " npm ci || pnpm install > ${npmLog} 2>&1 | tee ${npmLog}" +
-                            " || npm install > ${npmLog} 2>&1 | tee ${npmLog} || yarn install > ${npmLog} 2>&1 | tee ${npmLog} "
-                    // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
-                }
-            }
-
-            timeout(time: 20, unit: 'MINUTES') {
+            timeout(time: 30, unit: 'MINUTES') {
                 try {
-                    // >/dev/null为Shell脚本运行程序不输出日志到终端 2>&1是把出错输出也定向到标准输出
-                    println("执行Node构建 🏗️  ")
-                    // 如果是服务端SSR框架如 NextJS框架  1.部署到NodeJs服务  2.导出静态HTML部署
-                    def nextJSScript = ""
-                    if ("${IS_NEXT_JS}" == 'true') {
-                        // 导出静态HTML方式部署 可复用Nginx部署脚本  可配置到package.json内script 使用npm run执行
-                        // nextJSScript = " && next export && rm -rf ${NPM_PACKAGE_FOLDER} && mv out ${NPM_PACKAGE_FOLDER} "
-                    }
-                    sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
-                    def retryCount = 0
-                    retry(3) {
-                        retryCount++
-                        if (retryCount >= 2) {
-                            sh "rm -rf node_modules && rm -f *.lock.json"
-                            // 重新安装依赖
-                            sh "npm ci || pnpm install || npm install || yarn install"
+                    if (Git.isExistsChangeFile(this)) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
+                        def retryCount = 0
+                        retry(3) {
+                            retryCount++
+                            if (retryCount >= 2) {
+                                sh "rm -rf node_modules && rm -f *.lock.json"
+                                // 如果包404下载失败  可以更换官方镜像源重新下载
+                                Node.setOfficialMirror(this)
+                            }
+                            println("安装依赖 📥")
+                            // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱
+                            def npmLog = "npm_install.log"
+                            sh " npm ci || pnpm install > ${npmLog} 2>&1 " +
+                                    " || npm install > ${npmLog} 2>&1 || yarn install > ${npmLog} 2>&1  "
+                            // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
+                            sh " cat ${npmLog} "
                         }
+
+                        // >/dev/null为Shell脚本运行程序不输出日志到终端 2>&1是把出错输出也定向到标准输出
+                        println("执行Node构建 🏗️  ")
+                        // 如果是服务端SSR框架如 NextJS框架  1.部署到NodeJs服务  2.导出静态HTML部署
+                        def nextJSScript = ""
+                        if ("${IS_NEXT_JS}" == 'true') {
+                            // 导出静态HTML方式部署 可复用Nginx部署脚本  可配置到package.json内script 使用npm run执行
+                            // nextJSScript = " && next export && rm -rf ${NPM_PACKAGE_FOLDER} && mv out ${NPM_PACKAGE_FOLDER} "
+                        }
+                        sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
                         sh " npm run '${NPM_RUN_PARAMS}' ${nextJSScript} " // >/dev/null 2>&1
                     }
                 } catch (e) {
