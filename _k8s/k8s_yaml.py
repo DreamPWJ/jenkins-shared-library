@@ -62,7 +62,8 @@ if nfs_params is not None:
         nfs_server_path = nfs_path_array[1]
         nsf_mount_yaml.append({"name": nfs_name, "mountPath": nfs_mount_path})
         # readOnly设置False 而 NFS服务器是只读模式 可能导致Pod无法启动
-        nsf_server_yaml.append({"name": nfs_name, "nfs": {"server": nfs_server, "path": nfs_server_path, "readOnly": False}})
+        nsf_server_yaml.append(
+            {"name": nfs_name, "nfs": {"server": nfs_server, "path": nfs_server_path, "readOnly": False}})
 
 # 业务应用是否使用Session
 is_use_session = args.is_use_session
@@ -109,7 +110,7 @@ if nfs_params is not None:
 set_yaml_arags = args.set_yaml_arags
 if set_yaml_arags is not None:
     print(set_yaml_arags)
-    yaml_containers[0].append({'args': [set_yaml_arags]})
+    yaml_containers[0]["args"] = [set_yaml_arags]
 
 # 业务应用是否使用Session处理
 if is_use_session:
@@ -129,8 +130,6 @@ with open(k8s_yaml_file, mode='w', encoding='utf-8') as file:
     yaml.dump(yamlContent[0], file)
     file.write("\n---\n")
     yaml.dump(yamlContent[1], file)
-
-
 
 #  示例代码
 # yamlText = """\
