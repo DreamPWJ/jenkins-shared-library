@@ -1165,8 +1165,8 @@ def nodeBuildProject() {
                     println("安装依赖 📥")
                     // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱
                     def npmLog = "npm_install.log"
-                    sh "npm ci || pnpm install > ${npmLog} 2>&1 | tee ${npmLog}" +
-                            "|| npm install > ${npmLog} 2>&1 | tee ${npmLog} || yarn install > ${npmLog} 2>&1 | tee ${npmLog}"
+                    sh " npm ci || pnpm install > ${npmLog} 2>&1 | tee ${npmLog}" +
+                            " || npm install > ${npmLog} 2>&1 | tee ${npmLog} || yarn install > ${npmLog} 2>&1 | tee ${npmLog} "
                     // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
                 }
             }
