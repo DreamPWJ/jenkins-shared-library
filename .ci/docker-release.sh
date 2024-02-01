@@ -196,7 +196,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
   docker build -t ${docker_image_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg PROJECT_NAME=${project_name} \
     --build-arg EXPOSE_PORT="${build_expose_ports}" --build-arg JDK_VERSION=${jdk_version} \
-    --build-arg TOMCAT_VERSION=${tomcat_version} --build-arg JAVA_OPTS=-Xms128m ${docker_java_opts} \
+    --build-arg TOMCAT_VERSION=${tomcat_version} --build-arg JAVA_OPTS="-Xms128m ${docker_java_opts}" \
     -f /${deploy_folder}/${docker_file_name} . --no-cache
 else
   docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}-${project_type}-${env_mode}
