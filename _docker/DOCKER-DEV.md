@@ -81,9 +81,9 @@ sudo docker pull sonarqube:community
 sudo docker run -d --restart=always --name sonarqube -p 9000:9000 --cpus=2 -m 2048m \
 -e SONARQUBE_JDBC_USERNAME=root -e SONARQUBE_JDBC_PASSWORD=123456   \
 -e SONARQUBE_JDBC_URL="jdbc:postgresql://172.16.1.55:5432/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false"  \
-sonarqube:community &&  sysctl -w vm.max_map_count=262144
+sonarqube:community  && sysctl -w vm.max_map_count=262144
 
-#### 搭建私有docker仓库 http://39.96.84.51:5000/v2
+#### 搭建私有docker仓库 http://ip:5000/v2
 docker run -d --restart=always -p 5000:5000 -v /my/docker_registry:/var/lib/registry --name docker-registry registry:2
 
 #### 基于Docker安装部署ShadowSocks基于Socks5代理方式的加密传输协议件(翻墙)
@@ -105,8 +105,8 @@ ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 #### Docker容器数据迁移部署说明
 tar -zcvf my.tar.gz /my
-- 本地复制到远程 scp -r my.tar.gz root@39.96.84.51:/
-- 远程复制到本地 scp -r root@39.96.84.51:/my/jenkins.tar.gz ~/
+- 本地复制到远程 scp -r my.tar.gz root@ip:/
+- 远程复制到本地 scp -r root@ip:/my/jenkins.tar.gz ~/
 
 tar -xzvf my.tar.gz && rm -f my.tar.gz
 
