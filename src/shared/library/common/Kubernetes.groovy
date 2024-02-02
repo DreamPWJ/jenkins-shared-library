@@ -15,7 +15,7 @@ import shared.library.common.*
  */
 class Kubernetes implements Serializable {
 
-    static def k8sYAMLFile = "k8s.yaml" // k8s集群应用部署yaml定义文件
+    static def k8sYamlFile = "k8s.yaml" // k8s集群应用部署yaml定义文件
     static def pythonYamlFile = "k8s_yaml.py" // 使用Python动态处理Yaml文件
     static def k8sNameSpace = "default" // k8s命名空间
 
@@ -42,7 +42,7 @@ class Kubernetes implements Serializable {
 
                 // 部署应用 相同应用不同环境配置 需循环执行不同的镜像 指定命名空间--namespace=
                 ctx.sh """ 
-                    kubectl apply -f ${k8sYAMLFile}
+                    kubectl apply -f ${k8sYamlFile}
                     """
 
                 // 查看个组件的状态  如 kubectl get svc
@@ -61,7 +61,7 @@ class Kubernetes implements Serializable {
                 }
 
                 // 删除服务
-                // ctx.sh "kubectl delete -f ${k8sYAMLFile}"
+                // ctx.sh "kubectl delete -f ${k8sYamlFile}"
                 // kubectl 停止删除pod 默认等待30秒  删除deployment 命令kubectl delete deployment  删除所有 kubectl delete pods --all  --force
                 // kubectl delete pod podName
                 // 查看详细信息   kubectl describe pod podName
@@ -144,7 +144,7 @@ class Kubernetes implements Serializable {
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g;s#{DEFAULT_CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
                 " s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g;s#{MAX_MEMORY_SIZE}#${map.docker_memory}#g;s#{JAVA_OPTS_XMX}#${map.docker_java_opts}#g; " +
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g;s#{CUSTOM_HEALTH_CHECK_PATH}#${ctx.CUSTOM_HEALTH_CHECK_PATH}#g; " +
-                " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYAMLFile} > ${k8sYAMLFile} "
+                " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYamlFile} > ${k8sYamlFile} "
 
         def pythonYamlParams = ""
         def isYamlUseSession = ""
@@ -172,10 +172,10 @@ class Kubernetes implements Serializable {
                 ctx.println("使用Python的ruamel包动态配置K8S的Yaml文件: " + pythonYamlParams)
                 // ctx.sh " python --version "
                 // ctx.sh " pip install ruamel.yaml "
-                ctx.sh " python ${pythonYamlFile} --k8s_yaml_file=${ctx.env.WORKSPACE}/${k8sYAMLFile}  ${pythonYamlParams} "
+                ctx.sh " python ${pythonYamlFile} --k8s_yaml_file=${ctx.env.WORKSPACE}/${k8sYamlFile}  ${pythonYamlParams} "
             }
         }
-        ctx.sh " cat ${k8sYAMLFile} "
+        ctx.sh " cat ${k8sYamlFile} "
     }
 
     /**
