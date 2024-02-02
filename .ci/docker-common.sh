@@ -17,7 +17,7 @@ function show_args() {
 function stop_docker() {
   if [ "$(docker ps -a | grep $1)" ]; then
     echo "停止指定的容器"
-    docker stop $1 --time=0 || true
+    docker stop $1 --time=1 || true
     echo "删除指定的容器"
     sudo docker rm -f $1
   fi
