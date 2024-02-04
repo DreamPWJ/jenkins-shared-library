@@ -7,7 +7,7 @@ DING_TALK_WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=383391980b1
 
 # 定义告警阈值
 CPU_THRESHOLD=90
-MEMORY_THRESHOLD=90
+MEMORY_THRESHOLD=1
 DISK_USAGE_THRESHOLD=95
 
 # 获取主机名
@@ -56,7 +56,7 @@ if [ ${CPU_USAGE} -ge ${CPU_THRESHOLD} ]; then
 fi
 
 if [ ${MEMORY_USAGE%.*} -ge ${MEMORY_THRESHOLD} ]; then
-    # echo "警告：${HOSTNAME}上的内存使用率已达到${MEMORY_USAGE}%！超过阈值${MEMORY_THRESHOLD}%。" | mail -s "内存告警" admin@example.com
+    # echo "警告：${HOSTNAME}上的内存使用率已达到${MEMORY_USAGE}！超过阈值${MEMORY_THRESHOLD}%。" | mail -s "内存告警" admin@example.com
         DATA='{
             "msgtype": "markdown",
             "markdown": {
