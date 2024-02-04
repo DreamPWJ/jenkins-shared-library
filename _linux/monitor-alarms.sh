@@ -56,7 +56,7 @@ if [ ${CPU_USAGE} -ge ${CPU_THRESHOLD} ]; then
 fi
 
 if [ ${MEMORY_USAGE%.*} -ge ${MEMORY_THRESHOLD} ]; then
-    # echo "警告：${HOSTNAME}上的内存使用率已达到${MEMORY_USAGE}！超过阈值${MEMORY_THRESHOLD}%。" | mail -s "内存告警" admin@example.com
+    # echo "警告：${HOSTNAME}主机上的内存使用率已达到${MEMORY_USAGE}！超过阈值${MEMORY_THRESHOLD}%。" | mail -s "内存告警" admin@example.com
         DATA='{
             "msgtype": "markdown",
             "markdown": {
@@ -76,7 +76,7 @@ if [ ${MEMORY_USAGE%.*} -ge ${MEMORY_THRESHOLD} ]; then
 fi
 
 if [ ${DISK_USAGE} -ge ${DISK_USAGE_THRESHOLD} ]; then
-   # echo "警告：${HOSTNAME}上${DISK_PARTITION}分区的磁盘使用率已达到${DISK_USAGE}%！超过阈值${DISK_USAGE_THRESHOLD}%。" | mail -s "磁盘告警" admin@example.com
+   # echo "警告：${HOSTNAME}主机上${DISK_PARTITION}分区的磁盘使用率已达到${DISK_USAGE}%！超过阈值${DISK_USAGE_THRESHOLD}%。" | mail -s "磁盘告警" admin@example.com
         DATA='{
             "msgtype": "markdown",
             "markdown": {
@@ -94,6 +94,26 @@ if [ ${DISK_USAGE} -ge ${DISK_USAGE_THRESHOLD} ]; then
              --header 'Content-Type: application/json' \
              --data-raw "$DATA"
 fi
+
+
+# # 指定要监控的网卡名称
+# eth0="eth0"
+#
+# # 获取当前的接收和发送字节数
+# RX_CURRENT=$(cat /proc/net/dev | grep $eth0 | awk '{print $2}')
+# TX_CURRENT=$(cat /proc/net/dev | grep $eth0 | awk '{print $10}')
+#
+# # 示例：判断接收流量是否超过1GB
+# RX_THRESHOLD=$((1024*1024*1024)) # 1GB阈值
+# if [ $RX_CURRENT -gt $RX_THRESHOLD ]; then
+#     echo "警告：网卡 $eth0 的接收流量已超过1GB！当前接收流量为: $RX_CURRENT 字节。"
+# fi
+#
+# # 示例：判断发送流量是否超过512MB
+# TX_THRESHOLD=$((512*1024*1024)) # 512MB阈值
+# if [ $TX_CURRENT -gt $TX_THRESHOLD ]; then
+#     echo "警告：网卡 $eth0 的发送流量已超过512MB！当前发送流量为: $TX_CURRENT 字节。"
+# fi
 
 
 exit 0
