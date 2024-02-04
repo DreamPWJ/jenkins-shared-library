@@ -7,7 +7,7 @@ DING_TALK_WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=383391980b1
 
 # 定义告警阈值
 CPU_THRESHOLD=90
-MEMORY_THRESHOLD=85
+MEMORY_THRESHOLD=90
 DISK_USAGE_THRESHOLD=90
 
 # 获取主机名
@@ -38,7 +38,7 @@ if [ ${CPU_USAGE} -ge ${CPU_THRESHOLD} ]; then
         "msgtype": "markdown",
         "markdown": {
             "title": "🚨CPU告警-蓝能科技",
-            "text": "# CPU警告：'"${HOSTNAME}"'主机上的CPU使用率已达到'"${CPU_USAGE}"'%！超过阈值'"${CPU_THRESHOLD}"'% \n ### 外网IP: '"${public_ip}"' \n ### 内网IP: '"${local_ip}"'"
+            "text": "# CPU警告：'"${HOSTNAME}"'主机上的CPU使用率已达到'"${CPU_USAGE}"'%！超过阈值'"${CPU_THRESHOLD}"'% 。\n ### 外网IP: '"${public_ip}"' \n ### 内网IP: '"${local_ip}"'"
         },
         "at": {
             "isAtAll": false
@@ -57,7 +57,7 @@ if [ ${MEMORY_USAGE%.*} -ge ${MEMORY_THRESHOLD} ]; then
             "msgtype": "markdown",
             "markdown": {
                 "title": "🚨内存告警-蓝能科技",
-                "text": "# 内存警告：'"${HOSTNAME}"'主机上的内存使用率已达到'"${MEMORY_USAGE}"'%！超过阈值'"${MEMORY_THRESHOLD}"'% \n ### 外网IP: '"${public_ip}"' \n ### 内网IP: '"${local_ip}"'"
+                "text": "# 内存警告：'"${HOSTNAME}"'主机上的内存使用率已达到'"${MEMORY_USAGE}"'%！超过阈值'"${MEMORY_THRESHOLD}"'% 。\n ### 外网IP: '"${public_ip}"' \n ### 内网IP: '"${local_ip}"'"
             },
             "at": {
                 "isAtAll": false
@@ -76,7 +76,7 @@ if [ ${DISK_USAGE} -ge ${DISK_USAGE_THRESHOLD} ]; then
             "msgtype": "markdown",
             "markdown": {
                 "title": "🚨磁盘告警-蓝能科技",
-                "text": "# 磁盘警告：'"${HOSTNAME}"'主机上'"${DISK_PARTITION}"'分区的磁盘使用率已达到'"${DISK_USAGE}"'%！超过阈值'"${DISK_USAGE_THRESHOLD}"'% \n ### 外网IP: '"${public_ip}"' \n ### 内网IP: '"${local_ip}"'"
+                "text": "# 磁盘警告：'"${HOSTNAME}"'主机上'"${DISK_PARTITION}"'分区的磁盘使用率已达到'"${DISK_USAGE}"'%！超过阈值'"${DISK_USAGE_THRESHOLD}"'% 。\n ### 外网IP: '"${public_ip}"' \n ### 内网IP: '"${local_ip}"'"
             },
             "at": {
                 "isAtAll": true
@@ -93,4 +93,7 @@ fi
 exit 0
 
 
-#  chmod +x monitor-alarms.sh
+# 执行授权  chmod +x /my/monitor-alarms.sh
+# */10 * * * * /bin/bash /my/monitor-alarms.sh
+# service crond restart  , Ubuntu 使用 sudo service cron restart # 重启crond生效
+# crontab -l # 查看crond列表
