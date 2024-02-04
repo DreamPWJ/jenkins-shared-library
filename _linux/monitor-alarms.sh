@@ -9,6 +9,9 @@ DING_TALK_WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=383391980b1
 CPU_THRESHOLD=90
 MEMORY_THRESHOLD=90
 DISK_USAGE_THRESHOLD=95
+# 指定要监控的网卡名称 ifconfig查看网卡名称
+# eth0="enp1s0"
+# NETWORK_THRESHOLD=100  # 单位M
 
 # 获取主机名
 HOSTNAME=$(hostname)
@@ -96,23 +99,21 @@ if [ ${DISK_USAGE} -ge ${DISK_USAGE_THRESHOLD} ]; then
 fi
 
 
-# # 指定要监控的网卡名称
-# eth0="eth0"
-#
+
 # # 获取当前的接收和发送字节数
 # RX_CURRENT=$(cat /proc/net/dev | grep $eth0 | awk '{print $2}')
 # TX_CURRENT=$(cat /proc/net/dev | grep $eth0 | awk '{print $10}')
 #
-# # 示例：判断接收流量是否超过1GB
-# RX_THRESHOLD=$((1024*1024*1024)) # 1GB阈值
+# # 判断接收流量是否超过阈值
+# RX_THRESHOLD=$(($NETWORK_THRESHOLD*1024*1024)) # 阈值
 # if [ $RX_CURRENT -gt $RX_THRESHOLD ]; then
-#     echo "警告：网卡 $eth0 的接收流量已超过1GB！当前接收流量为: $RX_CURRENT 字节。"
+#     echo "警告：网卡 $eth0 的接收流量已超过$NETWORK_THRESHOLD MB ！当前接收流量为: $($RX_CURRENT/1024/1024) M"
 # fi
 #
-# # 示例：判断发送流量是否超过512MB
-# TX_THRESHOLD=$((512*1024*1024)) # 512MB阈值
+# # 判断发送流量是否超阈值
+# TX_THRESHOLD=$(($NETWORK_THRESHOLD*1024*1024)) # 阈值
 # if [ $TX_CURRENT -gt $TX_THRESHOLD ]; then
-#     echo "警告：网卡 $eth0 的发送流量已超过512MB！当前发送流量为: $TX_CURRENT 字节。"
+#     echo "警告：网卡 $eth0 的发送流量已超过$NETWORK_THRESHOLD MB ！当前发送流量为: $(echo "$TX_CURRENT / 1024.0 / 1024.0" | awk '{printf "%.2f\n", $1}') M"
 # fi
 
 
