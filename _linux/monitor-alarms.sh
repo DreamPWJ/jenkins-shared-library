@@ -8,7 +8,7 @@ DING_TALK_WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=383391980b1
 # 定义告警阈值
 CPU_THRESHOLD=90
 MEMORY_THRESHOLD=90
-DISK_USAGE_THRESHOLD=15
+DISK_USAGE_THRESHOLD=95
 
 # 获取主机名
 HOSTNAME=$(hostname)
@@ -41,7 +41,7 @@ if [ ${CPU_USAGE} -ge ${CPU_THRESHOLD} ]; then
         "msgtype": "markdown",
         "markdown": {
             "title": "🚨CPU告警-蓝能科技",
-            "text": "# CPU警告：'"${HOSTNAME}"'主机上的CPU使用率已达到'"${CPU_USAGE}"'%！超过阈值'"${CPU_THRESHOLD}"'% 。\n ### 外网IP: '"${public_ip}"' \n ### 内网IP: '"${local_ip}"'"
+            "text": "# CPU警告：'"${HOSTNAME}"'主机上的CPU使用率已达到'"${CPU_USAGE}"'%！超过阈值'"${CPU_THRESHOLD}"'% \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"'"
         },
         "at": {
                 "isAtAll": false,
@@ -61,7 +61,7 @@ if [ ${MEMORY_USAGE%.*} -ge ${MEMORY_THRESHOLD} ]; then
             "msgtype": "markdown",
             "markdown": {
                 "title": "🚨内存告警-蓝能科技",
-                "text": "# 内存警告：'"${HOSTNAME}"'主机上的内存使用率已达到'"${MEMORY_USAGE}"'%！超过阈值'"${MEMORY_THRESHOLD}"'% 。\n ### 外网IP: '"${public_ip}"' \n ### 内网IP: '"${local_ip}"'"
+                "text": "# 内存警告：'"${HOSTNAME}"'主机上的内存使用率已达到'"${MEMORY_USAGE}"'%！超过阈值'"${MEMORY_THRESHOLD}"'% \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"'"
             },
             "at": {
                     "isAtAll": false,
@@ -81,21 +81,7 @@ if [ ${DISK_USAGE} -ge ${DISK_USAGE_THRESHOLD} ]; then
             "msgtype": "markdown",
             "markdown": {
                 "title": "🚨磁盘告警-蓝能科技",
-                "text": """
-                    # **重要告警：磁盘告警🚨**
-                    > 告警时间：`'"${current_datetime}"'`
-                    - **主机名**：`'"${HOSTNAME}"'`
-                    - **事件等级**：**严重**
-                    - **触发器名称**：`磁盘使用率高达**'"${DISK_USAGE}"'%**`
-                    - **详细信息**：
-                          - '"${DISK_PARTITION}"'分区的磁盘使用率已达到**'"${DISK_USAGE}"'**%！磁盘超过阈值**'"${DISK_USAGE_THRESHOLD}"'%**
-                          - 外网IP: '"${public_ip}"'
-                          - 内网IP: '"${local_ip}"'
-                    - **建议操作**：
-                        - 请登录服务器查看实时资源使用情况
-                        - 调整应用配置或增加资源以缓解压力
-                        - 管理员: 潘维吉 手机号: 18863302302
-                """
+                "text": "# 磁盘警告：'"${HOSTNAME}"'主机上'"${DISK_PARTITION}"'分区的磁盘使用率已达到'"${DISK_USAGE}"'%！超过阈值'"${DISK_USAGE_THRESHOLD}"'% \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"'"
             },
             "at": {
                      "isAtAll": false,
