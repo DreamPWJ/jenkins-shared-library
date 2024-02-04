@@ -1,0 +1,92 @@
+#!/bin/bash
+# Author: 潘维吉
+# Description:  脚本来监控CPU、内存和磁盘的使用率，并在使用率超过预设阈值时发送告警
+
+# 安装mail
+# yum install -y mailutils || true
+# apt install -y mailutils || true
+
+# 钉钉机器人的Webhook地址
+DING_TALK_WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=383391980b120c38f0f9a4a398349739fa67a623f9cfa834df9c5374e81b2081"
+
+# 定义告警阈值
+CPU_THRESHOLD=80
+MEMORY_THRESHOLD=80
+DISK_USAGE_THRESHOLD=90
+
+# 获取主机名
+HOSTNAME=$(hostname)
+
+# 获取CPU使用率（百分比）
+CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}' | cut -d. -f1)
+
+# 获取内存使用率（百分比）
+MEMORY_USAGE=$(free -m | awk 'NR==2{printf "%.2f%%", $3*100/$2}')
+
+# 获取指定磁盘分区的使用率（例如根目录/的磁盘使用率，这里替换"/"为你想监控的磁盘分区）
+DISK_PARTITION="/"
+DISK_USAGE=$(df -h "${DISK_PARTITION}" | awk 'NR==2{print $(NF-1)}' | sed 's/%//g')
+
+# 检查并发送告警
+if [ ${CPU_USAGE} -ge ${CPU_THRESHOLD} ]; then
+   # echo "警告：${HOSTNAME}上的CPU使用率已达到${CPU_USAGE}%！超过阈值${CPU_THRESHOLD}%。" | mail -s "CPU告警" admin@example.com
+    DATA='{
+        "msgtype": "markdown",
+        "markdown": {
+            "title": "CPU告警-蓝能科技",
+            "text": "# 警告：'"${HOSTNAME}"'上的CPU使用率已达到'"${CPU_USAGE}"'%！超过阈值'"${CPU_THRESHOLD}"'%"
+        },
+        "at": {
+            "isAtAll": false
+        }
+    }'
+    # 发送POST请求到钉钉机器人接口
+    curl -sS --request POST \
+         --url $DING_TALK_WEBHOOK \
+         --header 'Content-Type: application/json' \
+         --data-raw "$DATA"
+fi
+
+if [ ${MEMORY_USAGE%.*} -ge ${MEMORY_THRESHOLD} ]; then
+    # echo "警告：${HOSTNAME}上的内存使用率已达到${MEMORY_USAGE}%！超过阈值${MEMORY_THRESHOLD}%。" | mail -s "内存告警" admin@example.com
+        DATA='{
+            "msgtype": "markdown",
+            "markdown": {
+                "title": "内存告警-蓝能科技",
+                "text": "# 警告：'"${HOSTNAME}"'上的内存使用率已达到'"${MEMORY_USAGE}"'%！超过阈值'"${MEMORY_THRESHOLD}"'%"
+            },
+            "at": {
+                "isAtAll": false
+            }
+        }'
+        # 发送POST请求到钉钉机器人接口
+        curl -sS --request POST \
+             --url $DING_TALK_WEBHOOK \
+             --header 'Content-Type: application/json' \
+             --data-raw "$DATA"
+fi
+
+if [ ${DISK_USAGE} -ge ${DISK_USAGE_THRESHOLD} ]; then
+   # echo "警告：${HOSTNAME}上${DISK_PARTITION}分区的磁盘使用率已达到${DISK_USAGE}%！超过阈值${DISK_USAGE_THRESHOLD}%。" | mail -s "磁盘告警" admin@example.com
+        DATA='{
+            "msgtype": "markdown",
+            "markdown": {
+                "title": "磁盘告警-蓝能科技",
+                "text": "# 警告：'"${HOSTNAME}"'上'"${DISK_PARTITION}"'分区的磁盘使用率已达到'"${DISK_USAGE}"'%！超过阈值'"${DISK_USAGE_THRESHOLD}"'%"
+            },
+            "at": {
+                "isAtAll": true
+            }
+        }'
+        # 发送POST请求到钉钉机器人接口
+        curl -sS --request POST \
+             --url $DING_TALK_WEBHOOK \
+             --header 'Content-Type: application/json' \
+             --data-raw "$DATA"
+fi
+
+
+exit 0
+
+
+#  chmod +x monitor-alarms.sh
