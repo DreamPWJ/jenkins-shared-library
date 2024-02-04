@@ -2,16 +2,12 @@
 # Author: 潘维吉
 # Description:  脚本来监控CPU、内存和磁盘的使用率，并在使用率超过预设阈值时发送告警
 
-# 安装mail
-# yum install -y mailutils || true
-# apt install -y mailutils || true
-
 # 钉钉机器人的Webhook地址
 DING_TALK_WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=383391980b120c38f0f9a4a398349739fa67a623f9cfa834df9c5374e81b2081"
 
 # 定义告警阈值
-CPU_THRESHOLD=80
-MEMORY_THRESHOLD=80
+CPU_THRESHOLD=90
+MEMORY_THRESHOLD=85
 DISK_USAGE_THRESHOLD=90
 
 # 获取主机名
@@ -27,14 +23,22 @@ MEMORY_USAGE=$(free -m | awk 'NR==2{printf "%.2f%%", $3*100/$2}')
 DISK_PARTITION="/"
 DISK_USAGE=$(df -h "${DISK_PARTITION}" | awk 'NR==2{print $(NF-1)}' | sed 's/%//g')
 
+# 获取内网IP地址
+local_ip=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}(?=/)' | grep -v '^127\.')
+#echo "Local IP: $local_ip"
+
+# 获取公网IP地址
+public_ip=$(curl -s ifconfig.me)
+#echo "Public IP: $public_ip"
+
 # 检查并发送告警
 if [ ${CPU_USAGE} -ge ${CPU_THRESHOLD} ]; then
    # echo "警告：${HOSTNAME}上的CPU使用率已达到${CPU_USAGE}%！超过阈值${CPU_THRESHOLD}%。" | mail -s "CPU告警" admin@example.com
     DATA='{
         "msgtype": "markdown",
         "markdown": {
-            "title": "CPU告警-蓝能科技",
-            "text": "# 警告：'"${HOSTNAME}"'上的CPU使用率已达到'"${CPU_USAGE}"'%！超过阈值'"${CPU_THRESHOLD}"'%"
+            "title": "🚨CPU告警-蓝能科技",
+            "text": "# CPU警告：'"${HOSTNAME}"'主机上的CPU使用率已达到'"${CPU_USAGE}"'%！超过阈值'"${CPU_THRESHOLD}"'% \n ### 外网IP: '"${public_ip}"' \n ### 内网IP: '"${local_ip}"'"
         },
         "at": {
             "isAtAll": false
@@ -52,8 +56,8 @@ if [ ${MEMORY_USAGE%.*} -ge ${MEMORY_THRESHOLD} ]; then
         DATA='{
             "msgtype": "markdown",
             "markdown": {
-                "title": "内存告警-蓝能科技",
-                "text": "# 警告：'"${HOSTNAME}"'上的内存使用率已达到'"${MEMORY_USAGE}"'%！超过阈值'"${MEMORY_THRESHOLD}"'%"
+                "title": "🚨内存告警-蓝能科技",
+                "text": "# 内存警告：'"${HOSTNAME}"'主机上的内存使用率已达到'"${MEMORY_USAGE}"'%！超过阈值'"${MEMORY_THRESHOLD}"'% \n ### 外网IP: '"${public_ip}"' \n ### 内网IP: '"${local_ip}"'"
             },
             "at": {
                 "isAtAll": false
@@ -71,8 +75,8 @@ if [ ${DISK_USAGE} -ge ${DISK_USAGE_THRESHOLD} ]; then
         DATA='{
             "msgtype": "markdown",
             "markdown": {
-                "title": "磁盘告警-蓝能科技",
-                "text": "# 警告：'"${HOSTNAME}"'上'"${DISK_PARTITION}"'分区的磁盘使用率已达到'"${DISK_USAGE}"'%！超过阈值'"${DISK_USAGE_THRESHOLD}"'%"
+                "title": "🚨磁盘告警-蓝能科技",
+                "text": "# 磁盘警告：'"${HOSTNAME}"'主机上'"${DISK_PARTITION}"'分区的磁盘使用率已达到'"${DISK_USAGE}"'%！超过阈值'"${DISK_USAGE_THRESHOLD}"'% \n ### 外网IP: '"${public_ip}"' \n ### 内网IP: '"${local_ip}"'"
             },
             "at": {
                 "isAtAll": true
