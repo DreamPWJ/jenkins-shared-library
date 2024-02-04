@@ -7,7 +7,7 @@ DING_TALK_WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=383391980b1
 
 # 定义告警阈值
 CPU_THRESHOLD=90
-MEMORY_THRESHOLD=1
+MEMORY_THRESHOLD=90
 DISK_USAGE_THRESHOLD=95
 
 # 获取主机名
