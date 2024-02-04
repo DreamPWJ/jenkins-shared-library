@@ -1169,7 +1169,7 @@ def nodeBuildProject() {
                             def npmLog = "npm_install.log"
                             sh " npm ci || pnpm install > ${npmLog} 2>&1  || npm install >> ${npmLog} 2>&1 || yarn install >> ${npmLog} 2>&1  "
                             // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
-                            sh " cat ${npmLog} "
+                            sh " cat ${npmLog} || true"
                         }
 
                         // >/dev/null为Shell脚本运行程序不输出日志到终端 2>&1是把出错输出也定向到标准输出

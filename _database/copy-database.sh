@@ -3,13 +3,13 @@
 # Description: 快速复制一个相同的数据库
 
 # 源数据库信息
-SOURCE_DB_HOST=39.96.84.51
+SOURCE_DB_HOST=ip
 SOURCE_DB_USER=root
 SOURCE_DB_PASSWORD=panweiji2019
 SOURCE_DB_NAME=health_dev
 
 # 目标数据库信息
-TARGET_DB_HOST=39.96.84.51
+TARGET_DB_HOST=ip
 TARGET_DB_USER=root
 TARGET_DB_PASSWORD=panweiji2019
 TARGET_DB_NAME=health_test
