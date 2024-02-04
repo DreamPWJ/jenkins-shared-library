@@ -41,7 +41,7 @@ if [ ${CPU_USAGE} -ge ${CPU_THRESHOLD} ]; then
         "msgtype": "markdown",
         "markdown": {
             "title": "🚨CPU告警-蓝能科技",
-            "text": "# CPU警告：'"${HOSTNAME}"'主机上的CPU使用率已达到'"${CPU_USAGE}"'%！超过阈值'"${CPU_THRESHOLD}"'% \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"'"
+            "text": "# CPU警告：'"${HOSTNAME}"'主机上的CPU使用率已达到'"${CPU_USAGE}"'%！超过阈值'"${CPU_THRESHOLD}"'% \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
         },
         "at": {
                 "isAtAll": false,
@@ -61,7 +61,7 @@ if [ ${MEMORY_USAGE%.*} -ge ${MEMORY_THRESHOLD} ]; then
             "msgtype": "markdown",
             "markdown": {
                 "title": "🚨内存告警-蓝能科技",
-                "text": "# 内存警告：'"${HOSTNAME}"'主机上的内存使用率已达到'"${MEMORY_USAGE}"'%！超过阈值'"${MEMORY_THRESHOLD}"'% \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"'"
+                "text": "# 内存警告：'"${HOSTNAME}"'主机上的内存使用率已达到'"${MEMORY_USAGE}"'%！超过阈值'"${MEMORY_THRESHOLD}"'% \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
             },
             "at": {
                     "isAtAll": false,
@@ -81,7 +81,7 @@ if [ ${DISK_USAGE} -ge ${DISK_USAGE_THRESHOLD} ]; then
             "msgtype": "markdown",
             "markdown": {
                 "title": "🚨磁盘告警-蓝能科技",
-                "text": "# 磁盘警告：'"${HOSTNAME}"'主机上'"${DISK_PARTITION}"'分区的磁盘使用率已达到'"${DISK_USAGE}"'%！超过阈值'"${DISK_USAGE_THRESHOLD}"'% \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"'"
+                "text": "# 🚨磁盘警告：'"${HOSTNAME}"'主机上'"${DISK_PARTITION}"'分区的磁盘使用率已达到'"${DISK_USAGE}"'%！超过阈值'"${DISK_USAGE_THRESHOLD}"'% \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
             },
             "at": {
                      "isAtAll": false,
