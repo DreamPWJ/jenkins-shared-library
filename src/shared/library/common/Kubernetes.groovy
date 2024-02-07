@@ -310,7 +310,6 @@ class Kubernetes implements Serializable {
         ctx.sh "kubectl delete deployment ${deploymentName}"
         ctx.sh "kubectl delete service ${deploymentName}"
         ctx.sh "kubectl create deployment balanced  ${deploymentName} --image=${imageName}"
-        // 测试镜像: idoop/zentao:latest
         ctx.sh "kubectl expose deployment balanced  ${deploymentName} --type=NodePort --port=${port} "
         // 获取服务
         ctx.sh "kubectl get services ${deploymentName} && kubectl get pod" // STATUS 为 Running
