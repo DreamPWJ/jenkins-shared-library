@@ -112,7 +112,8 @@ if set_yaml_arags is not None:
     print(set_yaml_arags)
     # 适配Java Spring Boot框架容器动态启动命令
     yaml_containers[0]["command"] = ["java"]  # 覆盖或补充 ENTRYPOINT
-    yaml_containers[0]["args"] = ["-jar", set_yaml_arags, "-Djava.security.egd=file:/dev/./urandom", "/server.jar"]
+    yaml_containers[0]["args"] = ["-jar", "-Xms128m", set_yaml_arags,
+                                  "-Djava.security.egd=file:/dev/./urandom", "/server.jar"]
 
 # 业务应用是否使用Session处理
 if is_use_session:
