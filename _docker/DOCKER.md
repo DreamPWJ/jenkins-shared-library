@@ -41,8 +41,7 @@ docker pull emqx/emqx:latest
 docker volume create mqtt-emqx && docker inspect mqtt-emqx
 
 docker run -d --restart=always  -p 18083:18083 -p 1883:1883 -p 8083:8083  \
--v mqtt-emqx:/opt/emqx  \
--e TZ="Asia/Shanghai" \
+-e TZ="Asia/Shanghai" -v mqtt-emqx:/opt/emqx  \
 --cpus=2 -m 2048m  --log-opt max-size=1024m --log-opt max-file=1 \
 --name emqx  emqx/emqx:latest
 

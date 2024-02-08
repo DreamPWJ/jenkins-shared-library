@@ -54,6 +54,7 @@ where db = 'panweiji';
 
 批量KILL执行正在提交的事务
 DataGrip批量导出CSV格式数据批量执行kill
+查看MySql运行日志:  sudo grep mysql /var/log/syslog
 
 #### MySql压力性能测试
 

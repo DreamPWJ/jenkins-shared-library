@@ -15,7 +15,7 @@ import shared.library.common.*
  */
 class Kubernetes implements Serializable {
 
-    static def k8sYAMLFile = "k8s.yaml" // k8s集群应用部署yaml定义文件
+    static def k8sYamlFile = "k8s.yaml" // k8s集群应用部署yaml定义文件
     static def pythonYamlFile = "k8s_yaml.py" // 使用Python动态处理Yaml文件
     static def k8sNameSpace = "default" // k8s命名空间
 
@@ -42,7 +42,7 @@ class Kubernetes implements Serializable {
 
                 // 部署应用 相同应用不同环境配置 需循环执行不同的镜像 指定命名空间--namespace=
                 ctx.sh """ 
-                    kubectl apply -f ${k8sYAMLFile}
+                    kubectl apply -f ${k8sYamlFile}
                     """
 
                 // 查看个组件的状态  如 kubectl get svc
@@ -61,7 +61,7 @@ class Kubernetes implements Serializable {
                 }
 
                 // 删除服务
-                // ctx.sh "kubectl delete -f ${k8sYAMLFile}"
+                // ctx.sh "kubectl delete -f ${k8sYamlFile}"
                 // kubectl 停止删除pod 默认等待30秒  删除deployment 命令kubectl delete deployment  删除所有 kubectl delete pods --all  --force
                 // kubectl delete pod podName
                 // 查看详细信息   kubectl describe pod podName
@@ -144,7 +144,7 @@ class Kubernetes implements Serializable {
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g;s#{DEFAULT_CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
                 " s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g;s#{MAX_MEMORY_SIZE}#${map.docker_memory}#g;s#{JAVA_OPTS_XMX}#${map.docker_java_opts}#g; " +
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g;s#{CUSTOM_HEALTH_CHECK_PATH}#${ctx.CUSTOM_HEALTH_CHECK_PATH}#g; " +
-                " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYAMLFile} > ${k8sYAMLFile} "
+                " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYamlFile} > ${k8sYamlFile} "
 
         def pythonYamlParams = ""
         def isYamlUseSession = ""
@@ -163,7 +163,7 @@ class Kubernetes implements Serializable {
         }
         // 动态设置k8s yaml args参数
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java && "${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
-            setYamlArags = " --set_yaml_arags='JAVA_OPTS=-Xms128m ${map.docker_java_opts}' "
+            setYamlArags = " --set_yaml_arags='${map.docker_java_opts}' "
         }
 
         pythonYamlParams = isYamlUseSession + yamlVolumeMounts + yamlNfsParams + yamlDefaultPort + setYamlArags
@@ -172,10 +172,10 @@ class Kubernetes implements Serializable {
                 ctx.println("使用Python的ruamel包动态配置K8S的Yaml文件: " + pythonYamlParams)
                 // ctx.sh " python --version "
                 // ctx.sh " pip install ruamel.yaml "
-                ctx.sh " python ${pythonYamlFile} --k8s_yaml_file=${ctx.env.WORKSPACE}/${k8sYAMLFile}  ${pythonYamlParams} "
+                ctx.sh " python ${pythonYamlFile} --k8s_yaml_file=${ctx.env.WORKSPACE}/${k8sYamlFile}  ${pythonYamlParams} "
             }
         }
-        ctx.sh " cat ${k8sYAMLFile} "
+        ctx.sh " cat ${k8sYamlFile} "
     }
 
     /**
@@ -262,9 +262,11 @@ class Kubernetes implements Serializable {
         def namespace = k8sNameSpace
         ctx.sleep 3 // 等待检测
         // 等待所有Pod达到Ready状态
-        ctx.timeout(time: 10, unit: 'MINUTES') { // 设置超时时间
+        ctx.timeout(time: 12, unit: 'MINUTES') { // 设置超时时间
             def podsAreReady = false
+            def whileCount = 0  // 循环次数
             while (!podsAreReady) {
+                whileCount++
                 def output = ctx.sh(script: "kubectl get pods -n $namespace -l app=$deploymentName -o json", returnStdout: true)
                 def podStatus = ctx.readJSON text: output
 
@@ -284,12 +286,17 @@ class Kubernetes implements Serializable {
                     }
                 }
             }
+
             // 除了Running之外的状态  都不能算部署成功 Pod处于Pending状态也会通过上面的Ready状态检测代码 其实部署是失败的
             // 如Pending由于资源不足或其他限制  Terminating器可能还在停止中或资源清理阶段  ContainerCreating 容器尚未创建完成
             // Failed 如果Pod中的所有容器都因失败而退出，并且不会再重启，则Pod会进入Failed状态  CrashLoopBackOff 时，这意味着 Pod 中的主容器（或其中一个容器）反复启动并快速退出
             // 示例 查询pod所有节点的状态  kubectl get pods --selector=app=my-app -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.phase}{"\n"}{end}'
-
-            Tools.printColor(ctx, "K8S集群中所有Pod服务已处于启动状态 ✅")
+            if (whileCount == 1) { // 只执行一次的话 健康探测失败
+                Tools.printColor(ctx, "K8S集群中Pod服务部署启动失败  ❌", "red")
+                ctx.error("K8S集群中Pod服务部署启动失败 ❌")
+            } else {
+                Tools.printColor(ctx, "K8S集群中所有Pod服务已处于启动状态 ✅")
+            }
         }
 
     }
@@ -303,7 +310,6 @@ class Kubernetes implements Serializable {
         ctx.sh "kubectl delete deployment ${deploymentName}"
         ctx.sh "kubectl delete service ${deploymentName}"
         ctx.sh "kubectl create deployment balanced  ${deploymentName} --image=${imageName}"
-        // 测试镜像: idoop/zentao:latest
         ctx.sh "kubectl expose deployment balanced  ${deploymentName} --type=NodePort --port=${port} "
         // 获取服务
         ctx.sh "kubectl get services ${deploymentName} && kubectl get pod" // STATUS 为 Running

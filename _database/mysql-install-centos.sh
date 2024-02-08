@@ -23,7 +23,7 @@ datadir=/var/lib/mysql
 socket=/var/lib/mysql/mysql.sock
 user=mysql
 
-default-authentication-plugin=mysql_native_password
+default-authentication-plugin=caching_sha2_password
 skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0
 
 group_concat_max_len=1024000000
@@ -55,12 +55,12 @@ systemctl status mysqld
 # SHOW VARIABLES LIKE 'validate_password%';
 # set global validate_password_policy=0;
 
-# ALTER USER 'root'@'%' IDENTIFIED WITH MYSQL_NATIVE_PASSWORD BY 'panweiji2020!@#';
+# ALTER USER 'root'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji2020!@#';
 # CREATE database if NOT EXISTS anjia;
 # show databases;
 
 #echo "新建远程用户"
-# CREATE USER IF NOT EXISTS 'anjia'@'%' IDENTIFIED WITH MYSQL_NATIVE_PASSWORD BY 'panweiji2020!@#';
+# CREATE USER IF NOT EXISTS 'anjia'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji2020!@#';
 # GRANT all privileges ON *.* TO 'anjia'@'%';
 # flush privileges;
 
