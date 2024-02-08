@@ -163,7 +163,7 @@ class Kubernetes implements Serializable {
         }
         // 动态设置k8s yaml args参数
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java && "${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
-            setYamlArags = " --set_yaml_arags='JAVA_OPTS=-Xms128m ${map.docker_java_opts}' "
+            setYamlArags = " --set_yaml_arags='-Xms128m ${map.docker_java_opts}' "
         }
 
         pythonYamlParams = isYamlUseSession + yamlVolumeMounts + yamlNfsParams + yamlDefaultPort + setYamlArags
@@ -262,7 +262,7 @@ class Kubernetes implements Serializable {
         def namespace = k8sNameSpace
         ctx.sleep 3 // 等待检测
         // 等待所有Pod达到Ready状态
-        ctx.timeout(time: 10, unit: 'MINUTES') { // 设置超时时间
+        ctx.timeout(time: 12, unit: 'MINUTES') { // 设置超时时间
             def podsAreReady = false
             def whileCount = 0  // 循环次数
             while (!podsAreReady) {
