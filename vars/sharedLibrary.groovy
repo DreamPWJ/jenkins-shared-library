@@ -1170,18 +1170,18 @@ def nodeBuildProject() {
                             sh " npm ci || pnpm install > ${npmLog} 2>&1  || npm install >> ${npmLog} 2>&1 || yarn install >> ${npmLog} 2>&1  "
                             // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
                             sh " cat ${npmLog} || true"
-                        }
 
-                        // >/dev/null为Shell脚本运行程序不输出日志到终端 2>&1是把出错输出也定向到标准输出
-                        println("执行Node构建 🏗️  ")
-                        // 如果是服务端SSR框架如 NextJS框架  1.部署到NodeJs服务  2.导出静态HTML部署
-                        def nextJSScript = ""
-                        if ("${IS_NEXT_JS}" == 'true') {
-                            // 导出静态HTML方式部署 可复用Nginx部署脚本  可配置到package.json内script 使用npm run执行
-                            // nextJSScript = " && next export && rm -rf ${NPM_PACKAGE_FOLDER} && mv out ${NPM_PACKAGE_FOLDER} "
+                            // >/dev/null为Shell脚本运行程序不输出日志到终端 2>&1是把出错输出也定向到标准输出
+                            println("执行Node构建 🏗️  ")
+                            // 如果是服务端SSR框架如 NextJS框架  1.部署到NodeJs服务  2.导出静态HTML部署
+                            def nextJSScript = ""
+                            if ("${IS_NEXT_JS}" == 'true') {
+                                // 导出静态HTML方式部署 可复用Nginx部署脚本  可配置到package.json内script 使用npm run执行
+                                // nextJSScript = " && next export && rm -rf ${NPM_PACKAGE_FOLDER} && mv out ${NPM_PACKAGE_FOLDER} "
+                            }
+                            sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
+                            sh " npm run '${NPM_RUN_PARAMS}' ${nextJSScript} " // >/dev/null 2>&1
                         }
-                        sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
-                        sh " npm run '${NPM_RUN_PARAMS}' ${nextJSScript} " // >/dev/null 2>&1
                     }
                 } catch (e) {
                     println(e.getMessage())

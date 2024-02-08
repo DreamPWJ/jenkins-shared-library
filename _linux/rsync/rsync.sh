@@ -2,9 +2,9 @@
 # Author: 潘维吉
 # Description:  使用rsync工具远程迁移数据 全量+增量同步方式 也支持-P断点续传
 
-# 安装迁移工具 传输的双方都必须安装rsync  rsync是负责执行复制的工具  tmux是帮助查看进度的工具
-sudo apt-get install -y rsync
-# sudo yum install -y rsync
+# 安装迁移工具 传输的双方都必须安装rsync  rsync是系统自带工具 负责执行复制的工具
+sudo apt-get install -y rsync  || true
+# sudo yum install -y rsync || true
 rsync --version
 
 # 基本示例 -r表示递归，即包含子目录  source表示源目录 target表示目标目录

@@ -9,6 +9,9 @@ DING_TALK_WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=383391980b1
 CPU_THRESHOLD=90
 MEMORY_THRESHOLD=90
 DISK_USAGE_THRESHOLD=95
+# 指定要监控的网卡名称 ifconfig查看网卡名称
+# eth0="enp1s0"
+# NETWORK_THRESHOLD=100  # 单位M
 
 # 获取主机名
 HOSTNAME=$(hostname)
@@ -56,12 +59,12 @@ if [ ${CPU_USAGE} -ge ${CPU_THRESHOLD} ]; then
 fi
 
 if [ ${MEMORY_USAGE%.*} -ge ${MEMORY_THRESHOLD} ]; then
-    # echo "警告：${HOSTNAME}上的内存使用率已达到${MEMORY_USAGE}%！超过阈值${MEMORY_THRESHOLD}%。" | mail -s "内存告警" admin@example.com
+    # echo "警告：${HOSTNAME}主机上的内存使用率已达到${MEMORY_USAGE}！超过阈值${MEMORY_THRESHOLD}%。" | mail -s "内存告警" admin@example.com
         DATA='{
             "msgtype": "markdown",
             "markdown": {
                 "title": "🚨内存告警-蓝能科技",
-                "text": "# 🚨 内存警告：'"${HOSTNAME}"'主机上的内存使用率已达到'"${MEMORY_USAGE}"'%！超过阈值'"${MEMORY_THRESHOLD}"'% \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
+                "text": "# 🚨 内存警告：'"${HOSTNAME}"'主机上的内存使用率已达到'"${MEMORY_USAGE}"'！超过阈值'"${MEMORY_THRESHOLD}"'% \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
             },
             "at": {
                     "isAtAll": false,
@@ -76,7 +79,7 @@ if [ ${MEMORY_USAGE%.*} -ge ${MEMORY_THRESHOLD} ]; then
 fi
 
 if [ ${DISK_USAGE} -ge ${DISK_USAGE_THRESHOLD} ]; then
-   # echo "警告：${HOSTNAME}上${DISK_PARTITION}分区的磁盘使用率已达到${DISK_USAGE}%！超过阈值${DISK_USAGE_THRESHOLD}%。" | mail -s "磁盘告警" admin@example.com
+   # echo "警告：${HOSTNAME}主机上${DISK_PARTITION}分区的磁盘使用率已达到${DISK_USAGE}%！超过阈值${DISK_USAGE_THRESHOLD}%。" | mail -s "磁盘告警" admin@example.com
         DATA='{
             "msgtype": "markdown",
             "markdown": {
@@ -94,6 +97,24 @@ if [ ${DISK_USAGE} -ge ${DISK_USAGE_THRESHOLD} ]; then
              --header 'Content-Type: application/json' \
              --data-raw "$DATA"
 fi
+
+
+
+# # 获取当前的接收和发送字节数
+# RX_CURRENT=$(cat /proc/net/dev | grep $eth0 | awk '{print $2}')
+# TX_CURRENT=$(cat /proc/net/dev | grep $eth0 | awk '{print $10}')
+#
+# # 判断接收流量是否超过阈值
+# RX_THRESHOLD=$(($NETWORK_THRESHOLD*1024*1024)) # 阈值
+# if [ $RX_CURRENT -gt $RX_THRESHOLD ]; then
+#     echo "警告：网卡 $eth0 的接收流量已超过$NETWORK_THRESHOLD MB ！当前接收流量为: $($RX_CURRENT/1024/1024) M"
+# fi
+#
+# # 判断发送流量是否超阈值
+# TX_THRESHOLD=$(($NETWORK_THRESHOLD*1024*1024)) # 阈值
+# if [ $TX_CURRENT -gt $TX_THRESHOLD ]; then
+#     echo "警告：网卡 $eth0 的发送流量已超过$NETWORK_THRESHOLD MB ！当前发送流量为: $(echo "$TX_CURRENT / 1024.0 / 1024.0" | awk '{printf "%.2f\n", $1}') M"
+# fi
 
 
 exit 0
