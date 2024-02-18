@@ -924,10 +924,9 @@ def nodeBuildProject() {
                             sh " cat ${npmLog} || true"
                         }
 
-                        // >/dev/null为Shell脚本运行程序不输出日志到终端 2>&1是把出错输出也定向到标准输出
                         println("执行Node构建 🏗️  ")
                         sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
-                        sh " npm run '${NPM_RUN_PARAMS}' " // >/dev/null 2>&1
+                        sh " npm run '${NPM_RUN_PARAMS}' "
                     }
                 } catch (e) {
                     println(e.getMessage())
