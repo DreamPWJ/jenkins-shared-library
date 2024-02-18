@@ -905,53 +905,59 @@ def nodeBuildProject() {
                 Web.needSass(this)
             }
 
-            if (Git.isExistsChangeFile(this)) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
-                retry(3) {
-                    println("安装依赖 📥")
-                    // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱
-                    sh "npm ci || pnpm install || npm install || yarn install"
-                    // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
-                }
-            }
-
-            timeout(time: 10, unit: 'MINUTES') {
+            timeout(time: 30, unit: 'MINUTES') {
                 try {
-                    // >/dev/null为Shell脚本运行程序不输出日志到终端 2>&1是把出错输出也定向到标准输出
-                    println("执行Node构建 🏗️  ")
-                    sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
-                    retry(2) {
-                        sh " npm run '${NPM_RUN_PARAMS}' " // >/dev/null 2>&1
+                    def retryCount = 0
+                    retry(3) {
+                        retryCount++
+                        if (retryCount >= 2) {
+                            sh "rm -rf node_modules && rm -f *.lock.*"
+                            // 如果包404下载失败  可以更换官方镜像源重新下载
+                            Node.setOfficialMirror(this)
+                        }
+                        if (Git.isExistsChangeFile(this) || retryCount >= 2) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
+                            println("安装依赖 📥")
+                            // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱但依赖lock文件
+                            def npmLog = "npm_install.log"
+                            sh " npm ci || pnpm install > ${npmLog} 2>&1  || npm install >> ${npmLog} 2>&1 || yarn install >> ${npmLog} 2>&1  "
+                            // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
+                            sh " cat ${npmLog} || true"
+                        }
+
+                        println("执行Node构建 🏗️  ")
+                        sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
+                        sh " npm run '${NPM_RUN_PARAMS}' "
                     }
                 } catch (e) {
                     println(e.getMessage())
-                    sh "rm -rf node_modules && rm -f *-lock.json"
+                    sh "rm -rf node_modules && rm -f *.lock.*"
                     error("Web打包失败, 终止当前Pipeline运行 ❌")
                 }
             }
         }
-    }
 
-    // NPM打包产出物位置
-    npmPackageLocationDir = "${IS_MONO_REPO}" == 'true' ? "${monoRepoProjectDir}/${NPM_PACKAGE_FOLDER}" : "${NPM_PACKAGE_FOLDER}"
-    npmPackageLocation = "${npmPackageLocationDir}" + ".tar.gz"
-    println(npmPackageLocation)
-    // 判断npm打包目录是否存在 打包名称规范不一致等
+        // NPM打包产出物位置
+        npmPackageLocationDir = "${IS_MONO_REPO}" == 'true' ? "${monoRepoProjectDir}/${NPM_PACKAGE_FOLDER}" : "${NPM_PACKAGE_FOLDER}"
+        npmPackageLocation = "${npmPackageLocationDir}" + ".tar.gz"
+        println(npmPackageLocation)
+        // 判断npm打包目录是否存在 打包名称规范不一致等
 /*    if (!fileExists("${npmPackageLocationDir}/")) {
         // React框架默认打包目录是build , Angular框架默认打包目录是多层级的等  重命名到定义的目录名称
         sh "rm -rf ${NPM_PACKAGE_FOLDER} && mv build ${NPM_PACKAGE_FOLDER}"
     }*/
-    webPackageSize = Utils.getFolderSize(this, npmPackageLocationDir)
-    Tools.printColor(this, "Web打包成功 ✅")
-    // 压缩文件夹 易于加速传输
-    if ("${IS_MONO_REPO}" == 'true') {
-        sh "cd ${monoRepoProjectDir} && tar -zcvf ${NPM_PACKAGE_FOLDER}.tar.gz ${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 "
-    } else {
-        sh "tar -zcvf ${NPM_PACKAGE_FOLDER}.tar.gz ${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 "
+        webPackageSize = Utils.getFolderSize(this, npmPackageLocationDir)
+        Tools.printColor(this, "Web打包成功 ✅")
+        // 压缩文件夹 易于加速传输
+        if ("${IS_MONO_REPO}" == 'true') {
+            sh "cd ${monoRepoProjectDir} && tar -zcvf ${NPM_PACKAGE_FOLDER}.tar.gz ${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 "
+        } else {
+            sh "tar -zcvf ${NPM_PACKAGE_FOLDER}.tar.gz ${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 "
+        }
+
+        // 替换自定义的nginx配置文件
+        Deploy.replaceNginxConfig(this)
+
     }
-
-    // 替换自定义的nginx配置文件
-    Deploy.replaceNginxConfig(this)
-
 }
 
 /**
@@ -1330,12 +1336,16 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
         } else if (type == 1) { // 部署完成
             // 生成二维码 方便手机端扫描
             genQRCode(map)
+            def screenshot = "![screenshot](${qrCodeOssUrl})"
+            if ("${qrCodeOssUrl}" == "") {
+                screenshot = ""
+            }
             dingtalk(
                     robot: "${DING_TALK_CREDENTIALS_ID}",
                     type: 'ACTION_CARD',
                     title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
                     text: [
-                            "![screenshot](${qrCodeOssUrl})",
+                            "${screenshot}",
                             "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL})",
                             "##### 版本信息",
                             "- Nginx Web服务启动${msg}",

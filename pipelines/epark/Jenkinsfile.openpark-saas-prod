@@ -31,7 +31,7 @@ map.put('build_num_keep', 2)
 
 // Docker相关参数
 // JVM内存设置
-map.put('docker_java_opts', '-Xmx2600m')
+map.put('docker_java_opts', '-Xmx2800m')
 // docker内存限制 不支持小数点形式设置
 map.put('docker_memory', '3G')
 // docker日志限制
@@ -158,7 +158,7 @@ JSON_PARAMS
     "NPM_RUN_PARAMS" : "build",
     "IS_K8S_DEPLOY" : true,
     "K8S_POD_REPLICAS" : "3",
-    "APPLICATION_DOMAIN" : "https://saas.pengbocloud.com",
+    "APPLICATION_DOMAIN" : "https://pengbocloud.com",
 }
 
 */
