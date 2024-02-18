@@ -958,456 +958,457 @@ def nodeBuildProject() {
         Deploy.replaceNginxConfig(this)
 
     }
+}
 
 /**
  * 制作镜像
  * 可通过ssh在不同机器上构建镜像
  */
-    def buildImage() {
-        // 定义镜像唯一构建名称
-        dockerBuildImageName = "${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}"
-        // Docker多阶段镜像构建处理
-        Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
-        // 构建Docker镜像  只构建一次
-        Docker.build(this, "${dockerBuildImageName}")
-    }
+def buildImage() {
+    // 定义镜像唯一构建名称
+    dockerBuildImageName = "${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}"
+    // Docker多阶段镜像构建处理
+    Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
+    // 构建Docker镜像  只构建一次
+    Docker.build(this, "${dockerBuildImageName}")
+}
 
 /**
  * 上传部署文件到远程云端
  */
-    def uploadRemote(filePath, map) {
-        // ssh免密登录检测和设置
-        autoSshLogin(map)
-        timeout(time: 2, unit: 'MINUTES') {
-            // 同步脚本和配置到部署服务器
-            syncScript()
-        }
-        Tools.printColor(this, "上传部署文件到远程云端 🚀 ")
-        def projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
-        if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
-            sh "cd ${filePath} && scp  ${npmPackageLocation} " +
-                    "${remote.user}@${remote.host}:${projectDeployFolder}"
-        }
+def uploadRemote(filePath, map) {
+    // ssh免密登录检测和设置
+    autoSshLogin(map)
+    timeout(time: 2, unit: 'MINUTES') {
+        // 同步脚本和配置到部署服务器
+        syncScript()
     }
+    Tools.printColor(this, "上传部署文件到远程云端 🚀 ")
+    def projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
+    if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
+        sh "cd ${filePath} && scp  ${npmPackageLocation} " +
+                "${remote.user}@${remote.host}:${projectDeployFolder}"
+    }
+}
 
 /**
  * 部署运行项目
  */
-    def runProject(map) {
-        // 初始化docker
-        initDocker()
-        try {
-            if ("${IS_PUSH_DOCKER_REPO}" == 'true') {
-                // 拉取远程仓库Docker镜像
-                Docker.pull(this, "${dockerBuildImageName}")
-            }
-            sh " ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/web " +
-                    "&& ./docker-release-web.sh '${SHELL_WEB_PARAMS_GETOPTS}' ' "
-        } catch (error) {
-            println error.getMessage()
-            currentBuild.result = 'FAILURE'
-            error("部署运行步骤出现异常 ❌")
+def runProject(map) {
+    // 初始化docker
+    initDocker()
+    try {
+        if ("${IS_PUSH_DOCKER_REPO}" == 'true') {
+            // 拉取远程仓库Docker镜像
+            Docker.pull(this, "${dockerBuildImageName}")
         }
+        sh " ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/web " +
+                "&& ./docker-release-web.sh '${SHELL_WEB_PARAMS_GETOPTS}' ' "
+    } catch (error) {
+        println error.getMessage()
+        currentBuild.result = 'FAILURE'
+        error("部署运行步骤出现异常 ❌")
     }
+}
 
 /**
  * 健康检测
  */
-    def healthCheck(map, params = '') { // 可选参数
-        if (params?.trim()) { // 为null或空判断
-            // 单机滚动部署从服务
-            healthCheckParams = params
-        } else {
-            healthCheckUrl = "http://${remote.host}:${SHELL_HOST_PORT}"
-            healthCheckParams = " -a 1 -b ${healthCheckUrl}"
-        }
-        def healthCheckStart = new Date()
-        timeout(time: 10, unit: 'MINUTES') {  // health-check.sh有检测超时时间 timeout为防止shell脚本超时失效兼容处理
-            healthCheckMsg = sh(
-                    script: "ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/ && ./health-check.sh ${healthCheckParams} '",
-                    returnStdout: true).trim()
-        }
-        healthCheckTimeDiff = Utils.getTimeDiff(healthCheckStart, new Date()) // 计算应用启动时间
-
-        if ("${healthCheckMsg}".contains("成功")) {
-            Tools.printColor(this, "${healthCheckMsg} ✅")
-            dingNotice(map, 1, "**成功 ✅**") // 钉钉成功通知
-        } else if ("${healthCheckMsg}".contains("失败")) { // shell返回echo信息包含值
-            isHealthCheckFail = true
-            Tools.printColor(this, "${healthCheckMsg} ❌", "red")
-            println("👉 健康检测失败原因分析: 首选排除CI服务器和应用服务器网络是否连通、应用服务器端口是否开放, 再查看应用服务启动日志是否失败")
-            // 钉钉失败通知
-            dingNotice(map, 1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
-            // 打印应用服务启动失败日志 方便快速排查错误
-            Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志开始 START 👇 ------------", "red")
-            sh " ssh  ${remote.user}@${remote.host} 'docker logs ${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}' "
-            Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志结束 END 👆 ------------", "red")
-            if ("${IS_ROLL_DEPLOY}" == 'true' || "${IS_BLUE_GREEN_DEPLOY}" == 'true') {
-                println '分布式部署情况, 服务启动失败, 自动中止取消job, 防止继续部署导致其他应用服务挂掉 。'
-                IS_ROLL_DEPLOY = false
-            }
-            IS_ARCHIVE = false // 不归档
-            currentBuild.result = 'FAILURE' // 失败  不稳定UNSTABLE 取消ABORTED
-            error("健康检测失败, 终止当前Pipeline运行 ❌")
-            return
-        }
+def healthCheck(map, params = '') { // 可选参数
+    if (params?.trim()) { // 为null或空判断
+        // 单机滚动部署从服务
+        healthCheckParams = params
+    } else {
+        healthCheckUrl = "http://${remote.host}:${SHELL_HOST_PORT}"
+        healthCheckParams = " -a 1 -b ${healthCheckUrl}"
     }
+    def healthCheckStart = new Date()
+    timeout(time: 10, unit: 'MINUTES') {  // health-check.sh有检测超时时间 timeout为防止shell脚本超时失效兼容处理
+        healthCheckMsg = sh(
+                script: "ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/ && ./health-check.sh ${healthCheckParams} '",
+                returnStdout: true).trim()
+    }
+    healthCheckTimeDiff = Utils.getTimeDiff(healthCheckStart, new Date()) // 计算应用启动时间
+
+    if ("${healthCheckMsg}".contains("成功")) {
+        Tools.printColor(this, "${healthCheckMsg} ✅")
+        dingNotice(map, 1, "**成功 ✅**") // 钉钉成功通知
+    } else if ("${healthCheckMsg}".contains("失败")) { // shell返回echo信息包含值
+        isHealthCheckFail = true
+        Tools.printColor(this, "${healthCheckMsg} ❌", "red")
+        println("👉 健康检测失败原因分析: 首选排除CI服务器和应用服务器网络是否连通、应用服务器端口是否开放, 再查看应用服务启动日志是否失败")
+        // 钉钉失败通知
+        dingNotice(map, 1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
+        // 打印应用服务启动失败日志 方便快速排查错误
+        Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志开始 START 👇 ------------", "red")
+        sh " ssh  ${remote.user}@${remote.host} 'docker logs ${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}' "
+        Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志结束 END 👆 ------------", "red")
+        if ("${IS_ROLL_DEPLOY}" == 'true' || "${IS_BLUE_GREEN_DEPLOY}" == 'true') {
+            println '分布式部署情况, 服务启动失败, 自动中止取消job, 防止继续部署导致其他应用服务挂掉 。'
+            IS_ROLL_DEPLOY = false
+        }
+        IS_ARCHIVE = false // 不归档
+        currentBuild.result = 'FAILURE' // 失败  不稳定UNSTABLE 取消ABORTED
+        error("健康检测失败, 终止当前Pipeline运行 ❌")
+        return
+    }
+}
 
 /**
  * 滚动部署
  */
-    def scrollToDeploy(map) {
-        // 主从架构与双主架构等  负载均衡和滚动更新worker应用服务
-        if ("${IS_SAME_SERVER}" == 'false') {   // 不同服务器滚动部署
-            def machineNum = 1
-            if (remote_worker_ips.isEmpty()) {
-                error("多机滚动部署, 请先在相关的Jenkinsfile.x文件配置其它服务器ip数组remote_worker_ips参数 ❌")
+def scrollToDeploy(map) {
+    // 主从架构与双主架构等  负载均衡和滚动更新worker应用服务
+    if ("${IS_SAME_SERVER}" == 'false') {   // 不同服务器滚动部署
+        def machineNum = 1
+        if (remote_worker_ips.isEmpty()) {
+            error("多机滚动部署, 请先在相关的Jenkinsfile.x文件配置其它服务器ip数组remote_worker_ips参数 ❌")
+        }
+        // 循环串行执行多机分布式部署
+        remote_worker_ips.each { ip ->
+            println ip
+            remote.host = ip
+            if (params.DEPLOY_MODE == GlobalVars.rollback) {
+                uploadRemote("${archivePath}", map)
+            } else {
+                uploadRemote(Utils.getShEchoResult(this, "pwd"), map)
             }
-            // 循环串行执行多机分布式部署
-            remote_worker_ips.each { ip ->
-                println ip
-                remote.host = ip
-                if (params.DEPLOY_MODE == GlobalVars.rollback) {
-                    uploadRemote("${archivePath}", map)
-                } else {
-                    uploadRemote(Utils.getShEchoResult(this, "pwd"), map)
-                }
-                runProject()
-                if (params.IS_HEALTH_CHECK == true) {
-                    machineNum++
-                    MACHINE_TAG = "${machineNum}号机" // 动态计算是几号机
-                    healthCheck(map)
-                }
+            runProject()
+            if (params.IS_HEALTH_CHECK == true) {
+                machineNum++
+                MACHINE_TAG = "${machineNum}号机" // 动态计算是几号机
+                healthCheck(map)
             }
         }
     }
+}
 
 /**
  * 云原生K8S部署大规模集群 弹性扩缩容
  */
-    def k8sDeploy(map) {
-        // 执行k8s集群部署
-        Kubernetes.deploy(this, map)
-        // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
-        if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-            println("K8S集群部署相同应用不同环境的部署节点")
-            Kubernetes.deploy(this, map, 2)
-        }
+def k8sDeploy(map) {
+    // 执行k8s集群部署
+    Kubernetes.deploy(this, map)
+    // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
+    if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+        println("K8S集群部署相同应用不同环境的部署节点")
+        Kubernetes.deploy(this, map, 2)
     }
+}
 
 /**
  * 自动设置免密连接 用于CI/CD服务器和应用部署服务器免密通信  避免手动批量设置繁琐重复劳动
  */
-    def autoSshLogin(map) {
-        SecureShell.autoSshLogin(this, map)
-    }
+def autoSshLogin(map) {
+    SecureShell.autoSshLogin(this, map)
+}
 
 /**
  * 同步脚本和配置到部署服务器
  */
-    def syncScript() {
+def syncScript() {
+    try {
+        // 自动创建服务器部署目录
+        // ssh登录概率性失败 连接数超报错: kex_exchange_identification
+        // 解决vim /etc/ssh/sshd_config中 MaxSessions与MaxStartups改大2000 默认10 重启生效 systemctl restart sshd.service
+        sh " ssh ${remote.user}@${remote.host} 'mkdir -p /${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}' "
+    } catch (error) {
+        println "访问目标服务器失败, 首先检查jenkins服务器和应用服务器的ssh免密连接是否生效 ❌"
+        println error.getMessage()
+    }
+
+    dir("${env.WORKSPACE}/ci") {
         try {
-            // 自动创建服务器部署目录
-            // ssh登录概率性失败 连接数超报错: kex_exchange_identification
-            // 解决vim /etc/ssh/sshd_config中 MaxSessions与MaxStartups改大2000 默认10 重启生效 systemctl restart sshd.service
-            sh " ssh ${remote.user}@${remote.host} 'mkdir -p /${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}' "
+            // Docker多阶段镜像构建处理
+            Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
+            // scp -r  递归复制整个目录 复制部署脚本和配置文件到服务器
+            sh " chmod -R 777 .ci && scp -r .ci/*  ${remote.user}@${remote.host}:/${DEPLOY_FOLDER}/ "
         } catch (error) {
-            println "访问目标服务器失败, 首先检查jenkins服务器和应用服务器的ssh免密连接是否生效 ❌"
+            println "复制部署脚本和配置文件到服务器失败 ❌"
             println error.getMessage()
         }
 
-        dir("${env.WORKSPACE}/ci") {
-            try {
-                // Docker多阶段镜像构建处理
-                Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
-                // scp -r  递归复制整个目录 复制部署脚本和配置文件到服务器
-                sh " chmod -R 777 .ci && scp -r .ci/*  ${remote.user}@${remote.host}:/${DEPLOY_FOLDER}/ "
-            } catch (error) {
-                println "复制部署脚本和配置文件到服务器失败 ❌"
-                println error.getMessage()
-            }
-
-            // 给shell脚本执行权限
-            sh " ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} " +
-                    "&& chmod -R 777 web && chmod +x *.sh ' "
-        }
+        // 给shell脚本执行权限
+        sh " ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} " +
+                "&& chmod -R 777 web && chmod +x *.sh ' "
     }
+}
 
 /**
  * 是否存在CI代码
  */
-    def existCiCode() {
-        if (!fileExists(".ci/Dockerfile")) {
-            println "为保证先后顺序拉取代码 可能导致第一次构建时候无法找到CI仓库代码 重新拉取代码"
-            pullCIRepo()
-        }
+def existCiCode() {
+    if (!fileExists(".ci/Dockerfile")) {
+        println "为保证先后顺序拉取代码 可能导致第一次构建时候无法找到CI仓库代码 重新拉取代码"
+        pullCIRepo()
     }
+}
 
 /**
  * 初始化Docker引擎环境 自动化第一次部署环境
  */
-    def initDocker() {
-        Docker.initDocker(this)
-    }
+def initDocker() {
+    Docker.initDocker(this)
+}
 
 /**
  * 回滚版本
  */
-    def rollbackVersion(map) {
-        if ("${ROLLBACK_BUILD_ID}" == '0') { // 默认回滚到上一个版本
-            ROLLBACK_BUILD_ID = "${Integer.parseInt(env.BUILD_ID) - 2}"
-        }
-        //input message: "是否确认回滚到构建ID为${ROLLBACK_BUILD_ID}的版本", ok: "确认"
-        //该/var/jenkins_home/**路径只适合在master节点执行的项目 不适合slave节点的项目
-        archivePath = "/var/jenkins_home/jobs/${env.JOB_NAME}/builds/${ROLLBACK_BUILD_ID}/archive/"
-        uploadRemote("${archivePath}", map)
-        runProject(map)
-        if (params.IS_HEALTH_CHECK == true) {
-            healthCheck(map)
-        }
-        if ("${IS_ROLL_DEPLOY}" == 'true') {
-            scrollToDeploy(map)
-        }
+def rollbackVersion(map) {
+    if ("${ROLLBACK_BUILD_ID}" == '0') { // 默认回滚到上一个版本
+        ROLLBACK_BUILD_ID = "${Integer.parseInt(env.BUILD_ID) - 2}"
     }
+    //input message: "是否确认回滚到构建ID为${ROLLBACK_BUILD_ID}的版本", ok: "确认"
+    //该/var/jenkins_home/**路径只适合在master节点执行的项目 不适合slave节点的项目
+    archivePath = "/var/jenkins_home/jobs/${env.JOB_NAME}/builds/${ROLLBACK_BUILD_ID}/archive/"
+    uploadRemote("${archivePath}", map)
+    runProject(map)
+    if (params.IS_HEALTH_CHECK == true) {
+        healthCheck(map)
+    }
+    if ("${IS_ROLL_DEPLOY}" == 'true') {
+        scrollToDeploy(map)
+    }
+}
 
 /**
  * 归档文件
  */
-    def archive() {
-        try {
-            archiveArtifacts artifacts: "${npmPackageLocation}", onlyIfSuccessful: true
-        } catch (error) {
-            println "归档文件异常"
-            println error.getMessage()
-        }
+def archive() {
+    try {
+        archiveArtifacts artifacts: "${npmPackageLocation}", onlyIfSuccessful: true
+    } catch (error) {
+        println "归档文件异常"
+        println error.getMessage()
     }
+}
 
 /**
  * 删除打包产出物 减少磁盘占用
  */
-    def deletePackagedOutput() {
-        try {
-            sh " rm -f ${npmPackageLocation} "
-        } catch (error) {
-            println "删除打包产出物异常"
-            println error.getMessage()
-        }
+def deletePackagedOutput() {
+    try {
+        sh " rm -f ${npmPackageLocation} "
+    } catch (error) {
+        println "删除打包产出物异常"
+        println error.getMessage()
     }
+}
 
 /**
  * 生成二维码 方便手机端扫描
  */
-    def genQRCode(map) {
-        if ("${IS_GEN_QR_CODE}" == 'true') { // 是否开启二维码生成功能
-            try {
-                imageSuffixName = "png"
-                def imageName = "${PROJECT_NAME}"
-                sh "rm -f *.${imageSuffixName}"
-                QRCode.generate(this, "http://${remote.host}:${SHELL_HOST_PORT}", imageName)
-                def sourceFile = "${env.WORKSPACE}/${imageName}.${imageSuffixName}" // 源文件
-                def targetFile = "frontend/${env.JOB_NAME}/${env.BUILD_NUMBER}/${imageName}.${imageSuffixName}"
-                // 目标文件
-                qrCodeOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
-                println "${qrCodeOssUrl}"
-            } catch (error) {
-                println " 生成二维码失败 ❌ "
-                println error.getMessage()
-            }
+def genQRCode(map) {
+    if ("${IS_GEN_QR_CODE}" == 'true') { // 是否开启二维码生成功能
+        try {
+            imageSuffixName = "png"
+            def imageName = "${PROJECT_NAME}"
+            sh "rm -f *.${imageSuffixName}"
+            QRCode.generate(this, "http://${remote.host}:${SHELL_HOST_PORT}", imageName)
+            def sourceFile = "${env.WORKSPACE}/${imageName}.${imageSuffixName}" // 源文件
+            def targetFile = "frontend/${env.JOB_NAME}/${env.BUILD_NUMBER}/${imageName}.${imageSuffixName}"
+            // 目标文件
+            qrCodeOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
+            println "${qrCodeOssUrl}"
+        } catch (error) {
+            println " 生成二维码失败 ❌ "
+            println error.getMessage()
         }
     }
+}
 
 /**
  * 总会执行统一处理方法
  */
-    def alwaysPost() {
-        // sh 'pwd'
-        // cleanWs()  // 清空工作空间
-        try {
-            def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
-            def noticeHealthCheckUrl = "${APPLICATION_DOMAIN == "" ? healthCheckUrl : healthCheckDomainUrl}"
-            currentBuild.description = "${IS_GEN_QR_CODE == 'true' ? "<img src=${qrCodeOssUrl} width=250 height=250 > <br/> " : ""}" +
-                    "<a href='${noticeHealthCheckUrl}'> 👉URL访问地址</a> " +
-                    "<br/> 项目: ${PROJECT_NAME}" +
-                    "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
-                    "<br/> 大小: ${webPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
-        } catch (error) {
-            println error.getMessage()
-        }
+def alwaysPost() {
+    // sh 'pwd'
+    // cleanWs()  // 清空工作空间
+    try {
+        def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
+        def noticeHealthCheckUrl = "${APPLICATION_DOMAIN == "" ? healthCheckUrl : healthCheckDomainUrl}"
+        currentBuild.description = "${IS_GEN_QR_CODE == 'true' ? "<img src=${qrCodeOssUrl} width=250 height=250 > <br/> " : ""}" +
+                "<a href='${noticeHealthCheckUrl}'> 👉URL访问地址</a> " +
+                "<br/> 项目: ${PROJECT_NAME}" +
+                "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
+                "<br/> 大小: ${webPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
+    } catch (error) {
+        println error.getMessage()
     }
+}
 
 /**
  * 生成版本tag和变更日志
  */
-    def gitTagLog() {
-        // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行一次jenkins任务才能生效
-        if (!params.IS_GIT_TAG && params.IS_GIT_TAG != false) {
-            params.IS_GIT_TAG = true
-        }
-        // 构建成功后生产环境并发布类型自动打tag和变更记录  指定tag方式不再重新打tag
-        if (params.IS_GIT_TAG == true && "${IS_PROD}" == 'true' && params.GIT_TAG == GlobalVars.noGit) {
-            // 获取变更记录
-            def gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", "\n")
-            def latestTag = ""
-            try {
-                if ("${params.VERSION_NUM}".trim() != "") { // 自定义版本号
-                    tagVersion = "${params.VERSION_NUM}".trim()
-                    println "手填的自定义版本号为: ${tagVersion} "
-                } else {
-                    // sh ' git fetch --tags ' // 拉取远程分支上所有的tags 需要设置用户名密码
-                    // 获取本地当前分支最新tag名称 git describe --abbrev=0 --tags  获取远程仓库最新tag命令 git ls-remote   获取所有分支的最新tag名称命令 git describe --tags `git rev-list --tags --max-count=1`
-                    // 不同分支下的独立打的tag可能导致tag版本错乱的情况  过滤掉非语义化版本的tag版本号
-                    latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")
-
-                    // 生成语义化版本号
-                    tagVersion = Utils.genSemverVersion(this, latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
-                            GlobalVars.gitCommitFeature : GlobalVars.gitCommitFix)
-                }
-            } catch (error) {
-                println "生成tag语义化版本号失败"
-                println error.getMessage()
-                // tagVersion = Utils.formatDate("yyyy-MM-dd") // 获取版本号失败 使用时间格式作为tag
-                tagVersion = "1.0.0" // 默认初始化版本
-            }
-
-            // 生成tag和变更日志
-            gitTagLog.genTagAndLog(this, tagVersion, gitChangeLog, "${REPO_URL}", "${GIT_CREDENTIALS_ID}")
-        }
-        // 指定tag时候设置版本信息
-        if (params.GIT_TAG != GlobalVars.noGit) {
-            tagVersion = params.GIT_TAG
-        }
+def gitTagLog() {
+    // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行一次jenkins任务才能生效
+    if (!params.IS_GIT_TAG && params.IS_GIT_TAG != false) {
+        params.IS_GIT_TAG = true
     }
+    // 构建成功后生产环境并发布类型自动打tag和变更记录  指定tag方式不再重新打tag
+    if (params.IS_GIT_TAG == true && "${IS_PROD}" == 'true' && params.GIT_TAG == GlobalVars.noGit) {
+        // 获取变更记录
+        def gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", "\n")
+        def latestTag = ""
+        try {
+            if ("${params.VERSION_NUM}".trim() != "") { // 自定义版本号
+                tagVersion = "${params.VERSION_NUM}".trim()
+                println "手填的自定义版本号为: ${tagVersion} "
+            } else {
+                // sh ' git fetch --tags ' // 拉取远程分支上所有的tags 需要设置用户名密码
+                // 获取本地当前分支最新tag名称 git describe --abbrev=0 --tags  获取远程仓库最新tag命令 git ls-remote   获取所有分支的最新tag名称命令 git describe --tags `git rev-list --tags --max-count=1`
+                // 不同分支下的独立打的tag可能导致tag版本错乱的情况  过滤掉非语义化版本的tag版本号
+                latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")
+
+                // 生成语义化版本号
+                tagVersion = Utils.genSemverVersion(this, latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
+                        GlobalVars.gitCommitFeature : GlobalVars.gitCommitFix)
+            }
+        } catch (error) {
+            println "生成tag语义化版本号失败"
+            println error.getMessage()
+            // tagVersion = Utils.formatDate("yyyy-MM-dd") // 获取版本号失败 使用时间格式作为tag
+            tagVersion = "1.0.0" // 默认初始化版本
+        }
+
+        // 生成tag和变更日志
+        gitTagLog.genTagAndLog(this, tagVersion, gitChangeLog, "${REPO_URL}", "${GIT_CREDENTIALS_ID}")
+    }
+    // 指定tag时候设置版本信息
+    if (params.GIT_TAG != GlobalVars.noGit) {
+        tagVersion = params.GIT_TAG
+    }
+}
 
 /**
  * 钉钉通知
  * @type 0 失败 1 部署完成 2 部署之前 3 变更记录
  * @msg 自定义消息* @atMobiles 要@的手机号
  */
-    def dingNotice(map, int type, msg = '', atMobiles = '') {
-        if ("${params.IS_DING_NOTICE}" == 'true') { // 是否钉钉通知
-            println("钉钉通知: " + params.NOTIFIER_PHONES)
-            // 格式化持续时间
-            def durationTimeString = "${currentBuild.durationString.replace(' and counting', '').replace('sec', 's')}".replace(' ', '')
-            def notifierPhone = params.NOTIFIER_PHONES.split("-")[1].trim()
-            if (notifierPhone == "oneself") { // 通知自己
-                notifierPhone = "${BUILD_USER_MOBILE}"
-            }
-            if ("${IS_ROLL_DEPLOY}" == 'false' && "${IS_BLUE_GREEN_DEPLOY}" == 'false') {
-                MACHINE_TAG = "" // 不是多节点部署不添加机器标识
-            }
-            def rollbackTag = ""
-            if (params.DEPLOY_MODE == GlobalVars.rollback) {
-                rollbackTag = "**回滚版本号: ${ROLLBACK_BUILD_ID}**" // 回滚版本添加标识
-            }
-            if (params.GIT_TAG != GlobalVars.noGit) {
-                rollbackTag = "**Git Tag构建版本: ${params.GIT_TAG}**" // Git Tag版本添加标识
-            }
-            def monorepoProjectName = ""
-            if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && "${IS_MONO_REPO}" == 'true') {
-                monorepoProjectName = "MonoRepo项目: ${PROJECT_NAME}"   // 单体仓库区分项目
-            }
-            def projectTypeName = "前端"
-            def envTypeMark = "内测版"  // 环境类型标志
-            if ("${IS_PROD}" == 'true') {
-                envTypeMark = "正式版"
-            }
-            def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
-            def noticeHealthCheckUrl = "${APPLICATION_DOMAIN == "" ? healthCheckUrl : healthCheckDomainUrl}"
+def dingNotice(map, int type, msg = '', atMobiles = '') {
+    if ("${params.IS_DING_NOTICE}" == 'true') { // 是否钉钉通知
+        println("钉钉通知: " + params.NOTIFIER_PHONES)
+        // 格式化持续时间
+        def durationTimeString = "${currentBuild.durationString.replace(' and counting', '').replace('sec', 's')}".replace(' ', '')
+        def notifierPhone = params.NOTIFIER_PHONES.split("-")[1].trim()
+        if (notifierPhone == "oneself") { // 通知自己
+            notifierPhone = "${BUILD_USER_MOBILE}"
+        }
+        if ("${IS_ROLL_DEPLOY}" == 'false' && "${IS_BLUE_GREEN_DEPLOY}" == 'false') {
+            MACHINE_TAG = "" // 不是多节点部署不添加机器标识
+        }
+        def rollbackTag = ""
+        if (params.DEPLOY_MODE == GlobalVars.rollback) {
+            rollbackTag = "**回滚版本号: ${ROLLBACK_BUILD_ID}**" // 回滚版本添加标识
+        }
+        if (params.GIT_TAG != GlobalVars.noGit) {
+            rollbackTag = "**Git Tag构建版本: ${params.GIT_TAG}**" // Git Tag版本添加标识
+        }
+        def monorepoProjectName = ""
+        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && "${IS_MONO_REPO}" == 'true') {
+            monorepoProjectName = "MonoRepo项目: ${PROJECT_NAME}"   // 单体仓库区分项目
+        }
+        def projectTypeName = "前端"
+        def envTypeMark = "内测版"  // 环境类型标志
+        if ("${IS_PROD}" == 'true') {
+            envTypeMark = "正式版"
+        }
+        def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
+        def noticeHealthCheckUrl = "${APPLICATION_DOMAIN == "" ? healthCheckUrl : healthCheckDomainUrl}"
 
-            if (type == 0) { // 失败
-                if (!isHealthCheckFail) {
-                    dingtalk(
-                            robot: "${DING_TALK_CREDENTIALS_ID}",
-                            type: 'MARKDOWN',
-                            title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}流水线失败通知",
-                            text: [
-                                    "### [${env.JOB_NAME}#${env.BUILD_NUMBER}](${env.BUILD_URL}) ${PROJECT_TAG}${envTypeMark}${projectTypeName}项目${msg}",
-                                    "#### 请及时处理 🏃",
-                                    "###### ** 流水线失败原因: [运行日志](${env.BUILD_URL}console) 👈 **",
-                                    "###### Jenkins地址  [查看](${env.JENKINS_URL})   源码地址  [查看](${REPO_URL})",
-                                    "###### 发布环境: ${releaseEnvironment}  持续时间: ${durationTimeString}",
-                                    "###### 发布人: ${BUILD_USER}",
-                                    "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                            ],
-                            at: ["${BUILD_USER_MOBILE}"]
-                    )
-                }
-            } else if (type == 1) { // 部署完成
-                // 生成二维码 方便手机端扫描
-                genQRCode(map)
-                def screenshot = "![screenshot](${qrCodeOssUrl})"
-                if ("${qrCodeOssUrl}" == "") {
-                    screenshot = ""
-                }
-                dingtalk(
-                        robot: "${DING_TALK_CREDENTIALS_ID}",
-                        type: 'ACTION_CARD',
-                        title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
-                        text: [
-                                "${screenshot}",
-                                "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL})",
-                                "##### 版本信息",
-                                "- Nginx Web服务启动${msg}",
-                                "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
-                                "- Node版本: ${NODE_VERSION}   包大小: ${webPackageSize}",
-                                "${monorepoProjectName}",
-                                "###### ${rollbackTag}",
-                                "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
-                                "###### 访问URL: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl})",
-                                "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
-                                "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
-                                "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                        ],
-                        btns: [
-                                [
-                                        title    : "直接访问URL地址",
-                                        actionUrl: "${noticeHealthCheckUrl}"
-                                ]
-                        ],
-                        at: [isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone)]
-                )
-            } else if (type == 2) { // 部署之前
+        if (type == 0) { // 失败
+            if (!isHealthCheckFail) {
                 dingtalk(
                         robot: "${DING_TALK_CREDENTIALS_ID}",
                         type: 'MARKDOWN',
-                        title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署前通知",
+                        title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}流水线失败通知",
                         text: [
-                                "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${envTypeMark}${projectTypeName}](${env.JOB_URL})",
-                                "#### ${PROJECT_TAG}服务部署启动中 🚀  请稍等...  ☕",
+                                "### [${env.JOB_NAME}#${env.BUILD_NUMBER}](${env.BUILD_URL}) ${PROJECT_TAG}${envTypeMark}${projectTypeName}项目${msg}",
+                                "#### 请及时处理 🏃",
+                                "###### ** 流水线失败原因: [运行日志](${env.BUILD_URL}console) 👈 **",
+                                "###### Jenkins地址  [查看](${env.JENKINS_URL})   源码地址  [查看](${REPO_URL})",
+                                "###### 发布环境: ${releaseEnvironment}  持续时间: ${durationTimeString}",
                                 "###### 发布人: ${BUILD_USER}",
                                 "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
                         ],
-                        at: []
+                        at: ["${BUILD_USER_MOBILE}"]
                 )
-            } else if (type == 3) { // 变更记录
-                if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
-                    def gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
-                    if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
-                        def titlePrefix = "${PROJECT_TAG} BUILD#${env.BUILD_NUMBER}"
-                        try {
-                            if ("${tagVersion}") {
-                                titlePrefix = "${PROJECT_TAG} ${tagVersion}"
-                            }
-                        } catch (e) {
+            }
+        } else if (type == 1) { // 部署完成
+            // 生成二维码 方便手机端扫描
+            genQRCode(map)
+            def screenshot = "![screenshot](${qrCodeOssUrl})"
+            if ("${qrCodeOssUrl}" == "") {
+                screenshot = ""
+            }
+            dingtalk(
+                    robot: "${DING_TALK_CREDENTIALS_ID}",
+                    type: 'ACTION_CARD',
+                    title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
+                    text: [
+                            "${screenshot}",
+                            "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL})",
+                            "##### 版本信息",
+                            "- Nginx Web服务启动${msg}",
+                            "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
+                            "- Node版本: ${NODE_VERSION}   包大小: ${webPackageSize}",
+                            "${monorepoProjectName}",
+                            "###### ${rollbackTag}",
+                            "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
+                            "###### 访问URL: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl})",
+                            "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
+                            "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
+                            "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
+                    ],
+                    btns: [
+                            [
+                                    title    : "直接访问URL地址",
+                                    actionUrl: "${noticeHealthCheckUrl}"
+                            ]
+                    ],
+                    at: [isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone)]
+            )
+        } else if (type == 2) { // 部署之前
+            dingtalk(
+                    robot: "${DING_TALK_CREDENTIALS_ID}",
+                    type: 'MARKDOWN',
+                    title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署前通知",
+                    text: [
+                            "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${envTypeMark}${projectTypeName}](${env.JOB_URL})",
+                            "#### ${PROJECT_TAG}服务部署启动中 🚀  请稍等...  ☕",
+                            "###### 发布人: ${BUILD_USER}",
+                            "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
+                    ],
+                    at: []
+            )
+        } else if (type == 3) { // 变更记录
+            if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
+                def gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
+                if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
+                    def titlePrefix = "${PROJECT_TAG} BUILD#${env.BUILD_NUMBER}"
+                    try {
+                        if ("${tagVersion}") {
+                            titlePrefix = "${PROJECT_TAG} ${tagVersion}"
                         }
-                        dingtalk(
-                                robot: "${DING_TALK_CREDENTIALS_ID}",
-                                type: 'MARKDOWN',
-                                title: "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
-                                text: [
-                                        "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉",
-                                        "#### 项目: ${PROJECT_NAME}",
-                                        "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}**",
-                                        "${gitChangeLog}",
-                                        ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看",
-                                        "###### 发布人: ${BUILD_USER}",
-                                        "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                                ],
-                                at: []
-                        )
+                    } catch (e) {
                     }
+                    dingtalk(
+                            robot: "${DING_TALK_CREDENTIALS_ID}",
+                            type: 'MARKDOWN',
+                            title: "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
+                            text: [
+                                    "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉",
+                                    "#### 项目: ${PROJECT_NAME}",
+                                    "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}**",
+                                    "${gitChangeLog}",
+                                    ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看",
+                                    "###### 发布人: ${BUILD_USER}",
+                                    "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
+                            ],
+                            at: []
+                    )
                 }
             }
         }
     }
+}
 
