@@ -19,6 +19,9 @@ bind-address=0.0.0.0
 datadir=/var/lib/mysql
 user=mysql
 
+# 缓存表数据和索引的内存区域。通常应将其设置为系统可用内存的50%-75%，以减少磁盘I/O
+innodb_buffer_pool_size = 4G
+
 # 主从复制-主机配置
 # 主服务器唯一ID
 server-id=1
@@ -47,6 +50,9 @@ port=3306
 bind-address=0.0.0.0
 datadir=/var/lib/mysql
 user=mysql
+
+# 缓存表数据和索引的内存区域。通常应将其设置为系统可用内存的50%-80%，以减少磁盘I/O
+innodb_buffer_pool_size = 4G
 
 # 主从复制-从机配置
 # 从服务器唯一ID

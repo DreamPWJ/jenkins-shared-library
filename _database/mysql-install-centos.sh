@@ -23,6 +23,9 @@ datadir=/var/lib/mysql
 socket=/var/lib/mysql/mysql.sock
 user=mysql
 
+# 缓存表数据和索引的内存区域。通常应将其设置为系统可用内存的50%-75%，以减少磁盘I/O
+innodb_buffer_pool_size = 4G
+
 default-authentication-plugin=caching_sha2_password
 skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0
 
