@@ -1330,12 +1330,16 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
         } else if (type == 1) { // 部署完成
             // 生成二维码 方便手机端扫描
             genQRCode(map)
+            def screenshot="![screenshot](${qrCodeOssUrl})"
+            if ("${qrCodeOssUrl}" == "") {
+                screenshot= ""
+            }
             dingtalk(
                     robot: "${DING_TALK_CREDENTIALS_ID}",
                     type: 'ACTION_CARD',
                     title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
                     text: [
-                            "![screenshot](${qrCodeOssUrl})",
+                            "${screenshot}",
                             "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL})",
                             "##### 版本信息",
                             "- Nginx Web服务启动${msg}",
