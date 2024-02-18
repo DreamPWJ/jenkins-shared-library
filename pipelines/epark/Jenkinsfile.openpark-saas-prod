@@ -158,7 +158,7 @@ JSON_PARAMS
     "NPM_RUN_PARAMS" : "build",
     "IS_K8S_DEPLOY" : true,
     "K8S_POD_REPLICAS" : "3",
-    "APPLICATION_DOMAIN" : "https://saas.pengbocloud.com",
+    "APPLICATION_DOMAIN" : "https://pengbocloud.com",
 }
 
 */

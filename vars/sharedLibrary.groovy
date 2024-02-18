@@ -1155,33 +1155,26 @@ def nodeBuildProject() {
 
             timeout(time: 30, unit: 'MINUTES') {
                 try {
-                    if (Git.isExistsChangeFile(this)) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
-                        def retryCount = 0
-                        retry(3) {
-                            retryCount++
-                            if (retryCount >= 2) {
-                                sh "rm -rf node_modules && rm -f *.lock.*"
-                                // 如果包404下载失败  可以更换官方镜像源重新下载
-                                Node.setOfficialMirror(this)
-                            }
+                    def retryCount = 0
+                    retry(3) {
+                        retryCount++
+                        if (retryCount >= 2) {
+                            sh "rm -rf node_modules && rm -f *.lock.*"
+                            // 如果包404下载失败  可以更换官方镜像源重新下载
+                            Node.setOfficialMirror(this)
+                        }
+                        if (Git.isExistsChangeFile(this) || retryCount >= 2) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
                             println("安装依赖 📥")
                             // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱但依赖lock文件
                             def npmLog = "npm_install.log"
                             sh " npm ci || pnpm install > ${npmLog} 2>&1  || npm install >> ${npmLog} 2>&1 || yarn install >> ${npmLog} 2>&1  "
                             // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
                             sh " cat ${npmLog} || true"
-
-                            // >/dev/null为Shell脚本运行程序不输出日志到终端 2>&1是把出错输出也定向到标准输出
-                            println("执行Node构建 🏗️  ")
-                            // 如果是服务端SSR框架如 NextJS框架  1.部署到NodeJs服务  2.导出静态HTML部署
-                            def nextJSScript = ""
-                            if ("${IS_NEXT_JS}" == 'true') {
-                                // 导出静态HTML方式部署 可复用Nginx部署脚本  可配置到package.json内script 使用npm run执行
-                                // nextJSScript = " && next export && rm -rf ${NPM_PACKAGE_FOLDER} && mv out ${NPM_PACKAGE_FOLDER} "
-                            }
-                            sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
-                            sh " npm run '${NPM_RUN_PARAMS}' ${nextJSScript} " // >/dev/null 2>&1
                         }
+
+                        println("执行Node构建 🏗️  ")
+                        sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
+                        sh " npm run '${NPM_RUN_PARAMS}' "
                     }
                 } catch (e) {
                     println(e.getMessage())
@@ -2047,12 +2040,16 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
                 // 生成二维码 方便手机端扫描
                 genQRCode(map)
+                def screenshot = "![screenshot](${qrCodeOssUrl})"
+                if ("${qrCodeOssUrl}" == "") {
+                    screenshot = ""
+                }
                 dingtalk(
                         robot: "${DING_TALK_CREDENTIALS_ID}",
                         type: 'ACTION_CARD',
                         title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
                         text: [
-                                "![screenshot](${qrCodeOssUrl})",
+                                "${screenshot}",
                                 "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL})",
                                 "##### 版本信息",
                                 "- Nginx Web服务启动${msg}",
