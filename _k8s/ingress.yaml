@@ -11,39 +11,43 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     acme.cert-manager.io/http01-edit-in-place: "true"
 
-    # 开启金丝雀Canary。
+    # 开启金丝雀Canary
     nginx.ingress.kubernetes.io/canary: "true"
-    # Http Header请求头为version。
+    # Http Header请求头为version
     nginx.ingress.kubernetes.io/canary-by-header: "version"
-    # 请求头version=v2.0.0时，请求才会被路由到新版本服务中。
+    # 请求头version=v2.0.0时，请求才会被路由到新版本服务中
     nginx.ingress.kubernetes.io/canary-by-header-value: "v2.0.0"
     #nginx.ingress.kubernetes.io/canary-by-header-pattern: ""
     #nginx.ingress.kubernetes.io/canary-by-cookie: ""
-    # 在满足上述匹配规则的基础上仅允许百分比的流量会被路由到新版本服务中。
+    # 在满足上述匹配规则的基础上仅允许百分比的流量会被路由到新版本服务中
     nginx.ingress.kubernetes.io/canary-weight: "100"
 
-    # 开启跨域
+    # 开启CORS跨域
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "*"
     nginx.ingress.kubernetes.io/cors-max-age: "64800"
     nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, DELETE, PATCH, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+
     # 数据请求超时时间
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+
     # 负载均衡算法 如ip_hash
     nginx.ingress.kubernetes.io/upstream-hash-by: "$host"
     # Session保持配置
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/affinity-mode: "persistent"
     nginx.ingress.kubernetes.io/session-cookie-name: "route"
-    # 后端大文件上传大小
+
+    # 后端大文件上传大小 数据传输大小
     nginx.ingress.kubernetes.io/client-body-buffer-size: 1024m
     nginx.ingress.kubernetes.io/proxy-max-temp-file-size: 2048m
-    # 数据传输大小
     nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+
     # 配置是否同时支持http和https访问应用
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+
     # 采用了 “漏斗” 算法实现限流 保证服务可用性和被攻击  nginx的限流是一个队列模型。限流连接数为 队列长度+队列处理能力
     # 每个IP每秒可以访问的次数 默认乘数为5
     nginx.ingress.kubernetes.io/limit-rps: "50"
