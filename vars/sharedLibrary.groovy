@@ -1159,7 +1159,7 @@ def nodeBuildProject() {
                     retry(3) {
                         retryCount++
                         if (retryCount >= 2) {
-                            sh "rm -rf node_modules && rm -f *.lock.*"
+                            sh "rm -rf node_modules && rm -f *lock*"
                             // 如果包404下载失败  可以更换官方镜像源重新下载
                             // Node.setOfficialMirror(this)
                         }
@@ -1176,7 +1176,7 @@ def nodeBuildProject() {
                     }
                 } catch (e) {
                     println(e.getMessage())
-                    sh "rm -rf node_modules && rm -f *.lock.*"
+                    sh "rm -rf node_modules && rm -f *lock*"
                     error("Web打包失败, 终止当前Pipeline运行 ❌")
                 }
             }
