@@ -913,15 +913,13 @@ def nodeBuildProject() {
                         if (retryCount >= 2) {
                             sh "rm -rf node_modules && rm -f *.lock.*"
                             // 如果包404下载失败  可以更换官方镜像源重新下载
-                            Node.setOfficialMirror(this)
+                            // Node.setOfficialMirror(this)
                         }
                         if (Git.isExistsChangeFile(this) || retryCount >= 2) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
                             println("安装依赖 📥")
                             // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱但依赖lock文件
-                            def npmLog = "npm_install.log"
-                            sh " npm ci || pnpm install > ${npmLog} 2>&1  || npm install >> ${npmLog} 2>&1 || yarn install >> ${npmLog} 2>&1  "
+                            sh " npm ci || pnpm install || npm install || yarn install  "
                             // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
-                            sh " cat ${npmLog} || true"
                         }
 
                         println("执行Node构建 🏗️  ")
