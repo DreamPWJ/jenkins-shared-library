@@ -151,6 +151,7 @@ class Kubernetes implements Serializable {
         def yamlVolumeMounts = ""
         def yamlNfsParams = ""
         def setYamlArags = ""
+        def setPythonParams = ""
         // 复杂参数动态组合配置yaml文件
         if ("${ctx.IS_USE_SESSION}" == "true") {   // k8s集群业务应用是否使用Session 做亲和度关联
             isYamlUseSession = " --is_use_session=true "
@@ -161,12 +162,16 @@ class Kubernetes implements Serializable {
         if ("${ctx.NFS_MOUNT_PATHS}".trim() != "") { // NFS服务
             yamlNfsParams = " --nfs_server=${ctx.NFS_SERVER}  --nfs_params=${ctx.NFS_MOUNT_PATHS} "
         }
-        // 动态设置k8s yaml args参数
+        // java动态设置k8s yaml args参数
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java && "${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
             setYamlArags = " --set_yaml_arags='${map.docker_java_opts}' "
         }
+        // 设置python语言相关的参数
+        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
+            setPythonParams = " --set_python_start_file=${ctx.CUSTOM_PYTHON_START_FILE} "
+        }
 
-        pythonYamlParams = isYamlUseSession + yamlVolumeMounts + yamlNfsParams + yamlDefaultPort + setYamlArags
+        pythonYamlParams = isYamlUseSession + yamlVolumeMounts + yamlNfsParams + yamlDefaultPort + setYamlArags + setPythonParams
         if ("${pythonYamlParams}".trim() != "") {
             ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
                 ctx.println("使用Python的ruamel包动态配置K8S的Yaml文件: " + pythonYamlParams)
