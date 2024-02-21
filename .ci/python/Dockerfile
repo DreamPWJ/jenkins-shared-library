@@ -42,7 +42,7 @@ RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
 EXPOSE $EXPOSE_PORT
 
 # 根据主文件默认名称 app.py  CMD中的"$MY_VAR"变量设置成 docker run -e MY_VAR=value 运行变量 否则无法获取
-CMD ["python", "main.py"]
+CMD ["python", "$PYTHON_START_FILE"]
 
 # Flask部署 启动命令
 #CMD [ "python", "-m" , "flask", "run", "--host=0.0.0.0"]

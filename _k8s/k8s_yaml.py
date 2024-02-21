@@ -27,6 +27,8 @@ parser.add_argument('--default_port', type=int, default=None)
 parser.add_argument('--remote_debug_port', type=int, default=None)
 parser.add_argument('--is_use_session', type=bool, default=False)
 parser.add_argument('--set_yaml_arags', type=str, default=None)
+parser.add_argument('--set_python_start_file', type=str, default=None)
+parser.add_argument('--is_k8s_health_probe', type=bool, default=False)
 
 args = parser.parse_args()
 
@@ -106,14 +108,22 @@ if nfs_params is not None:
         [*nsf_server_yaml]
     )
 
-# 动态设置k8s yaml args参数
+# Java动态设置k8s  yaml args参数
 set_yaml_arags = args.set_yaml_arags
 if set_yaml_arags is not None:
     print(set_yaml_arags)
     # 适配Java Spring Boot框架容器动态启动命令
-    yaml_containers[0]["command"] = ["java"]  # 覆盖或补充 ENTRYPOINT
+    yaml_containers[0]["command"] = ["java"]  # 覆盖或补充 ENTRYPOINT 或 CMD
     yaml_containers[0]["args"] = ["-jar", "-Xms128m", set_yaml_arags,
                                   "-Djava.security.egd=file:/dev/./urandom", "/server.jar"]
+
+# 设置python语言相关的参数
+set_python_start_file = args.set_python_start_file
+if set_python_start_file is not None:
+    print(set_python_start_file)
+    # 启动命令
+    yaml_containers[0]["command"] = ["python"]  # 覆盖或补充 ENTRYPOINT 或 CMD
+    yaml_containers[0]["args"] = [set_python_start_file]
 
 # 业务应用是否使用Session处理
 if is_use_session:
@@ -126,6 +136,12 @@ default_port = args.default_port
 if default_port is not None:
     print(default_port)
     yaml_containers[0]['ports'].append({'containerPort': default_port})
+
+# 是否禁止执行K8S默认的健康探测
+is_k8s_health_probe = args.is_k8s_health_probe
+if is_k8s_health_probe:
+    del yaml_containers[0]["readinessProbe"]
+    del yaml_containers[0]["livenessProbe"]
 
 # print(yamlContent)
 
