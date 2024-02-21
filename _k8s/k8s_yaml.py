@@ -137,7 +137,7 @@ if default_port is not None:
     print(default_port)
     yaml_containers[0]['ports'].append({'containerPort': default_port})
 
-# 是否执行K8S默认的健康探测
+# 是否禁止执行K8S默认的健康探测
 is_k8s_health_probe = args.is_k8s_health_probe
 if is_k8s_health_probe:
     del yaml_containers[0]["readinessProbe"]

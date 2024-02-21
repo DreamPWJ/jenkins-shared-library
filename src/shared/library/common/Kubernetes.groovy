@@ -172,8 +172,8 @@ class Kubernetes implements Serializable {
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
             setPythonParams = " --set_python_start_file=${ctx.CUSTOM_PYTHON_START_FILE} "
         }
-        // 是否执行K8S默认的健康探测
-        if (true) {
+        // 是否禁止执行K8S默认的健康探测
+        if (false) {
             isK8sHealthProbe = " --is_k8s_health_probe=true "
         }
 
