@@ -28,6 +28,7 @@ parser.add_argument('--remote_debug_port', type=int, default=None)
 parser.add_argument('--is_use_session', type=bool, default=False)
 parser.add_argument('--set_yaml_arags', type=str, default=None)
 parser.add_argument('--set_python_start_file', type=str, default=None)
+parser.add_argument('--is_k8s_health_probe', type=bool, default=False)
 
 args = parser.parse_args()
 
@@ -135,6 +136,12 @@ default_port = args.default_port
 if default_port is not None:
     print(default_port)
     yaml_containers[0]['ports'].append({'containerPort': default_port})
+
+# 是否执行K8S默认的健康探测
+is_k8s_health_probe = args.is_k8s_health_probe
+if is_k8s_health_probe:
+    del yaml_containers[0]["readinessProbe"]
+    del yaml_containers[0]["livenessProbe"]
 
 # print(yamlContent)
 
