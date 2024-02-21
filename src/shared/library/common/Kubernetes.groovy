@@ -268,6 +268,7 @@ class Kubernetes implements Serializable {
      * K8S验证部署是否成功
      */
     static def verifyDeployment(ctx) {
+        // 前提开启 readinessProbe和livenessProbe 健康探测
         ctx.println("K8S集群所有Pod节点健康探测中, 请耐心等待... 🚀")
         def deploymentName = "${ctx.FULL_PROJECT_NAME}" // labels.app标签值
         def namespace = k8sNameSpace
