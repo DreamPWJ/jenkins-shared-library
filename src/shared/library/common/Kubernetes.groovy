@@ -152,6 +152,8 @@ class Kubernetes implements Serializable {
         def yamlNfsParams = ""
         def setYamlArags = ""
         def setPythonParams = ""
+        def isK8sHealthProbe = ""
+
         // 复杂参数动态组合配置yaml文件
         if ("${ctx.IS_USE_SESSION}" == "true") {   // k8s集群业务应用是否使用Session 做亲和度关联
             isYamlUseSession = " --is_use_session=true "
@@ -170,8 +172,12 @@ class Kubernetes implements Serializable {
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
             setPythonParams = " --set_python_start_file=${ctx.CUSTOM_PYTHON_START_FILE} "
         }
+        // 是否禁止执行K8S默认的健康探测
+        if (false) {
+            isK8sHealthProbe = " --is_k8s_health_probe=true "
+        }
 
-        pythonYamlParams = isYamlUseSession + yamlVolumeMounts + yamlNfsParams + yamlDefaultPort + setYamlArags + setPythonParams
+        pythonYamlParams = isYamlUseSession + yamlVolumeMounts + yamlNfsParams + yamlDefaultPort + setYamlArags + setPythonParams + isK8sHealthProbe
         if ("${pythonYamlParams}".trim() != "") {
             ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
                 ctx.println("使用Python的ruamel包动态配置K8S的Yaml文件: " + pythonYamlParams)
@@ -262,6 +268,7 @@ class Kubernetes implements Serializable {
      * K8S验证部署是否成功
      */
     static def verifyDeployment(ctx) {
+        // 前提开启 readinessProbe和livenessProbe 健康探测
         ctx.println("K8S集群所有Pod节点健康探测中, 请耐心等待... 🚀")
         def deploymentName = "${ctx.FULL_PROJECT_NAME}" // labels.app标签值
         def namespace = k8sNameSpace
