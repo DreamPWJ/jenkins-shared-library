@@ -1,7 +1,7 @@
 # Author: 潘维吉
 # Description: 云原生K8S中使用cert-manager基于 ACME 协议与 Let's Encrypt 自动签发与续签免费的SSL证书
 
-# 创建一个集群级的签发机构 仅需一次
+# 创建一个集群级的签发机构 仅需一次  kubectl delete clusterissuer  issuerName
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
