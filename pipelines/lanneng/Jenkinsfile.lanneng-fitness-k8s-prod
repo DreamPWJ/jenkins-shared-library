@@ -56,7 +56,7 @@ map.put('k8s_credentials_ids', '74a3d376-cb4c-4a20-9bf7-7300a5eaa84d')
 map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
 // 项目标签或项目简称
-map.put('project_tag', '车位锁平台')
+map.put('project_tag', '悦动时刻')
 
 // 是否是生产环境
 map.put('is_prod', true)
@@ -82,9 +82,9 @@ map.put('jenkins_node', 'node-2')
 map.put('jenkins_node_front_end', 'node-2')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
-map.put('nodejs', 'Node14')
-map.put('maven', 'Maven3.6')
-map.put('jdk', '11')
+map.put('nodejs', 'Node18')
+map.put('maven', 'Maven3.8')
+map.put('jdk', '17')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
@@ -104,7 +104,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', 'floor-lock')
+map.put('maven_one_level', ' ')
 // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
 map.put('maven_setting_xml', ' ')
 
@@ -113,24 +113,42 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.floor-lock-k8s-prod
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/lanneng/Jenkinsfile.lanneng-fitness-k8s-prod
 
 /*
 
-floor-lock-app-k8s-prod
-相机地锁联动服务端-k8s集群
+lanneng-fitness-app-k8s-prod
+悦动时刻健身服务端-k8s集群
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
-   "BRANCH_NAME" : "main" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/car_wash_api.git" ,
+   "BRANCH_NAME" : "fitness" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "floor-lock-app" ,
-   "SHELL_PARAMS" : "floor-lock app 8099 8080 rizhao-prod",
+   "PROJECT_NAME" : "lanneng-fitness-app" ,
+   "SHELL_PARAMS" : "lanneng-fitness app 8102 8080 prod",
    "IS_K8S_DEPLOY" : true,
    "K8S_POD_REPLICAS" : "1",
+   "IS_MAVEN_SINGLE_MODULE" : true,
    "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check",
-   "APPLICATION_DOMAIN" : "https://floor-lock-api.pengbocloud.com"
+   "APPLICATION_DOMAIN" : "https://fitness-api.pengbocloud.com"
 }
+
+
+lanneng-fitness-admin-web-k8s-prod
+悦动时刻健身Admin Web前端 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/fitness_web.git" ,
+    "BRANCH_NAME" : "main" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "lanneng-fitness-admin-web" ,
+    "SHELL_PARAMS" : "lanneng-fitness admin-web 9101 80 prod",
+    "NPM_RUN_PARAMS" : "build",
+    "IS_K8S_DEPLOY" : true,
+    "K8S_POD_REPLICAS" : "1",
+    "APPLICATION_DOMAIN" : "https://fitness-admin.pengbocloud.com"
+}
+
 
 */
 
