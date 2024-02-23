@@ -389,7 +389,6 @@ def call(String type = 'web-java', Map map) {
                     }
 /*                    agent {
                         docker {
-
                             // JDK MAVEN 环境  构建完成自动删除容器
                             image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
                             // label 'master'  // 如果有特定标签的节点用于运行Docker容器

@@ -1,7 +1,7 @@
 # Author: 潘维吉
 # Description: 云原生K8S中使用cert-manager基于 ACME 协议与 Let's Encrypt 自动签发与续签免费的SSL证书
 
-# 创建一个集群级的签发机构 仅需一次
+# 创建一个集群级的签发机构 仅需一次  kubectl delete clusterissuer  issuerName
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
@@ -79,8 +79,8 @@ metadata:
     # 为计算限速漏桶算法的 burst size和 limit-rps 的相乘放大系数  burst为队列长度
     nginx.ingress.kubernetes.io/limit-burst-multiplier: "10"
     # 配合 limit-window 表示每多少秒全局限速多少次（需要依赖 memcached）
-    nginx.ingress.kubernetes.io/global-rate-limit: "100000"
-    nginx.ingress.kubernetes.io/global-rate-limit-window: 1s
+    #nginx.ingress.kubernetes.io/global-rate-limit: "100000"
+    #nginx.ingress.kubernetes.io/global-rate-limit-window: 1s
     # 限制发送给后端服务的发送速率为 多少MB/每秒 rate为队列处理能力
     #nginx.ingress.kubernetes.io/limit-rate: 10240
     # 发送给后端服务的前 多少MB 数据不进行限速
