@@ -1223,24 +1223,29 @@ def mavenBuildProject(map, deployNum = 0) {
         // maven如果存在多级目录 一级目录设置
         MAVEN_ONE_LEVEL = "${MAVEN_ONE_LEVEL}".trim() != "" ? "${MAVEN_ONE_LEVEL}/" : "${MAVEN_ONE_LEVEL}".trim()
         println("执行Maven构建 🏗️  ")
-        if ("${MAVEN_SETTING_XML}" == "") {
-            // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
-            if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') { // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
-                MAVEN_ONE_LEVEL = ""
-                // 在pom.xml文件目录下执行 规范是pom.xml在代码根目录
-                // def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
-                sh "mvn clean install -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true"
-            } else {  // 多模块情况
-                // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
-                sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true"
+        retry(2) {
+            if ("${MAVEN_SETTING_XML}" == "") {
+                // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
+                if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') { // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
+                    MAVEN_ONE_LEVEL = ""
+                    // 在pom.xml文件目录下执行 规范是pom.xml在代码根目录
+                    // def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
+                    sh "mvn clean install -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true"
+                } else {  // 多模块情况
+                    // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
+                    sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true"
+                }
+            } else {
+                // 基于自定义setting.xml文件方式打包 如私有包等
+                Maven.packageBySettingFile(this)
             }
-        } else {
-            // 基于自定义setting.xml文件方式打包 如私有包等
-            Maven.packageBySettingFile(this)
-        }
-        // 获取pom文件信息
-        //Maven.getPomInfo(this)
 
+            // 对于Spring Boot 3.x及Spring Native集成的项目，通过以下命令来构建原生镜像
+            // sh " mvn clean package -Pnative -Dmaven.compile.fork=true -Dmaven.test.skip=true "
+
+            // 获取pom文件信息
+            // Maven.getPomInfo(this)
+        }
         if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
             javaPackageType = "jar"
         } else if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringMVC) {
