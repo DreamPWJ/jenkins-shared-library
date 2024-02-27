@@ -1365,7 +1365,7 @@ def uploadRemote(filePath, map) {
             sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd ${projectDeployFolder} && rm -f *.${javaPackageType}' "
             dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
                 // 上传构建包到远程服务器
-                sh " cd ${filePath} && scp ${proxyJumpSCPText} ${mavenPackageLocation} ${remote.user}@${remote.host}:${projectDeployFolder} "
+                sh " scp ${proxyJumpSCPText} ${mavenPackageLocation} ${remote.user}@${remote.host}:${projectDeployFolder} "
             }
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
             // Go语言打包产物 上传包到远程服务器
