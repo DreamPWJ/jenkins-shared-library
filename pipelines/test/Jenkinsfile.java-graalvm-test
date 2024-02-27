@@ -84,7 +84,7 @@ map.put('jenkins_node_front_end', 'node-2')
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node18')
 map.put('maven', 'Maven3.8')
-map.put('jdk', '17')
+map.put('jdk', 'amazoncorretto-21')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
