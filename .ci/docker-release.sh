@@ -7,7 +7,7 @@ echo -e "\033[32m执行Docker部署Java语言脚本  👇 \033[0m"
 # 可采用$0,$1,$2..等方式获取脚本命令行传入的参数  执行脚本  sudo ./docker-release.sh
 
 echo "使用getopts的方式进行shell参数传递"
-while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:y:z:" opt; do
+while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:s:y:z:" opt; do
   case $opt in
   a)
     echo "project_name_prefix=$OPTARG"
@@ -78,6 +78,10 @@ while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:y:z:" opt; do
   r)
     echo "tomcat_version=$OPTARG"
     tomcat_version=$OPTARG # 自定义Tomcat版本
+    ;;
+  s)
+    echo "jdk_publisher=$OPTARG"
+    jdk_publisher=$OPTARG # jdk版本发行商
     ;;
   y)
     echo "remote_debug_port=$OPTARG"
@@ -195,7 +199,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
   # 对于简单项目无需重复构建镜像  将部署文件 docker run -v 做挂载映射 直接重启容器即可
   docker build -t ${docker_image_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg PROJECT_NAME=${project_name} \
-    --build-arg EXPOSE_PORT="${build_expose_ports}" --build-arg JDK_VERSION=${jdk_version} \
+    --build-arg EXPOSE_PORT="${build_expose_ports}" --build-arg JDK_PUBLISHER=${jdk_publisher} --build-arg JDK_VERSION=${jdk_version} \
     --build-arg TOMCAT_VERSION=${tomcat_version} --build-arg JAVA_OPTS="-Xms128m ${docker_java_opts}" \
     -f /${deploy_folder}/${docker_file_name} . --no-cache
 else

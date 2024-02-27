@@ -294,7 +294,7 @@ def call(String type = 'web-java', Map map) {
                     agent {
                         docker {
                             // JDK MAVEN 环境  构建完成自动删除容器
-                            image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
+                            image "maven:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
                             args " -v /var/cache/maven/.m2:/root/.m2 "
                             reuseNode true // 使用根节点
                         }
@@ -390,7 +390,7 @@ def call(String type = 'web-java', Map map) {
 /*                    agent {
                         docker {
                             // JDK MAVEN 环境  构建完成自动删除容器
-                            image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
+                            image "maven:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
                             // label 'master'  // 如果有特定标签的节点用于运行Docker容器
                             args " --privileged -v /var/run/docker.sock:/var/run/docker.sock  -v /var/cache/maven/.m2:/root/.m2 "
                             reuseNode true // 使用根节点
@@ -515,7 +515,7 @@ def call(String type = 'web-java', Map map) {
                     /*       agent {
                                docker {
                                    // JDK MAVEN 环境  构建完成自动删除容器
-                                   image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
+                                   image "maven:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
                                    // label 'master'  // 如果有特定标签的节点用于运行Docker容器
                                    args " -v /var/cache/maven/.m2:/root/.m2 "
                                    reuseNode true // 使用根节点
@@ -776,6 +776,7 @@ def getInitParams(map) {
     EXPAND_SERVER_IPS = jsonParams.EXPAND_SERVER_IPS ? jsonParams.EXPAND_SERVER_IPS.trim() : ""
 
     JDK_VERSION = jsonParams.JDK_VERSION ? jsonParams.JDK_VERSION.trim() : "${map.jdk}" // 自定义JDK版本
+    JDK_PUBLISHER = jsonParams.JDK_PUBLISHER ? jsonParams.JDK_PUBLISHER.trim() : "${map.jdk_publisher}" // JDK版本发行商
     NODE_VERSION = jsonParams.NODE_VERSION ? jsonParams.NODE_VERSION.trim() : "${map.nodejs}" // 自定义Node版本
     TOMCAT_VERSION = jsonParams.TOMCAT_VERSION ? jsonParams.TOMCAT_VERSION.trim() : "7.0" // 自定义Tomcat版本
     // npm包管理工具类型 如:  npm、yarn、pnpm
@@ -976,7 +977,7 @@ def getShellParams(map) {
 
         // 区分JAVA框架类型参数
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION}"
+            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION} -s ${JDK_PUBLISHER}"
         }
 
         // Python项目参数
