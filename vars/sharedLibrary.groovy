@@ -1240,7 +1240,7 @@ def mavenBuildProject(map, deployNum = 0) {
                 Maven.packageBySettingFile(this)
             }
 
-            // 对于Spring Boot 3.x及Spring Native集成的项目，通过以下命令来构建原生镜像
+            // 对于Spring Boot 3.x及Spring Native与GaalVM集成的项目，通过以下命令来构建原生镜像  特性：性能明显提升 使用资源明显减少
             // sh " mvn clean package -Pnative -Dmaven.compile.fork=true -Dmaven.test.skip=true "
 
             // 获取pom文件信息
