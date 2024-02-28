@@ -294,7 +294,7 @@ def call(String type = 'web-java', Map map) {
                     agent {
                         docker {
                             // JDK MAVEN 环境  构建完成自动删除容器  graalvm使用csanchez/maven镜像
-                            image "maven:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
+                            image "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
                             args " -v /var/cache/maven/.m2:/root/.m2 "
                             reuseNode true // 使用根节点
                         }
@@ -390,7 +390,7 @@ def call(String type = 'web-java', Map map) {
 /*                    agent {
                         docker {
                             // JDK MAVEN 环境  构建完成自动删除容器
-                            image "maven:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
+                            image "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
                             // label 'master'  // 如果有特定标签的节点用于运行Docker容器
                             args " --privileged -v /var/run/docker.sock:/var/run/docker.sock  -v /var/cache/maven/.m2:/root/.m2 "
                             reuseNode true // 使用根节点
@@ -515,7 +515,7 @@ def call(String type = 'web-java', Map map) {
                     /*       agent {
                                docker {
                                    // JDK MAVEN 环境  构建完成自动删除容器
-                                   image "maven:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
+                                   image "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
                                    // label 'master'  // 如果有特定标签的节点用于运行Docker容器
                                    args " -v /var/cache/maven/.m2:/root/.m2 "
                                    reuseNode true // 使用根节点
@@ -863,6 +863,12 @@ def getInitParams(map) {
         println("大统一前端monorepo仓库项目参数: ${PROJECT_NAME}:${NPM_RUN_PARAMS}:${SHELL_PARAMS}")
     } else {
         MONOREPO_PROJECT_NAMES = GlobalVars.defaultValue
+    }
+
+    // Maven Docker构建镜像名称
+    mavenDockerName = "maven"
+    if ("${IS_SPRING_NATIVE}" == "true") {
+        mavenDockerName = "csanchez/maven"
     }
 
     SHELL_PARAMS_ARRAY = SHELL_PARAMS.split("\\s+")  // 正则表达式\s表示匹配任何空白字符，+表示匹配一次或多次
