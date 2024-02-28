@@ -1233,11 +1233,10 @@ def mavenBuildProject(map, deployNum = 0) {
         println("执行Maven构建 🏗️  ")
         retry(2) {
             // 对于Spring Boot 3.x及Spring Native与GaalVM集成的项目，通过以下命令来构建原生镜像  特性：性能明显提升 使用资源明显减少
-            // sh " mvn clean package -Pnative -Dmaven.compile.fork=true -Dmaven.test.skip=true "
             def springNativeBuildParams = ""
             if ("${IS_SPRING_NATIVE}" == "true") {
-                springNativeBuildParams = " -Pnative "
-                sh "mvn clean package -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true ${springNativeBuildParams}"
+                springNativeBuildParams = " -Pnative spring-boot:build-image "
+                sh "mvn ${springNativeBuildParams}"
             } else if ("${MAVEN_SETTING_XML}" == "") {
                 // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
                 if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') { // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
