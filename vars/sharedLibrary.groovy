@@ -1265,6 +1265,10 @@ def mavenBuildProject(map, deployNum = 0) {
         }
         if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
             javaPackageType = "jar"
+            // Spring Native默认Linux无后缀 原生直接执行的文件 也无需JVM环境
+            if ("${IS_SPRING_NATIVE}" == "true") {
+                javaPackageType = ""
+            }
         } else if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringMVC) {
             javaPackageType = "war"
         }
