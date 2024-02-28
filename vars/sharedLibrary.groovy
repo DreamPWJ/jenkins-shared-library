@@ -294,7 +294,7 @@ def call(String type = 'web-java', Map map) {
                     agent {
                         docker {
                             // JDK MAVEN 环境  构建完成自动删除容器
-                            image "maven:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
+                            image "csanchez/maven:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
                             args " -v /var/cache/maven/.m2:/root/.m2 "
                             reuseNode true // 使用根节点
                         }
