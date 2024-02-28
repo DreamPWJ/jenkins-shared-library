@@ -979,7 +979,12 @@ def getShellParams(map) {
 
         // 区分JAVA框架类型参数
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION} -s ${JDK_PUBLISHER}"
+            def jdkPublisher = "${JDK_PUBLISHER}"
+            if ("${IS_SPRING_NATIVE}" == "true") {
+                // GraalVM JDK with Native Image
+                jdkPublisher = "container-registry.oracle.com/graalvm/native-image"
+            }
+            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION} -s ${jdkPublisher}"
         }
 
         // Python项目参数
