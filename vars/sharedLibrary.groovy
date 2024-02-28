@@ -1195,6 +1195,7 @@ def nodeBuildProject() {
         sh "rm -rf ${NPM_PACKAGE_FOLDER} && mv build ${NPM_PACKAGE_FOLDER}"
     }*/
     webPackageSize = Utils.getFolderSize(this, npmPackageLocationDir)
+    println(webPackageSize)
     Tools.printColor(this, "Web打包成功 ✅")
     // 压缩文件夹 易于加速传输
     if ("${IS_MONO_REPO}" == 'true') {
@@ -1265,6 +1266,7 @@ def mavenBuildProject(map, deployNum = 0) {
         mavenPackageLocation = "${mavenPackageLocationDir}" + "/*.${javaPackageType}"
         println(mavenPackageLocation)
         javaPackageSize = Utils.getFileSize(this, mavenPackageLocation)
+        println(javaPackageSize)
         Tools.printColor(this, "Maven打包成功 ✅")
         // 上传部署文件到OSS
         uploadOss(map)
