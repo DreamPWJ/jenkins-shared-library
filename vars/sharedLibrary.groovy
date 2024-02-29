@@ -293,8 +293,8 @@ def call(String type = 'web-java', Map map) {
                     }
                     agent {
                         docker {
-                            // JDK MAVEN 环境  构建完成自动删除容器
-                            image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
+                            // JDK MAVEN 环境  构建完成自动删除容器  graalvm使用csanchez/maven镜像
+                            image "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
                             args " -v /var/cache/maven/.m2:/root/.m2 "
                             reuseNode true // 使用根节点
                         }
@@ -390,7 +390,7 @@ def call(String type = 'web-java', Map map) {
 /*                    agent {
                         docker {
                             // JDK MAVEN 环境  构建完成自动删除容器
-                            image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
+                            image "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
                             // label 'master'  // 如果有特定标签的节点用于运行Docker容器
                             args " --privileged -v /var/run/docker.sock:/var/run/docker.sock  -v /var/cache/maven/.m2:/root/.m2 "
                             reuseNode true // 使用根节点
@@ -515,7 +515,7 @@ def call(String type = 'web-java', Map map) {
                     /*       agent {
                                docker {
                                    // JDK MAVEN 环境  构建完成自动删除容器
-                                   image "maven:${map.maven.replace('Maven', '')}-openjdk-${JDK_VERSION}"
+                                   image "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
                                    // label 'master'  // 如果有特定标签的节点用于运行Docker容器
                                    args " -v /var/cache/maven/.m2:/root/.m2 "
                                    reuseNode true // 使用根节点
@@ -776,6 +776,7 @@ def getInitParams(map) {
     EXPAND_SERVER_IPS = jsonParams.EXPAND_SERVER_IPS ? jsonParams.EXPAND_SERVER_IPS.trim() : ""
 
     JDK_VERSION = jsonParams.JDK_VERSION ? jsonParams.JDK_VERSION.trim() : "${map.jdk}" // 自定义JDK版本
+    JDK_PUBLISHER = jsonParams.JDK_PUBLISHER ? jsonParams.JDK_PUBLISHER.trim() : "${map.jdk_publisher}" // JDK版本发行商
     NODE_VERSION = jsonParams.NODE_VERSION ? jsonParams.NODE_VERSION.trim() : "${map.nodejs}" // 自定义Node版本
     TOMCAT_VERSION = jsonParams.TOMCAT_VERSION ? jsonParams.TOMCAT_VERSION.trim() : "7.0" // 自定义Tomcat版本
     // npm包管理工具类型 如:  npm、yarn、pnpm
@@ -803,6 +804,8 @@ def getInitParams(map) {
     IS_DIFF_CONF_IN_DIFF_MACHINES = jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES ? jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES : false
     // 是否开启基于QPS自定义指标的K8S水平弹性扩缩容
     IS_K8S_HPA_QPS = jsonParams.IS_K8S_HPA_QPS ? jsonParams.IS_K8S_HPA_QPS : false
+    // 是否开启Spring Native原生镜像 显著提升性能同时降低资源使用
+    IS_SPRING_NATIVE = jsonParams.IS_SPRING_NATIVE ? jsonParams.IS_SPRING_NATIVE : false
 
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
@@ -860,6 +863,12 @@ def getInitParams(map) {
         println("大统一前端monorepo仓库项目参数: ${PROJECT_NAME}:${NPM_RUN_PARAMS}:${SHELL_PARAMS}")
     } else {
         MONOREPO_PROJECT_NAMES = GlobalVars.defaultValue
+    }
+
+    // Maven Docker构建镜像名称
+    mavenDockerName = "maven"
+    if ("${IS_SPRING_NATIVE}" == "true") {
+        mavenDockerName = "csanchez/maven"
     }
 
     SHELL_PARAMS_ARRAY = SHELL_PARAMS.split("\\s+")  // 正则表达式\s表示匹配任何空白字符，+表示匹配一次或多次
@@ -976,7 +985,12 @@ def getShellParams(map) {
 
         // 区分JAVA框架类型参数
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION}"
+            def jdkPublisher = "${JDK_PUBLISHER}"
+            if ("${IS_SPRING_NATIVE}" == "true") {
+                // jdkPublisher = "container-registry.oracle.com/graalvm/native-image"  // GraalVM JDK with Native Image
+                jdkPublisher = "container-registry.oracle.com/graalvm/jdk" //  GraalVM JDK without Native Image
+            }
+            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION} -s ${jdkPublisher} -t ${IS_SPRING_NATIVE}"
         }
 
         // Python项目参数
@@ -1192,6 +1206,7 @@ def nodeBuildProject() {
         sh "rm -rf ${NPM_PACKAGE_FOLDER} && mv build ${NPM_PACKAGE_FOLDER}"
     }*/
     webPackageSize = Utils.getFolderSize(this, npmPackageLocationDir)
+    println(webPackageSize)
     Tools.printColor(this, "Web打包成功 ✅")
     // 压缩文件夹 易于加速传输
     if ("${IS_MONO_REPO}" == 'true') {
@@ -1216,46 +1231,64 @@ def mavenBuildProject(map, deployNum = 0) {
         Java.switchJDKByJenv(this, "${JDK_VERSION}")
     }
     sh "mvn --version"
-    // 自动替换不同分布式部署节点的环境文件  deployNum部署节点数
-    Deploy.replaceEnvFile(this, deployNum)
-    // maven如果存在多级目录 一级目录设置
-    MAVEN_ONE_LEVEL = "${MAVEN_ONE_LEVEL}".trim() != "" ? "${MAVEN_ONE_LEVEL}/" : "${MAVEN_ONE_LEVEL}".trim()
-    println("执行Maven构建 🏗️  ")
-    if ("${MAVEN_SETTING_XML}" == "") {
-        // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
-        if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') { // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
-            MAVEN_ONE_LEVEL = ""
-            // 在pom.xml文件目录下执行 规范是pom.xml在代码根目录
-            // def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
-            sh "mvn clean install -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true"
-        } else {  // 多模块情况
-            // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
-            sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true"
-        }
-    } else {
-        // 基于自定义setting.xml文件方式打包 如私有包等
-        Maven.packageBySettingFile(this)
-    }
-    // 获取pom文件信息
-    //Maven.getPomInfo(this)
+    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
+        // 自动替换不同分布式部署节点的环境文件  deployNum部署节点数
+        Deploy.replaceEnvFile(this, deployNum)
+        // maven如果存在多级目录 一级目录设置
+        MAVEN_ONE_LEVEL = "${MAVEN_ONE_LEVEL}".trim() != "" ? "${MAVEN_ONE_LEVEL}/" : "${MAVEN_ONE_LEVEL}".trim()
+        println("执行Maven构建 🏗️  ")
+        retry(2) {
+            // 对于Spring Boot 3.x及Spring Native与GaalVM集成的项目，通过以下命令来构建原生镜像  特性：性能明显提升 使用资源明显减少
+            // sh " mvn clean package -Pnative -Dmaven.compile.fork=true -Dmaven.test.skip=true "
+            def springNativeBuildParams = ""
+            if ("${IS_SPRING_NATIVE}" == "true") {
+                springNativeBuildParams = " -Pnative "
+                sh "mvn clean package -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true ${springNativeBuildParams}"
+            } else if ("${MAVEN_SETTING_XML}" == "") {
+                // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
+                if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') { // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
+                    MAVEN_ONE_LEVEL = ""
+                    // 在pom.xml文件目录下执行 规范是pom.xml在代码根目录
+                    // def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
+                    sh "mvn clean install -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true ${springNativeBuildParams}"
+                } else {  // 多模块情况
+                    // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
+                    sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true ${springNativeBuildParams}"
+                }
+            } else {
+                // 基于自定义setting.xml文件方式打包 如私有包等
+                Maven.packageBySettingFile(this)
+            }
 
-    if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
-        javaPackageType = "jar"
-    } else if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringMVC) {
-        javaPackageType = "war"
+            // 获取pom文件信息
+            // Maven.getPomInfo(this)
+        }
+        if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
+            javaPackageType = "jar"
+            // Spring Native默认Linux无后缀 原生直接执行的文件 也无需JVM环境
+            if ("${IS_SPRING_NATIVE}" == "true") {
+                javaPackageType = ""
+            }
+        } else if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringMVC) {
+            javaPackageType = "war"
+        }
+        // Maven打包产出物位置
+        if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') {
+            mavenPackageLocationDir = "target"
+        } else {
+            mavenPackageLocationDir = ("${MAVEN_ONE_LEVEL}" == "" ? "${PROJECT_NAME}" : "${MAVEN_ONE_LEVEL}${PROJECT_NAME}") + "/target"
+        }
+        mavenPackageLocation = "${mavenPackageLocationDir}" + "/*.${javaPackageType}"
+        if ("${IS_SPRING_NATIVE}" == "true") {
+            mavenPackageLocation = "${mavenPackageLocationDir}" + "/spring-native-graalvm"
+        }
+        println(mavenPackageLocation)
+        javaPackageSize = Utils.getFileSize(this, mavenPackageLocation)
+        println(javaPackageSize)
+        Tools.printColor(this, "Maven打包成功 ✅")
+        // 上传部署文件到OSS
+        uploadOss(map)
     }
-    // Maven打包产出物位置
-    if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') {
-        mavenPackageLocationDir = "target"
-    } else {
-        mavenPackageLocationDir = ("${MAVEN_ONE_LEVEL}" == "" ? "${PROJECT_NAME}" : "${MAVEN_ONE_LEVEL}${PROJECT_NAME}") + "/target"
-    }
-    mavenPackageLocation = "${mavenPackageLocationDir}" + "/*.${javaPackageType}"
-    println(mavenPackageLocation)
-    javaPackageSize = Utils.getFileSize(this, mavenPackageLocation)
-    Tools.printColor(this, "Maven打包成功 ✅")
-    // 上传部署文件到OSS
-    uploadOss(map)
 }
 
 /**
@@ -1355,9 +1388,10 @@ def uploadRemote(filePath, map) {
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
             // 上传前删除部署目录的jar包 防止名称修改等导致多个部署目标jar包存在  jar包需要唯一性
             sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd ${projectDeployFolder} && rm -f *.${javaPackageType}' "
-            // 上传构建包到远程服务器
-            sh "cd ${filePath} && scp ${proxyJumpSCPText} ${mavenPackageLocation} " +
-                    "${remote.user}@${remote.host}:${projectDeployFolder} "
+            dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
+                // 上传构建包到远程服务器
+                sh " scp ${proxyJumpSCPText} ${mavenPackageLocation} ${remote.user}@${remote.host}:${projectDeployFolder} "
+            }
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
             // Go语言打包产物 上传包到远程服务器
             sh "cd ${filePath} && scp ${proxyJumpSCPText} main.go ${remote.user}@${remote.host}:${projectDeployFolder} "

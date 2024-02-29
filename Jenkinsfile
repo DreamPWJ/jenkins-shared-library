@@ -89,6 +89,7 @@ map.put('jenkins_node_front_end', 'master')
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node14')
 map.put('maven', 'Maven3.6')
+map.put('jdk_publisher', 'openjdk')
 map.put('jdk', '11')
 
 // 相关信任标识

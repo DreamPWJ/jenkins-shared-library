@@ -3,6 +3,7 @@
 # Description: 自定义构建JDK Spring Boot项目镜像
 
 # 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
+ARG JDK_PUBLISHER
 ARG JDK_VERSION
 ARG DEPLOY_FOLDER
 ARG PROJECT_NAME
@@ -13,7 +14,7 @@ ARG EXPOSE_PORT
 #FROM-MULTISTAGE-BUILD-IMAGES
 
 # JDK基础镜像 默认值变量方式 ${JDK_VERSION:-11}
-FROM openjdk:${JDK_VERSION}
+FROM ${JDK_PUBLISHER}:${JDK_VERSION}
 
 # 多阶段构建镜像 从上一个镜像内复制环境到本镜像
 # 示例 COPY --from=0 / /   下行注释的KEY值动态替换

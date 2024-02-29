@@ -165,7 +165,8 @@ class Kubernetes implements Serializable {
             yamlNfsParams = " --nfs_server=${ctx.NFS_SERVER}  --nfs_params=${ctx.NFS_MOUNT_PATHS} "
         }
         // java动态设置k8s yaml args参数
-        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java && "${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
+        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java
+                && "${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${ctx.IS_SPRING_NATIVE}" == "false") {
             setYamlArags = " --set_yaml_arags='${map.docker_java_opts}' "
         }
         // 设置python语言相关的参数
