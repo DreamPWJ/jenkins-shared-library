@@ -7,7 +7,7 @@ echo -e "\033[32m执行Docker部署Java语言脚本  👇 \033[0m"
 # 可采用$0,$1,$2..等方式获取脚本命令行传入的参数  执行脚本  sudo ./docker-release.sh
 
 echo "使用getopts的方式进行shell参数传递"
-while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:s:y:z:" opt; do
+while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:" opt; do
   case $opt in
   a)
     echo "project_name_prefix=$OPTARG"
@@ -82,6 +82,10 @@ while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:s:y:z:" opt; do
   s)
     echo "jdk_publisher=$OPTARG"
     jdk_publisher=$OPTARG # jdk版本发行商
+    ;;
+  t)
+    echo "is_spring_native=$OPTARG"
+    is_spring_native=$OPTARG # 是否打包Spring Native原生镜像
     ;;
   y)
     echo "remote_debug_port=$OPTARG"
@@ -195,6 +199,9 @@ if [[ ${is_push_docker_repo} == false ]]; then
   docker_file_name="Dockerfile" # 默认Spring Boot框架 jar包
   if [[ ${java_framework_type} == 2 ]]; then
     docker_file_name="Dockerfile.mvc" # Spring MVC框架 war包
+  fi
+  if [[ ${is_spring_native} == true ]]; then
+    docker_file_name="Dockerfile.native" # Spring Native原生镜像直接执行文件
   fi
   # 对于简单项目无需重复构建镜像  将部署文件 docker run -v 做挂载映射 直接重启容器即可
   docker build -t ${docker_image_name} \

@@ -145,6 +145,9 @@ class Docker implements Serializable {
                     def dockerFileName = ""
                     if ("${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
                         dockerFileName = "Dockerfile"
+                        if ("${ctx.IS_SPRING_NATIVE}" == 'true') { // Spring Native原生镜像直接执行文件
+                            dockerFileName = "Dockerfile.native"
+                        }
                     } else if ("${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringMVC) {
                         dockerFileName = "Dockerfile.mvc"
                     }

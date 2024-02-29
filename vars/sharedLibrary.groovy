@@ -990,7 +990,7 @@ def getShellParams(map) {
                 // GraalVM JDK with Native Image
                 jdkPublisher = "container-registry.oracle.com/graalvm/native-image"
             }
-            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION} -s ${jdkPublisher}"
+            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION} -s ${jdkPublisher} -t ${IS_SPRING_NATIVE}"
         }
 
         // Python项目参数
@@ -1279,6 +1279,9 @@ def mavenBuildProject(map, deployNum = 0) {
             mavenPackageLocationDir = ("${MAVEN_ONE_LEVEL}" == "" ? "${PROJECT_NAME}" : "${MAVEN_ONE_LEVEL}${PROJECT_NAME}") + "/target"
         }
         mavenPackageLocation = "${mavenPackageLocationDir}" + "/*.${javaPackageType}"
+        if ("${IS_SPRING_NATIVE}" == "true") {
+            mavenPackageLocation = "${mavenPackageLocationDir}" + "/spring-native-graalvm"
+        }
         println(mavenPackageLocation)
         javaPackageSize = Utils.getFileSize(this, mavenPackageLocation)
         println(javaPackageSize)
