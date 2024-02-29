@@ -39,7 +39,7 @@ if [[ ${project_type} == 1 ]]; then
         echo "Web前端应用启动成功" # 必须包含"成功"字样 pipeline内判断
         break
       fi
-      sleep 2s
+      sleep 1s
     fi
   done
 elif [[ ${project_type} == 2 ]]; then
@@ -60,7 +60,7 @@ elif [[ ${project_type} == 2 ]]; then
         echo "服务端应用启动成功" # 必须包含"成功"字样 pipeline内判断
         break
       fi
-      sleep 2s
+      sleep 3s
     fi
   done
 fi

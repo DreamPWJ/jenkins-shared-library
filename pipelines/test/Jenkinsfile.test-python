@@ -84,6 +84,7 @@ map.put('jenkins_node_front_end', 'master')
 // 构建环境变量
 map.put('nodejs', 'Node14')
 map.put('maven', 'Maven3.6')
+map.put('jdk_publisher', 'openjdk')
 map.put('jdk', '11')
 
 // 相关信任标识

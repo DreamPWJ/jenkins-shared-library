@@ -11,13 +11,13 @@
 def map = [:]
 
 // 远程服务器地址 k8s集群方式可填空或填公网代理负载IP
-map.put('remote_ip', '172.16.1.55')
-// 工作服务器地址 同时支持N个服务器自动化部署
+map.put('remote_ip', '172.16.0.91')
+// 工作服务器地址 同时支持N个服务器自动化分布式部署
 map.put('remote_worker_ips', [])
 // 远程服务器用户名
 map.put('remote_user_name', 'root')
 // 代理机或跳板机外网ip用于透传部署到内网目标机器 选填 目标机器外部无法直接访问情况填写内网ip
-map.put('proxy_jump_ip', ' ')
+map.put('proxy_jump_ip', ' ') // 119.188.90.222
 // 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
 map.put('proxy_jump_user_name', 'root')
 // 自定义跳板机ssh和scp访问端口 默认22
@@ -31,11 +31,11 @@ map.put('build_num_keep', 1)
 
 // Docker相关参数
 // JVM内存设置
-map.put('docker_java_opts', '-Xmx1800m')
+map.put('docker_java_opts', '-Xmx2000m')
 // docker内存限制 不支持小数点形式设置
 map.put('docker_memory', '2G')
 // docker日志限制
-map.put('docker_log_opts', 'max-size=50m') // --log-opt max-size=50m --log-opt max-file=3
+map.put('docker_log_opts', 'max-size=150m') // --log-opt max-size=50m --log-opt max-file=3
 // docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
 map.put('docker_volume_mount', '')
 // Dockerfile多阶段构建 镜像名称
@@ -56,11 +56,11 @@ map.put('k8s_credentials_ids', ' ')
 map.put('k8s_image_pull_secrets', ' ')
 
 // 项目标签或项目简称
-map.put('project_tag', '单体式')
+map.put('project_tag', ' ')
 
 // 是否是生产环境
 map.put('is_prod', false)
-// 是否在同一台服务器分布式部署
+// 是否在同一台服务器蓝绿部署或滚动部署 非k8s集群方式设置
 map.put('is_same_server', false)
 // 是否进行优雅停机
 map.put('is_grace_shutdown', false)
@@ -71,26 +71,26 @@ map.put('is_ding_notice', false)
 // 是否进行部署前通知
 map.put('is_before_deploy_notice', false)
 // 是否通知变更记录
-map.put('is_notice_change_log', false)
+map.put('is_notice_change_log', true)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
 map.put('is_git_tag', true)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
-// jenkins分布式构建节点label名称  预配置在jenkins节点管理内
-map.put('jenkins_node', 'macos-test')
+// jenkins分布式构建节点label名称
+map.put('jenkins_node', 'master')
 map.put('jenkins_node_front_end', 'master')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node14')
 map.put('maven', 'Maven3.6')
 map.put('jdk_publisher', 'openjdk')
-map.put('jdk', '11')
+map.put('jdk', '8')
 
 // 相关信任标识
-map.put('ci_git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
-map.put('git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
-map.put('ding_talk_credentials_id', 'ba0ebec7-73ad-4a26-af8b-d15c470b1328')
+map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
+map.put('git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
+map.put('ding_talk_credentials_id', 'd33ae0ba-e531-41c8-8983-d9734e53a25a')
 // OSS对象存储访问凭据配置 Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
 map.put('oss_credentials_id', ' ')
 // 直连方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接
@@ -105,32 +105,70 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', ' ')
+map.put('maven_one_level', 'pellet-charging')
 // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
 map.put('maven_setting_xml', ' ')
 
 // 调用核心通用Pipeline
 sharedLibrary(map)
 
+
 // ---------------------------------------------------------------------------------------------------------------------
-// https://github.com/DreamPWJ/jenkins-shared-library.git  Jenkinsfile.monorepo
-
-
-// -------- 内测环境 -----------
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/Jenkinsfile.test
 
 /*
 
-vue-frontend-monorepo
-Vue大前端统一的单体式仓库❤️
+test-frontend-web
+测试Web前端 ❤️
 JSON_PARAMS
 {
-    "REPO_URL" : "https://github.com/DreamPWJ/panweiji/vue-frontend-monorepo.git" ,
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/rzhtc.git" ,
     "BRANCH_NAME" : "dev" ,
     "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "property-sales-manage,vue-demo" ,
-    "SHELL_PARAMS" : "property-sales manage-web 8009 80 dev,vue-lerna demo 8008 80 dev" ,
-    "NPM_RUN_PARAMS" : "build,build",
-    "IS_MONO_REPO": true
+    "PROJECT_NAME" : "rzhtc" ,
+    "SHELL_PARAMS" : "rzhtc h5 8020 80 sit" ,
+    "NPM_RUN_PARAMS" : "build:juxian",
+    "IS_ROLL_DEPLOY" : true,
+    "CUSTOM_NGINX_CONFIG" : "config/default.conf"
+}
+
+test-backend-spring-boot
+测试Java服务端Spring Boot框架
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
+   "BRANCH_NAME" : "develop" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "pellet-charging-app" ,
+   "SHELL_PARAMS" : "pellet-charging app 8098 8080 sit"
+}
+
+test-spring-boot
+测试Java服务端Spring Boot框架
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/openpark_backend.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "openpark" ,
+   "SHELL_PARAMS" : "openpark app 8099 9000 sit",
+   "IS_MAVEN_SINGLE_MODULE" : true,
+}
+
+test-backend-spring-mvc
+测试Java服务端Spring MVC框架
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/pan.weiji/spring-mvc-demo.git" ,
+   "BRANCH_NAME" : "master" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "spring-mvc-demo" ,
+   "SHELL_PARAMS" : "spring-mvc demo 8096 8080 sit",
+   "IS_MAVEN_SINGLE_MODULE" : true,
+   "JAVA_FRAMEWORK_TYPE" : "2",
+   "DOCKER_VOLUME_MOUNT" : "/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
 }
 
 */
+
+
