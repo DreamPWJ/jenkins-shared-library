@@ -3,6 +3,8 @@
 # Description: 自定义构建Spring Native与GraalVM新引擎项目镜像
 
 # 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
+ARG JDK_PUBLISHER
+ARG JDK_VERSION
 ARG PROJECT_NAME
 ARG EXPOSE_PORT
 
@@ -11,7 +13,8 @@ ARG EXPOSE_PORT
 #FROM-MULTISTAGE-BUILD-IMAGES
 
 # 基础镜像
-FROM alpine:latest
+#FROM alpine:latest
+FROM ${JDK_PUBLISHER}:${JDK_VERSION}
 
 # 多阶段构建镜像 从上一个镜像内复制环境到本镜像
 # 示例 COPY --from=0 / /   下行注释的KEY值动态替换
@@ -31,7 +34,7 @@ ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 将部署文件复制到docker内根目录 Spring Native原生镜像包 通常扩展名为.exe在Windows下，而在Linux上没有特定扩展名，直接是一个可执行文件
-COPY spring-native-graalvm /app/
+COPY  spring-native-graalvm /app/spring-native-graalvm
 
 # 给应用程序赋予执行权限
 RUN chmod +x /app/spring-native-graalvm
