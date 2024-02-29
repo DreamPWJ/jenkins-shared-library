@@ -11,7 +11,7 @@ ARG EXPOSE_PORT
 #FROM-MULTISTAGE-BUILD-IMAGES
 
 # 基础镜像
-FROM ubuntu:focal
+FROM alpine:latest
 
 # 多阶段构建镜像 从上一个镜像内复制环境到本镜像
 # 示例 COPY --from=0 / /   下行注释的KEY值动态替换
