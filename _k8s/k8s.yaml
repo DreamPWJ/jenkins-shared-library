@@ -81,7 +81,7 @@ spec:
             httpGet:  # 任何大于或等于 200 且小于 400 的代码都表示成功。任何其他代码表示失败
               path: {CUSTOM_HEALTH_CHECK_PATH}
               port: {DEFAULT_CONTAINER_PORT}
-            initialDelaySeconds: 3   # 探针在容器启动后的多少秒才开始执行
+            initialDelaySeconds: 1   # 探针在容器启动后的多少秒才开始执行  如GraalVM启动毫秒级
             periodSeconds: 10        # 探针执行频率。默认是10秒，最小1秒
             timeoutSeconds: 1        # 探测超时时间。默认1秒，最小1秒
             successThreshold: 1      # 连续探测1次成功表示成功
