@@ -12,6 +12,7 @@ class Maven implements Serializable {
      * 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
      */
     static def mvndPackage(ctx) {
+        ctx.sh "mvnd --version"
         ctx.sh "mvnd clean install -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am -Dmaven.test.skip=true"
     }
 

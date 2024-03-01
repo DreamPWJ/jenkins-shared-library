@@ -293,7 +293,7 @@ def call(String type = 'web-java', Map map) {
                     }
                     agent {
                         docker {
-                            // JDK MAVEN 环境  构建完成自动删除容器  graalvm使用csanchez/maven镜像
+                            // JDK MAVEN 环境  构建完成自动删除容器  graalvm使用csanchez/maven镜像  容器仓库：https://hub.docker.com/_/maven/
                             image "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
                             args " -v /var/cache/maven/.m2:/root/.m2 "
                             reuseNode true // 使用根节点
