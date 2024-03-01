@@ -293,7 +293,7 @@ def call(String type = 'web-java', Map map) {
                     }
                     agent {
                         docker {
-                            // JDK MAVEN 环境  构建完成自动删除容器  graalvm使用csanchez/maven镜像
+                            // JDK MAVEN 环境  构建完成自动删除容器  graalvm使用csanchez/maven镜像  容器仓库：https://hub.docker.com/_/maven/
                             image "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
                             args " -v /var/cache/maven/.m2:/root/.m2 "
                             reuseNode true // 使用根节点
@@ -988,7 +988,8 @@ def getShellParams(map) {
             def jdkPublisher = "${JDK_PUBLISHER}"
             if ("${IS_SPRING_NATIVE}" == "true") {
                 // jdkPublisher = "container-registry.oracle.com/graalvm/native-image"  // GraalVM JDK with Native Image
-                jdkPublisher = "container-registry.oracle.com/graalvm/jdk" //  GraalVM JDK without Native Image
+                // GraalVM JDK without Native Image
+                jdkPublisher = "container-registry.oracle.com/graalvm/jdk"
             }
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION} -s ${jdkPublisher} -t ${IS_SPRING_NATIVE}"
         }
@@ -1243,6 +1244,7 @@ def mavenBuildProject(map, deployNum = 0) {
             def springNativeBuildParams = ""
             if ("${IS_SPRING_NATIVE}" == "true") {
                 springNativeBuildParams = " -Pnative "
+                // 可以使用mvnd守护进程加速构建
                 sh "mvn clean package -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true ${springNativeBuildParams}"
             } else if ("${MAVEN_SETTING_XML}" == "") {
                 // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
