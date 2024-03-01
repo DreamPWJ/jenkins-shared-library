@@ -1243,6 +1243,7 @@ def mavenBuildProject(map, deployNum = 0) {
             def springNativeBuildParams = ""
             if ("${IS_SPRING_NATIVE}" == "true") {
                 springNativeBuildParams = " -Pnative "
+                // 使用mvnd守护进程加速构建
                 sh "mvnd clean package -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true ${springNativeBuildParams}"
             } else if ("${MAVEN_SETTING_XML}" == "") {
                 // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
