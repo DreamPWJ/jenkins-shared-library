@@ -23,7 +23,7 @@ class Kubernetes implements Serializable {
      * 声明式执行k8s集群部署
      */
     static def deploy(ctx, map, deployNum = 0) {
-        def k8sStartTime = new Date()
+
         // 多个K8s集群同时循环滚动部署
         "${map.k8s_credentials_ids}".trim().split(",").each { k8s_credentials_id ->
             // KUBECONFIG变量为k8s中kubectl命令的yaml配置授权访问文件内容 数据保存为Jenkins的“Secret file”类型的凭据，用credentials方法从凭据中获取
@@ -81,9 +81,9 @@ class Kubernetes implements Serializable {
 
                 ctx.println("K8S集群执行部署完成 ✅")
 
+                def k8sStartTime = new Date()
                 // K8S部署验证是否成功
                 verifyDeployment(ctx)
-
                 // 计算应用启动时间
                 ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date())
             }
