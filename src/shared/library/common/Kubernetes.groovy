@@ -273,6 +273,7 @@ class Kubernetes implements Serializable {
         ctx.println("K8S集群所有Pod节点健康探测中, 请耐心等待... 🚀")
         def deploymentName = "${ctx.FULL_PROJECT_NAME}" // labels.app标签值
         def namespace = k8sNameSpace
+        ctx.sleep 1 // 等待检测
         // 等待所有Pod达到Ready状态
         ctx.timeout(time: 12, unit: 'MINUTES') { // 设置超时时间
             def podsAreReady = false
@@ -303,11 +304,11 @@ class Kubernetes implements Serializable {
             // 如Pending由于资源不足或其他限制  Terminating器可能还在停止中或资源清理阶段  ContainerCreating 容器尚未创建完成
             // Failed 如果Pod中的所有容器都因失败而退出，并且不会再重启，则Pod会进入Failed状态  CrashLoopBackOff 时，这意味着 Pod 中的主容器（或其中一个容器）反复启动并快速退出
             // 示例 查询pod所有节点的状态  kubectl get pods --selector=app=my-app -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.phase}{"\n"}{end}'
-            if (whileCount == 1) { // 只执行一次的话 健康探测失败
-                Tools.printColor(ctx, "K8S集群中Pod服务部署启动失败  ❌", "red")
-                ctx.error("K8S集群中Pod服务部署启动失败 ❌")
-            } else {
+            if (podsAreReady == true) { //  健康探测成功
                 Tools.printColor(ctx, "K8S集群中所有Pod服务已处于启动状态 ✅")
+            } else { //  健康探测失败
+                Tools.printColor(ctx, "K8S集群中Pod服务部署启动失败  ❌", "red")
+                ctx.error("K8S集群中Pod服务部署启动失败 终止流水线运行 ❌")
             }
         }
 
