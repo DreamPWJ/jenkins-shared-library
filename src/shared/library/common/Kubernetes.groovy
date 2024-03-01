@@ -273,7 +273,7 @@ class Kubernetes implements Serializable {
         ctx.println("K8S集群所有Pod节点健康探测中, 请耐心等待... 🚀")
         def deploymentName = "${ctx.FULL_PROJECT_NAME}" // labels.app标签值
         def namespace = k8sNameSpace
-        ctx.sleep 1 // 等待检测
+        ctx.sleep 3 // 等待检测
         // 等待所有Pod达到Ready状态
         ctx.timeout(time: 12, unit: 'MINUTES') { // 设置超时时间
             def podsAreReady = false
@@ -292,10 +292,10 @@ class Kubernetes implements Serializable {
                     // yaml内容中包含初始化时间和启动完成时间 shell中自动解析所有内容，建议yq进行实际的YAML解析
                     ctx.echo "Waiting for all pods to be ready. Currently Ready: $readyCount / Total: $totalPods"
                     if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-                        ctx.sleep 12 // 每隔多少秒检查一次
+                        ctx.sleep 10 // 每隔多少秒检查一次
                     }
                     if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-                        ctx.sleep 8 // 每隔多少秒检查一次
+                        ctx.sleep 5 // 每隔多少秒检查一次
                     }
                 }
             }

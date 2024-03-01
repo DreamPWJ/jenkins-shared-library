@@ -1,6 +1,6 @@
 ## 5.2.0
 `2024-02-29`
-- 新增Spring Native与GraalVM新引擎项目
+- 新增Spring Native与GraalVM新引擎部署流水线
 - 新增Python项目K8S云原生的构建部署
 - 新增JDK17与JDK21以及更高版本构建运行支持
 
