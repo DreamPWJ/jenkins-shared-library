@@ -12,8 +12,9 @@ if [[ ! $(command -v certbot) ]]; then
   echo "安装Certbot客户端"
   # Certbot 目前需要在类 UNIX 操作系统上运行 Python 3.6+。默认情况下，它需要 root 访问权限才能写入 /etc/letsencrypt
   sudo apt-get update -y || true
-  sudo apt-get upgrade -y || true # 更新软件
-  sudo apt-get install -y certbot || true
+  sudo apt-get upgrade -y || true # 更新系统软件
+  sudo apt-get install -y certbot || true  # 安装Certbot客户端
+  sudo sudo apt upgrade certbot && sudo apt dist-upgrade # 升级Certbot版本
   # sudo yum update -y
   sudo yum install -y certbot || true  # 如果certbot不存在 设置yum镜像源/etc/yum.repos.d
   # Python包方式安装  非标准的CentOS或Ubuntu系统
@@ -33,7 +34,7 @@ if [[ ! $(command -v certbot) ]]; then
 
   # 初始化阿里云域名DNS验证插件  固定版本  pip install certbot-dns-aliyun==0.38.1
   sudo apt install -y python3-pip && pip install certbot-dns-aliyun
-
+  sudo pip3 install --upgrade certbot certbot-dns-aliyun
 fi
 
 echo "生成域名相关的SSL证书"
@@ -91,3 +92,5 @@ cd /etc/letsencrypt/live/ || true && ls -l
 
 
 # SSL 状态检测  访问 https://myssl.com
+
+# 卸载Certbot客户端  sudo apt remove -y certbot
