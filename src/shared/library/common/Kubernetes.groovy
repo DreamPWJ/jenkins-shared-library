@@ -23,7 +23,7 @@ class Kubernetes implements Serializable {
      * 声明式执行k8s集群部署
      */
     static def deploy(ctx, map, deployNum = 0) {
-        def k8sStartTime = new Date()
+
         // 多个K8s集群同时循环滚动部署
         "${map.k8s_credentials_ids}".trim().split(",").each { k8s_credentials_id ->
             // KUBECONFIG变量为k8s中kubectl命令的yaml配置授权访问文件内容 数据保存为Jenkins的“Secret file”类型的凭据，用credentials方法从凭据中获取
@@ -81,9 +81,9 @@ class Kubernetes implements Serializable {
 
                 ctx.println("K8S集群执行部署完成 ✅")
 
+                def k8sStartTime = new Date()
                 // K8S部署验证是否成功
                 verifyDeployment(ctx)
-
                 // 计算应用启动时间
                 ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date())
             }
@@ -273,7 +273,7 @@ class Kubernetes implements Serializable {
         ctx.println("K8S集群所有Pod节点健康探测中, 请耐心等待... 🚀")
         def deploymentName = "${ctx.FULL_PROJECT_NAME}" // labels.app标签值
         def namespace = k8sNameSpace
-        ctx.sleep 1 // 等待检测
+        ctx.sleep 3 // 等待检测
         // 等待所有Pod达到Ready状态
         ctx.timeout(time: 12, unit: 'MINUTES') { // 设置超时时间
             def podsAreReady = false
@@ -292,10 +292,10 @@ class Kubernetes implements Serializable {
                     // yaml内容中包含初始化时间和启动完成时间 shell中自动解析所有内容，建议yq进行实际的YAML解析
                     ctx.echo "Waiting for all pods to be ready. Currently Ready: $readyCount / Total: $totalPods"
                     if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-                        ctx.sleep 12 // 每隔多少秒检查一次
+                        ctx.sleep 10 // 每隔多少秒检查一次
                     }
                     if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-                        ctx.sleep 8 // 每隔多少秒检查一次
+                        ctx.sleep 5 // 每隔多少秒检查一次
                     }
                 }
             }
