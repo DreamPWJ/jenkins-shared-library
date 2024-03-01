@@ -273,7 +273,6 @@ class Kubernetes implements Serializable {
         ctx.println("K8S集群所有Pod节点健康探测中, 请耐心等待... 🚀")
         def deploymentName = "${ctx.FULL_PROJECT_NAME}" // labels.app标签值
         def namespace = k8sNameSpace
-        ctx.sleep 3 // 等待检测
         // 等待所有Pod达到Ready状态
         ctx.timeout(time: 12, unit: 'MINUTES') { // 设置超时时间
             def podsAreReady = false
@@ -306,7 +305,7 @@ class Kubernetes implements Serializable {
             // 示例 查询pod所有节点的状态  kubectl get pods --selector=app=my-app -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.phase}{"\n"}{end}'
             if (whileCount == 1) { // 只执行一次的话 健康探测失败
                 Tools.printColor(ctx, "K8S集群中Pod服务部署启动失败  ❌", "red")
-                ctx.error("K8S集群中Pod服务部署启动失败 ❌")
+                ctx.error("K8S集群中Pod服务部署启动失败 终止流水线运行 ❌")
             } else {
                 Tools.printColor(ctx, "K8S集群中所有Pod服务已处于启动状态 ✅")
             }
