@@ -143,10 +143,14 @@ class Docker implements Serializable {
                 exposePort = "${ctx.IS_PROD}" == 'true' ? "${exposePort}" : "${exposePort} 5005" // 调试端口
                 if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
                     def dockerFileName = ""
+                    def jdkPublisher = "${ctx.JDK_PUBLISHER}"
                     if ("${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
                         dockerFileName = "Dockerfile"
                         if ("${ctx.IS_SPRING_NATIVE}" == 'true') { // Spring Native原生镜像可执行二进制文件
                             dockerFileName = "Dockerfile.native"
+                            // jdkPublisher = "container-registry.oracle.com/graalvm/native-image"  // GraalVM JDK with Native Image
+                            // GraalVM JDK without Native Image
+                            jdkPublisher = "container-registry.oracle.com/graalvm/jdk"
                         }
                     } else if ("${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringMVC) {
                         dockerFileName = "Dockerfile.mvc"
@@ -154,7 +158,7 @@ class Docker implements Serializable {
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.GIT_PROJECT_FOLDER_NAME}/${ctx.mavenPackageLocationDir} && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}" --build-arg EXPOSE_PORT="${exposePort}" --build-arg TOMCAT_VERSION=${ctx.TOMCAT_VERSION} \
-                            --build-arg JDK_PUBLISHER=${ctx.JDK_PUBLISHER} --build-arg JDK_VERSION=${ctx.JDK_VERSION} --build-arg JAVA_OPTS="-Xms128m ${ctx.DOCKER_JAVA_OPTS}" \
+                            --build-arg JDK_PUBLISHER=${jdkPublisher} --build-arg JDK_VERSION=${ctx.JDK_VERSION} --build-arg JAVA_OPTS="-Xms128m ${ctx.DOCKER_JAVA_OPTS}" \
                             -f ${ctx.env.WORKSPACE}/ci/.ci/${dockerFileName} . --no-cache \
                             ${dockerPushDiffStr}
                             """

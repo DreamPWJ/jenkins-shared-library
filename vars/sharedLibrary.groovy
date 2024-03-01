@@ -988,7 +988,8 @@ def getShellParams(map) {
             def jdkPublisher = "${JDK_PUBLISHER}"
             if ("${IS_SPRING_NATIVE}" == "true") {
                 // jdkPublisher = "container-registry.oracle.com/graalvm/native-image"  // GraalVM JDK with Native Image
-                jdkPublisher = "container-registry.oracle.com/graalvm/jdk" //  GraalVM JDK without Native Image
+                // GraalVM JDK without Native Image
+                jdkPublisher = "container-registry.oracle.com/graalvm/jdk"
             }
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION} -s ${jdkPublisher} -t ${IS_SPRING_NATIVE}"
         }
