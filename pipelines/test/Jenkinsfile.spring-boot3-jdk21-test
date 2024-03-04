@@ -105,7 +105,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', ' ')
+map.put('maven_one_level', 'single-module-projects')
 // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
 map.put('maven_setting_xml', ' ')
 
@@ -126,9 +126,7 @@ JSON_PARAMS
    "BRANCH_NAME" : "feature/springboot3-jdk21" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "spring-boot3-jdk21-test" ,
-   "SHELL_PARAMS" : "spring-boot3-jdk21 test 8122 8080 dev",
-   "IS_MAVEN_SINGLE_MODULE" : true,
-   "GIT_PROJECT_FOLDER_NAME" : "single-module-projects/spring-boot3-jdk21-test",
+   "SHELL_PARAMS" : "spring-boot3-jdk21 test 8122 8080 dev"
 }
 
 
