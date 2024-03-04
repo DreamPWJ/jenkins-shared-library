@@ -3,7 +3,7 @@
 
 /**
  * @author 潘维吉
- * @description 核心Pipeline代码 针对Python语言项目CI/CD的脚本
+ * @description 核心Pipeline代码 针对Web项目和JAVA项目CI/CD的脚本
  * 注意 本文件在Git位置和名称不能随便改动 配置在jenkins里
  */
 
@@ -11,17 +11,17 @@
 def map = [:]
 
 // 远程服务器地址 k8s集群方式可填空或填公网代理负载IP
-map.put('remote_ip', '120.92.149.246')
+map.put('remote_ip', '192.168.1.128')
 // 工作服务器地址 同时支持N个服务器自动化分布式部署
 map.put('remote_worker_ips', [])
 // 远程服务器用户名
 map.put('remote_user_name', 'root')
 // 代理机或跳板机外网ip用于透传部署到内网目标机器 选填 目标机器外部无法直接访问情况填写内网ip
-map.put('proxy_jump_ip', ' ')
+map.put('proxy_jump_ip', '58.59.49.122')
 // 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
 map.put('proxy_jump_user_name', 'root')
 // 自定义跳板机ssh和scp访问端口 默认22
-map.put('proxy_jump_port', ' ')
+map.put('proxy_jump_port', '3900')
 
 // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
 map.put('default_git_branch', ' ')
@@ -41,31 +41,31 @@ map.put('docker_volume_mount', '')
 // Dockerfile多阶段构建 镜像名称
 map.put('docker_multistage_build_images', ' ')
 // 是否上传镜像到docker容器仓库
-map.put('is_push_docker_repo', true)
+map.put('is_push_docker_repo', false)
 // docker容器镜像仓库账号信任id
-map.put('docker_repo_credentials_id', '73f6b3b0-4580-4acf-b04a-63892fcf9ba8')
+map.put('docker_repo_credentials_id', '5553c9ed-5416-4bbf-b7fc-9d53ed856177')
 // docker镜像仓库注册地址
-map.put('docker_repo_registry', 'hub-cn-shanghai-2.kce.ksyun.com')
+map.put('docker_repo_registry', 'registry.cn-qingdao.aliyuncs.com')
 // docker仓库命名空间名称
-map.put('docker_repo_namespace', 'lanneng')
+map.put('docker_repo_namespace', 'lexiang')
 
 // K8S集群相关参数
 // K8S集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
-map.put('k8s_credentials_ids', 'a1d2642d-296f-47a2-8d1a-087b46e3255e')
+map.put('k8s_credentials_ids', ' ')
 // K8S集群私有镜像仓库拉取密钥 在集群内使用kubectl create secret命令生成
-map.put('k8s_image_pull_secrets', 'lannengkeji2022')
+map.put('k8s_image_pull_secrets', ' ')
 
 // 项目标签或项目简称
-map.put('project_tag', '蓝能Python项目')
+map.put('project_tag', 'Spring Boot3与JDK21新引擎')
 
 // 是否是生产环境
-map.put('is_prod', true)
+map.put('is_prod', false)
 // 是否在同一台服务器蓝绿部署或滚动部署 非k8s集群方式设置
 map.put('is_same_server', false)
 // 是否进行优雅停机
 map.put('is_grace_shutdown', false)
 // 是否进行服务启动健康探测 K8S集群类型设置false
-map.put('is_health_check', false)
+map.put('is_health_check', true)
 // 是否Pipeline内脚本钉钉通知  总开关
 map.put('is_ding_notice', true)
 // 是否进行部署前通知
@@ -78,14 +78,14 @@ map.put('is_git_tag', true)
 map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
-map.put('jenkins_node', 'master')
-map.put('jenkins_node_front_end', 'master')
+map.put('jenkins_node', 'node-2')
+map.put('jenkins_node_front_end', 'node-2')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node18')
-map.put('maven', 'Maven3.6')
-map.put('jdk_publisher', 'openjdk')
-map.put('jdk', '11')
+map.put('maven', 'Maven3.9')
+map.put('jdk_publisher', 'graalvm-community')
+map.put('jdk', '21')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
@@ -96,7 +96,7 @@ map.put('oss_credentials_id', ' ')
 // 直连方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接
 map.put('ssh_hosts_id', ' ')
 // 跳板机方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接
-map.put('proxy_jump_hosts_id', ' ')
+map.put('proxy_jump_hosts_id', '47226244-73ca-48b9-be2d-f3413f62701a')
 
 // 服务器上部署所在的文件夹名称
 map.put('deploy_folder', "my")
@@ -114,44 +114,21 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.lanneng-open-park-third-party-prod
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/test/Jenkinsfile.spring-boot3-jdk21-test
 
 /*
 
-park-saas-foreign-k8s-prod
-停车开放服务-k8s集群
+spring-boot3-jdk21-test
+Spring Boot3与JDK21新引擎服务端
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/park_saas_foreign_python.git" ,
-   "BRANCH_NAME" : "master" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
+   "BRANCH_NAME" : "feature/springboot3-jdk21" ,
    "PROJECT_TYPE" : "2" ,
-   "COMPUTER_LANGUAGE" : "3" ,
-   "PROJECT_NAME" : "park-saas-foreign" ,
-   "SHELL_PARAMS" : "park-saas-foreign python 8201 5000 prod",
-   "IS_K8S_DEPLOY" : true,
-   "K8S_POD_REPLICAS" : "1",
-   "CUSTOM_PYTHON_VERSION" : "3.10.0",
-   "CUSTOM_PYTHON_START_FILE" : "app.py",
-   "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check",
-   "APPLICATION_DOMAIN" : "https://park-foreign-api.pengbocloud.com"
-}
-
-
-park-saas-foreign-k8s-prod
-诱导屏DTU交互服务-k8s集群
-JSON_PARAMS
-{
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/park_saas_foreign_python.git" ,
-   "BRANCH_NAME" : "master" ,
-   "PROJECT_TYPE" : "2" ,
-   "COMPUTER_LANGUAGE" : "3" ,
-   "PROJECT_NAME" : "park-saas-foreign" ,
-   "SHELL_PARAMS" : "park-saas-foreign python 8203 5000 prod",
-   "IS_K8S_DEPLOY" : true,
-   "K8S_POD_REPLICAS" : "1",
-   "CUSTOM_PYTHON_VERSION" : "3.10.0",
-   "CUSTOM_PYTHON_START_FILE" : "app.py",
-   "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check"
+   "PROJECT_NAME" : "spring-boot3-jdk21-test" ,
+   "SHELL_PARAMS" : "spring-boot3-jdk21 test 8122 8080 dev",
+   "IS_MAVEN_SINGLE_MODULE" : true,
+   "GIT_PROJECT_FOLDER_NAME" : "single-module-projects/spring-boot3-jdk21-test",
 }
 
 
