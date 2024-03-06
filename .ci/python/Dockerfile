@@ -10,7 +10,7 @@ ARG PROJECT_NAME
 ARG EXPOSE_PORT
 ARG PYTHON_START_FILE
 
-# 依赖基础镜像
+# 依赖基础镜像 多阶段构建复用docker缓存层加速构建
 FROM python:$PYTHON_VERSION  AS base
 
 # Docker 将此路径用作所有后续命令的默认位置
@@ -23,7 +23,7 @@ WORKDIR /app
 #COPY . .
 COPY python.tar.gz .
 
-# 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包  利用 --cache-dir 指定缓存目录  执行多阶段构建复用docker缓存层
+# 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包  利用 --cache-dir 指定缓存目录
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
