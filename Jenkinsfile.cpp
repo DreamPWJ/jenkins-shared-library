@@ -50,7 +50,7 @@ map.put('docker_repo_registry', 'registry.cn-qingdao.aliyuncs.com')
 map.put('docker_repo_namespace', 'lexiang')
 
 // K8S集群相关参数
-// K8S集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
+// K8S集群部署集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
 map.put('k8s_credentials_ids', ' ')
 // K8S集群私有镜像仓库拉取密钥 在集群内使用kubectl create secret命令生成
 map.put('k8s_image_pull_secrets', ' ')
