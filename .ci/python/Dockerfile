@@ -29,7 +29,7 @@ RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && rm -f *.tar.gz \
  && pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
  && pwd && ls -l \
- && apt install libgl1-mesa-glx
+ && apt install libgl1-mesa-glx -y
 
 
 # 主要构建阶段   重新基于base镜像开始
