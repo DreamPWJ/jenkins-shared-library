@@ -11,14 +11,28 @@ ARG EXPOSE_PORT
 ARG PYTHON_START_FILE
 
 # 依赖基础镜像
-FROM python:$PYTHON_VERSION
-
-# 使用宿主机上的缓存目录
-#VOLUME /host_pip_cache
-ENV PIP_CACHE_DIR=/host_pip_cache
+FROM python:$PYTHON_VERSION  AS base
 
 # Docker 将此路径用作所有后续命令的默认位置
 WORKDIR /app
+
+# 下载项目依赖包
+#COPY requirements.txt requirements.txt
+
+# 复制代码到容器 ADD 会自动解压，COPY 不会解压  注意tar.gz不能使用中划线命名
+#COPY . .
+COPY python.tar.gz .
+
+# 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包  利用 --cache-dir 指定缓存目录  执行多阶段构建复用docker缓存层
+RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
+ && mv requirement.txt requirements.txt || true \
+ && rm -f *.tar.gz \
+ && pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
+ && pwd && ls -l
+
+
+# 主要构建阶段   重新基于base镜像开始
+FROM base AS prodction
 
 # 指定切换用户
 USER root
@@ -31,20 +45,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # apt-get update && \
 # apt-get install -y --no-install-recommends libgl1-mesa-glx libglu1-mesa-dev  freeglut3-dev && \
 # rm -rf /var/lib/apt/lists/*
-
-# 下载项目依赖包
-#COPY requirements.txt requirements.txt
-
-# 复制代码到容器 ADD 会自动解压，COPY 不会解压  注意tar.gz不能使用中划线命名
-#COPY . .
-COPY python.tar.gz .
-
-# 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包  利用 --cache-dir 指定缓存目录
-RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
- && mv requirement.txt requirements.txt || true \
- && rm -f *.tar.gz \
- && pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --cache-dir $PIP_CACHE_DIR || true \
- && pwd && ls -l
 
 # 暴露端口
 EXPOSE $EXPOSE_PORT
