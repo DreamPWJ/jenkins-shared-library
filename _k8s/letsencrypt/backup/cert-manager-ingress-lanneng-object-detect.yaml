@@ -5,32 +5,32 @@
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-prod-lanneng-open-park-third-party
+  name: letsencrypt-prod-lanneng-object-detect
   namespace: cert-manager
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory  # ACME 协议的服务端  acme-staging-v02测试证书没有限制
     email: 406798106@qq.com  # 证书快过期的时候会有邮件提醒
     privateKeySecretRef:
-      name: letsencrypt-prod-key-lanneng-open-park-third-party  # 私钥秘密必须与cert-manager服务在同一个命名空间中才能工作 kubectl delete Secret letsencrypt-prod-key --namespace cert-manager
+      name: letsencrypt-prod-key-lanneng-object-detect  # 私钥秘密必须与cert-manager服务在同一个命名空间中才能工作 kubectl delete Secret letsencrypt-prod-key --namespace cert-manager
     solvers:
       - http01: # 签发机构使用 HTTP-01 的方式进行 acme 协议 (还可用 DNS 方式，acme 协议的目的是证明机器和域名都是属于你的，然后才准许颁发证书)
           ingress:
             #serviceType: ClusterIP
-            name: lannengtech-k8s-ingress-lanneng-open-park-third-party  # 这个匹配是关键！！！  1. class是指定自动创建的 Ingress 的 ingress class  2. name是指定被自动修改的 Ingress 名称
+            name: lannengtech-k8s-ingress-lanneng-object-detect  # 这个匹配是关键！！！  1. class是指定自动创建的 Ingress 的 ingress class  2. name是指定被自动修改的 Ingress 名称
 
 ---
 
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: lannengtech-k8s-ingress-lanneng-open-park-third-party
+  name: lannengtech-k8s-ingress-lanneng-object-detect
   namespace: default
   annotations:
     # 指定使用nginx做代理
     #kubernetes.io/ingress.class: lanneng-park  # 已弃用 使用 spec.ingressClassName代替
     # add an annotation indicating the issuer to use
-    cert-manager.io/cluster-issuer: letsencrypt-prod-lanneng-open-park-third-party
+    cert-manager.io/cluster-issuer: letsencrypt-prod-lanneng-object-detect
     acme.cert-manager.io/http01-edit-in-place: "true"
 
     # 后端大文件上传大小
@@ -71,44 +71,10 @@ spec:
   ingressClassName: lanneng-park
   tls:
     - hosts:
-        - park-foreign-api.pengbocloud.com
-      secretName: park-foreign-api.pengbocloud.com-tls
-    - hosts:
-        - env-monitor-api.pengbocloud.com
-      secretName: env-monitor-api.pengbocloud.com-tls
-    - hosts:
         - object-detect-api.pengbocloud.com
       secretName: object-detect-api.pengbocloud.com-tls
 
   rules:
-    #自定义域名
-    - host: park-foreign-api.pengbocloud.com
-      http:
-        paths:
-          - path: /
-            backend:
-              #服务名称
-              service:
-                name: park-saas-foreign-python-service
-                #服务端口
-                port:
-                  number: 8201
-            pathType: Prefix
-
-    #自定义域名
-    - host: env-monitor-api.pengbocloud.com
-      http:
-        paths:
-          - path: /
-            backend:
-              #服务名称
-              service:
-                name: environment-monitor-python-service
-                #服务端口
-                port:
-                  number: 8205
-            pathType: Prefix
-
     #自定义域名
     - host: object-detect-api.pengbocloud.com
       http:

@@ -56,7 +56,7 @@ map.put('k8s_credentials_ids', ' ')
 map.put('k8s_image_pull_secrets', ' ')
 
 // 项目标签或项目简称
-map.put('project_tag', '停车SaaS')
+map.put('project_tag', 'Spring Boot3与JDK21新引擎')
 
 // 是否是生产环境
 map.put('is_prod', false)
@@ -67,13 +67,13 @@ map.put('is_grace_shutdown', false)
 // 是否进行服务启动健康探测 K8S集群类型设置false
 map.put('is_health_check', true)
 // 是否Pipeline内脚本钉钉通知  总开关
-map.put('is_ding_notice', true)
+map.put('is_ding_notice', false)
 // 是否进行部署前通知
 map.put('is_before_deploy_notice', false)
 // 是否通知变更记录
 map.put('is_notice_change_log', true)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', true)
+map.put('is_git_tag', false)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
@@ -82,10 +82,10 @@ map.put('jenkins_node', 'node-2')
 map.put('jenkins_node_front_end', 'node-2')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
-map.put('nodejs', 'Node18')
-map.put('maven', 'Maven3.6')
-map.put('jdk_publisher', 'openjdk')
-map.put('jdk', '11')
+map.put('nodejs', 'Node20')
+map.put('maven', 'Maven3.9')
+map.put('jdk_publisher', 'amazoncorretto')
+map.put('jdk', '21')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
@@ -105,7 +105,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', 'openpark-saas')
+map.put('maven_one_level', 'single-module-projects')
 // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
 map.put('maven_setting_xml', ' ')
 
@@ -114,46 +114,21 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.saas-test
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/test/Jenkinsfile.spring-boot3-jdk21-test
 
 /*
 
-park-saas-web-test
-停车SaaS平台Web前端 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/openpark_saas_frontend.git" ,
-    "BRANCH_NAME" : "main" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "openpark-saas-admin" ,
-    "SHELL_PARAMS" : "openpark-saas-admin web 8025 80 test" ,
-    "NPM_RUN_PARAMS" : "build:test",
-    "NODE_VERSION": "14" ,
-}
-
-park-saas-app-test
-停车SaaS平台App服务端
+spring-boot3-jdk21-test
+Spring Boot3与JDK21新引擎服务端
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
-   "BRANCH_NAME" : "develop" ,
+   "BRANCH_NAME" : "feature/springboot3-jdk21" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "openpark-saas-app" ,
-   "SHELL_PARAMS" : "openpark-saas app 8188 9000 sit",
+   "PROJECT_NAME" : "spring-boot3-jdk21-test" ,
+   "SHELL_PARAMS" : "spring-boot3-jdk21 test 8122 8080 dev"
 }
 
-
-park-saas-admin-web-test
-停车Saas平台 Web前端 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "https://git.pengbocloud.com/smart-parking/parking-admin.git" ,
-    "BRANCH_NAME" : "main" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "parking-admin" ,
-    "SHELL_PARAMS" : "parking-saas-admin web 9009 80 test" ,
-    "NPM_RUN_PARAMS" : "build",
-}
 
 */
 
