@@ -14,7 +14,7 @@ ARG PYTHON_START_FILE
 FROM python:$PYTHON_VERSION
 
 # 使用宿主机上的缓存目录
-VOLUME /host_pip_cache
+#VOLUME /host_pip_cache
 ENV PIP_CACHE_DIR=/host_pip_cache
 
 # Docker 将此路径用作所有后续命令的默认位置
