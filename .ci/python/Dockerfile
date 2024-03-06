@@ -28,7 +28,8 @@ RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
  && pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
- && pwd && ls -l
+ && pwd && ls -l \
+ && apt install libgl1-mesa-glx
 
 
 # 主要构建阶段   重新基于base镜像开始
@@ -40,11 +41,8 @@ USER root
 # 设置时区
 ENV TZ=Asia/Shanghai
 
-# 设置时区  安装OpenGL相关库的
+# 设置时区
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-# apt-get update && \
-# apt-get install -y --no-install-recommends libgl1-mesa-glx libglu1-mesa-dev  freeglut3-dev && \
-# rm -rf /var/lib/apt/lists/*
 
 # 暴露端口
 EXPOSE $EXPOSE_PORT
