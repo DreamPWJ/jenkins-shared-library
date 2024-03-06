@@ -73,6 +73,9 @@ spec:
     - hosts:
         - park-foreign-api.pengbocloud.com
       secretName: park-foreign-api.pengbocloud.com-tls
+    - hosts:
+        - env-monitor-api.pengbocloud.com
+      secretName: env-monitor-api.pengbocloud.com-tls
 
   rules:
     #自定义域名
@@ -87,4 +90,18 @@ spec:
                 #服务端口
                 port:
                   number: 8201
+            pathType: Prefix
+
+    #自定义域名
+    - host: env-monitor-api.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: environment-monitor-python-service
+                #服务端口
+                port:
+                  number: 8205
             pathType: Prefix
