@@ -29,7 +29,7 @@ ENV TZ=Asia/Shanghai
 # 设置时区  安装OpenGL相关库的
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
  apt-get update && \
- apt-get install -y --no-install-recommends libgl1-mesa-glx libglu1-mesa libsm6 libice6 libxrender1 libxext6 && \
+ apt-get install -y --no-install-recommends libgl1-mesa-glx libglu1-mesa-dev  freeglut3-dev && \
  rm -rf /var/lib/apt/lists/*
 
 # 下载项目依赖包
