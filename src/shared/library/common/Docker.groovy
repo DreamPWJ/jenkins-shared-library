@@ -235,7 +235,7 @@ class Docker implements Serializable {
                 def dockerFileContent = ctx.readFile(file: "${dockerFile}")
                 ctx.writeFile file: "${dockerFile}", text: "${dockerFileContent}"
                         .replaceAll("#FROM-MULTISTAGE-BUILD-IMAGES", "FROM ${imageName}")
-                        .replaceAll("#COPY-MULTISTAGE-BUILD-IMAGES", "COPY --from=0 / /")
+                        .replaceAll("#COPY-MULTISTAGE-BUILD-IMAGES", "COPY --from=0 /var/cache/apt/archives /var/cache/apt/archives")
             }
         }
     }
