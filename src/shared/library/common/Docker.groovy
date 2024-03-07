@@ -226,7 +226,12 @@ class Docker implements Serializable {
         } else if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
             if ("${imageName}".trim() != "") {
                 ctx.println("Docker多阶段镜像构建镜像名称: " + imageName)
-                def dockerFile = "${ctx.env.WORKSPACE}/ci/.ci/Dockerfile"
+                def dockerFile = ""
+                if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+                    dockerFile = "${ctx.env.WORKSPACE}/ci/.ci/Dockerfile"
+                } else if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
+                    dockerFile = "${ctx.env.WORKSPACE}/ci/.ci/python/Dockerfile"
+                }
                 def dockerFileContent = ctx.readFile(file: "${dockerFile}")
                 ctx.writeFile file: "${dockerFile}", text: "${dockerFileContent}"
                         .replaceAll("#FROM-MULTISTAGE-BUILD-IMAGES", "FROM ${imageName}")
