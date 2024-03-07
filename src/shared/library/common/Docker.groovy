@@ -92,7 +92,7 @@ class Docker implements Serializable {
             def dockerBuildDiffStr = " build " // 默认构建镜像
             def dockerPushDiffStr = "" // 默认不同时推送镜像
             // 是否使用buildkit构建多CPU架构支持
-            def isBuildKit = false
+            def isBuildKit = true
 
             if (isBuildKit) {
                 //docker buildx 多CPU架构支持 Building Multi-Arch Images for Arm and x86 with Docker Desktop
@@ -102,14 +102,14 @@ class Docker implements Serializable {
                 // 解决buildx报错error: failed to solve: rpc error: code = Unknown desc = failed to solve with frontend dockerfile.v0
                 // Docker desktop -> Settings -> Docker Engine -> Change the "features": { buildkit: true} to "features": { buildkit: false}
 
-                // 是否开启Buildkit
-                ctx.sh """  export DOCKER_BUILDKIT=0
+                // 是否开启Buildkit 是下一代的镜像构建组件
+                ctx.sh """  export DOCKER_BUILDKIT=1
                        """
                 // 在Docker容器内使用Buildkit
                 /* ctx.sh """  DOCKER_CLI_EXPERIMENTAL=enabled
                             """  */
                 // 根据运行CPU架构构建Docker镜像
-                // dockerBuildDiffStr = " buildx build --platform linux/amd64 "
+                dockerBuildDiffStr = " buildx build --platform linux/amd64 "
                 dockerPushDiffStr = " --push "
             } else {
                 ctx.println("开始制作Docker镜像并上传远程仓库 🏗️ ")
