@@ -284,7 +284,7 @@ class Kubernetes implements Serializable {
                 def podStatus = ctx.readJSON text: output
 
                 int readyCount = podStatus.items.findAll { it.status.containerStatuses.every { it.ready == true } }.size()
-                def podStatusPhase = podStatus.items.findAll { it.status.phase } // Running状态容器正式启动运行
+                def podStatusPhase = podStatus.items.status.phase // Running状态容器正式启动运行
                 int totalPods = podStatus.items.size()
 
                 if (readyCount == totalPods) {
