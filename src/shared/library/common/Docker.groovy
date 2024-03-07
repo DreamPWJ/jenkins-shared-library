@@ -102,13 +102,14 @@ class Docker implements Serializable {
                 // 解决buildx报错error: failed to solve: rpc error: code = Unknown desc = failed to solve with frontend dockerfile.v0
                 // Docker desktop -> Settings -> Docker Engine -> Change the "features": { buildkit: true} to "features": { buildkit: false}
 
-                // 开启Buildkit
-                ctx.sh """  export DOCKER_BUILDKIT=1
+                // 是否开启Buildkit
+                ctx.sh """  export DOCKER_BUILDKIT=0
                        """
                 // 在Docker容器内使用Buildkit
                 /* ctx.sh """  DOCKER_CLI_EXPERIMENTAL=enabled
                             """  */
-                dockerBuildDiffStr = " buildx build --platform linux/amd64 "
+                // 根据运行CPU架构构建Docker镜像
+                // dockerBuildDiffStr = " buildx build --platform linux/amd64 "
                 dockerPushDiffStr = " --push "
             } else {
                 ctx.println("开始制作Docker镜像并上传远程仓库 🏗️ ")
