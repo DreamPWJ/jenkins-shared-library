@@ -3,12 +3,12 @@
 # Description: 自定义K8S云原生构建部署环境
 
 # 多阶段进行 利用Python语言便利性自定义脚本处理等
-#FROM python:3.10.0-slim AS builder
+#FROM python:3.10.0-slim
 
 # 基础镜像
 FROM dtzar/helm-kubectl:latest
 
-#COPY --from=builder / /
+#COPY --from=0 / /
 
 ENV PYTHONUNBUFFERED=1
 
