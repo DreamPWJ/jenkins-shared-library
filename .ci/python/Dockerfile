@@ -18,7 +18,7 @@ ARG PYTHON_START_FILE
 FROM python:$PYTHON_VERSION
 
 # 多阶段构建镜像 从上一个镜像内复制环境到本镜像
-# 示例 COPY --from=0 / /   下行注释的KEY值动态替换
+# 示例 COPY --from=builder / /   下行注释的KEY值动态替换
 #COPY-MULTISTAGE-BUILD-IMAGES
 
 # Docker 将此路径用作所有后续命令的默认位置

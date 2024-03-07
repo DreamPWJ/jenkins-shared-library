@@ -17,7 +17,7 @@ ARG EXPOSE_PORT
 FROM ${JDK_PUBLISHER}:${JDK_VERSION}
 
 # 多阶段构建镜像 从上一个镜像内复制环境到本镜像
-# 示例 COPY --from=0 / /   下行注释的KEY值动态替换
+# 示例 COPY --from=builder / /   下行注释的KEY值动态替换
 #COPY-MULTISTAGE-BUILD-IMAGES
 
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
