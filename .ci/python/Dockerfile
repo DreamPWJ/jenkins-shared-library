@@ -20,7 +20,8 @@ USER root
 ENV TZ=Asia/Shanghai
 
 # 设置时区
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
+    && apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
 # Docker 将此路径用作所有后续命令的默认位置
 WORKDIR /app
@@ -38,7 +39,6 @@ RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && rm -f *.tar.gz \
  && pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
  && pwd && ls -l \
- && pip install PyOpenGL PyOpenGL_accelerate || true
 
 # 暴露端口
 EXPOSE $EXPOSE_PORT
