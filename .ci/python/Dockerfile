@@ -17,10 +17,6 @@ ARG PYTHON_START_FILE
 # 依赖基础镜像 多阶段构建复用docker缓存层加速构建
 FROM python:$PYTHON_VERSION
 
-# 多阶段构建镜像 从上一个镜像内复制环境到本镜像
-# 示例 COPY --from=0 / /   下行注释的KEY值动态替换
-#COPY-MULTISTAGE-BUILD-IMAGES
-
 # Docker 将此路径用作所有后续命令的默认位置
 WORKDIR /app
 
@@ -44,6 +40,10 @@ RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && rm -f *.tar.gz \
  && pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
  && pwd && ls -l
+
+# 多阶段构建镜像 从上一个镜像内复制环境到本镜像
+# 示例 COPY --from=0 / /   下行注释的KEY值动态替换
+#COPY-MULTISTAGE-BUILD-IMAGES
 
 # 暴露端口
 EXPOSE $EXPOSE_PORT
