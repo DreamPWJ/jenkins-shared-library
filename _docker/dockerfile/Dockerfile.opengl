@@ -1,0 +1,13 @@
+# Author: 潘维吉
+# Version 1.0.0
+# Description: 自定义构建OpenGL项目镜像
+
+FROM ubuntu:latest
+
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
+
+
+# 构建镜像
+# docker build -t panweiji/opengl:latest  -f /my/Dockerfile.opengl . --no-cache --load
+# 上传镜像
+# docker push panweiji/opengl:latest

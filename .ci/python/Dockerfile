@@ -13,18 +13,15 @@ ARG PYTHON_START_FILE
 # 依赖基础镜像 多阶段构建复用docker缓存层加速构建
 FROM python:$PYTHON_VERSION
 
+# Docker 将此路径用作所有后续命令的默认位置
+WORKDIR /app
+
 # 指定切换用户
 USER root
 
 # 设置时区
 ENV TZ=Asia/Shanghai
-
-# 设置时区
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
- # && apt-get update && apt-get install ffmpeg libsm6 libxext6  -y || true
-
-# Docker 将此路径用作所有后续命令的默认位置
-WORKDIR /app
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 下载项目依赖包
 #COPY requirements.txt requirements.txt
@@ -38,7 +35,7 @@ RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
  && pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
- && pwd && ls -l \
+ && pwd && ls -l
 
 # 暴露端口
 EXPOSE $EXPOSE_PORT
