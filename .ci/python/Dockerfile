@@ -13,6 +13,25 @@ ARG PYTHON_START_FILE
 # 依赖基础镜像 多阶段构建复用docker缓存层加速构建
 FROM ubuntu:latest AS base
 
+# 安装OpenGL
+RUN  pip install ffmpeg libsm6 libxext6 -y || true
+
+
+# 主要构建阶段   重新基于base镜像开始
+FROM python:$PYTHON_VERSION  AS prodction
+
+# 多阶段构建镜像 从上一个镜像内复制环境到本镜像
+COPY --from=0 / /
+
+# 指定切换用户
+USER root
+
+# 设置时区
+ENV TZ=Asia/Shanghai
+
+# 设置时区
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # Docker 将此路径用作所有后续命令的默认位置
 WORKDIR /app
 
@@ -29,20 +48,6 @@ RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && rm -f *.tar.gz \
  && pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
  && pwd && ls -l \
- && apt-get update && apt-get install ffmpeg libsm6 libxext6 -y || true
-
-
-# 主要构建阶段   重新基于base镜像开始
-FROM base AS prodction
-
-# 指定切换用户
-USER root
-
-# 设置时区
-ENV TZ=Asia/Shanghai
-
-# 设置时区
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 暴露端口
 EXPOSE $EXPOSE_PORT
