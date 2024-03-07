@@ -11,7 +11,7 @@ ARG EXPOSE_PORT
 ARG PYTHON_START_FILE
 
 # 依赖基础镜像 多阶段构建复用docker缓存层加速构建
-FROM python:$PYTHON_VERSION  AS base
+FROM ubuntu:latest AS base
 
 # Docker 将此路径用作所有后续命令的默认位置
 WORKDIR /app
@@ -29,7 +29,7 @@ RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && rm -f *.tar.gz \
  && pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
  && pwd && ls -l \
- && apt install libgl1-mesa-glx -y || true
+ && apt-get update && apt-get install ffmpeg libsm6 libxext6 -y || true
 
 
 # 主要构建阶段   重新基于base镜像开始
@@ -51,6 +51,6 @@ EXPOSE $EXPOSE_PORT
 CMD ["python", "$PYTHON_START_FILE"]
 
 # Flask部署 启动命令
-#CMD [ "python", "-m" , "flask", "run", "--host=0.0.0.0"]
+#CMD ["python", "-m" , "flask", "run", "--host=0.0.0.0"]
 # FastAPI部署 启动命令
 #CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${EXPOSE_PORT}"]
