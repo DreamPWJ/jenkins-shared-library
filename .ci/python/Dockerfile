@@ -11,7 +11,7 @@ ARG EXPOSE_PORT
 ARG PYTHON_START_FILE
 
 # 依赖基础镜像 多阶段构建复用docker缓存层加速构建
-FROM python:$PYTHON_VERSION  AS prodction
+FROM python:$PYTHON_VERSION
 
 # 指定切换用户
 USER root
@@ -21,7 +21,7 @@ ENV TZ=Asia/Shanghai
 
 # 设置时区
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
-    && apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
+ # && apt-get update && apt-get install ffmpeg libsm6 libxext6  -y || true
 
 # Docker 将此路径用作所有后续命令的默认位置
 WORKDIR /app
