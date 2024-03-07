@@ -107,7 +107,7 @@ class Docker implements Serializable {
                        """
                 // 在Docker容器内使用Buildkit
                 /* ctx.sh """  DOCKER_CLI_EXPERIMENTAL=enabled
-                            """*/
+                            """  */
                 dockerBuildDiffStr = " buildx build --platform linux/amd64 "
                 dockerPushDiffStr = " --push "
             } else {
