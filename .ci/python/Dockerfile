@@ -32,7 +32,7 @@ ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 依赖环境
-RUN apt-get install -y --no-install-recommends ffmpeg libsm6 libxext6
+RUN apt-get install -y --no-install-recommends libsm6 libxext6
 
 # 下载项目依赖包
 #COPY requirements.txt requirements.txt
