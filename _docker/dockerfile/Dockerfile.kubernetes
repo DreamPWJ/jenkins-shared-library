@@ -2,29 +2,25 @@
 # Version 1.0.0
 # Description: 自定义K8S云原生构建部署环境
 
-# 多阶段进行 利用Python语言便利性自定义脚本处理等
-#FROM python:3.10.0-slim
-
 # 基础镜像
 FROM dtzar/helm-kubectl:latest
-
-#COPY --from=0 / /
-
-ENV PYTHONUNBUFFERED=1
 
 # 更新默认的apk仓库，并添加额外的、速度较快的国内源（这里以阿里云为例）
 RUN echo "https://mirrors.aliyun.com/alpine/v3.19/main" > /etc/apk/repositories && \
     echo "https://mirrors.aliyun.com/alpine/v3.19/community" >> /etc/apk/repositories
 
-# Python环境
-RUN apk add --update --no-cache python3 gcc musl-dev python3-dev \
-&& ln -sf python3 /usr/bin/python \
-&& python3 -m ensurepip \
-&& pip3 install --no-cache --upgrade pip setuptools
+# 更新apt源并安装必要的系统包
+RUN apk update  \
+   && apk add --no-cache python3 py3-pip
+
+# 设置Python3为默认Python版本，并安装pip依赖管理工具
+RUN pip3 install --upgrade pip setuptools wheel
+
 # Python动态处理yaml文件
-RUN pip install ruamel.yaml
+RUN pip3 install ruamel.yaml
+
 
 # 构建镜像
-# docker build -t panweiji/k8s:latest  -f /my/Dockerfile.k8s . --no-cache --load
+# docker build -t panweiji/kubernetes:latest  -f /my/Dockerfile.kubernetes . --no-cache --load
 # 上传镜像 先 docker login 登录
-# docker push panweiji/k8s:latest
+# docker push panweiji/kubernetes:latest

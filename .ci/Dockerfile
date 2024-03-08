@@ -33,18 +33,8 @@ USER root
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# 自定义JDK内部配置
-# RUN echo "jdk.tls.disabledAlgorithms=SSLv3, MD2, MD5, MD5withRSA, RSA keySize < 1024, DSA keySize < 1024, EC keySize < 224, ECDSA" >>  /usr/local/openjdk-11/conf/security/java.security
-# ADD path/to/project/java.security ${JAVA_HOME}/lib/security/
-
 # 动态下载安装相关依赖 下行注释的KEY值动态替换
 #DOCKER-FILE-RUN-COMMAND
-
-# RUN apt-get upgrade && apt-get add bash \
-# && apt-get install -y curl  &&  curl -SL http://example.com/big.tar.xz
-
-# 配置字体 如果file-which-may-exist目标文件存在，才会被复制  未来新方案可考虑字体目录映射挂载方式更易维护和代码更通用
-# COPY msyh.ttc file-which-may-exist? /usr/share/fonts/
 
 # 将部署文件复制到docker内根目录
 COPY  *.jar  /server.jar

@@ -273,7 +273,7 @@ class Kubernetes implements Serializable {
         ctx.println("K8S集群所有Pod节点健康探测中, 请耐心等待... 🚀")
         def deploymentName = "${ctx.FULL_PROJECT_NAME}" // labels.app标签值
         def namespace = k8sNameSpace
-        ctx.sleep 3 // 等待检测
+        ctx.sleep 3 // 等待检测  需要等待容器镜像下载如Pending状态等  可以先判断容器下载完成后再执行下面的检测
         // 等待所有Pod达到Ready状态
         ctx.timeout(time: 12, unit: 'MINUTES') { // 设置超时时间
             def podsAreReady = false
@@ -284,13 +284,14 @@ class Kubernetes implements Serializable {
                 def podStatus = ctx.readJSON text: output
 
                 int readyCount = podStatus.items.findAll { it.status.containerStatuses.every { it.ready == true } }.size()
+                def podStatusPhase = podStatus.items.status.phase // Running状态容器正式启动运行
                 int totalPods = podStatus.items.size()
 
                 if (readyCount == totalPods) {
                     podsAreReady = true
                 } else {
                     // yaml内容中包含初始化时间和启动完成时间 shell中自动解析所有内容，建议yq进行实际的YAML解析
-                    ctx.echo "Waiting for all pods to be ready. Currently Ready: $readyCount / Total: $totalPods"
+                    ctx.echo "Waiting for all pods to be ready. Currently Ready: $readyCount / Total: $totalPods ,  podStatusPhase: $podStatusPhase"
                     if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
                         ctx.sleep 10 // 每隔多少秒检查一次
                     }
@@ -303,7 +304,6 @@ class Kubernetes implements Serializable {
             // 除了Running之外的状态  都不能算部署成功 Pod处于Pending状态也会通过上面的Ready状态检测代码 其实部署是失败的
             // 如Pending由于资源不足或其他限制  Terminating器可能还在停止中或资源清理阶段  ContainerCreating 容器尚未创建完成
             // Failed 如果Pod中的所有容器都因失败而退出，并且不会再重启，则Pod会进入Failed状态  CrashLoopBackOff 时，这意味着 Pod 中的主容器（或其中一个容器）反复启动并快速退出
-            // 示例 查询pod所有节点的状态  kubectl get pods --selector=app=my-app -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.phase}{"\n"}{end}'
             if (podsAreReady == true) { //  健康探测成功
                 Tools.printColor(ctx, "K8S集群中所有Pod服务已处于启动状态 ✅")
             } else { //  健康探测失败

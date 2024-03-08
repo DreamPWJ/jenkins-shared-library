@@ -102,12 +102,13 @@ class Docker implements Serializable {
                 // 解决buildx报错error: failed to solve: rpc error: code = Unknown desc = failed to solve with frontend dockerfile.v0
                 // Docker desktop -> Settings -> Docker Engine -> Change the "features": { buildkit: true} to "features": { buildkit: false}
 
-                // 开启Buildkit
+                // 是否开启Buildkit 是下一代的镜像构建组件
                 ctx.sh """  export DOCKER_BUILDKIT=1
                        """
                 // 在Docker容器内使用Buildkit
                 /* ctx.sh """  DOCKER_CLI_EXPERIMENTAL=enabled
-                            """*/
+                            """  */
+                // 根据运行CPU架构构建Docker镜像
                 dockerBuildDiffStr = " buildx build --platform linux/amd64 "
                 dockerPushDiffStr = " --push "
             } else {
@@ -226,11 +227,16 @@ class Docker implements Serializable {
         } else if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
             if ("${imageName}".trim() != "") {
                 ctx.println("Docker多阶段镜像构建镜像名称: " + imageName)
-                def dockerFile = "${ctx.env.WORKSPACE}/ci/.ci/Dockerfile"
+                def dockerFile = ""
+                if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+                    dockerFile = "${ctx.env.WORKSPACE}/ci/.ci/Dockerfile"
+                } else if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
+                    dockerFile = "${ctx.env.WORKSPACE}/ci/.ci/python/Dockerfile"
+                }
                 def dockerFileContent = ctx.readFile(file: "${dockerFile}")
                 ctx.writeFile file: "${dockerFile}", text: "${dockerFileContent}"
                         .replaceAll("#FROM-MULTISTAGE-BUILD-IMAGES", "FROM ${imageName}")
-                        .replaceAll("#COPY-MULTISTAGE-BUILD-IMAGES", "COPY --from=0 / /")
+                        .replaceAll("#COPY-MULTISTAGE-BUILD-IMAGES", "COPY --from=0 /usr/lib /usr/lib")
             }
         }
     }

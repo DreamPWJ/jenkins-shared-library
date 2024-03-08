@@ -11,7 +11,7 @@
 def map = [:]
 
 // 远程服务器地址 k8s集群方式可填空或填公网代理负载IP
-map.put('remote_ip', ' ')
+map.put('remote_ip', '120.92.149.246')
 // 工作服务器地址 同时支持N个服务器自动化分布式部署
 map.put('remote_worker_ips', [])
 // 远程服务器用户名
@@ -154,20 +154,20 @@ JSON_PARAMS
 }
 
 
-park-saas-foreign-k8s-prod
-诱导屏DTU交互服务-k8s集群
+lattice-screen-k8s-prod
+诱导屏MQTT-DTU交互服务-k8s集群
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/park_saas_foreign_python.git" ,
-   "BRANCH_NAME" : "master" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/lattice_screen.git" ,
+   "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "COMPUTER_LANGUAGE" : "3" ,
-   "PROJECT_NAME" : "park-saas-foreign" ,
-   "SHELL_PARAMS" : "park-saas-foreign python 8203 5000 prod",
+   "PROJECT_NAME" : "lattice-screen" ,
+   "SHELL_PARAMS" : "lattice-screen python 8207 5000 prod",
    "IS_K8S_DEPLOY" : true,
    "K8S_POD_REPLICAS" : "1",
    "CUSTOM_PYTHON_VERSION" : "3.10.0",
-   "CUSTOM_PYTHON_START_FILE" : "app.py",
+   "CUSTOM_PYTHON_START_FILE" : "app_mqtt.py",
    "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check"
 }
 
