@@ -5,19 +5,22 @@
 # 基础镜像
 FROM dtzar/helm-kubectl:latest
 
+# 更新默认的apk仓库，并添加额外的、速度较快的国内源（这里以阿里云为例）
+RUN echo "https://mirrors.aliyun.com/alpine/v3.19/main" > /etc/apk/repositories && \
+    echo "https://mirrors.aliyun.com/alpine/v3.19/community" >> /etc/apk/repositories
+
 # 更新apt源并安装必要的系统包
 RUN apk update  \
    && apk add --no-cache python3 py3-pip
 
 # 设置Python3为默认Python版本，并安装pip依赖管理工具
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1 && \
-    pip3 install --upgrade pip setuptools wheel
+RUN pip3 install --upgrade pip setuptools wheel
 
 # Python动态处理yaml文件
-RUN pip install ruamel.yaml
+RUN pip3 install ruamel.yaml
 
 
 # 构建镜像
 # docker build -t panweiji/kubernetes:latest  -f /my/Dockerfile.kubernetes . --no-cache --load
-# 上传镜像
+# 上传镜像 先 docker login 登录
 # docker push panweiji/kubernetes:latest

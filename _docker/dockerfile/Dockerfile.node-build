@@ -33,5 +33,5 @@ RUN node -v && npm -v && npm install -g yarn && npm install -g pnpm && npm confi
 
 # 构建镜像
 # docker build -t panweiji/node:20  -f /my/Dockerfile.node-build . --no-cache --load
-# 上传镜像
+# 上传镜像 先 docker login 登录
 # docker push panweiji/node:20
