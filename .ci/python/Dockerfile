@@ -32,7 +32,7 @@ ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 安装依赖环境  --no-install-recommends不安装那些被推荐但非必需的依赖包
-RUN apt-get install -y --no-install-recommends libsm6 libxext6
+RUN apt-get install -y --no-install-recommends libsm6 libxext6 libgl1-mesa-glx
 
 # 下载项目依赖包
 #COPY requirements.txt requirements.txt
