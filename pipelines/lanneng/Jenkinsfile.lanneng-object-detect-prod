@@ -39,7 +39,7 @@ map.put('docker_log_opts', 'max-size=150m') // --log-opt max-size=50m --log-opt 
 // docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
 map.put('docker_volume_mount', '')
 // Dockerfile多阶段构建 镜像名称
-map.put('docker_multistage_build_images', ' ')
+map.put('docker_multistage_build_images', 'panweiji/opengl:latest')
 // 是否上传镜像到docker容器仓库
 map.put('is_push_docker_repo', true)
 // docker容器镜像仓库账号信任id
@@ -131,6 +131,7 @@ JSON_PARAMS
    "SHELL_PARAMS" : "object-detect-yolo python 8206 5000 prod",
    "IS_K8S_DEPLOY" : true,
    "K8S_POD_REPLICAS" : "2",
+   "CUSTOM_PYTHON_START_FILE" : "app_onnx.py",
    "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check" ,
    "APPLICATION_DOMAIN" : "https://object-detect-api.pengbocloud.com" ,
 }
