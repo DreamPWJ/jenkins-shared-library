@@ -50,13 +50,13 @@ map.put('docker_repo_registry', 'hub-cn-shanghai-2.kce.ksyun.com')
 map.put('docker_repo_namespace', 'lanneng')
 
 // K8S集群相关参数
-// K8S集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
+// K8S集群部署集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
 map.put('k8s_credentials_ids', 'a1d2642d-296f-47a2-8d1a-087b46e3255e')
 // K8S集群私有镜像仓库拉取密钥 在集群内使用kubectl create secret命令生成
 map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
 // 项目标签或项目简称
-map.put('project_tag', '停车开放平台')
+map.put('project_tag', '蓝能Python项目')
 
 // 是否是生产环境
 map.put('is_prod', true)
@@ -78,8 +78,8 @@ map.put('is_git_tag', true)
 map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
-map.put('jenkins_node', 'master')
-map.put('jenkins_node_front_end', 'master')
+map.put('jenkins_node', 'node-2')
+map.put('jenkins_node_front_end', 'node-2')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node18')
@@ -96,7 +96,7 @@ map.put('oss_credentials_id', ' ')
 // 直连方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接
 map.put('ssh_hosts_id', ' ')
 // 跳板机方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接
-map.put('proxy_jump_hosts_id', ' ')
+map.put('proxy_jump_hosts_id', '47226244-73ca-48b9-be2d-f3413f62701a')
 
 // 服务器上部署所在的文件夹名称
 map.put('deploy_folder', "my")
@@ -135,6 +135,42 @@ JSON_PARAMS
    "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check",
    "APPLICATION_DOMAIN" : "https://park-foreign-api.pengbocloud.com"
 }
+
+
+environment-monitor-k8s-prod
+环境检测服务-k8s集群
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/environment_monitor.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "COMPUTER_LANGUAGE" : "3" ,
+   "PROJECT_NAME" : "environment-monitor" ,
+   "SHELL_PARAMS" : "environment-monitor python 8205 5000 prod",
+   "IS_K8S_DEPLOY" : true,
+   "K8S_POD_REPLICAS" : "1",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check" ,
+   "APPLICATION_DOMAIN" : "https://env-monitor-api.pengbocloud.com" ,
+}
+
+
+lattice-screen-k8s-prod
+诱导屏MQTT-DTU交互服务-k8s集群
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/lattice_screen.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "COMPUTER_LANGUAGE" : "3" ,
+   "PROJECT_NAME" : "lattice-screen" ,
+   "SHELL_PARAMS" : "lattice-screen python 8207 5000 prod",
+   "IS_K8S_DEPLOY" : true,
+   "K8S_POD_REPLICAS" : "1",
+   "CUSTOM_PYTHON_VERSION" : "3.10.0",
+   "CUSTOM_PYTHON_START_FILE" : "app_mqtt.py",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check"
+}
+
 
 */
 

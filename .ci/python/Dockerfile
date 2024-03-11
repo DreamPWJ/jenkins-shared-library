@@ -10,8 +10,16 @@ ARG PROJECT_NAME
 ARG EXPOSE_PORT
 ARG PYTHON_START_FILE
 
-# 依赖基础镜像
+# Dockerfile多阶段构建 参考文档: https://docs.docker.com/develop/develop-images/multistage-build/
+# 示例 FROM golang:1.16 下行注释的KEY值动态替换
+#FROM-MULTISTAGE-BUILD-IMAGES
+
+# 依赖基础镜像 多阶段构建复用docker缓存层加速构建
 FROM python:$PYTHON_VERSION
+
+# 多阶段构建镜像 从上一个镜像内复制环境到本镜像
+# 示例 COPY --from=0 / /   下行注释的KEY值动态替换
+#COPY-MULTISTAGE-BUILD-IMAGES
 
 # Docker 将此路径用作所有后续命令的默认位置
 WORKDIR /app
@@ -23,6 +31,9 @@ USER root
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+# 安装依赖环境  --no-install-recommends不安装那些被推荐但非必需的依赖包
+# RUN apt-get install -y --no-install-recommends libsm6 libxext6
+
 # 下载项目依赖包
 #COPY requirements.txt requirements.txt
 
@@ -30,13 +41,13 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 #COPY . .
 COPY python.tar.gz .
 
-# 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包
-
+# 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包  利用 --cache-dir 指定缓存目录
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
- && pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple || true \
+ && pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
  && pwd && ls -l
+
 
 # 暴露端口
 EXPOSE $EXPOSE_PORT
@@ -45,6 +56,6 @@ EXPOSE $EXPOSE_PORT
 CMD ["python", "$PYTHON_START_FILE"]
 
 # Flask部署 启动命令
-#CMD [ "python", "-m" , "flask", "run", "--host=0.0.0.0"]
+#CMD ["python", "-m" , "flask", "run", "--host=0.0.0.0"]
 # FastAPI部署 启动命令
 #CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${EXPOSE_PORT}"]

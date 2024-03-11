@@ -3,7 +3,7 @@
 
 /**
  * @author 潘维吉
- * @description 核心Pipeline代码 针对Web项目和JAVA项目CI/CD的脚本
+ * @description 核心Pipeline代码 针对Python语言项目CI/CD的脚本
  * 注意 本文件在Git位置和名称不能随便改动 配置在jenkins里
  */
 
@@ -41,31 +41,31 @@ map.put('docker_volume_mount', '')
 // Dockerfile多阶段构建 镜像名称
 map.put('docker_multistage_build_images', ' ')
 // 是否上传镜像到docker容器仓库
-map.put('is_push_docker_repo', false)
+map.put('is_push_docker_repo', true)
 // docker容器镜像仓库账号信任id
-map.put('docker_repo_credentials_id', '5553c9ed-5416-4bbf-b7fc-9d53ed856177')
+map.put('docker_repo_credentials_id', '73f6b3b0-4580-4acf-b04a-63892fcf9ba8')
 // docker镜像仓库注册地址
-map.put('docker_repo_registry', 'registry.cn-qingdao.aliyuncs.com')
+map.put('docker_repo_registry', 'hub-cn-shanghai-2.kce.ksyun.com')
 // docker仓库命名空间名称
-map.put('docker_repo_namespace', 'lexiang')
+map.put('docker_repo_namespace', 'lanneng')
 
 // K8S集群相关参数
 // K8S集群部署集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
-map.put('k8s_credentials_ids', ' ')
+map.put('k8s_credentials_ids', '74a3d376-cb4c-4a20-9bf7-7300a5eaa84d')
 // K8S集群私有镜像仓库拉取密钥 在集群内使用kubectl create secret命令生成
-map.put('k8s_image_pull_secrets', ' ')
+map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
 // 项目标签或项目简称
-map.put('project_tag', '停车SaaS')
+map.put('project_tag', '目标检测AI模型')
 
 // 是否是生产环境
-map.put('is_prod', false)
+map.put('is_prod', true)
 // 是否在同一台服务器蓝绿部署或滚动部署 非k8s集群方式设置
 map.put('is_same_server', false)
 // 是否进行优雅停机
 map.put('is_grace_shutdown', false)
 // 是否进行服务启动健康探测 K8S集群类型设置false
-map.put('is_health_check', true)
+map.put('is_health_check', false)
 // 是否Pipeline内脚本钉钉通知  总开关
 map.put('is_ding_notice', true)
 // 是否进行部署前通知
@@ -105,7 +105,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', 'openpark-saas')
+map.put('maven_one_level', ' ')
 // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
 map.put('maven_setting_xml', ' ')
 
@@ -114,46 +114,27 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.saas-test
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/lanneng/Jenkinsfile.lanneng-object-detect-prod
 
 /*
 
-park-saas-web-test
-停车SaaS平台Web前端 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/openpark_saas_frontend.git" ,
-    "BRANCH_NAME" : "main" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "openpark-saas-admin" ,
-    "SHELL_PARAMS" : "openpark-saas-admin web 8025 80 test" ,
-    "NPM_RUN_PARAMS" : "build:test",
-    "NODE_VERSION": "14" ,
-}
 
-park-saas-app-test
-停车SaaS平台App服务端
+object-detect-yolo-k8s-prod
+目标检测AI模型服务-k8s集群
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
-   "BRANCH_NAME" : "develop" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/object_detect_yolo.git" ,
+   "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "openpark-saas-app" ,
-   "SHELL_PARAMS" : "openpark-saas app 8188 9000 sit",
+   "COMPUTER_LANGUAGE" : "3" ,
+   "PROJECT_NAME" : "object-detect-yolo" ,
+   "SHELL_PARAMS" : "object-detect-yolo python 8206 5000 prod",
+   "IS_K8S_DEPLOY" : true,
+   "K8S_POD_REPLICAS" : "2",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check" ,
+   "APPLICATION_DOMAIN" : "https://object-detect-api.pengbocloud.com" ,
 }
 
-
-park-saas-admin-web-test
-停车Saas平台 Web前端 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "https://git.pengbocloud.com/smart-parking/parking-admin.git" ,
-    "BRANCH_NAME" : "main" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "parking-admin" ,
-    "SHELL_PARAMS" : "parking-saas-admin web 9009 80 test" ,
-    "NPM_RUN_PARAMS" : "build",
-}
 
 */
 

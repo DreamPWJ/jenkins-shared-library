@@ -123,6 +123,7 @@ tar -xzvf my.tar.gz && rm -f my.tar.gz
 - 当停止容器后，容器占用的空间就会变为可回收的
 - 一键删除所有已经停止的容器 删除容器时会删除其关联的读写层占用的空间
   docker container prune
+  docker image prune -a # 清理所有未被容器引用的镜像
   docker run --log-opt max-size=10m --log-opt max-file=3 日志大小限制
   
   sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
@@ -138,5 +139,6 @@ tar -xzvf my.tar.gz && rm -f my.tar.gz
 #### Linux磁盘空间分析
 - df -h 查看整体占用情况
 - du -sh 查看整个当前文件的占用情况
-- du -lh --max-depth=1 查看当前目录子目录占用情况
 - ls -lh 查看每个文件的占用情况
+- sudo du -h --max-depth=1 /  根目录每个文件的大小
+- du -lh --max-depth=1 查看当前目录子目录占用情况
