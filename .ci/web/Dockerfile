@@ -8,9 +8,6 @@ FROM nginx:stable
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
 #LABEL author="潘维吉"
 
-# 挂载数据卷 docker删除后数据不丢失 docker run -v 映射
-#VOLUME /logs
-
 # 指定切换用户
 USER root
 

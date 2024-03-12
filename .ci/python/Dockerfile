@@ -31,8 +31,13 @@ USER root
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+# 更新默认的apk仓库，并添加额外的、速度较快的国内源（这里以阿里云为例）
+#RUN echo "https://mirrors.aliyun.com/alpine/v3.19/main" > /etc/apk/repositories && \
+#    echo "https://mirrors.aliyun.com/alpine/v3.19/community" >> /etc/apk/repositories \
+
 # 安装依赖环境  --no-install-recommends不安装那些被推荐但非必需的依赖包
-# RUN apt-get install -y --no-install-recommends libsm6 libxext6
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && apt-get clean && apt-get update \
+    && apt install -y --no-install-recommends libgl1-mesa-glx
 
 # 下载项目依赖包
 #COPY requirements.txt requirements.txt
