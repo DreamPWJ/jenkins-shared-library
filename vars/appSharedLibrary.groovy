@@ -1147,16 +1147,17 @@ def androidBuildPackage(map) {
                 Flutter.setVersion(this, "${params.APP_VERSION_NUM}")
             }
         }
-
-        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.flutter) {
-            println("执行Flutter打包原生Android应用 🚀")
-            // Flutter使用自带flutter build命令实现多环境多产品构建
-            Flutter.buildAndroidApp(this)
-        } else {
-            println("执行Fastlane打包原生Android应用 🚀")
-            sh "fastlane package packaging_type:${androidBuildType}  is_aab:${IS_ANDROID_AAB} "
+        retry(3) {
+            if ("${PROJECT_TYPE}".toInteger() == GlobalVars.flutter) {
+                println("执行Flutter打包原生Android应用 🚀")
+                // Flutter使用自带flutter build命令实现多环境多产品构建
+                Flutter.buildAndroidApp(this)
+            } else {
+                println("执行Fastlane打包原生Android应用 🚀")
+                sh "fastlane package packaging_type:${androidBuildType}  is_aab:${IS_ANDROID_AAB} "
+            }
+            // sh "./gradlew clean --no-daemon assemble${androidBuildType}" // --no-daemon解决jenkins并发执行会将gradle杀掉
         }
-        // sh "./gradlew clean --no-daemon assemble${androidBuildType}" // --no-daemon解决jenkins并发执行会将gradle杀掉
     } else {
         bat "gradlew clean assemble${androidBuildType}"
     }
