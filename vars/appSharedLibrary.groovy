@@ -1147,7 +1147,7 @@ def androidBuildPackage(map) {
                 Flutter.setVersion(this, "${params.APP_VERSION_NUM}")
             }
         }
-        retry(3) {
+        retry(3) { // 可能因网络原因 重试几次
             if ("${PROJECT_TYPE}".toInteger() == GlobalVars.flutter) {
                 println("执行Flutter打包原生Android应用 🚀")
                 // Flutter使用自带flutter build命令实现多环境多产品构建
