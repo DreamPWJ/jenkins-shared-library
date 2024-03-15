@@ -56,7 +56,7 @@ map.put('k8s_credentials_ids', ' ')
 map.put('k8s_image_pull_secrets', ' ')
 
 // 项目标签或项目简称
-map.put('project_tag', '澎泊车SaaS 2.0平台')
+map.put('project_tag', '澎泊车SaaS 2.0 Native平台')
 
 // 是否是生产环境
 map.put('is_prod', false)
@@ -84,7 +84,7 @@ map.put('jenkins_node_front_end', 'node-2')
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node20')
 map.put('maven', 'Maven3.9')
-map.put('jdk_publisher', 'amazoncorretto')
+map.put('jdk_publisher', 'graalvm-community')
 map.put('jdk', '21')
 
 // 相关信任标识
@@ -114,30 +114,32 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.pengboche-test
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.pengboche-native-test
 
 /*
 
-pengbo-park-app-test
-澎泊车SaaS 2.0平台服务端
+pengbo-park-app-native-test
+澎泊车SaaS 2.0 Native平台服务端
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
    "BRANCH_NAME" : "feature/springboot3-jdk21" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pengbo-park-app" ,
-   "SHELL_PARAMS" : "pengbo-park-app test 8180 8080 sit"
+   "SHELL_PARAMS" : "pengbo-park-app test 8180 8080 sit",
+   "IS_SPRING_NATIVE" : true,
 }
 
-pengbo-park-admin-test
-澎泊车SaaS 2.0管理平台服务端
+pengbo-park-admin-native-test
+澎泊车SaaS 2.0 Native管理平台服务端
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
    "BRANCH_NAME" : "feature/springboot3-jdk21" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pengbo-park-admin" ,
-   "SHELL_PARAMS" : "pengbo-park-admin test 8181 8081 sit"
+   "SHELL_PARAMS" : "pengbo-park-admin test 8181 8081 dev",
+   "IS_SPRING_NATIVE" : true,
 }
 
 
