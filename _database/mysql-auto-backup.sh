@@ -45,4 +45,4 @@ find ${backup_dir} -name "*.sql.gz" -type f -mtime +3 -exec rm -rf {} \; >/dev/n
 
 # 解压 gzip -d my.sql.gz
 # 备份数据库: mysqldump -h localhost -u root -p123456 db_name > /my/dump.sql
-# 还原数据库: mysql -h localhost -u root -p123456 db_name < /my/dump.sql
+# 还原数据库: mysql -h localhost -u root -p123456 --database=db_name --default-character-set=utf8 < /my/dump.sql
