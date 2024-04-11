@@ -5,32 +5,32 @@
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-prod-car-lock-platform
+  name: letsencrypt-prod-iot-car-lock
   namespace: cert-manager
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory  # ACME 协议的服务端  acme-staging-v02测试证书没有限制
     email: 406798106@qq.com  # 证书快过期的时候会有邮件提醒
     privateKeySecretRef:
-      name: letsencrypt-prod-key-car-lock-platform  # 私钥秘密必须与cert-manager服务在同一个命名空间中才能工作 kubectl delete Secret letsencrypt-prod-key --namespace cert-manager
+      name: letsencrypt-prod-key-iot-car-lock  # 私钥秘密必须与cert-manager服务在同一个命名空间中才能工作 kubectl delete Secret letsencrypt-prod-key --namespace cert-manager
     solvers:
       - http01: # 签发机构使用 HTTP-01 的方式进行 acme 协议 (还可用 DNS 方式，acme 协议的目的是证明机器和域名都是属于你的，然后才准许颁发证书)
           ingress:
             #serviceType: ClusterIP
-            name: pengbocloud-k8s-ingress-car-lock-platform # 这个匹配是关键！！！  1. class是指定自动创建的 Ingress 的 ingress class  2. name是指定被自动修改的 Ingress 名称
+            name: pengbocloud-k8s-ingress-iot-car-lock # 这个匹配是关键！！！  1. class是指定自动创建的 Ingress 的 ingress class  2. name是指定被自动修改的 Ingress 名称
 
 ---
 
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: pengbocloud-k8s-ingress-car-lock-platform
+  name: pengbocloud-k8s-ingress-iot-car-lock
   namespace: default
   annotations:
     # 指定使用nginx做代理
     #kubernetes.io/ingress.class: lanneng-k8s-ingress  # 已弃用 使用 spec.ingressClassName代替
     # add an annotation indicating the issuer to use
-    cert-manager.io/cluster-issuer: letsencrypt-prod-car-lock-platform
+    cert-manager.io/cluster-issuer: letsencrypt-prod-iot-car-lock
     acme.cert-manager.io/http01-edit-in-place: "true"
     # 后端大文件上传大小
     nginx.ingress.kubernetes.io/client-body-buffer-size: 1024m
