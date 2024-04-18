@@ -26,8 +26,8 @@ docker pull mysql
 #### CREATE USER IF NOT EXISTS 'health'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji2020' ;
 #### GRANT all privileges ON *.* TO 'health'@'%' ; flush privileges;
 
-sudo docker run -d --restart=always -p 3306:3306 --name mysql \
--e MYSQL_DATABASE=design -e MYSQL_ROOT_PASSWORD=panweiji2020 \
+docker run -d --restart=always -p 3306:3306 --name mysql \
+-e MYSQL_DATABASE=design -e MYSQL_ROOT_PASSWORD=panweiji@2024 \
 -v /etc/localtime:/etc/localtime:ro -v /my/mysql/data:/var/lib/mysql \
 mysql --group_concat_max_len=1024000000 --max_connections=6000 --lower_case_table_names=1
 

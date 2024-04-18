@@ -10,7 +10,7 @@
 # 如果提示未到期，cert not due for renewal，可以强制更新 --force-renew  测试90天后续签情况执行添加参数 --dry-run
 # 如果距离过期不到30天 默认不会重新生成证书
 # 命令 certbot certificates 查看SSL证书的过期时间
-certbot renew
+sudo certbot renew
 
 # 重新加载nginx配置才会生效
 docker exec proxy-nginx nginx -t -c /etc/nginx/nginx.conf
@@ -21,7 +21,7 @@ docker exec proxy-nginx nginx -s reload || true
 # chmod +x /my/renew-cert.sh  给shell脚本执行文件可执行权限
 # sudo crontab -e
 # 每月执行一次 0 0 1 * *  每天凌晨2点执行一次 0 2 * * *
-# 0 2 * * * /bin/bash /my/renew-cert.sh >/my/crontab.log 2>&1
+# 0 2 * * * /bin/bash /my/renew-cert.sh >/my/certbot-crontab.log 2>&1
 # service crond restart , Ubuntu 使用 sudo service cron restart # 重启crond生效
 # crontab -l # 查看crond列表
 # GNU nano编辑器CTRL+O 再 CTRL+X 保存退出

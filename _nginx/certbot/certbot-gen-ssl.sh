@@ -17,7 +17,23 @@ if [[ ! $(command -v certbot) ]]; then
   sudo sudo apt upgrade certbot && sudo apt dist-upgrade # 升级Certbot版本
   # sudo yum update -y
   sudo yum install -y certbot || true  # 如果certbot不存在 设置yum镜像源/etc/yum.repos.d
-  # Python包方式安装  非标准的CentOS或Ubuntu系统
+
+  # 初始化阿里云域名DNS验证插件  固定版本  pip install certbot-dns-aliyun==0.38.1
+  sudo apt install -y python3-pip || true && sudo yum install python3-pip -y || true && pip install certbot-dns-aliyun
+  sudo pip3 install --upgrade certbot certbot-dns-aliyun
+
+  # Python包方式安装  非标准的CentOS或Ubuntu系统 比如国产麒麟等
+  sudo yum install python3-pip -y &&  python -m pip install --upgrade pip
+  pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple virtualenv
+  # 创建个虚拟环境操作
+  virtualenv venv_python
+  source ./venv_python/bin/activate
+  pip install -i https://pypi.tuna.tsinghua.edu.cn/simple certbot
+  pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple certbot-dns-aliyun
+  pip3 list
+  # 在虚拟环境中执行即可
+  /root/venv_python/bin/certbot --version
+
   # python3 -m venv venv #在certbot目录创建python工作环境
   # source venv/bin/activate
   # sudo pip install certbot || true
@@ -25,16 +41,14 @@ if [[ ! $(command -v certbot) ]]; then
   # sudo ln -s /my/letsencrypt/venv/bin/certbot /usr/bin/certbot #创建软链，以便可以直接执行certbot
 
   # Docker服务之间安装  https://hub.docker.com/r/certbot/certbot
-  docker pull certbot/certbot:latest
-  sudo docker run -it --rm --name certbot \
-               -v "/etc/letsencrypt:/etc/letsencrypt" \
-               -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
-               certbot/certbot certonly --email 406798106@qq.com  -d "panweiji.com"
+  #   docker pull certbot/certbot:latest
+  #   sudo docker run -it --rm --name certbot \
+  #                -v "/etc/letsencrypt:/etc/letsencrypt" \
+  #                -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
+  #                certbot/certbot certonly --email 406798106@qq.com  -d "panweiji.com"
+
   certbot --version
 
-  # 初始化阿里云域名DNS验证插件  固定版本  pip install certbot-dns-aliyun==0.38.1
-  sudo apt install -y python3-pip && pip install certbot-dns-aliyun
-  sudo pip3 install --upgrade certbot certbot-dns-aliyun
 fi
 
 echo "生成域名相关的SSL证书"

@@ -6,8 +6,8 @@
 DING_TALK_WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=383391980b120c38f0f9a4a398349739fa67a623f9cfa834df9c5374e81b2081"
 
 # 定义告警阈值
-CPU_THRESHOLD=90
-MEMORY_THRESHOLD=90
+CPU_THRESHOLD=95
+MEMORY_THRESHOLD=95
 DISK_USAGE_THRESHOLD=95
 # 指定要监控的网卡名称 ifconfig查看网卡名称
 # eth0="enp1s0"
