@@ -23,12 +23,12 @@ if [[ ! $(command -v certbot) ]]; then
   sudo pip3 install --upgrade certbot certbot-dns-aliyun
 
   # Python包方式安装  非标准的CentOS或Ubuntu系统 比如国产麒麟等
-  sudo yum install python3-pip -y
+  sudo yum install python3-pip -y &&  python -m pip install --upgrade pip
   pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple virtualenv
   # 创建个虚拟环境操作
   virtualenv venv_python
   source ./venv_python/bin/activate
-  pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple certbot
+  pip install -i https://pypi.tuna.tsinghua.edu.cn/simple certbot
   pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple certbot-dns-aliyun
   pip3 list
   # 在虚拟环境中执行即可
