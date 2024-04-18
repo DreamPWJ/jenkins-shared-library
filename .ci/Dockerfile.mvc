@@ -47,4 +47,4 @@ COPY  *.war  /usr/local/tomcat/webapps/ROOT.war
 EXPOSE  $EXPOSE_PORT
 
 # 启动Tomcat服务 运行启动命令
-CMD ["catalina.sh","run"]
+CMD ["catalina.sh", "run"]

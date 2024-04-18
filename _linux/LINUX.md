@@ -72,7 +72,7 @@ arp -a
 - ssh-keygen -t rsa root用户在/root/.ssh/id_rsa.pub
 - 公钥放在远程访问服务的/root/.ssh/authorized_keys里 重启sshd服务生效 执行 ssh root@ip 命令访问确认
 
-#### 设置Linux服务器DNS服务 如 144.144.144.144, 223.5.5.5, 223.6.6.6, 8.8.8.8
+#### 设置Linux服务器DNS服务 如 114.114.114.114, 223.5.5.5, 223.6.6.6, 8.8.8.8
 
 - sudo vim /etc/resolv.conf
 
