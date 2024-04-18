@@ -228,7 +228,7 @@ def call(String type = 'web-java', Map map) {
                            }*/
                         docker {
                             // js、jvm、php、jvm-android、python、php。 jvm-community是免费版
-                            image 'jetbrains/qodana-jvm-community' // 占用资源严重
+                            image 'jetbrains/qodana-jvm-community:2024.1' // 占用资源严重
                             args " --entrypoint='' -v ${env.WORKSPACE}:/data/project/ -v ${env.WORKSPACE}/qodana/:/data/results/ -v $HOME/.m2/:/root/.m2/ "
                             reuseNode true // 使用根节点
                         }
