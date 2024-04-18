@@ -28,7 +28,6 @@ if [[ ! $(command -v certbot) ]]; then
   # 创建个虚拟环境操作
   virtualenv venv_python
   source ./venv_python/bin/activate
-  pip3 list
   pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple certbot
   pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple certbot-dns-aliyun
   pip3 list
