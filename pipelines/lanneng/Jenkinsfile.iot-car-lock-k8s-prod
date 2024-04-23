@@ -122,8 +122,8 @@ iot-car-lock-app-k8s-prod
 物联网IoT车位锁2.0平台服务端-k8s集群
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
-   "BRANCH_NAME" : "feature/springboot3-jdk21" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+   "BRANCH_NAME" : "master" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "iot-car-lock-app" ,
    "SHELL_PARAMS" : "iot-car-lock app 8196 8080 prod",
