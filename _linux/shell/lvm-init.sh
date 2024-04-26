@@ -26,13 +26,16 @@ vgdisplay
 lvcreate -L 299G -n lv_data vg_data
 lvdisplay
 
-# 格式化分区
-mkfs.xfs /dev/vg_data/lv_data -f
+# 格式化分区 注意会擦除数据！！！  执行 blkid 命令查看UUID和文件类型
+mkfs.xfs /dev/vg_data/lv_data -f  # mkfs.ext4 /dev/vg_data/lv_data
 fdisk -l
 
 # 挂载分区
 mkdir /mnt/data
 mount /dev/vg_data/lv_data /tidb-data
+
+# 检查是否挂载成功
+df -h
 
 # 挂载永久生效  在 vim /etc/fstab内保存 重启等永久有效!!!
 # /dev/mapper/vg_data-lv_data /tidb-data xfs defaults 0 1
@@ -43,6 +46,7 @@ systemctl daemon-reload
 umount /dev/vg_data/lv_data
 
 
+# -------------------------- 已设置LVM重新在线扩容硬盘情况 -----------------------------
 # 在线扩容硬盘  重新挂载新磁盘 从这直接开始  注意区分设置的vg和lv名称
 lsblk
 fdisk /dev/sdc # fdisk分区 分别选m n p t(t代表LVM分区表 code设置8e) p w
