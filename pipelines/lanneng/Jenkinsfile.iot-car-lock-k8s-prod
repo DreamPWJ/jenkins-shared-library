@@ -73,7 +73,7 @@ map.put('is_before_deploy_notice', false)
 // 是否通知变更记录
 map.put('is_notice_change_log', true)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', false)
+map.put('is_git_tag', true)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
@@ -122,8 +122,8 @@ iot-car-lock-app-k8s-prod
 物联网IoT车位锁2.0平台服务端-k8s集群
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
-   "BRANCH_NAME" : "feature/springboot3-jdk21" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+   "BRANCH_NAME" : "master" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "iot-car-lock-app" ,
    "SHELL_PARAMS" : "iot-car-lock app 8196 8080 prod",

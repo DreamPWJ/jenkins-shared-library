@@ -81,7 +81,7 @@ class Git implements Serializable {
             def lsb = jenkins.getLastSuccessfulBuild()  // 上次成功的构建
             def lsbTime = lsb.getTime().format("yyyy-MM-dd HH:mm:ss")
             ctx.println("上次成功构建时间: " + lsbTime)
-            gitLogs = Utils.getShEchoResult(ctx, "git log --pretty=format:\"- %s @%an ; \" -n ${maxRecordsNum}  --since='${lsbTime}' --no-merges")
+            gitLogs = Utils.getShEchoResult(ctx, "git log --pretty=format:\"- %s @%an ;\" -n ${maxRecordsNum}  --since='${lsbTime}' --no-merges")
             // 针对变更记录数组遍历可进行特殊化处理
             return gitLogs
         } catch (error) {
