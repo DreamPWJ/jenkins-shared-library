@@ -140,6 +140,17 @@ JSON_PARAMS
    "SHELL_PARAMS" : "pengbo-park-admin test 8181 8081 sit"
 }
 
+pengbo-park-admin-client-test
+澎泊车SaaS 2.0停车场管理平台服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+   "BRANCH_NAME" : "develop" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "pengbo-park-admin-client" ,
+   "SHELL_PARAMS" : "pengbo-park-admin-client test 8183 8083 sit"
+}
+
 
 */
 
