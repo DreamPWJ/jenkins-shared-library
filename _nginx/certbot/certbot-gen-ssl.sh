@@ -2,7 +2,7 @@
 # Author: 潘维吉
 # Description: 创建域名SSL证书和过期自动更新 使用的是Let’s Encrypt签发的证书，配合Certbot客户端
 # Let’s Encrypt 是一个自动签发 https 证书的免费项目
-# Certbot 是 Let’s Encrypt 官方推荐的证书生成客户端工具
+# Certbot 是 Let’s Encrypt 官方推荐的证书生成客户端工具  或者 acme.sh客户端 https://github.com/acmesh-official/acme.sh
 # K8s集群使用 cert-manager 签发免费SSL证书: https://cloud.tencent.com/document/product/457/49368
 
 mkdir -p /my/letsencrypt
