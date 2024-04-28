@@ -122,6 +122,7 @@ class Docker implements Serializable {
                     // 如Node构建环境 SSR方式等
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} && pwd && \
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
+                            --build-arg EXPOSE_PORT="${ctx.SHELL_EXPOSE_PORT}" \
                             -f ${ctx.env.WORKSPACE}/ci/.ci/web/${webDockerFileName} . --no-cache \
                             ${dockerPushDiffStr}
                             """

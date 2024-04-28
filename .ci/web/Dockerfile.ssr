@@ -2,6 +2,9 @@
 # Version 1.0.0
 # Description: 自定义构建SSR服务器端渲染
 
+# 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
+ARG EXPOSE_PORT
+
 # 依赖基础镜像  默认值变量方式 ${NODE_VERSON:18}
 FROM node:lts AS runtime
 
@@ -17,15 +20,17 @@ WORKDIR /app
 
 # 将根目录下的源码文件都copy到docker容器文件系统的app文件夹下
 COPY . .
+#COPY myapp.tar.gz /app/
+#RUN tar -xzf myapp.tar.gz && rm myapp.tar.gz
 
 # 安装项目依赖包  RUN和CMD都是执行命令，他们的差异在于RUN中定义的命令会在执行docker build命令创建镜像时执行，而CMD中定义的命令会在执行docker run命令运行镜像时执行
 # RUN pnpm install && npm run build
 
 # 配置环境变量
 ENV HOST 0.0.0.0
-ENV PORT 3000
+ENV PORT $EXPOSE_PORT
 # 容器对外暴露的端口号
-EXPOSE 3000
+EXPOSE $EXPOSE_PORT
 
 # 启动运行 需要node_modules目录文件才能运行
 CMD node ./dist/server/entry.mjs
