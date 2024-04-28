@@ -20,6 +20,8 @@ WORKDIR /app
 
 # 将根目录下的源码文件都copy到docker容器文件系统的app文件夹下
 COPY . .
+#COPY myapp.tar.gz /app/
+#RUN tar -xzf myapp.tar.gz && rm myapp.tar.gz
 
 # 安装项目依赖包  RUN和CMD都是执行命令，他们的差异在于RUN中定义的命令会在执行docker build命令创建镜像时执行，而CMD中定义的命令会在执行docker run命令运行镜像时执行
 # RUN pnpm install && npm run build
