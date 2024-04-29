@@ -83,8 +83,8 @@ EOF
 chmod 600 /my/credentials.ini
 
 # Certbot 生成域名相关的SSL证书
-# 1. 使用更简单的WebRoot方式验证  适合那些已经在运行Web服务器  -w <web_root> 指定您的 Web 服务器的文档根目录
-# 2. 云DNS自动校验方式生成证书方式
+# 1. 使用更简单的WebRoot方式验证  适合那些已经在运行Web服务器 --webroot -w <web_root> 指定您的 Web 服务器的站点根目录 如/usr/share/nginx/html
+# 2. 云DNS自动校验方式生成证书方式  3. standalone模式获取证书 --standalone 不需要指定网站根目录，自动启用服务器的443端口，来验证域名的归属
 certbot certonly --authenticator=dns-aliyun --dns-aliyun-credentials='/my/credentials.ini' \
 --email 406798106@qq.com  -d "panweiji.com"
 
@@ -99,6 +99,9 @@ echo "查看生成的SSL证书"
 
 cd /etc/letsencrypt/live/ || true && ls -l
 
+# 取消撤销证书
+# certbot revoke --cert-path /etc/letsencrypt/live/example.com/cert.pem
+# certbot delete --cert-name example.com
 
 # 如果出现生成失败 如archive directory exists for domain.com-0001 执行删除操作
 # certbot certificates  查看
