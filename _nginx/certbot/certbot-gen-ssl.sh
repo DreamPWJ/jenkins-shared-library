@@ -82,7 +82,9 @@ EOF
 
 chmod 600 /my/credentials.ini
 
-# Certbot阿里云DNS自动校验方式生成证书  动手执行生成配置
+# Certbot 生成域名相关的SSL证书
+# 1. 使用更简单的WebRoot方式验证  适合那些已经在运行Web服务器  -w <web_root> 指定您的 Web 服务器的文档根目录
+# 2. 云DNS自动校验方式生成证书方式
 certbot certonly --authenticator=dns-aliyun --dns-aliyun-credentials='/my/credentials.ini' \
 --email 406798106@qq.com  -d "panweiji.com"
 
