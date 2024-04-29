@@ -2,7 +2,7 @@
 # Author: 潘维吉
 # Description: 创建域名SSL证书和过期自动更新 使用的是Let’s Encrypt签发的证书，配合Certbot客户端
 # Let’s Encrypt 是一个自动签发 https 证书的免费项目
-# Certbot 是 Let’s Encrypt 官方推荐的证书生成客户端工具
+# Certbot 是 Let’s Encrypt 官方推荐的证书生成客户端工具  或者 acme.sh客户端 https://github.com/acmesh-official/acme.sh
 # K8s集群使用 cert-manager 签发免费SSL证书: https://cloud.tencent.com/document/product/457/49368
 
 mkdir -p /my/letsencrypt
@@ -82,7 +82,9 @@ EOF
 
 chmod 600 /my/credentials.ini
 
-# Certbot阿里云DNS自动校验方式生成证书  动手执行生成配置
+# Certbot 生成域名相关的SSL证书
+# 1. 使用更简单的WebRoot方式验证  适合那些已经在运行Web服务器 --webroot -w <web_root> 指定您的 Web 服务器的站点根目录 如/usr/share/nginx/html
+# 2. 云DNS自动校验方式生成证书方式  3. standalone模式获取证书 --standalone 不需要指定网站根目录，自动启用服务器的443端口，来验证域名的归属
 certbot certonly --authenticator=dns-aliyun --dns-aliyun-credentials='/my/credentials.ini' \
 --email 406798106@qq.com  -d "panweiji.com"
 
@@ -97,6 +99,9 @@ echo "查看生成的SSL证书"
 
 cd /etc/letsencrypt/live/ || true && ls -l
 
+# 取消撤销证书
+# certbot revoke --cert-path /etc/letsencrypt/live/example.com/cert.pem
+# certbot delete --cert-name example.com
 
 # 如果出现生成失败 如archive directory exists for domain.com-0001 执行删除操作
 # certbot certificates  查看
