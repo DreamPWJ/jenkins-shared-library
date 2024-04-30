@@ -1,7 +1,7 @@
 # Author: 潘维吉
 # Description: 云原生K8S中使用cert-manager基于 ACME 协议与 Let's Encrypt 自动签发与续签免费的SSL证书
 
-# 创建一个集群级的签发机构 仅需一次
+# 创建一个集群级的签发机构 仅需一次 证书生成需要等待1分钟左右  kubectl delete clusterissuer  issuerName
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
@@ -76,9 +76,6 @@ spec:
     - hosts:
         - env-monitor-api.pengbocloud.com
       secretName: env-monitor-api.pengbocloud.com-tls
-    - hosts:
-        - object-detect-api.pengbocloud.com
-      secretName: object-detect-api.pengbocloud.com-tls
 
   rules:
     #自定义域名
@@ -107,18 +104,4 @@ spec:
                 #服务端口
                 port:
                   number: 8205
-            pathType: Prefix
-
-    #自定义域名
-    - host: object-detect-api.pengbocloud.com
-      http:
-        paths:
-          - path: /
-            backend:
-              #服务名称
-              service:
-                name: object-detect-yolo-python-service
-                #服务端口
-                port:
-                  number: 8206
             pathType: Prefix
