@@ -810,6 +810,8 @@ def getInitParams(map) {
     IS_DIFF_CONF_IN_DIFF_MACHINES = jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES ? jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES : false
     // 是否开启基于QPS自定义指标的K8S水平弹性扩缩容
     IS_K8S_HPA_QPS = jsonParams.IS_K8S_HPA_QPS ? jsonParams.IS_K8S_HPA_QPS : false
+    // 是否禁用K8S健康探测
+    IS_DISABLE_K8S_HEALTH_CHECK = jsonParams.IS_DISABLE_K8S_HEALTH_CHECK ? jsonParams.IS_DISABLE_K8S_HEALTH_CHECK : false
     // 是否开启Spring Native原生镜像 显著提升性能同时降低资源使用
     IS_SPRING_NATIVE = jsonParams.IS_SPRING_NATIVE ? jsonParams.IS_SPRING_NATIVE : false
 
