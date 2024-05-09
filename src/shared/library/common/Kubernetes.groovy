@@ -174,7 +174,7 @@ class Kubernetes implements Serializable {
             setPythonParams = " --set_python_start_file=${ctx.CUSTOM_PYTHON_START_FILE} "
         }
         // 是否禁止执行K8S默认的健康探测
-        if (ctx.IS_DISABLE_K8S_HEALTH_CHECK) {
+        if ("${ctx.IS_DISABLE_K8S_HEALTH_CHECK}" == "true") {
             isK8sHealthProbe = " --is_k8s_health_probe=true "
         }
 
