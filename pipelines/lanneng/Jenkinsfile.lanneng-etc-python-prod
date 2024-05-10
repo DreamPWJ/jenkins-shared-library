@@ -29,10 +29,12 @@ map.put('default_git_branch', ' ')
 // 保持构建的最大个数
 map.put('build_num_keep', 2)
 
-// Docker相关参数
+// 容器Docker相关参数
 // JVM内存设置
 map.put('docker_java_opts', '-Xmx2000m')
-// docker内存限制 不支持小数点形式设置
+// 容器最大cpu限制 m是千分之一 100m是0.1个CPU
+map.put('docker_limit_cpu', '1000m')
+// 容器最大内存限制 不支持小数点形式设置
 map.put('docker_memory', '2G')
 // docker日志限制
 map.put('docker_log_opts', 'max-size=150m') // --log-opt max-size=50m --log-opt max-file=3
@@ -114,7 +116,7 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/lanneng/Jenkinsfile.Jenkinsfile.lanneng-etc-python-prod
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/lanneng/Jenkinsfile.lanneng-etc-python-prod
 
 /*
 

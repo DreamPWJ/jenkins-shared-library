@@ -16,7 +16,11 @@ class Qodana implements Serializable {
     static def analyse(ctx) {
         ctx.sh " qodana --show-report "
 
-/*      // CLI 应该从具有qodana.yaml
+        // 增量代码分析 --paths-to-exclude 参数来指定只分析变化的文件
+        // def changedFiles = "" // 获取两次提交之间的更改文件列表 用逗号分隔的文件列表传递给Qodana
+        // ctx.sh " qodana inspect --paths-to-exclude ${changedFiles} "
+
+/*      // CLI 应该从具有 qodana.yaml
         def qodanaFile = "${ctx.env.WORKSPACE}/ci/_jenkins/qodana/qodana.yaml"
         // ctx.sh "export QODANA=${qodanaFile}"
         // 质量门是 Qdana 可以在不导致 CI/CD 工作流或管道失败的情况下检测到的最大问题数量 一旦达到质量门限，Qodana 就会以退出代码 255 终止
@@ -27,7 +31,7 @@ class Qodana implements Serializable {
         ctx.sh "qodana --show-report ${qualityGate}"*/
 
         // 展示HTML报告
-/*    sh "mkdir -p /var/www/qodana/${config.qodana_path}"
+/*      sh "mkdir -p /var/www/qodana/${config.qodana_path}"
         sh "cp -r qodana-reports/report/* /var/www/qodana/${config.qodana_path}/"
         // make a html-file we can archive in jenkins, that will redirect to our vhost that hosts the above folder
         sh "echo '<html><head><meta http-equiv=\"refresh\" content=\"0; url=https://qodana-host/${config.qodana_path}\" /></head></html>' > qodana-reports/qodana.html"

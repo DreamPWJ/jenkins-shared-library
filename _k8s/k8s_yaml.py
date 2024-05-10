@@ -112,7 +112,7 @@ if nfs_params is not None:
 set_yaml_arags = args.set_yaml_arags
 if set_yaml_arags is not None:
     print(set_yaml_arags)
-    # 适配Java Spring Boot框架容器动态启动命令
+    # 适配Java Spring Boot框架容器动态启动命令  比如 JVM堆栈内存控制
     yaml_containers[0]["command"] = ["java"]  # 覆盖或补充 ENTRYPOINT 或 CMD
     yaml_containers[0]["args"] = ["-jar", "-Xms128m", set_yaml_arags,
                                   "-Djava.security.egd=file:/dev/./urandom", "/server.jar"]
