@@ -39,7 +39,7 @@ while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:" opt; do
     ;;
   h)
     echo "docker_memory=$OPTARG"
-    docker_memory=$OPTARG # docker内存限制
+    docker_memory=$OPTARG # 容器最大内存限制
     ;;
   i)
     echo "docker_log_opts=$OPTARG"
