@@ -216,7 +216,7 @@ def call(String type = 'web-java', Map map) {
                         expression {
                             // 是否进行代码质量分析  && fileExists("sonar-project.properties") == true 代码根目录配置sonar-project.properties文件才进行代码质量分析
                             // return ("${IS_CODE_QUALITY_ANALYSIS}" == 'true' )
-                            return true
+                            return false
                         }
                     }
                     agent {
