@@ -115,7 +115,7 @@ def call(String type = 'web-java', Map map) {
                 WEB_STRIP_COMPONENTS = "${map.web_strip_components}" // Web项目解压到指定目录层级
                 MAVEN_ONE_LEVEL = "${map.maven_one_level}" // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
                 DOCKER_JAVA_OPTS = "${map.docker_java_opts}" // JVM内存设置
-                DOCKER_MEMORY = "${map.docker_memory}" // docker内存限制 不支持小数点形式设置
+                DOCKER_MEMORY = "${map.docker_memory}" // 容器最大内存限制 不支持小数点形式设置
                 DOCKER_LOG_OPTS = "${map.docker_log_opts}" // docker日志限制
                 IS_PUSH_DOCKER_REPO = "${map.is_push_docker_repo}" // 是否上传镜像到docker容器仓库
                 DOCKER_REPO_CREDENTIALS_ID = "${map.docker_repo_credentials_id}" // docker容器镜像仓库账号信任id
@@ -810,6 +810,8 @@ def getInitParams(map) {
     IS_DIFF_CONF_IN_DIFF_MACHINES = jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES ? jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES : false
     // 是否开启基于QPS自定义指标的K8S水平弹性扩缩容
     IS_K8S_HPA_QPS = jsonParams.IS_K8S_HPA_QPS ? jsonParams.IS_K8S_HPA_QPS : false
+    // 是否禁用K8S健康探测
+    IS_DISABLE_K8S_HEALTH_CHECK = jsonParams.IS_DISABLE_K8S_HEALTH_CHECK ? jsonParams.IS_DISABLE_K8S_HEALTH_CHECK : false
     // 是否开启Spring Native原生镜像 显著提升性能同时降低资源使用
     IS_SPRING_NATIVE = jsonParams.IS_SPRING_NATIVE ? jsonParams.IS_SPRING_NATIVE : false
 

@@ -3,7 +3,7 @@
 
 /**
  * @author 潘维吉
- * @description 核心Pipeline代码 针对Web项目和JAVA项目CI/CD的脚本
+ * @description 核心Pipeline代码 针对Python语言项目CI/CD的脚本
  * 注意 本文件在Git位置和名称不能随便改动 配置在jenkins里
  */
 
@@ -11,17 +11,17 @@
 def map = [:]
 
 // 远程服务器地址 k8s集群方式可填空或填公网代理负载IP
-map.put('remote_ip', '120.92.140.41')
+map.put('remote_ip', '192.168.1.128')
 // 工作服务器地址 同时支持N个服务器自动化分布式部署
 map.put('remote_worker_ips', [])
 // 远程服务器用户名
 map.put('remote_user_name', 'root')
 // 代理机或跳板机外网ip用于透传部署到内网目标机器 选填 目标机器外部无法直接访问情况填写内网ip
-map.put('proxy_jump_ip', ' ')
+map.put('proxy_jump_ip', '58.59.49.122')
 // 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
 map.put('proxy_jump_user_name', 'root')
 // 自定义跳板机ssh和scp访问端口 默认22
-map.put('proxy_jump_port', ' ')
+map.put('proxy_jump_port', '3900')
 
 // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
 map.put('default_git_branch', ' ')
@@ -58,14 +58,14 @@ map.put('k8s_credentials_ids', '74a3d376-cb4c-4a20-9bf7-7300a5eaa84d')
 map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
 // 项目标签或项目简称
-map.put('project_tag', '车位锁平台')
+map.put('project_tag', 'ETC RSU服务')
 
 // 是否是生产环境
 map.put('is_prod', true)
 // 是否在同一台服务器蓝绿部署或滚动部署 非k8s集群方式设置
 map.put('is_same_server', false)
 // 是否进行优雅停机
-map.put('is_grace_shutdown', true)
+map.put('is_grace_shutdown', false)
 // 是否进行服务启动健康探测 K8S集群类型设置false
 map.put('is_health_check', false)
 // 是否Pipeline内脚本钉钉通知  总开关
@@ -84,7 +84,7 @@ map.put('jenkins_node', 'node-2')
 map.put('jenkins_node_front_end', 'node-2')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
-map.put('nodejs', 'Node14')
+map.put('nodejs', 'Node18')
 map.put('maven', 'Maven3.6')
 map.put('jdk_publisher', 'openjdk')
 map.put('jdk', '11')
@@ -107,7 +107,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', 'floor-lock')
+map.put('maven_one_level', ' ')
 // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
 map.put('maven_setting_xml', ' ')
 
@@ -116,23 +116,26 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.floor-lock-k8s-prod
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/lanneng/Jenkinsfile.lanneng-etc-python-prod
 
 /*
 
-floor-lock-app-k8s-prod
-相机地锁联动服务端-k8s集群
+rsu-controller-k8s-prod
+ETC RSU服务-k8s集群
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/rsu_controller.git" ,
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "floor-lock-app" ,
-   "SHELL_PARAMS" : "floor-lock app 8099 8080 rizhao-prod",
+   "COMPUTER_LANGUAGE" : "3" ,
+   "PROJECT_NAME" : "rsu-controller" ,
+   "SHELL_PARAMS" : "rsu-controller python 8208 5000 prod",
+   "GIT_PROJECT_FOLDER_NAME" : "rsu_controller_cloud",
    "IS_K8S_DEPLOY" : true,
    "K8S_POD_REPLICAS" : "1",
-   "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check",
-   "APPLICATION_DOMAIN" : "https://floor-lock-api.pengbocloud.com"
+   "CUSTOM_PYTHON_START_FILE" : "main.py",
+   "IS_DISABLE_K8S_HEALTH_CHECK" : true ,
+   "APPLICATION_DOMAIN" : "https://etc-api.pengbocloud.com" ,
 }
 
 */

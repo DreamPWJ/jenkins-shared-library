@@ -27,7 +27,7 @@ map.put('default_git_branch', ' ')
 // 保持构建的最大个数
 map.put('build_num_keep', 2)
 
-// Docker相关参数
+// 容器Docker相关参数
 // docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
 map.put('docker_volume_mount', '')
 // Dockerfile多阶段构建 镜像名称
