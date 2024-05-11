@@ -131,8 +131,8 @@ JSON_PARAMS
    "SHELL_PARAMS" : "epark etc 8087 6868 k8s-prod",
    "IS_K8S_DEPLOY" : true,
    "IS_MAVEN_SINGLE_MODULE" : true,
+   "CUSTOM_HEALTH_CHECK_PATH" : "/etc/",
    "APPLICATION_DOMAIN" : "https://etc-api.pengbocloud.com",
-   "CUSTOM_HEALTH_CHECK_PATH" : "/etc",
 }
 
 epark-etc-web-k8s-prod
