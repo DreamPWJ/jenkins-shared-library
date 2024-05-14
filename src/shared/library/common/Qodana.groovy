@@ -14,7 +14,8 @@ class Qodana implements Serializable {
      * 文档: https://www.jetbrains.com/help/qodana/jenkins.html
      */
     static def analyse(ctx) {
-        ctx.sh " qodana --show-report "
+        //ctx.sh " qodana --show-report "
+        sh 'qodana scan --project-dir /project --save-report --report-dir /project/qodana-report'
         // 仅分析新增代码 增量代码分析 --paths-to-exclude 参数来指定只分析变化的文件  https://www.jetbrains.com/help/qodana/analyze-pr.html
         // def gitStartHash = "" // 获取两次提交之间的更改文件列表 用逗号分隔的文件列表传递给Qodana
         // ctx.sh " qodana inspect --diff-start=${gitStartHash} "
