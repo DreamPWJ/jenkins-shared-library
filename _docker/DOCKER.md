@@ -8,7 +8,7 @@ sudo docker run -d --restart=always -p 80:80 -p 443:443 --name proxy-nginx  -v /
 --log-opt max-size=1024m --log-opt max-file=1  \
 -v /my/nginx/logs:/var/log/nginx  nginx
 
-#### 从Docker Hub里拉取redis镜像来部署
+#### 从Docker Hub里拉取redis镜像来部署 密码强度要求：8位及以上，包含大小写，字母，特殊符号
 docker pull redis:latest
 
 #### redis docker容器启动 -d开启 守护进程Daemon模式 -v指定数据持久化存储宿主机位置 --requirepass "mypassword"设置密码 --appendonly yes数据持久化
