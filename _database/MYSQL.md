@@ -32,11 +32,6 @@ from information_schema.tables
 group by table_schema
 order by sum(data_length) desc, sum(index_length) desc;
 
-#### binlog回滚 按时间点进行恢复 主要参数 ［–start-datetime –stop-datetime］ 指定日期间隔内的所有日志
-
-mysqlbinlog –start-datetime='2022-04-20 10:01:00' –stop-datetime='2022-04-20 9:59:59'
-/usr/local/mysql/data/binlog.123456 | mysql -u root -p
-
 #### 处理大量正在提交的事务导致CPU和内存彪满100%或者不可访问
 
 show processlist;
