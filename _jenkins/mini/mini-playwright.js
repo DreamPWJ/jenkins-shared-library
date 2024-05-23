@@ -7,7 +7,8 @@ const argv = yargs.argv;
  @description  基于Playwright做小程序自动化提审
  Playwright是微软出品新一代前端自动化测试工具  支持大部分主流PC浏览器和移动端浏览器
  支持自动录制脚本、截图、录视频、自动等待、键盘鼠标、上传下载、网络请求拦截等  https://playwright.dev/
- 初始化  npx playwright install  启动录制  playwright codegen https://playwright.dev/
+ 初始化 npm i -g playwright  启动录制  playwright codegen https://playwright.dev/
+ 执行 node mini-playwright.js
 */
 
 (async () => {
