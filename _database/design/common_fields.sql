@@ -1,6 +1,6 @@
 # 数据库表设计常用字段
 
-create table common_fields
+create table base_common_fields
 (
     id          bigint unsigned auto_increment comment '主键'
         primary key,
@@ -22,7 +22,7 @@ create table common_fields
     create_by   bigint                               null comment '创建人',
     create_time datetime   default CURRENT_TIMESTAMP null comment '创建时间'
 )
-
+    comment '通用表设计字段表';
 #  创建索引
 /*
 create index table_name_column_name_index

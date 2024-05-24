@@ -2,8 +2,8 @@
 use database_name_design;
 show tables;
 
-drop table if exists base_table;
-create table base_table
+drop table if exists base_design_table;
+create table base_design_table
 (
     id          bigint unsigned auto_increment comment '主键'
         primary key,
@@ -18,7 +18,7 @@ create table base_table
     create_by   bigint                               null comment '创建人',
     create_time datetime   default CURRENT_TIMESTAMP null comment '创建时间'
 )
-    comment '(根据具体设计删减字段!!!)通用基础表';
+    comment '(根据具体设计删减字段!!!)通用基础设计表';
 
 
 ###  表设计开始

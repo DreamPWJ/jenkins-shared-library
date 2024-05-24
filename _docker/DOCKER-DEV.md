@@ -16,7 +16,7 @@ get_command_4_run_container（完美方案）
 docker pull cucker/get_command_4_run_container
 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock cucker/get_command_4_run_container [容器名称]/[容器ID]
 
-#### 从Docker Hub里拉取mysql镜像来部署
+#### 从Docker Hub里拉取mysql镜像来部署 密码强度要求：8位及以上，包含大小写，字母，特殊符号
 docker pull mysql
 
 #### mysql docker容器启动 创建数据库密码等 跟宿主机器同样的时区配置 -v指定数据持久化存储宿主机位置  添加mysql配置参数 -v 

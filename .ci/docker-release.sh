@@ -288,3 +288,10 @@ fi
 
 # 提交检出均不转换
 # git config --global core.autocrlf false
+
+
+# 手动单独部署情况 不依赖自动化CI/CD和自定义Dockerfile情况   更高版本JDK使用镜像 如 amazoncorretto:21
+# docker run -d --restart=always -p 8080:8080 --name project-name-java \
+# -v "$(pwd)/app.jar:/app/app.jar"  \
+# openjdk:11-jdk-slim java -jar /app/app.jar
+

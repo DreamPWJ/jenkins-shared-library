@@ -18,7 +18,7 @@ docker exec proxy-nginx nginx -s reload || true
 
 
 # 创建定时任务 自动续期SSL证书 默认证书有效期是90天
-# chmod +x /my/renew-cert.sh  给shell脚本执行文件可执行权限
+# chmod +x /my/renew-cert.sh  给shell脚本执行文件可执行权限  先手动执行测试一下
 # sudo crontab -e
 # 每月执行一次 0 0 1 * *  每天凌晨2点执行一次 0 2 * * *
 # 0 2 * * * /bin/bash /my/renew-cert.sh >/my/certbot-crontab.log 2>&1
