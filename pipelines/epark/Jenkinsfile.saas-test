@@ -157,6 +157,34 @@ JSON_PARAMS
     "NPM_RUN_PARAMS" : "build",
 }
 
+
+pengbo-admin-web-test
+澎泊车SaaS 2.0 运营平台 Web前端 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/smart-parking/parking-admin.git" ,
+    "BRANCH_NAME" : "v2" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "pengbo-admin" ,
+    "SHELL_PARAMS" : "pengbo-admin web 9011 80 test" ,
+    "NODE_VERSION": "20" ,
+    "NPM_RUN_PARAMS" : "build-operations",
+}
+
+
+pengbo-park-admin-web-test
+澎泊车SaaS 2.0 停车场平台 Web前端 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/smart-parking/parking-admin.git" ,
+    "BRANCH_NAME" : "v2" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "pengbo-park-admin" ,
+    "SHELL_PARAMS" : "pengbo-park-admin web 9012 80 test" ,
+    "NODE_VERSION": "20" ,
+    "NPM_RUN_PARAMS" : "build-parking",
+}
+
 */
 
 

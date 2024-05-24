@@ -27,7 +27,7 @@ sudo mysqldump ${mysql_options} | gzip >${backup_dir}/${dump_file}.gz
 
 # 备份账号相关信息
 # 只导出mysql库中的user，db，tables_priv表数据
-sudo mysqldump -u${USER_NAME} -h${HOST} -p${PASSWORD} mysql user db tables_priv -t --skip-extended-insert >${backup_dir}/user_info.sql
+#sudo mysqldump -u${USER_NAME} -h${HOST} -p${PASSWORD} mysql user db tables_priv -t --skip-extended-insert >${backup_dir}/user_info.sql
 #sudo docker exec mysql mysqldump -u${USER_NAME} -p${PASSWORD} mysql user db tables_priv -t --skip-extended-insert >${backup_dir}/user_info.sql
 
 # 删除-mtime是几天之前的备份文件
