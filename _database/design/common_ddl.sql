@@ -193,8 +193,8 @@ create table if not exists sys_dict
 (
     id           bigint unsigned auto_increment comment '主键'
         primary key,
-    type_code    varchar(50)                          not null comment '类型编号',
-    title        varchar(50)                          not null comment '字典码含义',
+    type_code    varchar(50)                          not null comment '父类型编号',
+    text         varchar(50)                          not null comment '字典文本',
     value        varchar(50)                          not null comment '字典值',
     extend_value varchar(255)                         null comment '扩展值',
     remark       varchar(200)                         null comment '备注',
