@@ -207,7 +207,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return false
+                            return true
                         }
                     }
                     steps {
