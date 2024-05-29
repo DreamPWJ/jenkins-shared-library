@@ -1437,14 +1437,14 @@ def manualApproval() {
         // 同时钉钉通知到审核人 点击链接自动进入要审核流水线  如果Jenkins提供Open API审核可直接在钉钉内完成点击审批
         DingTalk.notice(this, "${DING_TALK_CREDENTIALS_ID}", "发布流水线申请人工审批 ✍🏻 ",
                 "#### ${BUILD_USER}申请发布${PROJECT_NAME}服务 !" +
-                        " \n #### [点击链接 请您审批](${env.BUILD_URL}) 👈🏻 " +
+                        " \n ### [点击链接 请您审批](${env.JOB_URL}) 👈🏻 " +
                         " \n ###### Jenkins  [运行日志](${env.BUILD_URL}console)  " +
                         " \n ###### 发布人: ${BUILD_USER}" +
                         " \n ###### 通知时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
                 "${approvalPersonMobiles}")
         // input只能用于声明式语法 脚本式语法不支持input
         input(
-                message: "请相关人员审批本次部署是否同意继续发布 ?",
+                message: "请相关人员审批本次部署, 是否同意继续发布 ?",
                 ok: "同意"
         )
         def currentUser = env.BUILD_USER
@@ -1454,7 +1454,7 @@ def manualApproval() {
         } else {
             // 审核人同意后通知发布人 消息自动及时高效传递
             DingTalk.notice(this, "${DING_TALK_CREDENTIALS_ID}", "您发布流水线已被${currentUser}审批同意 ✅",
-                    "#### 前往流水线 [查看](${env.BUILD_URL})  !" +
+                    "#### 前往流水线 [查看](${env.JOB_URL})  !" +
                             " \n ###### 审批时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
                     "${BUILD_USER_MOBILE}")
         }
