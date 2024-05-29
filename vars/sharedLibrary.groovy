@@ -207,7 +207,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return false
+                            return true
                         }
                     }
                     steps {
@@ -1447,7 +1447,13 @@ def manualApproval() {
                 message: "请相关人员审批本次部署, 是否同意继续发布 ?",
                 ok: "同意"
         )
-        def currentUser = env.BUILD_USER
+        def currentUserId = ""
+        def currentUser = ""
+        wrap([$class: 'BuildUser']) {
+            currentUser = env.BUILD_USER
+            currentUserId = env.BUILD_USER_ID
+        }
+        println(currentUserId)
         println(currentUser)
         if (!"${approvalPersons}".contains(currentUser)) {
             error("人工审批失败, 您没有审批的权限, 请重新运行流水线发起审批 ❌")
