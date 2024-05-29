@@ -207,7 +207,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return true
+                            return false
                         }
                     }
                     steps {
@@ -1427,7 +1427,7 @@ def manualApproval() {
     // 针对生产环境部署前做人工发布审批
     // if ("${IS_PROD}" == 'true') {
     // 选择具有审核权限的人员 可以配置一个或多个
-    def approvalPersons = ["潘维吉"] // 多审批人数组 参数化配置 也可指定审批人
+    def approvalPersons = ["admin", "潘维吉", "**科技"] // 多审批人数组 参数化配置 也可指定审批人
     def approvalPersonMobiles = "18863302302" // 审核人的手机 多个逗号分隔 用于钉钉通知等
 
     // 两种审批 1. 或签(一名审批人员同意或拒绝即可) 2. 会签(须所有审批人同意)
@@ -1447,19 +1447,19 @@ def manualApproval() {
                 message: "请相关人员审批本次部署, 是否同意继续发布 ?",
                 ok: "同意"
         )
-        def currentUserId = ""
-        def currentUser = ""
+        def approvalCurrentUserId = ""
+        def approvalCcurrentUser = ""
         wrap([$class: 'BuildUser']) {
-            currentUser = env.BUILD_USER
-            currentUserId = env.BUILD_USER_ID
+            approvalCurrentUser = env.BUILD_USER
+            approvalCurrentUserId = env.BUILD_USER_ID
         }
-        println(currentUserId)
-        println(currentUser)
-        if (!"${approvalPersons}".contains(currentUser)) {
+        println(approvalCurrentUserId)
+        println(approvalCcurrentUser)
+        if (!"${approvalPersons}".contains(approvalCcurrentUser) || !"${approvalPersons}".contains(approvalCurrentUserId)) {
             error("人工审批失败, 您没有审批的权限, 请重新运行流水线发起审批 ❌")
         } else {
             // 审核人同意后通知发布人 消息自动及时高效传递
-            DingTalk.notice(this, "${DING_TALK_CREDENTIALS_ID}", "您发布流水线已被${currentUser}审批同意 ✅",
+            DingTalk.notice(this, "${DING_TALK_CREDENTIALS_ID}", "您发布流水线已被${approvalCcurrentUser}审批同意 ✅",
                     "#### 前往流水线 [查看](${env.JOB_URL})  !" +
                             " \n ###### 审批时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
                     "${BUILD_USER_MOBILE}")
