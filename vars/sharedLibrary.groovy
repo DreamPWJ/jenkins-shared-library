@@ -203,6 +203,20 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
+                stage('人工审批') {
+                    when {
+                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            return true
+                        }
+                    }
+                    steps {
+                        script {
+                            manualApproval()
+                        }
+                    }
+                }
+
                 /*   stage('扫码代码') {
                        //failFast true  // 其他阶段失败 中止parallel块同级正在进行的并行阶段
                        parallel { */// 阶段并发执行
@@ -418,20 +432,6 @@ def call(String type = 'web-java', Map map) {
                     steps {
                         script {
                             uploadRemote(Utils.getShEchoResult(this, "pwd"), map)
-                        }
-                    }
-                }
-
-                stage('人工审批') {
-                    when {
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return true
-                        }
-                    }
-                    steps {
-                        script {
-                            manualApproval()
                         }
                     }
                 }
@@ -1425,7 +1425,7 @@ def uploadRemote(filePath, map) {
  */
 def manualApproval() {
     // 针对生产环境部署前做人工发布审批
-    if ("${IS_PROD}" == 'true') {
+   // if ("${IS_PROD}" == 'true') {
         // 选择具有审核权限的人员 可以配置一个或多个
         def approvalPersons = ["潘维吉"] // 多审批人数组 参数化配置 也可指定审批人
         def approvalPersonMobiles = ["18863302302"] // 审核人的手机数组 用于钉钉通知等
@@ -1457,7 +1457,7 @@ def manualApproval() {
                         "${BUILD_USER_MOBILE}")
             }
         }
-    }
+    // }
 }
 
 /**
