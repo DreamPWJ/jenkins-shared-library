@@ -207,7 +207,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return false
+                            return true
                         }
                     }
                     steps {
@@ -1428,7 +1428,7 @@ def manualApproval() {
    // if ("${IS_PROD}" == 'true') {
         // 选择具有审核权限的人员 可以配置一个或多个
         def approvalPersons = ["潘维吉"] // 多审批人数组 参数化配置 也可指定审批人
-        def approvalPersonMobiles = ["18863302302"] // 审核人的手机数组 用于钉钉通知等
+        def approvalPersonMobiles = "18863302302" // 审核人的手机 多个逗号分隔 用于钉钉通知等
 
         // 两种审批 1. 或签(一名审批人员同意或拒绝即可) 2. 会签(须所有审批人同意)
         if ("${approvalPersons}".contains("${BUILD_USER}")) {
@@ -1436,13 +1436,14 @@ def manualApproval() {
         } else {
             // 同时钉钉通知到审核人 点击链接自动进入要审核流水线  如果Jenkins提供Open API审核可直接在钉钉内完成点击审批
             DingTalk.notice(this, "${DING_TALK_CREDENTIALS_ID}", "发布流水线申请人工审批 ✍🏻 ",
-                    "#### ${BUILD_USER}申请发布${PROJECT_NAME}服务, [请您审批](${env.BUILD_URL}) 👈🏻  !" +
+                    "#### ${BUILD_USER}申请发布${PROJECT_NAME}服务 !" +
+                            " \n #### [请您审批](${env.BUILD_URL}) 👈🏻 " +
                             " \n ###### Jenkins  [运行日志](${env.BUILD_URL}console)  " +
                             " \n ###### 发布人: ${BUILD_USER}" +
                             " \n ###### 通知时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
-                    "${approvalPersonMobiles}".split(","))
+                    "${approvalPersonMobiles}")
             input {
-                message "请【${approvalPersons.split(",")}】相关人员审批本次部署, 是否同意继续发布 ?"
+                message "请【${approvalPersons}】相关人员审批本次部署, 是否同意继续发布 ?"
                 ok "同意"
             }
             def currentUser = env.BUILD_USER
