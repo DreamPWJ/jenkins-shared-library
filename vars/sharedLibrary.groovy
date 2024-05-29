@@ -207,7 +207,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return false
+                            return true
                         }
                     }
                     steps {
@@ -1435,14 +1435,15 @@ def manualApproval() {
         // 如果是有审核权限人员发布的跳过本次审核
     } else {
         // 同时钉钉通知到审核人 点击链接自动进入要审核流水线  如果Jenkins提供Open API审核可直接在钉钉内完成点击审批
-        DingTalk.notice(this, "${DING_TALK_CREDENTIALS_ID}", "发布流水线申请人工审批 ✍🏻 ",
+        DingTalk.notice(this, "${DING_TALK_CREDENTIALS_ID}", "发布流水线申请人工审批通知 ✍🏻 ",
                 "#### ${BUILD_USER}申请发布${PROJECT_NAME}服务 !" +
-                        " \n ### [点击链接 请您审批](${env.JOB_URL}) 👈🏻 " +
+                        " \n ### [请您点击链接去审批](${env.JOB_URL}) 👈🏻 " +
+                        " \n ##### Git代码  [变更日志](${REPO_URL.replace('.git', '')}/-/commits/${BRANCH_NAME}/)  " +
                         " \n ###### Jenkins  [运行日志](${env.BUILD_URL}console)  " +
                         " \n ###### 发布人: ${BUILD_USER}" +
                         " \n ###### 通知时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
                 "${approvalPersonMobiles}")
-        // input只能用于声明式语法 脚本式语法不支持input
+        // 中断询问审批
         input(
                 message: "请相关人员审批本次部署, 是否同意继续发布 ?",
                 ok: "同意"
