@@ -1443,7 +1443,7 @@ def manualApproval() {
                             " \n ###### 通知时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
                     "${approvalPersonMobiles}")
             input {
-                message "请相关人员审批本次部署, 是否同意继续发布 ?"
+                message "请相关人员审批本次部署是否同意继续发布 ?"
                 ok "同意"
             }
             def currentUser = env.BUILD_USER
