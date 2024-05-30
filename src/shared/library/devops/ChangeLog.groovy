@@ -39,7 +39,7 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
                 def entry = entries[j]
                 // ${new Date(entry.timestamp)  ${entry.affectedPaths}
                 def truncatedMsg = entry.msg.take(60)  // 提交记录长度截取
-                def combinationMsg = "- ${truncatedMsg} " + "([${entry.commitId.substring(0, 7)}](${ctx.REPO_URL.replace('.git', '')}/commit/${entry.commitId})) " + "@${entry.author.fullName} \n"
+                def combinationMsg = "- ${truncatedMsg} " + "([${entry.commitId.substring(0, 7)}](${ctx.REPO_URL.replace('.git', '')}/commit/${entry.commitId})) " + "@${entry.authorName} \n"
                 // 提交记录信息去重
                 if (!(featChangeLog.contains("${combinationMsg}") || fixChangeLog.contains("${combinationMsg}") || otherChangeLog.contains("${combinationMsg}"))) {
                     if (truncatedMsg.toString().startsWith(GlobalVars.gitCommitFeature)) { // 新增功能标识
