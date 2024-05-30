@@ -193,9 +193,9 @@ create table if not exists sys_dict
 (
     id           bigint unsigned auto_increment comment '主键'
         primary key,
-    type_code    varchar(50)                          not null comment '类型编号',
-    title        varchar(50)                          not null comment '字典码含义',
-    value        varchar(50)                          not null comment '字典值',
+    type_code    varchar(50)                          not null comment '父类型编号',
+    code         varchar(50)                          not null comment '字典码',
+    text         varchar(50)                          not null comment '字典文本',
     extend_value varchar(255)                         null comment '扩展值',
     remark       varchar(200)                         null comment '备注',
     show_order   int        default 1                 null comment '显示排序号 数字越小优先级越高',
