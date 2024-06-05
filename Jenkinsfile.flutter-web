@@ -116,7 +116,7 @@ move-inspection-flutter-web
 移动质检Flutter For Web项目❤️
 JSON_PARAMS
 {
-   "REPO_URL" : "https://github.com/DreamPWJ/anjia/move_inspection_flutter.git" ,
+   "REPO_URL" : "https://github.com/DreamPWJ/panweiji/move_inspection_flutter.git" ,
    "BRANCH_NAME" : "dev" ,
    "WEB_PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "move-inspection" ,

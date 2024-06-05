@@ -60,12 +60,12 @@ systemctl status mysqld
 # set global validate_password_policy=0;
 
 # ALTER USER 'root'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji2020!@#';
-# CREATE database if NOT EXISTS anjia;
+# CREATE database if NOT EXISTS panweiji;
 # show databases;
 
 #echo "新建远程用户"
-# CREATE USER IF NOT EXISTS 'anjia'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji2020!@#';
-# GRANT all privileges ON *.* TO 'anjia'@'%';
+# CREATE USER IF NOT EXISTS 'panweiji'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji2020!@#';
+# GRANT all privileges ON *.* TO 'panweiji'@'%';
 # flush privileges;
 
 # 处理端口问题
