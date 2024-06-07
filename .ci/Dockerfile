@@ -13,6 +13,7 @@ ARG EXPOSE_PORT
 # 示例 FROM golang:1.16 下行注释的KEY值动态替换
 #FROM-MULTISTAGE-BUILD-IMAGES
 
+# Spring官方推荐的JDK提供商: https://bell-sw.com/libericajdk/
 # JDK基础镜像 默认值变量方式 ${JDK_VERSION:-11}
 FROM ${JDK_PUBLISHER}:${JDK_VERSION}
 

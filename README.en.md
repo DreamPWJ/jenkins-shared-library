@@ -65,4 +65,4 @@ Design a general and fully automated DevOps to improve the efficiency and qualit
 
 ### Core contributors
 
-- Pan Weiji
+- Pan WeiJi

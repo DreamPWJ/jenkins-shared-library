@@ -113,11 +113,11 @@ panweiji-saas-android-app
 JSON_PARAMS:
 {
     "PROJECT_TYPE" : "1",
-    "REPO_URL" : "https://github.com/DreamPWJ/anjia-jinhua/anjia-jinhua-android.git",
+    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-jinhua/panweiji-jinhua-android.git",
     "DEFAULT_GIT_BRANCH" : "dev",
     "CUSTOM_ANDROID_GRADLE_CONFIG_PATH" : "app/build.gradle" ,
     "IS_ANDROID_STORE_IDENTIFY" : true ,
-    "CUSTOM_ANDROID_FLAVOR" : "anjia,jinhua,bona,kaifeng,xingyu,huaxin,haoyu"
+    "CUSTOM_ANDROID_FLAVOR" : "panweiji,jinhua,bona,kaifeng,xingyu,huaxin,haoyu"
 }
 ANDROID_APP_INFO:
 {
@@ -130,11 +130,11 @@ panweiji-saas-android-mapp
 JSON_PARAMS:
 {
     "PROJECT_TYPE" : "1",
-    "REPO_URL" : "https://github.com/DreamPWJ/anjia-jinhua/anjia-jinhua-android-manager.git",
+    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-jinhua/panweiji-jinhua-android-manager.git",
     "DEFAULT_GIT_BRANCH" : "dev",
     "CUSTOM_ANDROID_GRADLE_CONFIG_PATH" : "app/build.gradle" ,
     "IS_ANDROID_STORE_IDENTIFY" : true ,
-    "CUSTOM_ANDROID_FLAVOR" : "anjia,jinhua,bona,kaifeng,xingyu,huaxin"
+    "CUSTOM_ANDROID_FLAVOR" : "panweiji,jinhua,bona,kaifeng,xingyu,huaxin"
 }
 
 panweiji-ai-payment-machine
@@ -189,12 +189,12 @@ panweiji-jinhua-ios-app
 JSON_PARAMS:
 {
     "PROJECT_TYPE" : "2",
-    "REPO_URL" : "https://github.com/DreamPWJ/anjia-jinhua/anjia-jinhua-ios.git",
+    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-jinhua/panweiji-jinhua-ios.git",
     "DEFAULT_GIT_BRANCH" : "dev",
-    "IOS_APP_IDENTIFIER" : "panweiji.com.saasAnjiaJinHua",
-    "IOS_PROJECT_LEVEL_DIR" : "saasAnjiaJinHua",
-    "IOS_MULTI_TARGET_NAMES" : "anjia,jinhua",
-    "IOS_MULTI_TARGET_PARAMS" : "panweiji.com.saasAnjialexiangNew~saaspanweiji,panweiji.com.saasAnjiaJinHua~saasAnjiaJinHua"
+    "IOS_APP_IDENTIFIER" : "panweiji.com.saaspanweijiJinHua",
+    "IOS_PROJECT_LEVEL_DIR" : "saaspanweijiJinHua",
+    "IOS_MULTI_TARGET_NAMES" : "panweiji,jinhua",
+    "IOS_MULTI_TARGET_PARAMS" : "panweiji.com.saaspanweijilexiangNew~saaspanweiji,panweiji.com.saaspanweijiJinHua~saaspanweijiJinHua"
 }
 IOS_APP_REVIEW_INFO:
 {
@@ -207,11 +207,11 @@ panweiji-jinhua-ios-mapp
 JSON_PARAMS:
 {
     "PROJECT_TYPE" : "2",
-    "REPO_URL" : "https://github.com/DreamPWJ/anjia-jinhua/anjia-jinhua-ios-manager.git",
+    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-jinhua/panweiji-jinhua-ios-manager.git",
     "DEFAULT_GIT_BRANCH" : "dev",
     "IOS_APP_IDENTIFIER" : "panweiji.com.saasMangerJinHua",
     "IOS_PROJECT_LEVEL_DIR" : "saasMangerJinHua",
-    "IOS_MULTI_TARGET_NAMES" : "anjia,jinhua",
+    "IOS_MULTI_TARGET_NAMES" : "panweiji,jinhua",
     "IOS_MULTI_TARGET_PARAMS" : "panweiji.com.saasMangerlexiang~saasMangerpanweiji,panweiji.com.saasMangerJinHua~saasMangerJinHua"
 }
 IOS_APP_REVIEW_INFO:
@@ -225,9 +225,9 @@ panweiji-saas-ios-app
 JSON_PARAMS:
 {
     "PROJECT_TYPE" : "2",
-    "REPO_URL" : "https://github.com/DreamPWJ/anjia-saas-lexiang/anjia-ios-sass.git",
-    "IOS_APP_IDENTIFIER" : "panweiji.com.saasAnjialexiangNew",
-    "IOS_PROJECT_LEVEL_DIR" : "saasAnjialexiang"
+    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-saas-lexiang/panweiji-ios-sass.git",
+    "IOS_APP_IDENTIFIER" : "panweiji.com.saaspanweijilexiangNew",
+    "IOS_PROJECT_LEVEL_DIR" : "saaspanweijilexiang"
 }
 IOS_APP_REVIEW_INFO:
 {
@@ -240,7 +240,7 @@ panweiji-saas-ios-mapp
 JSON_PARAMS:
 {
     "PROJECT_TYPE" : "2",
-    "REPO_URL" : "https://github.com/DreamPWJ/anjia-saas-lexiang/lexiang-ios-sass-manager.git",
+    "REPO_URL" : "https://github.com/DreamPWJ/panweiji-saas-lexiang/lexiang-ios-sass-manager.git",
     "IOS_APP_IDENTIFIER" : "panweiji.com.saasMangerlexiang",
     "IOS_PROJECT_LEVEL_DIR" : "saasMangerlexiang"
 }

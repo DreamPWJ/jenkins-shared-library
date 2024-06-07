@@ -12,6 +12,7 @@ ARG EXPOSE_PORT
 # 示例 FROM golang:1.16 下行注释的KEY值动态替换
 #FROM-MULTISTAGE-BUILD-IMAGES
 
+# 官方推荐的JDK提供商: https://www.graalvm.org/
 # 基础镜像
 #FROM alpine:latest
 FROM ${JDK_PUBLISHER}:${JDK_VERSION}

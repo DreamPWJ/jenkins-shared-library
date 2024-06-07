@@ -58,7 +58,7 @@ test-electron-desktop
 JSON_PARAMS:
 {
     "PROJECT_TYPE" : "1",
-    "REPO_URL" : "https://github.com/DreamPWJ/anjia/panweiji-coffee-electron-vue.git",
+    "REPO_URL" : "https://github.com/DreamPWJ/panweiji/panweiji-coffee-electron-vue.git",
     "DEFAULT_GIT_BRANCH" : "dev",
     "NPM_RUN_PARAMS" : "build:test,build:mac,build:linux,build:prod,build:dev",
     "PROJECT_CHINESE_NAME" : "上水咖啡"
