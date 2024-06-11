@@ -21,4 +21,4 @@ create table base_design_table
     comment '(根据具体设计删减字段!!!)通用基础设计表';
 
 
-###  表设计开始
+###  表设计开始  复制基础表模板修改字段即可
