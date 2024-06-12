@@ -1,6 +1,6 @@
-#### 安装Prometheus监控 https://prometheus.io/docs/prometheus/latest/installation/
+### 安装Prometheus监控 https://prometheus.io/docs/prometheus/latest/installation/
 
-##### 安装前确保prometheus的配置prometheus.yml文件放在挂载目录下
+#### 安装前确保prometheus的配置prometheus.yml文件放在挂载目录下
 
 mkdir -p /my/prometheus/
 
@@ -12,14 +12,14 @@ docker run -d --restart=always -p 9090:9090 \
 
 sudo docker run -d --restart=always -p 3000:3000 --name grafana grafana/grafana
 
-##### Prometheus监控MySQL
+#### Prometheus监控MySQL
 
 - 参考文档: https://zhuanlan.zhihu.com/p/337715590
 - 启动MySQL监控服务 重启后重新执行
 - nohup /opt/node_exporter/node_exporter & 
 - nohup /opt/mysqld_exporter/mysqld_exporter --config.my-cnf=/opt/mysqld_exporter/.my.cnf &
 
-##### Prometheus监控Nginx
+#### Prometheus监控Nginx
 
 - 参考文档: https://blog.51cto.com/cuiyingfeng/4371773
 
@@ -40,7 +40,7 @@ sudo docker run -d --restart=always -p 3000:3000 --name grafana grafana/grafana
             <version>1.7.5</version>
         </dependency>
 
-- yaml配置文件
+#### Spring Boot yaml配置文件设置 开放/actuator/** 监控路径可能导致内存数据安全漏洞
 
 management:
   endpoint:
@@ -61,26 +61,25 @@ management:
     tags:
       application: ${spring.application.name}
 
-- Spring Boot启动类Application追加
+#### Spring Boot启动类Application追加
   /**
-  * 集成prometheus监控
+    * 集成prometheus监控
     */
     @Bean
     MeterRegistryCustomizer<MeterRegistry> configurer(@Value("${spring.application.name}") String applicationName) {
     return (registry) -> registry.config().commonTags("application", applicationName);
     }
 
-- 查看度量指标是否集成成功
+####  查看度量指标是否集成成功
   访问 http://localhost:8080/actuator/prometheus
 
-首先在Grafana的Data Sources导入Prometheus数据源后, 再配置导入监控面板类型 一个Prometheus服务只需要配置一次 多应用共享
-
+- 首先在Grafana的Data Sources导入Prometheus数据源后, 再配置导入监控面板类型 一个Prometheus服务只需要配置一次 多应用共享
 - import配置https://grafana.com/dashboards/4701 是 jvm使用面板 和 10280 是 Spring Boot面板
 
 Prometheus监控 http://120.92.140.217:9090
 Grafana监控 http://120.92.140.217:3000  默认用户和密码均为admin
 
-### 各种PrometheusAlert告警通知服务 开源的运维告警中心消息转发系统
+#### 各种PrometheusAlert告警通知服务 开源的运维告警中心消息转发系统
 
 - 参考项目：https://github.com/feiyu563/PrometheusAlert
 
