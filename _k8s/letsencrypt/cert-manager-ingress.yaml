@@ -86,7 +86,7 @@ metadata:
     # 发送给后端服务的前 多少MB 数据不进行限速
     #nginx.ingress.kubernetes.io/limit-rate-after: 102400
     # 白名单 客户端IP源范围要从速率限制中排除。该值是逗号分隔的CIDR列表
-    #nginx.ingress.kubernetes.io/limit-whitelist:
+    #nginx.ingress.kubernetes.io/limit-whitelist: 120.10.150.36/16
     # 限流超出后的响应码
     nginx.ingress.kubernetes.io/configuration-snippet: |
       limit_req_status 429;
