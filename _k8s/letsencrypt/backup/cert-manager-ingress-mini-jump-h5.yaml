@@ -55,10 +55,25 @@ spec:
     - hosts:
         - qr.pb55.cn
       secretName: qr.pb55.cn-tls
+    - hosts:
+        - qr.pengbocloud.com
+      secretName: qr.pengbocloud.com-tls
 
   rules:
     #自定义域名
     - host: qr.pb55.cn
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: mini-jump-h5-service
+                #服务端口
+                port:
+                  number: 9106
+            pathType: Prefix
+    - host: qr.pengbocloud.com
       http:
         paths:
           - path: /
