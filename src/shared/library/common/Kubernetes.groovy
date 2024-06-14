@@ -127,7 +127,7 @@ class Kubernetes implements Serializable {
         if ("${ctx.IS_K8S_CANARY_DEPLOY}" == 'true') {
             // 只发布一个新的pod服务用于验证服务, 老服务不变, 验证完成后取消灰度发布, 重新发布全量服务
             appName += "-" + canaryFlag
-            k8sPodReplicas = 1  // 只部署一个服务测试
+            k8sPodReplicas = 1  // 只部署一个新服务用于验证
             // k8sPodReplicas= ctx.K8S_CANARY_DEPLOY_PERCENTAGE * Integer.parseInt(k8sPodReplicas)  // 也可以根据pod做百分比计算
             // 新增了canary测试节点同时减少老旧pod节点数
 /*          def oldDeploymentName = appName + "-deployment"

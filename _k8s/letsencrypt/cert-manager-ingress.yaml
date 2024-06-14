@@ -1,7 +1,7 @@
 # Author: 潘维吉
 # Description: 云原生K8S中使用cert-manager基于 ACME 协议与 Let's Encrypt 自动签发与续签免费的SSL证书
 
-# 创建一个集群级的签发机构  仅需一次  证书生成需要等待1分钟左右  kubectl delete clusterissuer  issuerName
+# 创建一个集群级的签发机构  仅需一次  证书生成需要等待1分钟左右  kubectl delete clusterissuer  issuerName  和  kubectl delete Secret letsencrypt-prod-key --namespace cert-manager
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
@@ -86,7 +86,7 @@ metadata:
     # 发送给后端服务的前 多少MB 数据不进行限速
     #nginx.ingress.kubernetes.io/limit-rate-after: 102400
     # 白名单 客户端IP源范围要从速率限制中排除。该值是逗号分隔的CIDR列表
-    #nginx.ingress.kubernetes.io/limit-whitelist:
+    #nginx.ingress.kubernetes.io/limit-whitelist: 120.10.150.36/16
     # 限流超出后的响应码
     nginx.ingress.kubernetes.io/configuration-snippet: |
       limit_req_status 429;
