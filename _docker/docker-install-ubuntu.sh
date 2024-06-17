@@ -48,7 +48,7 @@ echo "设置国内镜像源 加速docker pull速度"
 sudo cat <<EOF >/etc/docker/daemon.json
 {
   "registry-mirrors": [
-   "http://registry.docker-cn.com"
+   "https://registry.docker-cn.com"
   ]
 }
 EOF
