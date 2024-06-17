@@ -104,6 +104,32 @@ function get_cpu_rate() {
   # echo "结果4: ${rate4}"
 }
 
+# 获取系统磁盘资源 如果硬盘资源不足 停止容器构建或自动清理空间
+function get_disk_space() {
+    # 设置所需的最小可用空间（单位GB）
+    MIN_FREE_SPACE=2
+
+    # 获取总的可用空间（单位GB）
+    TOTAL_FREE=$(df -h | awk '/\// {print $4}' | sed 's/G//')
+
+    # 将KB转换成GB（如果需要的话）
+    if [[ $TOTAL_FREE =~ ^[0-9]+\.[0-9]+K ]]; then
+        TOTAL_FREE=$(echo "scale=2; $TOTAL_FREE / 1024" | bc)
+    elif [[ $TOTAL_FREE =~ ^[0-9]+\.[0-9]+M ]]; then
+        TOTAL_FREE=$(echo "scale=2; $TOTAL_FREE / 1024 / 1024" | bc)
+    fi
+
+    # 判断可用空间是否低于最小需求
+    if (( $(echo "$TOTAL_FREE < $MIN_FREE_SPACE" | bc -l) )); then
+        echo "🚨 Warning: Free space is below $MIN_FREE_SPACE GB!"
+        echo -e "\033[31m当前系统磁盘空间不足, 可能导致Docker镜像构建失败  ❌  \033[0m"
+        echo "开始自动清理Docker日志"
+        sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
+        cd /my && rm -rf /*/logs
+        #exit 1
+    fi
+}
+
 # 检测是否存在Dockerfile文件 不存在退出执行
 function exist_docker_file() {
   if [[ ! -f "Dockerfile" ]]; then
