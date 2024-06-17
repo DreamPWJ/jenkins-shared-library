@@ -123,7 +123,7 @@ class Docker implements Serializable {
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} && pwd && \
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
                             --build-arg EXPOSE_PORT="${ctx.SHELL_EXPOSE_PORT}" \
-                            -f ${ctx.env.WORKSPACE}/ci/.ci/web/${webDockerFileName} . --no-cache \
+                            -f ${ctx.env.WORKSPACE}/ci/.ci/web/${webDockerFileName} . \
                             ${dockerPushDiffStr}
                             """
                 } else {
@@ -132,7 +132,7 @@ class Docker implements Serializable {
                             cd ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} && pwd && \
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
                             --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg WEB_STRIP_COMPONENTS="${ctx.WEB_STRIP_COMPONENTS}" \
-                            --build-arg NPM_PACKAGE_FOLDER=${ctx.NPM_PACKAGE_FOLDER}  -f ${ctx.env.WORKSPACE}/ci/.ci/web/${webDockerFileName} . --no-cache \
+                            --build-arg NPM_PACKAGE_FOLDER=${ctx.NPM_PACKAGE_FOLDER}  -f ${ctx.env.WORKSPACE}/ci/.ci/web/${webDockerFileName} .  \
                             ${dockerPushDiffStr}
                             """
                 }
@@ -161,7 +161,7 @@ class Docker implements Serializable {
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}" --build-arg EXPOSE_PORT="${exposePort}" --build-arg TOMCAT_VERSION=${ctx.TOMCAT_VERSION} \
                             --build-arg JDK_PUBLISHER=${jdkPublisher} --build-arg JDK_VERSION=${ctx.JDK_VERSION} --build-arg JAVA_OPTS="-Xms128m ${ctx.DOCKER_JAVA_OPTS}" \
-                            -f ${ctx.env.WORKSPACE}/ci/.ci/${dockerFileName} . --no-cache \
+                            -f ${ctx.env.WORKSPACE}/ci/.ci/${dockerFileName} .  \
                             ${dockerPushDiffStr}
                             """
                 } else if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
@@ -169,7 +169,7 @@ class Docker implements Serializable {
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg EXPOSE_PORT="${exposePort}"  \
                             --build-arg PYTHON_VERSION=${ctx.CUSTOM_PYTHON_VERSION} --build-arg PYTHON_START_FILE=${ctx.CUSTOM_PYTHON_START_FILE} \
-                            -f ${ctx.env.WORKSPACE}/ci/.ci/python/Dockerfile . --no-cache \
+                            -f ${ctx.env.WORKSPACE}/ci/.ci/python/Dockerfile .  \
                             ${dockerPushDiffStr}
                             """
                 }
