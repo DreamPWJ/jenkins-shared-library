@@ -3,7 +3,7 @@ docker info
 sudo cat <<EOF >/etc/docker/daemon.json
 {
 "registry-mirrors": [
-"http://registry.docker-cn.com"
+  "http://registry.docker-cn.com"
 ]
 }
 EOF
