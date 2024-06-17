@@ -118,7 +118,7 @@ function get_disk_space() {
     elif [[ $TOTAL_FREE =~ ^[0-9]+\.[0-9]+M ]]; then
         TOTAL_FREE=$(echo "scale=2; $TOTAL_FREE / 1024 / 1024" | bc)
     fi
-
+    echo " Free space is $TOTAL_FREE GB! "
     # 判断可用空间是否低于最小需求
     if (( $(echo "$TOTAL_FREE < $MIN_FREE_SPACE" | bc -l) )); then
         echo "🚨 Warning: Free space is below $MIN_FREE_SPACE GB!"
