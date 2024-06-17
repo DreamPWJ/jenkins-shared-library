@@ -109,8 +109,8 @@ function get_disk_space() {
     # 设置所需的最小可用空间（单位GB）
     MIN_FREE_SPACE=2
 
-    # 获取总的可用空间（单位GB）
-    TOTAL_FREE=$(df -h | awk '/\// {print $4}' | sed 's/G//')
+    # 获取总的可用空间（单位GB） 获取根目录  df -h  / 命令
+    TOTAL_FREE=$(df -h  / | awk '/\// {print $4}' | sed 's/G//')
 
     # 将KB转换成GB（如果需要的话）
     if [[ $TOTAL_FREE =~ ^[0-9]+\.[0-9]+K ]]; then
@@ -123,7 +123,7 @@ function get_disk_space() {
     if (( $(echo "$TOTAL_FREE < $MIN_FREE_SPACE" | bc -l) )); then
         echo "🚨 Warning: Free space is below $MIN_FREE_SPACE GB!"
         echo -e "\033[31m当前系统磁盘空间不足, 可能导致Docker镜像构建失败  ❌  \033[0m"
-        echo "开始自动清理Docker日志"
+        echo "======== 开始自动清理Docker日志 ========"
         sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
         cd /my && rm -rf /*/logs
         #exit 1
