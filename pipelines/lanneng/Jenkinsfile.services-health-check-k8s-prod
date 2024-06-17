@@ -69,7 +69,7 @@ map.put('is_grace_shutdown', true)
 // 是否进行服务启动健康探测 K8S集群类型设置false
 map.put('is_health_check', false)
 // 是否Pipeline内脚本钉钉通知  总开关
-map.put('is_ding_notice', false)
+map.put('is_ding_notice', true)
 // 是否进行部署前通知
 map.put('is_before_deploy_notice', false)
 // 是否通知变更记录
@@ -80,8 +80,8 @@ map.put('is_git_tag', false)
 map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
-map.put('jenkins_node', 'node-2')
-map.put('jenkins_node_front_end', 'node-2')
+map.put('jenkins_node', 'master')
+map.put('jenkins_node_front_end', 'master')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node20')
@@ -116,7 +116,7 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/lanneng/Jenkinsfile.services-health-check-k8s-prod
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/lanneng/Jenkinsfile.services-health-check
 
 /*
 
@@ -132,7 +132,6 @@ JSON_PARAMS
    "IS_K8S_DEPLOY" : true,
    "K8S_POD_REPLICAS" : "1",
    "CUSTOM_HEALTH_CHECK_PATH" : "/",
-   "IS_MAVEN_SINGLE_MODULE" : true,
    "GIT_PROJECT_FOLDER_NAME" : "single-module-projects/services-health-check",
 }
 
