@@ -96,7 +96,7 @@ docker_image_ids=$(docker images -q --filter reference=${docker_image_name})
 # 获取系统CPU使用率 如果CPU占用高 则排队延迟部署 避免并发部署等导致资源阻塞
 cd /${deploy_folder} && ./docker-common.sh get_cpu_rate && cd /${deploy_file}
 # 获取系统磁盘资源 如果硬盘资源不足 停止容器构建或自动清理空间
-cd /${deploy_folder} && ./docker-common.sh get_disk_space && cd /${deploy_file}
+#cd /${deploy_folder} && ./docker-common.sh get_disk_space && cd /${deploy_file}
 
 set -x # 开启shell命令打印模式
 
