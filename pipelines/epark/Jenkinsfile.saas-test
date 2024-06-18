@@ -186,8 +186,8 @@ JSON_PARAMS
 }
 
 
-java-monorepo-docs-prod
-Java  Monorepo技术文档 ❤️
+java-monorepo-docs-test
+Java  MonoRepo技术文档 ❤️
 JSON_PARAMS
 {
     "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
