@@ -1394,7 +1394,7 @@ def uploadRemote(filePath, map) {
     if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
-                sh "cd ${filePath} && scp ${proxyJumpSCPText} ${npmPackageLocation} " +
+                sh " scp ${proxyJumpSCPText} ${npmPackageLocation} " +
                         "${remote.user}@${remote.host}:${projectDeployFolder}"
             }
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
