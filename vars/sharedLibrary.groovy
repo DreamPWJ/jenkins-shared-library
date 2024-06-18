@@ -1140,32 +1140,32 @@ def codeQualityAnalysis() {
  * Node编译构建
  */
 def nodeBuildProject() {
-    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
-    monoRepoProjectDir = "" // monorepo项目所在目录 默认根目录
-    if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
-        monoRepoProjectDir = "${MONO_REPO_MAIN_PACKAGE}/${PROJECT_NAME}"
-    }
-
-    if ("${IS_STATIC_RESOURCE}" == 'true') { // 静态资源项目
+    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
+        monoRepoProjectDir = "" // monorepo项目所在目录 默认根目录
         if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
-            dir("${monoRepoProjectDir}") {
-                // MonoRepo静态文件打包
+            monoRepoProjectDir = "${MONO_REPO_MAIN_PACKAGE}/${PROJECT_NAME}"
+        }
+
+        if ("${IS_STATIC_RESOURCE}" == 'true') { // 静态资源项目
+            if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
+                dir("${monoRepoProjectDir}") {
+                    // MonoRepo静态文件打包
+                    Web.staticResourceBuild(this)
+                }
+            } else {
+                // 静态文件打包
                 Web.staticResourceBuild(this)
             }
-        } else {
-            // 静态文件打包
-            Web.staticResourceBuild(this)
-        }
-    } else { // npm编译打包项目
-        if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
-            // 初始化Node环境变量
-            Node.initEnv(this)
-            // 动态切换Node版本
-            // Node.change(this, "${NODE_VERSION}".replaceAll("Node", ""))
-        }
-        // Node环境设置镜像
-        Node.setMirror(this)
-        // sh "rm -rf node_modules && npm cache clear --force"
+        } else { // npm编译打包项目
+            if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
+                // 初始化Node环境变量
+                Node.initEnv(this)
+                // 动态切换Node版本
+                // Node.change(this, "${NODE_VERSION}".replaceAll("Node", ""))
+            }
+            // Node环境设置镜像
+            Node.setMirror(this)
+            // sh "rm -rf node_modules && npm cache clear --force"
             if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
                 // 基于Lerna管理的Monorepo仓库打包
                 Web.monorepoBuild(this)
@@ -1240,7 +1240,7 @@ def mavenBuildProject(map, deployNum = 0) {
         Java.switchJDKByJenv(this, "${JDK_VERSION}")
     }
     sh "mvn --version"
-    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
+    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
         // 自动替换不同分布式部署节点的环境文件  deployNum部署节点数
         Deploy.replaceEnvFile(this, deployNum)
         // maven如果存在多级目录 一级目录设置
@@ -1393,8 +1393,10 @@ def uploadRemote(filePath, map) {
     def projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
     if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-            sh "cd ${filePath} && scp ${proxyJumpSCPText} ${npmPackageLocation} " +
-                    "${remote.user}@${remote.host}:${projectDeployFolder}"
+            dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
+                sh "cd ${filePath} && scp ${proxyJumpSCPText} ${npmPackageLocation} " +
+                        "${remote.user}@${remote.host}:${projectDeployFolder}"
+            }
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
             // 上传前删除部署目录的jar包 防止名称修改等导致多个部署目标jar包存在  jar包需要唯一性
             sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd ${projectDeployFolder} && rm -f *.${javaPackageType}' "
