@@ -185,6 +185,21 @@ JSON_PARAMS
     "NPM_RUN_PARAMS" : "build-parking",
 }
 
+
+java-monorepo-docs-prod
+Java  Monorepo技术文档 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+    "BRANCH_NAME" : "feature/infra" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "java-monorepo-docs" ,
+    "SHELL_PARAMS" : "java-monorepo docs 9999 80 prod",
+    "NODE_VERSION": "20" ,
+    "NPM_RUN_PARAMS" : "docs:build",
+    "GIT_PROJECT_FOLDER_NAME" : ".athena-doc/vite-press",
+}
+
 */
 
 
