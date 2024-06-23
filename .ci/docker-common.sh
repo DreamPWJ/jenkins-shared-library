@@ -107,7 +107,7 @@ function get_cpu_rate() {
 # 获取系统磁盘资源 如果硬盘资源不足 停止容器构建或自动清理空间
 function get_disk_space() {
     # 设置所需的最小可用空间（单位GB）
-    MIN_FREE_SPACE=5
+    MIN_FREE_SPACE=6
 
     # 获取总的可用空间（单位GB） 获取根目录  df -h  / 命令
     TOTAL_FREE=$(df -h  / | awk '/\// {print $4}' | sed 's/G//')
