@@ -185,6 +185,18 @@ JSON_PARAMS
     "NPM_RUN_PARAMS" : "build-parking",
 }
 
+pengbo-park-merchant-web-test
+澎泊车SaaS 2.0 停车场优惠卷平台 Web前端 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/smart-parking/parking-admin.git" ,
+    "BRANCH_NAME" : "v2" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "pengbo-park-merchant" ,
+    "SHELL_PARAMS" : "pengbo-park-merchant web 9013 80 test" ,
+    "NODE_VERSION": "20" ,
+    "NPM_RUN_PARAMS" : "build-merchant",
+}
 
 java-monorepo-docs-test
 Java  MonoRepo技术文档 ❤️
