@@ -945,6 +945,7 @@ def initInfo() {
     //println currentBuild
     try {
         echo "$git_event_name"
+        println("$git_event_name") // 如 push
         IS_AUTO_TRIGGER = true
     } catch (e) {
     }
@@ -1035,6 +1036,7 @@ def getShellParams(map) {
 def getUserInfo() {
     // 用户相关信息
     if ("${IS_AUTO_TRIGGER}" == 'true') { // 自动触发构建
+        println("代码提交自动触发构建")
         BUILD_USER = "$git_user_name"
         BUILD_USER_EMAIL = "$git_user_email"
     } else {
