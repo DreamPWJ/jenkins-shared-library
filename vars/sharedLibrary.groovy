@@ -81,16 +81,16 @@ def call(String type = 'web-java', Map map) {
                                 [key: 'commits', value: '$.commits'],
                                 [key: 'changed_files', value: '$.commits[*].[\'modified\',\'added\',\'removed\'][*]'],
                         ],
-                        token: "jenkins", // 唯一标识 env.JOB_NAME
+                        token: env.JOB_NAME, // 唯一标识 env.JOB_NAME
                         causeString: ' Triggered on $ref',
                         printContributedVariables: true,
                         printPostContent: true,
                         silentResponse: false,
-                        regexpFilterText: '$project_git_http_url_$ref_$git_message',
+                        regexpFilterText: '_$ref_$git_message',
                         // WebHooks触发后 正则匹配规则: 先匹配Job配置Git仓库确定项目, 根据jenkins job配置的分支匹配, 再匹配最新一次Git提交记录是否含有release发布关键字
                         // 如果是多模块项目再去匹配部署的模块 对于开发者只需要关心触发自动发布Git提交规范即可 如单模块: release 多模块: release(app)
                         // 针对monorepo单仓多包仓库 可根据changed_files变量中变更文件所在的项目匹配自动触发构建具体的分支
-                        regexpFilterExpression: '^(' + "${REPO_URL}" + ')' +
+                        regexpFilterExpression: '^' +
                                 '_(refs/heads/' + "${BRANCH_NAME}" + ')' +
                                 '_(release)' + "${PROJECT_TYPE.toInteger() == GlobalVars.backEnd ? '\\(' + "${SHELL_PROJECT_TYPE}" + '\\)' : ''}" + '.*$'
                 )
@@ -129,7 +129,7 @@ def call(String type = 'web-java', Map map) {
                 IS_BEFORE_DEPLOY_NOTICE = "${map.is_before_deploy_notice}" // 是否进行部署前通知
                 IS_GRACE_SHUTDOWN = "${map.is_grace_shutdown}" // 是否进行优雅停机
                 IS_NEED_SASS = "${map.is_need_sass}" // 是否需要css预处理器sass
-                IS_AUTO_TRIGGER = false // 是否是自动触发构建
+                IS_AUTO_TRIGGER = false // 是否是代码提交自动触发构建
                 IS_GEN_QR_CODE = false // 生成二维码 方便手机端扫描
                 IS_ARCHIVE = false // 是否归档
                 IS_CODE_QUALITY_ANALYSIS = false // 是否进行代码质量分析的总开关
@@ -945,6 +945,7 @@ def initInfo() {
     //println currentBuild
     try {
         echo "$git_event_name"
+        println("$git_event_name") // 如 push
         IS_AUTO_TRIGGER = true
     } catch (e) {
     }
@@ -1035,8 +1036,9 @@ def getShellParams(map) {
 def getUserInfo() {
     // 用户相关信息
     if ("${IS_AUTO_TRIGGER}" == 'true') { // 自动触发构建
+        println("代码提交自动触发构建")
         BUILD_USER = "$git_user_name"
-        BUILD_USER_EMAIL = "$git_user_email"
+        // BUILD_USER_EMAIL = "$git_user_email"
     } else {
         wrap([$class: 'BuildUser']) {
             try {
