@@ -81,7 +81,7 @@ def call(String type = 'web-java', Map map) {
                                 [key: 'commits', value: '$.commits'],
                                 [key: 'changed_files', value: '$.commits[*].[\'modified\',\'added\',\'removed\'][*]'],
                         ],
-                        token: "jenkins", // 唯一标识 env.JOB_NAME
+                        token: env.JOB_NAME, // 唯一标识 env.JOB_NAME
                         causeString: ' Triggered on $ref',
                         printContributedVariables: true,
                         printPostContent: true,
@@ -129,7 +129,7 @@ def call(String type = 'web-java', Map map) {
                 IS_BEFORE_DEPLOY_NOTICE = "${map.is_before_deploy_notice}" // 是否进行部署前通知
                 IS_GRACE_SHUTDOWN = "${map.is_grace_shutdown}" // 是否进行优雅停机
                 IS_NEED_SASS = "${map.is_need_sass}" // 是否需要css预处理器sass
-                IS_AUTO_TRIGGER = true // 是否是自动触发构建
+                IS_AUTO_TRIGGER = false // 是否是代码提交自动触发构建
                 IS_GEN_QR_CODE = false // 生成二维码 方便手机端扫描
                 IS_ARCHIVE = false // 是否归档
                 IS_CODE_QUALITY_ANALYSIS = false // 是否进行代码质量分析的总开关
