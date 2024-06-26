@@ -1140,95 +1140,95 @@ def codeQualityAnalysis() {
  * Node编译构建
  */
 def nodeBuildProject() {
-    monoRepoProjectDir = "" // monorepo项目所在目录 默认根目录
-    if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
-        monoRepoProjectDir = "${MONO_REPO_MAIN_PACKAGE}/${PROJECT_NAME}"
-    }
-
-    if ("${IS_STATIC_RESOURCE}" == 'true') { // 静态资源项目
+    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
+        monoRepoProjectDir = "" // monorepo项目所在目录 默认根目录
         if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
-            dir("${monoRepoProjectDir}") {
-                // MonoRepo静态文件打包
+            monoRepoProjectDir = "${MONO_REPO_MAIN_PACKAGE}/${PROJECT_NAME}"
+        }
+
+        if ("${IS_STATIC_RESOURCE}" == 'true') { // 静态资源项目
+            if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
+                dir("${monoRepoProjectDir}") {
+                    // MonoRepo静态文件打包
+                    Web.staticResourceBuild(this)
+                }
+            } else {
+                // 静态文件打包
                 Web.staticResourceBuild(this)
             }
-        } else {
-            // 静态文件打包
-            Web.staticResourceBuild(this)
-        }
-    } else { // npm编译打包项目
-        if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
-            // 初始化Node环境变量
-            Node.initEnv(this)
-            // 动态切换Node版本
-            // Node.change(this, "${NODE_VERSION}".replaceAll("Node", ""))
-        }
-        // Node环境设置镜像
-        Node.setMirror(this)
-        // sh "rm -rf node_modules && npm cache clear --force"
-
-        if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
-            // 基于Lerna管理的Monorepo仓库打包
-            Web.monorepoBuild(this)
-        } else {
-            if ("${IS_NEED_SASS}" == 'true') { // 是否需要css预处理器sass  兼容老项目老代码
-                // 是否需要css预处理器sass处理
-                Web.needSass(this)
+        } else { // npm编译打包项目
+            if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
+                // 初始化Node环境变量
+                Node.initEnv(this)
+                // 动态切换Node版本
+                // Node.change(this, "${NODE_VERSION}".replaceAll("Node", ""))
             }
+            // Node环境设置镜像
+            Node.setMirror(this)
+            // sh "rm -rf node_modules && npm cache clear --force"
+            if ("${IS_MONO_REPO}" == 'true') {  // 是否MonoRepo单体式仓库  单仓多包
+                // 基于Lerna管理的Monorepo仓库打包
+                Web.monorepoBuild(this)
+            } else {
+                if ("${IS_NEED_SASS}" == 'true') { // 是否需要css预处理器sass  兼容老项目老代码
+                    // 是否需要css预处理器sass处理
+                    Web.needSass(this)
+                }
 
-            timeout(time: 30, unit: 'MINUTES') {
-                try {
-                    def retryCount = 0
-                    retry(3) {
-                        retryCount++
-                        if (retryCount >= 2) {
-                            sh "rm -rf node_modules && rm -f *lock*"
-                            // 如果包404下载失败  可以更换官方镜像源重新下载
-                            // Node.setOfficialMirror(this)
-                        }
-                        if (Git.isExistsChangeFile(this) || retryCount >= 2) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
-                            println("安装依赖 📥")
-                            // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱但依赖lock文件
-                            sh " npm ci || pnpm install || npm install || yarn install "
-                            // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
-                        }
+                timeout(time: 30, unit: 'MINUTES') {
+                    try {
+                        def retryCount = 0
+                        retry(3) {
+                            retryCount++
+                            if (retryCount >= 2) {
+                                sh "rm -rf node_modules && rm -f *lock*"
+                                // 如果包404下载失败  可以更换官方镜像源重新下载
+                                // Node.setOfficialMirror(this)
+                            }
+                            if (Git.isExistsChangeFile(this) || retryCount >= 2) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
+                                println("安装依赖 📥")
+                                // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱但依赖lock文件
+                                sh " npm ci || pnpm install || npm install || yarn install "
+                                // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
+                            }
 
-                        println("执行Node构建 🏗️  ")
-                        sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
-                        sh " npm run '${NPM_RUN_PARAMS}' "
+                            println("执行Node构建 🏗️  ")
+                            sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
+                            sh " npm run '${NPM_RUN_PARAMS}' "
+                        }
+                    } catch (e) {
+                        println(e.getMessage())
+                        sh "rm -rf node_modules && rm -f *lock*"
+                        error("Web打包失败, 终止当前Pipeline运行 ❌")
                     }
-                } catch (e) {
-                    println(e.getMessage())
-                    sh "rm -rf node_modules && rm -f *lock*"
-                    error("Web打包失败, 终止当前Pipeline运行 ❌")
                 }
             }
         }
-    }
 
-    // NPM打包产出物位置
-    npmPackageLocationDir = "${IS_MONO_REPO}" == 'true' ? "${monoRepoProjectDir}/${NPM_PACKAGE_FOLDER}" : "${NPM_PACKAGE_FOLDER}"
-    npmPackageLocation = "${npmPackageLocationDir}" + ".tar.gz"
-    println(npmPackageLocation)
-    // 判断npm打包目录是否存在 打包名称规范不一致等
+        // NPM打包产出物位置
+        npmPackageLocationDir = "${IS_MONO_REPO}" == 'true' ? "${monoRepoProjectDir}/${NPM_PACKAGE_FOLDER}" : "${NPM_PACKAGE_FOLDER}"
+        npmPackageLocation = "${npmPackageLocationDir}" + ".tar.gz"
+        println(npmPackageLocation)
+        // 判断npm打包目录是否存在 打包名称规范不一致等
 /*    if (!fileExists("${npmPackageLocationDir}/")) {
         // React框架默认打包目录是build , Angular框架默认打包目录是多层级的等  重命名到定义的目录名称
         sh "rm -rf ${NPM_PACKAGE_FOLDER} && mv build ${NPM_PACKAGE_FOLDER}"
     }*/
-    webPackageSize = Utils.getFolderSize(this, npmPackageLocationDir)
-    println(webPackageSize)
-    Tools.printColor(this, "Web打包成功 ✅")
-    // 压缩文件夹 易于加速传输
-    if ("${IS_MONO_REPO}" == 'true') {
-        sh "cd ${monoRepoProjectDir} && tar -zcvf ${NPM_PACKAGE_FOLDER}.tar.gz ${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 "
-    } else {
-        // 代码内微信认证文件复制
-        // sh " cp MP_verify_*.txt ${NPM_PACKAGE_FOLDER} "
-        sh "tar -zcvf ${NPM_PACKAGE_FOLDER}.tar.gz ${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 "
+        webPackageSize = Utils.getFolderSize(this, npmPackageLocationDir)
+        println(webPackageSize)
+        Tools.printColor(this, "Web打包成功 ✅")
+        // 压缩文件夹 易于加速传输
+        if ("${IS_MONO_REPO}" == 'true') {
+            sh "cd ${monoRepoProjectDir} && tar -zcvf ${NPM_PACKAGE_FOLDER}.tar.gz ${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 "
+        } else {
+            // 代码内微信认证文件复制
+            // sh " cp MP_verify_*.txt ${NPM_PACKAGE_FOLDER} "
+            sh "tar -zcvf ${NPM_PACKAGE_FOLDER}.tar.gz ${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 "
+        }
+
+        // 替换自定义的nginx配置文件
+        Deploy.replaceNginxConfig(this)
     }
-
-    // 替换自定义的nginx配置文件
-    Deploy.replaceNginxConfig(this)
-
 }
 
 /**
@@ -1240,7 +1240,7 @@ def mavenBuildProject(map, deployNum = 0) {
         Java.switchJDKByJenv(this, "${JDK_VERSION}")
     }
     sh "mvn --version"
-    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
+    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
         // 自动替换不同分布式部署节点的环境文件  deployNum部署节点数
         Deploy.replaceEnvFile(this, deployNum)
         // maven如果存在多级目录 一级目录设置
@@ -1393,8 +1393,10 @@ def uploadRemote(filePath, map) {
     def projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
     if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-            sh "cd ${filePath} && scp ${proxyJumpSCPText} ${npmPackageLocation} " +
-                    "${remote.user}@${remote.host}:${projectDeployFolder}"
+            dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
+                sh " scp ${proxyJumpSCPText} ${npmPackageLocation} " +
+                        "${remote.user}@${remote.host}:${projectDeployFolder}"
+            }
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
             // 上传前删除部署目录的jar包 防止名称修改等导致多个部署目标jar包存在  jar包需要唯一性
             sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd ${projectDeployFolder} && rm -f *.${javaPackageType}' "

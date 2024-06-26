@@ -43,7 +43,7 @@ COPY  *.jar  /server.jar
 # 对外暴露端口
 EXPOSE  $EXPOSE_PORT
 
-# 运行jar包命令 远程调式  缩短 Tomcat 的启动时间  java -jar app.jar
+# 运行jar包命令 远程调式  缩短 Tomcat 的启动时间  java -jar app.jar  开启JDK特性功能预览功能 --enable-preview
 # JDK8  -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
 # JDK11 -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
 ENTRYPOINT "java" "-jar" $JAVA_OPTS $REMOTE_DEBUGGING_PARAM  "-Djava.security.egd=file:/dev/./urandom" "/server.jar"

@@ -43,7 +43,7 @@ class Web implements Serializable {
 
     /**
      * 基于Lerna管理的Monorepo仓库打包
-     * 基于pnpm-workspace的新的monorepo单仓多包方案
+     * 基于pnpm workspace的新的monorepo单仓多包方案
      */
     static def monorepoBuild(ctx) {
         // 初始化monorepo仓库依赖环境
@@ -67,7 +67,7 @@ class Web implements Serializable {
                     }
                     // 全部下载依赖 更通用 bootstrap不仅是下载依赖资源 还建立多包之间的依赖软链
                     // TurboRepo解决Monorepo多项目构建缓慢问题 充分利用CPU性能并发构建提速  同时新版Lerna v5.1集成Nx实现加速构建
-                    // 基于pnpm-workspace的新的monorepo单仓多包方案
+                    // 基于pnpm workspace的新的monorepo单仓多包方案
                     if (Git.isExistsChangeFile(ctx) || retryCount >= 2) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
                         ctx.sh "lerna bootstrap --ci || true"  // --ci 选项调用npm ci而不是npm install
                         ctx.sh "pnpm install || true"  // 新版版本lerna命令 lerna bootstrap新版已被弃用

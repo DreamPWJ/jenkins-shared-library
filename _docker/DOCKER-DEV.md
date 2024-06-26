@@ -1,11 +1,10 @@
-#### 设置镜像源  解决pull下载慢卡住问题  注意：镜像源不维护了可能导致latest不是最新的版本
+#### 设置镜像源  解决pull下载慢卡住问题  注意：镜像源不维护了可能导致latest不是最新的版本  
+##### 可使用CloudFlare Workers方案做Docker镜像源网络代理
 docker info
 sudo cat <<EOF >/etc/docker/daemon.json
 {
 "registry-mirrors": [
-"http://registry.docker-cn.com",
-"https://mirror.ccs.tencentyun.com",
-"http://docker.mirrors.ustc.edu.cn"
+  "https://docker.lanneng.tech"
 ]
 }
 EOF
