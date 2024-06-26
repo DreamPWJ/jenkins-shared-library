@@ -88,7 +88,6 @@ def call(String type = 'web-java', Map map) {
                         silentResponse: false,
                         regexpFilterText: '_$ref_$git_message',
                         // WebHooks触发后 正则匹配规则: 先匹配Job配置Git仓库确定项目, 根据jenkins job配置的分支匹配, 再匹配最新一次Git提交记录是否含有release发布关键字
-                        // 如果是多模块项目再去匹配部署的模块 对于开发者只需要关心触发自动发布Git提交规范即可 如单模块: release 多模块: release(app)
                         // 针对monorepo单仓多包仓库 可根据changed_files变量中变更文件所在的项目匹配自动触发构建具体的分支
                         regexpFilterExpression: '^' +
                                 '_(refs/heads/' + "${BRANCH_NAME}" + ')' +
@@ -944,8 +943,7 @@ def initInfo() {
     //println "${env.PATH}"
     //println currentBuild
     try {
-        echo "$git_event_name"
-        println("$git_event_name") // 如 push
+        echo "$git_event_name"  // 如 push
         IS_AUTO_TRIGGER = true
     } catch (e) {
     }
@@ -1043,7 +1041,7 @@ def getUserInfo() {
         wrap([$class: 'BuildUser']) {
             try {
                 BUILD_USER = env.BUILD_USER
-                BUILD_USER_EMAIL = env.BUILD_USER_EMAIL
+                // BUILD_USER_EMAIL = env.BUILD_USER_EMAIL
                 // 获取钉钉插件手机号 注意需要系统设置里in-process script approval允许权限
                 def user = hudson.model.User.getById(env.BUILD_USER_ID, false).getProperty(io.jenkins.plugins.DingTalkUserProperty.class)
                 BUILD_USER_MOBILE = user.mobile

@@ -83,11 +83,10 @@ def call(String type = 'web', Map map) {
                         printContributedVariables: true,
                         printPostContent: true,
                         silentResponse: false,
-                        regexpFilterText: '$project_git_http_url_$ref_$git_message',
+                        regexpFilterText: '$_$ref_$git_message',
                         // WebHooks触发后 正则匹配规则: 先匹配Job配置Git仓库确定项目, 根据jenkins job配置的分支匹配, 再匹配最新一次Git提交记录是否含有release发布关键字
-                        // 如果是多模块项目再去匹配部署的模块 对于开发者只需要关心触发自动发布Git提交规范即可 如单模块: release 多模块: release(app)
                         // 针对monorepo单仓多包仓库 可根据changed_files变量中变更文件所在的项目匹配自动触发构建具体的分支
-                        regexpFilterExpression: '^(' + "${REPO_URL}" + ')' +
+                        regexpFilterExpression: '^' +
                                 '_(refs/heads/' + "${BRANCH_NAME}" + ')' +
                                 '_(release).*$'
                 )
@@ -120,7 +119,7 @@ def call(String type = 'web', Map map) {
                 IS_SAME_SERVER = "${map.is_same_server}" // 是否在同一台服务器分布式部署
                 IS_BEFORE_DEPLOY_NOTICE = "${map.is_before_deploy_notice}" // 是否进行部署前通知
                 IS_NEED_SASS = "${map.is_need_sass}" // 是否需要css预处理器sass
-                IS_AUTO_TRIGGER = false // 是否是自动触发构建
+                IS_AUTO_TRIGGER = false // 是否是代码提交自动触发构建
                 IS_GEN_QR_CODE = false // 生成二维码 方便手机端扫描
                 IS_ARCHIVE = false // 是否归档
                 IS_CODE_QUALITY_ANALYSIS = false // 是否进行代码质量分析的总开关
@@ -722,12 +721,12 @@ def getUserInfo() {
     // 用户相关信息
     if ("${IS_AUTO_TRIGGER}" == 'true') { // 自动触发构建
         BUILD_USER = "$git_user_name"
-        BUILD_USER_EMAIL = "$git_user_email"
+        // BUILD_USER_EMAIL = "$git_user_email"
     } else {
         wrap([$class: 'BuildUser']) {
             try {
                 BUILD_USER = env.BUILD_USER
-                BUILD_USER_EMAIL = env.BUILD_USER_EMAIL
+                // BUILD_USER_EMAIL = env.BUILD_USER_EMAIL
                 // 获取钉钉插件手机号 注意需要系统设置里in-process script approval允许权限
                 def user = hudson.model.User.getById(env.BUILD_USER_ID, false).getProperty(io.jenkins.plugins.DingTalkUserProperty.class)
                 BUILD_USER_MOBILE = user.mobile
