@@ -4,11 +4,11 @@
 
 # 定义要ping的网络地址 因网络不通等原因提供等待网络方式
 TARGET="acme-v02.api.letsencrypt.org"
-
 # 设置超时时间（秒），可根据需要调整
 TIMEOUT=3600
 # 记录开始时间
 START_TIME=$(date +%s)
+
 # 循环直到ping成功或超过超时时间
 while true; do
     # 尝试ping目标地址，只ping一次并丢弃输出(-c 1 >/dev/null)，通过$?检查上一条命令的退出状态
@@ -29,7 +29,7 @@ while true; do
         exit 1
     fi
 
-    # 未成功，等待一段时间后重试，这里等待1秒
+    # 未成功，等待一段时间后重试，等待多少秒
     echo "网络未就绪，等待中..."
     sleep 60
 done
