@@ -1041,6 +1041,7 @@ def getUserInfo() {
         wrap([$class: 'BuildUser']) {
             try {
                 BUILD_USER = env.BUILD_USER
+                BUILD_USER_MOBILE = ""
                 // BUILD_USER_EMAIL = env.BUILD_USER_EMAIL
                 // 获取钉钉插件手机号 注意需要系统设置里in-process script approval允许权限
                 def user = hudson.model.User.getById(env.BUILD_USER_ID, false).getProperty(io.jenkins.plugins.DingTalkUserProperty.class)
