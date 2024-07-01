@@ -79,7 +79,7 @@ def call(String type = 'web-java', Map map) {
                                 [key: 'git_user_email', value: '$.user_email'],
                                 [key: 'git_event_name', value: '$.event_name'],
                                 [key: 'commits', value: '$.commits'],
-                                [key: 'changed_files', value: '$.commits[*].[\'modified\',\'added\',\'removed\'][*]'],
+                                [key: 'changed_files', value: '$.commits[*].[\'modified\',\'added\',\'removed\'][*]', expressionType: 'JSONPath'],
                         ],
                         token: env.JOB_NAME, // 唯一标识 env.JOB_NAME
                         causeString: ' Triggered on $ref',
