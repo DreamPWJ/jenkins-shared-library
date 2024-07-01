@@ -92,7 +92,7 @@ def call(String type = 'web-java', Map map) {
                         regexpFilterExpression: '^' +
                                 '_(refs/heads/' + "${BRANCH_NAME}" + ')' +
                                 '_(release)' + '.*' +
-                                '_.*pengbo-park-app.*'
+                                '_.*\\/pengbo-park-app\\/[^\\"]+?.*'
                 )
                 // 每分钟判断一次代码是否存在变化 有变化就执行
                 // pollSCM('H/1 * * * *')
