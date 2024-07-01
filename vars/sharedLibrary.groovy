@@ -86,7 +86,7 @@ def call(String type = 'web-java', Map map) {
                         printContributedVariables: true,
                         printPostContent: true,
                         silentResponse: false,
-                        regexpFilterText: '_$ref_$git_message_message_$changed_files',
+                        regexpFilterText: '_$ref_$git_message_$changed_files',
                         // WebHooks触发后 正则匹配规则: 先匹配Job配置Git仓库确定项目, 根据jenkins job配置的分支匹配, 再匹配最新一次Git提交记录是否含有release发布关键字
                         // 针对monorepo单仓多包仓库 可根据changed_files变量中变更文件所在的项目匹配自动触发构建具体的分支
                         regexpFilterExpression: '^' +
