@@ -92,7 +92,7 @@ def call(String type = 'web-java', Map map) {
                         regexpFilterExpression: '^' +
                                 '_(refs/heads/' + "${BRANCH_NAME}" + ')' +
                                 '_(release)' + '.*$' +
-                                '_(/.*' + "${PROJECT_NAME}" + '.*/)'
+                                '_(/.*' +  "${IS_MONO_REPO == true ?  + "${PROJECT_NAME}" + '' : ''}" + '.*/)'
                 )
                 // 每分钟判断一次代码是否存在变化 有变化就执行
                 // pollSCM('H/1 * * * *')
@@ -789,6 +789,7 @@ def getInitParams(map) {
     NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [test]的前端项目参数
 
+    IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
     // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
     IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true
     IS_BLUE_GREEN_DEPLOY = jsonParams.IS_BLUE_GREEN_DEPLOY ? jsonParams.IS_BLUE_GREEN_DEPLOY : false // 是否蓝绿部署
@@ -799,7 +800,7 @@ def getInitParams(map) {
     IS_SERVERLESS_DEPLOY = jsonParams.IS_SERVERLESS_DEPLOY ? jsonParams.IS_SERVERLESS_DEPLOY : false // 是否Serverless发布
     IS_STATIC_RESOURCE = jsonParams.IS_STATIC_RESOURCE ? jsonParams.IS_STATIC_RESOURCE : false // 是否静态web资源
     IS_UPLOAD_OSS = jsonParams.IS_UPLOAD_OSS ? jsonParams.IS_UPLOAD_OSS : false // 是否构建产物上传到OSS
-    IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
+
     // 是否Maven单模块代码
     IS_MAVEN_SINGLE_MODULE = jsonParams.IS_MAVEN_SINGLE_MODULE ? jsonParams.IS_MAVEN_SINGLE_MODULE : false
     // K8s集群业务应用是否使用Session 做亲和度关联
