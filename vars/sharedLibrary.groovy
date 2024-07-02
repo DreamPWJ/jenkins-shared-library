@@ -92,7 +92,7 @@ def call(String type = 'web-java', Map map) {
                         // +  '_.*('+ "${(IS_MONO_REPO == true || IS_MAVEN_SINGLE_MODULE == false) ? '\\' + "${PROJECT_NAME}" + '\\' : ''}"  + ').*'
                         regexpFilterExpression: '^' +
                                 '_(refs/heads/' + "${BRANCH_NAME}" + ')' +
-                                '_(release)' + '.*'
+                                '_(release)' + "${PROJECT_TYPE.toInteger() == GlobalVars.backEnd ? '\\(' + "${PROJECT_NAME}" + '\\)' : ''}" + '.*$'
                 )
                 // 每分钟判断一次代码是否存在变化 有变化就执行
                 // pollSCM('H/1 * * * *')
