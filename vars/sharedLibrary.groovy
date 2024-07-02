@@ -88,11 +88,10 @@ def call(String type = 'web-java', Map map) {
                         silentResponse: false,
                         regexpFilterText: '_$ref_$git_message', //_$changed_files
                         // WebHooks触发后 正则匹配规则: 先匹配Job配置Git仓库确定项目, 根据jenkins job配置的分支匹配, 再匹配最新一次Git提交记录是否含有release发布关键字
-                        // 针对monorepo单仓多包仓库 可根据changed_files变量中变更文件所在的项目匹配自动触发构建具体的分支
-                        // +  '_.*('+ "${(IS_MONO_REPO == true || IS_MAVEN_SINGLE_MODULE == false) ? '\\' + "${PROJECT_NAME}" + '\\' : ''}"  + ').*'
+                        // 针对monorepo单仓多包仓库 可根据release(项目模块名称)或者changed_files变量中变更文件所在的项目匹配自动触发构建具体的分支
                         regexpFilterExpression: '^' +
                                 '_(refs/heads/' + "${BRANCH_NAME}" + ')' +
-                                '_(release)' + "${(IS_MONO_REPO == true || IS_MAVEN_SINGLE_MODULE == false)? '\\(' + "${PROJECT_NAME}" + '\\)' : ''}" + '.*$'
+                                '_(release)' + "${((PROJECT_TYPE.toInteger() == GlobalVars.frontEnd && IS_MONO_REPO == true) || (PROJECT_TYPE.toInteger() == GlobalVars.backEnd && IS_MAVEN_SINGLE_MODULE == false)) ? '\\(' + "${PROJECT_NAME}" + '\\)' : ''}" + '.*$'
                 )
                 // 每分钟判断一次代码是否存在变化 有变化就执行
                 // pollSCM('H/1 * * * *')
