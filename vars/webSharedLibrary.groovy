@@ -141,7 +141,7 @@ def call(String type = 'web', Map map) {
                 //如果某个stage为unstable状态，则忽略后面的任务，直接退出
                 skipStagesAfterUnstable()
                 //安静的时期 设置管道的静默时间段（以秒为单位），以覆盖全局默认值
-                quietPeriod(3)
+                quietPeriod(1)
                 //删除隐式checkout scm语句
                 skipDefaultCheckout()
                 //日志颜色
