@@ -30,6 +30,7 @@ while true; do
     fi
 
     # 未成功，等待一段时间后重试，等待多少秒
+    echo $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S')
     echo "网络未就绪，等待中..."
     sleep 60
 done

@@ -106,7 +106,7 @@ def call(String type = 'iot', Map map) {
                 //如果某个stage为unstable状态，则忽略后面的任务，直接退出
                 skipStagesAfterUnstable()
                 //安静的时期 设置管道的静默时间段（以秒为单位），以覆盖全局默认值
-                quietPeriod(3)
+                quietPeriod(1)
                 //删除隐式checkout scm语句
                 skipDefaultCheckout()
                 //日志颜色
@@ -498,7 +498,8 @@ def getUserInfo() {
     // 用户相关信息
     if ("${IS_AUTO_TRIGGER}" == 'true') { // 自动触发构建
         BUILD_USER = "$git_user_name"
-        BUILD_USER_EMAIL = "$git_user_email"
+        BUILD_USER_MOBILE = "18863302302"
+        // BUILD_USER_EMAIL = "$git_user_email"
     } else {
         wrap([$class: 'BuildUser']) {
             try {

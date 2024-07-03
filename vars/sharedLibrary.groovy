@@ -79,19 +79,20 @@ def call(String type = 'web-java', Map map) {
                                 [key: 'git_user_email', value: '$.user_email'],
                                 [key: 'git_event_name', value: '$.event_name'],
                                 [key: 'commits', value: '$.commits'],
-                                [key: 'changed_files', value: '$.commits[*].[\'modified\',\'added\',\'removed\'][*]'],
+                                [key: 'changed_files', value: '$.commits[*].[\'modified\',\'added\',\'removed\'][*]', expressionType: 'JSONPath'],
                         ],
                         token: env.JOB_NAME, // 唯一标识 env.JOB_NAME
                         causeString: ' Triggered on $ref',
                         printContributedVariables: true,
                         printPostContent: true,
                         silentResponse: false,
-                        regexpFilterText: '_$ref_$git_message',
+                        regexpFilterText: '_$ref_$git_message', //_$changed_files
                         // WebHooks触发后 正则匹配规则: 先匹配Job配置Git仓库确定项目, 根据jenkins job配置的分支匹配, 再匹配最新一次Git提交记录是否含有release发布关键字
-                        // 针对monorepo单仓多包仓库 可根据changed_files变量中变更文件所在的项目匹配自动触发构建具体的分支
+                        // 针对monorepo单仓多包仓库 可根据release(项目模块名称)或者changed_files变量中变更文件所在的项目匹配自动触发构建具体的分支
                         regexpFilterExpression: '^' +
                                 '_(refs/heads/' + "${BRANCH_NAME}" + ')' +
-                                '_(release)' + "${PROJECT_TYPE.toInteger() == GlobalVars.backEnd ? '\\(' + "${SHELL_PROJECT_TYPE}" + '\\)' : ''}" + '.*$'
+                                '_(release)' + "${((PROJECT_TYPE.toInteger() == GlobalVars.frontEnd && IS_MONO_REPO == true) || (PROJECT_TYPE.toInteger() == GlobalVars.backEnd && IS_MAVEN_SINGLE_MODULE == false)) ? '\\(' + "${PROJECT_NAME}" + '\\)' : ''}" + '.*' +
+                                '$'
                 )
                 // 每分钟判断一次代码是否存在变化 有变化就执行
                 // pollSCM('H/1 * * * *')
@@ -150,7 +151,7 @@ def call(String type = 'web-java', Map map) {
                 //如果某个stage为unstable状态，则忽略后面的任务，直接退出
                 skipStagesAfterUnstable()
                 //安静的时期 设置管道的静默时间段（以秒为单位），以覆盖全局默认值
-                quietPeriod(3)
+                quietPeriod(1)
                 //删除隐式checkout scm语句
                 skipDefaultCheckout()
                 //日志颜色
@@ -788,6 +789,9 @@ def getInitParams(map) {
     NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [test]的前端项目参数
 
+    IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
+    // 是否Maven单模块代码
+    IS_MAVEN_SINGLE_MODULE = jsonParams.IS_MAVEN_SINGLE_MODULE ? jsonParams.IS_MAVEN_SINGLE_MODULE : false
     // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
     IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true
     IS_BLUE_GREEN_DEPLOY = jsonParams.IS_BLUE_GREEN_DEPLOY ? jsonParams.IS_BLUE_GREEN_DEPLOY : false // 是否蓝绿部署
@@ -798,9 +802,6 @@ def getInitParams(map) {
     IS_SERVERLESS_DEPLOY = jsonParams.IS_SERVERLESS_DEPLOY ? jsonParams.IS_SERVERLESS_DEPLOY : false // 是否Serverless发布
     IS_STATIC_RESOURCE = jsonParams.IS_STATIC_RESOURCE ? jsonParams.IS_STATIC_RESOURCE : false // 是否静态web资源
     IS_UPLOAD_OSS = jsonParams.IS_UPLOAD_OSS ? jsonParams.IS_UPLOAD_OSS : false // 是否构建产物上传到OSS
-    IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
-    // 是否Maven单模块代码
-    IS_MAVEN_SINGLE_MODULE = jsonParams.IS_MAVEN_SINGLE_MODULE ? jsonParams.IS_MAVEN_SINGLE_MODULE : false
     // K8s集群业务应用是否使用Session 做亲和度关联
     IS_USE_SESSION = jsonParams.IS_USE_SESSION ? jsonParams.IS_USE_SESSION : false
     // 是否是NextJs服务端React框架
@@ -1036,7 +1037,7 @@ def getUserInfo() {
     if ("${IS_AUTO_TRIGGER}" == 'true') { // 自动触发构建
         println("代码提交自动触发构建")
         BUILD_USER = "$git_user_name"
-        BUILD_USER_MOBILE = ""
+        BUILD_USER_MOBILE = "18863302302"
         // BUILD_USER_EMAIL = "$git_user_email"
     } else {
         wrap([$class: 'BuildUser']) {
@@ -1095,7 +1096,7 @@ def pullProjectCode() {
         sh "git --version"  // 使用git 2.0以上的高级版本  否则有兼容性问题
         // sh "which git"
         // https仓库下载报错处理 The certificate issuer's certificate has expired.  Check your system date and time.
-        sh "git config --global http.sslVerify false"
+        sh "git config --global http.sslVerify false || true"
         // 在node节点工具位置选项配置 which git的路径 才能拉取代码!!!
         // 对于大体积仓库或网络不好情况 自定义代码下载超时时间 默认10分钟
         checkout([$class           : 'GitSCM',
