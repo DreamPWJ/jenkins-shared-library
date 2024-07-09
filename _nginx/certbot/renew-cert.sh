@@ -42,7 +42,7 @@ done
 # 可用ansible将文件同步到所有服务器
 # 如果提示未到期，cert not due for renewal，可以强制更新 --force-renew  测试90天后续签情况执行添加参数 --dry-run
 # 如果距离过期不到30天 默认不会重新生成证书 命令 certbot certificates 查看SSL证书的过期时间
-# 如果certbot名称不存在 which certbot 查看 执行命令添加路径 如 /root/miniconda3/bin/certbot renew
+# 如果certbot名称不存在 which certbot 查看 执行命令添加路径 如 /root/miniconda3/bin/certbot renew 或 /root/venv_python/bin/certbot renew
 sudo certbot renew
 
 # 重新加载nginx配置才会生效
