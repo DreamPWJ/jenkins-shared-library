@@ -61,7 +61,7 @@ mysqlslap -a --concurrency=50,100 --number-of-queries 1000  -uroot -p123456
 - show variables like '%log_bin%';  查看binlog是否开启 通常是my.cnf或my.ini设置log-bin=mysql-bin
 - lock tables 表名 read;  锁表 防止数据被污染  根据需求选择 不阻塞业务情况    
 - show master status;  查询binlog最新日志
-- show binlog events in '最新日志文件' ;  查看binlog日志和pos位置
+- show binlog events in '最新日志文件'  FROM pos LIMIT 0, 10;  查看binlog日志和pos位置  可根据表名等关键字搜索到pos位置的日志
 - 下载 binlog日志到本地 一般在 /var/lib/mysql/binlog.000001
 - 在Window上 先进入 D:\Program Files\MySQL\MySQL Server 8.1\bin 目录 再Powershell 输入  .\mysqlbinlog.exe
 - 根据pos位置恢复 BEGIN开始  COMMIT的结束位置  生成可以恢复的sql文件 查看数据使用--base64-output=decode-rows -v 查看设置好编码  datagrip 直接run sql script执行 recovery.sql
