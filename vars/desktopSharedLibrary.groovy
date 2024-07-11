@@ -8,7 +8,7 @@ import shared.library.devops.GitTagLog
 /**
  * @author 潘维吉
  * @description 通用核心共享Pipeline脚本库  针对桌面客户端 (Windows、MacOS、Linux)
- * 桌面端技术类型 0.原生桌面技术(如C++ For Windows、Linux, Swift For MacOS) 1.Electron 2.Flutter 3.Unity 4.ComposeMultiPlatform 5.Qt
+ * 桌面端技术类型 0.原生桌面技术(如C++ For Windows、Linux, Swift For MacOS) 1.Electron or Tauri 2.Flutter 3.Unity 4.ComposeMultiPlatform 5.Qt
  */
 def call(String type = 'desktop', Map map) {
     echo "Pipeline共享库脚本类型: ${type}, jenkins分布式节点名: ${map.jenkins_node}"
