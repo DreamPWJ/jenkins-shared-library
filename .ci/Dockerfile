@@ -40,6 +40,10 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # 将部署文件复制到docker内根目录
 COPY  *.jar  /server.jar
 
+# 健康检查 如果服务不可用或未响应，Docker可以标记容器为不健康，并根据配置采取行动，如自动重启容器
+HEALTHCHECK --interval=30s --timeout=10s  --retries=3 \
+    CMD curl --fail http://localhost:$EXPOSE_PORT || exit 1
+
 # 对外暴露端口
 EXPOSE  $EXPOSE_PORT
 
