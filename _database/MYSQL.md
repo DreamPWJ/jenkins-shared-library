@@ -1,4 +1,4 @@
-#### MYSQL一主一从复制和双主双从配置
+#### MYSQL一主一从复制和双主双从配置  简单的使用主备配置方式即可
 
 - 文档地址: https://www.cnblogs.com/cao-lei/p/13603043.html
 
