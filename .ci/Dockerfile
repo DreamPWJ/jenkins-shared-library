@@ -45,7 +45,7 @@ EXPOSE  $EXPOSE_PORT
 
 # 健康检查 如果服务不可用或未响应，Docker可以标记容器为不健康，并根据配置采取行动，如自动重启容器
 HEALTHCHECK --start-period=1s --interval=30s --timeout=10s --retries=3 \
-    CMD curl --fail http://localhost:$SERVICE_PORT || exit 1
+    CMD curl --fail http://localhost:$DOCKER_SERVICE_PORT || exit 1
 
 # 运行jar包命令 远程调式  缩短 Tomcat 的启动时间  java -jar app.jar  开启JDK特性功能预览功能 --enable-preview
 ENTRYPOINT "java" "-jar" $JAVA_OPTS $REMOTE_DEBUGGING_PARAM  "-Djava.security.egd=file:/dev/./urandom" "/server.jar"
