@@ -44,9 +44,6 @@ function is_success_images() {
   if [[ ${docker_image_time_diff} -ge 60 && $2 == false ]]; then
     #echo "当前时间与创建镜像的时间差: ${docker_image_time_diff}秒"
     echo -e "\033[31mDocker镜像构建失败  ❌  \033[0m " # 镜像可能不是最新镜像 可能为同一台服务器并发构建导致父镜像层被删除
-#    echo "======== 开始自动清理Docker日志 ========"
-#    sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
-#    cd /my && rm -rf /*/logs
     echo "请查看错误日志后, 再次尝试部署 🤪 "
     exit 1
   fi
@@ -126,6 +123,8 @@ function get_disk_space() {
         echo "======== 开始自动清理Docker日志 ========"
         sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
         cd /my && rm -rf /*/logs
+        AFTER_TOTAL_FREE=$(df -h  / | awk '/\// {print $4}' | sed 's/G//')
+        echo "After clean free space is $AFTER_TOTAL_FREE GB! "
         #exit 1
     fi
 }

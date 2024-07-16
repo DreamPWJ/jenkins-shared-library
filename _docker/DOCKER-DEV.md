@@ -85,6 +85,9 @@ sonarqube:community  && sysctl -w vm.max_map_count=262144
 #### 搭建私有docker仓库 http://ip:5000/v2
 docker run -d --restart=always -p 5000:5000 -v /my/docker_registry:/var/lib/registry --name docker-registry registry:2
 
+#### 使用 Cloudflare Workers 自建节点科学上网 https://xiaowangye.org/posts/using-cloudflare-workers-build-proxy-for-internet-access/
+#### 自建订阅地址: https://tunnel.lanneng.tech/09268ef9-d1d1-4b58-a542-8b9f4857f65a
+
 #### 基于Docker安装部署ShadowSocks基于Socks5代理方式的加密传输协议件(翻墙)
 #### 从Docker Hub里拉取ShadowSocks镜像最新版来部署 Dream2021  8.211.160.201 注意端口要开放出去
 #### Github客户端地址: https://github.com/shadowsocks
