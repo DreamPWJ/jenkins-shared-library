@@ -15,12 +15,9 @@ if [[ ! $(command -v certbot) ]]; then
   sudo apt-get upgrade -y || true # 更新系统软件
   sudo apt-get install -y certbot || true  # 安装Certbot客户端
   sudo sudo apt upgrade certbot && sudo apt dist-upgrade # 升级Certbot版本
+
   # sudo yum update -y
   sudo yum install -y certbot || true  # 如果certbot不存在 设置yum镜像源/etc/yum.repos.d
-
-  # 初始化阿里云域名DNS验证插件  固定版本  pip install certbot-dns-aliyun==0.38.1
-  sudo apt install -y python3-pip || true && sudo yum install python3-pip -y || true && pip install certbot-dns-aliyun
-  sudo pip3 install --upgrade certbot certbot-dns-aliyun
 
   # Python包方式安装  非标准的CentOS或Ubuntu系统 比如国产麒麟等
   sudo yum install python3-pip -y &&  python -m pip install --upgrade pip
@@ -34,11 +31,9 @@ if [[ ! $(command -v certbot) ]]; then
   # 在虚拟环境中执行即可
   /root/venv_python/bin/certbot --version
 
-  # python3 -m venv venv #在certbot目录创建python工作环境
-  # source venv/bin/activate
-  # sudo pip install certbot || true
-  # sudo pip install certbot-dns-aliyun==0.38.1 || true
-  # sudo ln -s /my/letsencrypt/venv/bin/certbot /usr/bin/certbot #创建软链，以便可以直接执行certbot
+  # 初始化阿里云域名DNS验证插件  固定版本  pip install certbot-dns-aliyun==0.38.1  也使用更简单的WebRoot方式验证
+  sudo apt install -y python3-pip || true && sudo yum install python3-pip -y || true && pip install certbot-dns-aliyun
+  sudo pip3 install --upgrade certbot certbot-dns-aliyun
 
   # Docker服务之间安装  https://hub.docker.com/r/certbot/certbot
   #   docker pull certbot/certbot:latest
@@ -103,13 +98,13 @@ cd /etc/letsencrypt/live/ || true && ls -l
 # certbot revoke --cert-path /etc/letsencrypt/live/example.com/cert.pem
 # certbot delete --cert-name example.com
 
+# SSL 状态检测  访问 https://myssl.com
+
+# 卸载Certbot客户端  sudo apt remove -y certbot
+
+
 # 如果出现生成失败 如archive directory exists for domain.com-0001 执行删除操作
 # certbot certificates  查看
 # rm -rf /etc/letsencrypt/archives/domain.com-0001
 # rm -rf /etc/letsencrypt/live/domain.com-0001
 # rm -f /etc/letsencrypt/renewal/domain.com-0001.conf
-
-
-# SSL 状态检测  访问 https://myssl.com
-
-# 卸载Certbot客户端  sudo apt remove -y certbot

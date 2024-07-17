@@ -5,13 +5,15 @@
 echo "======== 开始自动清理Docker日志 ========"
 
 TOTAL_FREE=$(df -h  / | awk '/\// {print $4}' | sed 's/G//')
-echo "Free space is $TOTAL_FREE GB! "
+echo " Free space is $TOTAL_FREE GB! "
 
 sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
 cd /my && rm -rf /*/logs
 
 AFTER_TOTAL_FREE=$(df -h  / | awk '/\// {print $4}' | sed 's/G//')
-echo "After clean free space is $AFTER_TOTAL_FREE GB! "
+echo " After clean free space is $AFTER_TOTAL_FREE GB! "
+
+
 
 # crontab -e
 # 0 2 * * *  /bin/bash /my/docker-logs-clean.sh

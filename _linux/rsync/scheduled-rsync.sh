@@ -14,6 +14,8 @@ chmod -R 777 /tidb-data/backup
 # 删除-mtime是几天之前的备份文件
 find /tidb-data/backup -name "*.sql.gz" -type f -mtime +7 -exec rm -rf {} \; >/dev/null 2>&1
 
+
+
 # 创建定时任务 
 # chmod +x scheduled-rsync.sh  给shell脚本执行文件可执行权限
 # sudo crontab -e
