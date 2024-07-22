@@ -9,13 +9,14 @@ echo " Free space is $TOTAL_FREE GB! "
 
 sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
 cd /my && rm -rf /*/logs
+rm -rf /var/log/nginx/*.log
 
-# 移除所有未使用的镜像（包括没有被任何容器使用的镜像）
-docker image prune -a
+# 移除所有未使用的镜像（包括没有被任何容器使用的镜像） 如/var/lib/docker/overlay2占用
+docker image prune -a --force
 # 移除所有未使用的卷
-docker volume prune
+docker volume prune --force
 # 移除 Docker 构建缓存
-docker builder prune
+docker builder prune --force
 
 AFTER_TOTAL_FREE=$(df -h  / | awk '/\// {print $4}' | sed 's/G//')
 echo " After clean free space is $AFTER_TOTAL_FREE GB! "
