@@ -161,14 +161,23 @@ def call(String type = 'wx-mini', Map map) {
                 }
 
                 stage('编译构建') {
-                    /*   when {
-                           beforeAgent true  // 只有在 when 条件验证为真时才会进入 agent
-                           expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.taro) }
-                       }*/
-                    tools {
-                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
-                        nodejs "${NODE_VERSION}"
+                    when {
+                        beforeAgent true  // 只有在 when 条件验证为真时才会进入 agent
+                        //expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.taro) }
                     }
+                    agent {
+                        docker {
+                            // Node环境  构建完成自动删除容器
+                            //image "node:${NODE_VERSION.replace('Node', '')}"
+                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                            // 使用自定义Dockerfile的node环境 加速monorepo依赖构建内置lerna等相关依赖
+                            reuseNode true // 使用根节点
+                        }
+                    }
+                    /*  tools {
+                          // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
+                          nodejs "${NODE_VERSION}"
+                      }*/
                     steps {
                         script {
                             buildProject()
