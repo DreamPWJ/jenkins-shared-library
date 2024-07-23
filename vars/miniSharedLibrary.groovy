@@ -623,7 +623,7 @@ def buildProject() {
     }
     dir("${env.WORKSPACE}${monoRepoProjectPackage}/${PROJECT_NAME}") {
         println("安装依赖 📥")
-        sh "yarn"
+        // sh "yarn"
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.miniNativeCode) {
             // 安装微信小程序CI依赖工具   二维码生成库qrcode-terminal
             try {
@@ -649,7 +649,7 @@ def buildProject() {
 
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.taro) {
             // sh "rm -rf node_modules"
-            // sh "npm install"
+            sh "pnpm install"
             sh "npm run '${NPM_RUN_PARAMS}'"
         }
     }
