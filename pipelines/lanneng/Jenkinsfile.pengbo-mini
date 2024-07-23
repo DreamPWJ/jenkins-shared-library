@@ -58,12 +58,13 @@ pengbo-monorepo-mini
 澎泊车Monorepo小程序流水线
 JSON_PARAMS:
 {
-  "PROJECT_TYPE" : "1",
+  "PROJECT_TYPE" : "2",
   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/mini-monorepo",
   "DEFAULT_GIT_BRANCH" : "feature/infra",
   "PROJECT_CHINESE_NAME" : "澎泊车",
   "IS_MONO_REPO" : true,
-  "PROJECT_NAME" : "pengbo-mini"
+  "PROJECT_NAME" : "pengbo-mini",
+  "NPM_RUN_PARAMS": "build:weapp"
 }
 
 */

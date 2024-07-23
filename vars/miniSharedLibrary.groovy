@@ -410,6 +410,8 @@ def getInitParams(map) {
     isSubmitAuditSucceed = false
     // 小程序总包大小
     miniTotalPackageSize = ""
+    // monorepo方式项目多包复用父包 如 projects
+    monoRepoProjectPackage = ""
 }
 
 /**
@@ -592,7 +594,7 @@ def getProjectName() {
 
         // 考虑Monorepo代码组织方式
         if ("${IS_MONO_REPO}" == "true") {
-            projectConfigFile = "${env.WORKSPACE}/${PROJECT_NAME}/" + "${projectConfigFile}"
+            projectConfigFile = "${env.WORKSPACE}${monoRepoProjectPackage}/${PROJECT_NAME}/" + "${projectConfigFile}"
         }
         def projectConfigJson = readJSON file: "${projectConfigFile}", text: ''
         def projectName = projectConfigJson.projectname
@@ -611,12 +613,15 @@ def getProjectName() {
  */
 def buildProject() {
     // 初始化Node环境变量
-    Node.initEnv(this)
+    // Node.initEnv(this)
 
     // Node环境设置镜像
     Node.setMirror(this)
 
-    dir("${env.WORKSPACE}/${PROJECT_NAME}") {
+    if ("${IS_MONO_REPO}" == "true") {
+        monoRepoProjectPackage = "/projects"
+    }
+    dir("${env.WORKSPACE}${monoRepoProjectPackage}/${PROJECT_NAME}") {
         println("安装依赖 📥")
         sh "yarn"
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.miniNativeCode) {
@@ -654,7 +659,7 @@ def buildProject() {
  * 预览上传
  */
 def previewUpload() {
-    dir("${env.WORKSPACE}/${PROJECT_NAME}") {
+    dir("${env.WORKSPACE}${monoRepoProjectPackage}/${PROJECT_NAME}") {
         // 小程序配置目录
         miniConfigDir = "${env.WORKSPACE}/ci/_jenkins/mini"
         // 同步脚本和删除构建产物
@@ -701,7 +706,7 @@ def previewUpload() {
  * 小程序信息
  */
 def miniInfo() {
-    dir("${env.WORKSPACE}/${PROJECT_NAME}") {
+    dir("${env.WORKSPACE}${monoRepoProjectPackage}/${PROJECT_NAME}") {
         // 读取文件信息
         wxCiResult = readFile(file: "${wxCiResultFile}")
         println("${wxCiResult}")
