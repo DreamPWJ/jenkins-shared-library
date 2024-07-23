@@ -620,10 +620,14 @@ def buildProject() {
 
     if ("${IS_MONO_REPO}" == "true") {
         monoRepoProjectPackage = "/projects"
+        println("安装依赖 📥")
+        sh "pnpm install"
+        sh "npm run bootstrap:all"
     }
     dir("${env.WORKSPACE}${monoRepoProjectPackage}/${PROJECT_NAME}") {
-        println("安装依赖 📥")
+        // println("安装依赖 📥")
         // sh "yarn"
+
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.miniNativeCode) {
             // 安装微信小程序CI依赖工具   二维码生成库qrcode-terminal
             try {
@@ -649,7 +653,6 @@ def buildProject() {
 
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.taro) {
             // sh "rm -rf node_modules"
-            sh "pnpm install"
             sh "npm run '${NPM_RUN_PARAMS}'"
         }
     }
