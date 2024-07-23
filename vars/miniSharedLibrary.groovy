@@ -163,6 +163,7 @@ def call(String type = 'wx-mini', Map map) {
                 stage('编译构建') {
                     when {
                         beforeAgent true  // 只有在 when 条件验证为真时才会进入 agent
+                        expression { return true }
                         //expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.taro) }
                     }
                     agent {
@@ -174,7 +175,7 @@ def call(String type = 'wx-mini', Map map) {
                             reuseNode true // 使用根节点
                         }
                     }
-                    /*  tools {
+                    /* tools {
                           // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
                           nodejs "${NODE_VERSION}"
                       }*/
