@@ -249,9 +249,18 @@ def call(String type = 'wx-mini', Map map) {
 
                 stage('提审授权') {
                     when {
+                        beforeAgent true  // 只有在 when 条件验证为真时才会进入 agent
                         expression {
                             return ("${params.BUILD_TYPE}" == "${Constants.RELEASE_TYPE}"
                                     && "${params.IS_AUTO_SUBMIT_FOR_REVIEW}" == 'true')
+                        }
+                    }
+                    agent {
+                        docker {
+                            // Node环境  构建完成自动删除容器
+                            //image "node:${NODE_VERSION.replace('Node', '')}"
+                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                            reuseNode true // 使用根节点
                         }
                     }
                     steps {
