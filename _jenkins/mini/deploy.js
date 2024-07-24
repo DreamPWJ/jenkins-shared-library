@@ -113,14 +113,20 @@ const projectConfig = require('./project.config.json');
 function handleResult(wxCiResultFile, result) {
     console.log("小程序上传响应结果: ")
     console.log(result)
-    /*   let customResult = {}
-       result.subPackageInfo.map(item => {
-           if (item.name === "__FULL__") {
-               Object.assign(customResult, {"totalPackageSize": item.size})
-           }
-           if (item.name === "__APP__") {
-               Object.assign(customResult, {"mainPackageSize": item.size})
-           }
-       })
-       fs.writeFileSync(wxCiResultFile, JSON.stringify(customResult));*/
+    let customResult = {}
+    result.subPackageInfo.map(item => {
+        if (item.name === "__FULL__") {
+            Object.assign(customResult, {"totalPackageSize": item.size})
+        }
+        if (item.name === "__APP__") {
+            Object.assign(customResult, {"mainPackageSize": item.size})
+        }
+    })
+    console.log(customResult)
+    try {
+        fs.writeFileSync(wxCiResultFile, JSON.stringify(customResult), {encoding: 'utf8'});
+        console.log('Data written successfully!');
+    } catch (err) {
+        console.error('Error writing to file:', err);
+    }
 }
