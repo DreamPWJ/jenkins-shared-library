@@ -19,7 +19,7 @@ class PlayWright implements Serializable {
             ctx.sh "playwright --version"
         } catch (error) {
             // 固定版本号防止新版有兼容性问题和需要下载新的Chromium版本等问题
-            def playwrightVersion = "1.20.0"
+            def playwrightVersion = "1.45.3"
             ctx.sh "npm i -D playwright@${playwrightVersion}"
             ctx.sh "npm i -D yargs"
             // ctx.sh "npm i -D @playwright/test"
