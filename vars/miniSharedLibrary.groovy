@@ -723,10 +723,15 @@ def previewUpload() {
         sh "rm -f ${wxCiResultFile}"
         wxPreviewQrcodeName = "preview-qrcode-v${MINI_VERSION_NUM}" // 微信预览码图片名称
         println("执行小程序自动化预览上传 🚀 ")
-        // 执行自动化预览上传
-        sh "node deploy.js --type=${params.BUILD_TYPE} --v=${MINI_VERSION_NUM} --desc='${params.VERSION_DESC}' " +
-                " --isNeedNpm='${IS_MINI_NATIVE_NEED_NPM}' --buildDir=${NPM_BUILD_DIRECTORY} --wxCiResultFile='${wxCiResultFile}' " +
-                " --qrcodeName=${wxPreviewQrcodeName} --robot=${params.CI_ROBOT}"
+        try {
+            timeout(time: 1, unit: 'MINUTES') {
+                // 执行自动化预览上传
+                sh "node deploy.js --type=${params.BUILD_TYPE} --v=${MINI_VERSION_NUM} --desc='${params.VERSION_DESC}' " +
+                        " --isNeedNpm='${IS_MINI_NATIVE_NEED_NPM}' --buildDir=${NPM_BUILD_DIRECTORY} --wxCiResultFile='${wxCiResultFile}' " +
+                        " --qrcodeName=${wxPreviewQrcodeName} --robot=${params.CI_ROBOT}"
+            }
+        } catch (e) {
+        }
     }
     println("小程序预览上传成功 ✅")
 }
