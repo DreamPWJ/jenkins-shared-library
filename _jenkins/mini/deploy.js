@@ -111,7 +111,7 @@ const projectConfig = require('./project.config.json');
  * 响应结果自定义处理
  */
 function handleResult(wxCiResultFile, result) {
-    console.log("响应结果")
+    console.log("小程序上传响应结果: ")
     console.log(result)
     /*   let customResult = {}
        result.subPackageInfo.map(item => {
