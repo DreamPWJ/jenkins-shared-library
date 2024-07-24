@@ -122,5 +122,5 @@ function handleResult(wxCiResultFile, result) {
             Object.assign(customResult, {"mainPackageSize": item.size})
         }
     })
-    fs.writeFileSync(wxCiResultFile, JSON.stringify(customResult));
+    fs.writeFile(wxCiResultFile, JSON.stringify(customResult));
 }
