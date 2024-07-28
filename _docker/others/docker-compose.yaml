@@ -25,7 +25,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${PASSWORD}
       MYSQL_ROOT_HOST: '%'
     # --default-authentication-plugin=mysql_native_password设置协议认证方式 8.x默认密码加密方式：caching_sha2_password 现在很多客户端工具还不支持这种加密认证方式
-    command: [ "--group_concat_max_len=102400","--max_connections=6000", "--lower_case_table_names=1" ]
+    command: [ "--group_concat_max_len=102400","--max_connections=6000", "--max_connect_errors=200" ,"--lower_case_table_names=1" ]
 
   proxy-nginx:
     #镜像容器名称

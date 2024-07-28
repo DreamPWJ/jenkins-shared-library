@@ -37,6 +37,7 @@ default-authentication-plugin=caching_sha2_password
 
 group_concat_max_len=1024000000
 max_connections=6000
+max_connect_errors=200
 #lower_case_table_names=1
 
 [mysqld_safe]
@@ -68,6 +69,7 @@ default-authentication-plugin=caching_sha2_password
 
 group_concat_max_len=1024000000
 max_connections=6000
+max_connect_errors=200
 #lower_case_table_names=1
 
 [mysqld_safe]
