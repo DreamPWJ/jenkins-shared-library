@@ -10,7 +10,8 @@ echo " Free space is $TOTAL_FREE GB! "
 
 sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
 cd /my && rm -rf /*/logs
-rm -rf /var/log/nginx/*.log
+rm -rf /var/log/nginx/*.log || true
+rm -rf /usr/local/nginx/logs/*.log || true
 
 # 移除所有未使用的镜像（包括没有被任何容器使用的镜像） 如/var/lib/docker/overlay2占用
 docker image prune -a --force || true
