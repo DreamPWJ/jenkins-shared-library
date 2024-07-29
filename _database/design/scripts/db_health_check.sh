@@ -1,7 +1,6 @@
 #!/bin/bash
 # Author: 潘维吉
-# 数据库健康检查
-
+# 数据库健康状态检查并自我修复
 
 # MySQL服务器配置
 DB_HOST="localhost"
@@ -12,6 +11,7 @@ DB_NAME="mydatabase"
 # 检查数据库服务是否运行
 if ! systemctl is-active mysql.service > /dev/null 2>&1; then
     echo "MySQL服务未运行"
+    systemctl start mysql.service
     exit 1
 fi
 
@@ -19,6 +19,7 @@ fi
 QUERY="SELECT 1"
 if ! mysql -h $DB_HOST -u $DB_USER -p$DB_PASS -e "$QUERY" < /dev/null; then
     echo "无法连接到数据库"
+    systemctl restart mysql.service
     exit 1
 fi
 
@@ -39,3 +40,11 @@ fi
 
 echo "数据库健康检查通过"
 exit 0
+
+
+
+# 执行授权  chmod +x /my/db_health_check.sh
+# crontab -e
+# */5 * * * * /bin/bash /my/db_health_check.sh
+# service crond restart  , Ubuntu 使用 sudo service cron restart # 重启crond生效
+# crontab -l # 查看crond列表
