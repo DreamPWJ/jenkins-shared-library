@@ -7,7 +7,7 @@ DB_HOST="localhost"
 DB_PORT="3306"
 DB_USER="root"
 DB_PASS="password"
-DB_NAME="database_name"
+DB_NAME="db_name"
 
 # 检查数据库服务是否运行
 if ! systemctl is-active mysql.service > /dev/null 2>&1; then
@@ -46,6 +46,6 @@ exit 0
 
 # 执行授权  chmod +x /my/db_health_check.sh
 # crontab -e
-# */5 * * * * /bin/bash /my/db_health_check.sh > /my/db-health-check.log 2>&1
+# */5 * * * * /bin/bash /my/db_health_check.sh >> /my/db-health-check.log 2>&1
 # service crond restart  , Ubuntu 使用 sudo service cron restart # 重启crond生效
 # crontab -l # 查看crond列表

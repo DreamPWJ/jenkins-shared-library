@@ -79,6 +79,9 @@ chmod 600 /my/credentials.ini
 
 # Certbot 生成域名相关的SSL证书
 # 1. 使用更简单的WebRoot方式验证  适合那些已经在运行Web服务器 --webroot -w <web_root> 指定您的 Web 服务器的站点根目录 如/usr/share/nginx/html
+sudo certbot certonly --webroot -w /path/web/root --non-interactive --agree-tos \
+     -d panweiji.com  -d www.panweiji.com \
+     --email 406798106@qq.com
 # 2. 云DNS自动校验方式生成证书方式  3. standalone模式获取证书 --standalone 不需要指定网站根目录，自动启用服务器的443端口，来验证域名的归属
 certbot certonly --authenticator=dns-aliyun --dns-aliyun-credentials='/my/credentials.ini' \
 --email 406798106@qq.com  -d "panweiji.com"
