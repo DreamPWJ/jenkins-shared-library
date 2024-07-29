@@ -124,8 +124,9 @@ function get_disk_space() {
         docker image prune -a --force  || true
         sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
         cd /my && rm -rf /*/logs
-        rm -rf /var/log/nginx/*.log || true
-        rm -rf /usr/local/nginx/logs/*.log || true
+        rm -f /var/log/nginx/*.log || true
+        rm -f /usr/local/nginx/logs/*.log || true
+        rm -f /var/lib/docker/overlay2/*/diff/var/log/nginx/*.log || true
         AFTER_TOTAL_FREE=$(df -h  / | awk '/\// {print $4}' | sed 's/G//')
         echo "After clean free space is $AFTER_TOTAL_FREE GB! "
         #exit 1
