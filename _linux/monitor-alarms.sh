@@ -30,7 +30,7 @@ MEMORY_USAGE_MAX=$(ps aux --sort=-%mem | head -n 2)
 DISK_PARTITION="/"
 DISK_USAGE=$(df -h "${DISK_PARTITION}" | awk 'NR==2{print $(NF-1)}' | sed 's/%//g')
 # 获取占用磁盘最高的目录列表  如 /* 根目录
-DISK_USAGE_MAX=$(du -hsx /* | sort -hr | head -n 5)
+DISK_USAGE_MAX=$(du -hsx /* | sort -hr | head -n 2)
 
 # 获取内网IP地址
 local_ip=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}(?=/)' | grep -v '^127\.')
