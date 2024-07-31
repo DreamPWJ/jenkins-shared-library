@@ -18,13 +18,19 @@ HOSTNAME=$(hostname)
 
 # 获取CPU使用率（百分比）
 CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}' | cut -d. -f1)
+# 获取cpu使用最高的进程
+CPU_USAGE_MAX=$(ps aux --sort=-%cpu | head -n 2)
 
 # 获取内存使用率（百分比）
 MEMORY_USAGE=$(free -m | awk 'NR==2{printf "%.2f%%", $3*100/$2}')
+# 获取内存使用最高的进程
+MEMORY_USAGE_MAX=$(ps aux --sort=-%mem | head -n 2)
 
 # 获取指定磁盘分区的使用率（例如根目录/的磁盘使用率，这里替换"/"为你想监控的磁盘分区）
 DISK_PARTITION="/"
 DISK_USAGE=$(df -h "${DISK_PARTITION}" | awk 'NR==2{print $(NF-1)}' | sed 's/%//g')
+# 获取占用磁盘最高的目录列表  如 /* 根目录
+DISK_USAGE_MAX=$(du -hsx /* | sort -hr | head -n 2)
 
 # 获取内网IP地址
 local_ip=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}(?=/)' | grep -v '^127\.')
@@ -44,7 +50,7 @@ if [ ${CPU_USAGE} -ge ${CPU_THRESHOLD} ]; then
         "msgtype": "markdown",
         "markdown": {
             "title": "🚨CPU告警-蓝能科技",
-            "text": "# 🚨 CPU警告：'"${HOSTNAME}"'主机上的CPU使用率已达到'"${CPU_USAGE}"'%！超过阈值'"${CPU_THRESHOLD}"'% \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
+            "text": "# 🚨 CPU警告：'"${HOSTNAME}"'主机上的CPU使用率已达到'"${CPU_USAGE}"'%！超过阈值'"${CPU_THRESHOLD}"'% \n - 最大CPU进程: '"${CPU_USAGE_MAX}"' \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
         },
         "at": {
                 "isAtAll": false,
@@ -64,7 +70,7 @@ if [ ${MEMORY_USAGE%.*} -ge ${MEMORY_THRESHOLD} ]; then
             "msgtype": "markdown",
             "markdown": {
                 "title": "🚨内存告警-蓝能科技",
-                "text": "# 🚨 内存警告：'"${HOSTNAME}"'主机上的内存使用率已达到'"${MEMORY_USAGE}"'！超过阈值'"${MEMORY_THRESHOLD}"'% \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
+                "text": "# 🚨 内存警告：'"${HOSTNAME}"'主机上的内存使用率已达到'"${MEMORY_USAGE}"'！超过阈值'"${MEMORY_THRESHOLD}"'%  \n - 最大内存进程: '"${MEMORY_USAGE_MAX}"' \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
             },
             "at": {
                     "isAtAll": false,
@@ -84,7 +90,7 @@ if [ ${DISK_USAGE} -ge ${DISK_USAGE_THRESHOLD} ]; then
             "msgtype": "markdown",
             "markdown": {
                 "title": "🚨磁盘告警-蓝能科技",
-                "text": "# 🚨 磁盘警告：'"${HOSTNAME}"'主机上'"${DISK_PARTITION}"'分区的磁盘使用率已达到'"${DISK_USAGE}"'%！超过阈值'"${DISK_USAGE_THRESHOLD}"'% \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
+                "text": "# 🚨 磁盘警告：'"${HOSTNAME}"'主机上'"${DISK_PARTITION}"'分区的磁盘使用率已达到'"${DISK_USAGE}"'%！超过阈值'"${DISK_USAGE_THRESHOLD}"'% \n - 最大磁盘占用: '"${DISK_USAGE_MAX}"' \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
             },
             "at": {
                      "isAtAll": false,

@@ -161,14 +161,23 @@ def call(String type = 'wx-mini', Map map) {
                 }
 
                 stage('编译构建') {
-                    /*   when {
-                           beforeAgent true  // 只有在 when 条件验证为真时才会进入 agent
-                           expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.taro) }
-                       }*/
-                    tools {
-                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
-                        nodejs "${NODE_VERSION}"
+                    when {
+                        beforeAgent true  // 只有在 when 条件验证为真时才会进入 agent
+                        expression { return true }
+                        //expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.taro) }
                     }
+                    agent {
+                        docker {
+                            // Node环境  构建完成自动删除容器
+                            //image "node:${NODE_VERSION.replace('Node', '')}"
+                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                            reuseNode true // 使用根节点
+                        }
+                    }
+                    /* tools {
+                          // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
+                          nodejs "${NODE_VERSION}"
+                      }*/
                     steps {
                         script {
                             buildProject()
@@ -178,7 +187,16 @@ def call(String type = 'wx-mini', Map map) {
 
                 stage('预览代码') {
                     when {
+                        beforeAgent true  // 只有在 when 条件验证为真时才会进入 agent
                         expression { return ("${params.BUILD_TYPE}" == "${Constants.DEVELOP_TYPE}") }
+                    }
+                    agent {
+                        docker {
+                            // Node环境  构建完成自动删除容器
+                            //image "node:${NODE_VERSION.replace('Node', '')}"
+                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                            reuseNode true // 使用根节点
+                        }
                     }
                     steps {
                         script {
@@ -189,7 +207,16 @@ def call(String type = 'wx-mini', Map map) {
 
                 stage('上传代码') {
                     when {
+                        beforeAgent true  // 只有在 when 条件验证为真时才会进入 agent
                         expression { return ("${params.BUILD_TYPE}" == "${Constants.TRIAL_TYPE}" || "${params.BUILD_TYPE}" == "${Constants.RELEASE_TYPE}") }
+                    }
+                    agent {
+                        docker {
+                            // Node环境  构建完成自动删除容器
+                            //image "node:${NODE_VERSION.replace('Node', '')}"
+                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                            reuseNode true // 使用根节点
+                        }
                     }
                     steps {
                         script {
@@ -222,15 +249,24 @@ def call(String type = 'wx-mini', Map map) {
 
                 stage('提审授权') {
                     when {
+                        beforeAgent true  // 只有在 when 条件验证为真时才会进入 agent
                         expression {
                             return ("${params.BUILD_TYPE}" == "${Constants.RELEASE_TYPE}"
                                     && "${params.IS_AUTO_SUBMIT_FOR_REVIEW}" == 'true')
                         }
                     }
+                    agent {
+                        docker {
+                            // Node环境  构建完成自动删除容器
+                            //image "node:${NODE_VERSION.replace('Node', '')}"
+                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                            reuseNode true // 使用根节点
+                        }
+                    }
                     steps {
                         // 只显示当前阶段stage失败  而整个流水线构建显示成功
-                        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                            //  script {
+                        // catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                        script {
                             parallel( // 步骤内并发执行
                                     '提审': {
                                         submitAudit()
@@ -238,8 +274,8 @@ def call(String type = 'wx-mini', Map map) {
                                     '授权': {
                                         submitAuthorization(map)
                                     })
-                            // }
                         }
+                        // }
                     }
                 }
 
@@ -400,6 +436,8 @@ def getInitParams(map) {
     isSubmitAuditSucceed = false
     // 小程序总包大小
     miniTotalPackageSize = ""
+    // monorepo方式项目多包复用父包 如 projects
+    monoRepoProjectPackage = ""
 }
 
 /**
@@ -582,7 +620,7 @@ def getProjectName() {
 
         // 考虑Monorepo代码组织方式
         if ("${IS_MONO_REPO}" == "true") {
-            projectConfigFile = "${env.WORKSPACE}/${PROJECT_NAME}/" + "${projectConfigFile}"
+            projectConfigFile = "${env.WORKSPACE}${monoRepoProjectPackage}/${PROJECT_NAME}/" + "${projectConfigFile}"
         }
         def projectConfigJson = readJSON file: "${projectConfigFile}", text: ''
         def projectName = projectConfigJson.projectname
@@ -601,14 +639,21 @@ def getProjectName() {
  */
 def buildProject() {
     // 初始化Node环境变量
-    Node.initEnv(this)
+    // Node.initEnv(this)
 
     // Node环境设置镜像
     Node.setMirror(this)
 
-    dir("${env.WORKSPACE}/${PROJECT_NAME}") {
+    if ("${IS_MONO_REPO}" == "true") {
+        monoRepoProjectPackage = "/projects"
         println("安装依赖 📥")
-        sh "yarn"
+        sh "pnpm install"
+        sh "npm run bootstrap:all"
+    }
+    dir("${env.WORKSPACE}${monoRepoProjectPackage}/${PROJECT_NAME}") {
+        // println("安装依赖 📥")
+        // sh "yarn"
+
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.miniNativeCode) {
             // 安装微信小程序CI依赖工具   二维码生成库qrcode-terminal
             try {
@@ -634,7 +679,6 @@ def buildProject() {
 
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.taro) {
             // sh "rm -rf node_modules"
-            // sh "npm install"
             sh "npm run '${NPM_RUN_PARAMS}'"
         }
     }
@@ -644,7 +688,7 @@ def buildProject() {
  * 预览上传
  */
 def previewUpload() {
-    dir("${env.WORKSPACE}/${PROJECT_NAME}") {
+    dir("${env.WORKSPACE}${monoRepoProjectPackage}/${PROJECT_NAME}") {
         // 小程序配置目录
         miniConfigDir = "${env.WORKSPACE}/ci/_jenkins/mini"
         // 同步脚本和删除构建产物
@@ -679,10 +723,15 @@ def previewUpload() {
         sh "rm -f ${wxCiResultFile}"
         wxPreviewQrcodeName = "preview-qrcode-v${MINI_VERSION_NUM}" // 微信预览码图片名称
         println("执行小程序自动化预览上传 🚀 ")
-        // 执行自动化预览上传
-        sh "node deploy.js --type=${params.BUILD_TYPE} --v=${MINI_VERSION_NUM} --desc='${params.VERSION_DESC}' " +
-                " --isNeedNpm='${IS_MINI_NATIVE_NEED_NPM}' --buildDir=${NPM_BUILD_DIRECTORY} --wxCiResultFile='${wxCiResultFile}' " +
-                " --qrcodeName=${wxPreviewQrcodeName} --robot=${params.CI_ROBOT}"
+        try {
+            timeout(time: 1, unit: 'MINUTES') {
+                // 执行自动化预览上传
+                sh "node deploy.js --type=${params.BUILD_TYPE} --v=${MINI_VERSION_NUM} --desc='${params.VERSION_DESC}' " +
+                        " --isNeedNpm='${IS_MINI_NATIVE_NEED_NPM}' --buildDir=${NPM_BUILD_DIRECTORY} --wxCiResultFile='${wxCiResultFile}' " +
+                        " --qrcodeName=${wxPreviewQrcodeName} --robot=${params.CI_ROBOT}"
+            }
+        } catch (e) {
+        }
     }
     println("小程序预览上传成功 ✅")
 }
@@ -691,7 +740,7 @@ def previewUpload() {
  * 小程序信息
  */
 def miniInfo() {
-    dir("${env.WORKSPACE}/${PROJECT_NAME}") {
+    dir("${env.WORKSPACE}${monoRepoProjectPackage}/${PROJECT_NAME}") {
         // 读取文件信息
         wxCiResult = readFile(file: "${wxCiResultFile}")
         println("${wxCiResult}")

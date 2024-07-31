@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Author: 潘维吉
 # 清理Docker日志
+# 获取占用磁盘最高的目录列表  如 /* 根目录命令:  du -hsx /* | sort -hr | head -n 5
 
 echo "======== 开始自动清理Docker日志 ========"
 
@@ -9,6 +10,16 @@ echo " Free space is $TOTAL_FREE GB! "
 
 sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
 cd /my && rm -rf /*/logs
+rm -f /var/log/nginx/*.log || true
+rm -f /usr/local/nginx/logs/*.log || true
+rm -f /var/lib/docker/overlay2/*/diff/var/log/nginx/*.log || true
+
+# 移除所有未使用的镜像（包括没有被任何容器使用的镜像） 如/var/lib/docker/overlay2占用
+docker image prune -a --force || true
+# 移除所有未使用的卷
+docker volume prune --force  || true
+# 移除 Docker 构建缓存
+docker builder prune --force  || true
 
 AFTER_TOTAL_FREE=$(df -h  / | awk '/\// {print $4}' | sed 's/G//')
 echo " After clean free space is $AFTER_TOTAL_FREE GB! "
