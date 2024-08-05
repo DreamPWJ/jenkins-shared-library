@@ -190,15 +190,19 @@ def call(String type = 'web-java', Map map) {
                           }*/
                     steps {
                         script {
-                            pullProjectCode()
-                            pullCIRepo()
+                            // 按顺序执行代码
+                            // 重试几次
+                            retry(2) {
+                                pullProjectCode()
+                                pullCIRepo()
+                            }
                             /*  parallel( // 步骤内并发执行
                                      'CI/CD代码': {
                                          pullCIRepo()
                                      },
                                      '项目代码': {
                                          pullProjectCode()
-                                     })*/
+                                     }) */
                         }
                     }
                 }
@@ -1126,7 +1130,6 @@ def pullProjectCode() {
  * 代码质量分析
  */
 def codeQualityAnalysis() {
-    pullProjectCode()
     SonarQube.scan(this, "${FULL_PROJECT_NAME}")
     // SonarQube.getStatus(this, "${PROJECT_NAME}")
 /*    def scannerHome = tool 'SonarQube' // 工具名称
