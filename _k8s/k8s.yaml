@@ -98,7 +98,8 @@ spec:
             failureThreshold: 3
 
       restartPolicy: Always   # 停机后总是不断重启
-      #     affinity: # 使用工作负载反亲和特性，让Pod之间尽量“互斥”，能尽量均匀的分布在各node节点上  参考文档： https://support.huaweicloud.com/cce_faq/cce_faq_00260.html
+      # 新特性topologySpreadConstraints代替affinity 实现均匀部署pod 拓扑分布约束 在K8s v1.28版本起默认启用
+      # affinity: # 使用工作负载反亲和特性，让Pod之间尽量“互斥”，能尽量均匀的分布在各node节点上  参考文档： https://support.huaweicloud.com/cce_faq/cce_faq_00260.html
       affinity: # 处理反亲和导致第一次部署后重复部署的冲突问题 滚动部署旧pod存在导致
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
