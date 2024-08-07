@@ -121,7 +121,7 @@ sharedLibrary(map)
 /*
 
 pengbo-park-app-test
-澎泊车SaaS 2.0平台服务端
+澎泊车SaaS 2.0用户平台服务端
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
@@ -129,6 +129,17 @@ JSON_PARAMS
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pengbo-park-app" ,
    "SHELL_PARAMS" : "pengbo-park-app test 8180 8080 sit"
+}
+
+pengbo-park-access-test
+澎泊车SaaS 2.0相机交互平台服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+   "BRANCH_NAME" : "feature/saas-v2.0" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "pengbo-park-access" ,
+   "SHELL_PARAMS" : "pengbo-park-access test 8186 9000 sit"
 }
 
 pengbo-park-admin-test
