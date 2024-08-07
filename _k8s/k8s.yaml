@@ -35,7 +35,7 @@ spec:
           imagePullPolicy: Always       # 强制拉取线上镜像
           resources: # 合理设置内存 防止内存溢出 导致整个服务器宕机 如0/3 nodes are available: 3 Insufficient memory
             requests:
-              cpu: 200m  # cpu请求 容器启动的初始可用数量
+              cpu: 100m  # cpu请求 容器启动的初始可用数量
               memory: 256Mi # 内存请求 容器启动的初始可用数量 不能大于limits设置值
             limits:
               # m是千分之一  100m是0.1个CPU  限制最大cpu防止资源溢出 导致整个集群全部不可用
@@ -102,7 +102,7 @@ spec:
       topologySpreadConstraints:    # 配置一个拓扑分布约束
         - maxSkew: 1                           #  Pod 可能被不均匀分布的程度
           topologyKey: kubernetes.io/hostname  # 按照节点来分散 Pod
-          whenUnsatisfiable: DoNotSchedule     # 当无法满足约束条件时的行为。可选值为 DoNotSchedule（不调度）或 ScheduleAnyway（无论如何都调度
+          whenUnsatisfiable: ScheduleAnyway     # 当无法满足约束条件时的行为。可选值为 DoNotSchedule不调度 或 ScheduleAnyway 无论如何都调度
           labelSelector:
             matchLabels:
               app: {APP_COMMON_NAME}
