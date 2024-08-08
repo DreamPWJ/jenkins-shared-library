@@ -674,7 +674,7 @@ def call(String type = 'web-java', Map map) {
                         docker {
                             // 构建完成自动删除容器
                             image "panweiji/k8s:latest"
-                            args " -v /root/.ssh/id_rsa:/root/.ssh/id_rsa "
+                            // args " -v "
                             reuseNode true // 使用根节点
                         }
                     }
