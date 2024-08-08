@@ -114,15 +114,15 @@ class Deploy implements Serializable {
                     ctx.println("K8S服务方式 控制服务 启动 停止 重启等")
                     def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
                     if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
-                        ctx.println("启动服务: " + deploymentName)
+                        ctx.println("K8S启动服务: " + deploymentName)
                         startService(ctx, map)
                     }
                     if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
-                        ctx.println("停止服务: " + deploymentName)
+                        ctx.println("K8S停止服务: " + deploymentName)
                         stopService(ctx, map)
                     }
                     if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
-                        ctx.println("重启服务: " + deploymentName)
+                        ctx.println("K8S重启服务: " + deploymentName)
                         restartService(ctx, map)
                     }
                 }
@@ -133,20 +133,30 @@ class Deploy implements Serializable {
             def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
             def command = ""
             if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
-                ctx.println("启动服务: " + dockerContainerName)
+                ctx.println("Docker启动服务: " + dockerContainerName)
                 command = "docker start " + dockerContainerName
             }
             if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
-                ctx.println("停止服务: " + dockerContainerName)
+                ctx.println("Docker停止服务: " + dockerContainerName)
                 command = "docker stop " + dockerContainerName
             }
             if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
-                ctx.println("重启服务: " + dockerContainerName)
+                ctx.println("Docker重启服务: " + dockerContainerName)
                 command = "docker restart " + dockerContainerName
             }
-            // 多个服务循环执行命令
+            // 执行控制命令
+            ctx.println "${ctx.remote.host}"
             ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} ' " + command + " ' "
+            // 循环串行执行多机分布式部署
+            if (!ctx.remote_worker_ips.isEmpty()) {
+                ctx.remote_worker_ips.each { ip ->
+                    ctx.println ip
+                    ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ip} ' " + command + " ' "
+                }
+            }
         }
+
+        // 控制完成钉钉通知大家
     }
 
     /**
@@ -187,7 +197,7 @@ class Deploy implements Serializable {
             // K8s服务方式
             def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
             ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=0 "
-            ctx.sleep 3
+            ctx.sleep 2
             ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=" + "${ctx.K8S_POD_REPLICAS}"
         } else {
             // Docker服务方式
