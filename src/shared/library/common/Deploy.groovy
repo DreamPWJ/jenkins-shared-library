@@ -119,7 +119,7 @@ class Deploy implements Serializable {
         if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
             type = "重启"
         }
-        typeText = type + "服务: " + "${ctx.IS_K8S_DEPLOY}" == 'true' ? deploymentName : dockerContainerName
+        typeText = type + "服务: " + ("${ctx.IS_K8S_DEPLOY}" == 'true' ? deploymentName : dockerContainerName)
         ctx.println(typeText)
 
         // 多服务器命令控制
@@ -167,7 +167,7 @@ class Deploy implements Serializable {
         }
 
         // 控制完成钉钉通知大家
-        DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "服务" + type + "控制", typeText + " \n 执行控制命令完成", "")
+        DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "服务" + type + "控制 👩‍💻", typeText + " \n 执行控制命令完成 ✅", "")
     }
 
     /**
