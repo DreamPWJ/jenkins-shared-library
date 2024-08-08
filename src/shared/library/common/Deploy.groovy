@@ -145,6 +145,7 @@ class Deploy implements Serializable {
                 command = "docker restart " + dockerContainerName
             }
             // 执行控制命令
+            println "${ctx.remote.host}"
             ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} ' " + command + " ' "
             // 循环串行执行多机分布式部署
             if (!ctx.remote_worker_ips.isEmpty()) {
