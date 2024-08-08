@@ -3,8 +3,8 @@
 # 数据库健康状态检查并自我修复
 
 # MySQL服务器配置
-DB_SSH_IP="172.16.100.185" # 数据主机SSH IP
-DB_HOST="localhost"  # 数据库连接地址 可能是负载均衡地址
+DB_SSH_IP="172.16.0.1" # 数据主机SSH IP 用于远程SSH执行数据库控制命令
+DB_HOST="172.16.0.1"   # 数据库连接地址 可能是负载均衡地址
 DB_PORT="3306"
 DB_USER="root"
 DB_PASS="password"
