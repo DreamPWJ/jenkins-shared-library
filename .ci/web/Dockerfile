@@ -21,9 +21,9 @@ ARG NPM_PACKAGE_FOLDER
 ARG PROJECT_NAME
 ARG WEB_STRIP_COMPONENTS
 
-# 拷贝自定义配置文件和SSL安全证书到指定目录
+# 拷贝自定义配置文件
 COPY  default.conf /etc/nginx/conf.d/
-#COPY  ssl/* /etc/nginx/ssl/
+COPY  nginx.conf   /etc/nginx/
 
 # 删除之前的部署文件
 #RUN rm -rf /usr/share/nginx/html/*

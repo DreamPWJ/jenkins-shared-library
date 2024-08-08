@@ -42,9 +42,10 @@ def call(String type = 'web-java', Map map) {
             //agent { label "${map.jenkins_node}" }
 
             parameters {
-                choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback],
+                choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback, GlobalVars.start, GlobalVars.stop, GlobalVars.restart],
                         description: '选择部署方式  1. ' + GlobalVars.release + '发布 2. ' + GlobalVars.rollback +
-                                '回滚(基于jenkins归档方式回滚选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚请选择默认的' + GlobalVars.release + ')')
+                                '回滚(基于jenkins归档方式回滚选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚请选择默认的' + GlobalVars.release + ') ' +
+                                ' 3. ' + GlobalVars.start + '启动服务 4. ' + GlobalVars.stop + '停止服务 5. ' + GlobalVars.restart + '重启服务')
                 choice(name: 'MONOREPO_PROJECT_NAME', choices: "${MONOREPO_PROJECT_NAMES}",
                         description: "选择MonoRepo单体式统一仓库项目名称, ${GlobalVars.defaultValue}选项是MultiRepo多体式独立仓库或未配置, 大统一单体式仓库流水线可减少构建时间和磁盘空间")
                 gitParameter(name: 'GIT_BRANCH', type: 'PT_BRANCH', defaultValue: "${BRANCH_NAME}", selectedValue: "DEFAULT",
@@ -649,6 +650,40 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                 }
+                stage('Docker启停重服务') {
+                    when {
+                        beforeAgent true
+                        expression {
+                            return (IS_K8S_DEPLOY == false && ("${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}"))
+                        }
+                    }
+                    steps {
+                        script {
+                            controlService(map)
+                        }
+                    }
+                }
+                stage('K8S启停重服务') {
+                    when {
+                        beforeAgent true
+                        expression {
+                            return (IS_K8S_DEPLOY == true && ("${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}"))
+                        }
+                    }
+                    agent {
+                        docker {
+                            // 构建完成自动删除容器
+                            image "panweiji/k8s:latest"
+                            // args " -v "
+                            reuseNode true // 使用根节点
+                        }
+                    }
+                    steps {
+                        script {
+                            controlService(map)
+                        }
+                    }
+                }
 
                 stage('制品仓库') {
                     when {
@@ -803,7 +838,8 @@ def getInitParams(map) {
     // 是否灰度发布  金丝雀发布  A/B测试
     IS_K8S_CANARY_DEPLOY = jsonParams.IS_K8S_CANARY_DEPLOY ? jsonParams.IS_K8S_CANARY_DEPLOY : params.IS_K8S_CANARY_DEPLOY
     IS_K8S_DEPLOY = jsonParams.IS_K8S_DEPLOY ? jsonParams.IS_K8S_DEPLOY : false // 是否K8S集群部署
-    IS_SERVERLESS_DEPLOY = jsonParams.IS_SERVERLESS_DEPLOY ? jsonParams.IS_SERVERLESS_DEPLOY : false // 是否Serverless发布
+    IS_SERVERLESS_DEPLOY = jsonParams.IS_SERVERLESS_DEPLOY ? jsonParams.IS_SERVERLESS_DEPLOY : false
+    // 是否Serverless发布
     IS_STATIC_RESOURCE = jsonParams.IS_STATIC_RESOURCE ? jsonParams.IS_STATIC_RESOURCE : false // 是否静态web资源
     IS_UPLOAD_OSS = jsonParams.IS_UPLOAD_OSS ? jsonParams.IS_UPLOAD_OSS : false // 是否构建产物上传到OSS
     // K8s集群业务应用是否使用Session 做亲和度关联
@@ -1190,7 +1226,8 @@ def nodeBuildProject() {
                                 // 如果包404下载失败  可以更换官方镜像源重新下载
                                 // Node.setOfficialMirror(this)
                             }
-                            if (Git.isExistsChangeFile(this) || retryCount >= 2) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
+                            if (Git.isExistsChangeFile(this) || retryCount >= 2) {
+                                // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
                                 println("安装依赖 📥")
                                 // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱但依赖lock文件
                                 sh " npm ci || pnpm install || npm install || yarn install "
@@ -1910,6 +1947,13 @@ def genQRCode(map) {
             println error.getMessage()
         }
     }
+}
+
+/**
+ * 控制服务 启动 停止 重启等
+ */
+def controlService(map) {
+    Deploy.controlService(this, map)
 }
 
 /**

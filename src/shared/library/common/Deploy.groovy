@@ -100,4 +100,101 @@ class Deploy implements Serializable {
         }
     }
 
+    /**
+     * 控制服务 启动 停止 重启等
+     */
+    static def controlService(ctx, map) {
+        // 多服务器命令控制
+        if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
+            // 多个K8s集群同时循环滚动部署
+            "${map.k8s_credentials_ids}".trim().split(",").each { k8s_credentials_id ->
+                // KUBECONFIG变量为k8s中kubectl命令的yaml配置授权访问文件内容 数据保存为Jenkins的“Secret file”类型的凭据，用credentials方法从凭据中获取
+                ctx.withCredentials([ctx.file(credentialsId: "${k8s_credentials_id}", variable: 'KUBECONFIG')]) {
+                    // ctx.sh "kubectl version"
+                    ctx.println("K8S服务方式 控制服务 启动 停止 重启等")
+                    def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
+                    if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
+                        ctx.println("启动服务: " + deploymentName)
+                        startService(ctx, map)
+                    }
+                    if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
+                        ctx.println("停止服务: " + deploymentName)
+                        stopService(ctx, map)
+                    }
+                    if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
+                        ctx.println("重启服务: " + deploymentName)
+                        restartService(ctx, map)
+                    }
+                }
+            }
+        } else {
+            // Docker服务方式
+            ctx.println("Docker服务方式 控制服务 启动 停止 重启等")
+            def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
+            def command = ""
+            if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
+                ctx.println("启动服务: " + dockerContainerName)
+                command = "docker start " + dockerContainerName
+            }
+            if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
+                ctx.println("停止服务: " + dockerContainerName)
+                command = "docker stop " + dockerContainerName
+            }
+            if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
+                ctx.println("重启服务: " + dockerContainerName)
+                command = "docker restart " + dockerContainerName
+            }
+            // 多个服务循环执行命令
+            ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} ' " + command + " ' "
+        }
+    }
+
+    /**
+     * 启动服务
+     */
+    static def startService(ctx, map) {
+        if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
+            // K8s服务方式
+            def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
+            ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=" + "${ctx.K8S_POD_REPLICAS}"
+        } else {
+            // Docker服务方式
+            def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
+            ctx.sh " docker start  " + dockerContainerName
+        }
+    }
+
+    /**
+     * 关闭服务
+     */
+    static def stopService(ctx, map) {
+        if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
+            // K8s服务方式
+            def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
+            ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=0 "
+        } else {
+            // Docker服务方式
+            def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
+            ctx.sh " docker stop " + dockerContainerName
+        }
+    }
+
+    /**
+     * 重启服务
+     */
+    static def restartService(ctx, map) {
+        if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
+            // K8s服务方式
+            def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
+            ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=0 "
+            ctx.sleep 3
+            ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=" + "${ctx.K8S_POD_REPLICAS}"
+        } else {
+            // Docker服务方式
+            def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
+            ctx.sh " docker restart " + dockerContainerName
+        }
+    }
+
+
 }

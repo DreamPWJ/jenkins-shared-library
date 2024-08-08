@@ -1,5 +1,5 @@
 # Author: 潘维吉
-# Description: 云原生K8S部署应用yaml核心通用配置文件   同时部署Deployment与Service服务
+# Description: 云原生K8S部署应用yaml核心通用配置文件 不同项目传入动态传参复用  同时部署Deployment与Service服务
 
 apiVersion: apps/v1
 kind: Deployment
