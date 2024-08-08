@@ -6,13 +6,13 @@
 server {
 location ~ .*\.(gif|jpg|jpeg|png|ico|cur|heic|webp|avif|pdf|doc|docx|xlsx|xls|md|mdx)$ {
     root /usr/share/nginx/html/images/;
-    expires 30d;
+    expires 7d;
     access_log off;
 }
 
 location ~ .*\.(json|txt)$ {
     root /usr/share/nginx/html/;
-    expires 30d;
+    expires 7d;
     access_log off;
 }
 }

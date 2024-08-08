@@ -35,7 +35,7 @@ spec:
           imagePullPolicy: Always       # 强制拉取线上镜像
           resources: # 合理设置内存 防止内存溢出 导致整个服务器宕机 如0/3 nodes are available: 3 Insufficient memory
             requests:
-              cpu: 200m  # cpu请求 容器启动的初始可用数量
+              cpu: 100m  # cpu请求 容器启动的初始可用数量
               memory: 256Mi # 内存请求 容器启动的初始可用数量 不能大于limits设置值
             limits:
               # m是千分之一  100m是0.1个CPU  限制最大cpu防止资源溢出 导致整个集群全部不可用
@@ -98,21 +98,29 @@ spec:
             failureThreshold: 3
 
       restartPolicy: Always   # 停机后总是不断重启
-      #     affinity: # 使用工作负载反亲和特性，让Pod之间尽量“互斥”，能尽量均匀的分布在各node节点上  参考文档： https://support.huaweicloud.com/cce_faq/cce_faq_00260.html
-      affinity: # 处理反亲和导致第一次部署后重复部署的冲突问题 滚动部署旧pod存在导致
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                    - key: app            # node节点标签方式 kubectl get nodes --show-labels 与 kubectl label nodes <your-node-name> nodeLabelName=node1
-                      operator: In        # NotIn 和 DoesNotExist 可用来实现节点反亲和性行为。 你也可以使用节点污点 将 Pod 从特定节点上驱逐
-                      values:
-                        - {APP_COMMON_NAME}
-                namespaces:
-                  - default
-                topologyKey: kubernetes.io/hostname         # pod不会调度到同一节点 在节点上起作用
+      # 新特性topologySpreadConstraints代替affinity 实现均匀部署pod到不同的node 拓扑分布约束 在K8s v1.18版本进入beta阶段默认启用 参考文档： https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/topology-spread-constraints/
+      topologySpreadConstraints:    # 配置一个拓扑分布约束
+        - maxSkew: 1                           #  Pod 可能被不均匀分布的程度
+          topologyKey: kubernetes.io/hostname  # 按照节点来分散 Pod
+          whenUnsatisfiable: ScheduleAnyway     # 当无法满足约束条件时的行为。可选值为 DoNotSchedule不调度 或 ScheduleAnyway 无论如何都调度
+          labelSelector:
+            matchLabels:
+              app: {APP_COMMON_NAME}
+      # affinity: # 使用工作负载反亲和特性，让Pod之间尽量“互斥”，能尽量均匀的分布在各node节点上  参考文档： https://support.huaweicloud.com/cce_faq/cce_faq_00260.html
+#      affinity: # 处理反亲和导致第一次部署后重复部署的冲突问题 滚动部署旧pod存在导致
+#        podAntiAffinity:
+#          preferredDuringSchedulingIgnoredDuringExecution:
+#            - weight: 100
+#              podAffinityTerm:
+#                labelSelector:
+#                  matchExpressions:
+#                    - key: app            # node节点标签方式 kubectl get nodes --show-labels 与 kubectl label nodes <your-node-name> nodeLabelName=node1
+#                      operator: In        # NotIn 和 DoesNotExist 可用来实现节点反亲和性行为。 你也可以使用节点污点 将 Pod 从特定节点上驱逐
+#                      values:
+#                        - {APP_COMMON_NAME}
+#                namespaces:
+#                  - default
+#                topologyKey: kubernetes.io/hostname         # pod不会调度到同一节点 在节点上起作用
       # 私有镜像拉取密钥配置   参考文档：https://kubernetes.io/docs/concepts/containers/images/#creating-a-secret-with-a-docker-config
       # kubectl create secret docker-registry panweiji2022 --docker-server=registry.cn-qingdao.aliyuncs.com  --docker-username=2000160180 --docker-password=panweiji@2022--docker-email=406798106@qq.com --namespace=default
       imagePullSecrets:
