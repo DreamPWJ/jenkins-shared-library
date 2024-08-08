@@ -118,9 +118,17 @@ class Deploy implements Serializable {
             ctx.println("Docker服务方式 控制服务 启动 停止 重启等")
             def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
             def command = ""
+            if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
+                ctx.println("启动服务: " + dockerContainerName)
+                command = "docker start " + dockerContainerName
+            }
             if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
-                ctx.println("Docker服务方式  停止服务: " + dockerContainerName)
-                command = " docker stop " + dockerContainerName
+                ctx.println("停止服务: " + dockerContainerName)
+                command = "docker stop " + dockerContainerName
+            }
+            if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
+                ctx.println("重启服务: " + dockerContainerName)
+                command = "docker restart " + dockerContainerName
             }
             ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} ' " + command + " ' "
         }

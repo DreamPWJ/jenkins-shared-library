@@ -658,17 +658,16 @@ def call(String type = 'web-java', Map map) {
                             return ("${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}")
                         }
                     }
-                    agent {
+ /*                   agent {
                         docker {
                             //   构建完成自动删除容器
                             image "panweiji/k8s:latest"
                             // args " "
                             reuseNode true // 使用根节点
                         }
-                    }
+                    }*/
                     steps {
                         script {
-                            echo "启动、停止、重启服务"
                             controlService(map)
                         }
                     }
