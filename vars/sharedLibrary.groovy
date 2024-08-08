@@ -655,7 +655,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         expression {
-                            return GlobalVars.start == params.DEPLOY_MODE || GlobalVars.start == params.DEPLOY_MODE || GlobalVars.restart == params.DEPLOY_MODE
+                            return (GlobalVars.start == params.DEPLOY_MODE || GlobalVars.start == params.DEPLOY_MODE || GlobalVars.restart == params.DEPLOY_MODE)
                         }
                     }
                     agent {
@@ -668,6 +668,7 @@ def call(String type = 'web-java', Map map) {
                     }
                     steps {
                         script {
+                            echo "启动、停止、重启服务"
                             controlService(map)
                         }
                     }
