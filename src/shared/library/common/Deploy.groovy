@@ -130,6 +130,7 @@ class Deploy implements Serializable {
                 ctx.println("重启服务: " + dockerContainerName)
                 command = "docker restart " + dockerContainerName
             }
+            // 多个服务循环执行命令
             ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} ' " + command + " ' "
         }
     }
