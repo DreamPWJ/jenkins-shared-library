@@ -655,7 +655,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         expression {
-                            return (GlobalVars.start == params.DEPLOY_MODE || GlobalVars.start == params.DEPLOY_MODE || GlobalVars.restart == params.DEPLOY_MODE)
+                            return ("${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}")
                         }
                     }
                     agent {
@@ -957,7 +957,6 @@ def getInitParams(map) {
     // 计算应用启动时间
     healthCheckTimeDiff = "未知"
 
-    println("DEPLOY_MODE: " + params.DEPLOY_MODE)
 }
 
 /**
