@@ -42,7 +42,7 @@ def call(String type = 'web-java', Map map) {
             //agent { label "${map.jenkins_node}" }
 
             parameters {
-                choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback],
+                choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback, GlobalVars.start, GlobalVars.stop, GlobalVars.restart],
                         description: '选择部署方式  1. ' + GlobalVars.release + '发布 2. ' + GlobalVars.rollback +
                                 '回滚(基于jenkins归档方式回滚选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚请选择默认的' + GlobalVars.release + ')')
                 choice(name: 'MONOREPO_PROJECT_NAME', choices: "${MONOREPO_PROJECT_NAMES}",
@@ -646,6 +646,20 @@ def call(String type = 'web-java', Map map) {
                             gitTagLog()
                             // 钉钉通知变更记录
                             dingNotice(map, 3)
+                        }
+                    }
+                }
+
+                stage('启停重服务') {
+                    when {
+                        beforeAgent true
+                        expression {
+                            return GlobalVars.start == params.DEPLOY_MODE || GlobalVars.start == params.DEPLOY_MODE || GlobalVars.restart == params.DEPLOY_MODE
+                        }
+                    }
+                    steps {
+                        script {
+                            controlService(map)
                         }
                     }
                 }
@@ -1910,6 +1924,13 @@ def genQRCode(map) {
             println error.getMessage()
         }
     }
+}
+
+/**
+ * 控制服务 启动 停止 重启等
+ */
+def controlService(map) {
+    Deploy.controlService(this, map)
 }
 
 /**
