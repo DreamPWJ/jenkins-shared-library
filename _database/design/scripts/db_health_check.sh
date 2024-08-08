@@ -3,7 +3,8 @@
 # 数据库健康状态检查并自我修复
 
 # MySQL服务器配置
-DB_HOST="localhost"
+DB_SSH_IP="172.16.100.185" # 数据主机SSH IP
+DB_HOST="localhost"  # 数据库连接地址 可能是负载均衡地址
 DB_PORT="3306"
 DB_USER="root"
 DB_PASS="password"
@@ -19,8 +20,8 @@ DB_NAME="db_name"
 # 尝试连接数据库并执行简单查询
 QUERY="SELECT 1"
 if ! mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$DB_PASS -e "$QUERY" < /dev/null; then
-    echo "无法连接到数据库"
-    ssh root$DB_HOST ' systemctl restart mysql.service ' # 远程重启服务
+    echo "无法连接到数据库, 当前时间: $(date +'%Y-%m-%d %H:%M:%S')"
+    ssh root$DB_SSH_IP ' systemctl restart mysql.service ' # 远程重启服务
     # systemctl restart mysql.service
     exit 1
 fi
@@ -40,7 +41,8 @@ fi
 #     exit 1
 # fi
 
-echo "数据库健康检查通过"
+echo "数据库健康检查通过, 当前时间: $(date +'%Y-%m-%d %H:%M:%S')"
+
 exit 0
 
 
