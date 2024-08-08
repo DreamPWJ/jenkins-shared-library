@@ -677,13 +677,13 @@ def call(String type = 'web-java', Map map) {
                             args " -v /root/.ssh/id_rsa:/root/.ssh/id_rsa "
                             reuseNode true // 使用根节点
                         }
-
-                        steps {
-                            script {
-                                controlService(map)
-                            }
+                    }
+                    steps {
+                        script {
+                            controlService(map)
                         }
                     }
+
                 }
                 stage('制品仓库') {
                     when {
