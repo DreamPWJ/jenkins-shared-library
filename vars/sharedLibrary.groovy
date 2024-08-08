@@ -654,7 +654,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         expression {
-                            return (IS_K8S_DEPLOY == false || "${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}")
+                            return (IS_K8S_DEPLOY == false && ("${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}"))
                         }
                     }
                     steps {
@@ -667,7 +667,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         expression {
-                            return (IS_K8S_DEPLOY == true || "${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}")
+                            return (IS_K8S_DEPLOY == true && ("${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}"))
                         }
                     }
                     agent {
@@ -683,8 +683,8 @@ def call(String type = 'web-java', Map map) {
                             controlService(map)
                         }
                     }
-
                 }
+
                 stage('制品仓库') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
