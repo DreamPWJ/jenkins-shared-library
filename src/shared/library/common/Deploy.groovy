@@ -167,7 +167,8 @@ class Deploy implements Serializable {
         }
 
         // 控制完成钉钉通知大家
-        DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "服务" + type + "控制 👩‍💻", typeText + " \n 执行控制命令完成 ✅", "")
+        DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "执行服务" + type + "控制 👩‍💻", typeText + "  ##### 执行控制命令完成 ✅  " +
+                " ###### 执行人: ${ctx.BUILD_USER}, ###### 执行时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
     }
 
     /**

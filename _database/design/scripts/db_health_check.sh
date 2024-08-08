@@ -10,17 +10,18 @@ DB_PASS="password"
 DB_NAME="db_name"
 
 # 检查数据库服务是否运行
-if ! systemctl is-active mysql.service > /dev/null 2>&1; then
-    echo "MySQL服务未运行"
-    systemctl start mysql.service
-    exit 1
-fi
+#if ! systemctl is-active mysql.service > /dev/null 2>&1; then
+#    echo "MySQL服务未运行"
+#    systemctl start mysql.service
+#    exit 1
+#fi
 
 # 尝试连接数据库并执行简单查询
 QUERY="SELECT 1"
 if ! mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$DB_PASS -e "$QUERY" < /dev/null; then
     echo "无法连接到数据库"
-    systemctl restart mysql.service
+    ssh root$DB_HOST ' systemctl restart mysql.service ' # 远程重启服务
+    # systemctl restart mysql.service
     exit 1
 fi
 
