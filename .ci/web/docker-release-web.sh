@@ -82,6 +82,7 @@ cd /${deploy_folder} && ./docker-common.sh mkdir_deploy_file ${deploy_file}
 
 # 复制配置文件
 cd /${deploy_folder}/web && cp -p default.conf ${deploy_file}/
+cd /${deploy_folder}/web && cp -p nginx.conf ${deploy_file}/
 #cp -r ssl/ ${deploy_file}/
 
 # 进入部署文件

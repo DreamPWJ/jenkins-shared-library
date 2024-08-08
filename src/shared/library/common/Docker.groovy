@@ -129,6 +129,7 @@ class Docker implements Serializable {
                 } else {
                     // 前端静态资源部署
                     ctx.sh """  cp -p ${ctx.env.WORKSPACE}/ci/.ci/web/default.conf ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} &&
+                            cp -p ${ctx.env.WORKSPACE}/ci/.ci/web/nginx.conf ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} &&
                             cd ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} && pwd && \
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
                             --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg WEB_STRIP_COMPONENTS="${ctx.WEB_STRIP_COMPONENTS}" \
