@@ -111,6 +111,20 @@ class Deploy implements Serializable {
                 // KUBECONFIG变量为k8s中kubectl命令的yaml配置授权访问文件内容 数据保存为Jenkins的“Secret file”类型的凭据，用credentials方法从凭据中获取
                 ctx.withCredentials([ctx.file(credentialsId: "${k8s_credentials_id}", variable: 'KUBECONFIG')]) {
                     ctx.sh "kubectl version"
+                    ctx.println("K8S服务方式 控制服务 启动 停止 重启等")
+                    def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
+                    if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
+                        ctx.println("启动服务: " + deploymentName)
+                        startService(ctx, map)
+                    }
+                    if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
+                        ctx.println("停止服务: " + deploymentName)
+                        stopService(ctx, map)
+                    }
+                    if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
+                        ctx.println("重启服务: " + deploymentName)
+                        restartService(ctx, map)
+                    }
                 }
             }
         } else {
