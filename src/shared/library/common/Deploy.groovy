@@ -2,6 +2,7 @@ package shared.library.common
 
 import shared.library.GlobalVars
 import shared.library.Utils
+import shared.library.common.*
 
 /**
  * @author 潘维吉
@@ -104,6 +105,23 @@ class Deploy implements Serializable {
      * 控制服务 启动 停止 重启等
      */
     static def controlService(ctx, map) {
+        def type = "" // 控制类型
+        def typeText = "" // 控制类型文案
+        def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}" // docker容器名称
+        def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"  // kubernetes deployment名称
+
+        if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
+            type = "启动"
+        }
+        if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
+            type = "停止"
+        }
+        if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
+            type = "重启"
+        }
+        typeText = type + "服务: " + "${ctx.IS_K8S_DEPLOY}" == 'true' ? deploymentName : dockerContainerName
+        ctx.println(typeText)
+
         // 多服务器命令控制
         if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
             // 多个K8s集群同时循环滚动部署
@@ -112,17 +130,13 @@ class Deploy implements Serializable {
                 ctx.withCredentials([ctx.file(credentialsId: "${k8s_credentials_id}", variable: 'KUBECONFIG')]) {
                     // ctx.sh "kubectl version"
                     ctx.println("K8S服务方式控制服务 启动、停止、重启等")
-                    def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
                     if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
-                        ctx.println("K8S启动服务: " + deploymentName)
                         startService(ctx, map)
                     }
                     if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
-                        ctx.println("K8S停止服务: " + deploymentName)
                         stopService(ctx, map)
                     }
                     if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
-                        ctx.println("K8S重启服务: " + deploymentName)
                         restartService(ctx, map)
                     }
                 }
@@ -130,18 +144,14 @@ class Deploy implements Serializable {
         } else {
             // Docker服务方式
             ctx.println("Docker服务方式控制服务 启动、停止、重启等")
-            def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
             def command = ""
             if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
-                ctx.println("Docker启动服务: " + dockerContainerName)
                 command = "docker start " + dockerContainerName
             }
             if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
-                ctx.println("Docker停止服务: " + dockerContainerName)
                 command = "docker stop " + dockerContainerName
             }
             if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
-                ctx.println("Docker重启服务: " + dockerContainerName)
                 command = "docker restart " + dockerContainerName
             }
             // 执行控制命令
@@ -157,6 +167,7 @@ class Deploy implements Serializable {
         }
 
         // 控制完成钉钉通知大家
+        DingTalk.notice(ctx, "${ctx.credentialsId}", "服务" + type + "控制", typeText + " \n 执行控制完成", "")
     }
 
     /**
