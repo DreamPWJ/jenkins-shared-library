@@ -957,6 +957,7 @@ def getInitParams(map) {
     // 计算应用启动时间
     healthCheckTimeDiff = "未知"
 
+    println("DEPLOY_MODE: " + params.DEPLOY_MODE)
 }
 
 /**
