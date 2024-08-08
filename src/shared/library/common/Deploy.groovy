@@ -160,6 +160,9 @@ class Deploy implements Serializable {
             // 循环串行执行多机分布式部署
             if (!ctx.remote_worker_ips.isEmpty()) {
                 ctx.remote_worker_ips.each { ip ->
+                    if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
+                        ctx.sleep 10  // 重启多个服务 防止服务不可用等待顺序重启
+                    }
                     ctx.println ip
                     ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ip} ' " + command + " ' "
                 }
@@ -167,8 +170,8 @@ class Deploy implements Serializable {
         }
 
         // 控制完成钉钉通知大家
-        DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "执行服务" + type + "控制 👩‍💻", typeText + "  ##### 执行控制命令完成 ✅  " +
-                " ###### 执行人: ${ctx.BUILD_USER}, ###### 执行时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
+        DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "执行服务" + type + "控制 👩‍💻", typeText + "\n  ##### 执行控制命令完成 ✅  " +
+                "\n  ###### 执行人: ${ctx.BUILD_USER} \n ###### 执行时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
     }
 
     /**
