@@ -161,7 +161,7 @@ class Deploy implements Serializable {
             if (!ctx.remote_worker_ips.isEmpty()) {
                 ctx.remote_worker_ips.each { ip ->
                     if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
-                        ctx.sleep 10  // 重启多个服务 防止服务不可用等待顺序重启
+                        ctx.sleep 20  // 重启多个服务 防止服务不可用等待顺序重启
                     }
                     ctx.println ip
                     ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ip} ' " + command + " ' "
