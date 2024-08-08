@@ -21,7 +21,7 @@ DB_NAME="db_name"
 QUERY="SELECT 1"
 if ! mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$DB_PASS -e "$QUERY" < /dev/null; then
     echo "无法连接到数据库, 当前时间: $(date +'%Y-%m-%d %H:%M:%S')"
-    ssh root$DB_SSH_IP ' systemctl restart mysql.service ' # 远程重启服务
+    ssh root@$DB_SSH_IP ' systemctl restart mysql.service ' # 远程重启服务
     # systemctl restart mysql.service
     exit 1
 fi
