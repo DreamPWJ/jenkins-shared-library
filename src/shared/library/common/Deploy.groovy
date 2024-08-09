@@ -2,6 +2,7 @@ package shared.library.common
 
 import shared.library.GlobalVars
 import shared.library.Utils
+import shared.library.common.*
 
 /**
  * @author 潘维吉
@@ -104,6 +105,23 @@ class Deploy implements Serializable {
      * 控制服务 启动 停止 重启等
      */
     static def controlService(ctx, map) {
+        def type = "" // 控制类型
+        def typeText = "" // 控制类型文案
+        def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}" // docker容器名称
+        def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"  // kubernetes deployment名称
+
+        if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
+            type = "启动"
+        }
+        if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
+            type = "停止"
+        }
+        if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
+            type = "重启"
+        }
+        typeText = type + "服务: " + ("${ctx.IS_K8S_DEPLOY}" == 'true' ? deploymentName : dockerContainerName)
+        ctx.println(typeText)
+
         // 多服务器命令控制
         if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
             // 多个K8s集群同时循环滚动部署
@@ -111,37 +129,29 @@ class Deploy implements Serializable {
                 // KUBECONFIG变量为k8s中kubectl命令的yaml配置授权访问文件内容 数据保存为Jenkins的“Secret file”类型的凭据，用credentials方法从凭据中获取
                 ctx.withCredentials([ctx.file(credentialsId: "${k8s_credentials_id}", variable: 'KUBECONFIG')]) {
                     // ctx.sh "kubectl version"
-                    ctx.println("K8S服务方式 控制服务 启动 停止 重启等")
-                    def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
+                    ctx.println("K8S服务方式控制服务 启动、停止、重启等")
                     if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
-                        ctx.println("K8S启动服务: " + deploymentName)
                         startService(ctx, map)
                     }
                     if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
-                        ctx.println("K8S停止服务: " + deploymentName)
                         stopService(ctx, map)
                     }
                     if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
-                        ctx.println("K8S重启服务: " + deploymentName)
                         restartService(ctx, map)
                     }
                 }
             }
         } else {
             // Docker服务方式
-            ctx.println("Docker服务方式 控制服务 启动 停止 重启等")
-            def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
+            ctx.println("Docker服务方式控制服务 启动、停止、重启等")
             def command = ""
             if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
-                ctx.println("Docker启动服务: " + dockerContainerName)
                 command = "docker start " + dockerContainerName
             }
             if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
-                ctx.println("Docker停止服务: " + dockerContainerName)
                 command = "docker stop " + dockerContainerName
             }
             if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
-                ctx.println("Docker重启服务: " + dockerContainerName)
                 command = "docker restart " + dockerContainerName
             }
             // 执行控制命令
@@ -149,14 +159,34 @@ class Deploy implements Serializable {
             ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} ' " + command + " ' "
             // 循环串行执行多机分布式部署
             if (!ctx.remote_worker_ips.isEmpty()) {
+                if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
+                    ctx.timeout(time: 5, unit: 'MINUTES') {
+                        def healthCheckMsg = ctx.sh(
+                                script: "ssh  ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} ' cd /${ctx.DEPLOY_FOLDER}/ && ./health-check.sh -a ${ctx.PROJECT_TYPE} -b http://${ctx.remote.host}:${ctx.SHELL_HOST_PORT} '",
+                                returnStdout: true).trim()
+                        ctx.println "${healthCheckMsg}"
+                    }
+                }
                 ctx.remote_worker_ips.each { ip ->
                     ctx.println ip
                     ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ip} ' " + command + " ' "
+                    if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
+                        // ctx.sleep 30  // 重启多个服务 防止服务不可用等待顺序重启
+                        // 健康检测  判断服务是否启动成功
+                        ctx.timeout(time: 5, unit: 'MINUTES') {  // health-check.sh有检测超时时间 timeout为防止shell脚本超时失效兼容处理
+                            def healthCheckMsg = ctx.sh(
+                                    script: "ssh  ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ip} ' cd /${ctx.DEPLOY_FOLDER}/ && ./health-check.sh -a ${ctx.PROJECT_TYPE} -b http://${ip}:${ctx.SHELL_HOST_PORT} '",
+                                    returnStdout: true).trim()
+                            ctx.println "${healthCheckMsg}"
+                        }
+                    }
                 }
             }
         }
 
         // 控制完成钉钉通知大家
+        DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "[${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}](${ctx.env.JOB_URL}) 执行服务" + type + "控制 👩‍💻", typeText + "\n  ##### 执行控制命令完成 ✅  " +
+                "\n  ###### 执行人: ${ctx.BUILD_USER} \n ###### 完成时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
     }
 
     /**
@@ -175,7 +205,7 @@ class Deploy implements Serializable {
     }
 
     /**
-     * 关闭服务
+     * 停止服务
      */
     static def stopService(ctx, map) {
         if ("${ctx.IS_K8S_DEPLOY}" == 'true') {

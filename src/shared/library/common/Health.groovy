@@ -11,10 +11,10 @@ class Health implements Serializable {
     /**
      * 健康探测
      */
-    static def check(ctx) {
+    static def check(ctx, url) {
         ctx.retry(20) { // 闭包内脚本重复执行次数
             ctx.script {
-                ctx.sh script: 'curl http://panweiji.com', returnStatus: true
+                ctx.sh script: 'curl ' + url, returnStatus: true
                 ctx.sleep(time: 5, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
             }
         }
