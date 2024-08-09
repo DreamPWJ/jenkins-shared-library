@@ -160,12 +160,16 @@ class Deploy implements Serializable {
             // 循环串行执行多机分布式部署
             if (!ctx.remote_worker_ips.isEmpty()) {
                 ctx.remote_worker_ips.each { ip ->
-                    if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
-                        ctx.sleep 30  // 重启多个服务 防止服务不可用等待顺序重启
-                        // curl 判断docker服务是否启动成功
-                        // Health.check(ctx, "http://" + dockerContainerName + "")
-                    }
                     ctx.println ip
+                    if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
+                        // ctx.sleep 30  // 重启多个服务 防止服务不可用等待顺序重启
+                        // 健康检测  判断服务是否启动成功
+                        ctx.timeout(time: 5, unit: 'MINUTES') {  // health-check.sh有检测超时时间 timeout为防止shell脚本超时失效兼容处理
+                            healthCheckMsg = ctx.sh(
+                                    script: "ssh  ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ip} ' cd /${ctx.DEPLOY_FOLDER}/ && ./health-check.sh -a ${ctx.PROJECT_TYPE} -b http://${ip}:${ctx.SHELL_HOST_PORT} '",
+                                    returnStdout: true).trim()
+                        }
+                    }
                     ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ip} ' " + command + " ' "
                 }
             }

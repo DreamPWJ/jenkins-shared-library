@@ -43,6 +43,23 @@ fi
 
 echo "数据库健康检查通过, 当前时间: $(date +'%Y-%m-%d %H:%M:%S')"
 
+# 文件大于多少时执行删除
+# 删除的文件名称
+FILE_NAME=db-health-check.log
+# 定义阈值 MB
+THRESHOLD_MB=10
+# 获取文件大小（以 MB 为单位）
+FILE_SIZE_MB=$(du -m $FILE_NAME | cut -f1)
+
+# 检查文件大小是否超过阈值
+if [ "$FILE_SIZE_MB" -gt "$THRESHOLD_MB" ]; then
+    # 打印通知信息
+    echo "Deleting file larger than $THRESHOLD_MB MB: $FILE_NAME"
+    # 删除文件
+    rm $FILE_NAME
+fi
+
+
 exit 0
 
 
