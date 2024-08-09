@@ -45,7 +45,9 @@ echo "数据库健康检查通过, 当前时间: $(date +'%Y-%m-%d %H:%M:%S')"
 
 # 文件大于多少时执行删除
 # 删除的文件名称
+cd /my
 FILE_NAME=db-health-check.log
+chmod +x $FILE_NAME
 # 定义阈值 MB
 THRESHOLD_MB=10
 # 获取文件大小（以 MB 为单位）
