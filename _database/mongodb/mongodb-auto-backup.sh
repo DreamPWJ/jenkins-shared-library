@@ -55,6 +55,7 @@ find $TAR_DIR/ -mtime +$DAYS -delete
 # 备份恢复数据命令
 # mongorestore -h 127.0.0.1 --port 27017 -u root -p 123456 -d db_name --authenticationDatabase admin  /my/mongodb/backup/db_name/
 
+
 # crontab -e
 # MySQL数据库自动化定时备份
 # 0 */1 * * * /bin/bash /my/backup/mongodb-auto-backup.sh
