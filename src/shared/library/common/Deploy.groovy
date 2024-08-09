@@ -168,6 +168,7 @@ class Deploy implements Serializable {
                             healthCheckMsg = ctx.sh(
                                     script: "ssh  ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ip} ' cd /${ctx.DEPLOY_FOLDER}/ && ./health-check.sh -a ${ctx.PROJECT_TYPE} -b http://${ip}:${ctx.SHELL_HOST_PORT} '",
                                     returnStdout: true).trim()
+                            ctx.println "${healthCheckMsg}"
                         }
                     }
                     ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ip} ' " + command + " ' "

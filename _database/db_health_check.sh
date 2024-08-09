@@ -54,11 +54,10 @@ FILE_SIZE_MB=$(du -m $FILE_NAME | cut -f1)
 # 检查文件大小是否超过阈值
 if [ "$FILE_SIZE_MB" -gt "$THRESHOLD_MB" ]; then
     # 打印通知信息
-    echo "Deleting file larger than $THRESHOLD_MB MB: $FILE_NAME"
+    echo "Deleting file $FILE_SIZE_MB MB larger than $THRESHOLD_MB MB: $FILE_NAME"
     # 删除文件
     rm $FILE_NAME
 fi
-
 
 exit 0
 
