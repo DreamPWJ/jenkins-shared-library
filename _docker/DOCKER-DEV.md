@@ -48,7 +48,7 @@ mongo
 docker pull jenkins/jenkins:lts
 
 #### 添加挂载映射本地数据卷权限 sudo chown -R 1000:1000 /my/jenkins  将宿主机的docker命令挂载到容器中
-#### JDK11需要Oracle商业授权 JDK11配置使用jenkins/jenkins:jdk11镜像 使用openJDK
+#### 可使用Jenkins Configuration as Code Plugin保存复用配置
 sudo docker run -d --restart=always -p 8000:8080 -p 50000:50000 \
 -u root --cpus=4 -m 4096m -e JAVA_OPTS=-Duser.timezone=Asia/Shanghai \
 -v /etc/localtime:/etc/localtime:ro -v $(which bash):/bin/bash  \
