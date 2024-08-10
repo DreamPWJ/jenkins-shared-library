@@ -159,20 +159,33 @@ class Deploy implements Serializable {
             ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} ' " + command + " ' "
             // 循环串行执行多机分布式部署
             if (!ctx.remote_worker_ips.isEmpty()) {
-                ctx.remote_worker_ips.each { ip ->
-                    if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
-                        ctx.sleep 30  // 重启多个服务 防止服务不可用等待顺序重启
-                        // curl 判断docker服务是否启动成功
-                        // Health.check(ctx, "http://" + dockerContainerName + "")
+                if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
+                    ctx.timeout(time: 5, unit: 'MINUTES') {
+                        def healthCheckMsg = ctx.sh(
+                                script: "ssh  ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} ' cd /${ctx.DEPLOY_FOLDER}/ && ./health-check.sh -a ${ctx.PROJECT_TYPE} -b http://${ctx.remote.host}:${ctx.SHELL_HOST_PORT} '",
+                                returnStdout: true).trim()
+                        ctx.println "${healthCheckMsg}"
                     }
+                }
+                ctx.remote_worker_ips.each { ip ->
                     ctx.println ip
                     ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ip} ' " + command + " ' "
+                    if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
+                        // ctx.sleep 30  // 重启多个服务 防止服务不可用等待顺序重启
+                        // 健康检测  判断服务是否启动成功
+                        ctx.timeout(time: 5, unit: 'MINUTES') {  // health-check.sh有检测超时时间 timeout为防止shell脚本超时失效兼容处理
+                            def healthCheckMsg = ctx.sh(
+                                    script: "ssh  ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ip} ' cd /${ctx.DEPLOY_FOLDER}/ && ./health-check.sh -a ${ctx.PROJECT_TYPE} -b http://${ip}:${ctx.SHELL_HOST_PORT} '",
+                                    returnStdout: true).trim()
+                            ctx.println "${healthCheckMsg}"
+                        }
+                    }
                 }
             }
         }
 
         // 控制完成钉钉通知大家
-        DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "[${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}](${ctx.env.JOB_URL}) 执行服务" + type + "控制 👩‍💻", typeText + "\n  ##### 执行控制命令完成 ✅  " +
+        DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "执行" + type + "服务命令 [${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}](${ctx.env.JOB_URL})  👩‍💻 ", typeText + "\n  ##### 执行" + type + "控制命令完成 ✅  " +
                 "\n  ###### 执行人: ${ctx.BUILD_USER} \n ###### 完成时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
     }
 

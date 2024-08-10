@@ -1,4 +1,5 @@
 ### DataX离线数据同步工具/平台 异构数据源之间高效的数据同步功能
+### Canal 阿里巴巴 MySQL binlog 增量订阅 & 消费组件
 ### 阿里云DMS数据管理服务数据迁移 https://dms.aliyun.com/
 
 #### 安装DataX

@@ -7,13 +7,13 @@
 echo "Red Hat或CentOS宿主机安装MongoDB"
 
 echo "配置包管理系统"
-sudo cat <<EOF >/etc/yum.repos.d/mongodb-org-5.0.repo
-[mongodb-org-5.0]
+sudo cat <<EOF >/etc/yum.repos.d/mongodb-org-8.0.repo
+[mongodb-org-8.0]
 name=MongoDB Repository
-baseurl=https://mirrors.aliyun.com/mongodb/yum/redhat/8/mongodb-org/5.0/x86_64/
+baseurl=https://mirrors.aliyun.com/mongodb/yum/redhat/8/mongodb-org/8.0/x86_64/
 gpgcheck=1
 enabled=1
-gpgkey=https://www.mongodb.org/static/pgp/server-5.0.asc
+gpgkey=https://www.mongodb.org/static/pgp/server-8.0.asc
 EOF
 
 # 检查系统最大可打开文件数  文档 https://docs.mongodb.com/manual/reference/ulimit/
