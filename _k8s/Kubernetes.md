@@ -60,8 +60,7 @@ labels:      #自定义标签
           failureThreshold: 0
           securityContext:
           privileged:false
-          restartPolicy: [Always | Never | OnFailure]
-          #Pod的重启策略，Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Never表示不再重启该Pod
+          restartPolicy: [Always | Never | OnFailure] #Pod的重启策略，Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Never表示不再重启该Pod
           nodeSelector: object #设置NodeSelector表示将该Pod调度到包含这个label的node上，以key：value的格式指定
           imagePullSecrets:    #Pull镜像时使用的secret名称，以key：secretKey格式指定
     - name: string
@@ -133,7 +132,7 @@ kubectl create secret docker-registry <name> --docker-server=DOCKER_REGISTRY_SER
 
 ### 在IDEA内查看K8S容器日志乱码问题
 
-idea64.exe.vmoptions配置文件中添加 -Dfile.encoding=UTF-8 即可解决
+idea64.exe.vmoptions 配置文件中添加 -Dfile.encoding=UTF-8 即可解决
 
 ### K8S扩缩容和重启Pod命令
 
