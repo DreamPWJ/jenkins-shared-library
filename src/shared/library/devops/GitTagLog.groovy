@@ -29,7 +29,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
 
             try {
                 // 打版本tag  删除本地已存在tag
-                if (Utils.getShEchoResult(this, "git tag", false).toString().contains(tagVersion)) {
+                if (Utils.getShEchoResult(this, "git tag").toString().contains(tagVersion)) {
                     sh "git tag -d ${tagVersion}"
                     // 删除远程tag 重新设置相同的新tag
                     sh "git push ${userPassWordUrl} :refs/tags/${tagVersion}"
