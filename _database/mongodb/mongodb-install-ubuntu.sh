@@ -7,9 +7,9 @@
 echo "Ubuntu宿主机安装MongoDB"
 
 echo "安装平台依赖包"
-wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
+wget -qO - https://www.mongodb.org/static/pgp/server-8.0.asc | sudo apt-key add -
 sudo apt-get install -y gnupg
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/8.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
 sudo sudo apt update && apt-get update && apt-get upgrade
 
 # 检查系统最大可打开文件数  文档 https://docs.mongodb.com/manual/reference/ulimit/
@@ -61,6 +61,7 @@ sudo systemctl status mongod
 #  authorization: enabled # 开启用户访问控制
 
 # sudo systemctl restart mongod
+
 
 
 # 如果启动失败错误  --config /etc/mongod.conf (code=exited, status=14) 解决方法如下

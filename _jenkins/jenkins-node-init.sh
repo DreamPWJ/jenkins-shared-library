@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Author: 潘维吉
-# Description:  jenkins分布式节点环境初始化
+# Description:  Jenkins分布式node节点环境初始化
 
 if [[ ! $(command -v git) ]]; then
-  echo "安装git"
+  echo "安装Git"
   sudo yum update || true
   # sudo yum search git | grep -i 'git2'
   # sudo yum install -y libgit2.x86_64 || true
@@ -14,19 +14,18 @@ if [[ ! $(command -v git) ]]; then
 fi
 
 if [[ ! $(command -v java) ]]; then
-  echo "安装jdk"
-  sudo yum install -y java-11-openjdk-devel.x86_64  || true # java-1.8.0-openjdk-devel.x86_64
+  echo "安装JDK"
+  sudo yum install -y java-21-openjdk-devel.x86_64  || true # java-1.8.0-openjdk-devel.x86_64
   sudo apt update || true
-  sudo apt install -y openjdk-11-jdk || true
+  sudo apt install -y openjdk-21-jdk || true
   java -version
   which java
   # apt-get remove openjdk*
 fi
 
 if [[ ! $(command -v node) ]]; then
-  echo "安装nodejs"
-  # curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-  curl -sL https://rpm.nodesource.com/setup_20.x | sudo bash -
+  echo "安装Nodejs"
+  curl -sL https://rpm.nodesource.com/setup_22.x | sudo bash -
   yum install -y nodejs || true
   sudo apt install -y nodejs || true
   node -v && npm -v
@@ -34,10 +33,10 @@ if [[ ! $(command -v node) ]]; then
 fi
 
 if [[ ! $(command -v mvn) ]]; then
-  echo "安装maven" # export HOMEBREW_BOTTLE_DOMAIN=''
+  echo "安装Maven" # export HOMEBREW_BOTTLE_DOMAIN=''
   mkdir -p /opt/maven && cd /opt/maven
-  wget https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
-  tar -xzvf apache-maven-3.6.3-bin.tar.gz
+  wget https://archive.apache.org/dist/maven/maven-3/3.9.8/binaries/apache-maven-3.9.8-bin.tar.gz
+  tar -xzvf apache-maven-3.9.8-bin.tar.gz
 
   # 写入数据到文件输出重定向 双 >> 是追加 , 单 > 是覆盖
   # export JAVA_HOME=/usr/bin/java
@@ -46,7 +45,7 @@ if [[ ! $(command -v mvn) ]]; then
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.21.0.9-1.el7_9.x86_64
 export JRE_HOME=$JAVA_HOME/jre
 export CLASSPATH=$JAVA_HOME/lib:$JRE_HOME/lib:$CLASSPATH
-export MAVEN_HOME=/opt/maven/apache-maven-3.6.3
+export MAVEN_HOME=/opt/maven/apache-maven-3.9.8
 export PATH=$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH
 ' >>/etc/profile
 
@@ -78,13 +77,13 @@ if [[ ! $(command -v adb) ]]; then
 
   sdkmanager
   sdkmanager --list
-  #安装 Android SDK
-  sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.2" "ndk;21.0.6113669"
+  # 安装 Android SDK
+  sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.2" "ndk;27.0.12077973"
   adb --version
 
   # api-versions.xml文件不再存在
   mkdir $ANDROID_HOME/platform-tools/api/
-  cp $ANDROID_HOME/platforms/android-30/data/api-versions.xml $ANDROID_HOME/platform-tools/api/
+  cp $ANDROID_HOME/platforms/android-35/data/api-versions.xml $ANDROID_HOME/platform-tools/api/
 
   sdkmanager --update
 

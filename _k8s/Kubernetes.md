@@ -17,8 +17,7 @@ labels:      #自定义标签
 
 - name: string #必选，容器名称
   image: string #必选，容器的镜像名称
-  imagePullPolicy: [Always | Never | IfNotPresent] #获取镜像的策略 Always表示下载镜像
-  IfnotPresent表示优先使用本地镜像，否则下载镜像，Nerver表示仅使用本地镜像
+  imagePullPolicy: [Always | Never | IfNotPresent] #获取镜像的策略 Always表示总是下载最新镜像 IfNotPresent表示优先使用本地镜像，否则下载镜像，Never表示仅使用本地镜像
   command: [string]    #容器的启动命令列表，如不指定，使用打包时使用的启动命令
   args: [string]     #容器的启动命令参数列表
   workingDir: string #容器的工作目录
@@ -62,18 +61,17 @@ labels:      #自定义标签
           securityContext:
           privileged:false
           restartPolicy: [Always | Never | OnFailure]
-          #Pod的重启策略，Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Nerver表示不再重启该Pod
-          nodeSelector: obeject #设置NodeSelector表示将该Pod调度到包含这个label的node上，以key：value的格式指定
-          imagePullSecrets:    #Pull镜像时使用的secret名称，以key：secretkey格式指定
+          #Pod的重启策略，Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Never表示不再重启该Pod
+          nodeSelector: object #设置NodeSelector表示将该Pod调度到包含这个label的node上，以key：value的格式指定
+          imagePullSecrets:    #Pull镜像时使用的secret名称，以key：secretKey格式指定
     - name: string
       hostNetwork:false #是否使用主机网络模式，默认为false，如果设置为true，表示使用宿主机网络
       volumes:       #在该pod上定义共享存储卷列表
     - name: string #共享存储卷名称 （volumes类型有很多种）
-      emptyDir: {} #类型为emtyDir的存储卷，与Pod同生命周期的一个临时目录。为空值
+      emptyDir: {} #类型为emptyDir的存储卷，与Pod同生命周期的一个临时目录。为空值
       hostPath: string #类型为hostPath的存储卷，表示挂载Pod所在宿主机的目录
       path: string #Pod所在宿主机的目录，将被用于同期中mount的目录
-      secret:      #类型为secret的存储卷，挂载集群与定义的secre对象到容器内部
-      scretname: string  
+      secret:      #类型为secret的存储卷，挂载集群与定义的secret对象到容器内部
       items:
         - key: string
           path: string

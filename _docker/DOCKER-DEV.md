@@ -18,7 +18,7 @@ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock cucker/get_command_
 #### 从Docker Hub里拉取mysql镜像来部署 密码强度要求：8位及以上，包含大小写，字母，特殊符号
 docker pull mysql
 
-#### mysql docker容器启动 创建数据库密码等 跟宿主机器同样的时区配置 -v指定数据持久化存储宿主机位置  添加mysql配置参数 -v 
+#### Mysql Docker容器启动 创建数据库密码等 跟宿主机器同样的时区配置 -v指定数据持久化存储宿主机位置  添加mysql配置参数 -v 
 #### GROUP_CONCAT函数可拼接某个字段值成字符串 默认的分隔符是"," 默认最大长度为1024字节超过则会被截断 （-1为最大值或根据实际需求设置长度） 
 #### convert(数据,char) CONCAT解决乱码
 
@@ -28,15 +28,15 @@ docker pull mysql
 docker run -d --restart=always -p 3306:3306 --name mysql \
 -e MYSQL_DATABASE=design -e MYSQL_ROOT_PASSWORD=panweiji@2024 \
 -v /etc/localtime:/etc/localtime:ro -v /my/mysql/data:/var/lib/mysql \
-mysql --group_concat_max_len=1024000000 --max_connections=6000 --max_connect_errors=200 --lower_case_table_names=1
+mysql --group_concat_max_len=1024000000 --max_connections=6000 --max_connect_errors=2000 --lower_case_table_names=1
 
-#### 安装postgres数据库
+#### 安装Postgres数据库
 docker pull postgres
 
 docker run -d --restart=always  -p 5432:5432 --name postgres  -v /my/postgresql:/var/lib/postgresql -v /etc/localtime:/etc/localtime:ro  \
 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=123456 -e POSTGRES_DB=design  postgres
 
-#### 安装mongodb数据库
+#### 安装Mongodb数据库
 docker pull mongo:latest
 
 docker run -d --restart=always -p 27017:27017 \
@@ -48,7 +48,7 @@ mongo
 docker pull jenkins/jenkins:lts
 
 #### 添加挂载映射本地数据卷权限 sudo chown -R 1000:1000 /my/jenkins  将宿主机的docker命令挂载到容器中
-#### JDK11需要Oracle商业授权 JDK11配置使用jenkins/jenkins:jdk11镜像 使用openJDK
+#### 可使用Jenkins Configuration as Code Plugin保存复用配置
 sudo docker run -d --restart=always -p 8000:8080 -p 50000:50000 \
 -u root --cpus=4 -m 4096m -e JAVA_OPTS=-Duser.timezone=Asia/Shanghai \
 -v /etc/localtime:/etc/localtime:ro -v $(which bash):/bin/bash  \

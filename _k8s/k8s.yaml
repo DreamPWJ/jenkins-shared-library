@@ -32,7 +32,7 @@ spec:
       containers:
         - name: {APP_COMMON_NAME}
           image: {IMAGE_URL}:{IMAGE_TAG}
-          imagePullPolicy: Always       # 强制拉取线上镜像
+          imagePullPolicy: Always       # 获取镜像的策略 Always表示总是下载最新镜像 IfNotPresent表示优先使用本地镜像，否则下载镜像，Never表示仅使用本地镜像
           resources: # 合理设置内存 防止内存溢出 导致整个服务器宕机 如0/3 nodes are available: 3 Insufficient memory
             requests:
               cpu: 100m  # cpu请求 容器启动的初始可用数量
@@ -65,16 +65,6 @@ spec:
                 command:
                   - sleep
                   - 5s   # 等待 kube-proxy 完成规则同步再开始停止容器内进程
-              #        volumeMounts:
-              #          - name: nfs-storage
-              #            mountPath: {NFS_HOST_PATH}
-              # The variable expansion uses round brackets (not curly brackets).
-              # subPathExpr: $(POD_NAME)
-          #      volumes:
-          #        - name: nfs-storage
-          #          nfs: # 自建NFS文档: https://docs.ksyun.com/documents/5509?type=3
-          #            server: {NFS_SERVER}
-          #            path: {NFS_SERVER_PATH}
 
           # 对节点（就绪探测）服务可用性进行检测， initialDelaySeconds启动多少秒后开始，periodSeconds每多少秒检测一次，timeoutSeconds超时时间秒
           readinessProbe: #  Pod 未就绪时，它会从服务负载均衡器中删除   Readiness探针在容器的整个生命周期内运行在容器上
@@ -97,7 +87,7 @@ spec:
             successThreshold: 1      # 连续探测1次成功表示成功
             failureThreshold: 3
 
-      restartPolicy: Always   # 停机后总是不断重启
+      restartPolicy: Always         # Pod的重启策略 Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Never表示不再重启该Pod
       # 新特性topologySpreadConstraints代替affinity 实现均匀部署pod到不同的node 拓扑分布约束 在K8s v1.18版本进入beta阶段默认启用 参考文档： https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/topology-spread-constraints/
       topologySpreadConstraints:    # 配置一个拓扑分布约束
         - maxSkew: 1                           #  Pod 可能被不均匀分布的程度
