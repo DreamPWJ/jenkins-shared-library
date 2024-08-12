@@ -135,7 +135,7 @@ if [[ "${exist_port_code}" == 1 ]]; then
 fi
 
 echo "👨‍💻 启动运行Docker容器  映射端口: ${host_port}:${expose_port}"
-docker run -d --restart=always -p ${host_port}:${expose_port} \
+docker run -d --restart=on-failure:6 -p ${host_port}:${expose_port} \
   -m 4G --name ${docker_container_name} ${docker_image_name}
 
 set +x # 关闭shell命令打印模式
