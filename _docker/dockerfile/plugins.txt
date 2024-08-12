@@ -1,3 +1,0 @@
-(out) scm-api:latest
-(out) git-client:latest
-(out) git:latest

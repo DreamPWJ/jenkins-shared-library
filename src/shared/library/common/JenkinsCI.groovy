@@ -5,6 +5,7 @@ package shared.library.common
  * @date 2021/8/10 13:22
  * @email 406798106@qq.com
  * @description jenkins相关方法
+ * 访问Jenkins调试的Groovy脚本: https://YOUR_JENKINS_URL/script
  */
 class JenkinsCI implements Serializable {
 
@@ -58,6 +59,17 @@ class JenkinsCI implements Serializable {
         }
         ctx.echo("jenkins job自动触发部署: $url")
         ctx.sh(script: "curl -fk $url")
+    }
+
+    /**
+     * 获取所有已安装插件信息
+     * 存储到 plugins.txt 用于自动化初始化安装大量插件
+     */
+    static def getAllPlugins(ctx) {
+        Jenkins.instance.pluginManager.plugins.each{
+            plugin ->
+                println ("${plugin.getShortName()}:${plugin.getVersion()}")
+        }
     }
 
     /**
