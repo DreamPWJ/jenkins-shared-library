@@ -132,7 +132,7 @@ def call(String type = 'web-java', Map map) {
                 IS_NEED_SASS = "${map.is_need_sass}" // 是否需要css预处理器sass
                 IS_AUTO_TRIGGER = false // 是否是代码提交自动触发构建
                 IS_GEN_QR_CODE = false // 生成二维码 方便手机端扫描
-                IS_ARCHIVE = false // 是否归档
+                IS_ARCHIVE = false // 是否归档  多个job会占用磁盘空间
                 IS_CODE_QUALITY_ANALYSIS = false // 是否进行代码质量分析的总开关
                 IS_INTEGRATION_TESTING = false // 是否进集成测试
                 IS_NOTICE_CHANGE_LOG = "${map.is_notice_change_log}" // 是否通知变更记录
@@ -2051,6 +2051,7 @@ def gitTagLog() {
     if (params.GIT_TAG != GlobalVars.noGit) {
         tagVersion = params.GIT_TAG
     }
+    // 非生产环境下也需要回滚版本 所以需要打tag版本
 }
 
 /**
