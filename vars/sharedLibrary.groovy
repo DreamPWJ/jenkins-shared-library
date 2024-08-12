@@ -2051,7 +2051,7 @@ def gitTagLog() {
     if (params.GIT_TAG != GlobalVars.noGit) {
         tagVersion = params.GIT_TAG
     }
-    // 非生产环境下也需要回滚版本 所以需要打tag版本
+    // 非生产环境下也需要回滚版本 所以需要打tag版本 如 1.0.0-beta
 }
 
 /**

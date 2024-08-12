@@ -21,10 +21,12 @@ class Utils implements Serializable {
 
     /**
      * 获取 shell 命令输出内容方法
+     * @param isLog 是否打印控制台日志
+     * @return shell 命令输出内容
      */
     static def getShEchoResult(ctx, cmd, Boolean isLog = true) {
         def getShEchoResultCmd = "ECHO_RESULT=`${cmd}`\necho \${ECHO_RESULT}"
-        if (!isLog) { // 不打印日志
+        if (!isLog) { // 不打印控制台日志
             getShEchoResultCmd = "${cmd}"
         }
         return ctx.sh(
