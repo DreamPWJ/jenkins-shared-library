@@ -17,15 +17,18 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
             script {
                 env.ENCODED_GIT_PASSWORD = URLEncoder.encode(GIT_PASSWORD, "UTF-8")
             }
-            def userPassWordUrl = " http://${GIT_USERNAME.replace("@", "%40")}:${ENCODED_GIT_PASSWORD.replace("@", "%40")}" +
+            def userPassWordUrl = " https://${GIT_USERNAME.replace("@", "%40")}:${ENCODED_GIT_PASSWORD.replace("@", "%40")}" +
                     "@${repoUrl.toString().replace("http://", "").replace("https://", "")} "
-            sh("""
+
+            ctx.retry(2) {
+                sh("""
                    git config --global user.email "406798106@qq.com"
                    git config --global user.name ${GIT_USERNAME}
                    git stash || true
                    git checkout ${ctx.BRANCH_NAME} || true
                    git pull ${userPassWordUrl} || true
                    """)
+            }
 
             try {
                 // 打版本tag  删除本地已存在tag
