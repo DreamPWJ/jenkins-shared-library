@@ -1855,8 +1855,8 @@ def deletePackagedOutput() {
         }
         //}
     } catch (error) {
-        println "删除打包产出物异常"
-        println error.getMessage()
+        // println "删除打包产出物异常"
+        // println error.getMessage()
     }
 }
 
