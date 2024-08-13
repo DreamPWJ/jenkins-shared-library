@@ -777,20 +777,20 @@ def submitAudit() {
     // 微信小程序官方CI暂不提供自动审核和发布等功能
     // Puppeteer或Playwright基于UI操作的服务，主要提供获取体验码、送审、发布服务
     // 自动化审核提交
-    docker.image("mcr.microsoft.com/playwright:v1.46.0-jammy").inside {
-        try {
-            timeout(time: 20, unit: 'MINUTES') { // 下载playwright支持的浏览器下载比较耗时
+    try {
+        timeout(time: 20, unit: 'MINUTES') { // 下载playwright支持的浏览器下载比较耗时
+            docker.image("mcr.microsoft.com/playwright:v1.46.0-jammy").inside {
                 PlayWright.miniPlatform(this)
-                isSubmitAuditSucceed = true // 自动提审是否成功
-                submitAuditMsg = "小程序自动提交审核成功 ✅ "
-                println "${submitAuditMsg}"
             }
-        } catch (e) {
-            isSubmitAuditSucceed = false
-            println("自动提交审核失败  ❌")
-            println(e.getMessage())
-            sh "exit 1" // 本阶段制造异常
+            isSubmitAuditSucceed = true // 自动提审是否成功
+            submitAuditMsg = "小程序自动提交审核成功 ✅ "
+            println "${submitAuditMsg}"
         }
+    } catch (e) {
+        isSubmitAuditSucceed = false
+        println("自动提交审核失败  ❌")
+        println(e.getMessage())
+        sh "exit 1" // 本阶段制造异常
     }
 }
 
