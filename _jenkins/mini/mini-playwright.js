@@ -1,5 +1,5 @@
-const {chromium} = require('playwright');
-const yargs = require('yargs');
+import { chromium } from '@playwright';
+import { yargs } from '@yargs';
 const argv = yargs.argv;
 
 /*
