@@ -780,7 +780,7 @@ def submitAudit() {
     try {
         timeout(time: 20, unit: 'MINUTES') { // 下载playwright支持的浏览器下载比较耗时
             docker.image("mcr.microsoft.com/playwright:v1.46.0-jammy").inside {
-                sh "npx playwright --version"
+                // sh "npx playwright --version"
                 PlayWright.miniPlatform(this)
             }
             isSubmitAuditSucceed = true // 自动提审是否成功
