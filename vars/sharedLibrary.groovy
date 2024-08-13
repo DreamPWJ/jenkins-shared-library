@@ -650,7 +650,7 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                 }
-                stage('Docker/K8S启停重服务') {
+                stage('Docker/K8s启停重服务') {
                     when {
                         beforeAgent true
                         expression {
@@ -1936,7 +1936,7 @@ def controlService(map) {
     // 内部语法使用docker镜像
     if ("${IS_K8S_DEPLOY}" == 'true') {
         docker.image("panweiji/k8s:latest").withRun() {
-            sh "python --version"
+            Deploy.controlService(this, map)
         }
     } else {
         Deploy.controlService(this, map)
