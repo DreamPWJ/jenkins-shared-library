@@ -650,32 +650,11 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                 }
-                stage('Docker启停重服务') {
+                stage('Docker/K8S启停重服务') {
                     when {
                         beforeAgent true
                         expression {
-                            return (IS_K8S_DEPLOY == false && ("${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}"))
-                        }
-                    }
-                    steps {
-                        script {
-                            controlService(map)
-                        }
-                    }
-                }
-                stage('K8S启停重服务') {
-                    when {
-                        beforeAgent true
-                        expression {
-                            return (IS_K8S_DEPLOY == true && ("${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}"))
-                        }
-                    }
-                    agent {
-                        docker {
-                            // 构建完成自动删除容器
-                            image "panweiji/k8s:latest"
-                            // args " -v "
-                            reuseNode true // 使用根节点
+                            return ("${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}")
                         }
                     }
                     steps {
@@ -1954,9 +1933,13 @@ def genQRCode(map) {
  * 控制服务 启动 停止 重启等
  */
 def controlService(map) {
-   // Deploy.controlService(this, map)
-    docker.image("python:3.10-slim").withRun() {
-        sh "python --version"
+    // 内部语法使用docker镜像
+    if ("${IS_K8S_DEPLOY}" == 'true') {
+        docker.image("panweiji/k8s:latest").withRun() {
+            sh "python --version"
+        }
+    } else {
+        Deploy.controlService(this, map)
     }
 }
 
