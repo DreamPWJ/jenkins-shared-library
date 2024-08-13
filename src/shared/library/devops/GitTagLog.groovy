@@ -17,6 +17,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
             script {
                 env.ENCODED_GIT_PASSWORD = URLEncoder.encode(GIT_PASSWORD, "UTF-8")
             }
+            // 可以获取配置的repoUrl代码仓库协议 设置一下访问协议
             def userPassWordUrl = " https://${GIT_USERNAME.replace("@", "%40")}:${ENCODED_GIT_PASSWORD.replace("@", "%40")}" +
                     "@${repoUrl.toString().replace("http://", "").replace("https://", "")} "
 
