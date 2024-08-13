@@ -263,7 +263,7 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                stage('JavaScript构建 In Docker') {
+                stage('JavaScript构建') {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
@@ -286,8 +286,7 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                 }
-
-                stage('JavaScript构建') {
+/*                stage('JavaScript构建') {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
@@ -302,9 +301,9 @@ def call(String type = 'web-java', Map map) {
                             nodeBuildProject()
                         }
                     }
-                }
+                }*/
 
-                stage('Java构建 In Docker') {
+                stage('Java构建') {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
@@ -324,7 +323,7 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                 }
-                stage('Java构建') {
+/*                stage('Java构建') {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
@@ -340,7 +339,7 @@ def call(String type = 'web-java', Map map) {
                             mavenBuildProject(map)
                         }
                     }
-                }
+                }*/
 
                 stage('Go构建') {
                     when {
@@ -405,20 +404,6 @@ def call(String type = 'web-java', Map map) {
                         beforeAgent true
                         expression { return ("${IS_PUSH_DOCKER_REPO}" == 'true') }
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                    }
-/*                    agent {
-                        docker {
-                            // JDK MAVEN 环境  构建完成自动删除容器
-                            image "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
-                            // label 'master'  // 如果有特定标签的节点用于运行Docker容器
-                            args " --privileged -v /var/run/docker.sock:/var/run/docker.sock  -v /var/cache/maven/.m2:/root/.m2 "
-                            reuseNode true // 使用根节点
-                        }
-                    }*/
-                    //agent { label "slave-jdk11-prod" }
-                    tools {
-                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中  如果有node节点 工具位置也要配置HOME路径
-                        maven "${map.maven}"
                     }
                     steps {
                         script {
@@ -517,19 +502,6 @@ def call(String type = 'web-java', Map map) {
                             return (IS_ROLL_DEPLOY == true) // 是否进行滚动部署
                         }
                     }
-                    /*       agent {
-                               docker {
-                                   // JDK MAVEN 环境  构建完成自动删除容器
-                                   image "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
-                                   // label 'master'  // 如果有特定标签的节点用于运行Docker容器
-                                   args " -v /var/cache/maven/.m2:/root/.m2 "
-                                   reuseNode true // 使用根节点
-                               }
-                           }*/
-                    tools {
-                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中 如果有node节点 工具位置也要配置HOME路径
-                        maven "${map.maven}"
-                    }
                     steps {
                         script {
                             // 滚动部署实现多台服务按顺序更新 分布式零停机
@@ -546,12 +518,7 @@ def call(String type = 'web-java', Map map) {
                             return (IS_K8S_DEPLOY == true && IS_K8S_CANARY_DEPLOY == true) // 是否进行灰度发布
                         }
                     }
-                    agent { // agent语法文档： https://www.jenkins.io/doc/book/pipeline/syntax/#agent
-                        /*   dockerfile {
-                              filename 'Dockerfile.k8s' // 在WORKSPACE工作区代码目录
-                              dir "${env.WORKSPACE}/ci"
-                              reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
-                          } */
+                    agent {
                         docker {
                             //   构建完成自动删除容器
                             image "panweiji/k8s:latest"
@@ -633,18 +600,12 @@ def call(String type = 'web-java', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                    agent {
-                        // label "linux"
-                        docker {
-                            // Git环境  完成自动删除容器
-                            image "bitnami/git:latest"
-                            reuseNode true // 使用根节点
-                        }
-                    }
                     steps {
                         script {
                             // 自动打tag和生成CHANGELOG.md文件
-                            gitTagLog()
+                            docker.image("bitnami/git:latest").inside {
+                                gitTagLog()
+                            }
                             // 钉钉通知变更记录
                             dingNotice(map, 3)
                         }
@@ -1368,9 +1329,9 @@ def buildImage(map) {
     // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
     if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
         def deployNum = 2  // 暂时区分两个不同环境文件 实际还存在每一个部署服务的环境配置文件都不一样
-        // docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").withRun() {
+        docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside {
         mavenBuildProject(map, deployNum) // 需要mvn jdk构建环境
-        // }
+        }
         // Docker多阶段镜像构建处理
         Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
         // 构建并上传Docker镜像仓库  多节点部署只构建一次
@@ -1715,7 +1676,9 @@ def scrollToDeploy(map) {
             } else {
                 // 如果配置多节点动态替换不同的配置文件重新执行maven构建打包或者直接替换部署服务器文件
                 if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-                    mavenBuildProject(map) // 需要mvn jdk构建环境
+                    docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside {
+                        mavenBuildProject(map) // 需要mvn jdk构建环境
+                    }
                 }
                 uploadRemote(Utils.getShEchoResult(this, "pwd"), map)
             }
