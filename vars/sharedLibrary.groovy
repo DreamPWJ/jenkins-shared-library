@@ -1954,7 +1954,7 @@ def genQRCode(map) {
  * 控制服务 启动 停止 重启等
  */
 def controlService(map) {
-    Deploy.controlService(this, map)
+   // Deploy.controlService(this, map)
     docker.image("python:3.10-slim").withRun() {
         sh "python --version"
     }
