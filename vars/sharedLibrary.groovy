@@ -1935,7 +1935,7 @@ def genQRCode(map) {
 def controlService(map) {
     // 内部语法使用docker镜像
     if ("${IS_K8S_DEPLOY}" == 'true') {
-        docker.image("panweiji/k8s:latest").withRun() {
+        docker.image("dtzar/helm-kubectl:latest").withRun() {
             Deploy.controlService(this, map)
         }
     } else {
