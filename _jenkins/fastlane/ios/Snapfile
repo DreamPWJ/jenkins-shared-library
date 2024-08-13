@@ -1,8 +1,8 @@
 # 图片尺寸
 devices([
-  "iPhone 5",
-  "iPhone 6",
-  "iPhone 6 Plus"
+  "iPhone 16",
+  "iPhone 15",
+  "iPhone 15 Pro"
 ])
 
 # 语言

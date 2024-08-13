@@ -1292,7 +1292,7 @@ def mavenBuildProject(map, deployNum = 0) {
             // 对于Spring Boot 3.x及Spring Native与GaalVM集成的项目，通过以下命令来构建原生镜像  特性：性能明显提升 使用资源明显减少
             // sh " mvn clean package -Pnative -Dmaven.compile.fork=true -Dmaven.test.skip=true "
             def springNativeBuildParams = ""
-            if ("${IS_SPRING_NATIVE}" == "true") {
+            if ("${IS_SPRING_NATIVE}" == "true") { // 构建原生镜像包
                 springNativeBuildParams = " -Pnative "
                 // 可以使用mvnd守护进程加速构建
                 sh "mvn clean package -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true ${springNativeBuildParams}"
@@ -1332,6 +1332,7 @@ def mavenBuildProject(map, deployNum = 0) {
         }
         mavenPackageLocation = "${mavenPackageLocationDir}" + "/*.${javaPackageType}"
         if ("${IS_SPRING_NATIVE}" == "true") {
+            // 名称为pom.xml下build内的imageName标签名称
             mavenPackageLocation = "${mavenPackageLocationDir}" + "/spring-native-graalvm"
         }
         println(mavenPackageLocation)
