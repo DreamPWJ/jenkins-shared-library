@@ -343,25 +343,6 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                /*  stage('Python构建 In Docker') {
-                      when {
-                          beforeAgent true
-                          environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                          expression { return (IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) }
-                      }
-                      agent {
-                          docker {
-                              // Python打包环境  构建完成自动删除容器
-                              image "cdrx/pyinstaller-linux:python3" // cdrx/pyinstaller-windows
-                              reuseNode true // 使用根节点
-                          }
-                      }
-                      steps {
-                          script {
-                              pythonBuildProject()
-                          }
-                      }
-                  }*/
                 stage('Python构建') {
                     when {
                         beforeAgent true
@@ -370,7 +351,14 @@ def call(String type = 'web-java', Map map) {
                     }
                     steps {
                         script {
+                            /*   if (IS_DOCKER_BUILD == true) {
+                                   // Python需要交叉编译 不同系统部署使用不同系统环境打包 如Windows使用 cdrx/pyinstaller-windows
+                                   docker.image("cdrx/pyinstaller-linux:python3").inside {
+                                       pythonBuildProject()
+                                   }
+                               } else {*/
                             pythonBuildProject()
+                            //  }
                         }
                     }
                 }
@@ -1320,7 +1308,7 @@ def buildImage(map) {
     if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
         def deployNum = 2  // 暂时区分两个不同环境文件 实际还存在每一个部署服务的环境配置文件都不一样
         docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside {
-        mavenBuildProject(map, deployNum) // 需要mvn jdk构建环境
+            mavenBuildProject(map, deployNum) // 需要mvn jdk构建环境
         }
         // Docker多阶段镜像构建处理
         Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
