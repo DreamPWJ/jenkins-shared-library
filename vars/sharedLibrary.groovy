@@ -204,9 +204,6 @@ def call(String type = 'web-java', Map map) {
                                      '项目代码': {
                                          pullProjectCode()
                                      }) */
-                            docker.image("python:3.10-slim").withRun() {
-                                sh "python --version"
-                            }
                         }
                     }
                 }
@@ -1958,6 +1955,9 @@ def genQRCode(map) {
  */
 def controlService(map) {
     Deploy.controlService(this, map)
+    docker.image("python:3.10-slim").withRun() {
+        sh "python --version"
+    }
 }
 
 /**
