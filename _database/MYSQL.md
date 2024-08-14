@@ -21,13 +21,12 @@ order by table_rows desc
 limit 10;
 
 #### 查看 MySQL「所有库」的容量大小
-
-SELECT
-table_schema as '数据库',
-sum(table_rows) as '记录数',
-sum(truncate(data_length/1024/1024, 2)) as '数据容量(MB)',
-sum(truncate(index_length/1024/1024, 2)) as '索引容量(MB)',
-sum(truncate(DATA_FREE/1024/1024, 2)) as '碎片占用(MB)'
+select
+    table_schema as '数据库',
+    sum(table_rows) as '记录数',
+    sum(truncate(data_length/1024/1024/1024, 2)) as '数据容量(GB)',
+    sum(truncate(index_length/1024/1024/1024, 2)) as '索引容量(GB)',
+    sum(truncate(DATA_FREE/1024/1024/1024, 2)) as '碎片占用(GB)'
 from information_schema.tables
 group by table_schema
 order by sum(data_length) desc, sum(index_length) desc;

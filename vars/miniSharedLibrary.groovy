@@ -255,14 +255,14 @@ def call(String type = 'wx-mini', Map map) {
                                     && "${params.IS_AUTO_SUBMIT_FOR_REVIEW}" == 'true')
                         }
                     }
-                    agent {
+    /*                agent {
                         docker {
                             // Node环境  构建完成自动删除容器
                             //image "node:${NODE_VERSION.replace('Node', '')}"
                             image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
                             reuseNode true // 使用根节点
                         }
-                    }
+                    }*/
                     steps {
                         // 只显示当前阶段stage失败  而整个流水线构建显示成功
                         // catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
@@ -779,7 +779,10 @@ def submitAudit() {
     // 自动化审核提交
     try {
         timeout(time: 20, unit: 'MINUTES') { // 下载playwright支持的浏览器下载比较耗时
-            PlayWright.miniPlatform(this)
+            docker.image("mcr.microsoft.com/playwright:v1.46.0-jammy").inside {
+                // sh "npx playwright --version"
+                PlayWright.miniPlatform(this)
+            }
             isSubmitAuditSucceed = true // 自动提审是否成功
             submitAuditMsg = "小程序自动提交审核成功 ✅ "
             println "${submitAuditMsg}"

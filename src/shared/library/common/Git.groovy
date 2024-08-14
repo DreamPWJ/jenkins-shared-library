@@ -22,7 +22,8 @@ class Git implements Serializable {
                 ctx.script {
                     ctx.env.ENCODED_GIT_PASSWORD = URLEncoder.encode(ctx.GIT_PASSWORD, "UTF-8")
                 }
-                def userPassWordUrl = " http://${ctx.GIT_USERNAME.replace("@", "%40")}:${ctx.ENCODED_GIT_PASSWORD.replace("@", "%40")}" +
+                def repoUrlProtocol = ctx.REPO_URL.toString().split("://")[0]
+                def userPassWordUrl = repoUrlProtocol + "://${ctx.GIT_USERNAME.replace("@", "%40")}:${ctx.ENCODED_GIT_PASSWORD.replace("@", "%40")}" +
                         "@${ctx.REPO_URL.toString().replace("http://", "").replace("https://", "")} "
                 // 先从远程下载最新代码  防止推送的时候冲突
                 ctx.sh("""
