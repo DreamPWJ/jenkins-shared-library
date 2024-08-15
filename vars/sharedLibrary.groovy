@@ -1927,7 +1927,7 @@ def alwaysPost() {
                     "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉直接下载构建${javaPackageType}包</a>" : ""}" +
                     "<br/> 项目: ${PROJECT_NAME}" +
                     "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
-                    "<br/> 大小: ${javaPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
+                    "<br/> 环境: ${releaseEnvironment}   大小: ${javaPackageSize} <br/> 分支: ${BRANCH_NAME}  <br/> 发布人: ${BUILD_USER}"
         }
     } catch (error) {
         println error.getMessage()
