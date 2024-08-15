@@ -246,7 +246,7 @@ if [[ ${is_prod} == false && ${remote_debug_port} ]]; then
   fi
 fi
 
-echo "👨‍💻 启动运行Docker容器 环境: ${env_mode} 映射端口: ${host_port}:${expose_port}"
+echo -e "\033[32m 👨‍💻  启动运行Docker容器 环境: ${env_mode} 映射端口: ${host_port}:${expose_port} \033[0m"
 # --pid=host 使用宿主机命名空间 方便容器获取宿主机所有进程 解决多个docker节点RocketMQ重复消费消息等问题
 # 限制资源 --cpus=${docker_cpu} 防止整个服务器资源被占用停机
 docker run -d --restart=on-failure:6 -p ${host_port}:${expose_port} --privileged=true --pid=host \
