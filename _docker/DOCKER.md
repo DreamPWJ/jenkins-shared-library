@@ -35,7 +35,7 @@ docker run -d --restart=always  -p 2181:2181 \
 --cpus=2 -m 2048m --log-opt max-size=1024m --log-opt max-file=1 \
 --privileged=true  --name zookeeper  zookeeper:latest
 
-#### EMQX物联网MQTT代理服务器 Dashboard地址http://127.0.0.1:18083  用户名 admin 与默认密码 public
+#### EMQX物联网MQTT代理服务器 Dashboard地址http://127.0.0.1:18083  用户名 admin 与默认密码 public 建议更换默认密码防止被攻击
 docker pull emqx/emqx:latest
 
 docker volume create mqtt-emqx && docker inspect mqtt-emqx
