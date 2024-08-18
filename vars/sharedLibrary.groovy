@@ -1728,6 +1728,7 @@ def autoSshLogin(map) {
  * 同步脚本和配置到部署服务器
  */
 def syncScript() {
+    println "自动同步脚本和配置等到部署服务器"
     try {
         // 自动创建服务器部署目录
         // ssh登录概率性失败 连接数超报错: kex_exchange_identification
@@ -1762,7 +1763,7 @@ def syncScript() {
  */
 def existCiCode() {
     if (!fileExists(".ci/Dockerfile")) {
-        println "为保证先后顺序拉取代码 可能导致第一次构建时候无法找到CI仓库代码 重新拉取代码"
+        // println "为保证先后顺序拉取代码 可能导致第一次构建时候无法找到CI仓库代码 重新拉取代码"
         pullCIRepo()
     }
 }
@@ -1927,7 +1928,7 @@ def alwaysPost() {
                     "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉直接下载构建${javaPackageType}包</a>" : ""}" +
                     "<br/> 项目: ${PROJECT_NAME}" +
                     "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
-                    "<br/> 大小: ${javaPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
+                    "<br/> 环境: ${releaseEnvironment}   大小: ${javaPackageSize} <br/> 分支: ${BRANCH_NAME}  <br/> 发布人: ${BUILD_USER}"
         }
     } catch (error) {
         println error.getMessage()

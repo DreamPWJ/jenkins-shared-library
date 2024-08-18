@@ -47,5 +47,5 @@ EXPOSE  $EXPOSE_PORT
 HEALTHCHECK --start-period=10s --interval=30s --timeout=30s --retries=3 \
     CMD curl --fail http://localhost:$DOCKER_SERVICE_PORT || exit 1
 
-# 运行jar包命令 远程调式  缩短 Tomcat 的启动时间  java -jar app.jar  开启JDK特性功能预览功能 --enable-preview
+# 运行jar包命令 远程调式  缩短 Tomcat 的启动时间  java -jar app.jar  开启JDK特性功能预览功能(预览特性不稳定建议关闭) --enable-preview
 ENTRYPOINT "java" "-jar" $JAVA_OPTS $REMOTE_DEBUGGING_PARAM  "-Djava.security.egd=file:/dev/./urandom" "/server.jar"

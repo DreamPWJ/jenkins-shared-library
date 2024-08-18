@@ -1137,7 +1137,7 @@ def syncScript() {
  */
 def existCiCode() {
     if (!fileExists(".ci/Dockerfile")) {
-        println "为保证先后顺序拉取代码 可能导致第一次构建时候无法找到CI仓库代码 重新拉取代码"
+        // println "为保证先后顺序拉取代码 可能导致第一次构建时候无法找到CI仓库代码 重新拉取代码"
         pullCIRepo()
     }
 }
