@@ -198,7 +198,7 @@ fi
 echo "👨‍💻 启动运行Docker容器 环境: ${env_mode} 映射端口: ${host_port}:${expose_port}"
 docker run -d --restart=always -p ${host_port}:${expose_port} \
   -e "PROJECT_NAME=${project_name}" \
-  -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1  --log-opt max-age=30d ${dynamic_run_args} \
+  -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1   ${dynamic_run_args} \
   -e "REMOTE_DEBUGGING_PARAM=${remote_debugging_param}" -e "PYTHON_START_FILE=${python_start_file}" \
   -v /${deploy_folder}/${project_name}/logs:/logs \
   --name ${docker_container_name} ${docker_image_name}

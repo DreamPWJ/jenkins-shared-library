@@ -251,7 +251,7 @@ echo -e "\033[32m 👨‍💻  启动运行Docker容器 环境: ${env_mode} 映�
 # 限制资源 --cpus=${docker_cpu} 防止整个服务器资源被占用停机
 docker run -d --restart=on-failure:6 -p ${host_port}:${expose_port} --privileged=true --pid=host \
   -e "SPRING_PROFILES_ACTIVE=${env_mode}" -e "PROJECT_NAME=${project_name}" -e "DOCKER_SERVICE_PORT=${build_expose_ports}" \
-  -e "JAVA_OPTS=-Xms128m ${docker_java_opts}" -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1 --log-opt max-age=30d ${dynamic_run_args} \
+  -e "JAVA_OPTS=-Xms128m ${docker_java_opts}" -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1  ${dynamic_run_args} \
   -e "REMOTE_DEBUGGING_PARAM=${remote_debugging_param}" -e HOST_NAME=$(hostname) \
   -v /${deploy_folder}/${project_name}/logs:/logs \
   --name ${docker_container_name} ${docker_image_name}
