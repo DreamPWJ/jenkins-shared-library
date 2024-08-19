@@ -658,15 +658,15 @@ def buildProject() {
         // sh "yarn"
 
         // 安装微信小程序CI依赖工具
-/*        try {
-            println("安装miniprogram-ci")
-            sh "yarn add miniprogram-ci"
+        try {
+            println("本地离线安装miniprogram-ci")
+            sh "yarn add miniprogram-ci --dev  --offline"
         } catch (e) {
             println(e.getMessage())
             println("远程线上安装miniprogram-ci")
-            sh "yarn add miniprogram-ci"
-        }*/
-        sh "npm i -D miniprogram-ci"
+            sh "yarn add miniprogram-ci --dev"
+        }
+        //sh "npm i -D miniprogram-ci"
 
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.miniNativeCode) {
             // 原生小程序编译前自定义命令 支持monorepo方式多包复用
