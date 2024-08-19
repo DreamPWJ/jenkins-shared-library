@@ -131,7 +131,8 @@ JSON_PARAMS
     "SHELL_PARAMS" : "jxyb h5 8010 80 prod" ,
     "NPM_RUN_PARAMS" : "build:juxian",
     "IS_ROLL_DEPLOY" : true,
-    "CUSTOM_NGINX_CONFIG" : "config/default-hci.conf"
+    "CUSTOM_NGINX_CONFIG" : "config/default-hci.conf",
+    "APPLICATION_DOMAIN" : "http://www.jxybkj.cn:8010"
 }
 
 jxyb-hci-epark-server-prod
@@ -148,7 +149,8 @@ JSON_PARAMS
    "JAVA_FRAMEWORK_TYPE" : "2",
    "IS_DIFF_CONF_IN_DIFF_MACHINES": true,
    "SOURCE_TARGET_CONFIG_DIR" : "resources/juxian,resources",
-   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/nfsdata/ParkPicture:/usr/local/tomcat/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
+   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/nfsdata/ParkPicture:/usr/local/tomcat/webapps/FileUpload,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml",
+   "APPLICATION_DOMAIN" : "http://www.jxybkj.cn"
 }
 
 jxyb-hci-open-epark-server-prod
@@ -164,7 +166,8 @@ JSON_PARAMS
    "IS_MAVEN_SINGLE_MODULE" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
    "SOURCE_TARGET_CONFIG_DIR" : "resource/juxian,resource",
-   "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server-open-epark.xml:/usr/local/tomcat/conf/server.xml"
+   "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server-open-epark.xml:/usr/local/tomcat/conf/server.xml",
+   "APPLICATION_DOMAIN" : "http://www.jxybkj.cn:8081"
 }
 
 jxyb-hci-park-coupon-h5-prod
@@ -177,7 +180,8 @@ JSON_PARAMS
     "PROJECT_NAME" : "park-coupon" ,
     "SHELL_PARAMS" : "park-coupon h5 8008 80 prod" ,
     "NPM_RUN_PARAMS" : "build",
-    "CUSTOM_NGINX_CONFIG" : "config/default-hci.conf"
+    "CUSTOM_NGINX_CONFIG" : "config/default-hci.conf",
+    "APPLICATION_DOMAIN" : "http://www.jxybkj.cn:8100"
 }
 REMOTE_IP: 172.16.100.177
 
@@ -205,7 +209,8 @@ JSON_PARAMS
     "SHELL_PARAMS" : "induction-screen web 8009 80 prod" ,
     "NODE_VERSION" : "10",
     "NPM_RUN_PARAMS" : "build",
-    "CUSTOM_NGINX_CONFIG" : "config/default-hci.conf"
+    "CUSTOM_NGINX_CONFIG" : "config/default-hci.conf",
+    "APPLICATION_DOMAIN" : "http://www.jxybkj.cn:8009"
 }
 REMOTE_IP: 172.16.100.177
 
