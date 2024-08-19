@@ -255,26 +255,26 @@ def call(String type = 'wx-mini', Map map) {
                                     && "${params.IS_AUTO_SUBMIT_FOR_REVIEW}" == 'true')
                         }
                     }
-    /*                agent {
-                        docker {
-                            // Node环境  构建完成自动删除容器
-                            //image "node:${NODE_VERSION.replace('Node', '')}"
-                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
-                            reuseNode true // 使用根节点
-                        }
-                    }*/
+                    /*                agent {
+                                        docker {
+                                            // Node环境  构建完成自动删除容器
+                                            //image "node:${NODE_VERSION.replace('Node', '')}"
+                                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                                            reuseNode true // 使用根节点
+                                        }
+                                    }*/
                     steps {
                         // 只显示当前阶段stage失败  而整个流水线构建显示成功
                         // catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                         script {
                             submitAudit()
-             /*               parallel( // 步骤内并发执行
-                                    '提审': {
-                                        submitAudit()
-                                    },
-                                    '授权': {
-                                        submitAuthorization(map)
-                                    })*/
+                            /*               parallel( // 步骤内并发执行
+                                                   '提审': {
+                                                       submitAudit()
+                                                   },
+                                                   '授权': {
+                                                       submitAuthorization(map)
+                                                   })*/
                         }
                         // }
                     }
@@ -650,7 +650,7 @@ def buildProject() {
     // 安装微信小程序CI依赖工具
     try {
         println("本地离线安装miniprogram-ci")
-        sh "yarn add miniprogram-ci --dev  --offline"
+        sh "yarn add miniprogram-ci --dev --offline"
     } catch (e) {
         println(e.getMessage())
         println("远程线上安装miniprogram-ci")
@@ -724,16 +724,12 @@ def previewUpload() {
         wxCiResultFile = "wx-ci-result.json"
         sh "rm -f ${wxCiResultFile}"
         wxPreviewQrcodeName = "preview-qrcode-v${MINI_VERSION_NUM}" // 微信预览码图片名称
+
         println("执行小程序自动化预览上传 🚀 ")
-        try {
-            timeout(time: 1, unit: 'MINUTES') {
-                // 执行自动化预览上传
-                sh "node deploy.js --type=${params.BUILD_TYPE} --v=${MINI_VERSION_NUM} --desc='${params.VERSION_DESC}' " +
-                        " --isNeedNpm='${IS_MINI_NATIVE_NEED_NPM}' --buildDir=${NPM_BUILD_DIRECTORY} --wxCiResultFile='${wxCiResultFile}' " +
-                        " --qrcodeName=${wxPreviewQrcodeName} --robot=${params.CI_ROBOT}"
-            }
-        } catch (e) {
-        }
+        // 执行自动化预览上传
+        sh "node deploy.js --type=${params.BUILD_TYPE} --v=${MINI_VERSION_NUM} --desc='${params.VERSION_DESC}' " +
+                " --isNeedNpm='${IS_MINI_NATIVE_NEED_NPM}' --buildDir=${NPM_BUILD_DIRECTORY} --wxCiResultFile='${wxCiResultFile}' " +
+                " --qrcodeName=${wxPreviewQrcodeName} --robot=${params.CI_ROBOT}"
     }
     println("小程序预览上传成功 ✅")
 }
