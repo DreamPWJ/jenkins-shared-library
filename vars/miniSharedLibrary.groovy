@@ -589,6 +589,12 @@ def setVersion() {
  * 获取版本号和描述
  */
 def getVersion() {
+    docker.image("mcr.microsoft.com/playwright:v${playwrightVersion}-jammy").inside {
+        sh 'npx playwright test'
+        sh "playwright --version"
+    }
+    return
+
     try {
         if ("${params.VERSION_NUM}".trim() == "") { // 没有手动输入版本号情况
             if (params.GIT_TAG == GlobalVars.noGit && fileExists("${VERSION_FILE}")) {
