@@ -5,7 +5,7 @@ docker pull nginx
 sudo docker run -d --restart=always -p 80:80 -p 443:443 --name proxy-nginx  -v /etc/localtime:/etc/localtime:ro \
 -v /my/nginx/config/nginx.conf:/etc/nginx/nginx.conf:ro  -v /my/nginx/config/default.conf:/etc/nginx/conf.d/default.conf:ro \
 -v /my/nginx/ssl:/etc/nginx/ssl -v /my/nginx/html:/usr/share/nginx/html  -v /etc/letsencrypt:/etc/letsencrypt   \
---log-opt max-size=1024m --log-opt max-file=1   \
+--log-opt max-size=200m --log-opt max-file=1   \
 -v /my/nginx/logs:/var/log/nginx  nginx
 
 #### 从Docker Hub里拉取redis镜像来部署 密码强度要求：8位及以上，包含大小写，字母，特殊符号
@@ -23,7 +23,7 @@ docker pull rabbitmq:management
 
 sudo docker run -d --restart=always -p 5672:5672 -p 15672:15672 --name rabbitmq \
 -v /my/rabbitmq:/var/lib/rabbitmq -v /etc/localtime:/etc/localtime:ro \
---cpus=2 -m 2048m --log-opt max-size=1024m --log-opt max-file=1   \
+--cpus=2 -m 2048m --log-opt max-size=200m --log-opt max-file=1   \
 -e RABBITMQ_DEFAULT_USER=root -e RABBITMQ_DEFAULT_PASS=panweiji2020 rabbitmq:management
 
 #### ZooKeeper分布式应用程序调度服务
@@ -32,7 +32,7 @@ docker pull zookeeper
 docker run -d --restart=always  -p 2181:2181 \
 -e "ZOO_INIT_LIMIT=10"  -e TZ="Asia/Shanghai" \
 -v /my/zookeeper/data:/data \
---cpus=2 -m 2048m --log-opt max-size=1024m --log-opt max-file=1   \
+--cpus=2 -m 2048m --log-opt max-size=200m --log-opt max-file=1   \
 --privileged=true  --name zookeeper  zookeeper:latest
 
 #### EMQX物联网MQTT代理服务器 Dashboard地址http://127.0.0.1:18083  用户名 admin 与默认密码 public 建议更换默认密码防止被攻击
@@ -42,7 +42,7 @@ docker volume create mqtt-emqx && docker inspect mqtt-emqx
 
 docker run -d --restart=always  -p 18083:18083 -p 1883:1883 -p 8083:8083 -p 8084:8084 -p 8883:8883  \
 -e TZ="Asia/Shanghai" -v mqtt-emqx:/opt/emqx  \
---cpus=2 -m 2048m  --log-opt max-size=1024m --log-opt max-file=1   \
+--cpus=2 -m 2048m  --log-opt max-size=200m --log-opt max-file=1   \
 --name emqx  emqx/emqx:latest
 
 #### 安装 分布式任务调度平台XXL-JOB服务 在浏览器中使用http://ip:8081/xxl-job-admin/ 默认用户名 admin 密码 123456
@@ -51,7 +51,7 @@ docker pull xuxueli/xxl-job-admin:2.4.1
 docker run -d --restart=always -p 8081:8080  \
 -e PARAMS="--spring.config.location=/application.properties" \
 -v /my/xxl-job/applogs:/data/applogs  -v /my/xxl-job/application.properties:/application.properties \
---cpus=2 -m 2048m --log-opt max-size=1024m --log-opt max-file=1   \
+--cpus=2 -m 2048m --log-opt max-size=200m --log-opt max-file=1   \
 --name xxl-job-admin xuxueli/xxl-job-admin:2.4.1
 
 #### RocketMQ消息队列服务  官方文档： https://github.com/apache/rocketmq-docker
