@@ -14,7 +14,7 @@ class PlayWright implements Serializable {
      */
     static def init(ctx) {
         // 固定版本号防止新版有兼容性问题和需要下载新的Chromium版本耗时等问题
-        def playwrightVersion = "1.46.1"
+        def playwrightVersion = "${ctx.playwrightVersion}"
         try {
             // 使用Docker方式安装 https://playwright.dev/docs/docker
             // 判断服务器是是否安装playwright环境

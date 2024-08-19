@@ -439,6 +439,8 @@ def getInitParams(map) {
     miniTotalPackageSize = ""
     // monorepo方式项目多包复用父包 如 projects
     monoRepoProjectPackage = ""
+    // 自动化UI工具版本
+    playwrightVersion = "1.46.1"
 }
 
 /**
@@ -780,7 +782,7 @@ def submitAudit() {
     // 自动化审核提交
     try {
         timeout(time: 20, unit: 'MINUTES') { // 下载playwright支持的浏览器下载比较耗时
-            docker.image("mcr.microsoft.com/playwright:v1.46.1-jammy").inside {
+            docker.image("mcr.microsoft.com/playwright:v${playwrightVersion}-jammy").inside {
                 // sh "npx playwright --version"
                 PlayWright.miniPlatform(this)
             }
