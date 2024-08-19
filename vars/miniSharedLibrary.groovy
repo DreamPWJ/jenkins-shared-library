@@ -546,12 +546,6 @@ def codeQualityAnalysis() {
  * 设置版本信息
  */
 def setVersionInfo() {
-    docker.image("mcr.microsoft.com/playwright:v${playwrightVersion}-jammy").inside {
-        sh 'npx playwright test'
-        sh "playwright --version"
-    }
-    return
-
     // 项目配置JSON文件是存在主工程代码中 说明不是标准的单体式monorepo仓库 自动重新设置覆盖任务配置的错误参数
     if ("${IS_MONO_REPO}" == "true") {
         projectConfigFile = "project.config.json"
@@ -664,15 +658,15 @@ def buildProject() {
         // sh "yarn"
 
         // 安装微信小程序CI依赖工具
-        try {
+/*        try {
             println("安装miniprogram-ci")
             sh "yarn add miniprogram-ci"
         } catch (e) {
             println(e.getMessage())
             println("远程线上安装miniprogram-ci")
             sh "yarn add miniprogram-ci"
-        }
-        //sh "npm i -D miniprogram-ci"
+        }*/
+        sh "npm i -D miniprogram-ci"
 
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.miniNativeCode) {
             // 原生小程序编译前自定义命令 支持monorepo方式多包复用
