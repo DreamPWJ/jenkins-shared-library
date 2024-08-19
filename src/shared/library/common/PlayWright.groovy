@@ -19,7 +19,7 @@ class PlayWright implements Serializable {
             // 使用Docker方式安装 https://playwright.dev/docs/docker
             // 判断服务器是是否安装playwright环境
             ctx.sh "npx playwright --version"
-            ctx.sh "npm i playwright-chromium" // 安装浏览器驱动文件（文件较大下载有点慢）
+            // ctx.sh "npm i playwright-chromium" // 安装浏览器驱动文件（文件较大下载有点慢）
         } catch (error) {
             ctx.sh "npm init playwright@${playwrightVersion}"
             ctx.sh "npm i -D yargs"
