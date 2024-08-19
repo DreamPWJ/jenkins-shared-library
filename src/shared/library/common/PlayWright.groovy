@@ -19,7 +19,7 @@ class PlayWright implements Serializable {
             // 使用Docker方式安装 https://playwright.dev/docs/docker
             // 判断服务器是是否安装playwright环境
             ctx.sh "npx playwright --version"
-            // ctx.sh "npm i playwright-chromium" // 安装浏览器驱动文件（文件较大下载有点慢）
+            ctx.sh "npx playwright install chromium" // 安装浏览器驱动文件（文件较大下载有点慢）
         } catch (error) {
             ctx.sh "npm init playwright@${playwrightVersion}"
             ctx.sh "npm i -D yargs"
@@ -34,7 +34,7 @@ class PlayWright implements Serializable {
     static def miniPlatform(ctx) {
         this.init(ctx)
         def fileName = "mini-playwright.js"
-        ctx.sh "cp -r ${ctx.miniConfigDir}/${fileName} ${ctx.env.WORKSPACE}${ctx.monoRepoProjectPackage}/${ctx.PROJECT_NAME}"
+        ctx.sh "cp -r ${ctx.miniConfigDir}/${fileName} ./"
         // 提审参数 如版本描述、账号密码等动态传入并自动填写到页面上填充值
         ctx.sh "node --unhandled-rejections=strict ${fileName} --versionDesc='${ctx.params.VERSION_DESC}' ${ctx.miniReviewInfo} "
         ctx.sh "rm -f ${fileName}"
