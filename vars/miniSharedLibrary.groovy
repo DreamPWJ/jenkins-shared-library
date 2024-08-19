@@ -647,6 +647,17 @@ def buildProject() {
     // Node环境设置镜像
     Node.setMirror(this)
 
+    // 安装微信小程序CI依赖工具
+    try {
+        println("本地离线安装miniprogram-ci")
+        sh "yarn add miniprogram-ci --dev  --offline"
+    } catch (e) {
+        println(e.getMessage())
+        println("远程线上安装miniprogram-ci")
+        sh "yarn add miniprogram-ci --dev"
+    }
+    //sh "npm i -D miniprogram-ci"
+
     if ("${IS_MONO_REPO}" == "true") {
         monoRepoProjectPackage = "/projects"
         println("安装依赖 📥")
@@ -656,18 +667,6 @@ def buildProject() {
     dir("${env.WORKSPACE}${monoRepoProjectPackage}/${PROJECT_NAME}") {
         // println("安装依赖 📥")
         // sh "yarn"
-
-        // 安装微信小程序CI依赖工具
-        try {
-            println("本地离线安装miniprogram-ci")
-            sh "yarn add miniprogram-ci --dev  --offline"
-        } catch (e) {
-            println(e.getMessage())
-            println("远程线上安装miniprogram-ci")
-            sh "yarn add miniprogram-ci --dev"
-        }
-        //sh "npm i -D miniprogram-ci"
-
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.miniNativeCode) {
             // 原生小程序编译前自定义命令 支持monorepo方式多包复用
             if ("${IS_MONO_REPO}" == "true") {
