@@ -160,7 +160,7 @@ fi
 #  tar -zcvf dist.tar.gz dist
 
 
-# 手动单独部署情况 不依赖自动化CI/CD和自定义Dockerfile情况
+# 👉 手动单独部署Docker应用场景 不依赖自动化CI/CD和自定义Dockerfile情况
 # docker run -d --restart=always -p 8008:80 --name project-name-web \
 # -v /my/project-name-web/default.conf:/etc/nginx/conf.d/default.conf:ro \
 # -v /my/project-name-web/dist:/usr/share/nginx/html:ro  nginx:stable
