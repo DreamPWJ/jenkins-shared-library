@@ -590,6 +590,8 @@ def setVersion() {
  */
 def getVersion() {
     docker.image("mcr.microsoft.com/playwright:v${playwrightVersion}-jammy").inside {
+        sh 'npm ci'
+        sh 'npx playwright test'
         sh "playwright --version"
         sh "npx playwright --version"
     }
