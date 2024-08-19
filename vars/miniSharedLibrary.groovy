@@ -247,7 +247,7 @@ def call(String type = 'wx-mini', Map map) {
                     }
                 }
 
-                stage('提审授权') {
+                stage('提审与授权') {
                     when {
                         beforeAgent true  // 只有在 when 条件验证为真时才会进入 agent
                         expression {
