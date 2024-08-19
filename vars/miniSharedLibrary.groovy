@@ -660,11 +660,11 @@ def buildProject() {
         // 安装微信小程序CI依赖工具
         try {
             println("安装miniprogram-ci")
-            sh "pnpm add -D miniprogram-ci"
+            sh "yarn add miniprogram-ci"
         } catch (e) {
             println(e.getMessage())
-            println("安装miniprogram-ci")
-            sh "pnpm add -D miniprogram-ci"
+            println("远程线上安装miniprogram-ci")
+            sh "yarn add miniprogram-ci"
         }
         //sh "npm i -D miniprogram-ci"
 
