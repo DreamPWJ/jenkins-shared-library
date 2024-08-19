@@ -546,6 +546,12 @@ def codeQualityAnalysis() {
  * 设置版本信息
  */
 def setVersionInfo() {
+    docker.image("mcr.microsoft.com/playwright:v${playwrightVersion}-jammy").inside {
+        sh 'npx playwright test'
+        sh "playwright --version"
+    }
+    return
+
     // 项目配置JSON文件是存在主工程代码中 说明不是标准的单体式monorepo仓库 自动重新设置覆盖任务配置的错误参数
     if ("${IS_MONO_REPO}" == "true") {
         projectConfigFile = "project.config.json"
@@ -589,12 +595,6 @@ def setVersion() {
  * 获取版本号和描述
  */
 def getVersion() {
-    docker.image("mcr.microsoft.com/playwright:v${playwrightVersion}-jammy").inside {
-        sh 'npx playwright test'
-        sh "playwright --version"
-    }
-    return
-
     try {
         if ("${params.VERSION_NUM}".trim() == "") { // 没有手动输入版本号情况
             if (params.GIT_TAG == GlobalVars.noGit && fileExists("${VERSION_FILE}")) {
