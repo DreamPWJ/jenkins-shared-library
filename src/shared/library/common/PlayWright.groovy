@@ -13,13 +13,14 @@ class PlayWright implements Serializable {
      * 初始化
      */
     static def init(ctx) {
+        // 固定版本号防止新版有兼容性问题和需要下载新的Chromium版本耗时等问题
+        def playwrightVersion = "1.46.1"
         try {
             // 使用Docker方式安装 https://playwright.dev/docs/docker
             // 判断服务器是是否安装playwright环境
             ctx.sh "npx playwright --version"
+            ctx.sh "npm i playwright-chromium" // 安装浏览器驱动文件（文件较大下载有点慢）
         } catch (error) {
-            // 固定版本号防止新版有兼容性问题和需要下载新的Chromium版本等问题
-            def playwrightVersion = "1.45.3"
             ctx.sh "npm init playwright@${playwrightVersion}"
             ctx.sh "npm i -D yargs"
             // ctx.sh "npm i -D @playwright/test"
