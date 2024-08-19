@@ -267,13 +267,14 @@ def call(String type = 'wx-mini', Map map) {
                         // 只显示当前阶段stage失败  而整个流水线构建显示成功
                         // catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                         script {
-                            parallel( // 步骤内并发执行
+                            submitAudit()
+             /*               parallel( // 步骤内并发执行
                                     '提审': {
                                         submitAudit()
                                     },
                                     '授权': {
                                         submitAuthorization(map)
-                                    })
+                                    })*/
                         }
                         // }
                     }

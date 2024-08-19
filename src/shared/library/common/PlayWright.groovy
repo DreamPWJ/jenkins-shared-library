@@ -33,7 +33,7 @@ class PlayWright implements Serializable {
     static def miniPlatform(ctx) {
         this.init(ctx)
         def fileName = "mini-playwright.js"
-        ctx.sh "cp -r ${ctx.miniConfigDir}/${fileName} ./"
+        ctx.sh "cp -r ${ctx.miniConfigDir}/${fileName} ./${ctx.env.WORKSPACE}${ctx.monoRepoProjectPackage}/${ctx.PROJECT_NAME}"
         // 提审参数 如版本描述、账号密码等动态传入并自动填写到页面上填充值
         ctx.sh "node --unhandled-rejections=strict ${fileName} --versionDesc='${ctx.params.VERSION_DESC}' ${ctx.miniReviewInfo} "
         ctx.sh "rm -f ${fileName}"
