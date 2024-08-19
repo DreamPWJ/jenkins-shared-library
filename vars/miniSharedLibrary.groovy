@@ -589,14 +589,6 @@ def setVersion() {
  * 获取版本号和描述
  */
 def getVersion() {
-    docker.image("mcr.microsoft.com/playwright:v${playwrightVersion}-jammy").inside {
-        sh 'npm ci'
-        sh 'npx playwright test'
-        sh "playwright --version"
-        sh "npx playwright --version"
-    }
-    return
-
     try {
         if ("${params.VERSION_NUM}".trim() == "") { // 没有手动输入版本号情况
             if (params.GIT_TAG == GlobalVars.noGit && fileExists("${VERSION_FILE}")) {
@@ -792,6 +784,8 @@ def submitAudit() {
         timeout(time: 20, unit: 'MINUTES') { // 下载playwright支持的浏览器下载比较耗时
             docker.image("mcr.microsoft.com/playwright:v${playwrightVersion}-jammy").inside {
                 // sh "npx playwright --version"
+                sh 'npm ci'
+                sh 'npx playwright test'
                 PlayWright.miniPlatform(this)
             }
             isSubmitAuditSucceed = true // 自动提审是否成功
