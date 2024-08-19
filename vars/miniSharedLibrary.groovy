@@ -777,6 +777,12 @@ def previewImageUpload(map) {
  * 提交审核
  */
 def submitAudit() {
+    docker.image("mcr.microsoft.com/playwright:v${playwrightVersion}-jammy").inside {
+        sh "playwright --version"
+        sh "npx playwright --version"
+    }
+    return
+
     // 微信小程序官方CI暂不提供自动审核和发布等功能
     // Puppeteer或Playwright基于UI操作的服务，主要提供获取体验码、送审、发布服务
     // 自动化审核提交
