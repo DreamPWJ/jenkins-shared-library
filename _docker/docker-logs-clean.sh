@@ -14,6 +14,9 @@ rm -f /var/log/nginx/*.log || true
 rm -f /usr/local/nginx/logs/*.log || true
 rm -f /var/lib/docker/overlay2/*/diff/var/log/nginx/*.log || true
 
+# 清除所有未使用或悬挂的图像 容器 卷和网络
+docker system prune -a --force || true
+
 # 移除所有未使用的镜像（包括没有被任何容器使用的镜像） 如/var/lib/docker/overlay2占用
 docker image prune -a --force || true
 # 移除所有未使用的卷
