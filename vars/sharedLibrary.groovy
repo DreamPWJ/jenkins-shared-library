@@ -2027,9 +2027,16 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && "${IS_MONO_REPO}" == 'true') {
             monorepoProjectName = "MonoRepo项目: ${PROJECT_NAME}"   // 单体仓库区分项目
         }
-        // K8S部署方式
+        // Docker部署方式
         def deployType = ""
         def k8sPodContent = ""
+        if ("${IS_ROLL_DEPLOY}" == "true") {
+            deployType = "部署方式: Docker集群滚动发布"
+            if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
+                deployType = "部署方式: Docker集群金丝雀发布"
+            }
+        }
+        // K8S部署方式
         if ("${IS_K8S_DEPLOY}" == "true") {
             deployType = "部署方式: K8S集群滚动发布"
             if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
