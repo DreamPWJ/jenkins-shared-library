@@ -263,8 +263,9 @@ def call(String type = 'web-java', Map map) {
                         docker {
                             // Node环境  构建完成自动删除容器
                             //image "node:${NODE_VERSION.replace('Node', '')}"
-                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
                             // 使用自定义Dockerfile的node环境 加速monorepo依赖构建内置lerna等相关依赖
+                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                            args " -v /var/cache/node/node_modules:/root/node_modules "
                             reuseNode true // 使用根节点
                         }
                     }
@@ -803,10 +804,11 @@ def getInitParams(map) {
     // 自定义Python版本
     CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.10.0"
     // 自定义Python启动文件名称 默认app.py文件
+    // 自定义Python启动文件名称 默认app.py文件
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
 
     // 统一处理第一次部署或更新pipeline代码导致jenkins构建参数parameters不存在的情况 如 params.
-    if (IS_CANARY_DEPLOY == null) {  // 判断IS_CANARY_DEPLOY不存在 设置默认值
+    if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
         IS_CANARY_DEPLOY = false
     }
 
