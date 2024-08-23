@@ -271,7 +271,7 @@ def call(String type = 'web-java', Map map) {
                     }
                     steps {
                         script {
-                            echo "Docker环境内构建Node方式"
+                            // echo "Docker环境内Node构建方式"
                             nodeBuildProject()
                         }
                     }
