@@ -805,6 +805,11 @@ def getInitParams(map) {
     // 自定义Python启动文件名称 默认app.py文件
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
 
+    // 统一处理第一次部署或更新pipeline代码导致jenkins构建参数parameters不存在的情况 如 params.
+    if (IS_CANARY_DEPLOY == null) {  // 判断IS_CANARY_DEPLOY不存在 设置默认值
+        IS_CANARY_DEPLOY = false
+    }
+
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
         BRANCH_NAME = "${map.default_git_branch}"
@@ -868,7 +873,7 @@ def getInitParams(map) {
         healthCheckDomainUrl = "${APPLICATION_DOMAIN}"
     }
 
-    // tag版本变量定义
+    // Git Tag版本变量定义
     tagVersion = ""
     // 扫描二维码地址
     qrCodeOssUrl = ""
