@@ -123,7 +123,7 @@ function get_disk_space() {
         echo "======== 开始自动清理Docker日志 ========"
         # docker system prune -a --force || true
         sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
-        cd /my && rm -rf /*/logs
+        rm -rf /my/**/log* && rm -f /my/**/*.log
         rm -f /var/log/nginx/*.log || true
         rm -f /usr/local/nginx/logs/*.log || true
         rm -f /var/lib/docker/overlay2/*/diff/var/log/nginx/*.log || true

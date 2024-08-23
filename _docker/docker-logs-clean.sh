@@ -9,7 +9,7 @@ TOTAL_FREE=$(df -h  / | awk '/\// {print $4}' | sed 's/G//')
 echo " Free space is $TOTAL_FREE GB! "
 
 sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
-cd /my && rm -rf /*/logs
+rm -rf /my/**/log* && rm -f /my/**/*.log
 rm -f /var/log/nginx/*.log || true
 rm -f /usr/local/nginx/logs/*.log || true
 rm -f /var/lib/docker/overlay2/*/diff/var/log/nginx/*.log || true
