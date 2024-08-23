@@ -265,7 +265,7 @@ def call(String type = 'web-java', Map map) {
                             //image "node:${NODE_VERSION.replace('Node', '')}"
                             // 使用自定义Dockerfile的node环境 加速monorepo依赖构建内置lerna等相关依赖
                             image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
-                            args " -v ${"${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}"}/node_modules:/node_modules "
+                            // args " -v ${"${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}"}/node_modules:/node_modules "
                             reuseNode true // 使用根节点
                         }
                     }
