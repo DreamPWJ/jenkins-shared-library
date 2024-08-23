@@ -59,12 +59,12 @@ def call(String type = 'web-java', Map map) {
                         description: "填写服务版本描述文案 (不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊 ")
                 string(name: 'ROLLBACK_BUILD_ID', defaultValue: '0', description: "DEPLOY_MODE基于" + GlobalVars.rollback + "部署方式, 输入对应保留的回滚构建记录ID, " +
                         "默认0是回滚到上一次连续构建, 当前归档模式的回滚仅适用于在master节点构建的任务")
+                booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行Docker/K8S灰度发布、金丝雀发布、A/B测试实现多版本共存机制 ")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
                         description: '是否执行服务启动健康检测 否: 可大幅减少流水线持续时间 分布式部署不建议取消  K8S使用默认的健康探测')
                 booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}",
                         description: '是否在生产环境中自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录')
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 📢 ")
-                booleanParam(name: 'IS_K8S_CANARY_DEPLOY', defaultValue: false, description: "是否执行K8S灰度发布、金丝雀发布、A/B测试实现多版本共存机制 ")
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
                 //booleanParam(name: 'IS_DEPLOY_MULTI_ENV', defaultValue: false, description: '是否同时部署当前job项目多环境 如dev test等')
             }
@@ -476,7 +476,7 @@ def call(String type = 'web-java', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (IS_ROLL_DEPLOY == true) // 是否进行滚动部署
+                            return (IS_ROLL_DEPLOY == true && IS_CANARY_DEPLOY == false) // 是否进行滚动部署
                         }
                     }
                     steps {
@@ -492,7 +492,7 @@ def call(String type = 'web-java', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (IS_K8S_DEPLOY == true && IS_K8S_CANARY_DEPLOY == true) // 是否进行灰度发布
+                            return (IS_K8S_DEPLOY == true && IS_CANARY_DEPLOY == true) // 是否进行灰度发布
                         }
                     }
                     agent {
@@ -516,7 +516,7 @@ def call(String type = 'web-java', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (IS_K8S_DEPLOY == true && IS_K8S_CANARY_DEPLOY == false)  // 是否进行云原生K8S集群部署
+                            return (IS_K8S_DEPLOY == true && IS_CANARY_DEPLOY == false)  // 是否进行云原生K8S集群部署
                         }
                     }
                     agent { // agent语法文档： https://www.jenkins.io/doc/book/pipeline/syntax/#agent
@@ -754,7 +754,7 @@ def getInitParams(map) {
     IS_BLUE_GREEN_DEPLOY = jsonParams.IS_BLUE_GREEN_DEPLOY ? jsonParams.IS_BLUE_GREEN_DEPLOY : false // 是否蓝绿部署
     IS_ROLL_DEPLOY = jsonParams.IS_ROLL_DEPLOY ? jsonParams.IS_ROLL_DEPLOY : false // 是否滚动部署
     // 是否灰度发布  金丝雀发布  A/B测试
-    IS_K8S_CANARY_DEPLOY = jsonParams.IS_K8S_CANARY_DEPLOY ? jsonParams.IS_K8S_CANARY_DEPLOY : params.IS_K8S_CANARY_DEPLOY
+    IS_CANARY_DEPLOY = jsonParams.IS_CANARY_DEPLOY ? jsonParams.IS_CANARY_DEPLOY : params.IS_CANARY_DEPLOY
     IS_K8S_DEPLOY = jsonParams.IS_K8S_DEPLOY ? jsonParams.IS_K8S_DEPLOY : false // 是否K8S集群部署
     IS_SERVERLESS_DEPLOY = jsonParams.IS_SERVERLESS_DEPLOY ? jsonParams.IS_SERVERLESS_DEPLOY : false
     // 是否Serverless发布
@@ -1728,6 +1728,7 @@ def autoSshLogin(map) {
  * 同步脚本和配置到部署服务器
  */
 def syncScript() {
+    println "自动同步脚本和配置等到部署服务器"
     try {
         // 自动创建服务器部署目录
         // ssh登录概率性失败 连接数超报错: kex_exchange_identification
@@ -1762,7 +1763,7 @@ def syncScript() {
  */
 def existCiCode() {
     if (!fileExists(".ci/Dockerfile")) {
-        println "为保证先后顺序拉取代码 可能导致第一次构建时候无法找到CI仓库代码 重新拉取代码"
+        // println "为保证先后顺序拉取代码 可能导致第一次构建时候无法找到CI仓库代码 重新拉取代码"
         pullCIRepo()
     }
 }
@@ -1927,7 +1928,7 @@ def alwaysPost() {
                     "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉直接下载构建${javaPackageType}包</a>" : ""}" +
                     "<br/> 项目: ${PROJECT_NAME}" +
                     "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
-                    "<br/> 大小: ${javaPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
+                    "<br/> 环境: ${releaseEnvironment}   大小: ${javaPackageSize} <br/> 分支: ${BRANCH_NAME}  <br/> 发布人: ${BUILD_USER}"
         }
     } catch (error) {
         println error.getMessage()
@@ -2026,12 +2027,19 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && "${IS_MONO_REPO}" == 'true') {
             monorepoProjectName = "MonoRepo项目: ${PROJECT_NAME}"   // 单体仓库区分项目
         }
-        // K8S部署方式
+        // Docker部署方式
         def deployType = ""
         def k8sPodContent = ""
+        if ("${IS_ROLL_DEPLOY}" == "true") {
+            deployType = "部署方式: Docker集群滚动发布"
+            if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
+                deployType = "部署方式: Docker集群金丝雀发布"
+            }
+        }
+        // K8S部署方式
         if ("${IS_K8S_DEPLOY}" == "true") {
             deployType = "部署方式: K8S集群滚动发布"
-            if ("${IS_K8S_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
+            if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
                 deployType = "部署方式: K8S集群金丝雀发布"
             } else {
                 k8sPodContent = "K8S集群部署Pod节点数: **${K8S_POD_REPLICAS}**个"

@@ -104,7 +104,7 @@ function get_cpu_rate() {
 # 获取系统磁盘资源 如果硬盘资源不足 停止容器构建或自动清理空间
 function get_disk_space() {
     # 设置所需的最小可用空间（单位GB）
-    MIN_FREE_SPACE=6
+    MIN_FREE_SPACE=5
 
     # 获取总的可用空间（单位GB） 获取根目录  df -h  / 命令
     TOTAL_FREE=$(df -h  / | awk '/\// {print $4}' | sed 's/G//')
@@ -121,9 +121,9 @@ function get_disk_space() {
         echo "🚨 Warning: Free space is below $MIN_FREE_SPACE GB!"
         echo -e "\033[31m当前系统磁盘空间不足, 可能导致Docker镜像构建失败   \033[0m"
         echo "======== 开始自动清理Docker日志 ========"
-        docker image prune -a --force  || true
+        # docker system prune -a --force || true
         sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
-        cd /my && rm -rf /*/logs
+        rm -rf /my/**/log* && rm -f /my/**/*.log || true
         rm -f /var/log/nginx/*.log || true
         rm -f /usr/local/nginx/logs/*.log || true
         rm -f /var/lib/docker/overlay2/*/diff/var/log/nginx/*.log || true

@@ -5,7 +5,12 @@ sudo cat <<EOF >/etc/docker/daemon.json
 {
 "registry-mirrors": [
   "https://docker.lanneng.tech"
-]
+],
+"log-driver":"json-file",
+"log-opts": {
+"max-size": "100m",
+"max-file": "2"
+}
 }
 EOF
 sudo systemctl daemon-reload && sudo systemctl restart docker

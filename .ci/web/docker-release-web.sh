@@ -134,8 +134,9 @@ if [[ "${exist_port_code}" == 1 ]]; then
   exit 1
 fi
 
-echo "👨‍💻 启动运行Docker容器  映射端口: ${host_port}:${expose_port}"
+echo -e "\033[32m 👨‍💻 启动运行Docker容器  映射端口: ${host_port}:${expose_port} \033[0m"
 docker run -d --restart=on-failure:6 -p ${host_port}:${expose_port} \
+  --log-opt max-size=100m --log-opt max-file=1  \
   -m 4G --name ${docker_container_name} ${docker_image_name}
 
 set +x # 关闭shell命令打印模式
@@ -159,7 +160,7 @@ fi
 #  tar -zcvf dist.tar.gz dist
 
 
-# 手动单独部署情况 不依赖自动化CI/CD和自定义Dockerfile情况
+# 👉 手动单独部署Docker应用场景 不依赖自动化CI/CD和自定义Dockerfile情况
 # docker run -d --restart=always -p 8008:80 --name project-name-web \
 # -v /my/project-name-web/default.conf:/etc/nginx/conf.d/default.conf:ro \
 # -v /my/project-name-web/dist:/usr/share/nginx/html:ro  nginx:stable

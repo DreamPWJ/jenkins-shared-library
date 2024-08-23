@@ -23,7 +23,7 @@ Y | y)
   sudo docker run -d --restart=always -p 80:80 -p 443:443 -p 4000:4000 --name proxy-nginx -v /etc/localtime:/etc/localtime:ro \
     -v /my/nginx/config/nginx.conf:/etc/nginx/nginx.conf:ro -v /my/nginx/config/default.conf:/etc/nginx/conf.d/default.conf:ro \
     -v /my/nginx/ssl:/etc/nginx/ssl -v /my/nginx/html:/usr/share/nginx/html -v /etc/letsencrypt:/etc/letsencrypt \
-    --log-opt max-size=1024m --log-opt max-file=1 \
+    --log-opt max-size=200m --log-opt max-file=1   \
     -v /my/nginx/logs:/var/log/nginx nginx
 
   echo "安装Let's Encrypt客户端Certbot"
@@ -36,14 +36,14 @@ Y | y)
   docker pull redis:latest
 
   sudo docker run -d --restart=always -p 6379:6379 --name redis -v /my/redis/data:/data -v /etc/localtime:/etc/localtime:ro \
-    -m 4096m --log-opt max-size=1024m --log-opt max-file=1 \
+    -m 4096m --log-opt max-size=200m --log-opt max-file=1   \
     redis:latest redis-server --appendonly yes --requirepass "panweiji2020"
 
   echo "基于Docker安装部署RabbitMQ"
   docker pull rabbitmq:3.8-management
 
   sudo docker run -d --restart=always -p 5672:5672 -p 15672:15672 --name rabbitmq -v /my/rabbitmq:/var/lib/rabbitmq -v /etc/localtime:/etc/localtime:ro \
-    -m 2048m --log-opt max-size=1024m --log-opt max-file=1 \
+    -m 2048m --log-opt max-size=200m --log-opt max-file=1   \
     -e RABBITMQ_DEFAULT_VHOST=/ -e RABBITMQ_DEFAULT_USER=root -e RABBITMQ_DEFAULT_PASS=panweiji2020 rabbitmq:3.8-management
 
   echo "基于Docker安装部署Zookeeper"
@@ -52,7 +52,7 @@ Y | y)
   docker run -d --restart=always -p 2181:2181 \
     -e "ZOO_INIT_LIMIT=10" -e TZ="Asia/Shanghai" \
     -v /my/zookeeper/data:/data \
-    -m 2048m --log-opt max-size=1024m --log-opt max-file=1 \
+    -m 2048m --log-opt max-size=200m --log-opt max-file=1   \
     --privileged=true --name zookeeper zookeeper:latest
 
   echo "基于Docker安装部署分布式任务调度平台XXL-JOB"
@@ -62,7 +62,7 @@ Y | y)
   docker run -d --restart=always -p 8081:8080 \
     -e PARAMS="--spring.config.location=/application.properties" \
     -v /my/xxl-job/applogs:/data/applogs -v /my/xxl-job/application.properties:/application.properties \
-    -m 2048m --log-opt max-size=1024m --log-opt max-file=1 \
+    -m 2048m --log-opt max-size=200m --log-opt max-file=1   \
     --name xxl-job-admin xuxueli/xxl-job-admin:2.4.1
 
   echo -e "\033[32m中间件服务全部安装结束  ✔ \033[0m"

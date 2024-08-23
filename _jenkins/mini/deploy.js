@@ -125,7 +125,8 @@ function handleResult(wxCiResultFile, result) {
     console.log(customResult)
     try {
         fs.writeFileSync(wxCiResultFile, JSON.stringify(customResult), {encoding: 'utf8'});
-        console.log('Data written successfully!');
+        console.log('Mini Programs data written successfully!');
+        process.exit(0); // 正常退出
     } catch (err) {
         console.error('Error writing to file:', err);
     }

@@ -247,7 +247,7 @@ def call(String type = 'wx-mini', Map map) {
                     }
                 }
 
-                stage('提审授权') {
+                stage('提审与授权') {
                     when {
                         beforeAgent true  // 只有在 when 条件验证为真时才会进入 agent
                         expression {
@@ -255,25 +255,26 @@ def call(String type = 'wx-mini', Map map) {
                                     && "${params.IS_AUTO_SUBMIT_FOR_REVIEW}" == 'true')
                         }
                     }
-    /*                agent {
-                        docker {
-                            // Node环境  构建完成自动删除容器
-                            //image "node:${NODE_VERSION.replace('Node', '')}"
-                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
-                            reuseNode true // 使用根节点
-                        }
-                    }*/
+                    /*                agent {
+                                        docker {
+                                            // Node环境  构建完成自动删除容器
+                                            //image "node:${NODE_VERSION.replace('Node', '')}"
+                                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                                            reuseNode true // 使用根节点
+                                        }
+                                    }*/
                     steps {
                         // 只显示当前阶段stage失败  而整个流水线构建显示成功
                         // catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                         script {
-                            parallel( // 步骤内并发执行
-                                    '提审': {
-                                        submitAudit()
-                                    },
-                                    '授权': {
-                                        submitAuthorization(map)
-                                    })
+                            submitAudit()
+                            /*               parallel( // 步骤内并发执行
+                                                   '提审': {
+                                                       submitAudit()
+                                                   },
+                                                   '授权': {
+                                                       submitAuthorization(map)
+                                                   })*/
                         }
                         // }
                     }
@@ -438,6 +439,8 @@ def getInitParams(map) {
     miniTotalPackageSize = ""
     // monorepo方式项目多包复用父包 如 projects
     monoRepoProjectPackage = ""
+    // 自动化UI工具版本
+    playwrightVersion = "1.46.0"
 }
 
 /**
@@ -644,6 +647,17 @@ def buildProject() {
     // Node环境设置镜像
     Node.setMirror(this)
 
+    // 安装微信小程序CI依赖工具
+    try {
+        println("本地离线安装miniprogram-ci")
+        sh "yarn add miniprogram-ci --dev --offline"
+    } catch (e) {
+        println(e.getMessage())
+        println("远程线上安装miniprogram-ci")
+        sh "yarn add miniprogram-ci --dev"
+    }
+    //sh "npm i -D miniprogram-ci"
+
     if ("${IS_MONO_REPO}" == "true") {
         monoRepoProjectPackage = "/projects"
         println("安装依赖 📥")
@@ -653,19 +667,7 @@ def buildProject() {
     dir("${env.WORKSPACE}${monoRepoProjectPackage}/${PROJECT_NAME}") {
         // println("安装依赖 📥")
         // sh "yarn"
-
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.miniNativeCode) {
-            // 安装微信小程序CI依赖工具   二维码生成库qrcode-terminal
-            try {
-                println("本地离线安装miniprogram-ci")
-                sh "yarn add miniprogram-ci --dev  --offline"
-            } catch (e) {
-                println(e.getMessage())
-                println("远程线上安装miniprogram-ci")
-                sh "yarn add miniprogram-ci --dev"
-            }
-            //sh "npm i -D miniprogram-ci"
-
             // 原生小程序编译前自定义命令 支持monorepo方式多包复用
             if ("${IS_MONO_REPO}" == "true") {
                 def compileFileName = "pre-compile.js"
@@ -722,16 +724,12 @@ def previewUpload() {
         wxCiResultFile = "wx-ci-result.json"
         sh "rm -f ${wxCiResultFile}"
         wxPreviewQrcodeName = "preview-qrcode-v${MINI_VERSION_NUM}" // 微信预览码图片名称
+
         println("执行小程序自动化预览上传 🚀 ")
-        try {
-            timeout(time: 1, unit: 'MINUTES') {
-                // 执行自动化预览上传
-                sh "node deploy.js --type=${params.BUILD_TYPE} --v=${MINI_VERSION_NUM} --desc='${params.VERSION_DESC}' " +
-                        " --isNeedNpm='${IS_MINI_NATIVE_NEED_NPM}' --buildDir=${NPM_BUILD_DIRECTORY} --wxCiResultFile='${wxCiResultFile}' " +
-                        " --qrcodeName=${wxPreviewQrcodeName} --robot=${params.CI_ROBOT}"
-            }
-        } catch (e) {
-        }
+        // 执行自动化预览上传
+        sh "node deploy.js --type=${params.BUILD_TYPE} --v=${MINI_VERSION_NUM} --desc='${params.VERSION_DESC}' " +
+                " --isNeedNpm='${IS_MINI_NATIVE_NEED_NPM}' --buildDir=${NPM_BUILD_DIRECTORY} --wxCiResultFile='${wxCiResultFile}' " +
+                " --qrcodeName=${wxPreviewQrcodeName} --robot=${params.CI_ROBOT}"
     }
     println("小程序预览上传成功 ✅")
 }
@@ -779,8 +777,8 @@ def submitAudit() {
     // 自动化审核提交
     try {
         timeout(time: 20, unit: 'MINUTES') { // 下载playwright支持的浏览器下载比较耗时
-            docker.image("mcr.microsoft.com/playwright:v1.46.0-jammy").inside {
-                // sh "npx playwright --version"
+            docker.image("mcr.microsoft.com/playwright:v${playwrightVersion}-jammy").inside {
+                // sh "playwright --version"
                 PlayWright.miniPlatform(this)
             }
             isSubmitAuditSucceed = true // 自动提审是否成功
