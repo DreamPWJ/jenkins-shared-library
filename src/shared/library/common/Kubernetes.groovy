@@ -124,7 +124,7 @@ class Kubernetes implements Serializable {
 
         // 灰度发布  金丝雀发布  A/B测试
         def canaryFlag = "canary"
-        if ("${ctx.IS_K8S_CANARY_DEPLOY}" == 'true') {
+        if ("${ctx.IS_CANARY_DEPLOY}" == 'true') {
             // 只发布一个新的pod服务用于验证服务, 老服务不变, 验证完成后取消灰度发布, 重新发布全量服务
             appName += "-" + canaryFlag
             k8sPodReplicas = 1  // 只部署一个新服务用于验证
