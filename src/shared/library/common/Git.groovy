@@ -52,7 +52,14 @@ class Git implements Serializable {
         try {
             def changedFiles = JenkinsCI.getChangedFilesList(ctx)
             if (changedFiles.isEmpty()) { // 无变更文件 可判断是否初始化过依赖 防止重复安装浪费资源和时间
-                return true
+                // 是否存在node_modules文件夹
+                if (ctx.fileExists("node_modules")) {
+                    // ctx.println "node_modules文件夹存在"
+                    return false
+                } else {
+                    ctx.println "node_modules文件夹不存在"
+                    return true
+                }
             } else {
                 def isExistsFile = changedFiles.findAll { a ->
                     changedFiles.any { (a.contains(fileName) || a.contains(lockFileName) || a.contains("yarn.lock") || a.contains("pnpm-lock.yaml") || a.contains("Podfile")) }
