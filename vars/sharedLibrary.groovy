@@ -804,7 +804,6 @@ def getInitParams(map) {
     // 自定义Python版本
     CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.10.0"
     // 自定义Python启动文件名称 默认app.py文件
-    // 自定义Python启动文件名称 默认app.py文件
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
 
     // 统一处理第一次部署或更新pipeline代码导致jenkins构建参数parameters不存在的情况 如 params.
@@ -1146,7 +1145,7 @@ def nodeBuildProject() {
                         def retryCount = 0
                         retry(3) {
                             retryCount++
-                            if (retryCount >= 2) {
+                            if (retryCount >= 2) { // 第一次构建不处理
                                 sh "rm -rf node_modules && rm -f *lock*"
                                 // 如果包404下载失败  可以更换官方镜像源重新下载
                                 // Node.setOfficialMirror(this)
