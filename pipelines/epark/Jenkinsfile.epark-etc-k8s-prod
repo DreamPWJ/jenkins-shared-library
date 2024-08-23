@@ -1,5 +1,5 @@
 #!groovy
-@Library('jenkins-shared-library@master') _
+@Library('jenkins-shared-library@dev') _
 
 /**
  * @author 潘维吉
