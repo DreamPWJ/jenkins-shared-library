@@ -59,7 +59,7 @@ def call(String type = 'web-java', Map map) {
                         description: "填写服务版本描述文案 (不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊 ")
                 string(name: 'ROLLBACK_BUILD_ID', defaultValue: '0', description: "DEPLOY_MODE基于" + GlobalVars.rollback + "部署方式, 输入对应保留的回滚构建记录ID, " +
                         "默认0是回滚到上一次连续构建, 当前归档模式的回滚仅适用于在master节点构建的任务")
-                booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行Docker/K8S灰度发布、金丝雀发布、A/B测试实现多版本共存机制 ")
+                booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行Docker/K8S灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
                         description: '是否执行服务启动健康检测 否: 可大幅减少流水线持续时间 分布式部署不建议取消  K8S使用默认的健康探测')
                 booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}",
@@ -263,14 +263,15 @@ def call(String type = 'web-java', Map map) {
                         docker {
                             // Node环境  构建完成自动删除容器
                             //image "node:${NODE_VERSION.replace('Node', '')}"
-                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
                             // 使用自定义Dockerfile的node环境 加速monorepo依赖构建内置lerna等相关依赖
+                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                            // args " -v ${"${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}"}/node_modules:/node_modules "
                             reuseNode true // 使用根节点
                         }
                     }
                     steps {
                         script {
-                            echo "Docker环境内构建Node方式"
+                            // echo "Docker环境内Node构建方式"
                             nodeBuildProject()
                         }
                     }
@@ -803,7 +804,13 @@ def getInitParams(map) {
     // 自定义Python版本
     CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.10.0"
     // 自定义Python启动文件名称 默认app.py文件
+    // 自定义Python启动文件名称 默认app.py文件
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
+
+    // 统一处理第一次部署或更新pipeline代码导致jenkins构建参数parameters不存在的情况 如 params.
+    if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
+        IS_CANARY_DEPLOY = false
+    }
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
@@ -868,7 +875,7 @@ def getInitParams(map) {
         healthCheckDomainUrl = "${APPLICATION_DOMAIN}"
     }
 
-    // tag版本变量定义
+    // Git Tag版本变量定义
     tagVersion = ""
     // 扫描二维码地址
     qrCodeOssUrl = ""
