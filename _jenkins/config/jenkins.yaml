@@ -698,7 +698,7 @@ appearance:
     theme: PRISM
   themeManager:
     disableUserThemes: true
-    theme: "dark"
+    theme: "darkSystem"
 security:
   apiToken:
     creationOfLegacyTokenEnabled: false
