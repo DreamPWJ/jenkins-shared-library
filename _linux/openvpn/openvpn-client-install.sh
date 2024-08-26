@@ -12,7 +12,7 @@ sudo yum -y install openvpn  || true
 openvpn --version
 
 # 客户端配置证书信息  client.ovpn是服务端分配的  有权限问题执行 sudo openvpn client.ovpn
-# 执行 ./openvpn-install.sh 即可 初始化和生成证书文件等
+# 公网IP的openvpn服务端执行 ./openvpn-install.sh 即可 初始化和生成证书文件等
 sudo openvpn --daemon --config /etc/openvpn/client.ovpn --log-append /var/log/openvpn.log
 
 # 查看相关日志
