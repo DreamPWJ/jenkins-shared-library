@@ -63,7 +63,7 @@ sudo docker run -d --restart=always -p 8000:8080 -p 50000:50000 \
 && sudo chown -R 1000:1000 /my/jenkins
 
 #### 可使用Jenkins Configuration as Code Plugin保存复用配置 与 一键安装所有插件 jenkins-plugin-cli --plugin-file plugins.txt
-docker exec -it jenkins bash -c "jenkins-plugin-cli --plugin-file /var/jenkins_home/plugins.txt"
+docker exec -it jenkins bash -c "jenkins-plugin-cli --plugin-file /var/jenkins_home/plugins.txt" && docker restart jenkins
 
 #### 基于Docker安装部署GitLab系统镜像
 #### 从Docker Hub里拉取GitLab镜像最新社区版来部署
