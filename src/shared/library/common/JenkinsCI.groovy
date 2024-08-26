@@ -67,9 +67,8 @@ class JenkinsCI implements Serializable {
      * 存储到 plugins.txt 用于自动化初始化安装大量插件
      */
     static def getAllPlugins(ctx) {
-        Jenkins.instance.pluginManager.plugins.each{
-            plugin ->
-                println ("${plugin.getShortName()}:${plugin.getVersion()}")
+        Jenkins.instance.pluginManager.plugins.each {
+            println("${it.getShortName()}: ${it.getVersion()}")
         }
     }
 
