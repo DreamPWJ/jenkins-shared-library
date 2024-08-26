@@ -68,8 +68,10 @@ class JenkinsCI implements Serializable {
      */
     static def getAllPlugins(ctx) {
         Jenkins.instance.pluginManager.plugins.each {
-            println("${it.getShortName()}: ${it.getVersion()}")
+            plugin ->
+                println("${plugin.getShortName()}:${plugin.getVersion()}")
         }
+        // java -jar jenkins-cli.jar -s https://jenkins.url/ install-plugin SOURCE ... [-deploy] [-name VAL] [-restart]
     }
 
     /**
