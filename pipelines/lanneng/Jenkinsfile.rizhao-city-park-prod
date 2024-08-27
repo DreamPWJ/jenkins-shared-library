@@ -148,6 +148,20 @@ JSON_PARAMS
     "APPLICATION_DOMAIN" : "https://vision.pengboche.com",
 }
 
+city-watch-h5-prod
+日照市智慧停车平台Web H5前端集群 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/city_admin/smartparking-manage-h5.git" ,
+    "BRANCH_NAME" : "main" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "city-watch-h5" ,
+    "SHELL_PARAMS" : "city-watch-h5 web 8002 80 prod" ,
+    "NPM_RUN_PARAMS" : "build",
+    "IS_ROLL_DEPLOY" : true,
+    "APPLICATION_DOMAIN" : "https://vision.pengboche.com/h5",
+}
+
 city-watch-app-prod
 日照市智慧停车平台App服务端集群
 JSON_PARAMS
