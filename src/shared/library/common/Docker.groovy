@@ -103,14 +103,14 @@ class Docker implements Serializable {
                 // Docker desktop -> Settings -> Docker Engine -> Change the "features": { buildkit: true} to "features": { buildkit: false}
 
                 // 是否开启Buildkit 是下一代的镜像构建组件
- /*               ctx.sh """  export DOCKER_BUILDKIT=1
-                       """*/
+                ctx.sh """  export DOCKER_BUILDKIT=1
+                       """
                 // 在Docker容器内使用Buildkit
                 /* ctx.sh """  DOCKER_CLI_EXPERIMENTAL=enabled
                             """  */
                 // 根据运行CPU架构构建Docker镜像
-                dockerBuildDiffStr = " build --platform linux/arm64,linux/amd64 " // 如 --platform  linux/arm64,linux/amd64,linux/arm/v7
-                dockerPushDiffStr = " --push . "
+                dockerBuildDiffStr = " buildx build --platform linux/arm64 " // 如 --platform  linux/arm64,linux/amd64
+                dockerPushDiffStr = " --push "
             } else {
                 ctx.println("开始制作Docker镜像并上传远程仓库 🏗️ ")
             }
