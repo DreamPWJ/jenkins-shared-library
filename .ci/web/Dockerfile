@@ -13,7 +13,7 @@ USER root
 
 # 设置时区
 ENV TZ=Asia/Shanghai
-#RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime || true && echo $TZ > /etc/timezone || true
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 构建镜像docker build --build-arg 或 docker-compose.yaml args参数传入
 ARG DEPLOY_FOLDER
