@@ -70,8 +70,7 @@ class Docker implements Serializable {
     }
 
     /**
-     *  构建Docker镜像
-     *  Docker For Mac 3.1.0以后docker login登录镜像仓库报错 删除 ~/.docker/config.json中的credsStore这行解决
+     *  构建Docker镜像和多CPU平台架构镜像
      */
     static def build(ctx, imageName, deployNum = 0) {
         // k8s用版本号方式给tag打标签
@@ -86,31 +85,32 @@ class Docker implements Serializable {
         //ctx.pullCIRepo()
         def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${localImageTag}"
         ctx.withCredentials([ctx.usernamePassword(credentialsId: "${ctx.DOCKER_REPO_CREDENTIALS_ID}", usernameVariable: 'DOCKER_HUB_USER_NAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+            // Docker For Mac 3.1.0以后docker login登录镜像仓库报错 删除 ~/.docker/config.json中的credsStore这行解决
             ctx.sh """      
                    docker login ${ctx.DOCKER_REPO_REGISTRY} --username=${ctx.DOCKER_HUB_USER_NAME} --password=${ctx.DOCKER_HUB_PASSWORD}
                    """
             def dockerBuildDiffStr = " build " // 默认构建镜像
             def dockerPushDiffStr = "" // 默认不同时推送镜像
             // 是否使用buildkit构建多CPU架构支持
-            def isBuildKit = "${ctx.IS_DOCKER_BUILD_KIT}" == 'true' ? true : false
+            def isBuildKit = "${ctx.IS_DOCKER_BUILD_MULTI_PLATFORM}" == 'true' ? true : false
 
             if (isBuildKit) {
-                //docker buildx 多CPU架构支持 Building Multi-Arch Images for Arm and x86 with Docker Desktop
-                //docker buildx create --name mybuilder && docker buildx use mybuilder && docker buildx build --platform linux/amd64 .
-                //多CPU架构文档: https://docs.docker.com/develop/develop-images/build_enhancements/
+                // docker buildx 多CPU架构支持 Building Multi-Arch Images for Arm and x86 with Docker Desktop
+                // docker buildx create --name mybuilder && docker buildx use mybuilder && docker buildx build --platform linux/amd64 .
+                // 多CPU架构文档: https://docs.docker.com/build/building/multi-platform/
                 ctx.println("开始制作多CPU架构Docker镜像并上传远程仓库")
                 // 解决buildx报错error: failed to solve: rpc error: code = Unknown desc = failed to solve with frontend dockerfile.v0
                 // Docker desktop -> Settings -> Docker Engine -> Change the "features": { buildkit: true} to "features": { buildkit: false}
 
                 // 是否开启Buildkit 是下一代的镜像构建组件
-                ctx.sh """  export DOCKER_BUILDKIT=1
-                       """
+ /*               ctx.sh """  export DOCKER_BUILDKIT=1
+                       """*/
                 // 在Docker容器内使用Buildkit
                 /* ctx.sh """  DOCKER_CLI_EXPERIMENTAL=enabled
                             """  */
                 // 根据运行CPU架构构建Docker镜像
-                dockerBuildDiffStr = " buildx build --platform linux/arm64 " // 如 --platform  linux/arm64,linux/amd64
-                dockerPushDiffStr = " --push "
+                dockerBuildDiffStr = " build --platform linux/arm64,linux/amd64 " // 如 --platform  linux/arm64,linux/amd64,linux/arm/v7
+                dockerPushDiffStr = " --push . "
             } else {
                 ctx.println("开始制作Docker镜像并上传远程仓库 🏗️ ")
             }
