@@ -43,7 +43,7 @@ map.put('docker_volume_mount', '')
 // Dockerfile多阶段构建 镜像名称
 map.put('docker_multistage_build_images', ' ')
 // 是否上传镜像到docker容器仓库
-map.put('is_push_docker_repo', false)
+map.put('is_push_docker_repo', true)
 // docker容器镜像仓库账号信任id
 map.put('docker_repo_credentials_id', '73f6b3b0-4580-4acf-b04a-63892fcf9ba8')
 // docker镜像仓库注册地址
@@ -69,7 +69,7 @@ map.put('is_grace_shutdown', true)
 // 是否进行服务启动健康探测 K8S集群类型设置false
 map.put('is_health_check', false)
 // 是否Pipeline内脚本钉钉通知  总开关
-map.put('is_ding_notice', true)
+map.put('is_ding_notice', false)
 // 是否进行部署前通知
 map.put('is_before_deploy_notice', false)
 // 是否通知变更记录
@@ -131,6 +131,7 @@ JSON_PARAMS
     "SHELL_PARAMS" : "city-watch-vision web 8025 80 prod" ,
     "NPM_RUN_PARAMS" : "build",
     "IS_ROLL_DEPLOY" : true,
+    "IS_DOCKER_BUILD_KIT": true,
     "APPLICATION_DOMAIN" : "https://vision.pengboche.com",
 }
 
