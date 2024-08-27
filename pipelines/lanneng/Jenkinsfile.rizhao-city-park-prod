@@ -166,25 +166,39 @@ city-watch-app-prod
 日照市智慧停车平台App服务端集群
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
+   "REPO_URL" : "https://git.pengbocloud.com/city_admin/spring-backend-monorepo.git" ,
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "city-watch-app" ,
-   "SHELL_PARAMS" : "city-watch app 8085 9000 prod",
-   "APPLICATION_DOMAIN" : "https://saasadmin.pengbocloud.com",
+   "SHELL_PARAMS" : "city-watch app 8080 8080 prod",
+   "IS_ROLL_DEPLOY" : true,
+   "APPLICATION_DOMAIN" : "https://app-api.pengboche.com",
 }
 
-city-watch-job-prod
-日照市智慧停车平台Job服务端集群
+city-watch-admin-prod
+日照市智慧停车平台Admin服务端集群
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
+   "REPO_URL" : "https://git.pengbocloud.com/city_admin/spring-backend-monorepo.git" ,
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "city-watch-job" ,
-   "SHELL_PARAMS" : "city-watch job 8066 8065 prod 8166 8266",
+   "PROJECT_NAME" : "city-watch-admin" ,
+   "SHELL_PARAMS" : "city-watch admin 8090 8090 prod",
+   "IS_ROLL_DEPLOY" : true,
+   "APPLICATION_DOMAIN" : "https://admin-api.pengboche.com",
 }
 
+city-watch-oauth2-prod
+日照市智慧停车平台OAuth2服务端集群
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/city_admin/spring-backend-monorepo.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "city-watch-oauth2" ,
+   "SHELL_PARAMS" : "city-watch oauth2 6868 6868 prod",
+   "IS_ROLL_DEPLOY" : true
+}
 
 */
 
