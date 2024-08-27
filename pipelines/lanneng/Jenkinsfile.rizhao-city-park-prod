@@ -188,6 +188,7 @@ JSON_PARAMS
    "IS_ROLL_DEPLOY" : true,
    "APPLICATION_DOMAIN" : "https://admin-api.pengboche.com",
 }
+REMOTE_IP: 192.168.0.5
 
 city-watch-oauth2-prod
 日照市智慧停车平台OAuth2服务端集群
