@@ -109,7 +109,7 @@ class Docker implements Serializable {
                 /* ctx.sh """  DOCKER_CLI_EXPERIMENTAL=enabled
                             """  */
                 // 根据运行CPU架构构建Docker镜像
-                dockerBuildDiffStr = " buildx build --platform linux/amd64 "
+                dockerBuildDiffStr = " buildx build --platform linux/arm64,linux/amd64 "
                 dockerPushDiffStr = " --push "
             } else {
                 ctx.println("开始制作Docker镜像并上传远程仓库 🏗️ ")
