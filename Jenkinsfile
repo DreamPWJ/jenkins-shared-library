@@ -10,7 +10,7 @@
 // 共享库请先去配置Jenkins系统配置 -> Global Untrusted Pipeline Libraries 注意名称和版本分支分开填写 最终组合如@Library('jenkins-shared-library@master')
 // Pipeline Maven Integration , NodeJS , Pipeline Utility Steps , DingTalk , Docker , Docker Pipeline , Maven Integration, Kubernetes ,
 // Configuration as Code, build user vars, Git Parameter, AnsiColor, Generic Webhook Trigger, Blue Ocean, Gitlab,  HTTP Request,
-// Dark Theme, ThinBackup, Role Strategy, SSH Pipeline Steps, HTML Publisher, Extended Choice Parameter, Hidden Parameter, Rebuilder, Active Choices
+// Dark Theme, ThinBackup, Role-based Authorization Strategy, HTML Publisher, SSH Pipeline Steps, Extended Choice Parameter, Hidden Parameter, Rebuilder, Active Choices
 
 // 根据不同环境项目配置不同参数
 def map = [:]
