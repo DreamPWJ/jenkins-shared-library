@@ -130,7 +130,6 @@ JSON_PARAMS
     "PROJECT_NAME" : "city-watch-admin" ,
     "SHELL_PARAMS" : "city-watch-admin web 8000 80 prod" ,
     "NPM_RUN_PARAMS" : "build",
-    "NODE_VERSION": "16" ,
     "IS_ROLL_DEPLOY" : true,
     "APPLICATION_DOMAIN" : "https://admin.pengboche.com",
 }
