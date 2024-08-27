@@ -131,6 +131,7 @@ JSON_PARAMS
     "SHELL_PARAMS" : "city-watch-vision web 8025 80 prod" ,
     "NPM_RUN_PARAMS" : "build",
     "IS_ROLL_DEPLOY" : true,
+    "IS_DOCKER_BUILD_KIT": true,
     "APPLICATION_DOMAIN" : "https://vision.pengboche.com",
 }
 

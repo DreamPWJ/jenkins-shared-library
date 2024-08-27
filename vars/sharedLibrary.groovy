@@ -752,6 +752,8 @@ def getInitParams(map) {
     IS_MAVEN_SINGLE_MODULE = jsonParams.IS_MAVEN_SINGLE_MODULE ? jsonParams.IS_MAVEN_SINGLE_MODULE : false
     // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
     IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true
+    // 是否开启Docker多架构CPU构建支持
+    IS_DOCKER_BUILD_KIT = jsonParams.IS_DOCKER_BUILD_KIT ? jsonParams.IS_DOCKER_BUILD_KIT : false
     IS_BLUE_GREEN_DEPLOY = jsonParams.IS_BLUE_GREEN_DEPLOY ? jsonParams.IS_BLUE_GREEN_DEPLOY : false // 是否蓝绿部署
     IS_ROLL_DEPLOY = jsonParams.IS_ROLL_DEPLOY ? jsonParams.IS_ROLL_DEPLOY : false // 是否滚动部署
     // 是否灰度发布  金丝雀发布  A/B测试

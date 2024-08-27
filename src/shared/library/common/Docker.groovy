@@ -92,7 +92,7 @@ class Docker implements Serializable {
             def dockerBuildDiffStr = " build " // 默认构建镜像
             def dockerPushDiffStr = "" // 默认不同时推送镜像
             // 是否使用buildkit构建多CPU架构支持
-            def isBuildKit = false
+            def isBuildKit = "${ctx.IS_DOCKER_BUILD_KIT}" == 'true' ? true : false
 
             if (isBuildKit) {
                 //docker buildx 多CPU架构支持 Building Multi-Arch Images for Arm and x86 with Docker Desktop
