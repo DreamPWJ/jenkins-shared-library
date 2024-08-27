@@ -130,6 +130,7 @@ JSON_PARAMS
     "PROJECT_NAME" : "city-watch-admin" ,
     "SHELL_PARAMS" : "city-watch-admin web 8000 80 prod" ,
     "NPM_RUN_PARAMS" : "build",
+    "NODE_VERSION": "16" ,
     "IS_ROLL_DEPLOY" : true,
     "APPLICATION_DOMAIN" : "https://admin.pengboche.com",
 }
@@ -158,6 +159,7 @@ JSON_PARAMS
     "PROJECT_NAME" : "city-watch-h5" ,
     "SHELL_PARAMS" : "city-watch-h5 web 8002 80 prod" ,
     "NPM_RUN_PARAMS" : "build:h5",
+    "NODE_VERSION": "14" ,
     "IS_ROLL_DEPLOY" : true,
     "APPLICATION_DOMAIN" : "https://vision.pengboche.com/h5",
 }
