@@ -182,7 +182,7 @@ def call(String type = 'web-java', Map map) {
                         script {
                             // 按顺序执行代码
                             // 重试几次
-                            retry(2) {
+                            retry(3) {
                                 pullProjectCode()
                                 pullCIRepo()
                             }
@@ -728,7 +728,7 @@ def getInitParams(map) {
     // JSON_PARAMS为单独项目的初始化参数  JSON_PARAMS为key值  value为json结构  请选择jenkins动态参数中的 "文本参数" 配置  具体参数定义如下
     def jsonParams = readJSON text: "${JSON_PARAMS}"
     // println "${jsonParams}"
-    REPO_URL = jsonParams.REPO_URL ? jsonParams.REPO_URL.trim() : "" // Git源码地址
+    REPO_URL = jsonParams.REPO_URL ? jsonParams.REPO_URL.trim() : "" // Git源码地址 需要包含.git后缀
     BRANCH_NAME = jsonParams.BRANCH_NAME ? jsonParams.BRANCH_NAME.trim() : GlobalVars.defaultBranch  // Git默认分支
     PROJECT_TYPE = jsonParams.PROJECT_TYPE ? jsonParams.PROJECT_TYPE.trim() : ""  // 项目类型 1 前端项目 2 后端项目
     // 计算机语言类型 1. Java  2. Go  3. Python  5. C++  6. JavaScript
@@ -1055,6 +1055,10 @@ def pullProjectCode() {
         }
 
         println "Git构建分支是: ${BRANCH_NAME} 📇"
+        // 仓库地址是否包含.git后缀 没有添加
+        if (!"${REPO_URL}".contains(".git")) {
+            REPO_URL = "${REPO_URL}.git"
+        }
         // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
         // println "${git}"
         sh "git --version"  // 使用git 2.0以上的高级版本  否则有兼容性问题

@@ -124,7 +124,7 @@ city-watch-vision-web-prod
 日照市智慧停车平台可视化Web前端集群 ❤️
 JSON_PARAMS
 {
-    "REPO_URL" : "https://git.pengbocloud.com/city_admin/smartparking-vision" ,
+    "REPO_URL" : "https://git.pengbocloud.com/city_admin/smartparking-vision.git" ,
     "BRANCH_NAME" : "main" ,
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "city-watch-vision" ,
