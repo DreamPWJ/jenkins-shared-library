@@ -91,7 +91,8 @@ if [[ ! $(command -v adb) ]]; then
 fi
 
 
-# MacOS jenkins节点管理远程工作目录 为 MacOS设置./jenkins  Linux设置/my/jenkins
+# Jenkins新增节点设置 节点管理远程工作目录 为 MacOS设置./jenkins  Linux设置/my/jenkins  标签和名称一致  SSH安全策略选择 Non verifying Verification Strategy
+
 # Flutter官网安装文档: https://docs.flutter.dev/get-started/install
 
 # MacOS安装Android SDK命令文档: https://proandroiddev.com/how-to-setup-android-sdk-without-android-studio-6d60d0f2812a
