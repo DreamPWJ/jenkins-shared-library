@@ -38,7 +38,7 @@ RUN cd /usr/share/nginx/html/ \
 # 暴露端口
 EXPOSE  80 443
 
-# 健康检查 如果服务不可用或未响应，Docker可以标记容器为不健康，并根据配置采取行动，如自动重启容器
+# 健康检查 HTTP响应200为健康 如果服务不可用或未响应，Docker可以标记容器为不健康，并根据配置采取行动，如自动重启容器
 HEALTHCHECK --start-period=1s --interval=30s --timeout=30s --retries=3 \
     CMD curl --fail http://localhost:80 || exit 1
 
