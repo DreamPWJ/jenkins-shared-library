@@ -168,7 +168,7 @@ city-watch-app-prod
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/city_admin/spring-backend-monorepo.git" ,
-   "BRANCH_NAME" : "master" ,
+   "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "city-watch-app" ,
    "SHELL_PARAMS" : "city-watch app 8080 8080 prod",
@@ -181,7 +181,7 @@ city-watch-admin-prod
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/city_admin/spring-backend-monorepo.git" ,
-   "BRANCH_NAME" : "master" ,
+   "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "city-watch-admin" ,
    "SHELL_PARAMS" : "city-watch admin 8090 8090 prod",
@@ -195,7 +195,7 @@ city-watch-oauth2-prod
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/city_admin/spring-backend-monorepo.git" ,
-   "BRANCH_NAME" : "master" ,
+   "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "city-watch-oauth2" ,
    "SHELL_PARAMS" : "city-watch oauth2 6868 6868 prod",
