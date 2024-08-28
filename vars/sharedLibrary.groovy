@@ -110,7 +110,7 @@ def call(String type = 'web-java', Map map) {
 
                 CI_GIT_CREDENTIALS_ID = "${map.ci_git_credentials_id}" // CI仓库信任ID
                 GIT_CREDENTIALS_ID = "${map.git_credentials_id}" // Git信任ID
-                DING_TALK_CREDENTIALS_ID = "${map.ding_talk_credentials_id}" // 钉钉授信ID 系统设置里面配置 自动生成
+                DING_TALK_CREDENTIALS_ID = "${map.ding_talk_credentials_id}" // 钉钉授信ID 系统管理根目录里面配置 自动生成
                 DEPLOY_FOLDER = "${map.deploy_folder}" // 服务器上部署所在的文件夹名称
                 NPM_PACKAGE_FOLDER = "${map.npm_package_folder}" // Web项目NPM打包代码所在的文件夹名称
                 WEB_STRIP_COMPONENTS = "${map.web_strip_components}" // Web项目解压到指定目录层级
@@ -182,7 +182,7 @@ def call(String type = 'web-java', Map map) {
                         script {
                             // 按顺序执行代码
                             // 重试几次
-                            retry(2) {
+                            retry(3) {
                                 pullProjectCode()
                                 pullCIRepo()
                             }
@@ -728,7 +728,7 @@ def getInitParams(map) {
     // JSON_PARAMS为单独项目的初始化参数  JSON_PARAMS为key值  value为json结构  请选择jenkins动态参数中的 "文本参数" 配置  具体参数定义如下
     def jsonParams = readJSON text: "${JSON_PARAMS}"
     // println "${jsonParams}"
-    REPO_URL = jsonParams.REPO_URL ? jsonParams.REPO_URL.trim() : "" // Git源码地址
+    REPO_URL = jsonParams.REPO_URL ? jsonParams.REPO_URL.trim() : "" // Git源码地址 需要包含.git后缀
     BRANCH_NAME = jsonParams.BRANCH_NAME ? jsonParams.BRANCH_NAME.trim() : GlobalVars.defaultBranch  // Git默认分支
     PROJECT_TYPE = jsonParams.PROJECT_TYPE ? jsonParams.PROJECT_TYPE.trim() : ""  // 项目类型 1 前端项目 2 后端项目
     // 计算机语言类型 1. Java  2. Go  3. Python  5. C++  6. JavaScript
@@ -752,6 +752,8 @@ def getInitParams(map) {
     IS_MAVEN_SINGLE_MODULE = jsonParams.IS_MAVEN_SINGLE_MODULE ? jsonParams.IS_MAVEN_SINGLE_MODULE : false
     // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
     IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true
+    // 是否开启Docker多架构CPU构建支持
+    IS_DOCKER_BUILD_MULTI_PLATFORM = jsonParams.IS_DOCKER_BUILD_MULTI_PLATFORM ? jsonParams.IS_DOCKER_BUILD_MULTI_PLATFORM : false
     IS_BLUE_GREEN_DEPLOY = jsonParams.IS_BLUE_GREEN_DEPLOY ? jsonParams.IS_BLUE_GREEN_DEPLOY : false // 是否蓝绿部署
     IS_ROLL_DEPLOY = jsonParams.IS_ROLL_DEPLOY ? jsonParams.IS_ROLL_DEPLOY : false // 是否滚动部署
     // 是否灰度发布  金丝雀发布  A/B测试
@@ -803,7 +805,6 @@ def getInitParams(map) {
     CUSTOM_DOCKERFILE_NAME = jsonParams.CUSTOM_DOCKERFILE_NAME ? jsonParams.CUSTOM_DOCKERFILE_NAME.trim() : ""
     // 自定义Python版本
     CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.10.0"
-    // 自定义Python启动文件名称 默认app.py文件
     // 自定义Python启动文件名称 默认app.py文件
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
 
@@ -1056,6 +1057,10 @@ def pullProjectCode() {
         }
 
         println "Git构建分支是: ${BRANCH_NAME} 📇"
+        // 仓库地址是否包含.git后缀 没有添加
+        if (!"${REPO_URL}".contains(".git")) {
+            REPO_URL = "${REPO_URL}.git"
+        }
         // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
         // println "${git}"
         sh "git --version"  // 使用git 2.0以上的高级版本  否则有兼容性问题
@@ -1146,7 +1151,7 @@ def nodeBuildProject() {
                         def retryCount = 0
                         retry(3) {
                             retryCount++
-                            if (retryCount >= 2) {
+                            if (retryCount >= 2) { // 第一次构建不处理
                                 sh "rm -rf node_modules && rm -f *lock*"
                                 // 如果包404下载失败  可以更换官方镜像源重新下载
                                 // Node.setOfficialMirror(this)
@@ -1155,7 +1160,7 @@ def nodeBuildProject() {
                                 // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
                                 println("安装依赖 📥")
                                 // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱但依赖lock文件
-                                sh " npm ci || pnpm install || npm install || yarn install "
+                                sh " pnpm install || yarn install || npm install || npm ci "
                                 // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
                             }
 
@@ -2065,33 +2070,33 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
         def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
         def noticeHealthCheckUrl = "${APPLICATION_DOMAIN == "" ? healthCheckUrl : healthCheckDomainUrl}"
 
-        if (type == 0) { // 失败
-            if (!isHealthCheckFail) {
-                dingtalk(
-                        robot: "${DING_TALK_CREDENTIALS_ID}",
-                        type: 'MARKDOWN',
-                        title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}流水线失败通知",
-                        text: [
-                                "### [${env.JOB_NAME}#${env.BUILD_NUMBER}](${env.BUILD_URL}) ${PROJECT_TAG}${envTypeMark}${projectTypeName}项目${msg}",
-                                "#### 请及时处理 🏃",
-                                "###### ** 流水线失败原因: [运行日志](${env.BUILD_URL}console) 👈 **",
-                                "###### Jenkins地址  [查看](${env.JENKINS_URL})   源码地址  [查看](${REPO_URL})",
-                                "###### 发布环境: ${releaseEnvironment}  持续时间: ${durationTimeString}",
-                                "###### 发布人: ${BUILD_USER}",
-                                "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                        ],
-                        at: ["${BUILD_USER_MOBILE}"]
-                )
-            }
-        } else if (type == 1) { // 部署完成
-            if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-                // 生成二维码 方便手机端扫描
-                genQRCode(map)
-                def screenshot = "![screenshot](${qrCodeOssUrl})"
-                if ("${qrCodeOssUrl}" == "") {
-                    screenshot = ""
+        try {
+            if (type == 0) { // 失败
+                if (!isHealthCheckFail) {
+                    dingtalk(
+                            robot: "${DING_TALK_CREDENTIALS_ID}",
+                            type: 'MARKDOWN',
+                            title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}流水线失败通知",
+                            text: [
+                                    "### [${env.JOB_NAME}#${env.BUILD_NUMBER}](${env.BUILD_URL}) ${PROJECT_TAG}${envTypeMark}${projectTypeName}项目${msg}",
+                                    "#### 请及时处理 🏃",
+                                    "###### ** 流水线失败原因: [运行日志](${env.BUILD_URL}console) 👈 **",
+                                    "###### Jenkins地址  [查看](${env.JENKINS_URL})   源码地址  [查看](${REPO_URL})",
+                                    "###### 发布环境: ${releaseEnvironment}  持续时间: ${durationTimeString}",
+                                    "###### 发布人: ${BUILD_USER}",
+                                    "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
+                            ],
+                            at: ["${BUILD_USER_MOBILE}"]
+                    )
                 }
-                try {
+            } else if (type == 1) { // 部署完成
+                if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
+                    // 生成二维码 方便手机端扫描
+                    genQRCode(map)
+                    def screenshot = "![screenshot](${qrCodeOssUrl})"
+                    if ("${qrCodeOssUrl}" == "") {
+                        screenshot = ""
+                    }
                     dingtalk(
                             robot: "${DING_TALK_CREDENTIALS_ID}",
                             type: 'ACTION_CARD',
@@ -2121,22 +2126,18 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             ],
                             at: [isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone)]
                     )
-                } catch (e) {
-                    echo "钉钉通知失败，原因：${e.getMessage()}"
-                }
-            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-                def javaInfo = ""
-                if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-                    javaInfo = "构建版本: JDK${JDK_VERSION}   包大小: ${javaPackageSize}"
-                    if ("${javaOssUrl}".trim() != '') {
-                        javaInfo = javaInfo + "\n [直接下载构建${javaPackageType}包](${javaOssUrl})  👈"
+                } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
+                    def javaInfo = ""
+                    if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+                        javaInfo = "构建版本: JDK${JDK_VERSION}   包大小: ${javaPackageSize}"
+                        if ("${javaOssUrl}".trim() != '') {
+                            javaInfo = javaInfo + "\n [直接下载构建${javaPackageType}包](${javaOssUrl})  👈"
+                        }
                     }
-                }
-                def pythonInfo = ""
-                if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-                    pythonInfo = "运行版本: Python ${CUSTOM_PYTHON_VERSION} "
-                }
-                try {
+                    def pythonInfo = ""
+                    if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
+                        pythonInfo = "运行版本: Python ${CUSTOM_PYTHON_VERSION} "
+                    }
                     dingtalk(
                             robot: "${DING_TALK_CREDENTIALS_ID}",
                             type: 'MARKDOWN',
@@ -2159,58 +2160,59 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             ],
                             at: [isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone)]
                     )
-                } catch (e) {
-                    echo "钉钉通知失败，原因：${e.getMessage()}"
                 }
-            }
-        } else if (type == 2) { // 部署之前
-            dingtalk(
-                    robot: "${DING_TALK_CREDENTIALS_ID}",
-                    type: 'MARKDOWN',
-                    title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署前通知",
-                    text: [
-                            "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${envTypeMark}${projectTypeName}](${env.JOB_URL})",
-                            "#### ${PROJECT_TAG}服务部署启动中 🚀  请稍等...  ☕",
-                            "###### 发布人: ${BUILD_USER}",
-                            "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                    ],
-                    at: []
-            )
-        } else if (type == 3) { // 变更记录
-            if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
-                def gitChangeLog = ""
-                if ("${Constants.DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESCRIPTION) {
-                    gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
-                } else {
-                    // 使用自定义文案
-                    gitChangeLog = "${params.VERSION_DESCRIPTION}"
-                }
-                if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
-                    def titlePrefix = "${PROJECT_TAG} BUILD#${env.BUILD_NUMBER}"
-                    try {
-                        if ("${tagVersion}") {
-                            titlePrefix = "${PROJECT_TAG} ${tagVersion}"
-                        }
-                    } catch (e) {
+            } else if (type == 2) { // 部署之前
+                dingtalk(
+                        robot: "${DING_TALK_CREDENTIALS_ID}",
+                        type: 'MARKDOWN',
+                        title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署前通知",
+                        text: [
+                                "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${envTypeMark}${projectTypeName}](${env.JOB_URL})",
+                                "#### ${PROJECT_TAG}服务部署启动中 🚀  请稍等...  ☕",
+                                "###### 发布人: ${BUILD_USER}",
+                                "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
+                        ],
+                        at: []
+                )
+            } else if (type == 3) { // 变更记录
+                if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
+                    def gitChangeLog = ""
+                    if ("${Constants.DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESCRIPTION) {
+                        gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
+                    } else {
+                        // 使用自定义文案
+                        gitChangeLog = "${params.VERSION_DESCRIPTION}"
                     }
-                    dingtalk(
-                            robot: "${DING_TALK_CREDENTIALS_ID}",
-                            type: 'MARKDOWN',
-                            title: "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
-                            text: [
-                                    "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉",
-                                    "#### 项目: ${PROJECT_NAME}",
-                                    "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}**",
-                                    "${gitChangeLog}",
-                                    ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看",
-                                    "###### 发布人: ${BUILD_USER}",
-                                    "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                            ],
-                            at: []
-                    )
+                    if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
+                        def titlePrefix = "${PROJECT_TAG} BUILD#${env.BUILD_NUMBER}"
+                        try {
+                            if ("${tagVersion}") {
+                                titlePrefix = "${PROJECT_TAG} ${tagVersion}"
+                            }
+                        } catch (e) {
+                        }
+                        dingtalk(
+                                robot: "${DING_TALK_CREDENTIALS_ID}",
+                                type: 'MARKDOWN',
+                                title: "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
+                                text: [
+                                        "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉",
+                                        "#### 项目: ${PROJECT_NAME}",
+                                        "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}**",
+                                        "${gitChangeLog}",
+                                        ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看",
+                                        "###### 发布人: ${BUILD_USER}",
+                                        "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
+                                ],
+                                at: []
+                        )
+                    }
                 }
             }
+        } catch (e) {
+            echo "钉钉通知失败，原因：${e.getMessage()}"
         }
+
     }
 }
 

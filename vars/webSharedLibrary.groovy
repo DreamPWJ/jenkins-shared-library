@@ -104,7 +104,7 @@ def call(String type = 'web', Map map) {
 
                 CI_GIT_CREDENTIALS_ID = "${map.ci_git_credentials_id}" // CI仓库信任ID
                 GIT_CREDENTIALS_ID = "${map.git_credentials_id}" // Git信任ID
-                DING_TALK_CREDENTIALS_ID = "${map.ding_talk_credentials_id}" // 钉钉授信ID 系统设置里面配置 自动生成
+                DING_TALK_CREDENTIALS_ID = "${map.ding_talk_credentials_id}" // 钉钉授信ID 系统管理根目录里面配置 自动生成
                 DEPLOY_FOLDER = "${map.deploy_folder}" // 服务器上部署所在的文件夹名称
                 NPM_PACKAGE_FOLDER = "${map.npm_package_folder}" // Web项目NPM打包代码所在的文件夹名称
                 WEB_STRIP_COMPONENTS = "${map.web_strip_components}" // Web项目解压到指定目录层级
@@ -919,7 +919,7 @@ def nodeBuildProject() {
                         if (Git.isExistsChangeFile(this) || retryCount >= 2) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
                             println("安装依赖 📥")
                             // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱但依赖lock文件
-                            sh " npm ci || pnpm install || npm install || yarn install  "
+                            sh " pnpm install || yarn install || npm install || npm ci "
                             // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
                         }
 

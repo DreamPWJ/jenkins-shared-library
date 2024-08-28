@@ -6,6 +6,7 @@ package shared.library.common
  * @email 406798106@qq.com
  * @description jenkins相关方法
  * 访问Jenkins调试的Groovy脚本: https://YOUR_JENKINS_URL/script
+ * 执行Jenkins调用CLI命令: https://www.jenkins.io/doc/book/managing/cli/
  */
 class JenkinsCI implements Serializable {
 
@@ -66,10 +67,18 @@ class JenkinsCI implements Serializable {
      * 存储到 plugins.txt 用于自动化初始化安装大量插件
      */
     static def getAllPlugins(ctx) {
-        Jenkins.instance.pluginManager.plugins.each{
+        Jenkins.instance.pluginManager.plugins.each {
             plugin ->
-                println ("${plugin.getShortName()}:${plugin.getVersion()}")
+                println("${plugin.getShortName()}:${plugin.getVersion()}")
         }
+        // java -jar jenkins-cli.jar -s https://jenkins.url/ install-plugin SOURCE ... [-deploy] [-name VAL] [-restart]
+    }
+
+    /**
+     * 重新加载配置
+     */
+    static def reload(ctx) {
+        // curl -X POST http://localhost:9090/reload -u "<your-admin-username>:<your-admin-api-token>"
     }
 
     /**

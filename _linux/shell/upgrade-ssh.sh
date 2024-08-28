@@ -33,7 +33,7 @@ target_version="OpenSSH_7.3p1"
 
 # 比较版本号
 if compare_ssh_versions "$current_version" "$target_version"; then
-  # echo "当前服务器SSH版本高于或等于目标版本$target_version"
+   echo "当前服务器SSH版本$current_version高于或等于目标最低版本$target_version"
 else
   echo "当前服务器SSH版本低于目标版本$target_version"
   echo "OpenSSH版本低于7.3 版本, 无法支持跳板机 -J 模式, 执行自动升级OpenSSH版本"
