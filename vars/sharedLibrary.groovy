@@ -2126,20 +2126,18 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             ],
                             at: [isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone)]
                     )
-                }
-            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-                def javaInfo = ""
-                if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-                    javaInfo = "构建版本: JDK${JDK_VERSION}   包大小: ${javaPackageSize}"
-                    if ("${javaOssUrl}".trim() != '') {
-                        javaInfo = javaInfo + "\n [直接下载构建${javaPackageType}包](${javaOssUrl})  👈"
+                } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
+                    def javaInfo = ""
+                    if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+                        javaInfo = "构建版本: JDK${JDK_VERSION}   包大小: ${javaPackageSize}"
+                        if ("${javaOssUrl}".trim() != '') {
+                            javaInfo = javaInfo + "\n [直接下载构建${javaPackageType}包](${javaOssUrl})  👈"
+                        }
                     }
-                }
-                def pythonInfo = ""
-                if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-                    pythonInfo = "运行版本: Python ${CUSTOM_PYTHON_VERSION} "
-                }
-                try {
+                    def pythonInfo = ""
+                    if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
+                        pythonInfo = "运行版本: Python ${CUSTOM_PYTHON_VERSION} "
+                    }
                     dingtalk(
                             robot: "${DING_TALK_CREDENTIALS_ID}",
                             type: 'MARKDOWN',
@@ -2162,8 +2160,6 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             ],
                             at: [isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone)]
                     )
-                } catch (e) {
-                    echo "钉钉通知失败，原因：${e.getMessage()}"
                 }
             } else if (type == 2) { // 部署之前
                 dingtalk(
