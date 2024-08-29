@@ -2174,7 +2174,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                         ],
                         at: []
                 )
-            } else if (type == 3) { // 变更记录
+            } else if (type == 3) { // 变更记录 有些场景精简提醒只推送发布日志消息
                 if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
                     def gitChangeLog = ""
                     if ("${Constants.DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESCRIPTION) {
