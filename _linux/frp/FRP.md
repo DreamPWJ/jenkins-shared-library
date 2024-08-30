@@ -4,15 +4,17 @@
 - 配置后台运行和开机自启动文档: https://gofrp.org/zh-cn/docs/setup/systemd/
 - 自定义后台运行和开机自启动目录: /etc/systemd/system/
 
-# 启动frp
+#### 启动frps or frpc
 sudo systemctl start frps
-# 停止frp
+#### 停止frp
 sudo systemctl stop frps
-# 重启frp
+#### 重启frp
 sudo systemctl restart frps
-# 查看frp状态
+#### 查看frp状态
 sudo systemctl status frps
-# 禁用frp状态
+#### 开启自启动frp状态
+sudo systemctl enable frps
+#### 禁用frp状态
 sudo systemctl disable frps
 
 - 启动服务器：./frps -c ./frps.toml
