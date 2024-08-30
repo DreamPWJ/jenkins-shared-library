@@ -1,5 +1,5 @@
 [Unit]
-# 服务名称，可自定义
+# 开机自启动服务名称，可自定义
 Description = frp client
 After = network.target syslog.target
 Wants = network.target

@@ -1,10 +1,10 @@
-serverAddr = "47.102.214.33"
+serverAddr = "66.111.222.88"
 serverPort = 7000
 auth.token = "YRgC=Vh*WD6v:xp-Ab-Ng3@=0F*+.fD7*r,)8i.La^yi,d!79vNZHLbaR50r"
 
 [[proxies]]
-name = "ssh"
+name = "ssh-01"
 type = "tcp"
 localIP = "127.0.0.1"
 localPort = 22
-remotePort = 20068
+remotePort = 20088
