@@ -82,7 +82,7 @@ def call(String type = 'desktop', Map map) {
                 PROJECT_TAG = "${map.project_tag}" // 项目标签或项目简称
                 IS_AUTO_TRIGGER = false // 是否是自动触发构建
                 IS_ARCHIVE = false // 是否归档
-                IS_NOTICE_CHANGE_LOG = "${map.is_notice_change_log}" // 是否通知变更记录
+                IS_ONLY_NOTICE_CHANGE_LOG = "${map.is_only_notice_change_log}" // 是否只通知发布变更记录
             }
 
             options {
@@ -973,7 +973,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                         ],
                         at: ["${BUILD_USER_MOBILE}"]
                 )
-            } else if (type == 1) { // 构建完成
+            } else if (type == 1 && "${IS_ONLY_NOTICE_CHANGE_LOG}" == 'false') { // 构建完成
                 def notifierPhone = params.NOTIFIER_PHONES.split("-")[1].trim()
                 if (notifierPhone == "oneself") { // 通知自己
                     notifierPhone = "${BUILD_USER_MOBILE}"
@@ -1003,31 +1003,29 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                         at: [notifierPhone == '110' ? '' : notifierPhone]
                 )
             } else if (type == 3) { // 变更记录
-                if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
-                    def gitChangeLog = ""
-                    if ("${Constants.DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESCRIPTION) {
-                        gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
-                    } else {
-                        // 使用自定义文案
-                        gitChangeLog = "${params.VERSION_DESCRIPTION}".replace("\\n", "\\n ##### ")
-                    }
+                def gitChangeLog = ""
+                if ("${Constants.DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESCRIPTION) {
+                    gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
+                } else {
+                    // 使用自定义文案
+                    gitChangeLog = "${params.VERSION_DESCRIPTION}".replace("\\n", "\\n ##### ")
+                }
 
-                    if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
-                        dingtalk(
-                                robot: "${dingId}",
-                                type: 'MARKDOWN',
-                                title: "${PROJECT_CHINESE_NAME} ${SYSTEM_TYPE_NAME} v${DESKTOP_VERSION_NUM} 发布日志",
-                                text: [
-                                        "### ${PROJECT_CHINESE_NAME}${PROJECT_TAG} ${ENV_TYPE_MARK}${SYSTEM_TYPE_NAME} 🖥  v${DESKTOP_VERSION_NUM} 发布日志 🎉",
-                                        "#### 打包模式: ${params.PUBLISH_ENV_TYPE}",
-                                        "${gitChangeLog}",
-                                        ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看",
-                                        "###### 发布人: ${BUILD_USER}",
-                                        "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                                ],
-                                at: []
-                        )
-                    }
+                if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
+                    dingtalk(
+                            robot: "${dingId}",
+                            type: 'MARKDOWN',
+                            title: "${PROJECT_CHINESE_NAME} ${SYSTEM_TYPE_NAME} v${DESKTOP_VERSION_NUM} 发布日志",
+                            text: [
+                                    "### ${PROJECT_CHINESE_NAME}${PROJECT_TAG} ${ENV_TYPE_MARK}${SYSTEM_TYPE_NAME} 🖥  v${DESKTOP_VERSION_NUM} 发布日志 🎉",
+                                    "#### 打包模式: ${params.PUBLISH_ENV_TYPE}",
+                                    "${gitChangeLog}",
+                                    ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看",
+                                    "###### 发布人: ${BUILD_USER}",
+                                    "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
+                            ],
+                            at: []
+                    )
                 }
             } else if (type == 4) { // 应用商店
 

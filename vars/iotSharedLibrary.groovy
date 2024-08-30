@@ -89,7 +89,7 @@ def call(String type = 'iot', Map map) {
                 IS_ARCHIVE = true // 是否归档
                 IS_CODE_QUALITY_ANALYSIS = false // 是否进行代码质量分析的总开关
                 IS_INTEGRATION_TESTING = false // 是否进集成测试
-                IS_NOTICE_CHANGE_LOG = "${map.is_notice_change_log}" // 是否通知变更记录
+                IS_ONLY_NOTICE_CHANGE_LOG = "${map.is_only_notice_change_log}" // 是否只通知发布变更记录
             }
 
             options {
@@ -953,7 +953,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                     ],
                     at: ["${BUILD_USER_MOBILE}"]
             )
-        } else if (type == 1) { // 发布通知
+        } else if (type == 1 && "${IS_ONLY_NOTICE_CHANGE_LOG}" == 'false') { // 发布通知
             dingtalk(
                     robot: "${DING_TALK_CREDENTIALS_ID}",
                     type: 'ACTION_CARD',
@@ -985,23 +985,21 @@ def dingNotice(int type, msg = '', atMobiles = '') {
         } else if (type == 2) { // 部署之前
 
         } else if (type == 3) { // 变更记录
-            if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
-                def gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
-                if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
-                    dingtalk(
-                            robot: "${DING_TALK_CREDENTIALS_ID}",
-                            type: 'MARKDOWN',
-                            title: "${PROJECT_CHINESE_NAME}${projectTypeName} v${IOT_VERSION_NUM} 发布日志",
-                            text: [
-                                    "### ${PROJECT_CHINESE_NAME}${PROJECT_TAG}${envTypeMark}${projectTypeName} 📟  v${IOT_VERSION_NUM} 发布日志 🎉",
-                                    "${gitChangeLog}",
-                                    ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看",
-                                    "###### 发布人: ${BUILD_USER}",
-                                    "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                            ],
-                            at: []
-                    )
-                }
+            def gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
+            if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
+                dingtalk(
+                        robot: "${DING_TALK_CREDENTIALS_ID}",
+                        type: 'MARKDOWN',
+                        title: "${PROJECT_CHINESE_NAME}${projectTypeName} v${IOT_VERSION_NUM} 发布日志",
+                        text: [
+                                "### ${PROJECT_CHINESE_NAME}${PROJECT_TAG}${envTypeMark}${projectTypeName} 📟  v${IOT_VERSION_NUM} 发布日志 🎉",
+                                "${gitChangeLog}",
+                                ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看",
+                                "###### 发布人: ${BUILD_USER}",
+                                "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
+                        ],
+                        at: []
+                )
             }
         }
     }

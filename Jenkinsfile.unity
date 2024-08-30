@@ -21,8 +21,8 @@ map.put('default_git_branch', 'master')
 map.put('is_icon_add_badge', false)
 // 是否Pipeline内脚本钉钉通知  总开关
 map.put('is_ding_notice', false)
-// 是否通知变更记录
-map.put('is_notice_change_log', false)
+// 是否只通知发布变更记录
+map.put('is_only_notice_change_log', false)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
 map.put('is_git_tag', false)
 
