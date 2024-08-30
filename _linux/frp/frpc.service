@@ -1,0 +1,15 @@
+[Unit]
+# 服务名称，可自定义
+Description = frp client
+After = network.target syslog.target
+Wants = network.target
+
+[Service]
+Type = simple
+Restart = always
+RestartSec = 10s
+# 启动frps的命令，需修改为您的frpc的安装路径
+ExecStart = /my/frp/frpc -c /my/frp/frpc.toml
+
+[Install]
+WantedBy = multi-user.target

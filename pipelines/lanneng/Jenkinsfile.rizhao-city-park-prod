@@ -21,7 +21,7 @@ map.put('proxy_jump_ip', '47.102.214.33')
 // 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
 map.put('proxy_jump_user_name', 'root')
 // 自定义跳板机ssh和scp访问端口 默认22
-map.put('proxy_jump_port', '20066')
+map.put('proxy_jump_port', '20068')
 
 // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
 map.put('default_git_branch', ' ')
@@ -72,8 +72,8 @@ map.put('is_health_check', true)
 map.put('is_ding_notice', true)
 // 是否进行部署前通知
 map.put('is_before_deploy_notice', false)
-// 是否通知变更记录
-map.put('is_notice_change_log', true)
+// 是否只通知发布变更记录
+map.put('is_only_notice_change_log', true)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
 map.put('is_git_tag', true)
 // 是否需要css预处理器sass
@@ -84,7 +84,7 @@ map.put('jenkins_node', 'node-2')
 map.put('jenkins_node_front_end', 'node-2')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
-map.put('nodejs', 'Node18')
+map.put('nodejs', 'Node16')
 map.put('maven', 'Maven3.6')
 map.put('jdk_publisher', 'openjdk')
 map.put('jdk', '11')

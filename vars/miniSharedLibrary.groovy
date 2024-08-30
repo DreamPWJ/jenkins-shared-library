@@ -82,7 +82,7 @@ def call(String type = 'wx-mini', Map map) {
                 DING_TALK_CREDENTIALS_ID = "${map.ding_talk_credentials_id}" // 钉钉授信ID 系统管理根目录里面配置 自动生成
                 PROJECT_TAG = "${map.project_tag}" // 项目标签或项目简称
                 IS_AUTO_TRIGGER = false // 是否是自动触发构建
-                IS_NOTICE_CHANGE_LOG = "${map.is_notice_change_log}" // 是否通知变更记录
+                IS_ONLY_NOTICE_CHANGE_LOG = "${map.is_only_notice_change_log}" // 是否只通知发布变更记录
             }
 
             options {
@@ -953,7 +953,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                     ],
                     at: ["${BUILD_USER_MOBILE}"]
             )
-        } else if (type == 1) { // 构建完成
+        } else if (type == 1 && "${IS_ONLY_NOTICE_CHANGE_LOG}" == 'false') { // 构建完成
             def notifierPhone = params.NOTIFIER_PHONES.split("-")[1].trim()
             if (notifierPhone == "oneself") { // 通知自己
                 notifierPhone = "${BUILD_USER_MOBILE}"
@@ -998,30 +998,28 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                     at: [notifierPhone == '110' ? '' : notifierPhone]
             )
         } else if (type == 3) { // 变更记录
-            if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
-                def gitChangeLog = ""
-                if ("${Constants.MINI_DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESC) {
-                    gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
-                } else {
-                    // 使用自定义文案
-                    gitChangeLog = "${params.VERSION_DESC}".replace("\\n", "\\n ##### ")
-                }
+            def gitChangeLog = ""
+            if ("${Constants.MINI_DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESC) {
+                gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
+            } else {
+                // 使用自定义文案
+                gitChangeLog = "${params.VERSION_DESC}".replace("\\n", "\\n ##### ")
+            }
 
-                if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
-                    dingtalk(
-                            robot: "${DING_TALK_CREDENTIALS_ID}",
-                            type: 'MARKDOWN',
-                            title: "${PROJECT_CHINESE_NAME} 小程序 v${MINI_VERSION_NUM} 发布日志",
-                            text: [
-                                    "### ${PROJECT_CHINESE_NAME}${PROJECT_TAG}${buildTypeMsg}小程序🌱 v${MINI_VERSION_NUM} 发布日志 🎉",
-                                    "${gitChangeLog}",
-                                    ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看",
-                                    "###### 发布人: ${BUILD_USER}",
-                                    "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                            ],
-                            at: []
-                    )
-                }
+            if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
+                dingtalk(
+                        robot: "${DING_TALK_CREDENTIALS_ID}",
+                        type: 'MARKDOWN',
+                        title: "${PROJECT_CHINESE_NAME} 小程序 v${MINI_VERSION_NUM} 发布日志",
+                        text: [
+                                "### ${PROJECT_CHINESE_NAME}${PROJECT_TAG}${buildTypeMsg}小程序🌱 v${MINI_VERSION_NUM} 发布日志 🎉",
+                                "${gitChangeLog}",
+                                ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看",
+                                "###### 发布人: ${BUILD_USER}",
+                                "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
+                        ],
+                        at: []
+                )
             }
         }
     }

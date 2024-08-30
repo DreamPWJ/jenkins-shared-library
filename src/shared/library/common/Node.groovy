@@ -29,9 +29,15 @@ class Node implements Serializable {
     static def setMirror(ctx) {
         // 每次流水线执行都将执行 会产生无效的浪费  后面优化一下
         ctx.sh "node -v && npm -v"  // node和npm版本信息
+        def npmMirror = "" // NPM镜像
+        if (false) { // 是否使用官方镜像
+            npmMirror = "https://registry.npmjs.org" // 官方镜像
+        } else { // 其他国内镜像加速下载
+            npmMirror = "https://registry.npmmirror.com" // 新淘宝镜像
+        }
 
         // 设置镜像源 加速下载
-        ctx.sh "npm config set registry https://registry.npmmirror.com"
+        ctx.sh "npm config set registry ${npmMirror}"
 
         try {
             ctx.sh "yarn --version"
@@ -45,8 +51,8 @@ class Node implements Serializable {
         }
 
         // 设置镜像源 加速下载
-        ctx.sh "yarn config set registry https://registry.npmmirror.com"
-        ctx.sh "pnpm config set registry https://registry.npmmirror.com || true"
+        ctx.sh "yarn config set registry ${npmMirror}"
+        ctx.sh "pnpm config set registry ${npmMirror} || true"
     }
 
     /**
@@ -59,9 +65,10 @@ class Node implements Serializable {
         // 检查文件内容是否包含特定关键字
         if (fileContent.contains('ERR_PNPM_FETCH_404') || fileContent.contains('Not Found - 404')
                 || fileContent.contains('No matching version found') || fileContent.contains('error Couldn\'t find any versions')) {
-            ctx.sh "npm config set registry https://registry.npmjs.org"
-            ctx.sh "yarn config set registry https://registry.npmjs.org"
-            ctx.sh "pnpm config set registry https://registry.npmjs.org || true"
+            def npmMirror = "https://registry.npmjs.org" // 官方镜像
+            ctx.sh "npm config set registry ${npmMirror}"
+            ctx.sh "yarn config set registry ${npmMirror}"
+            ctx.sh "pnpm config set registry ${npmMirror} || true"
         }
     }
 
@@ -76,10 +83,17 @@ class Node implements Serializable {
         } catch (error) {
             ctx.sh "npm install -g yarn"  // 动态配置或固定yarn版本号 防止版本变化兼容性问题
         }
-        ctx.sh "npm config set registry https://registry.npmmirror.com"
-        ctx.sh "yarn config set registry https://registry.npmmirror.com"
-        ctx.sh "npm config set electron_mirror https://registry.npmmirror.com/electron/"
-        ctx.sh "yarn config set electron_mirror https://registry.npmmirror.com/electron/"
+        def npmMirror = "" // NPM镜像
+        if (false) { // 是否使用官方镜像
+            npmMirror = "https://registry.npmjs.org" // 官方镜像
+        } else { // 其他国内镜像加速下载
+            npmMirror = "https://registry.npmmirror.com" // 新淘宝镜像
+        }
+
+        ctx.sh "npm config set registry ${npmMirror}"
+        ctx.sh "yarn config set registry ${npmMirror}"
+        ctx.sh "npm config set electron_mirror ${npmMirror}/electron/"
+        ctx.sh "yarn config set electron_mirror ${npmMirror}/electron/"
         // ctx.sh "yarn config set electron_mirror https://mirrors.huaweicloud.com/electron/"
         // ctx.sh "npm config set registry  https://mirrors.huaweicloud.com/repository/npm"
     }

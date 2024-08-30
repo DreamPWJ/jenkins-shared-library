@@ -125,7 +125,7 @@ def call(String type = 'web', Map map) {
                 IS_ARCHIVE = false // 是否归档
                 IS_CODE_QUALITY_ANALYSIS = false // 是否进行代码质量分析的总开关
                 IS_INTEGRATION_TESTING = false // 是否进集成测试
-                IS_NOTICE_CHANGE_LOG = "${map.is_notice_change_log}" // 是否通知变更记录
+                IS_ONLY_NOTICE_CHANGE_LOG = "${map.is_only_notice_change_log}" // 是否只通知发布变更记录
             }
 
             options {
@@ -1332,7 +1332,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                         at: ["${BUILD_USER_MOBILE}"]
                 )
             }
-        } else if (type == 1) { // 部署完成
+        } else if (type == 1 && "${IS_ONLY_NOTICE_CHANGE_LOG}" == 'false') { // 部署完成
             // 生成二维码 方便手机端扫描
             genQRCode(map)
             def screenshot = "![screenshot](${qrCodeOssUrl})"
@@ -1380,32 +1380,30 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                     at: []
             )
         } else if (type == 3) { // 变更记录
-            if ("${IS_NOTICE_CHANGE_LOG}" == 'true') {
-                def gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
-                if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
-                    def titlePrefix = "${PROJECT_TAG} BUILD#${env.BUILD_NUMBER}"
-                    try {
-                        if ("${tagVersion}") {
-                            titlePrefix = "${PROJECT_TAG} ${tagVersion}"
-                        }
-                    } catch (e) {
+            def gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
+            if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
+                def titlePrefix = "${PROJECT_TAG} BUILD#${env.BUILD_NUMBER}"
+                try {
+                    if ("${tagVersion}") {
+                        titlePrefix = "${PROJECT_TAG} ${tagVersion}"
                     }
-                    dingtalk(
-                            robot: "${DING_TALK_CREDENTIALS_ID}",
-                            type: 'MARKDOWN',
-                            title: "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
-                            text: [
-                                    "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉",
-                                    "#### 项目: ${PROJECT_NAME}",
-                                    "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}**",
-                                    "${gitChangeLog}",
-                                    ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看",
-                                    "###### 发布人: ${BUILD_USER}",
-                                    "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                            ],
-                            at: []
-                    )
+                } catch (e) {
                 }
+                dingtalk(
+                        robot: "${DING_TALK_CREDENTIALS_ID}",
+                        type: 'MARKDOWN',
+                        title: "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
+                        text: [
+                                "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉",
+                                "#### 项目: ${PROJECT_NAME}",
+                                "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}**",
+                                "${gitChangeLog}",
+                                ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看",
+                                "###### 发布人: ${BUILD_USER}",
+                                "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
+                        ],
+                        at: []
+                )
             }
         }
     }
