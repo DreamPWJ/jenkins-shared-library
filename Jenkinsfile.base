@@ -132,12 +132,12 @@ JSON_PARAMS:
     "BRANCH_NAME" : "prod" ,
     "PROJECT_TYPE" : "2" ,
     "PROJECT_NAME" : "health-app" ,
-    "SHELL_PARAMS" : "health app 8080 8080 prod 8180" ,
+    "SHELL_PARAMS" : "health app 8080 8080 prod" ,
 }
 
 可选参数如下
 {
-  "NPM_RUN_PARAMS" : "release"
+  "NPM_RUN_PARAMS" : "build"
   "IS_ROLL_DEPLOY" : true
   "IS_BLUE_GREEN_DEPLOY" : true
   "IS_STATIC_RESOURCE" : true
