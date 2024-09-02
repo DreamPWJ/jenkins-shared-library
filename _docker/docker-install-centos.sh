@@ -18,7 +18,7 @@ sudo yum update -y || true
 # 安装需要的软件包， yum-util 提供yum-config-manager功能，另外两个是devicemapper驱动依赖的
 sudo yum install -y yum-utils device-mapper-persistent-data lvm2
 # 设置yum源 https://download.docker.com/linux/centos/docker-ce.repo
-#sudo yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+sudo yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 
 echo "安装Docker"
 sudo yum makecache # 将服务器上的软件包信息 现在本地缓存,以提高 搜索 安装软件的速度
