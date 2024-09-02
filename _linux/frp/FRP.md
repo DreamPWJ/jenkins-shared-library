@@ -12,13 +12,18 @@
 
 #### 启动frps or frpc
 sudo systemctl start frps
+
 #### 停止frp
 sudo systemctl stop frps
+
 #### 重启frp
 sudo systemctl restart frps
+
 #### 查看frp状态
 sudo systemctl status frps
-#### 开启自启动frp状态
+
+#### 开机自启动frp
 sudo systemctl enable frps
-#### 禁用frp状态
+
+#### 禁用frp
 sudo systemctl disable frps
