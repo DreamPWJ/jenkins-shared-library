@@ -1,5 +1,5 @@
 bindPort = 7000
-auth.token = "YRgC=Vh*WD6v:xp-Ab-Ng3@=0F*+.fD7*r,)8i.La^yi,d!79vNZHLbaR50r"
+auth.token = ".=:N!uLm!RtrY_MxvNZGzM3^LH2-h#co!k3wbH.i~BXCMa-JAh?>Q=GWp2JQ"
 
 # 默认为 127.0.0.1，如果需要公网访问，需要修改为 0.0.0.0。
 webServer.addr = "0.0.0.0"
