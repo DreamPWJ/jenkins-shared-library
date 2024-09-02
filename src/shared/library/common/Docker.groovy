@@ -49,7 +49,7 @@ class Docker implements Serializable {
                 def dockerFileName = ""
                 if ("${linuxType}".contains("CentOS")) {
                     ctx.println "CentOS系统"
-                    dockerFileName = "docker-install.sh"
+                    dockerFileName = "docker-install-centos.sh"
                 } else if ("${linuxType}".contains("Ubuntu")) {
                     ctx.println "Ubuntu系统"
                     dockerFileName = "docker-install-ubuntu.sh"

@@ -2,7 +2,7 @@
 # Author: 潘维吉
 
 echo -e "\033[32mCentOS系统Docker初始化安装  📥 \033[0m"
-# chmod +x docker-install.sh　给shell脚本执行文件可执行权限
+# chmod +x docker-install-centos.sh　给shell脚本执行文件可执行权限
 
 if [[ $(command -v docker) ]]; then
   echo -e "\033[34mDocker版本： $(docker --version) ，已经初始化 退出安装  ✘ \033[0m"
