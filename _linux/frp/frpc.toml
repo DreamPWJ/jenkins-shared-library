@@ -1,4 +1,4 @@
-serverAddr = "66.111.222.88"
+serverAddr = "frp.server.com"
 serverPort = 7000
 auth.token = "YRgC=Vh*WD6v:xp-Ab-Ng3@=0F*+.fD7*r,)8i.La^yi,d!79vNZHLbaR50r"
 
@@ -8,3 +8,10 @@ type = "tcp"
 localIP = "127.0.0.1"
 localPort = 22
 remotePort = 20088
+
+[[proxies]]
+name = "http-01"
+type = "http"
+localIP = "127.0.0.1"
+localPort = 8080
+customDomains = ["www.yourdomain.com"] # 自定义域名 A 记录解析到frp服务器的 IP 地址 x.x.x.x, 访问 http://www.yourdomain.com:8080 可访问内网服务

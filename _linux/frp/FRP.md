@@ -1,7 +1,7 @@
 ### FRP (fast reverse proxy)内网穿透
 
-- 代码地址: https://github.com/fatedier/frp
-- 配置后台运行和开机自启动文档: https://gofrp.org/zh-cn/docs/setup/systemd/
+- 源码地址: https://github.com/fatedier/frp
+- 后台运行和开机自启动配置文档: https://gofrp.org/zh-cn/docs/setup/systemd/
 - 自定义后台运行和开机自启动目录: /etc/systemd/system/
 
 #### 下载frp相关平台包到相关目录中  直接执行go原生二进制包程序启动
