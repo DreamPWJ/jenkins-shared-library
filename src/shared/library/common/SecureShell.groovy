@@ -29,11 +29,6 @@ class SecureShell implements Serializable {
                 ctx.error("请配置部署服务器登录用户名或IP地址 ❌")
             }
 
-            if ("${ctx.isProxyJumpType}" == "true") {  // 跳板机方式部署
-                // 执行升级检测  在较新版本的OpenSSH 7.3及以上中( ssh -V 查看版本)，跳板机（jump host）-J 选项是存在的
-                ctx.sh " cd ci/_linux/shell/ && chmod +x upgrade-ssh.sh && ./upgrade-ssh.sh "
-            }
-
             // 检测ssh免密连接是否成功 ssh/scp跳过首次连接远程主机的指纹fingerprint(防止中间人攻击)设置-o StrictHostKeyChecking=no
             ctx.sh "ssh ${ctx.proxyJumpSSHText} -o StrictHostKeyChecking=no ${ctx.remote.user}@${ctx.remote.host} exit"
         } catch (error) {
@@ -59,11 +54,15 @@ class SecureShell implements Serializable {
                                 ctx.writeFile file: filePath, text: textData
                             }
                         }
-                        if ("${ctx.isProxyJumpType}" == "true") {
+
+                        if ("${ctx.isProxyJumpType}" == "true") {  // 跳板机方式部署
+                            // 执行升级检测  在较新版本的OpenSSH 7.3及以上中( ssh -V 查看版本)，跳板机（jump host）-J 选项是存在的
+                            ctx.sh " cd ci/_linux/shell/ && chmod +x upgrade-ssh.sh && ./upgrade-ssh.sh "
+
                             ctx.withCredentials([ctx.file(credentialsId: "${map.proxy_jump_hosts_id}", variable: 'PROXY_JUMP_HOSTS')]) {
                                 def jsonData = ctx.readFile(file: "${ctx.PROXY_JUMP_HOSTS}")
                                 def json = ctx.readJSON text: "${jsonData}"
-                                def filePath = "_linux/proxy_jump_hosts.json"
+                                def filePath = "_linux/proxy_jump_hosts.json" // 跳板机地址账号密码登配置文件
                                 // 使用 Groovy 代码写入文件
                                 // 将数组转换为JSON格式的字符串
                                 def jsonText = JsonOutput.toJson(json)

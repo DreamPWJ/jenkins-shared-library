@@ -1,9 +1,0 @@
-**/*.log
-**/*.log*
-**/log/**
-**/logs/**
-**/logs/*.log
-**/logs/*.txt
-.git
-*.md
-/var/lib/docker/overlay2/*

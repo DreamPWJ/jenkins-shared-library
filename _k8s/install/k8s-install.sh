@@ -3,7 +3,7 @@
 # kubernetes云原生容器编排管理安装  生产级别的容器编排系统  自动化的容器部署、扩展和管理
 # chmod +x k8s-install.sh 给shell脚本执行文件可执行权限
 
-#./docker-install.sh
+#./docker-install-centos.sh
 
 echo "国内网络原因 设置阿里镜像源"
 cat <<EOF >/etc/yum.repos.d/kubernetes.repo

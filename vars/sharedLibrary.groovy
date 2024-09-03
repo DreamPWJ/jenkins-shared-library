@@ -102,7 +102,7 @@ def call(String type = 'web-java', Map map) {
             environment {
                 // 系统环境变量
                 JAVA_TOOL_OPTIONS = "-Dfile.encoding=UTF-8" // 在全局系统设置或构建环境中设置 为了确保正确解析编码和颜色
-                NODE_OPTIONS = "--max_old_space_size=4096" // NODE内存调整 防止打包内存溢出
+                NODE_OPTIONS = "--max-old-space-size=4096" // NODE内存调整 防止打包内存溢出
                 // jenkins节点java路径 适配不同版本jdk情况 /Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home
                 //JAVA_HOME = "/var/jenkins_home/tools/hudson.model.JDK/${JDK_VERSION}${JDK_VERSION == '11' ? '/jdk-11' : ''}"
                 // 动态设置环境变量  配置相关自定义工具
@@ -133,8 +133,6 @@ def call(String type = 'web-java', Map map) {
                 IS_AUTO_TRIGGER = false // 是否是代码提交自动触发构建
                 IS_GEN_QR_CODE = false // 生成二维码 方便手机端扫描
                 IS_ARCHIVE = false // 是否归档  多个job会占用磁盘空间
-                IS_CODE_QUALITY_ANALYSIS = false // 是否进行代码质量分析的总开关
-                IS_INTEGRATION_TESTING = false // 是否进集成测试
                 IS_ONLY_NOTICE_CHANGE_LOG = "${map.is_only_notice_change_log}" // 是否只通知发布变更记录
             }
 
@@ -745,11 +743,13 @@ def getInitParams(map) {
     TOMCAT_VERSION = jsonParams.TOMCAT_VERSION ? jsonParams.TOMCAT_VERSION.trim() : "7.0" // 自定义Tomcat版本
     // npm包管理工具类型 如:  npm、yarn、pnpm
     NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
-    NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [test]的前端项目参数
+    NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [build]的前端项目参数
 
     IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
     // 是否Maven单模块代码
     IS_MAVEN_SINGLE_MODULE = jsonParams.IS_MAVEN_SINGLE_MODULE ? jsonParams.IS_MAVEN_SINGLE_MODULE : false
+    // 是否执行Maven单元测试
+    IS_RUN_MAVEN_TEST = jsonParams.IS_RUN_MAVEN_TEST ? jsonParams.IS_RUN_MAVEN_TEST : false
     // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
     IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true
     // 是否开启Docker多架构CPU构建支持
@@ -775,6 +775,10 @@ def getInitParams(map) {
     IS_DISABLE_K8S_HEALTH_CHECK = jsonParams.IS_DISABLE_K8S_HEALTH_CHECK ? jsonParams.IS_DISABLE_K8S_HEALTH_CHECK : false
     // 是否开启Spring Native原生镜像 显著提升性能同时降低资源使用
     IS_SPRING_NATIVE = jsonParams.IS_SPRING_NATIVE ? jsonParams.IS_SPRING_NATIVE : false
+    // 是否进行代码质量分析的总开关
+    IS_CODE_QUALITY_ANALYSIS = jsonParams.IS_CODE_QUALITY_ANALYSIS ? jsonParams.IS_CODE_QUALITY_ANALYSIS : false
+    // 是否进集成测试
+    IS_INTEGRATION_TESTING = jsonParams.IS_INTEGRATION_TESTING ? jsonParams.IS_INTEGRATION_TESTING : false
 
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
@@ -1218,6 +1222,7 @@ def mavenBuildProject(map, deployNum = 0) {
         // maven如果存在多级目录 一级目录设置
         MAVEN_ONE_LEVEL = "${MAVEN_ONE_LEVEL}".trim() != "" ? "${MAVEN_ONE_LEVEL}/" : "${MAVEN_ONE_LEVEL}".trim()
         println("执行Maven构建 🏗️  ")
+        def isMavenTest = "${IS_RUN_MAVEN_TEST}" == "true" ? "" : "-Dmaven.test.skip=true"  // 是否Maven单元测试
         retry(2) {
             // 对于Spring Boot 3.x及Spring Native与GaalVM集成的项目，通过以下命令来构建原生镜像  特性：性能明显提升 使用资源明显减少
             // sh " mvn clean package -Pnative -Dmaven.compile.fork=true -Dmaven.test.skip=true "
@@ -1225,17 +1230,17 @@ def mavenBuildProject(map, deployNum = 0) {
             if ("${IS_SPRING_NATIVE}" == "true") { // 构建原生镜像包
                 springNativeBuildParams = " -Pnative "
                 // 可以使用mvnd守护进程加速构建
-                sh "mvn clean package -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true ${springNativeBuildParams}"
+                sh "mvn clean package -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
             } else if ("${MAVEN_SETTING_XML}" == "") {
                 // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
                 if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') { // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
                     MAVEN_ONE_LEVEL = ""
                     // 在pom.xml文件目录下执行 规范是pom.xml在代码根目录
                     // def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
-                    sh "mvn clean install -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true ${springNativeBuildParams}"
+                    sh "mvn clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 } else {  // 多模块情况
                     // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
-                    sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true ${springNativeBuildParams}"
+                    sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 }
             } else {
                 // 基于自定义setting.xml文件方式打包 如私有包等
@@ -1357,6 +1362,8 @@ def uploadOss(map) {
  * 上传部署文件到远程云端
  */
 def uploadRemote(filePath, map) {
+    // 应用包部署目录
+    projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
     // ssh免密登录检测和设置
     autoSshLogin(map)
     timeout(time: 2, unit: 'MINUTES') {
@@ -1365,7 +1372,6 @@ def uploadRemote(filePath, map) {
     }
     println("上传部署文件到部署服务器中... 🚀 ")
     // 基于scp或rsync同步文件到远程服务器
-    def projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
     if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
@@ -1537,7 +1543,7 @@ def healthCheck(map, params = '') { // 可选参数
 def integrationTesting() {
     // 可先动态传入数据库名称部署集成测试应用 启动测试完成销毁 再重新部署业务应用
     try {
-        // 创建JMeter性能报告
+        // 创建JMeter性能压测报告
         Tests.createJMeterReport(this)
         // 创建冒烟测试报告
         Tests.createSmokeReport(this)
@@ -1758,7 +1764,7 @@ def syncScript() {
             // scp -r  递归复制整个目录 复制部署脚本和配置文件到服务器
             sh " chmod -R 777 .ci && scp ${proxyJumpSCPText} -r .ci/*  ${remote.user}@${remote.host}:/${DEPLOY_FOLDER}/ "
             // 处理 .dockerignore文件被忽略了
-            sh " chmod -R 777 .ci && scp ${proxyJumpSCPText} .ci/.dockerignore  ${remote.user}@${remote.host}:/${DEPLOY_FOLDER}/ "
+            sh " scp ${proxyJumpSCPText} .ci/.dockerignore  ${remote.user}@${remote.host}:/${projectDeployFolder}/ "
         } catch (error) {
             println "复制部署脚本和配置文件到服务器失败 ❌"
             println error.getMessage()
