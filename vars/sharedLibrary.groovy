@@ -592,7 +592,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         expression {
-                            return ("${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}")
+                            return ("${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}" || "${GlobalVars.destroy}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}")
                         }
                     }
                     steps {
