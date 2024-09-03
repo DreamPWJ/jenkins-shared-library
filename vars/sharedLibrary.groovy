@@ -1363,7 +1363,7 @@ def uploadOss(map) {
  */
 def uploadRemote(filePath, map) {
     // 应用包部署目录
-    def projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
+    projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
     // ssh免密登录检测和设置
     autoSshLogin(map)
     timeout(time: 2, unit: 'MINUTES') {
