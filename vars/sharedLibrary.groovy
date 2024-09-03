@@ -133,8 +133,6 @@ def call(String type = 'web-java', Map map) {
                 IS_AUTO_TRIGGER = false // 是否是代码提交自动触发构建
                 IS_GEN_QR_CODE = false // 生成二维码 方便手机端扫描
                 IS_ARCHIVE = false // 是否归档  多个job会占用磁盘空间
-                IS_CODE_QUALITY_ANALYSIS = false // 是否进行代码质量分析的总开关
-                IS_INTEGRATION_TESTING = false // 是否进集成测试
                 IS_ONLY_NOTICE_CHANGE_LOG = "${map.is_only_notice_change_log}" // 是否只通知发布变更记录
             }
 
@@ -777,6 +775,10 @@ def getInitParams(map) {
     IS_DISABLE_K8S_HEALTH_CHECK = jsonParams.IS_DISABLE_K8S_HEALTH_CHECK ? jsonParams.IS_DISABLE_K8S_HEALTH_CHECK : false
     // 是否开启Spring Native原生镜像 显著提升性能同时降低资源使用
     IS_SPRING_NATIVE = jsonParams.IS_SPRING_NATIVE ? jsonParams.IS_SPRING_NATIVE : false
+    // 是否进行代码质量分析的总开关
+    IS_CODE_QUALITY_ANALYSIS = jsonParams.IS_CODE_QUALITY_ANALYSIS ? jsonParams.IS_CODE_QUALITY_ANALYSIS : false
+    // 是否进集成测试
+    IS_INTEGRATION_TESTING = jsonParams.IS_INTEGRATION_TESTING ? jsonParams.IS_INTEGRATION_TESTING : false
 
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
@@ -1540,7 +1542,7 @@ def healthCheck(map, params = '') { // 可选参数
 def integrationTesting() {
     // 可先动态传入数据库名称部署集成测试应用 启动测试完成销毁 再重新部署业务应用
     try {
-        // 创建JMeter性能报告
+        // 创建JMeter性能压测报告
         Tests.createJMeterReport(this)
         // 创建冒烟测试报告
         Tests.createSmokeReport(this)
