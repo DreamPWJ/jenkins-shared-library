@@ -97,7 +97,7 @@ def call(String type = 'web', Map map) {
 
             environment {
                 // 系统环境变量
-                NODE_OPTIONS = "--max_old_space_size=4096" // NODE内存调整 防止打包内存溢出
+                NODE_OPTIONS = "--max-old-space-size=4096" // NODE内存调整 防止打包内存溢出
                 // 动态设置环境变量  配置相关自定义工具
                 //PATH = "${JAVA_HOME}/bin:$PATH"
                 SYSTEM_HOME = "$HOME" // 系统主目录
@@ -551,7 +551,7 @@ def getInitParams(map) {
     // npm包管理工具类型 如:  npm、yarn、pnpm
     NODE_VERSION = jsonParams.NODE_VERSION ? jsonParams.NODE_VERSION.trim() : "${map.nodejs}" // nodejs版本
     NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
-    NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [test]的前端项目参数
+    NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [build]的前端项目参数
 
     // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
     IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true

@@ -434,7 +434,7 @@ def getInitParams(map) {
     PROJECT_CHINESE_NAME = jsonParams.PROJECT_CHINESE_NAME ? jsonParams.PROJECT_CHINESE_NAME.trim() : "" // 自定义项目中文名称
     // npm包管理工具类型 如:  npm、yarn、pnpm
     NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
-    // 发布打包多环境和类型 多个按顺序逗号,分隔  npm run [test]的前端项目参数
+    // 发布打包多环境和类型 多个按顺序逗号,分隔  npm run [build]的前端项目参数
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim().replace(",", "\n") : ""
     // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
     IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD ? jsonParams.IS_DOCKER_BUILD : false

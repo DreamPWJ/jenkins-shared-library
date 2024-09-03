@@ -102,7 +102,7 @@ def call(String type = 'web-java', Map map) {
             environment {
                 // 系统环境变量
                 JAVA_TOOL_OPTIONS = "-Dfile.encoding=UTF-8" // 在全局系统设置或构建环境中设置 为了确保正确解析编码和颜色
-                NODE_OPTIONS = "--max_old_space_size=4096" // NODE内存调整 防止打包内存溢出
+                NODE_OPTIONS = "--max-old-space-size=4096" // NODE内存调整 防止打包内存溢出
                 // jenkins节点java路径 适配不同版本jdk情况 /Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home
                 //JAVA_HOME = "/var/jenkins_home/tools/hudson.model.JDK/${JDK_VERSION}${JDK_VERSION == '11' ? '/jdk-11' : ''}"
                 // 动态设置环境变量  配置相关自定义工具
@@ -745,7 +745,7 @@ def getInitParams(map) {
     TOMCAT_VERSION = jsonParams.TOMCAT_VERSION ? jsonParams.TOMCAT_VERSION.trim() : "7.0" // 自定义Tomcat版本
     // npm包管理工具类型 如:  npm、yarn、pnpm
     NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
-    NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [test]的前端项目参数
+    NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [build]的前端项目参数
 
     IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
     // 是否Maven单模块代码
