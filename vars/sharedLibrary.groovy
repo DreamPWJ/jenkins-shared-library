@@ -1362,6 +1362,8 @@ def uploadOss(map) {
  * 上传部署文件到远程云端
  */
 def uploadRemote(filePath, map) {
+    // 应用包部署目录
+    def projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
     // ssh免密登录检测和设置
     autoSshLogin(map)
     timeout(time: 2, unit: 'MINUTES') {
@@ -1370,7 +1372,6 @@ def uploadRemote(filePath, map) {
     }
     println("上传部署文件到部署服务器中... 🚀 ")
     // 基于scp或rsync同步文件到远程服务器
-    def projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
     if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
