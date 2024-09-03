@@ -42,7 +42,7 @@ def call(String type = 'web-java', Map map) {
             //agent { label "${map.jenkins_node}" }
 
             parameters {
-                choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback, GlobalVars.start, GlobalVars.stop, GlobalVars.restart],
+                choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback, GlobalVars.start, GlobalVars.stop, GlobalVars.destroy, GlobalVars.restart],
                         description: '选择部署方式  1. ' + GlobalVars.release + '发布 2. ' + GlobalVars.rollback +
                                 '回滚(基于jenkins归档方式回滚选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚请选择默认的' + GlobalVars.release + ') ' +
                                 ' 3. ' + GlobalVars.start + '启动服务 4. ' + GlobalVars.stop + '停止服务 5. ' + GlobalVars.destroy + '销毁删除服务 6. ' + GlobalVars.restart + '重启服务')
