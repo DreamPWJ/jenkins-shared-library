@@ -1168,7 +1168,7 @@ def nodeBuildProject() {
 
                             println("执行Node构建 🏗️  ")
                             sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
-                            sh " npm run '${NPM_RUN_PARAMS}' "
+                            sh " npm run '${NPM_RUN_PARAMS}'  -- --parallel"
                         }
                     } catch (e) {
                         println(e.getMessage())
