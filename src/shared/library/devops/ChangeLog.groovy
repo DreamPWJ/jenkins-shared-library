@@ -57,7 +57,7 @@ def genChangeLog(ctx, int maxRecordsNum = 100) {
                         docsChangeLog += combinationMsg
                     } else {
                         // 过滤无需生成的变更日志类型
-                        // combinationMsg.contains("revert") || combinationMsg.contains("chore") || combinationMsg.contains("test")
+                        // combinationMsg.contains("revert") || combinationMsg.contains("chore") || combinationMsg.contains("test")  || combinationMsg.contains("docs(changelog)")
                         if (combinationMsg.contains(GlobalVars.gitCommitChangeLogDocs)) {
                             combinationMsg = ""
                         } else {

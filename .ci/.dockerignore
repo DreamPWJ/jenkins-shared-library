@@ -8,3 +8,5 @@ logs/
 **/tomcat/**
 .git
 *.md
+**/node_modules/**
+node_modules/
