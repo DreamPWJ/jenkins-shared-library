@@ -750,6 +750,8 @@ def getInitParams(map) {
     IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
     // 是否Maven单模块代码
     IS_MAVEN_SINGLE_MODULE = jsonParams.IS_MAVEN_SINGLE_MODULE ? jsonParams.IS_MAVEN_SINGLE_MODULE : false
+    // 是否执行Maven单元测试
+    IS_RUN_MAVEN_TEST = jsonParams.IS_RUN_MAVEN_TEST ? jsonParams.IS_RUN_MAVEN_TEST : false
     // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
     IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true
     // 是否开启Docker多架构CPU构建支持
@@ -1218,6 +1220,7 @@ def mavenBuildProject(map, deployNum = 0) {
         // maven如果存在多级目录 一级目录设置
         MAVEN_ONE_LEVEL = "${MAVEN_ONE_LEVEL}".trim() != "" ? "${MAVEN_ONE_LEVEL}/" : "${MAVEN_ONE_LEVEL}".trim()
         println("执行Maven构建 🏗️  ")
+        def isMavenTest = "${IS_RUN_MAVEN_TEST}" == "true" ? "" : "-Dmaven.test.skip=true"  // 是否Maven单元测试
         retry(2) {
             // 对于Spring Boot 3.x及Spring Native与GaalVM集成的项目，通过以下命令来构建原生镜像  特性：性能明显提升 使用资源明显减少
             // sh " mvn clean package -Pnative -Dmaven.compile.fork=true -Dmaven.test.skip=true "
@@ -1225,17 +1228,17 @@ def mavenBuildProject(map, deployNum = 0) {
             if ("${IS_SPRING_NATIVE}" == "true") { // 构建原生镜像包
                 springNativeBuildParams = " -Pnative "
                 // 可以使用mvnd守护进程加速构建
-                sh "mvn clean package -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true ${springNativeBuildParams}"
+                sh "mvn clean package -T 1C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
             } else if ("${MAVEN_SETTING_XML}" == "") {
                 // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
                 if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') { // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
                     MAVEN_ONE_LEVEL = ""
                     // 在pom.xml文件目录下执行 规范是pom.xml在代码根目录
                     // def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
-                    sh "mvn clean install -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true ${springNativeBuildParams}"
+                    sh "mvn clean install -T 1C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 } else {  // 多模块情况
                     // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
-                    sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 1C -Dmaven.compile.fork=true -Dmaven.test.skip=true ${springNativeBuildParams}"
+                    sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 1C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 }
             } else {
                 // 基于自定义setting.xml文件方式打包 如私有包等
