@@ -136,6 +136,9 @@ class Deploy implements Serializable {
                     if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
                         stopService(ctx, map)
                     }
+                    if (GlobalVars.destroy == ctx.params.DEPLOY_MODE) {
+                        destroyService(ctx, map)
+                    }
                     if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
                         restartService(ctx, map)
                     }
@@ -150,6 +153,9 @@ class Deploy implements Serializable {
             }
             if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
                 command = "docker stop " + dockerContainerName
+            }
+            if (GlobalVars.destroy == ctx.params.DEPLOY_MODE) {
+                command = "docker stop " + dockerContainerName  + " && docker rm " + dockerContainerName
             }
             if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
                 command = "docker restart " + dockerContainerName
@@ -217,6 +223,21 @@ class Deploy implements Serializable {
             // Docker服务方式
             def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
             ctx.sh " docker stop " + dockerContainerName
+        }
+    }
+
+    /**
+     * 销毁删除服务
+     */
+    static def destroyService(ctx, map) {
+        if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
+            // K8s服务方式
+            def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
+            ctx.sh " kubectl delete deployment " + deploymentName
+        } else {
+            // Docker服务方式
+            def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
+            ctx.sh " docker stop " + dockerContainerName + " && docker rm " + dockerContainerName
         }
     }
 

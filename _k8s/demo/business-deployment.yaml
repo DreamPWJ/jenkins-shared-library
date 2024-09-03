@@ -34,7 +34,7 @@ spec:
 # 快速回滚到上个版本
 # kubectl rollout undo deployment/business-deployment
 # 删除Deployment
-# kubectl delete deploy deployment-name
+# kubectl delete deployment deployment-name
 
 # 重启Deployment
 # kubectl rollout restart deployment deployment-name

@@ -20,6 +20,7 @@ class GlobalVars implements Serializable {
     static String start = "start" // 启动服务
     static String stop = "stop" // 停止服务
     static String restart = "restart" // 重启服务
+    static String destroy = "destroy" // 彻底删除销毁服务
 
     /**
      * 前后端项目类型
