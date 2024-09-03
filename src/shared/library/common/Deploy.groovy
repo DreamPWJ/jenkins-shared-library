@@ -116,6 +116,9 @@ class Deploy implements Serializable {
         if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
             type = "停止"
         }
+        if (GlobalVars.destroy == ctx.params.DEPLOY_MODE) {
+            type = "销毁"
+        }
         if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
             type = "重启"
         }
