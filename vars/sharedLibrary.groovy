@@ -812,7 +812,7 @@ def getInitParams(map) {
     // 自定义Python启动文件名称 默认app.py文件
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
 
-    // 统一处理第一次部署或更新pipeline代码导致jenkins构建参数parameters不存在的情况 如 params.
+    // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值
     if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
         IS_CANARY_DEPLOY = false
     }
@@ -1152,7 +1152,7 @@ def nodeBuildProject() {
 
                 timeout(time: 30, unit: 'MINUTES') {
                     try {
-                        def retryCount = 0
+                        def retryCount = 0 // 重试次数初始值
                         retry(3) {
                             retryCount++
                             if (retryCount >= 2) { // 第一次构建不处理
