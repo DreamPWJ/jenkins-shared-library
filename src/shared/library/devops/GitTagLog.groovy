@@ -27,9 +27,9 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                    git config --global user.email "406798106@qq.com"
                    git config --global user.name ${GIT_USERNAME}
                    git stash || true
+                   git checkout ${ctx.BRANCH_NAME} || true
                    git pull ${userPassWordUrl} || true
                    """)
-                //  git checkout ${ctx.BRANCH_NAME} || true
             }
 
             try {
@@ -73,7 +73,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                     println "推送${changeLogFileName}变更日志异常"
                     println e.getMessage()
                     // 当前分支处于分离状态 fatal: You are not currently on a branch
-/*                    def tempBranch = "pan-wei-ji-temp-branch"
+                   def tempBranch = "pan-wei-ji-temp-branch"
                     sh("""
                           git branch -D ${tempBranch} || true
                           git branch ${tempBranch}
@@ -84,7 +84,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                           git branch -d ${tempBranch} 
                           git merge --abort || true
                           git reset --merge || true
-                           """)*/
+                           """)
                 }
                 //}
                 //}
