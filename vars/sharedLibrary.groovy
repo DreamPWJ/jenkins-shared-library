@@ -1409,7 +1409,7 @@ def uploadRemote(filePath, map) {
 def manualApproval() {
     // 针对生产环境部署前做人工发布审批
     // if ("${IS_PROD}" == 'true') {
-    // 选择具有审核权限的人员 可以配置一个或多个
+    // 选择具有审核权限的人员 可以配置一个或多个 也可以相互审批
     def approvalPersons = ["admin", "潘维吉", "**科技"] // 多审批人数组 参数化配置 也可指定审批人
     def approvalPersonMobiles = "18863302302" // 审核人的手机 多个逗号分隔 用于钉钉通知等
 

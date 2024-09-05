@@ -50,6 +50,10 @@ where db = 'panweiji';
 DataGrip批量导出CSV格式数据批量执行kill
 查看MySql运行日志:  sudo grep mysql /var/log/syslog
 
+#### 临时关闭SQL严格模式
+
+set global sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
+
 #### MySql压力性能测试
 
 执行一次测试，分别50和100个并发，执行1000次总查询  mysqlslap是版本高于5.1的mysql自带的工具
