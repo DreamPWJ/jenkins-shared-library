@@ -31,10 +31,10 @@ class Maven implements Serializable {
     }
 
     /**
-     * Maven打包时混淆 防止反编译
+     * 打包时混淆可读性 防止反编译
      */
     static def obfuscation(ctx) {
-        // 代码混淆proguard  地址: https://github.com/Guardsquare/proguard
+        // 代码可读性混淆proguard  地址: https://github.com/Guardsquare/proguard
         ctx.sh "bin/proguard.sh <options...>"
     }
 
