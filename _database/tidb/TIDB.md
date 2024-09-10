@@ -21,7 +21,10 @@
 - 检测TiDB集群模版有效性
   tiup cluster check /my/topology.yaml
 
-- 销毁TiDB集群！！！
+- 重命名集群
+  tiup cluster rename old-name new-name
+
+- 销毁TiDB集群 ！！！
   tiup cluster destroy tidb-prod
 
 #### TiUP在不中断线上服务的情况扩容缩容TiDB集群 https://docs.pingcap.com/zh/tidb/stable/scale-tidb-using-tiup
