@@ -7,7 +7,7 @@
 -  重复部署的情况， 注意数据库名称重复冲突
 -  MYSQL迁移TiDB兼容性问题(TiDB不支持函数、存储过程、触发器等): https://docs.pingcap.com/zh/tidb/stable/mysql-compatibility
 
-#### TiDB运维命令
+#### TiDB运维命令 https://docs.pingcap.com/zh/tidb/stable/maintain-tidb-using-tiup
 
 - 查看TiDB集群
   tiup cluster display tidb-prod
