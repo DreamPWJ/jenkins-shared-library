@@ -21,6 +21,7 @@ order by table_rows desc
 limit 10;
 
 #### 查看 MySQL「所有库」的容量大小
+
 select
     table_schema as '数据库',
     sum(table_rows) as '记录数',
