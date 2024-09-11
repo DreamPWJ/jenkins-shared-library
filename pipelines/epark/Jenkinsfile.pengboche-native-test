@@ -124,8 +124,8 @@ pengbo-park-app-native-test
 澎泊车SaaS 2.0 Native平台服务端
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
-   "BRANCH_NAME" : "feature/springboot3-jdk21" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+   "BRANCH_NAME" : "feature/infra" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pengbo-park-app" ,
    "SHELL_PARAMS" : "pengbo-park-app test 8180 8080 sit",
@@ -136,8 +136,8 @@ pengbo-park-admin-native-test
 澎泊车SaaS 2.0 Native管理平台服务端
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
-   "BRANCH_NAME" : "feature/springboot3-jdk21" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+   "BRANCH_NAME" : "feature/infra" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pengbo-park-admin" ,
    "SHELL_PARAMS" : "pengbo-park-admin test 8181 8081 dev",
