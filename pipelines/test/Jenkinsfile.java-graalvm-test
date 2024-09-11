@@ -124,8 +124,8 @@ spring-boot3-graalvm-demo
 Spring Boot3与GraalVM新引擎服务端
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
-   "BRANCH_NAME" : "feature/graalvm" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+   "BRANCH_NAME" : "feature/infra" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "graalvm-demo" ,
    "SHELL_PARAMS" : "graalvm-demo app 8121 8180 dev",
