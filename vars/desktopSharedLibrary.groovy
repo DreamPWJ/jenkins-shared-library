@@ -11,7 +11,7 @@ import shared.library.devops.GitTagLog
  * 桌面端技术类型 0.原生桌面技术(如C++ For Windows、Linux, Swift For MacOS) 1.Electron or Tauri 2.Flutter 3.Unity 4.ComposeMultiPlatform 5.Qt
  */
 def call(String type = 'desktop', Map map) {
-    echo "Pipeline共享库脚本类型: ${type}, jenkins分布式节点名: ${map.jenkins_node}"
+    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: ${map.jenkins_node}"
     // 应用共享方法定义
     changeLog = new ChangeLog()
     gitTagLog = new GitTagLog()
