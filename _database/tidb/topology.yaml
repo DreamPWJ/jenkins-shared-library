@@ -1,12 +1,15 @@
 global:
   user: "root"
   ssh_port: 22
-  deploy_dir: "/tidb-deploy" # 部署目录 注意会产生大量的log日志防止磁盘满 rm -rf /tidb-deploy/tidb-4000/log
+  deploy_dir: "/tidb-deploy" # 部署目录 注意会产生大量的log日志防止磁盘满 rm -f /tidb-deploy/tidb-4000/log/*
   data_dir: "/tidb-data"  #  基于Raft协议同步复制  所有节点数据保持一致
 
+# 配置文档: https://docs.pingcap.com/zh/tidb/dev/tidb-configuration-file
 server_configs:
   tidb:
-    log.slow-threshold: 300
+    log.slow-threshold: 300 # 输出慢日志的耗时阈值 毫秒
+    log.file.max-size: 300  # 日志文件的大小限制 单位：MB
+    log.file.max-days: 30   # 日志最大保留的天数 默认不清理
     binlog.enable: false
     binlog.ignore-error: false
   tikv:

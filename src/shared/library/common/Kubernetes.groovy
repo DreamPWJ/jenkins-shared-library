@@ -252,7 +252,7 @@ class Kubernetes implements Serializable {
         // 删除Canary Ingress资源gray-release-canary
         ctx.sh "kubectl delete ingress gray-release-canary"
         // 删除旧版本的Deployment和新版本的Service
-        ctx.sh "kubectl delete deploy old-deployment-name"
+        ctx.sh "kubectl delete deployment old-deployment-name"
         ctx.sh "kubectl delete svc new-service-name"
     }
 

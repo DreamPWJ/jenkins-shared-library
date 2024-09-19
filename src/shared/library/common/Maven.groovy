@@ -13,7 +13,7 @@ class Maven implements Serializable {
      */
     static def mvndPackage(ctx) {
         ctx.sh "mvnd --version"
-        ctx.sh "mvnd clean install -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am -Dmaven.test.skip=true"
+        ctx.sh "mvnd clean install -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am ${ctx.isMavenTest}"
     }
 
     /**
@@ -22,12 +22,20 @@ class Maven implements Serializable {
     static def packageBySettingFile(ctx) {
         // Managed files自定义settings.xml方式 安装 Config File Provider插件
         /* ctx.configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
-             ctx.sh "mvn -s $MAVEN_SETTINGS clean install -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am -Dmaven.test.skip=true"
+             ctx.sh "mvn -s $MAVEN_SETTINGS clean install -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am ${ctx.isMavenTest}"
          }*/
 
         // -s settings.xml文件路径  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
         def settingsFile = "${ctx.env.WORKSPACE}/ci/_jenkins/maven/${ctx.MAVEN_SETTING_XML}"
-        ctx.sh "mvn -s ${settingsFile} -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am -T 2C -Dmaven.compile.fork=true clean install -Dmaven.test.skip=true ${ctx.springNativeBuildParams}"
+        ctx.sh "mvn -s ${settingsFile} -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am -T 2C -Dmaven.compile.fork=true clean install ${ctx.isMavenTest} ${ctx.springNativeBuildParams}"
+    }
+
+    /**
+     * 打包时混淆可读性 防止反编译
+     */
+    static def obfuscation(ctx) {
+        // 代码可读性混淆proguard  地址: https://github.com/Guardsquare/proguard
+        ctx.sh "bin/proguard.sh <options...>"
     }
 
     /**

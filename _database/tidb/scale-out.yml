@@ -5,3 +5,22 @@ tidb_servers:
     status_port: 10080
     deploy_dir: /tidb-deploy/tidb-4000
     log_dir: /tidb-deploy/tidb-4000/log
+
+tikv_servers:
+  - host: 10.0.1.5
+    ssh_port: 22
+    port: 20160
+    status_port: 20180
+    deploy_dir: /tidb-deploy/tikv-20160
+    data_dir: /tidb-data/tikv-20160
+    log_dir: /tidb-deploy/tikv-20160/log
+
+pd_servers:
+  - host: 10.0.1.5
+    ssh_port: 22
+    name: pd-1
+    client_port: 2379
+    peer_port: 2380
+    deploy_dir: /tidb-deploy/pd-2379
+    data_dir: /tidb-data/pd-2379
+    log_dir: /tidb-deploy/pd-2379/log

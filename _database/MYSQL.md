@@ -21,6 +21,7 @@ order by table_rows desc
 limit 10;
 
 #### 查看 MySQL「所有库」的容量大小
+
 select
     table_schema as '数据库',
     sum(table_rows) as '记录数',
@@ -49,6 +50,10 @@ where db = 'panweiji';
 批量KILL执行正在提交的事务
 DataGrip批量导出CSV格式数据批量执行kill
 查看MySql运行日志:  sudo grep mysql /var/log/syslog
+
+#### 临时关闭SQL严格模式
+
+set global sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
 
 #### MySql压力性能测试
 

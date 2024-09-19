@@ -11,7 +11,7 @@ import shared.library.devops.GitTagLog
  * 基于Fastlane 、Mac mini、Docker、VMware vSphere(esxi)、VirtualBox等技术实现
  */
 def call(String type = 'android-ios', Map map) {
-    echo "Pipeline共享库脚本类型: ${type}, jenkins分布式节点名: ${map.jenkins_node}"
+    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: ${map.jenkins_node}"
     // 应用共享方法定义
     changeLog = new ChangeLog()
     gitTagLog = new GitTagLog()

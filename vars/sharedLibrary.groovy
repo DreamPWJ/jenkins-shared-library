@@ -11,7 +11,7 @@ import shared.library.devops.GitTagLog
  * 针对大前端Web和服务端Java、Go、Python、C++等多语言项目
  */
 def call(String type = 'web-java', Map map) {
-    echo "Pipeline共享库脚本类型: ${type}, jenkins分布式节点名: 前端${map.jenkins_node_front_end} , 后端${map.jenkins_node} "
+    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: 前端${map.jenkins_node_front_end} , 后端${map.jenkins_node} "
     // 应用共享方法定义
     changeLog = new ChangeLog()
     gitTagLog = new GitTagLog()
@@ -42,10 +42,10 @@ def call(String type = 'web-java', Map map) {
             //agent { label "${map.jenkins_node}" }
 
             parameters {
-                choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback, GlobalVars.start, GlobalVars.stop, GlobalVars.restart],
+                choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback, GlobalVars.start, GlobalVars.stop, GlobalVars.destroy, GlobalVars.restart],
                         description: '选择部署方式  1. ' + GlobalVars.release + '发布 2. ' + GlobalVars.rollback +
-                                '回滚(基于jenkins归档方式回滚选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚请选择默认的' + GlobalVars.release + ') ' +
-                                ' 3. ' + GlobalVars.start + '启动服务 4. ' + GlobalVars.stop + '停止服务 5. ' + GlobalVars.restart + '重启服务')
+                                '回滚(基于Jenkins归档方式回滚选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚请选择默认的' + GlobalVars.release + ') ' +
+                                ' 3. ' + GlobalVars.start + '启动服务 4. ' + GlobalVars.stop + '停止服务 5. ' + GlobalVars.destroy + '销毁删除服务 6. ' + GlobalVars.restart + '重启服务')
                 choice(name: 'MONOREPO_PROJECT_NAME', choices: "${MONOREPO_PROJECT_NAMES}",
                         description: "选择MonoRepo单体式统一仓库项目名称, ${GlobalVars.defaultValue}选项是MultiRepo多体式独立仓库或未配置, 大统一单体式仓库流水线可减少构建时间和磁盘空间")
                 gitParameter(name: 'GIT_BRANCH', type: 'PT_BRANCH', defaultValue: "${BRANCH_NAME}", selectedValue: "DEFAULT",
@@ -59,7 +59,7 @@ def call(String type = 'web-java', Map map) {
                         description: "填写服务版本描述文案 (不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊 ")
                 string(name: 'ROLLBACK_BUILD_ID', defaultValue: '0', description: "DEPLOY_MODE基于" + GlobalVars.rollback + "部署方式, 输入对应保留的回滚构建记录ID, " +
                         "默认0是回滚到上一次连续构建, 当前归档模式的回滚仅适用于在master节点构建的任务")
-                booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行Docker/K8S灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
+                booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行Docker/K8S集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
                         description: '是否执行服务启动健康检测 否: 可大幅减少流水线持续时间 分布式部署不建议取消  K8S使用默认的健康探测')
                 booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}",
@@ -592,7 +592,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         expression {
-                            return ("${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}")
+                            return ("${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}" || "${GlobalVars.destroy}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}")
                         }
                     }
                     steps {
@@ -812,7 +812,7 @@ def getInitParams(map) {
     // 自定义Python启动文件名称 默认app.py文件
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
 
-    // 统一处理第一次部署或更新pipeline代码导致jenkins构建参数parameters不存在的情况 如 params.
+    // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值
     if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
         IS_CANARY_DEPLOY = false
     }
@@ -1152,7 +1152,7 @@ def nodeBuildProject() {
 
                 timeout(time: 30, unit: 'MINUTES') {
                     try {
-                        def retryCount = 0
+                        def retryCount = 0 // 重试次数初始值
                         retry(3) {
                             retryCount++
                             if (retryCount >= 2) { // 第一次构建不处理
@@ -1409,7 +1409,7 @@ def uploadRemote(filePath, map) {
 def manualApproval() {
     // 针对生产环境部署前做人工发布审批
     // if ("${IS_PROD}" == 'true') {
-    // 选择具有审核权限的人员 可以配置一个或多个
+    // 选择具有审核权限的人员 可以配置一个或多个 也可以相互审批
     def approvalPersons = ["admin", "潘维吉", "**科技"] // 多审批人数组 参数化配置 也可指定审批人
     def approvalPersonMobiles = "18863302302" // 审核人的手机 多个逗号分隔 用于钉钉通知等
 

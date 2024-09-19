@@ -12,7 +12,7 @@ import shared.library.devops.GitTagLog
  * 技术类型 1. 原生小程序 2. Taro跨端小程序 3. uni-app跨端小程序 4. mpvue跨端小程序 5. Remax跨端小程序
  */
 def call(String type = 'wx-mini', Map map) {
-    echo "Pipeline共享库脚本类型: ${type}, jenkins分布式节点名: ${map.jenkins_node}"
+    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: ${map.jenkins_node}"
     // 应用共享方法定义
     changeLog = new ChangeLog()
     gitTagLog = new GitTagLog()

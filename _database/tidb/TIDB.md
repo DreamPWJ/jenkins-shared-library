@@ -3,26 +3,33 @@
 -  PD为总调度中心  TiDB整个项目分为两层，TiDB 作为SQL 层，采用Go 语言开发， TiKV 作为下边的分布式存储引擎，采用Rust 语言开发
 -  使用TiUP初始化部署TiDB集群步骤: https://docs.pingcap.com/zh/tidb/stable/production-deployment-using-tiup
 -  执行部署TiDB分布式集群(首先设置ssh免密登录) : 
-   cd /my && tiup cluster deploy tidb-prod v7.5.0 ./topology.yaml --user root 和 tiup cluster start tidb-prod --init
--  重复部署的情况， 注意数据库名称重复冲突
+   cd /my && tiup cluster deploy cluster-name v8.1.1 ./topology.yaml --user root 和 tiup cluster start cluster-name --init
+-  重复部署的情况， 注意数据库名称重复冲突 重命名集群  tiup cluster rename old-name new-name
 -  MYSQL迁移TiDB兼容性问题(TiDB不支持函数、存储过程、触发器等): https://docs.pingcap.com/zh/tidb/stable/mysql-compatibility
 
-#### TiDB运维命令
-
-- 启动TiDB集群  重启机器后需要执行start命令 不会自动重启tidb集群服务  复制数据备份  cp -r /tidb-data /root/tidb-data
-tiup cluster start tidb-prod
-
-- 停止TiDB集群
-tiup cluster stop tidb-prod
+#### TiDB运维命令 https://docs.pingcap.com/zh/tidb/stable/maintain-tidb-using-tiup
 
 - 查看TiDB集群
-tiup cluster display tidb-prod
+  tiup cluster display cluster-name
+
+- 启动TiDB集群  重启机器后需要执行start命令 不会自动重启tidb集群服务  复制数据备份  cp -r /tidb-data /root/tidb-data
+  tiup cluster start cluster-name
+
+- 停止TiDB集群
+  tiup cluster stop cluster-name
+
+- 重启TiDB集群或部分Node节点
+  tiup cluster restart cluster-name
+  tiup cluster restart cluster-name --node ip:port
 
 - 检测TiDB集群模版有效性
-tiup cluster check /my/topology.yaml
+  tiup cluster check /my/topology.yaml
 
-- 销毁TiDB集群！！！
-tiup cluster destroy tidb-prod
+- 修改配TiDB集群置参数 比如将日志 max-days默认不过期更改过期等
+  tiup cluster edit-config cluster-name
+
+- 销毁TiDB集群 ！！！
+  tiup cluster destroy cluster-name
 
 #### TiUP在不中断线上服务的情况扩容缩容TiDB集群 https://docs.pingcap.com/zh/tidb/stable/scale-tidb-using-tiup
 

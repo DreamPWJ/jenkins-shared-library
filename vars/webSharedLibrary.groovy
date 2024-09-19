@@ -11,7 +11,7 @@ import shared.library.devops.GitTagLog
  * 技术项目类型 1. Npm生态与静态Web项目 2. Flutter For Web 3. React Native For Web 4. Unity For Web  5. WebAssembly
  */
 def call(String type = 'web', Map map) {
-    echo "Pipeline共享库脚本类型: ${type}, jenkins分布式节点名: ${map.jenkins_node} "
+    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: ${map.jenkins_node} "
     // 应用共享方法定义
     changeLog = new ChangeLog()
     gitTagLog = new GitTagLog()
@@ -44,7 +44,7 @@ def call(String type = 'web', Map map) {
             parameters {
                 choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback],
                         description: '选择部署方式  1. ' + GlobalVars.release + '发布 2. ' + GlobalVars.rollback +
-                                '回滚(基于jenkins归档方式回滚选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚请选择默认的' + GlobalVars.release + ')')
+                                '回滚(基于Jenkins归档方式回滚选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚请选择默认的' + GlobalVars.release + ')')
                 choice(name: 'MONOREPO_PROJECT_NAME', choices: "${MONOREPO_PROJECT_NAMES}",
                         description: "选择MonoRepo单体式统一仓库项目名称, ${GlobalVars.defaultValue}选项是MultiRepo多体式独立仓库或未配置, 大统一单体式仓库流水线可减少构建时间和磁盘空间")
                 gitParameter(name: 'GIT_BRANCH', type: 'PT_BRANCH', defaultValue: "${BRANCH_NAME}", selectedValue: "DEFAULT",
@@ -56,7 +56,7 @@ def call(String type = 'web', Map map) {
                 string(name: 'VERSION_NUM', defaultValue: "", description: '选填 自定义语义化版本号x.y.z 如1.0.0 (默认不填写  自动生成的版本号并且语义化自增 生产环境设置有效) 🖊 ')
                 string(name: 'ROLLBACK_BUILD_ID', defaultValue: '0', description: "DEPLOY_MODE基于" + GlobalVars.rollback + "部署方式, 输入对应保留的回滚构建记录ID, " +
                         "默认0是回滚到上一次连续构建, 当前归档模式的回滚仅适用于在master节点构建的任务")
-                booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行Docker/K8S灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
+                booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行Docker/K8S集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
                         description: '是否执行服务启动健康检测 否: 可大幅减少流水线持续时间 分布式部署不建议取消  K8S使用默认的健康探测')
                 booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}",

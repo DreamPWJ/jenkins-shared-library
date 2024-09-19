@@ -116,6 +116,9 @@ class Deploy implements Serializable {
         if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
             type = "停止"
         }
+        if (GlobalVars.destroy == ctx.params.DEPLOY_MODE) {
+            type = "销毁"
+        }
         if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
             type = "重启"
         }
@@ -136,6 +139,9 @@ class Deploy implements Serializable {
                     if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
                         stopService(ctx, map)
                     }
+                    if (GlobalVars.destroy == ctx.params.DEPLOY_MODE) {
+                        destroyService(ctx, map)
+                    }
                     if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
                         restartService(ctx, map)
                     }
@@ -150,6 +156,9 @@ class Deploy implements Serializable {
             }
             if (GlobalVars.stop == ctx.params.DEPLOY_MODE) {
                 command = "docker stop " + dockerContainerName
+            }
+            if (GlobalVars.destroy == ctx.params.DEPLOY_MODE) {
+                command = "docker stop " + dockerContainerName  + " && docker rm " + dockerContainerName
             }
             if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
                 command = "docker restart " + dockerContainerName
@@ -184,7 +193,7 @@ class Deploy implements Serializable {
             }
         }
 
-        // 控制完成钉钉通知大家
+        // 控制完成钉钉通知大家 重要操作默认执行钉钉通知
         // if ("${ctx.params.IS_DING_NOTICE}" == 'true')  // 是否钉钉通知
         DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "执行" + type + "服务命令 [${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}](${ctx.env.JOB_URL})  👩‍💻 ", typeText + "\n  ##### 执行" + type + "控制命令完成 ✅  " +
                 "\n  ###### 执行人: ${ctx.BUILD_USER} \n ###### 完成时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
@@ -217,6 +226,21 @@ class Deploy implements Serializable {
             // Docker服务方式
             def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
             ctx.sh " docker stop " + dockerContainerName
+        }
+    }
+
+    /**
+     * 销毁删除服务
+     */
+    static def destroyService(ctx, map) {
+        if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
+            // K8s服务方式
+            def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
+            ctx.sh " kubectl delete deployment " + deploymentName
+        } else {
+            // Docker服务方式
+            def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
+            ctx.sh " docker stop " + dockerContainerName + " && docker rm " + dockerContainerName
         }
     }
 
