@@ -18,6 +18,10 @@
 - 停止TiDB集群
   tiup cluster stop tidb-prod
 
+- 重启TiDB集群或部分Node节点
+  tiup cluster restart tidb-prod
+  tiup cluster restart tidb-prod --node ip:port
+
 - 检测TiDB集群模版有效性
   tiup cluster check /my/topology.yaml
 
