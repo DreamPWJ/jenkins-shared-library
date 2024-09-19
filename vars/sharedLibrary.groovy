@@ -8,7 +8,7 @@ import shared.library.devops.GitTagLog
 /**
  * @author 潘维吉
  * @description 通用核心共享Pipeline脚本库
- * 针对大前端Web和服务端Java、Go、Python、C++等多语言项目
+ * 针对大前端Web和服务端Java、Python、C++、Go等多语言项目
  */
 def call(String type = 'web-java', Map map) {
     echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: 前端${map.jenkins_node_front_end} , 后端${map.jenkins_node} "
