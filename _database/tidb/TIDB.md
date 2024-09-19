@@ -4,7 +4,7 @@
 -  使用TiUP初始化部署TiDB集群步骤: https://docs.pingcap.com/zh/tidb/stable/production-deployment-using-tiup
 -  执行部署TiDB分布式集群(首先设置ssh免密登录) : 
    cd /my && tiup cluster deploy cluster-name v8.1.1 ./topology.yaml --user root 和 tiup cluster start cluster-name --init
--  重复部署的情况， 注意数据库名称重复冲突
+-  重复部署的情况， 注意数据库名称重复冲突 重命名集群  tiup cluster rename old-name new-name
 -  MYSQL迁移TiDB兼容性问题(TiDB不支持函数、存储过程、触发器等): https://docs.pingcap.com/zh/tidb/stable/mysql-compatibility
 
 #### TiDB运维命令 https://docs.pingcap.com/zh/tidb/stable/maintain-tidb-using-tiup
@@ -27,9 +27,6 @@
 
 - 修改配TiDB集群置参数 比如将日志 max-days默认不过期更改过期等
   tiup cluster edit-config cluster-name
-
-- 重命名集群
-  tiup cluster rename old-name new-name
 
 - 销毁TiDB集群 ！！！
   tiup cluster destroy cluster-name

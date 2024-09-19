@@ -9,7 +9,7 @@ server_configs:
   tidb:
     log.slow-threshold: 300 # 输出慢日志的耗时阈值 毫秒
     log.file.max-size: 300  # 日志文件的大小限制 单位：MB
-    log.file.max-days: 30  # 日志最大保留的天数 默认不清理
+    log.file.max-days: 30   # 日志最大保留的天数 默认不清理
     binlog.enable: false
     binlog.ignore-error: false
   tikv:
