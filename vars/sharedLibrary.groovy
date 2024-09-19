@@ -11,7 +11,7 @@ import shared.library.devops.GitTagLog
  * 针对大前端Web和服务端Java、Python、C++、Go等多语言项目
  */
 def call(String type = 'web-java', Map map) {
-    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: 前端${map.jenkins_node_front_end} , 后端${map.jenkins_node} "
+    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: 前端${map.jenkins_node_frontend} , 后端${map.jenkins_node} "
     // 应用共享方法定义
     changeLog = new ChangeLog()
     gitTagLog = new GitTagLog()
@@ -38,7 +38,7 @@ def call(String type = 'web-java', Map map) {
     if (type == "web-java") { // 针对标准项目
         pipeline {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
-            agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_front_end}" : "${map.jenkins_node}"}" }
+            agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}" }
             //agent { label "${map.jenkins_node}" }
 
             parameters {
