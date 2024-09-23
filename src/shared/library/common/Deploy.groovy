@@ -158,7 +158,7 @@ class Deploy implements Serializable {
                 command = "docker stop " + dockerContainerName
             }
             if (GlobalVars.destroy == ctx.params.DEPLOY_MODE) {
-                command = "docker stop " + dockerContainerName  + " && docker rm " + dockerContainerName
+                command = "docker stop " + dockerContainerName + " && docker rm " + dockerContainerName
             }
             if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
                 command = "docker restart " + dockerContainerName
@@ -230,6 +230,27 @@ class Deploy implements Serializable {
     }
 
     /**
+     * 重启服务
+     */
+    static def restartService(ctx, map) {
+        if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
+            // K8s服务方式
+            def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
+            // 重启deployment命令
+            ctx.sh " kubectl rollout restart deployment " + deploymentName
+
+//         ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=0 "
+//         ctx.sleep 2
+//         ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=" + "${ctx.K8S_POD_REPLICAS}"
+
+        } else {
+            // Docker服务方式
+            def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
+            ctx.sh " docker restart " + dockerContainerName
+        }
+    }
+
+    /**
      * 销毁删除服务
      */
     static def destroyService(ctx, map) {
@@ -241,23 +262,6 @@ class Deploy implements Serializable {
             // Docker服务方式
             def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
             ctx.sh " docker stop " + dockerContainerName + " && docker rm " + dockerContainerName
-        }
-    }
-
-    /**
-     * 重启服务
-     */
-    static def restartService(ctx, map) {
-        if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
-            // K8s服务方式
-            def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
-            ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=0 "
-            ctx.sleep 2
-            ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=" + "${ctx.K8S_POD_REPLICAS}"
-        } else {
-            // Docker服务方式
-            def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
-            ctx.sh " docker restart " + dockerContainerName
         }
     }
 
