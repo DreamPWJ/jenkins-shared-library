@@ -236,9 +236,10 @@ class Deploy implements Serializable {
         if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
             // K8s服务方式
             def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
-            // 重启deployment命令
+            // 重启deployment命令 会逐一滚动重启 重启过程中保证服务可用性
             ctx.sh " kubectl rollout restart deployment " + deploymentName
 
+            // 扩缩容方式重启 会导致服务不可用 同时停止服务和启动服务
 //         ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=0 "
 //         ctx.sleep 2
 //         ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=" + "${ctx.K8S_POD_REPLICAS}"
