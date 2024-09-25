@@ -13,7 +13,7 @@ import shared.library.common.*
 class Deploy implements Serializable {
 
     /**
-     * SSH 通过堡垒机/跳板机 访问目标机器 利用ssh的高级的ProxyJump最方便或中级的ProxyJump或者ssh tunnel隧道功能来透过跳板机
+     * SSH 通过堡垒机/跳板机 访问目标机器 利用ssh的高级的ProxyJump最方便或中级的ProxyJump或者ssh tunnel隧道或Frp内网穿透功能来透过跳板机或堡垒机
      */
     static def sshProxy(ctx) {
         // SSH客户端执行访问的机器通过跳板机直接访问目标机器
@@ -22,7 +22,7 @@ class Deploy implements Serializable {
         ctx.sh "ssh -J root@${ctx.proxyJumphost} ${ctx.remote.user}@${ctx.remote.host}"
         // ssh -J root@119.188.90.222 root@172.16.0.91
         // scp -o 'ProxyJump root@跳板机IP:22' file.txt root@目标机器IP:/my/
-        // Tabby跨越堡垒机的SSH利器 文档: https://zhuanlan.zhihu.com/p/490662490
+        // Tabby跨越跳板机的SSH利器 文档: https://zhuanlan.zhihu.com/p/490662490
     }
 
     /**
