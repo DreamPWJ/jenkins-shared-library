@@ -2,7 +2,7 @@
 # Author: 潘维吉
 # 清理Docker日志
 # 获取占用磁盘最高的目录列表  如 /* 根目录命令:  du -hsx /* | sort -hr | head -n 5
-# 隐藏占用情况 查找进程没有关闭导致内核无法回收占用空间隐藏删除的文件:  lsof -n | grep deleted  执行释放 kill -9 PID
+# 隐藏占用情况 查找进程没有关闭导致内核无法回收占用空间的隐藏要删除的文件:  lsof -n | grep deleted  执行释放 kill -9 PID
 
 echo "======== 开始自动清理Docker日志 ========"
 
