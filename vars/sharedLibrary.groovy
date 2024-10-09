@@ -1520,7 +1520,7 @@ def healthCheck(map, params = '') { // 可选参数
     } else if ("${healthCheckMsg}".contains("失败")) { // shell返回echo信息包含值
         isHealthCheckFail = true
         Tools.printColor(this, "${healthCheckMsg} ❌", "red")
-        println("👉 健康检测失败原因分析: 首选排除CI服务器和应用服务器网络是否连通、应用服务器端口是否开放, 再查看应用服务启动日志是否失败")
+        println("👉 健康检测失败原因分析: 查看应用服务启动日志是否失败")
         // 钉钉失败通知
         dingNotice(map, 1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
         // 打印应用服务启动失败日志 方便快速排查错误
