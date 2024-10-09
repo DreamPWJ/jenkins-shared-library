@@ -17,3 +17,6 @@ rm -rf /var/lib/docker
 #                  docker-latest-logrotate \
 #                  docker-logrotate \
 #                  docker-engine
+
+# apt卸载方式
+sudo apt-get remove docker-ce docker-ce-cli containerd.io
