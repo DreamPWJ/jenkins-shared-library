@@ -33,7 +33,7 @@ default-authentication-plugin=caching_sha2_password
 #skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0
 
 # 关闭SQL严格模式
-#sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
+#sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
 
 group_concat_max_len=1024000000
 max_connections=6000
