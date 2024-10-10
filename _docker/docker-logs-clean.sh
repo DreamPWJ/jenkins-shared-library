@@ -2,6 +2,7 @@
 # Author: 潘维吉
 # 清理Docker日志
 # 获取占用磁盘最高的目录列表  如 /* 根目录命令:  du -hsx /* | sort -hr | head -n 5
+# 隐藏占用情况 查找进程没有关闭导致内核无法回收占用空间的隐藏要删除的文件:  lsof -n | grep deleted  执行释放 kill -9 PID
 
 echo "======== 开始自动清理Docker日志 ========"
 
@@ -10,6 +11,9 @@ echo " Free space is $TOTAL_FREE GB! "
 
 sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
 rm -rf /my/**/log* && rm -f /my/**/*.log || true
+find /my -type f -name "*.log" -exec rm -f {} + || true
+# 删除所有 log 的目录
+find /my -type d -name "log*" -exec rm -rf {} + || true
 rm -f /var/log/nginx/*.log || true
 rm -f /usr/local/nginx/logs/*.log || true
 rm -f /var/lib/docker/overlay2/*/diff/var/log/nginx/*.log || true

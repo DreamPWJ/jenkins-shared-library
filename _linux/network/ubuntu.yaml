@@ -17,6 +17,7 @@ network:
 # 1. 查看网卡设备号  ip addr 并配置网卡名称
 # 2. 配置网络yaml文件  sudo nano /etc/netplan/00-installer-config.yaml    GNU nano编辑器CTRL+X 保存退出
 # 3. 让配置生效  sudo netplan apply
+# CentOS系统设置固定静态IP地址: 在 /etc/sysconfig/network-scripts/ifcfg-* 配置
 
 # 默认配置
 

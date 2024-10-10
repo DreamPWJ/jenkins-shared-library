@@ -1,13 +1,14 @@
 #### 查看运行端口
 
+lsof -i:8080
 netstat -tunlp
 netstat -anp | grep 8080
-lsof -i:8080
 
 #### 查看详细进程
 
+ps aux | grep tomcat
 ps -ef | grep rsync
-ps aux | grep tomcat 
+
 
 #### 内存最多的10个进程
 
@@ -81,7 +82,7 @@ arp -a
 - 首先将系统版本的ISO镜像下载到U盘 , 使用Rufus软件制作的USB的启动引导盘安装
 - 安装参考文章: https://bynss.com/howto/633952.html
 - Ubuntu系统设置固定静态IP地址: _linux/network目录下有配置 参考文章: https://ld246.com/article/1593929878472
-- CentOS系统设置固定静态IP地址: 在 /etc/sysconfig/network-scripts/ifcfg-* 配置 在VMware中使用自动桥接配置 网关使用宿主机相同的网关地址
+- CentOS系统设置固定静态IP地址: 在 /etc/sysconfig/network-scripts/ifcfg-* 配置 在VMware中使用自动桥接配置 网关使用宿主机相同的网关地址并且主网络开启桥接协议、 journalctl查看xfs_repair修复emergency mode紧急模式磁盘挂载故障
   参考文章: https://cloud.tencent.com/developer/article/1721181
 - 固定IP可在路由器上设置静态地址 防止被DHCP动态分配
 - 开启Ubuntu系统 root用户访问ssh远程访问权限(sudo passwd root) : https://blog.csdn.net/boonya/article/details/121256380

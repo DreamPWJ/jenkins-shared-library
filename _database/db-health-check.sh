@@ -65,8 +65,8 @@ exit 0
 
 
 
-# 执行授权  chmod +x /my/db_health_check.sh
+# 执行授权  chmod +x /my/db-health-check.sh
 # crontab -e
-# */1 * * * * /bin/bash /my/db_health_check.sh >> /my/db-health-check.log 2>&1
+# */1 * * * * /bin/bash /my/db-health-check.sh >> /my/db-health-check.log 2>&1
 # service crond restart  , Ubuntu 使用 sudo service cron restart # 重启crond生效
 # crontab -l # 查看crond列表

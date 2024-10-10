@@ -8,10 +8,10 @@ import shared.library.devops.GitTagLog
 /**
  * @author 潘维吉
  * @description 通用核心共享Pipeline脚本库
- * 针对大前端Web和服务端Java、Go、Python、C++等多语言项目
+ * 针对大前端Web和服务端Java、Python、C++、Go等多语言项目
  */
 def call(String type = 'web-java', Map map) {
-    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: 前端${map.jenkins_node_front_end} , 后端${map.jenkins_node} "
+    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: 前端${map.jenkins_node_frontend} , 后端${map.jenkins_node} "
     // 应用共享方法定义
     changeLog = new ChangeLog()
     gitTagLog = new GitTagLog()
@@ -38,7 +38,7 @@ def call(String type = 'web-java', Map map) {
     if (type == "web-java") { // 针对标准项目
         pipeline {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
-            agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_front_end}" : "${map.jenkins_node}"}" }
+            agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}" }
             //agent { label "${map.jenkins_node}" }
 
             parameters {
@@ -560,6 +560,7 @@ def call(String type = 'web-java', Map map) {
                 stage('钉钉通知') {
                     when {
                         beforeAgent true
+                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression { return true }
                     }
                     steps {
@@ -1519,7 +1520,7 @@ def healthCheck(map, params = '') { // 可选参数
     } else if ("${healthCheckMsg}".contains("失败")) { // shell返回echo信息包含值
         isHealthCheckFail = true
         Tools.printColor(this, "${healthCheckMsg} ❌", "red")
-        println("👉 健康检测失败原因分析: 首选排除CI服务器和应用服务器网络是否连通、应用服务器端口是否开放, 再查看应用服务启动日志是否失败")
+        println("👉 健康检测失败原因分析: 查看应用服务启动日志是否失败")
         // 钉钉失败通知
         dingNotice(map, 1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
         // 打印应用服务启动失败日志 方便快速排查错误

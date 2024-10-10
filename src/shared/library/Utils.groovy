@@ -164,7 +164,7 @@ class Utils implements Serializable {
     }
 
     /**
-     * 获取文件大小 kb转mb
+     * 获取文件大小 KB转MB
      */
     static kbConvertMb(size) {
         return ((Double) "${size}".toInteger() / 1024 / 1024).round(2) + " MB"

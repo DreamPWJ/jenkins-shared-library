@@ -13,16 +13,16 @@ import shared.library.common.*
 class Deploy implements Serializable {
 
     /**
-     * SSH 通过堡垒机/跳板机 访问目标机器 利用ssh的高级的ProxyJump最方便或中级的ProxyJump或者ssh tunnel隧道功能来透过跳板机
+     * SSH 通过堡垒机/跳板机 访问目标机器 利用ssh的高级的ProxyJump最方便或中级的ProxyJump或者ssh tunnel隧道或Frp内网穿透功能来透过跳板机或堡垒机
      */
     static def sshProxy(ctx) {
         // SSH客户端执行访问的机器通过跳板机直接访问目标机器
         // OpenSSH 7.3版本查看版本ssh -V 开始使用更方便ssh ProxyJump 文档: https://woodenrobot.me/2019/07/18/ssh-proxyjump/
+        // Tabby跨越跳板机的SSH利器 文档: https://zhuanlan.zhihu.com/p/490662490
         // ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22
         ctx.sh "ssh -J root@${ctx.proxyJumphost} ${ctx.remote.user}@${ctx.remote.host}"
         // ssh -J root@119.188.90.222 root@172.16.0.91
         // scp -o 'ProxyJump root@跳板机IP:22' file.txt root@目标机器IP:/my/
-        // Tabby跨越堡垒机的SSH利器 文档: https://zhuanlan.zhihu.com/p/490662490
     }
 
     /**
@@ -158,7 +158,7 @@ class Deploy implements Serializable {
                 command = "docker stop " + dockerContainerName
             }
             if (GlobalVars.destroy == ctx.params.DEPLOY_MODE) {
-                command = "docker stop " + dockerContainerName  + " && docker rm " + dockerContainerName
+                command = "docker stop " + dockerContainerName + " && docker rm " + dockerContainerName
             }
             if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
                 command = "docker restart " + dockerContainerName
@@ -230,6 +230,28 @@ class Deploy implements Serializable {
     }
 
     /**
+     * 重启服务
+     */
+    static def restartService(ctx, map) {
+        if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
+            // K8s服务方式
+            def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
+            // 重启deployment命令 会逐一滚动重启 重启过程中保证服务可用性
+            ctx.sh " kubectl rollout restart deployment " + deploymentName
+
+            // 扩缩容方式重启 会导致服务不可用 同时停止服务和启动服务
+//         ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=0 "
+//         ctx.sleep 2
+//         ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=" + "${ctx.K8S_POD_REPLICAS}"
+
+        } else {
+            // Docker服务方式
+            def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
+            ctx.sh " docker restart " + dockerContainerName
+        }
+    }
+
+    /**
      * 销毁删除服务
      */
     static def destroyService(ctx, map) {
@@ -241,23 +263,6 @@ class Deploy implements Serializable {
             // Docker服务方式
             def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
             ctx.sh " docker stop " + dockerContainerName + " && docker rm " + dockerContainerName
-        }
-    }
-
-    /**
-     * 重启服务
-     */
-    static def restartService(ctx, map) {
-        if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
-            // K8s服务方式
-            def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
-            ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=0 "
-            ctx.sleep 2
-            ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=" + "${ctx.K8S_POD_REPLICAS}"
-        } else {
-            // Docker服务方式
-            def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
-            ctx.sh " docker restart " + dockerContainerName
         }
     }
 

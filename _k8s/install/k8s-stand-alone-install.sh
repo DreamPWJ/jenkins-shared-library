@@ -4,7 +4,7 @@
 # 创建 Kubernetes cluster（单机版）最简单的方法是 minikube 实现本地 Kubernetes 集群。
 # 参考文档: https://minikube.sigs.k8s.io/docs/start/
 
-# 首选要安装Docker环境
+# 首先要安装Docker环境
 echo "单机版Kubernetes云原生容器编排管理安装"
 
 echo "Debian / Ubuntu阿里云Kubernetes 镜像"

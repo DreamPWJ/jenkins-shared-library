@@ -121,7 +121,7 @@ function get_disk_space() {
     # 判断可用空间是否低于最小需求  包含MB或KB单位终止部署
      if [[ "$TOTAL_FREE" =~ [MK] ]]; then
          echo -e "\033[31m当前系统磁盘空间严重不足 ❌ , 剩余空间: $TOTAL_FREE, 会导致Docker镜像拉取或构建失败, 请先清理空间资源后重新构建  \033[0m"
-         exit 1
+         exit 1 # 在子 shell 中执行 exit，那么它只会退出子 shell 而不会影响父 shell 或整个脚本
      fi
 
     if (( $(echo "$TOTAL_FREE < $MIN_FREE_SPACE" | bc -l) )); then
@@ -130,7 +130,11 @@ function get_disk_space() {
         echo "======== 开始自动清理Docker日志 ========"
         # docker system prune -a --force || true
         sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
-        rm -rf /my/**/log* && rm -f /my/**/*.log || true
+        #rm -rf /my/**/log* && rm -f /my/**/*.log || true
+        # 删除所有 .log 文件
+        find /my -type f -name "*.log" -exec rm -f {} + || true
+        # 删除所有 log 的目录
+        find /my -type d -name "log*" -exec rm -rf {} + || true
         rm -f /var/log/nginx/*.log || true
         rm -f /usr/local/nginx/logs/*.log || true
         rm -f /var/lib/docker/overlay2/*/diff/var/log/nginx/*.log || true

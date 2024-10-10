@@ -345,9 +345,9 @@ class Kubernetes implements Serializable {
      */
     static def rollback(ctx) {
         // 回滚上一个版本
-        ctx.sh " kubectl rollout undo deployment/deployment名称  -n ${k8sNameSpace} "
+        ctx.sh " kubectl rollout undo deployment/deployment-name  -n ${k8sNameSpace} "
         // 回滚到指定版本
-        ctx.sh " kubectl rollout undo deployment/deployment名称 --revision=2 -n ${k8sNameSpace} "
+        ctx.sh " kubectl rollout undo deployment/deployment-name --revision=2 -n ${k8sNameSpace} "
     }
 
     /**
