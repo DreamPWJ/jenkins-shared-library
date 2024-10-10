@@ -11,6 +11,9 @@ echo " Free space is $TOTAL_FREE GB! "
 
 sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
 rm -rf /my/**/log* && rm -f /my/**/*.log || true
+find /my -type f -name "*.log" -exec rm -f {} + || true
+# 删除所有 log 的目录
+find /my -type d -name "log*" -exec rm -rf {} + || true
 rm -f /var/log/nginx/*.log || true
 rm -f /usr/local/nginx/logs/*.log || true
 rm -f /var/lib/docker/overlay2/*/diff/var/log/nginx/*.log || true
