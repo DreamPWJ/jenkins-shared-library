@@ -133,7 +133,7 @@ function get_disk_space() {
         #rm -rf /my/**/log* && rm -f /my/**/*.log || true
         # 删除所有 .log 文件
         find /my -type f -name "*.log" -exec rm -f {} + || true
-        # 删除所有 log 的目录
+        # 删除所有 log* 的目录
         find /my -type d -name "log*" -exec rm -rf {} + || true
         rm -f /var/log/nginx/*.log || true
         rm -f /usr/local/nginx/logs/*.log || true
