@@ -35,9 +35,10 @@
 
 tiup cluster scale-out <cluster-name> scale-out.yml [-p] [-i /home/root/.ssh/gcp_rsa]
 
-#### TiDB 备份与恢复
+#### TiDB 备份与恢复 https://docs.pingcap.com/zh/tidb/stable/backup-and-restore-overview
 
 - 基于 Raft 协议和合理的部署拓扑规划，TiDB 实现了集群的高可用，当集群中少数节点挂掉时，集群依然能对外提供服务
+- tiup br backup full 命令来备份集群快照到备份存储 例如在每天零点进行集群快照备份
 
 #### 连接到 TiDB 控制台 用于查看和备份等
 
