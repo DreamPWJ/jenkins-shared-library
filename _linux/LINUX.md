@@ -77,7 +77,7 @@ arp -a
 
 - sudo vim /etc/resolv.conf
 
-#### 安装Ubuntu服务器系统 插入U盘启动主机大部分长按F12或Delete可以进入USB系统启动引导盘安装 (BIOS界面不同电脑快捷键不一样 有EFI源文件安装)
+#### 安装Ubuntu服务器系统 插入U盘启动主机大部分长按F12或Delete可以进入USB系统启动引导盘安装 (BIOS界面不同电脑快捷键不一样 有EFI源文件安装 一般台式机开机按delete键可以进入BIOS，笔记本按F2键进入BIOS)
 
 - 首先将服务器系统版本的ISO镜像下载到高配U盘 , 使用Rufus软件制作的USB的启动引导盘安装
 - 安装参考文章: https://developer.aliyun.com/article/927675  设置阿里云镜像源: http://mirrors.aliyun.com/ubuntu/

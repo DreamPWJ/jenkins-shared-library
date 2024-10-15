@@ -108,7 +108,7 @@ class Deploy implements Serializable {
         def type = "" // 控制类型
         def typeText = "" // 控制类型文案
         def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}" // docker容器名称
-        def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"  // kubernetes deployment名称
+        def deploymentName = "${ctx.FULL_PROJECT_NAME}" + "-deployment"  // kubernetes deployment名称
 
         if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
             type = "启动"
@@ -205,7 +205,7 @@ class Deploy implements Serializable {
     static def startService(ctx, map) {
         if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
             // K8s服务方式
-            def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
+            def deploymentName = "${ctx.FULL_PROJECT_NAME}" + "-deployment"
             ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=" + "${ctx.K8S_POD_REPLICAS}"
         } else {
             // Docker服务方式
@@ -220,7 +220,7 @@ class Deploy implements Serializable {
     static def stopService(ctx, map) {
         if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
             // K8s服务方式
-            def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
+            def deploymentName = "${ctx.FULL_PROJECT_NAME}" + "-deployment"
             ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=0 "
         } else {
             // Docker服务方式
@@ -235,7 +235,7 @@ class Deploy implements Serializable {
     static def restartService(ctx, map) {
         if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
             // K8s服务方式
-            def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
+            def deploymentName = "${ctx.FULL_PROJECT_NAME}" + "-deployment"
             // 重启deployment命令 会逐一滚动重启 重启过程中保证服务可用性
             ctx.sh " kubectl rollout restart deployment " + deploymentName
 
@@ -257,7 +257,7 @@ class Deploy implements Serializable {
     static def destroyService(ctx, map) {
         if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
             // K8s服务方式
-            def deploymentName = "${ctx.PROJECT_NAME}" + "-deployment"
+            def deploymentName = "${ctx.FULL_PROJECT_NAME}" + "-deployment"
             ctx.sh " kubectl delete deployment " + deploymentName
         } else {
             // Docker服务方式
