@@ -28,7 +28,7 @@ sudo apt-get install -y software-properties-common || true
 sudo apt-get install -y linux-image-generic-lts-xenial || true
 
 # 非设置镜像情况安装Docker 网络原因可能比较慢或者失败
-echo "安装Docker"
+echo "安装Docker环境"
 if [[ $(command -v curl) ]]; then
   curl -s --connect-timeout 60 --retry 6 https://get.docker.com/ | sudo sh
 else
@@ -48,9 +48,15 @@ fi
 echo "设置国内镜像源 加速docker pull速度"
 sudo cat <<EOF >/etc/docker/daemon.json
 {
-  "registry-mirrors": [
-   "https://registry.docker-cn.com"
-  ]
+"registry-mirrors": [
+  "https://docker.lanneng.tech",
+  "https://registry.docker-cn.com"
+],
+"log-driver":"json-file",
+"log-opts": {
+"max-size": "100m",
+"max-file": "2"
+}
 }
 EOF
 
