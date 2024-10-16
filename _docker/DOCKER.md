@@ -55,6 +55,7 @@ docker run -d --restart=always -p 8081:8080  \
 --name xxl-job-admin xuxueli/xxl-job-admin:2.4.1
 
 #### RocketMQ消息队列服务  官方文档： https://github.com/apache/rocketmq-docker
+#### 已运行的容器动态修改内存限制 docker update --memory 1024m --memory-swap -1 rocketmq-broker
 docker pull apache/rocketmq:latest
 
 mkdir -p /my/rocketmq/broker/conf && sudo chmod 777  /my/rocketmq/ -R

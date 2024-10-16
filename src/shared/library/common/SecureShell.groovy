@@ -22,7 +22,7 @@ class SecureShell implements Serializable {
      * 自动设置SSH免密连接 用于CI/CD服务器和应用部署服务器免密通信  避免手动批量设置繁琐重复劳动
      */
     static def autoSshLogin(ctx, map) {
-        ctx.println "自动设置SSH免密连接 用于CI/CD服务器和应用部署服务器免密通信"
+        ctx.println "自动设置SSH免密连接 用于CI/CD服务器和应用部署服务器免密通信 注意当前跳板机或部署机器先执行 ssh-keygen -t rsa"
         try {
             if ("${ctx.remote.user}".trim() == "" || "${ctx.remote.host}".trim() == "") {
                 ctx.currentBuild.result = 'FAILURE'
@@ -57,7 +57,7 @@ class SecureShell implements Serializable {
 
                         if ("${ctx.isProxyJumpType}" == "true") {  // 跳板机方式部署
                             // 执行升级检测  在较新版本的OpenSSH 7.3及以上中( ssh -V 查看版本)，跳板机（jump host）-J 选项是存在的
-                            ctx.sh " cd ci/_linux/shell/ && chmod +x upgrade-ssh.sh && ./upgrade-ssh.sh "
+                            ctx.sh " cd _linux/shell/ && chmod +x upgrade-ssh.sh && ./upgrade-ssh.sh "
 
                             ctx.withCredentials([ctx.file(credentialsId: "${map.proxy_jump_hosts_id}", variable: 'PROXY_JUMP_HOSTS')]) {
                                 def jsonData = ctx.readFile(file: "${ctx.PROXY_JUMP_HOSTS}")

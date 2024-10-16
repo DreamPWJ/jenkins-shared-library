@@ -73,15 +73,16 @@ arp -a
 - ssh-keygen -t rsa root用户在/root/.ssh/id_rsa.pub
 - 公钥放在远程访问服务的/root/.ssh/authorized_keys里 重启sshd服务生效 执行 ssh root@ip 命令访问确认
 
-#### 设置Linux服务器DNS服务 nameserver设置如 114.114.114.114, 223.5.5.5, 223.6.6.6, 8.8.8.8
+#### 设置Linux服务器DNS服务 nameserver设置如 114.114.114.114, 223.5.5.5, 223.6.6.6, 8.8.8.8, 1.1.1.1
 
 - sudo vim /etc/resolv.conf
 
-#### 安装Ubuntu服务器系统 大部分按F12可以进入USB启动引导盘安装 (不同电脑快捷键不一样 有EFI源文件安装)
+#### 安装Ubuntu服务器系统 
 
-- 首先将系统版本的ISO镜像下载到U盘 , 使用Rufus软件制作的USB的启动引导盘安装
-- 安装参考文章: https://bynss.com/howto/633952.html
-- Ubuntu系统设置固定静态IP地址: _linux/network目录下有配置 参考文章: https://ld246.com/article/1593929878472
+- 首先将服务器系统版本的ISO镜像下载到高配U盘 , 使用Rufus软件制作的USB的启动引导盘安装 (安装完成reboot now重启系统前先拔出U盘, 再物理重启进入系统) , Help选项可提前进入shell控制
+- 插入U盘启动主机大部分长按Delete或F2可以进入USB系统启动引导盘安装 F10保存设置 (BIOS界面不同电脑快捷键不一样 有EFI源文件安装 一般台式机开机按delete键可以进入BIOS，笔记本按F2键进入BIOS)
+- 安装参考文章: https://developer.aliyun.com/article/927675  设置阿里云镜像源: http://mirrors.aliyun.com/ubuntu/
+- Ubuntu系统设置固定静态IP地址: _linux/network目录下有配置 命令如 sudo nano /etc/netplan/00-installer-config.yaml
 - CentOS系统设置固定静态IP地址: 在 /etc/sysconfig/network-scripts/ifcfg-* 配置 在VMware中使用自动桥接配置 网关使用宿主机相同的网关地址并且主网络开启桥接协议、 journalctl查看xfs_repair修复emergency mode紧急模式磁盘挂载故障
   参考文章: https://cloud.tencent.com/developer/article/1721181
 - 固定IP可在路由器上设置静态地址 防止被DHCP动态分配
