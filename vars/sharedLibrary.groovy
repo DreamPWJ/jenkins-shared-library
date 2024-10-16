@@ -184,7 +184,7 @@ def call(String type = 'web-java', Map map) {
                                 pullProjectCode()
                                 pullCIRepo()
                             }
-                            autoSshLogin(map) // 测试部署服务器的免密登录
+
                             /*  parallel( // 步骤内并发执行
                                      'CI/CD代码': {
                                          pullCIRepo()
@@ -192,6 +192,8 @@ def call(String type = 'web-java', Map map) {
                                      '项目代码': {
                                          pullProjectCode()
                                      }) */
+
+                            autoSshLogin(map) // 测试部署服务器的免密登录
                         }
                     }
                 }

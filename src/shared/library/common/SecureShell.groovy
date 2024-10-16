@@ -57,7 +57,7 @@ class SecureShell implements Serializable {
 
                         if ("${ctx.isProxyJumpType}" == "true") {  // 跳板机方式部署
                             // 执行升级检测  在较新版本的OpenSSH 7.3及以上中( ssh -V 查看版本)，跳板机（jump host）-J 选项是存在的
-                            ctx.sh " cd ci/_linux/shell/ && chmod +x upgrade-ssh.sh && ./upgrade-ssh.sh "
+                            ctx.sh " cd ci/_linux/shell/ || true && chmod +x upgrade-ssh.sh && ./upgrade-ssh.sh "
 
                             ctx.withCredentials([ctx.file(credentialsId: "${map.proxy_jump_hosts_id}", variable: 'PROXY_JUMP_HOSTS')]) {
                                 def jsonData = ctx.readFile(file: "${ctx.PROXY_JUMP_HOSTS}")
