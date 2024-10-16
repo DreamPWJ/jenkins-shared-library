@@ -22,7 +22,7 @@ class SecureShell implements Serializable {
      * 自动设置SSH免密连接 用于CI/CD服务器和应用部署服务器免密通信  避免手动批量设置繁琐重复劳动
      */
     static def autoSshLogin(ctx, map) {
-        ctx.println "自动设置SSH免密连接 用于CI/CD服务器和应用部署服务器免密通信"
+        ctx.println "自动设置SSH免密连接 用于CI/CD服务器和应用部署服务器免密通信 注意当前跳板机或部署机器先执行 ssh-keygen -t rsa"
         try {
             if ("${ctx.remote.user}".trim() == "" || "${ctx.remote.host}".trim() == "") {
                 ctx.currentBuild.result = 'FAILURE'
