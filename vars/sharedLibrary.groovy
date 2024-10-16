@@ -193,7 +193,7 @@ def call(String type = 'web-java', Map map) {
                                          pullProjectCode()
                                      }) */
 
-                            autoSshLogin(map) // 测试部署服务器的免密登录
+                            // autoSshLogin(map) // 测试部署服务器的免密登录
                         }
                     }
                 }
