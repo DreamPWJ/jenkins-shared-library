@@ -229,7 +229,7 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                     agent {
-                        /* label "linux"*/
+                        // label "node-3"  // 执行节点 分布式执行 可在不同服务上执行不同任务
                         /*   docker {
                                // sonarqube环境  构建完成自动删除容器
                                image "sonarqube:community"
@@ -237,7 +237,7 @@ def call(String type = 'web-java', Map map) {
                            }*/
                         docker {
                             // js、jvm、php、jvm-android、go、python、php。 jvm-community是免费版
-                            image 'jetbrains/qodana-jvm-community:2024.1' // 设置镜像类型和版本号 latest
+                            image 'jetbrains/qodana-jvm-community:latest' // 设置镜像类型和版本号 latest
                             args " --entrypoint='' -v ${env.WORKSPACE}:/data/project/ -v ${env.WORKSPACE}/qodana/:/data/results/ -v $HOME/.m2/:/root/.m2/ "
                             reuseNode true // 使用根节点
                         }
