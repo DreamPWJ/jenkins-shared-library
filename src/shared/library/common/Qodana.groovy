@@ -40,7 +40,7 @@ class Qodana implements Serializable {
 
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana"
         // 归档生成的 SARIF 报告文件
-        ctx.archiveArtifacts artifacts: "${qodanaReportDir}/qodana.sarif.json", allowEmptyArchive: true
+        // ctx.archiveArtifacts artifacts: "${qodanaReportDir}/qodana.sarif.json", allowEmptyArchive: true
 
         // 发布 HTML 报告
         ctx.publishHTML(target: [
