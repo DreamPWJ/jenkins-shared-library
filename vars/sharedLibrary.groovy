@@ -225,11 +225,11 @@ def call(String type = 'web-java', Map map) {
                         expression {
                             // 是否进行代码质量分析  && fileExists("sonar-project.properties") == true 代码根目录配置sonar-project.properties文件才进行代码质量分析
                             // return ("${IS_CODE_QUALITY_ANALYSIS}" == 'true' )
-                            return false
+                            return true
                         }
                     }
                     agent {
-                        // label "node-3"  // 执行节点 分布式执行 可在不同服务上执行不同任务
+                        label "node-3"  // 执行节点 分布式执行 可在不同服务上执行不同任务
                         /*   docker {
                                // sonarqube环境  构建完成自动删除容器
                                image "sonarqube:community"
