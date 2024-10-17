@@ -42,14 +42,15 @@ class Qodana implements Serializable {
         // 归档生成的 SARIF 报告文件
         // ctx.archiveArtifacts artifacts: "${qodanaReportDir}/qodana.sarif.json", allowEmptyArchive: true
 
-        // 发布 HTML 报告
+        // 发布 HTML 报告  需要安装插件 https://plugins.jenkins.io/htmlpublisher/
         ctx.publishHTML(target: [
                 reportName           : 'Qodana质量报告',
-                reportDir            : "${qodanaReportDir}",
-                reportFiles          : 'report.html',
+                reportDir            : "${qodanaReportDir}/reports",
+                reportFiles          : 'index.html',
                 alwaysLinkToLastBuild: true,
                 keepAll              : true
         ])
+
     }
 
 }
