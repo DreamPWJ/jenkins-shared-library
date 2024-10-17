@@ -40,7 +40,7 @@ class Qodana implements Serializable {
 
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana"
 
-        // 发布 HTML 报告  需要安装插件 https://plugins.jenkins.io/htmlpublisher/
+        // 发布 HTML 报告 显示在左侧菜单栏 需要安装插件 https://plugins.jenkins.io/htmlpublisher/
         ctx.publishHTML(target: [
                 reportName           : 'Qodana质量报告',
                 reportDir            : "${qodanaReportDir}/report",
