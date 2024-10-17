@@ -68,7 +68,7 @@ arp -a
 - systemctl disable --now iptables # 永久禁用防火墙配置表
 - iptables -F # 清空防火墙配置规则 设置
 
-#### 建立免密连接
+#### 建立SSH免密连接
 
 - ssh-keygen -t rsa root用户在/root/.ssh/id_rsa.pub
 - 公钥放在远程访问服务的/root/.ssh/authorized_keys里 重启sshd服务生效 执行 ssh root@ip 命令访问确认
