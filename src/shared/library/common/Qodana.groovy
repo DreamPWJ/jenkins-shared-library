@@ -50,7 +50,7 @@ class Qodana implements Serializable {
         ])
 
         // 归档生成的 SARIF 报告文件
-        ctx.archiveArtifacts artifacts: "${qodanaReportDir}/qodana.sarif.json", allowEmptyArchive: true
+        // ctx.archiveArtifacts artifacts: "${qodanaReportDir}/qodana.sarif.json", allowEmptyArchive: true
 
     }
 
