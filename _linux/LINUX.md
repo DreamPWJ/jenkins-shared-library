@@ -77,7 +77,7 @@ arp -a
 
 - sudo vim /etc/resolv.conf
 
-#### 安装Ubuntu服务器系统 
+#### 安装Ubuntu服务器系统或VMware ESXI裸机虚拟化
 
 - 首先将服务器系统版本的ISO镜像下载到高配U盘 , 使用Rufus软件制作的USB的启动引导盘安装 (安装完成reboot now重启系统前先拔出U盘, 再物理重启进入系统) , Help选项可提前进入shell控制
 - 插入U盘启动主机大部分长按Delete或F2可以进入USB系统启动引导盘安装 F10保存设置 (BIOS界面不同电脑快捷键不一样 有EFI源文件安装 一般台式机开机按delete键可以进入BIOS，笔记本按F2键进入BIOS)
@@ -89,7 +89,7 @@ arp -a
 - 开启Ubuntu系统 root用户访问ssh远程访问权限(sudo passwd root) : https://blog.csdn.net/boonya/article/details/121256380
   su root 再执行 sudo vim /etc/ssh/sshd_config 添加 PermitRootLogin yes 生效 sudo systemctl restart sshd
   切换到root用户命令 sudo -i
--  同步时间操作
+-  同步系统时区操作
    sudo timedatectl set-timezone Asia/Shanghai  # 设置时区
    sudo timedatectl set-ntp true  # 设置NTP时间同步
 
