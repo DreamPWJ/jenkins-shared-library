@@ -229,7 +229,7 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                     agent {
-                        label "node-3"  // 执行节点 分布式执行 可在不同服务上执行不同任务
+                        // label "node-1"  // 执行节点 分布式执行 可在不同服务上执行不同任务
                         /*   docker {
                                // sonarqube环境  构建完成自动删除容器
                                image "sonarqube:community"
