@@ -14,7 +14,7 @@ class Qodana implements Serializable {
      * 文档: https://www.jetbrains.com/help/qodana/jenkins.html
      */
     static def analyse(ctx) {
-        ctx.sh " qodana --show-report "
+        ctx.sh " qodana --show-report  & sleep infinity " //   sleep infinity 保持容器运行
         // 仅分析新增代码 增量代码分析 --paths-to-exclude 参数来指定只分析变化的文件  https://www.jetbrains.com/help/qodana/analyze-pr.html
         // def gitStartHash = "" // 获取两次提交之间的更改文件列表 用逗号分隔的文件列表传递给Qodana
         // ctx.sh " qodana inspect --diff-start=${gitStartHash} "
@@ -36,6 +36,18 @@ class Qodana implements Serializable {
         sh "echo '<html><head><meta http-equiv=\"refresh\" content=\"0; url=https://qodana-host/${config.qodana_path}\" /></head></html>' > qodana-reports/qodana.html"
         archiveArtifacts artifacts: 'qodana-reports/qodana.html', fingerprint: true
         */
+
+        // 归档生成的 SARIF 报告文件
+        ctx.archiveArtifacts artifacts: "${ctx.env.WORKSPACE}/qodana/qodana.sarif.json", allowEmptyArchive: true
+
+        // 发布 HTML 报告
+        ctx.publishHTML(target: [
+                reportName : 'Qodana Report',
+                reportDir  : "${ctx.env.WORKSPACE}/qodana",
+                reportFiles: 'report.html',
+                alwaysLinkToLastBuild: true,
+                keepAll: true
+        ])
     }
 
 }
