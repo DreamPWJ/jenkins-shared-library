@@ -20,8 +20,11 @@ fi
 
 while read host; do
   ip=$(echo $host | cut -d " " -f1)
-  username=$(echo $host | cut -d " " -f2)
-  password=$(echo $host | cut -d " " -f3)
+  port=$(echo $host | cut -d " " -f2)
+  username=$(echo $host | cut -d " " -f3)
+  password=$(echo $host | cut -d " " -f4)
+  # 如果已经免密连接登录跳过设置
+
   expect <<EOF
         spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub  $username@$ip
         expect {
