@@ -7,7 +7,7 @@
 #### 下载frp相关平台包到相关目录中  直接执行go原生二进制包程序启动
 
 - 启动frp服务端: ./frps -c ./frps.toml
-- Linux启动frp客户端: ./frpc -c ./frpc.toml
+- Linux启动frp客户端: chmod +x frpc &&  chmod +x frpc.toml && ./frpc -c ./frpc.toml
 - Windows启动frp客户端: frpc.exe -c frpc.toml
 
 #### 启动frps or frpc
