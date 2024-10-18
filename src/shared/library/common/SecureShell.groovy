@@ -38,7 +38,12 @@ class SecureShell implements Serializable {
                 try {
                     // 目的是清除当前机器里关于远程服务器的缓存和公钥信息 如远程服务器已重新初始化或升降配等情况 导致本地还有缓存
                     // ECDSA host key "ip" for  has changed and you have requested strict checking 报错
-                    ctx.sh "ssh-keygen -R ${ctx.remote.host}"
+                    if ("${ctx.isProxyJumpType}" == "true") {
+                        ctx.sh "ssh-keygen -R ${map.proxy_jump_ip}"
+                    } else {
+                        ctx.sh "ssh-keygen -R ${ctx.remote.host}"
+                    }
+
                 } catch (e) {
                     ctx.println "清除当前机器里关于远程服务器的缓存和公钥信息失败"
                     ctx.println e.getMessage()
