@@ -40,7 +40,9 @@ while read host; do
     jump_user_name=$(echo "$host" | jq -r '.jump_user_name')
     jump_password=$(echo "$host" | jq -r '.jump_password')
     jump_port=$(echo "$host" | jq -r '.jump_port')
-    echo "jump_host: $jump_host"
+    echo "jump_host_ip: $jump_host"
+    # 如果已经免密连接登录跳过设置
+
   expect <<EOF
         spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $jump_port $jump_user_name@$jump_host
         expect {
