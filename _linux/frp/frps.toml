@@ -1,5 +1,5 @@
 bindPort = 7000   # frp服务端口
-vhostHTTPPort = 8000 # http服务端口
+vhostHTTPPort = 8008 # http服务端口
 auth.token = ".=:N!uLm!RtrY_MxvNZGzM3^LH2-h#co!k3wbH.i~BXCMa-JAh?>Q=GWp2JQ"
 
 # 默认为 127.0.0.1，如果需要公网访问，需要修改为 0.0.0.0。
