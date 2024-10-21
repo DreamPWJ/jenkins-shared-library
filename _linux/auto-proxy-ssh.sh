@@ -60,6 +60,7 @@ EOF
         target_password=$(echo "$item_host" | jq -r '.target_password')
         target_port=$(echo "$item_host" | jq -r '.target_port')
         echo "target_host: $target_host ,  target_user_name: $target_user_name"
+        # 如果已经免密连接登录跳过设置
 
         # 通过跳板机登录目标主机 ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22 '命令'
 
