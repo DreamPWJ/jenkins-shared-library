@@ -128,7 +128,9 @@ JSON_PARAMS
    "BRANCH_NAME" : "feature/infra" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "spring-ai-demo" ,
-   "SHELL_PARAMS" : "spring-ai demo 8123 8080 dev"
+   "SHELL_PARAMS" : "spring-ai demo 8123 8080 dev",
+   "IS_MAVEN_SINGLE_MODULE" : true,
+   "GIT_PROJECT_FOLDER_NAME" : "single-module-projects/spring-ai-demo",
 }
 
 
