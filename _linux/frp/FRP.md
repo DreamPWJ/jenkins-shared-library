@@ -1,4 +1,4 @@
-### FRP (fast reverse proxy)内网穿透
+### FRP (fast reverse proxy)内网穿透服务  分客户端和服务端(服务端需固定的公网ip)
 
 - 源码地址: https://github.com/fatedier/frp
 - 后台运行和开机自启动配置文档: https://gofrp.org/zh-cn/docs/setup/systemd/
