@@ -44,7 +44,24 @@ function is_success_images() {
   if [[ ${docker_image_time_diff} -ge 60 && $2 == false ]]; then
     #echo "当前时间与创建镜像的时间差: ${docker_image_time_diff}秒"
     echo -e "\033[31m  Docker镜像构建失败  ❌  \033[0m"
-    echo "请查看错误日志(可能网络不通或磁盘空间等问题)后, 再次尝试部署 🤪 "
+    echo "请查看错误日志(可能网络不通或镜像源失效或磁盘空间等问题)后, 再次尝试部署 🤪 "
+    # 如果镜像构建失败 重新设置/etc/docker/daemon.json数据
+    sudo cat <<EOF >/etc/docker/daemon.json
+{
+"registry-mirrors": [
+  "https://docker.lanneng.tech"
+],
+"log-driver":"json-file",
+"log-opts": {
+"max-size": "100m",
+"max-file": "2"
+}
+}
+EOF
+
+    # 重启容器服务生效
+    # sudo systemctl daemon-reload && sudo systemctl restart docker
+
     exit 1
   fi
 }
