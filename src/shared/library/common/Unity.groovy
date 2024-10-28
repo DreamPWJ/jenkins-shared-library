@@ -10,7 +10,7 @@ import shared.library.Utils
  */
 class Unity implements Serializable {
 
-    static def sshCommand = "root@172.16.1.55"
+    static def sshCommand = "root@172.16.1.100"
     static def jenkinsWorkspace = "/my/jenkins/workspace/"
 
     /**

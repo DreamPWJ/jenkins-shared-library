@@ -13,7 +13,7 @@ class SonarQube implements Serializable {
     /**
      *  SonarQube服务端地址
      */
-    static def sonarServer = "http://172.16.1.55:9000"
+    static def sonarServer = "http://172.16.1.100:9000"
 
     /**
      *  Sonar扫描

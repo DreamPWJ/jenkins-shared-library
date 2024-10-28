@@ -1112,7 +1112,7 @@ def codeQualityAnalysis() {
         sh "${scannerHome}/bin/sonar-scanner"
         // sh "/usr/local/bin/sonar-scanner --version"
     }*/
-    // 可打通项目管理平台自动提交bug指派任务
+    // 可自动提交自动修复PR代码或打通项目管理平台自动提交bug指派任务
 }
 
 /**
