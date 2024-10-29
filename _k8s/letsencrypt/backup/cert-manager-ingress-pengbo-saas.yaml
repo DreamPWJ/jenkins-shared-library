@@ -64,20 +64,29 @@ spec:
   ingressClassName: lanneng-k8s-ingress
   tls:
     - hosts:
-        - saas-app.pengbocloud.com
-      secretName: saas-app.pengbocloud.com-tls
-    - hosts:
-        - access.pengbocloud.com
-      secretName: access.pengbocloud.com-tls
-    - hosts:
         - admin.pengbocloud.com
       secretName: admin.pengbocloud.com-tls
     - hosts:
         - admin-client.pengbocloud.com
       secretName: admin-client.pengbocloud.com-tls
+    - hosts:
+        - merchant.pengbocloud.com
+      secretName: merchant.pengbocloud.com-tls
+    - hosts:
+        - app-api.pengbocloud.com
+      secretName: app-api.pengbocloud.com-tls
+    - hosts:
+        - access-api.pengbocloud.com
+      secretName: access-api.pengbocloud.com-tls
+    - hosts:
+        - admin-api.pengbocloud.com
+      secretName: admin-api.pengbocloud.com-tls
+    - hosts:
+        - admin-client-api.pengbocloud.com
+      secretName: admin-client-api.pengbocloud.com-tls
   rules:
     #自定义域名
-    - host: saas-app.pengbocloud.com
+    - host: app-api.pengbocloud.com
       http:
         paths:
           - path: /
@@ -90,7 +99,7 @@ spec:
                   number: 8180
             pathType: Prefix
 
-    - host: access.pengbocloud.com
+    - host: access-api.pengbocloud.com
       http:
         paths:
           - path: /
@@ -103,7 +112,7 @@ spec:
                   number: 8186
             pathType: Prefix
 
-    - host: admin.pengbocloud.com
+    - host: admin-api.pengbocloud.com
       http:
         paths:
           - path: /
@@ -116,7 +125,7 @@ spec:
                   number: 8181
             pathType: Prefix
 
-    - host: admin-client.pengbocloud.com
+    - host: admin-client-api.pengbocloud.com
       http:
         paths:
           - path: /
@@ -127,4 +136,43 @@ spec:
                 #服务端口
                 port:
                   number: 8183
+            pathType: Prefix
+
+    - host: admin.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: pengbo-park-admin-web-service
+                #服务端口
+                port:
+                  number: 9011
+            pathType: Prefix
+
+    - host: admin-client.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: pengbo-park-admin-client-web-service
+                #服务端口
+                port:
+                  number: 9012
+            pathType: Prefix
+
+    - host: merchant.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: pengbo-park-merchant-web-service
+                #服务端口
+                port:
+                  number: 9013
             pathType: Prefix
