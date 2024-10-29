@@ -75,7 +75,7 @@ map.put('is_before_deploy_notice', false)
 // 是否只通知发布变更记录
 map.put('is_only_notice_change_log', false)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', true)
+map.put('is_git_tag', false)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
@@ -119,7 +119,6 @@ sharedLibrary(map)
 // https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.pengbo-saas-prod
 
 /*
-
 
 pengbo-park-app-k8s-prod
 澎泊车SaaS 2.0用户平台服务端-k8s集群
