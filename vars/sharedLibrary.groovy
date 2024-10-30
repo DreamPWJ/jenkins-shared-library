@@ -825,6 +825,10 @@ def getInitParams(map) {
     if ("${map.default_git_branch}".trim() != "") {
         BRANCH_NAME = "${map.default_git_branch}"
     }
+    if ("${map.default_frontend_git_branch}".trim() != "") { // 支持前端项目单独统一配置分支
+        BRANCH_NAME = "${map.default_frontend_git_branch}"
+    }
+
     // 启动时间长的服务是否进行部署前通知  具体job级别设置优先
     if (jsonParams.IS_BEFORE_DEPLOY_NOTICE ? jsonParams.IS_BEFORE_DEPLOY_NOTICE.toBoolean() : false) {
         IS_BEFORE_DEPLOY_NOTICE = true
