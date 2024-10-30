@@ -825,7 +825,8 @@ def getInitParams(map) {
     if ("${map.default_git_branch}".trim() != "") {
         BRANCH_NAME = "${map.default_git_branch}"
     }
-    if ("${map.default_frontend_git_branch}".trim() != "") { // 支持前端项目单独统一配置分支
+    if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && "${map.default_frontend_git_branch}".trim() != "") {
+        // 支持前端项目单独统一配置分支
         BRANCH_NAME = "${map.default_frontend_git_branch}"
     }
 
