@@ -64,8 +64,8 @@ spec:
   ingressClassName: lanneng-k8s-ingress
   tls:
     - hosts:
-        - admin.pengbocloud.com
-      secretName: admin.pengbocloud.com-tls
+        - admin-web.pengbocloud.com
+      secretName: admin-web.pengbocloud.com-tls
     - hosts:
         - admin-client.pengbocloud.com
       secretName: admin-client.pengbocloud.com-tls
@@ -138,7 +138,7 @@ spec:
                   number: 8183
             pathType: Prefix
 
-    - host: admin.pengbocloud.com
+    - host: admin-web.pengbocloud.com
       http:
         paths:
           - path: /
