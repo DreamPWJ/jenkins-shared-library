@@ -52,13 +52,12 @@ mongo
 #### 从Docker Hub里拉取Jenkins镜像最新LTS版来部署
 docker pull jenkins/jenkins:lts
 
-#### 添加挂载映射本地数据卷权限 sudo chown -R 1000:1000 /my/jenkins  将宿主机的docker命令挂载到容器中
+#### 添加挂载映射本地数据卷权限 sudo chown -R 1000:1000 /my/jenkins  将宿主机的docker命令挂载到容器中  -v /my/jenkins/plugins.txt:/var/jenkins_home/plugins.txt
 sudo docker run -d --restart=always -p 8000:8080 -p 50000:50000 \
--u root --cpus=4 -m 4096m -e JAVA_OPTS=-Duser.timezone=Asia/Shanghai \
+-u root --cpus=2 -m 4096m -e JAVA_OPTS=-Duser.timezone=Asia/Shanghai \
 -v /etc/localtime:/etc/localtime:ro -v $(which bash):/bin/bash  \
 -v $(which docker):/usr/bin/docker -v /var/run/docker.sock:/var/run/docker.sock \
 -v /my/jenkins:/var/jenkins_home -v /my/jenkins/ssh:/root/.ssh  \
--v /my/jenkins/plugins.txt:/var/jenkins_home/plugins.txt    \
 -v "$HOME":/home --privileged --name jenkins jenkins/jenkins:lts \
 && sudo chown -R 1000:1000 /my/jenkins
 

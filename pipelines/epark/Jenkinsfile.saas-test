@@ -169,7 +169,7 @@ JSON_PARAMS
     "PROJECT_NAME" : "pengbo-admin" ,
     "SHELL_PARAMS" : "pengbo-admin web 9011 80 test" ,
     "NODE_VERSION": "16" ,
-    "NPM_RUN_PARAMS" : "build-operations",
+    "NPM_RUN_PARAMS" : "build-operations:test",
 }
 
 
@@ -183,7 +183,7 @@ JSON_PARAMS
     "PROJECT_NAME" : "pengbo-park-admin" ,
     "SHELL_PARAMS" : "pengbo-park-admin web 9012 80 test" ,
     "NODE_VERSION": "16" ,
-    "NPM_RUN_PARAMS" : "build-parking",
+    "NPM_RUN_PARAMS" : "build-parking:test",
 }
 
 pengbo-park-merchant-web-test
@@ -196,7 +196,7 @@ JSON_PARAMS
     "PROJECT_NAME" : "pengbo-park-merchant" ,
     "SHELL_PARAMS" : "pengbo-park-merchant web 9013 80 test" ,
     "NODE_VERSION": "16" ,
-    "NPM_RUN_PARAMS" : "build-merchant",
+    "NPM_RUN_PARAMS" : "build-merchant:test",
 }
 
 java-monorepo-docs-test

@@ -10,7 +10,8 @@ USER root
 COPY --chown=jenkins:jenkins /my/jenkins/plugins.txt /var/jenkins_home/plugins.txt
 
 RUN apt-get update \
-      && apt-get install -y sudo \
+      && apt-get install -y \
+      && git config --global --add safe.directory '*' \
       && rm -rf /var/lib/apt/lists/* \
       && apt-get install -y libtinfo5
       && apt-get install -y libltdl-dev || true

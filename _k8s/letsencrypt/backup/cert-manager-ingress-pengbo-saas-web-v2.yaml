@@ -5,19 +5,19 @@
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-prod-pengbo-saas-v2
+  name: letsencrypt-prod-pengbo-saas-web-v2
   namespace: cert-manager
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory  # ACME 协议的服务端  acme-staging-v02测试证书没有限制
     email: 406798106@qq.com  # 证书快过期的时候会有邮件提醒
     privateKeySecretRef:
-      name: letsencrypt-prod-key-pengbo-saas-v2  # 私钥秘密必须与cert-manager服务在同一个命名空间中才能工作 kubectl delete Secret letsencrypt-prod-key --namespace cert-manager
+      name: letsencrypt-prod-key-pengbo-saas-web-v2  # 私钥秘密必须与cert-manager服务在同一个命名空间中才能工作 kubectl delete Secret letsencrypt-prod-key --namespace cert-manager
     solvers:
       - http01: # 签发机构使用 HTTP-01 的方式进行 acme 协议 (还可用 DNS 方式，acme 协议的目的是证明机器和域名都是属于你的，然后才准许颁发证书)
           ingress:
             #serviceType: ClusterIP
-            name: pengbocloud-k8s-ingress-pengbo-saas-v2  # 这个匹配是关键！！！  1. class是指定自动创建的 Ingress 的 ingress class  2. name是指定被自动修改的 Ingress 名称
+            name: pengbocloud-k8s-ingress-pengbo-saas-web-v2  # 这个匹配是关键！！！  1. class是指定自动创建的 Ingress 的 ingress class  2. name是指定被自动修改的 Ingress 名称
 
 
 ---
@@ -25,13 +25,13 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: pengbocloud-k8s-ingress-pengbo-saas-v2
+  name: pengbocloud-k8s-ingress-pengbo-saas-web-v2
   namespace: default
   annotations:
     # 指定使用nginx做代理
     #kubernetes.io/ingress.class: lanneng-k8s-ingress  # 已弃用 使用 spec.ingressClassName代替
     # add an annotation indicating the issuer to use
-    cert-manager.io/cluster-issuer: letsencrypt-prod-pengbo-saas-v2
+    cert-manager.io/cluster-issuer: letsencrypt-prod-pengbo-saas-web-v2
     acme.cert-manager.io/http01-edit-in-place: "true"
 
     # 负载均衡算法 如ip_hash
@@ -64,67 +64,51 @@ spec:
   ingressClassName: lanneng-k8s-ingress
   tls:
     - hosts:
-        - app-api.pengbocloud.com
-      secretName: app-api.pengbocloud.com-tls
+        - admin-web.pengbocloud.com
+      secretName: admin-web.pengbocloud.com-tls
     - hosts:
-        - access-api.pengbocloud.com
-      secretName: access-api.pengbocloud.com-tls
+        - admin-client.pengbocloud.com
+      secretName: admin-client.pengbocloud.com-tls
     - hosts:
-        - admin-api.pengbocloud.com
-      secretName: admin-api.pengbocloud.com-tls
-    - hosts:
-        - admin-client-api.pengbocloud.com
-      secretName: admin-client-api.pengbocloud.com-tls
+        - merchant.pengbocloud.com
+      secretName: merchant.pengbocloud.com-tls
   rules:
     #自定义域名
-    - host: app-api.pengbocloud.com
+    - host: admin-web.pengbocloud.com
       http:
         paths:
           - path: /
             backend:
               #服务名称
               service:
-                name: pengbo-park-app-service
+                name: pengbo-park-admin-web-service
                 #服务端口
                 port:
-                  number: 8180
+                  number: 9011
             pathType: Prefix
 
-    - host: access-api.pengbocloud.com
+    - host: admin-client.pengbocloud.com
       http:
         paths:
           - path: /
             backend:
               #服务名称
               service:
-                name: pengbo-park-access-service
+                name: pengbo-park-client-admin-web-service
                 #服务端口
                 port:
-                  number: 8186
+                  number: 9012
             pathType: Prefix
 
-    - host: admin-api.pengbocloud.com
+    - host: merchant.pengbocloud.com
       http:
         paths:
           - path: /
             backend:
               #服务名称
               service:
-                name: pengbo-park-admin-service
+                name: pengbo-park-merchant-web-service
                 #服务端口
                 port:
-                  number: 8181
-            pathType: Prefix
-
-    - host: admin-client-api.pengbocloud.com
-      http:
-        paths:
-          - path: /
-            backend:
-              #服务名称
-              service:
-                name: pengbo-park-admin-client-service
-                #服务端口
-                port:
-                  number: 8183
+                  number: 9013
             pathType: Prefix
