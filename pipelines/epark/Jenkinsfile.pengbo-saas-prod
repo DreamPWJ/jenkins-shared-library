@@ -1,5 +1,5 @@
 #!groovy
-@Library('jenkins-shared-library@dev') _
+@Library('jenkins-shared-library@master') _
 
 /**
  * @author 潘维吉
@@ -24,19 +24,19 @@ map.put('proxy_jump_user_name', 'root')
 map.put('proxy_jump_port', ' ')
 
 // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
-map.put('default_git_branch', ' ')
-map.put('default_frontend_git_branch', ' ')
+map.put('default_git_branch', 'feature/saas-v2.0')
+map.put('default_frontend_git_branch', 'v2')
 
 // 保持构建的最大个数
 map.put('build_num_keep', 2)
 
 // 容器Docker相关参数
 // JVM内存设置
-map.put('docker_java_opts', '-Xmx1800m')
+map.put('docker_java_opts', '-Xmx2800m')
 // 容器最大cpu限制 m是千分之一 100m是0.1个CPU
-map.put('docker_limit_cpu', '1000m')
+map.put('docker_limit_cpu', '1500m')
 // 容器最大内存限制 不支持小数点形式设置
-map.put('docker_memory', '2G')
+map.put('docker_memory', '3G')
 // docker日志限制
 map.put('docker_log_opts', 'max-size=150m') // --log-opt max-size=50m --log-opt max-file=3
 // docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
@@ -59,7 +59,7 @@ map.put('k8s_credentials_ids', '74a3d376-cb4c-4a20-9bf7-7300a5eaa84d')
 map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
 // 项目标签或项目简称
-map.put('project_tag', '跃动时刻')
+map.put('project_tag', '澎泊云SaaS2.0')
 
 // 是否是生产环境
 map.put('is_prod', true)
@@ -76,7 +76,7 @@ map.put('is_before_deploy_notice', false)
 // 是否只通知发布变更记录
 map.put('is_only_notice_change_log', false)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', true)
+map.put('is_git_tag', false)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
@@ -85,10 +85,10 @@ map.put('jenkins_node', 'node-2')
 map.put('jenkins_node_frontend', 'node-2')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
-map.put('nodejs', 'Node18')
-map.put('maven', 'Maven3.8')
-map.put('jdk_publisher', 'openjdk')
-map.put('jdk', '17')
+map.put('nodejs', 'Node20')
+map.put('maven', 'Maven3.9')
+map.put('jdk_publisher', 'amazoncorretto')
+map.put('jdk', '21')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
@@ -108,7 +108,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', ' ')
+map.put('maven_one_level', 'pengbo-park')
 // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
 map.put('maven_setting_xml', ' ')
 
@@ -117,42 +117,131 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/lanneng/Jenkinsfile.lanneng-fitness-k8s-prod
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.pengbo-saas-prod
 
 /*
 
-lanneng-fitness-app-k8s-prod
-跃动时刻健身服务端-k8s集群
+pengbo-park-app-k8s-prod
+澎泊车SaaS 2.0用户平台服务端-k8s集群
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/car_wash_api.git" ,
-   "BRANCH_NAME" : "fitness" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+   "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "lanneng-fitness-app" ,
-   "SHELL_PARAMS" : "lanneng-fitness app 8102 8080 prod",
+   "PROJECT_NAME" : "pengbo-park-app" ,
+   "SHELL_PARAMS" : "pengbo-park app 8180 8080 prod",
    "IS_K8S_DEPLOY" : true,
    "K8S_POD_REPLICAS" : "1",
-   "IS_MAVEN_SINGLE_MODULE" : true,
-   "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check",
-   "APPLICATION_DOMAIN" : "https://fitness-api.pengbocloud.com"
+   "CUSTOM_HEALTH_CHECK_PATH" : "/health",
+   "APPLICATION_DOMAIN" : "https://app-api.pengbocloud.com",
 }
 
-
-lanneng-fitness-admin-web-k8s-prod
-跃动时刻健身Admin Web前端 ❤️
+pengbo-park-access-k8s-prod
+澎泊车SaaS 2.0相机交互平台服务端-k8s集群
 JSON_PARAMS
 {
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/fitness_web.git" ,
-    "BRANCH_NAME" : "main" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "lanneng-fitness-admin-web" ,
-    "SHELL_PARAMS" : "lanneng-fitness admin-web 9101 80 prod",
-    "NPM_RUN_PARAMS" : "build",
-    "IS_K8S_DEPLOY" : true,
-    "K8S_POD_REPLICAS" : "1",
-    "APPLICATION_DOMAIN" : "https://fitness-admin.pengbocloud.com"
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "pengbo-park-access" ,
+   "SHELL_PARAMS" : "pengbo-park access 8186 9000 prod",
+   "IS_K8S_DEPLOY" : true,
+   "K8S_POD_REPLICAS" : "1",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/health",
+   "APPLICATION_DOMAIN" : "https://access-api.pengbocloud.com",
 }
 
+pengbo-park-admin-k8s-prod
+澎泊车SaaS 2.0管理平台服务端-k8s集群
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "pengbo-park-admin" ,
+   "SHELL_PARAMS" : "pengbo-park admin 8181 8081 prod",
+   "IS_K8S_DEPLOY" : true,
+   "K8S_POD_REPLICAS" : "1",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/health",
+   "APPLICATION_DOMAIN" : "https://admin-api.pengbocloud.com",
+}
+
+pengbo-park-admin-client-k8s-prod
+澎泊车SaaS 2.0停车场管理平台服务端-k8s集群
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "pengbo-park-admin-client" ,
+   "SHELL_PARAMS" : "pengbo-park admin-client 8183 8083 prod",
+   "IS_K8S_DEPLOY" : true,
+   "K8S_POD_REPLICAS" : "1",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/health",
+   "APPLICATION_DOMAIN" : "https://admin-client-api.pengbocloud.com",
+}
+
+pengbo-park-job-k8s-prod
+澎泊车SaaS 2.0分布式Job服务端-k8s集群
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "pengbo-park-job" ,
+   "SHELL_PARAMS" : "pengbo-park job 8065 8065 prod 8165 8265",
+   "IS_K8S_DEPLOY" : true,
+   "K8S_POD_REPLICAS" : "1",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/health"
+}
+
+pengbo-park-admin-web-k8s-prod
+澎泊车SaaS 2.0 运营平台 Web前端-k8s集群 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/smart-parking/parking-admin.git" ,
+    "BRANCH_NAME" : "v2" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "pengbo-admin" ,
+    "SHELL_PARAMS" : "pengbo-admin web 9011 80 prod" ,
+    "NODE_VERSION": "16" ,
+    "NPM_RUN_PARAMS" : "build-operations",
+    "IS_K8S_DEPLOY" : true,
+    "K8S_POD_REPLICAS" : "1",
+    "APPLICATION_DOMAIN" : "https://admin-web.pengbocloud.com",
+}
+
+pengbo-park-admin-client-web-k8s-prod
+澎泊车SaaS 2.0 停车场平台 Web前端-k8s集群 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/smart-parking/parking-admin.git" ,
+    "BRANCH_NAME" : "v2" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "pengbo-park-admin-client" ,
+    "SHELL_PARAMS" : "pengbo-park client-admin-web 9012 80 prod" ,
+    "NODE_VERSION": "16" ,
+    "NPM_RUN_PARAMS" : "build-parking",
+    "IS_K8S_DEPLOY" : true,
+    "K8S_POD_REPLICAS" : "1",
+    "APPLICATION_DOMAIN" : "https://admin-client.pengbocloud.com",
+}
+
+pengbo-park-merchant-web-k8s-prod
+澎泊车SaaS 2.0 停车场优惠卷平台 Web前端-k8s集群 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/smart-parking/parking-admin.git" ,
+    "BRANCH_NAME" : "v2" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "pengbo-park-merchant" ,
+    "SHELL_PARAMS" : "pengbo-park merchant-web 9013 80 prod" ,
+    "NODE_VERSION": "16" ,
+    "NPM_RUN_PARAMS" : "build-merchant",
+    "IS_K8S_DEPLOY" : true,
+    "K8S_POD_REPLICAS" : "1",
+    "APPLICATION_DOMAIN" : "https://merchant.pengbocloud.com",
+}
 
 */
 

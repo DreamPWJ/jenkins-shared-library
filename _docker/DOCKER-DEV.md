@@ -85,9 +85,10 @@ sudo docker run -d --restart=always -p 8080:80 -p 3308:3306 --cpus=2 -m 2048m --
 #### 安装 sonar代码质量检测服务 默认用户名密码都是admin  如果docker启动报错宿主机执行 sysctl -w vm.max_map_count=262144 
 sudo docker pull sonarqube:community  
 
-sudo docker run -d --restart=always --name sonarqube -p 9000:9000 --cpus=2 -m 2048m \
+sudo docker run -d --restart=always --name sonarqube -p 9100:9000 --cpus=2 -m 4096m \
+-v /etc/localtime:/etc/localtime:ro \
 -e SONARQUBE_JDBC_USERNAME=root -e SONARQUBE_JDBC_PASSWORD=123456   \
--e SONARQUBE_JDBC_URL="jdbc:postgresql://172.16.1.55:5432/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false"  \
+-e SONARQUBE_JDBC_URL="jdbc:postgresql://127.0.0.1:5432/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false"  \
 sonarqube:community  && sysctl -w vm.max_map_count=262144
 
 #### 搭建私有docker仓库 http://ip:5000/v2

@@ -14,8 +14,10 @@ if [[ ! $(command -v git) ]]; then
 fi
 
 if [[ ! $(command -v java) ]]; then
-  echo "安装JDK"
-  sudo yum install -y java-21-openjdk-devel.x86_64  || true # java-1.8.0-openjdk-devel.x86_64
+  echo "安装JDK" # 内切换JDK多版本 修改执行 vim /etc/profile 生效执行 source /etc/profile
+  sudo yum -y update
+  sudo yum install -y java-21-openjdk  || true
+  # cd /usr/lib/jvm && wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz  && tar -zxvf jdk-21_linux-x64_bin.tar.gz
   sudo apt update || true
   sudo apt install -y openjdk-21-jdk || true
   java -version

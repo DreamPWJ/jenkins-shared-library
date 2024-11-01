@@ -47,7 +47,7 @@ class Go implements Serializable {
             ctx.(e.getMessage())
         }
         // nohup 用于在系统后台不挂断地运行命令，不挂断指的是退出执行命令的终端也不会影响程序的运行
-        // Go运行不需要任何语言环境  只需要将编译后的代码执行即可
+        // Go二进制包运行不需要任何语言环境  只需要将编译后的代码执行即可
         ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} 'cd /${ctx.DEPLOY_FOLDER}/${ctx.SHELL_PROJECT_NAME}-${ctx.SHELL_PROJECT_TYPE} " +
                 " && chmod +x main.go && nohup ./main.go > ${ctx.env.JOB_NAME}.log 2>&1 & ' "
     }
