@@ -19,7 +19,7 @@ if [[ ! $(command -v java) ]]; then
   sudo yum install -y java-21-openjdk  || true
   # cd /usr/lib/jvm && wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz  && tar -zxvf jdk-21_linux-x64_bin.tar.gz
   sudo apt update || true
-  sudo apt install -y openjdk-21-jdk || true
+  sudo apt install -y openjdk-21-jdk || true  # 卸载版本 sudo apt-get autoremove  openjdk-11-jre-headless
   java -version
   which java
   # apt-get remove openjdk*
