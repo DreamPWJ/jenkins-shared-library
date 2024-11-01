@@ -14,7 +14,7 @@ if [[ ! $(command -v git) ]]; then
 fi
 
 if [[ ! $(command -v java) ]]; then
-  echo "安装JDK" # 内切换JDK多版本 修改执行 vim /etc/profile 生效执行 source /etc/profile  如果node节点因jdk版本启动失败  在高级设置中java选项配置which java路径
+  echo "安装JDK" # 内切换JDK多版本 修改执行 vim /etc/profile 生效执行 source /etc/profile  如果jenkins node节点因jdk版本启动失败  在高级设置中'Java路径'配置which java路径
   sudo yum -y update
   sudo yum install -y java-21-openjdk  || true # 卸载版本 yum -y remove openjdk-11-jdk-headless
   # cd /usr/lib/jvm && wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz  && tar -zxvf jdk-21_linux-x64_bin.tar.gz
