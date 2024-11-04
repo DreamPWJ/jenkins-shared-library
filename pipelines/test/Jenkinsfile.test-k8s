@@ -48,7 +48,7 @@ map.put('is_push_docker_repo', true)
 // docker容器镜像仓库账号信任id
 map.put('docker_repo_credentials_id', '73f6b3b0-4580-4acf-b04a-63892fcf9ba8')
 // docker镜像仓库注册地址
-map.put('docker_repo_registry', 'hub.kce.ksyun.com')
+map.put('docker_repo_registry', 'docker.lanneng.tech')
 // docker仓库命名空间名称
 map.put('docker_repo_namespace', 'lanneng')
 
