@@ -189,7 +189,7 @@ JSON_PARAMS
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pengbo-park-job" ,
-   "SHELL_PARAMS" : "pengbo-park job 8065 8065 prod 8165 8265",
+   "SHELL_PARAMS" : "pengbo-park job 8065 8065 prod 8165 8268",
    "IS_K8S_DEPLOY" : true,
    "K8S_POD_REPLICAS" : "1",
    "CUSTOM_HEALTH_CHECK_PATH" : "/health"
