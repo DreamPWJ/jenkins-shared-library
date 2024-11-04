@@ -1,5 +1,5 @@
-#### 设置镜像源  解决pull下载慢卡住问题  注意：镜像源不维护了可能导致latest不是最新的版本  
-##### 可使用CloudFlare Workers方案做Docker镜像源网络代理
+#### 设置镜像源  解决pull下载慢卡住问题  注意：镜像源不维护了可能导致latest不是最新的版本 
+##### 可使用CloudFlare Workers方案做Docker镜像源网络代理  或者临时 docker pull docker.lanneng.tech/repo-name/images:version 下载
 docker info
 sudo cat <<EOF >/etc/docker/daemon.json
 {

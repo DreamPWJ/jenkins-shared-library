@@ -60,7 +60,7 @@ function is_success_images() {
 EOF
 
     # 让容器配置服务生效
-    sudo systemctl reload docker # # reload 不会重启 Docker 服务，但会使新的配置生效
+    sudo systemctl reload docker  # reload 不会重启 Docker 服务，但会使新的配置生效
 
     exit 1
   fi
