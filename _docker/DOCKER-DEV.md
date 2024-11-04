@@ -13,7 +13,8 @@ sudo cat <<EOF >/etc/docker/daemon.json
 }
 }
 EOF
-sudo systemctl daemon-reload && sudo systemctl restart docker
+sudo systemctl reload docker # reload 不会重启 Docker 服务，但会使新的配置生效
+sudo systemctl daemon-reload && sudo systemctl restart docker  # 导致当前运行的容器短暂中断 reload命令无效执行
 
 #### 还原Docker容器的启动run命令完整参数
 get_command_4_run_container（完美方案）
