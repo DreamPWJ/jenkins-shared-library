@@ -1,0 +1,67 @@
+# Author: 潘维吉
+# Description: 云原生K8S部署应用yaml配置文件  同时部署Deployment与Service服务
+# 执行命名 kubectl apply -f xxl-job-admin-k8s-deploy.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xxl-job-admin-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: xxl-job-admin
+  template:
+    metadata:
+      labels:
+        app: xxl-job-admin
+    spec:
+      containers:
+        - name: xxl-job-admin
+          image: xuxueli/xxl-job-admin:2.4.1
+          imagePullPolicy: Always     # 优先使用本地镜像
+          resources: # 合理设置内存 防止内存溢出 导致整个服务器宕机 如0/3 nodes are available: 3 Insufficient memory
+            requests:
+              cpu: 100m  # cpu请求 容器启动的初始可用数量
+              memory: 200Mi # 内存请求 容器启动的初始可用数量 不能大于limits设置值
+            limits:
+              # m是千分之一  100m是0.1个CPU  限制最大cpu防止资源溢出 导致整个集群全部不可用
+              cpu: 1000m
+              # 设置memory应用最大使用内存 限制防止雪崩现象导致其它服务不可用 不支持小数点形式的设置 K8S默认对占用高资源会有驱逐Evicted机制
+              memory: 2000Mi
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PARAMS   # 定义变量，用来接收sql的用户/密码 mysql为k8s集群内的service名称，在k8s集群内部可以直接使用service名称，因为集群默认做了coredns解析
+              value: "--spring.datasource.url=jdbc:mysql://*:3306/xxl_job?Unicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true&serverTimezone=Asia/Shanghai 
+              --spring.datasource.username= --spring.datasource.password=
+              --spring.mail.username= --spring.mail.password= 
+              --xxl.job.accessToken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1ODE5MjgwMDMsInN1YiI6IntcInVzZXJJZFwiOjF9IiwiaXNzIjoiYW4tcGx1cy1qb2IifQ.s0au9aVh14ql6bSidRxTaJRSJO_fJ7o-XSqCmghmG80"
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - sleep
+                  - 5s   # 等待 kube-proxy 完成规则同步再开始停止容器内进程
+      restartPolicy: Always         # Pod的重启策略 Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Never表示不再重启该Pod
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: xxl-job-admin-service
+  labels:
+    app: xxl-job-admin-service
+spec:
+  type: LoadBalancer                   # 规格类型ClusterIP、NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡
+  selector:
+    app: xxl-job-admin
+  ports:
+    - name: xxl-job-admin
+      port: 8081
+      targetPort: 8080
+      protocol: TCP
+
+
