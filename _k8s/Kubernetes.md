@@ -89,6 +89,7 @@ labels:      #自定义标签
 - https://github.com/helm/helm/releases
 
 ### K8S集群使用 cert-manager基于 ACME 协议与 Let's Encrypt 自动签发与续签免费的SSL证书 [文档](https://help.aliyun.com/document_detail/409430.html)
+#### Let's Encrypt限制 每个 IP 地址每 3 小时最多可以请求 5 个证书 
 
 - kubectl create namespace cert-manager
 - helm repo add jetstack https://charts.jetstack.io
