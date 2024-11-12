@@ -89,10 +89,10 @@ spec:
             failureThreshold: 3
 
       restartPolicy: Always         # Pod的重启策略 Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Never表示不再重启该Pod
-      # 新特性topologySpreadConstraints代替affinity 实现均匀部署pod到不同的node 拓扑分布约束 在K8s v1.18版本进入beta阶段默认启用 参考文档： https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/topology-spread-constraints/
+      # 新特性topologySpreadConstraints分布约束代替affinity亲和度 实现均匀部署pod到不同的node 拓扑分布约束 在K8s v1.18版本进入beta阶段默认启用 参考文档： https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/topology-spread-constraints/
       topologySpreadConstraints:    # 配置一个拓扑分布约束
-        - maxSkew: 1                           #  Pod 可能被不均匀分布的程度
-          topologyKey: kubernetes.io/hostname  # 按照节点来分散 Pod
+        - maxSkew: 1                            # Pod可能被不均匀分布的程度
+          topologyKey: kubernetes.io/hostname   # 按照节点来分散 Pod
           whenUnsatisfiable: ScheduleAnyway     # 当无法满足约束条件时的行为。可选值为 DoNotSchedule不调度 或 ScheduleAnyway 无论如何都调度
           labelSelector:
             matchLabels:
