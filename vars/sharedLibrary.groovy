@@ -1808,8 +1808,8 @@ def beforeRunProject(map) {
         dingNotice(map, 2)
     }
     try {
-        if ("${IS_GRACE_SHUTDOWN}" == 'true') {
-            // Spring Boot优雅停机 curl几秒超时
+        if ("${IS_GRACE_SHUTDOWN}" == 'true') { // 准备启用 有新方案
+            // Spring Boot优雅停机 curl几秒超时  需要开放监控服务  但是开放监控服务又安全性问题  建议使用Spring Boot新版本自带的优雅停机配置
             sh " curl --connect-timeout 3 --max-time 10  ${healthCheckUrl}/actuator/shutdown -X POST "
         }
     } catch (error) {
