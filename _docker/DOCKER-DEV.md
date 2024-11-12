@@ -1,5 +1,5 @@
-#### 设置镜像源  解决pull下载慢卡住问题  注意：镜像源不维护了可能导致latest不是最新的版本  
-##### 可使用CloudFlare Workers方案做Docker镜像源网络代理
+#### 设置镜像源  解决pull下载慢卡住问题  注意：镜像源不维护了可能导致latest不是最新的版本 
+##### 可使用CloudFlare Workers方案做Docker镜像源网络代理  或者临时镜像源设置 如: docker pull docker.lanneng.tech/repo-name/images:version 
 docker info
 sudo cat <<EOF >/etc/docker/daemon.json
 {
@@ -13,7 +13,8 @@ sudo cat <<EOF >/etc/docker/daemon.json
 }
 }
 EOF
-sudo systemctl daemon-reload && sudo systemctl restart docker
+sudo systemctl reload docker # reload 不会重启 Docker 服务，但会使新的配置生效
+sudo systemctl daemon-reload && sudo systemctl restart docker  # 导致当前运行的容器短暂中断 reload命令无效执行
 
 #### 还原Docker容器的启动run命令完整参数
 get_command_4_run_container（完美方案）
@@ -23,7 +24,7 @@ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock cucker/get_command_
 #### 从Docker Hub里拉取mysql镜像来部署 密码强度要求：8位及以上，包含大小写，字母，特殊符号
 docker pull mysql
 
-#### Mysql Docker容器启动 创建数据库密码等 跟宿主机器同样的时区配置 -v指定数据持久化存储宿主机位置  添加mysql配置参数 -v 
+#### MySql Docker容器启动 创建数据库密码等 跟宿主机器同样的时区配置 -v指定数据持久化存储宿主机位置  添加mysql配置参数 -v 
 #### GROUP_CONCAT函数可拼接某个字段值成字符串 默认的分隔符是"," 默认最大长度为1024字节超过则会被截断 （-1为最大值或根据实际需求设置长度） 
 #### convert(数据,char) CONCAT解决乱码
 
@@ -97,7 +98,7 @@ docker run -d --restart=always -p 5000:5000 -v /my/docker_registry:/var/lib/regi
 #### 自建订阅地址: https://tunnel.lanneng.tech/09268ef9-d1d1-4b58-a542-8b9f4857f65a
 
 #### 基于Docker安装部署ShadowSocks基于Socks5代理方式的加密传输协议件(翻墙)
-#### 从Docker Hub里拉取ShadowSocks镜像最新版来部署 Dream2021  8.211.160.201 注意端口要开放出去
+#### 从Docker Hub里拉取ShadowSocks镜像最新版来部署 Dream2021 注意端口要开放出去
 #### Github客户端地址: https://github.com/shadowsocks
 docker pull mritd/shadowsocks
 

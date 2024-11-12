@@ -53,9 +53,10 @@ sudo cat <<EOF >/etc/docker/daemon.json
 }
 EOF
 
-# 重启镜像源生效
-sudo systemctl daemon-reload
-sudo systemctl restart docker
+# 让容器配置服务生效
+sudo systemctl reload docker  # reload 不会重启 Docker 服务，但会使新的配置生效
+#sudo systemctl daemon-reload && sudo systemctl restart docker
+
 echo "查看docker信息"
 docker info
 
