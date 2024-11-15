@@ -1,0 +1,30 @@
+# Author: 潘维吉
+# Description: 云原生K8S部署应用yaml  Service Ipv6服务
+# 实现思路: 1. 创建一个ipv6的负载均衡  2. 创建一个新的Service指向这个ipv6的负载均衡  3. 域名解析到AAAA记录的ipv6
+# 浏览器访问IPV6地址：http://[2401:1d40:2f00:8800::2d2]:29012/     curl -6 admin-client.pengbocloud.com   telnet -6 2401:1d40:2f00:8800::2d2 29012
+
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: pengbo-park-client-admin-web-service-ipv6
+  namespace: default
+  labels:
+    app: pengbo-park-client-admin-web-service-ipv6
+  annotations:
+    prometheus.io/scrape: "true"                # 让prometheus自动发现
+    prometheus.io/path: /actuator/prometheus    # /metric路径是集成内提供的 Prometheus 监控接口 或利用 exporter 服务来为 Prometheus 提供指标数据
+    prometheus.io/port: "80"      # /metric接口的端口
+
+spec:
+  type: LoadBalancer                   # 规格类型ClusterIP、NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡
+#  ipFamilies:
+#    - IPv6
+  selector:
+    app: pengbo-park-client-admin-web             # 通过Pod的labels指定Pod 建立关联  Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
+  ports:
+    - name: pengbo-park-client-admin-web-ipv6
+      port: 29012                # 指定Service接收请求的端口
+      targetPort: 80             # 请求转发的端口 容器内部端口
+      #nodePort: 9012            # NodePort类型端口区间 30000–32767 不指定端口，系统将分配一个随机端口
+      protocol: TCP                    # 定义通信协议
