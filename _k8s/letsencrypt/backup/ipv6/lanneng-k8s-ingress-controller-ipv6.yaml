@@ -1,0 +1,31 @@
+# Author: 潘维吉
+# Description: 云原生K8S部署应用yaml  Ingress Controller Service Ipv6服务
+# 实现思路: 1. 创建一个ipv6的负载均衡  2. 只需要创建一个新的Ingress Controller Service指向这个ipv6的负载均衡  3. 域名解析到AAAA记录的ipv6
+# 浏览器访问IPV6地址：http://[2401:1d40:2f00:8800::2d2]:9000/
+# 是否支持 Ipv6 检测地址: https://www.dns.com/ipv6_check_tool.html  或  https://ipw.cn/ipv6webcheck/
+
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/ksc-loadbalancer-id: c14f6a84-3a0c-455f-8fb3-d11ba31ee8ea
+  name: lanneng-k8s-ingress-controller-ipv6
+  namespace: default
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+    - appProtocol: http
+      name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+    - appProtocol: https
+      name: https
+      port: 443
+      protocol: TCP
+      targetPort: 443
+  selector:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: lanneng-k8s-ingress
+    app.kubernetes.io/name: ingress-nginx
+  type: LoadBalancer
