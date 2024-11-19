@@ -9,6 +9,11 @@ kind: Service
 metadata:
   annotations:
     service.beta.kubernetes.io/ksc-loadbalancer-id: c14f6a84-3a0c-455f-8fb3-d11ba31ee8ea
+    service.beta.kubernetes.io/ksc-loadbalancer-healthcheck-state: start
+    service.beta.kubernetes.io/ksc-loadbalancer-healthcheck-interval: "1"
+    service.beta.kubernetes.io/ksc-loadbalancer-healthcheck-timeout: "1"
+    service.beta.kubernetes.io/ksc-loadbalancer-healthy-threshold: "3"
+    service.beta.kubernetes.io/ksc-loadbalancer-unhealthy-threshold: "3"
   name: lanneng-k8s-ingress-controller-ipv6
   namespace: default
 spec:
