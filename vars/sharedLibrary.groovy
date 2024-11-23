@@ -2202,7 +2202,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                 }
                 if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
                     def titlePrefix = "${PROJECT_TAG} BUILD#${env.BUILD_NUMBER}"
-                    // 如果gitChangeLog为空 赋值
+                    // 如果gitChangeLog为空 赋值提醒文案
                     if ("${gitChangeLog}" == '') {
                         gitChangeLog = "无版本变更记录 🈳"
                     }
