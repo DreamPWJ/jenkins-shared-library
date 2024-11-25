@@ -36,14 +36,18 @@ class SecureShell implements Serializable {
             if (error.getMessage().contains("255")) { // 0连接成功 255无法连接
                 ctx.println "免密登录失败 ❌, 根据hosts.txt或proxy_jump_hosts.json文件已有的账号信息自动设置, 如果没有配置请手动设置ssh免密登录文件"
                 try {
-                    // 目的是清除当前机器里关于远程服务器的缓存和公钥信息 如远程服务器已重新初始化或升降配等情况 导致本地还有缓存
+                    // 目的是清除当前机器里关于远程服务器的缓存和公钥信息 如远程服务器已重新初始化或升降配或SSH客户端软件或发生了中间人攻击等情况 导致本地还有缓存
                     // ECDSA host key "ip" for  has changed and you have requested strict checking 报错
+                    // 出现kex_exchange_identification: Connection closed by remote host内容，主要是由于远程计算机登录节点的数量限制问题
                     if ("${ctx.isProxyJumpType}" == "true") {
                         ctx.sh "ssh-keygen -R ${map.proxy_jump_ip}"
+                        // 刷新known_hosts中对应远程服务器公钥
+                        ctx.sh "ssh-keyscan -H ${map.proxy_jump_ip} >> ~/.ssh/known_hosts"
                     } else {
                         ctx.sh "ssh-keygen -R ${ctx.remote.host}"
+                        ctx.sh "ssh-keyscan -H ${ctx.remote.host} >> ~/.ssh/known_hosts"
                     }
-
+                    // ctx.sh "rm -f ~/.ssh/known_hosts" // 删除known_hosts中对应远程服务器公钥 重新初始化
                 } catch (e) {
                     ctx.println "清除当前机器里关于远程服务器的缓存和公钥信息失败"
                     ctx.println e.getMessage()
