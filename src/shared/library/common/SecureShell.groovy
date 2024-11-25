@@ -39,14 +39,15 @@ class SecureShell implements Serializable {
                     // 目的是清除当前机器里关于远程服务器的缓存和公钥信息 如远程服务器已重新初始化或升降配或SSH客户端软件或发生了中间人攻击等情况 导致本地还有缓存
                     // ECDSA host key "ip" for  has changed and you have requested strict checking 报错
                     // 出现kex_exchange_identification: Connection closed by remote host内容，主要是由于远程计算机登录节点的数量限制问题
+                    def remoteHostIp = "" // 远程服务Ip地址
                     if ("${ctx.isProxyJumpType}" == "true") {
-                        ctx.sh "ssh-keygen -R ${map.proxy_jump_ip}"
-                        // 刷新known_hosts中对应远程服务器公钥
-                        ctx.sh "ssh-keyscan -H ${map.proxy_jump_ip} >> ~/.ssh/known_hosts"
+                        remoteHostIp = "${map.proxy_jump_ip}"
                     } else {
-                        ctx.sh "ssh-keygen -R ${ctx.remote.host}"
-                        ctx.sh "ssh-keyscan -H ${ctx.remote.host} >> ~/.ssh/known_hosts"
+                        remoteHostIp = "${ctx.remote.host}"
                     }
+                    ctx.sh "ssh-keygen -R ${remoteHostIp}"
+                    // 刷新known_hosts中对应远程服务器公钥
+                    ctx.sh "ssh-keyscan -H ${remoteHostIp} >> ~/.ssh/known_hosts"
                     // ctx.sh "rm -f ~/.ssh/known_hosts" // 删除known_hosts中对应远程服务器公钥 重新初始化
                 } catch (e) {
                     ctx.println "清除当前机器里关于远程服务器的缓存和公钥信息失败"
