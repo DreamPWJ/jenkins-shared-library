@@ -5,7 +5,7 @@
 # 安全性高和定制化的数据建议保存为Jenkins的“Secret file”类型的凭据并获取 无需放在代码中
 
 # 透传跳板机实现自动登录授权 主要思路是： A访问B 需要把A的公钥放在B的授权列表里  然后重启ssh服务即可
-# 1. 客户端执行机器先免密到跳板机 用户在cat /root/.ssh/id_rsa.pub 公钥放在远程要访问服务的vim /root/.ssh/authorized_keys里
+# 1. 访问客户端执行机器先免密到跳板机 用户在cat /root/.ssh/id_rsa.pub 公钥放在远程要访问服务的vim /root/.ssh/authorized_keys里
 # 执行命令： ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $jump_port $jump_user_name@$jump_host
 # 2. 跳板机再免密到目标机 同理1  执行命令：  ssh $jump_user_name@$jump_host -p $jump_port && ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $target_port $target_user_name@$target_host
 # 3. 最后将客户端的公钥 cat /root/.ssh/id_rsa.pub 放到内网目标机 vim /root/.ssh/authorized_keys 授信

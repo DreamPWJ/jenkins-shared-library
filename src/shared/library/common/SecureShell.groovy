@@ -48,7 +48,7 @@ class SecureShell implements Serializable {
                     ctx.sh "ssh-keygen -R ${remoteHostIp}"
                     try {
                         // 刷新known_hosts中对应远程服务器公钥
-                        ctx.sh "ssh-keyscan -h ${remoteHostIp} >> ~/.ssh/known_hosts"
+                        ctx.sh "ssh-keyscan  ${remoteHostIp} >> ~/.ssh/known_hosts"
                     } catch (e) {
                         // 删除known_hosts中对应远程服务器公钥 重新初始化
                         ctx.sh "rm -f ~/.ssh/known_hosts"
