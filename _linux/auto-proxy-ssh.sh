@@ -16,17 +16,17 @@
 echo "跳板机方式自动批量执行SSH ProxyJump免密登录"
 
 if [[ ! $(command -v jq) ]]; then
-  sudo apt-get update || true
-  sudo apt install -y jq || true
-  sudo yum update -y || true
-  sudo yum install -y jq || true
-  jq --version
+   apt-get update || true
+   apt install -y jq || true
+   yum update -y || true
+   yum install -y jq || true
+   jq --version
 fi
 
 if [[ ! $(command -v expect) ]]; then
-  yum install -y expect || true
-  apt-get install -y expect || true
-  brew install expect || true
+   yum install -y expect || true
+   apt-get install -y expect || true
+   brew install expect || true
 fi
 
 # 指定要读取的文件名
