@@ -9,7 +9,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    service.beta.kubernetes.io/ksc-loadbalancer-id: c14f6a84-3a0c-455f-8fb3-d11ba31ee8ea
+    service.beta.kubernetes.io/ksc-loadbalancer-id: a7d551f9-9312-4ea8-b5d5-8a3605785b4d
     service.beta.kubernetes.io/ksc-loadbalancer-healthcheck-state: start
     service.beta.kubernetes.io/ksc-loadbalancer-healthcheck-interval: "1"
     service.beta.kubernetes.io/ksc-loadbalancer-healthcheck-timeout: "1"
@@ -32,6 +32,6 @@ spec:
       targetPort: 443
   selector:
     app.kubernetes.io/component: controller
-    app.kubernetes.io/instance: lanneng-k8s-ingress
+    app.kubernetes.io/instance: lanneng-park
     app.kubernetes.io/name: ingress-nginx
   type: LoadBalancer
