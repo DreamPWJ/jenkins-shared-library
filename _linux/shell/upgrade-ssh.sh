@@ -2,7 +2,7 @@
 # Author: 潘维吉
 # Description:  升级OpenSSH 版本  支持更高级特性 比如跳板机 jump host -J 模式
 
-
+# 对比SSH版本号 因为低版本OpenSSH不支持ssh命令跳板机方式访问
 compare_ssh_versions() {
   # 将传入的版本字符串转化为数组
   local -a version1=($(echo "$1" | tr '_' ' ' | awk '{print $2}'))
@@ -37,6 +37,9 @@ if compare_ssh_versions "$current_version" "$target_version"; then
 else
   echo "当前服务器SSH版本$current_version低于目标版本$target_version"
   echo "OpenSSH版本低于$target_version 版本, 无法支持跳板机 -J 模式, 执行自动升级OpenSSH版本"
+
+  sudo apt-get update -y || true
+  sudo yum update -y || true
 
   sudo yum upgrade -y openssh || true
   sudo yum upgrade -y openssh-clients || true

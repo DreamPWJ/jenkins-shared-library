@@ -16,7 +16,7 @@
 echo "跳板机方式自动批量执行SSH ProxyJump免密登录"
 
 if [[ ! $(command -v jq) ]]; then
-   apt-get update || true
+   apt-get update -y || true
    apt install -y jq || true
    yum update -y || true
    yum install -y jq || true

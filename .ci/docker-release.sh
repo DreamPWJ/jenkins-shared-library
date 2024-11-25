@@ -131,7 +131,7 @@ cd /${deploy_folder} && ./docker-common.sh mkdir_deploy_file ${deploy_file}
 #fi
 #cp -p msyh.ttc ${deploy_file}/
 
-# 进入部署文件所在目录
+echo "进入部署文件目录构建镜像: ${deploy_file}"
 cd ${deploy_file}
 pwd
 
