@@ -18,6 +18,7 @@ find /my -type d -name "log*" -exec rm -rf {} + || true
 rm -f /var/log/nginx/*.log || true
 rm -f /usr/local/nginx/logs/*.log || true
 rm -f /var/lib/docker/overlay2/*/diff/var/log/nginx/*.log || true
+rm -f /var/lib/docker/overlay2/*/diff/etc/nginx/on || true
 
 # 清除所有未使用或悬挂的图像 容器 卷和网络
 docker system prune -a --force || true
