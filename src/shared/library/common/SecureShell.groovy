@@ -46,13 +46,13 @@ class SecureShell implements Serializable {
                         remoteHostIp = "${ctx.remote.host}"
                     }
                     ctx.sh "ssh-keygen -R ${remoteHostIp}"
-                    try {
+      /*              try {
                         // 刷新known_hosts中对应远程服务器公钥
                         ctx.sh "ssh-keyscan  ${remoteHostIp} >> ~/.ssh/known_hosts"
                     } catch (e) {
                         // 删除known_hosts中对应远程服务器公钥 重新初始化
                         ctx.sh "rm -f ~/.ssh/known_hosts"
-                    }
+                    }*/
                 } catch (e) {
                     ctx.println "清除当前机器里关于远程服务器的缓存和公钥信息失败"
                     ctx.println e.getMessage()
