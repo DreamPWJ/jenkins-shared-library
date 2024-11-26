@@ -45,6 +45,9 @@ while read host; do
     echo "jump_host_ip: $jump_host"
     # 如果已经免密连接登录跳过设置
 
+    # 清除之前授权信息  防止授权失败
+    ssh -p $jump_port $jump_user_name@$jump_host "rm -f ~/.ssh/authorized_keys"
+
   expect <<EOF
         spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $jump_port $jump_user_name@$jump_host
         expect {
@@ -70,6 +73,15 @@ EOF
   expect <<EOF
         # 启动spawn命令来启动一个新的进程 建立跳板机到目标机的免密连接 使用 -J 参数通过跳板机连接目标主机
         spawn ssh $jump_user_name@$jump_host -p $jump_port
+
+        # 清除之前授权信息  防止授权失败
+        send "ssh -p $target_port $target_user_name@$target_host 'rm -f ~/.ssh/authorized_keys' \r"
+
+        # 处理可能的交互
+         expect {
+                 "yes/no" {send "yes\n";exp_continue}
+                 "password" {send "$target_password\n"}
+         }
 
         # 在目标主机上执行 ssh-copy-id 命令
         send "ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $target_port $target_user_name@$target_host \r"

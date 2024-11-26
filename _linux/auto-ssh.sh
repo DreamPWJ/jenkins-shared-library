@@ -25,8 +25,12 @@ while read host; do
   password=$(echo $host | cut -d " " -f4)
   # 如果已经免密连接登录跳过设置
 
+  # 清除之前授权信息  防止授权失败
+  ssh -p $port $username@$ip "rm -f ~/.ssh/authorized_keys"
+
+
   expect <<EOF
-        spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub  $username@$ip
+        spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $port $username@$ip
         expect {
                 "yes/no" {send "yes\n";exp_continue}
                 "password" {send "$password\n"}
