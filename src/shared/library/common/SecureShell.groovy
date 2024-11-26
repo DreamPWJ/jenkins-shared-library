@@ -33,13 +33,13 @@ class SecureShell implements Serializable {
             ctx.sh "ssh ${ctx.proxyJumpSSHText} -o StrictHostKeyChecking=no ${ctx.remote.user}@${ctx.remote.host} exit"
         } catch (error) {
             ctx.println error.getMessage()
+            def remoteHostIp = "" // 远程服务Ip地址
             if (error.getMessage().contains("255")) { // 0连接成功 255无法连接
                 ctx.println "免密登录失败 ❌, 根据hosts.txt或proxy_jump_hosts.json文件已有的账号信息自动设置, 如果没有配置请手动设置ssh免密登录文件"
                 try {
                     // 目的是清除当前机器里关于远程服务器的缓存和公钥信息 如远程服务器已重新初始化或升降配或SSH客户端软件或发生了中间人攻击等情况 导致本地还有缓存
                     // ECDSA host key "ip" for  has changed and you have requested strict checking 报错
                     // 出现kex_exchange_identification: Connection closed by remote host内容，主要是由于远程计算机登录节点的数量限制问题
-                    def remoteHostIp = "" // 远程服务Ip地址
                     if ("${ctx.isProxyJumpType}" == "true") {
                         remoteHostIp = "${map.proxy_jump_ip}"
                     } else {
@@ -86,10 +86,10 @@ class SecureShell implements Serializable {
 
                         if ("${ctx.isProxyJumpType}" == "true") {
                             // 执行跳板机方式免密登录脚本
-                            ctx.sh " cd _linux && chmod +x auto-proxy-ssh.sh && ./auto-proxy-ssh.sh "
+                            ctx.sh " cd _linux && chmod +x auto-proxy-ssh.sh && ./auto-proxy-ssh.sh ${remoteHostIp} "
                         } else {
                             // 执行免密登录脚本
-                            ctx.sh " cd _linux && chmod +x auto-ssh.sh && ./auto-ssh.sh "
+                            ctx.sh " cd _linux && chmod +x auto-ssh.sh && ./auto-ssh.sh ${remoteHostIp} "
                         }
                     } catch (e) {
                         ctx.println e.getMessage()

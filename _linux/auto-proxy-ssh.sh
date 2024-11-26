@@ -43,10 +43,14 @@ while read host; do
     jump_password=$(echo "$host" | jq -r '.jump_password')
     jump_port=$(echo "$host" | jq -r '.jump_port')
     echo "jump_host_ip: $jump_host"
-    # 如果已经免密连接登录跳过设置
+
+    # 只设置当前要配置的服务器   如果已经免密连接登录跳过设置
+    if [[ ${jump_host} -ne  $1 ]] ; then
+          continue  # 跳出本次循环
+    fi
 
     # 清除之前授权信息  防止授权失败
-    ssh -p $jump_port $jump_user_name@$jump_host "rm -f ~/.ssh/authorized_keys"
+    #ssh -p $jump_port $jump_user_name@$jump_host "rm -f ~/.ssh/authorized_keys"
 
   expect <<EOF
         spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $jump_port $jump_user_name@$jump_host
@@ -75,13 +79,7 @@ EOF
         spawn ssh $jump_user_name@$jump_host -p $jump_port
 
         # 清除之前授权信息  防止授权失败
-        send "ssh -p $target_port $target_user_name@$target_host 'rm -f ~/.ssh/authorized_keys' \r"
-
-        # 处理可能的交互
-         expect {
-                 "yes/no" {send "yes\n";exp_continue}
-                 "password" {send "$target_password\n"}
-         }
+        # send "ssh -p $target_port $target_user_name@$target_host 'rm -f ~/.ssh/authorized_keys' \r"
 
         # 在目标主机上执行 ssh-copy-id 命令
         send "ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $target_port $target_user_name@$target_host \r"

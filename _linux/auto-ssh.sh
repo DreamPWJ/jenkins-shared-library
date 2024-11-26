@@ -23,10 +23,14 @@ while read host; do
   port=$(echo $host | cut -d " " -f2)
   username=$(echo $host | cut -d " " -f3)
   password=$(echo $host | cut -d " " -f4)
-  # 如果已经免密连接登录跳过设置
+
+  # 只设置当前要配置的服务器   如果已经免密连接登录跳过设置
+  if [[ ${ip} -ne  $1 ]] ; then
+        continue  # 跳出本次循环
+  fi
 
   # 清除之前授权信息  防止授权失败
-  ssh -p $port $username@$ip "rm -f ~/.ssh/authorized_keys"
+  # ssh -p $port $username@$ip "rm -f ~/.ssh/authorized_keys"
 
 
   expect <<EOF
