@@ -38,7 +38,7 @@ json_file="proxy_jump_hosts.json"
 # 对于变量中的JSON数据，直接通过echo传递给jq
 
 while read host; do
-    jump_host=$(echo "$host" | jq -r '.jump_host')
+    jump_host=$(echo "$host" | jq -r '.jump_host') # 注意ip不要有空格
     jump_user_name=$(echo "$host" | jq -r '.jump_user_name')
     jump_password=$(echo "$host" | jq -r '.jump_password')
     jump_port=$(echo "$host" | jq -r '.jump_port')

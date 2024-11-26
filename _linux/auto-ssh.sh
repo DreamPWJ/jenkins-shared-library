@@ -19,7 +19,7 @@ if [[ ! $(command -v expect) ]]; then
 fi
 
 while read host; do
-  ip=$(echo $host | cut -d " " -f1)
+  ip=$(echo $host | cut -d " " -f1) # 注意ip不要有空格
   port=$(echo $host | cut -d " " -f2)
   username=$(echo $host | cut -d " " -f3)
   password=$(echo $host | cut -d " " -f4)
