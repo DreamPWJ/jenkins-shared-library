@@ -18,6 +18,9 @@
 - 停止TiDB集群
   tiup cluster stop cluster-name
 
+- 重新加载TiDB集群  滚动升级所有的tidb组件
+  tiup cluster reload cluster-name -R tidb
+
 - 重启TiDB集群或部分Node节点
   tiup cluster restart cluster-name
   tiup cluster restart cluster-name --node ip:port

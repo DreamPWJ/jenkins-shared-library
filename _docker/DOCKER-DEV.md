@@ -19,7 +19,7 @@ sudo systemctl daemon-reload && sudo systemctl restart docker  # 导致当前运
 #### 还原Docker容器的启动run命令完整参数
 get_command_4_run_container（完美方案）
 docker pull cucker/get_command_4_run_container
-docker run --rm -v /var/run/docker.sock:/var/run/docker.sock cucker/get_command_4_run_container [容器名称]/[容器ID]
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock cucker/get_command_4_run_container [容器ID]
 
 #### 从Docker Hub里拉取mysql镜像来部署 密码强度要求：8位及以上，包含大小写，字母，特殊符号
 docker pull mysql

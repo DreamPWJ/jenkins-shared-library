@@ -85,7 +85,7 @@ cd /${deploy_folder}/web && cp -p default.conf ${deploy_file}/
 cd /${deploy_folder}/web && cp -p nginx.conf ${deploy_file}/
 #cp -r ssl/ ${deploy_file}/
 
-# 进入部署文件
+echo "进入部署文件目录构建镜像: ${deploy_file}"
 cd ${deploy_file}
 pwd
 # 进入部署文件所在目录并解压部署资源

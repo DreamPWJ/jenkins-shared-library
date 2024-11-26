@@ -106,7 +106,7 @@ cd /${deploy_folder} && ./docker-common.sh exist_docker_file
 # 检测是否存在部署文件夹 如果不存在创建一个
 cd /${deploy_folder} && ./docker-common.sh mkdir_deploy_file ${deploy_file}
 
-# 进入部署文件所在目录
+echo "进入部署文件目录构建镜像: ${deploy_file}"
 cd ${deploy_file}
 pwd
 
