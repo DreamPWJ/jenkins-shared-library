@@ -45,7 +45,7 @@ while read host; do
     echo "jump_host_ip: $jump_host"
 
     # 只设置当前要配置的服务器   如果已经免密连接登录跳过设置
-    if [[ ${jump_host} -ne  $1 ]] ; then
+    if [[ "$jump_host" != "$1" ]] ; then
           continue  # 跳出本次循环
     fi
 

@@ -25,7 +25,7 @@ while read host; do
   password=$(echo $host | cut -d " " -f4)
 
   # 只设置当前要配置的服务器   如果已经免密连接登录跳过设置
-  if [[ ${ip} -ne  $1 ]] ; then
+  if [[ "$ip" != "$1" ]] ; then
         continue  # 跳出本次循环
   fi
 
