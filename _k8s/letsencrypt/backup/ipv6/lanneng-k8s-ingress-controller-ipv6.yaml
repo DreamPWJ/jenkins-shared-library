@@ -4,6 +4,8 @@
 # K8S网络通道顺序：ipv4/ipv6 -> ingress controller -> ingress规则 -> 对应的service -> 相应的pod
 # 浏览器访问IPV6地址：http://[2401:1d40:2f00:8800::2d2]:9000/
 # 是否支持 Ipv6 检测地址: https://www.dns.com/ipv6_check_tool.html  或  https://ipw.cn/ipv6webcheck/
+# 120.92.149.115     2401:1d40:2f00:8800::2d2
+# 120.92.149.246     2401:1d40:2f00:8800::788
 
 apiVersion: v1
 kind: Service
