@@ -81,8 +81,8 @@ map.put('is_git_tag', false)
 map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
-map.put('jenkins_node', 'node-2')
-map.put('jenkins_node_frontend', 'node-2')
+map.put('jenkins_node', 'node-3')
+map.put('jenkins_node_frontend', 'node-3')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node20')
@@ -122,7 +122,7 @@ sharedLibrary(map)
 /*
 
 pengbo-park-app-native-test
-澎泊车SaaS 2.0 Native平台服务端
+澎泊车SaaS 2.0 Native用户平台服务端
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
@@ -138,10 +138,10 @@ pengbo-park-admin-native-test
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
-   "BRANCH_NAME" : "feature/infra" ,
+   "BRANCH_NAME" : "feature/saas-v2.0" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pengbo-park-admin" ,
-   "SHELL_PARAMS" : "pengbo-park-admin test 8181 8081 dev",
+   "SHELL_PARAMS" : "pengbo-park-admin test 8181 8081 sit",
    "IS_SPRING_NATIVE" : true,
 }
 
