@@ -27,7 +27,7 @@ if exist "%backupFile%" (
     echo hosts 文件已成功备份为 host.bak
 
     :: 清空原有内容并写入新的内容
-    echo 192.168.0.100 jtss.rzbus.cn > "%hostsFile%"
+    echo 58.58.179.242 jtss.rzbus.cn >> "%hostsFile%"
     :: 这是换行注释
     :: echo. >> "%hostsFile%"  
     :: echo 192.168.1.135 t2.com >> "%hostsFile%"
