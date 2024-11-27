@@ -129,7 +129,7 @@ JSON_PARAMS
    "BRANCH_NAME" : "feature/infra" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pengbo-park-app" ,
-   "SHELL_PARAMS" : "pengbo-park-app test 8180 8080 sit",
+   "SHELL_PARAMS" : "pengbo-park app-native 8180 8080 sit",
    "IS_SPRING_NATIVE" : true,
 }
 
@@ -141,7 +141,7 @@ JSON_PARAMS
    "BRANCH_NAME" : "feature/saas-v2.0" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "pengbo-park-admin" ,
-   "SHELL_PARAMS" : "pengbo-park-admin test 8181 8081 sit",
+   "SHELL_PARAMS" : "pengbo-park admin-native 8181 8081 sit",
    "IS_SPRING_NATIVE" : true,
 }
 
