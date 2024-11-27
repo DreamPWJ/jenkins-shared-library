@@ -81,8 +81,8 @@ map.put('is_git_tag', true)
 map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
-map.put('jenkins_node', 'node-2')
-map.put('jenkins_node_frontend', 'node-2')
+map.put('jenkins_node', 'node-3')
+map.put('jenkins_node_frontend', 'node-3')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node20')
@@ -131,6 +131,7 @@ JSON_PARAMS
    "PROJECT_NAME" : "services-health-check" ,
    "SHELL_PARAMS" : "services-health check 8197 8080 prod",
    "IS_MAVEN_SINGLE_MODULE" : true,
+   "IS_SPRING_NATIVE" : true,
    "IS_K8S_DEPLOY" : true,
    "K8S_POD_REPLICAS" : "1",
    "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check",
