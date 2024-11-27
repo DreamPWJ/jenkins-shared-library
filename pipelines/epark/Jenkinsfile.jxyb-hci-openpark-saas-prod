@@ -121,37 +121,33 @@ sharedLibrary(map)
 
 /*
 
-jxyb-hci-openpark-saas-app-k8s-prod
-莒县云泊SaaS平台App服务端-k8s集群
+jxyb-hci-openpark-saas-app-prod
+莒县云泊SaaS平台App服务端
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "openpark-saas-app" ,
-   "SHELL_PARAMS" : "openpark-saas app 8085 9000 prod",
-   "IS_K8S_DEPLOY" : true,
-   "IS_K8S_HPA_QPS" : true,
+   "SHELL_PARAMS" : "openpark-saas app 8085 9000 jxyb-prod",
+   "IS_ROLL_DEPLOY" : true,
    "APPLICATION_DOMAIN" : "http://www.jxybkj.cn",
-   "CUSTOM_HEALTH_CHECK_PATH" : "/healthyCheck",
 }
 
-jxyb-hci-openpark-saas-job-k8s-prod
-莒县云泊SaaS平台Job服务端-k8s集群
+jxyb-hci-openpark-saas-job-prod
+莒县云泊SaaS平台Job服务端
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "openpark-saas-job" ,
-   "SHELL_PARAMS" : "openpark-saas job 8066 8065 prod 8166 8266",
-   "IS_K8S_DEPLOY" : true,
-   "K8S_POD_REPLICAS" : "2",
-   "CUSTOM_HEALTH_CHECK_PATH" : "/healthyCheck",
+   "SHELL_PARAMS" : "openpark-saas job 8066 8065 jxyb-prod 8166 8266",
+   "IS_ROLL_DEPLOY" : true
 }
 
-jxyb-hci-openpark-saas-web-k8s-prod
-莒县云泊SaaS平台Web前端-k8s集群 ❤️
+jxyb-hci-openpark-saas-web-prod
+莒县云泊SaaS平台Web前端 ❤️
 JSON_PARAMS
 {
     "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/openpark_saas_frontend.git" ,
@@ -160,8 +156,7 @@ JSON_PARAMS
     "PROJECT_NAME" : "openpark-saas-admin" ,
     "SHELL_PARAMS" : "openpark-saas-admin web 8025 80 prod" ,
     "NPM_RUN_PARAMS" : "build",
-    "IS_K8S_DEPLOY" : true,
-    "K8S_POD_REPLICAS" : "3",
+    "IS_ROLL_DEPLOY" : true,
     "APPLICATION_DOMAIN" : "http://www.jxybkj.cn",
 }
 
