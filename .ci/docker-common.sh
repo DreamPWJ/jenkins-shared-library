@@ -157,7 +157,7 @@ function get_disk_space() {
         rm -f /var/lib/docker/overlay2/*/diff/var/log/nginx/*.log || true
         rm -f /var/lib/docker/overlay2/*/diff/etc/nginx/on || true
         # 隐藏占用情况 查找进程没有关闭导致内核无法回收占用空间的隐藏要删除的文件
-        lsof -w | grep 'deleted' | awk '{print $2}' | xargs kill -9
+        lsof -w | grep 'deleted' | awk '{print $2}' | xargs kill -9  || true
         AFTER_TOTAL_FREE=$(df -h  / | awk '/\// {print $4}' | sed 's/G//')
         echo "After clean free space is $AFTER_TOTAL_FREE GB! "
     fi
