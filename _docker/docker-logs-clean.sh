@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Author: 潘维吉
 # 清理Docker日志
-# 获取占用磁盘最高的目录列表  如 /* 根目录命令:  du -hsx /* | sort -hr | head -n 5
-# 隐藏占用情况 查找进程没有关闭导致内核无法回收占用空间的隐藏要删除的文件:  lsof -n | grep deleted  执行释放 kill -9 PID
+# 获取占用磁盘最高的目录列表  如 /* 根目录命令 * 当前目录 :  du -hsx * | sort -hr | head -n 5
+# 隐藏占用情况 查找进程没有关闭导致内核无法回收占用空间的隐藏要删除的文件:
+# lsof -w | grep deleted  执行释放 kill -9 PID  或一条命令执行 lsof -w | grep 'deleted' | awk '{print $2}' | xargs kill -9
 
 echo "======== 开始自动清理Docker日志 ========"
 
@@ -19,6 +20,8 @@ rm -f /var/log/nginx/*.log || true
 rm -f /usr/local/nginx/logs/*.log || true
 rm -f /var/lib/docker/overlay2/*/diff/var/log/nginx/*.log || true
 rm -f /var/lib/docker/overlay2/*/diff/etc/nginx/on || true
+# 隐藏占用情况 查找进程没有关闭导致内核无法回收占用空间的隐藏要删除的文件
+lsof -w | grep 'deleted' | awk '{print $2}' | xargs kill -9  || true
 
 # 清除所有未使用或悬挂的图像 容器 卷和网络
 docker system prune -a --force || true
