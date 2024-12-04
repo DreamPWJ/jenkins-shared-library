@@ -3,7 +3,7 @@
 # 实现思路: 1. 每个集群单独创建一个ipv6的负载均衡  2. 集群下只需要创建一个新的Ingress Controller Service指向这个ipv6的负载均衡  3. 域名解析到AAAA记录的ipv6
 # K8S网络通道顺序：ipv4/ipv6 -> ingress controller -> ingress规则 -> 对应的service -> 相应的pod
 # 浏览器访问IPV6地址：http://[2401:1d40:2f00:8800::2d2]:9000/
-# 是否支持 Ipv6 检测地址: https://www.dns.com/ipv6_check_tool.html  或  https://ipw.cn/ipv6webcheck/
+# 是否支持 Ipv6 检测地址: https://www.dns.com/ipv6_check_tool.html  或  https://www.china-ipv6.cn/#/checkTools
 # 120.92.149.115     2401:1d40:2f00:8800::2d2
 # 120.92.149.246     2401:1d40:2f00:8800::788
 

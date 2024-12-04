@@ -82,7 +82,7 @@ map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
 map.put('jenkins_node', 'master')
-map.put('jenkins_node_frontend', 'master')
+map.put('jenkins_node_frontend', 'node-3')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
 map.put('nodejs', 'Node14')
@@ -155,65 +155,6 @@ JSON_PARAMS
    "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server-open-epark.xml:/usr/local/tomcat/conf/server.xml"
 }
 
-
-htc-epark-h5-new-prod
-好停车H5 Web前端 新 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/rzhtc.git" ,
-    "BRANCH_NAME" : "rizhao" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "rzhtc" ,
-    "SHELL_PARAMS" : "rzhtc h5 9000 80 prod" ,
-    "NPM_RUN_PARAMS" : "build:rizhao",
-    "IS_ROLL_DEPLOY" : true,
-    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf"
-}
-
-htc-park-coupon-h5-new-prod
-好停车优惠券H5 Web前端 新 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/park_coupon.git" ,
-    "BRANCH_NAME" : "master" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "park-coupon" ,
-    "SHELL_PARAMS" : "park-coupon h5 8008 80 prod" ,
-    "NPM_RUN_PARAMS" : "build",
-    "IS_ROLL_DEPLOY" : true,
-    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf"
-}
-
-
-htc-epark-h5-prod
-好停车H5 Web前端 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/rzhtc.git" ,
-    "BRANCH_NAME" : "rizhao" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "rzhtc" ,
-    "SHELL_PARAMS" : "rzhtc h5 9000 80 prod" ,
-    "NPM_RUN_PARAMS" : "build:rizhao",
-    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf",
-    "APPLICATION_DOMAIN" : "http://jtss.rzbus.cn:18805"
-}
-REMOTE_IP: 172.16.99.51
-
-htc-park-coupon-h5-prod
-好停车优惠券H5 Web前端 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/park_coupon.git" ,
-    "BRANCH_NAME" : "master" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "park-coupon" ,
-    "SHELL_PARAMS" : "park-coupon h5 8008 80 prod" ,
-    "NPM_RUN_PARAMS" : "build",
-    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf",
-    "APPLICATION_DOMAIN" : "http://jtss.rzbus.cn:18804"
-}
-REMOTE_IP: 172.16.99.51
 
 */
 
