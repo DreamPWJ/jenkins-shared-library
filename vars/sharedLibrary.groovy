@@ -1080,7 +1080,6 @@ def pullProjectCode() {
         // sh "which git"
         // https仓库下载报错处理 The certificate issuer's certificate has expired.  Check your system date and time.
         sh "git config --global http.sslVerify false || true"
-        sh "git config --global --add safe.directory \"*\" || true" // 文件夹的所有者和现在的用户不一致
         // 在node节点工具位置选项配置 which git的路径 才能拉取代码!!!
         // 对于大体积仓库或网络不好情况 自定义代码下载超时时间 默认10分钟
         checkout([$class           : 'GitSCM',
@@ -1974,6 +1973,9 @@ def alwaysPost() {
  * 生成版本tag和变更日志
  */
 def gitTagLog() {
+    // 文件夹的所有者和现在的用户不一致导致 git命令异常
+    sh "git config --global --add safe.directory ${env.WORKSPACE} || true"
+
     // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行一次jenkins任务才能生效
     if (!params.IS_GIT_TAG && params.IS_GIT_TAG != false) {
         params.IS_GIT_TAG = true
@@ -2007,7 +2009,7 @@ def gitTagLog() {
             println "生成tag语义化版本号失败"
             println error.getMessage()
             // tagVersion = Utils.formatDate("yyyy-MM-dd") // 获取版本号失败 使用时间格式作为tag
-            tagVersion = "1.0.0" // 默认初始化版本
+            tagVersion = "1.0.${env.BUILD_NUMBER}" // 默认初始化版本 使用构建号作为tag
         }
 
         // 生成tag和变更日志
