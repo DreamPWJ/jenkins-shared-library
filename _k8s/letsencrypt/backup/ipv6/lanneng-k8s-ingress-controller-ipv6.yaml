@@ -2,8 +2,8 @@
 # Description: 云原生K8S部署应用yaml  Ingress Controller Service Ipv6服务
 # 实现思路: 1. 每个集群单独创建一个ipv6的负载均衡  2. 集群下只需要创建一个新的Ingress Controller Service指向这个ipv6的负载均衡  3. 域名解析到AAAA记录的ipv6
 # K8S网络通道顺序：ipv4/ipv6 -> ingress controller -> ingress规则 -> 对应的service -> 相应的pod
-#  NAT64 IPV6过度转换技术: 将ipv6指定到路由器或防火墙上再转换成ipv4再静态映射到具体服务器上
-# 设置NAT64前缀 nat64 prefix 3001:: 96  做nat64静态一对一映射 nat64 static protocol tcp 2001::1 8080 172.16.1.10 8080
+#  NAT64 IPV6过度转换技术: 将ipv6指定到路由器或防火墙上再转换成ipv4再静态映射到具体服务器上 因NAT64前缀不能与设备上一任接口的IPv6地址前缀重叠需要两个网段  前缀网段运营上做路由指向机房路由器
+# 1. 开启NAT64 nat64 enable  2. 设置NAT64前缀 nat64 prefix 只ipv6前缀 96  3. 做nat64静态一对一映射 nat64 static protocol tcp 只ipv6前缀 8080 172.16.1.10 8080
 # 浏览器访问IPV6地址：http://[2401:1d40:2f00:8800::2d2]:9000/
 # 是否支持 Ipv6 检测地址: https://www.dns.com/ipv6_check_tool.html  或  https://www.china-ipv6.cn/#/checkTools  或 https://ipw.cn/ipv6webchec
 # 120.92.149.115     2401:1d40:2f00:8800::2d2
