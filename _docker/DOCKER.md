@@ -36,7 +36,7 @@ docker run -d --restart=always  -p 2181:2181 \
 --privileged=true  --name zookeeper  zookeeper:latest
 
 #### EMQX物联网MQTT代理服务器 Dashboard地址http://127.0.0.1:18083  用户名 admin 与默认密码 public 建议更换默认密码防止被攻击
-##### 容器内默认配置文件  /opt/emqx/etc/emqx.conf   宿主机存储地址 /var/lib/docker/volumes/mqtt-emqx/_data
+##### 容器内默认配置文件  /opt/emqx/etc/emqx.conf   emqx宿主机卷存储地址 /var/lib/docker/volumes/mqtt-emqx/_data 并更立刻生效无需重启
 docker pull emqx/emqx:latest
 
 docker volume create mqtt-emqx && docker inspect mqtt-emqx
