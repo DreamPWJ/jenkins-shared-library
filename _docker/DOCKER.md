@@ -35,14 +35,14 @@ docker run -d --restart=always  -p 2181:2181 \
 --cpus=2 -m 2048m --log-opt max-size=200m --log-opt max-file=1   \
 --privileged=true  --name zookeeper  zookeeper:latest
 
-#### EMQX物联网MQTT代理服务器 Dashboard地址http://127.0.0.1:18083  用户名 admin 与默认密码 public 建议更换默认密码防止被攻击 容器删除后丢失数据建议更换认证数据源
-##### 容器内默认配置文件 变更重启  /opt/emqx/etc/emqx.conf   emqx宿主机卷存储地址 /var/lib/docker/volumes/mqtt-emqx/_data/etc
+#### EMQX物联网MQTT代理服务器 Dashboard地址http://127.0.0.1:18083  用户名 admin 与默认密码 public 建议更换默认密码防止被攻击 容器删除后丢失数据建议更换存储数据源
+##### 容器内默认配置文件 变更重启  /opt/emqx/etc/emqx.conf   emqx宿主机卷存储地址 /var/lib/docker/volumes/mqtt-emqx/_data/etc   安全letsencrypt ssl服务证书存放在etc/certs/下面生效
 docker pull emqx/emqx:latest
 
 docker volume create mqtt-emqx && docker inspect mqtt-emqx
 
 docker run -d --restart=always  -p 18083:18083 -p 1883:1883 -p 8083:8083 -p 8084:8084 -p 8883:8883  \
--e TZ="Asia/Shanghai" -v mqtt-emqx:/opt/emqx  -v /etc/letsencrypt:/etc/letsencrypt \
+-e TZ="Asia/Shanghai" -v mqtt-emqx:/opt/emqx  \
 --cpus=2 -m 2048m  --log-opt max-size=200m --log-opt max-file=1   \
 --name emqx  emqx/emqx:latest
 
