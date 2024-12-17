@@ -1,3 +1,7 @@
+# Author: 潘维吉
+# Description: 云原生K8S部署Jenkins应用
+# 官方文档: https://www.jenkins.io/doc/book/installing/kubernetes/
+
 kind: Deployment
 apiVersion: apps/v1
 metadata:
