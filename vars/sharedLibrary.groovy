@@ -2009,17 +2009,18 @@ def gitTagLog() {
             println "生成tag语义化版本号失败"
             println error.getMessage()
             // tagVersion = Utils.formatDate("yyyy-MM-dd") // 获取版本号失败 使用时间格式作为tag
-            tagVersion = "1.0.${env.BUILD_NUMBER}" // 默认初始化版本 使用构建号作为tag
+            tagVersion = "1.0.${env.BUILD_NUMBER}" // 自动设置不重复tag版本 使用CI构建号作为tag
         }
 
         // 生成tag和变更日志
         gitTagLog.genTagAndLog(this, tagVersion, gitChangeLog, "${REPO_URL}", "${GIT_CREDENTIALS_ID}")
     }
+
     // 指定tag时候设置版本信息
     if (params.GIT_TAG != GlobalVars.noGit) {
         tagVersion = params.GIT_TAG
     }
-    // 非生产环境下也需要回滚版本 所以需要打tag版本 如 1.0.0-beta
+    // 非生产环境下也需要回滚版本 所以需要打tag版本 如 1.0.0-beta 或者 0.x.y 等
 }
 
 /**

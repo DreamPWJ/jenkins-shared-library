@@ -49,6 +49,9 @@ sudo certbot renew
 docker exec proxy-nginx nginx -t -c /etc/nginx/nginx.conf
 docker exec proxy-nginx nginx -s reload || true
 
+# 针对证书目录有要求情况  复制证书文件到另一个目录 并授权
+# cp -p /etc/letsencrypt/live/*/privkey.pem /my/letsencrypt/live/
+# chmod 755 /my/letsencrypt/live/*/privkey.pem
 
 # 创建定时任务 自动续期SSL证书 默认证书有效期是90天
 # chmod +x /my/renew-cert.sh  给shell脚本执行文件可执行权限  先手动执行测试一下

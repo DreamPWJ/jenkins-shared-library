@@ -5,7 +5,7 @@ auth.token = ".=:N!uLm!RtrY_MxvNZGzM3^LH2-h#co!k3wbH.i~BXCMa-JAh?>Q=GWp2JQ"
 # SSH配置文档: https://gofrp.org/zh-cn/docs/examples/ssh/
 [[proxies]]
 name = "ssh-01"
-type = "tcp"
+type = "tcp"              # 代理类型，可选值为 tcp, udp, http, https, tcpmux, stcp, sudp, xtcp
 localIP = "127.0.0.1"
 localPort = 22
 remotePort = 20088

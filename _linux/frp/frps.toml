@@ -2,9 +2,20 @@ bindPort = 7000   # frp服务端口
 vhostHTTPPort = 8008 # http服务端口
 auth.token = ".=:N!uLm!RtrY_MxvNZGzM3^LH2-h#co!k3wbH.i~BXCMa-JAh?>Q=GWp2JQ"
 
+# 服务端 Dashboard 配置
 # 默认为 127.0.0.1，如果需要公网访问，需要修改为 0.0.0.0。
 webServer.addr = "0.0.0.0"
 webServer.port = 7500
 # dashboard 用户名密码，可选，默认为空
 webServer.user = "admin"
 webServer.password = "Admin@0633"
+
+
+# 日志配置文件
+#log.to = "./frps.log"            # 日志输出文件路径，如果为 console，则会将日志打印在标准输出中
+#log.level= "info"                # 日志级别，可选值为 trace, debug, info, warn, error，默认级别为 info
+#log.maxDays = 3                  # 日志文件最多保留天数，默认为 3 天
+
+# 网络层配置
+# 允许客户端设置的最大连接池大小，如果客户端配置的值大于此值，会被强制修改为最大值，默认为 5
+#transport.maxPoolCount = 5
