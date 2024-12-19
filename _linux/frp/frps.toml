@@ -8,3 +8,12 @@ webServer.port = 7500
 # dashboard 用户名密码，可选，默认为空
 webServer.user = "admin"
 webServer.password = "Admin@0633"
+
+
+# 日志配置文件
+#log_file = "./frps.log"           # 日志文件,不指定日志信息默认输出到控制台
+#log_level = "info"                # 日志等级，可用等级“trace, debug, info, warn, error”
+#log_max_days = 3                # 日志保存最大保存时间
+
+# 允许客户端设置的最大连接池大小，如果客户端配置的值大于此值，会被强制修改为最大值，默认为 5
+#maxPoolCount
