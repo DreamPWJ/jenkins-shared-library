@@ -94,7 +94,7 @@ arp -a
    sudo timedatectl set-timezone Asia/Shanghai  # 设置时区
    sudo timedatectl set-ntp true  # 设置NTP时间同步
 
-#### 内网穿透工具 FRP
+#### 内网穿透工具 FRP 无需安装客户端外网即可直接访问
 
 - https://github.com/fatedier/frp
 
