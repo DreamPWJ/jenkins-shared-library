@@ -10,7 +10,7 @@
 - Linux启动frp客户端: chmod +x frpc && chmod +x frpc.toml &&  ./frpc -c ./frpc.toml
 - Windows启动frp客户端: frpc.exe -c frpc.toml
 
-#### 启动frps or frpc
+#### 启动frps 或 frpc
 
 sudo systemctl start frps 或 frpc
 
