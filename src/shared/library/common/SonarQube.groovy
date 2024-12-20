@@ -13,13 +13,13 @@ class SonarQube implements Serializable {
     /**
      *  SonarQube服务端地址
      */
-    static def sonarServer = "http://172.16.1.100:9100"
+    static def sonarServer = "http://192.168.0.100:9100"
 
     /**
      * 创建sonar项目
      */
     static def createProject(ctx, projectName) {
-        ctx.println("创建sonar项目")
+        ctx.println("CI自动创建SonarQube项目")
         def apiUrl = "projects/create?name=${projectName}&project=${projectName}"
         // 发请求
         def response = httpReq(ctx, "POST", apiUrl, "")
