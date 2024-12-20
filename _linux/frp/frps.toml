@@ -13,7 +13,7 @@ webServer.password = "Admin@0633"
 
 # 日志配置文件
 #log.to = "./frps.log"            # 日志输出文件路径，如果为 console，则会将日志打印在标准输出中
-#log.level= "info"                # 日志级别，可选值为 trace, debug, info, warn, error，默认级别为 info
+#log.level = "info"                # 日志级别，可选值为 trace, debug, info, warn, error，默认级别为 info
 #log.maxDays = 3                  # 日志文件最多保留天数，默认为 3 天
 
 # 网络层配置

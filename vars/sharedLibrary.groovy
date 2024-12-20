@@ -192,8 +192,7 @@ def call(String type = 'web-java', Map map) {
                                      '项目代码': {
                                          pullProjectCode()
                                      }) */
-
-                            // autoSshLogin(map) // 测试部署服务器的免密登录
+                            // codeQualityAnalysis()
                         }
                     }
                 }
@@ -1109,7 +1108,10 @@ def pullProjectCode() {
  * 代码质量分析
  */
 def codeQualityAnalysis() {
-    SonarQube.scan(this, "${FULL_PROJECT_NAME}")
+    // 创建项目
+    SonarQube.createProject(this, "${FULL_PROJECT_NAME}")
+    // 扫描项目
+    // SonarQube.scan(this, "${FULL_PROJECT_NAME}")
     // SonarQube.getStatus(this, "${PROJECT_NAME}")
 /*    def scannerHome = tool 'SonarQube' // 工具名称
     withSonarQubeEnv('SonarQubeServer') { // 服务地址链接名称

@@ -13,7 +13,18 @@ class SonarQube implements Serializable {
     /**
      *  SonarQube服务端地址
      */
-    static def sonarServer = "http://172.16.1.100:9000"
+    static def sonarServer = "http://192.168.0.100:9100"
+
+    /**
+     * 创建sonar项目
+     */
+    static def createProject(ctx, projectName) {
+        ctx.println("CI自动创建SonarQube项目")
+        def apiUrl = "projects/create?name=${projectName}&project=${projectName}"
+        // 发请求
+        def response = httpReq(ctx, "POST", apiUrl, "")
+        ctx.println(response)
+    }
 
     /**
      *  Sonar扫描
@@ -63,6 +74,22 @@ class SonarQube implements Serializable {
         // 获取状态值
         def result = response["branches"][0]["status"]["qualityGateStatus"]
         ctx.println(result)
+        return result
+    }
+
+    /**
+     * 封装HTTP请求
+     */
+    static def httpReq(ctx, requestType, requestUrl, requestBody) {
+        // 定义sonar api接口
+        def sonarServerApi = "${sonarServer}/api"
+        def result = ctx.httpRequest authentication: 'sonar-admin-user', // 在系统管理->系统配置->HTTP Request中配置 应用
+                httpMode: requestType,
+                contentType: "APPLICATION_JSON",
+                consoleLogResponseBody: true,
+                ignoreSslErrors: true,
+                requestBody: requestBody,
+                url: "${sonarServerApi}/${requestUrl}"
         return result
     }
 
