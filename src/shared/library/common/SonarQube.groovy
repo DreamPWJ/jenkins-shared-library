@@ -82,7 +82,7 @@ class SonarQube implements Serializable {
     static def httpReq(ctx, requestType, requestUrl, requestBody) {
         // 定义sonar api接口
         def sonarServerApi = "${sonarServer}/api"
-        def result = ctx.httpRequest authentication: 'sonar-admin-user',
+        def result = ctx.httpRequest authentication: 'squ_023c7d3a9b25461d70624ef43a5df1d15ceafdfa', // 访问token
                 httpMode: requestType,
                 contentType: "APPLICATION_JSON",
                 consoleLogResponseBody: true,

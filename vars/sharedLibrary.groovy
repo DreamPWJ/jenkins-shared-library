@@ -192,8 +192,7 @@ def call(String type = 'web-java', Map map) {
                                      '项目代码': {
                                          pullProjectCode()
                                      }) */
-
-                            // codeQualityAnalysis()
+                            codeQualityAnalysis()
                         }
                     }
                 }
