@@ -21,7 +21,7 @@ class SonarQube implements Serializable {
     static def createProject(ctx, projectName) {
         def apiUrl = "projects/create?name=${projectName}&project=${projectName}"
         // 发请求
-        def response = httpReq("POST", apiUrl, "")
+        def response = httpReq(ctx, "POST", apiUrl, "")
         ctx.println(response)
     }
 
@@ -79,10 +79,10 @@ class SonarQube implements Serializable {
     /**
      * 封装HTTP请求
      */
-    static def httpReq(requestType, requestUrl, requestBody) {
+    static def httpReq(ctx, requestType, requestUrl, requestBody) {
         // 定义sonar api接口
         def sonarServerApi = "${sonarServer}/api"
-        def result = httpRequest authentication: 'sonar-admin-user',
+        def result = ctx.httpRequest authentication: 'sonar-admin-user',
                 httpMode: requestType,
                 contentType: "APPLICATION_JSON",
                 consoleLogResponseBody: true,
