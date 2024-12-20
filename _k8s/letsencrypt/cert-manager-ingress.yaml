@@ -1,7 +1,7 @@
 # Author: 潘维吉
 # Description: 云原生K8S中使用cert-manager基于 ACME 协议与 Let's Encrypt 自动签发与续签免费的SSL证书
 
-# 创建一个集群级的签发机构  仅需一次  证书生成需要等待1分钟左右  Let's Encrypt限制每个 IP 地址每 3 小时最多可以请求 5 个证书
+# 创建一个集群级的签发机构  仅需一次  证书生成需要等待1分钟左右  Let's Encrypt限制每个 IP 地址每 3 小时最多可以请求 5 个证书 超出请分批执行创建证书
 # 重新生成证书 kubectl delete clusterissuer  issuerName  和 kubectl --namespace cert-manager  delete  Secret  letsencrypt-prod-key
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
