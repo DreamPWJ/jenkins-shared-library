@@ -19,6 +19,7 @@ class SonarQube implements Serializable {
      * 创建sonar项目
      */
     static def createProject(ctx, projectName) {
+        ctx.println("创建sonar项目")
         def apiUrl = "projects/create?name=${projectName}&project=${projectName}"
         // 发请求
         def response = httpReq(ctx, "POST", apiUrl, "")
