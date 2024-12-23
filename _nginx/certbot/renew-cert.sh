@@ -53,8 +53,9 @@ docker exec proxy-nginx nginx -s reload || true
 # cp -p /etc/letsencrypt/live/*/privkey.pem /my/letsencrypt/live/
 # chmod 755 /my/letsencrypt/live/*/privkey.pem
 
-# scp 复制证书到另一个服务器 比如Keepalived双机热备情况
+# 设置ssh免密登录后 scp 复制证书到另一个服务器 比如Keepalived双机热备情况都需要一样的证书
 # scp -r /etc/letsencrypt/live/* root@172.16.1.99:/etc/letsencrypt/live/
+
 
 # 创建定时任务 自动续期SSL证书 默认证书有效期是90天
 # chmod +x /my/renew-cert.sh  给shell脚本执行文件可执行权限  先手动执行测试一下
