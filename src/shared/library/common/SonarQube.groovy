@@ -79,6 +79,7 @@ class SonarQube implements Serializable {
 
     /**
      * 封装HTTP请求
+     * 或更复杂的需求可使用 OKHTTP库
      */
     static def httpReq(ctx, requestType, requestUrl, requestBody) {
         // 定义sonar api接口
