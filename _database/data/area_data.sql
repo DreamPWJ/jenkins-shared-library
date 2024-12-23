@@ -1,5 +1,21 @@
 # 基础行政单位初始化
 
+create table if not exists base_area
+(
+    id          bigint auto_increment comment '主键id'
+        primary key,
+    parent_code varchar(50)                        null comment '父级code',
+    code        varchar(50)                        null comment '编码',
+    name        varchar(50)                        null comment '名称',
+    name_path   varchar(100)                       null comment '名称路径',
+    level       varchar(20)                        null comment '等级 国家 省 市 区/县',
+    center      varchar(30)                        null comment '经度,纬度',
+    show_order  int      default 1                 null comment '显示排序号 数字越小优先级越高',
+    modify_time datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP comment '修改时间',
+    create_time datetime default CURRENT_TIMESTAMP null comment '创建时间'
+)
+    comment '区域表';
+
 INSERT INTO base_area (parent_code, code, name, name_path, level, center)
 VALUES (null, '230000', '黑龙江省', '黑龙江省', 'province', '126.642464,45.756967'),
        ('230000', '230900', '七台河市', '黑龙江省,七台河市', 'city', '131.015584,45.771266'),
