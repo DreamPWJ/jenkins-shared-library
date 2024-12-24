@@ -131,10 +131,10 @@ JSON_PARAMS
    "COMPUTER_LANGUAGE" : "3" ,
    "PROJECT_NAME" : "rsu-controller" ,
    "SHELL_PARAMS" : "rsu-controller python 8208 5000 prod",
-   "GIT_PROJECT_FOLDER_NAME" : "rsu_controller_cloud",
+   "GIT_PROJECT_FOLDER_NAME" : "rsu_controller_flask",
    "IS_K8S_DEPLOY" : true,
    "K8S_POD_REPLICAS" : "1",
-   "CUSTOM_PYTHON_START_FILE" : "main.py",
+   "CUSTOM_PYTHON_START_FILE" : "app.py",
    "IS_DISABLE_K8S_HEALTH_CHECK" : true ,
    "APPLICATION_DOMAIN" : "https://etc-rsu-api.pengbocloud.com" ,
 }

@@ -59,7 +59,7 @@ map.put('k8s_credentials_ids', ' ')
 map.put('k8s_image_pull_secrets', ' ')
 
 // 项目标签或项目简称
-map.put('project_tag', '停车SaaS')
+map.put('project_tag', '澎泊停车SaaS')
 
 // 是否是生产环境
 map.put('is_prod', false)
@@ -122,7 +122,7 @@ sharedLibrary(map)
 /*
 
 park-saas-web-test
-停车SaaS平台Web前端 ❤️
+澎泊停车SaaS平台Web前端 ❤️
 JSON_PARAMS
 {
     "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/openpark_saas_frontend.git" ,
@@ -135,7 +135,7 @@ JSON_PARAMS
 }
 
 park-saas-app-test
-停车SaaS平台App服务端
+澎泊停车SaaS平台App服务端
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-backend-monorepo.git" ,
@@ -147,7 +147,7 @@ JSON_PARAMS
 
 
 park-saas-admin-web-test
-停车Saas平台 Web前端 ❤️
+澎泊停车SaaS平台 Web前端 ❤️
 JSON_PARAMS
 {
     "REPO_URL" : "https://git.pengbocloud.com/smart-parking/parking-admin.git" ,
