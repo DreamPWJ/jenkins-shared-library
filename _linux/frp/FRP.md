@@ -1,4 +1,4 @@
-### FRP (fast reverse proxy)内网穿透服务  分客户端和服务端(服务端需固定的公网ip)
+### FRP (fast reverse proxy)内网穿透服务  分客户端和服务端(服务端需固定的公网ip) 访问者无需安装客户端外网即可直接访问
 
 - 源码地址: https://github.com/fatedier/frp
 - 后台运行和开机自启动配置文档: https://gofrp.org/zh-cn/docs/setup/systemd/
@@ -7,8 +7,8 @@
 #### 下载frp相关平台包到相关目录中  直接执行go原生二进制包程序启动并设置开机自启动
 
 - 启动frp服务端:  ./frps -c ./frps.toml
-- Linux启动frp客户端: chmod +x frpc && chmod +x frpc.toml &&  ./frpc -c ./frpc.toml
-- Windows启动frp客户端: frpc.exe -c frpc.toml
+- Linux启动frp客户端启动: chmod +x frpc && chmod +x frpc.toml &&  ./frpc -c ./frpc.toml
+- Windows启动frp客户端启动(低版本Windows使用低版本frpc兼容): frpc.exe -c frpc.toml
 
 #### 启动frps 或 frpc
 
