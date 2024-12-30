@@ -54,15 +54,6 @@ metadata:
     nginx.ingress.kubernetes.io/limit-rps: "50"
     # 为计算限速漏桶算法的 burst size和 limit-rps 的相乘放大系数  burst为队列长度
     nginx.ingress.kubernetes.io/limit-burst-multiplier: "10"
-    # 配合 limit-window 表示每多少秒全局限速多少次（需要依赖 memcached）
-    #nginx.ingress.kubernetes.io/global-rate-limit: "100000"
-    #nginx.ingress.kubernetes.io/global-rate-limit-window: 1s
-    # 限制发送给后端服务的发送速率为 多少MB/每秒 rate为队列处理能力
-    #nginx.ingress.kubernetes.io/limit-rate: 10240
-    # 发送给后端服务的前 多少MB 数据不进行限速
-    #nginx.ingress.kubernetes.io/limit-rate-after: 102400
-    # 白名单 客户端IP源范围要从速率限制中排除。该值是逗号分隔的CIDR列表
-    #nginx.ingress.kubernetes.io/limit-whitelist:
     # 限流超出后的响应码
     nginx.ingress.kubernetes.io/configuration-snippet: |
       limit_req_status 429;
