@@ -100,7 +100,7 @@ spec:
             backend:
               #服务名称
               service:
-                name: etc-rsu-admin-web-service
+                name: etc-controller-admin-web-service
                 #服务端口
                 port:
                   number: 9007
