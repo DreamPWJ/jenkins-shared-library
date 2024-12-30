@@ -135,6 +135,7 @@ JSON_PARAMS
    "IS_K8S_DEPLOY" : true,
    "K8S_POD_REPLICAS" : "1",
    "CUSTOM_PYTHON_START_FILE" : "app.py",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/health-check",
    "IS_DISABLE_K8S_HEALTH_CHECK" : true ,
    "APPLICATION_DOMAIN" : "https://etc-rsu-api.pengbocloud.com" ,
 }
