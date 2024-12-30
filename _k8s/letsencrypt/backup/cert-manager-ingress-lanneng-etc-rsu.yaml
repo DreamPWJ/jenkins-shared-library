@@ -62,26 +62,26 @@ metadata:
 spec:
   ingressClassName: lanneng-park
   tls:
-    - hosts:
-        - etc-rsu-api.pengbocloud.com
-      secretName: etc-rsu-api.pengbocloud.com-tls
+#    - hosts:
+#        - etc-rsu-api.pengbocloud.com
+#      secretName: etc-rsu-api.pengbocloud.com-tls
     - hosts:
         - etc-rsu-admin.pengbocloud.com
       secretName: etc-rsu-admin.pengbocloud.com-tls
   rules:
     #自定义域名
-    - host: etc-rsu-api.pengbocloud.com
-      http:
-        paths:
-          - path: /
-            backend:
-              #服务名称
-              service:
-                name: rsu-controller-python-service
-                #服务端口
-                port:
-                  number: 8007
-            pathType: Prefix
+#    - host: etc-rsu-api.pengbocloud.com
+#      http:
+#        paths:
+#          - path: /
+#            backend:
+#              #服务名称
+#              service:
+#                name: rsu-controller-python-service
+#                #服务端口
+#                port:
+#                  number: 8007
+#            pathType: Prefix
 
     #自定义域名
     - host: etc-rsu-admin.pengbocloud.com
