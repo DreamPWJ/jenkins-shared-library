@@ -118,13 +118,17 @@ if [[ ${extend_port} ]]; then
   dynamic_run_args=" -p ${extend_port}:${extend_port} -e "EXTEND_PORT=${extend_port}" "
 fi
 
-# 非生产环境限制容器CPU占用 防止同时部署情况导致其他服务无法访问
-if [[ ${is_prod} == false ]]; then
-  cup_num=$(cat /proc/cpuinfo | grep "processor" | wc -l)
-  echo "逻辑CPU的个数: ${cup_num}"
-  # limit_cup_num=$(echo "scale=4; ${cup_num} - 0.3" | bc) # 浮点数计算 bc命令可能不存在
-  dynamic_run_args=${dynamic_run_args}" --cpus=${cup_num} "
-fi
+# 限制容器CPU占用 防止同时部署情况导致其他服务无法访问
+#if [[ ${is_prod} == false ]]; then
+  # cup_num=$(cat /proc/cpuinfo | grep "processor" | wc -l)
+  # echo "逻辑CPU的个数: ${cup_num}"
+  cpu_cores=$(nproc)
+  echo "物理CPU的个数: ${cpu_cores}"
+  cpus_limit=$(awk "BEGIN {print $cpu_cores * 0.8}") # 使用百分多少的资源 防止整个服务器资源被占用停机
+  # limit_cup_num=$(echo "scale=4; ${cup_num} - 0.3" | bc) # 浮点数计算  bc命令可能不存
+
+  dynamic_run_args=${dynamic_run_args}" --cpus=${cpus_limit} "
+#fi
 
 # 动态参数
 if [[ ${docker_volume_mount} ]]; then
