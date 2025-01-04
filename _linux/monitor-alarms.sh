@@ -2,8 +2,12 @@
 # Author: 潘维吉
 # Description:  脚本来监控CPU、内存和磁盘的使用率，并在使用率超过预设阈值时发送告警
 
+# 项目服务器名称
+PROJECT_SERVER_NAME="服务器"
 # 钉钉机器人的Webhook地址
 DING_TALK_WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=383391980b120c38f0f9a4a398349739fa67a623f9cfa834df9c5374e81b2081"
+# 钉钉通知KEY
+DING_TALK_KEY="蓝能科技"
 
 # 定义告警阈值
 CPU_THRESHOLD=95
@@ -49,8 +53,8 @@ if [ ${CPU_USAGE} -ge ${CPU_THRESHOLD} ]; then
     DATA='{
         "msgtype": "markdown",
         "markdown": {
-            "title": "🚨CPU告警-蓝能科技",
-            "text": "# 🚨 CPU警告：'"${HOSTNAME}"'主机上的CPU使用率已达到'"${CPU_USAGE}"'%！超过阈值'"${CPU_THRESHOLD}"'% \n - 最大CPU进程: '"${CPU_USAGE_MAX}"' \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
+            "title": "🚨CPU告警-'"${DING_TALK_KEY}"'",
+            "text": "# 🚨 CPU警告：'"${PROJECT_SERVER_NAME} ${HOSTNAME}"'主机上的CPU使用率已达到'"${CPU_USAGE}"'%！超过阈值'"${CPU_THRESHOLD}"'% \n - 最大CPU进程: '"${CPU_USAGE_MAX}"' \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
         },
         "at": {
                 "isAtAll": false,
@@ -69,8 +73,8 @@ if [ ${MEMORY_USAGE%.*} -ge ${MEMORY_THRESHOLD} ]; then
         DATA='{
             "msgtype": "markdown",
             "markdown": {
-                "title": "🚨内存告警-蓝能科技",
-                "text": "# 🚨 内存警告：'"${HOSTNAME}"'主机上的内存使用率已达到'"${MEMORY_USAGE}"'！超过阈值'"${MEMORY_THRESHOLD}"'%  \n - 最大内存进程: '"${MEMORY_USAGE_MAX}"' \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
+                "title": "🚨内存告警-'"${DING_TALK_KEY}"'",
+                "text": "# 🚨 内存警告：'"${PROJECT_SERVER_NAME} ${HOSTNAME}"'主机上的内存使用率已达到'"${MEMORY_USAGE}"'！超过阈值'"${MEMORY_THRESHOLD}"'%  \n - 最大内存进程: '"${MEMORY_USAGE_MAX}"' \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
             },
             "at": {
                     "isAtAll": false,
@@ -89,8 +93,8 @@ if [ ${DISK_USAGE} -ge ${DISK_USAGE_THRESHOLD} ]; then
         DATA='{
             "msgtype": "markdown",
             "markdown": {
-                "title": "🚨磁盘告警-蓝能科技",
-                "text": "# 🚨 磁盘警告：'"${HOSTNAME}"'主机上'"${DISK_PARTITION}"'分区的磁盘使用率已达到'"${DISK_USAGE}"'%！超阈值'"${DISK_USAGE_THRESHOLD}"'% \n - 最大磁盘占用: '"${DISK_USAGE_MAX}"' \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
+                "title": "🚨磁盘告警-'"${DING_TALK_KEY}"'",
+                "text": "# 🚨 磁盘警告：'"${PROJECT_SERVER_NAME} ${HOSTNAME}"'主机上'"${DISK_PARTITION}"'分区的磁盘使用率已达到'"${DISK_USAGE}"'%！超阈值'"${DISK_USAGE_THRESHOLD}"'% \n - 最大磁盘占用: '"${DISK_USAGE_MAX}"' \n - 外网IP: '"${public_ip}"' \n - 内网IP: '"${local_ip}"' \n - 告警时间: '"${current_datetime}"' @18863302302"
             },
             "at": {
                      "isAtAll": false,

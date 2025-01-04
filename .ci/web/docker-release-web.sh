@@ -137,7 +137,7 @@ fi
 echo -e "\033[32m 👨‍💻 启动运行Docker容器  映射端口: ${host_port}:${expose_port} \033[0m"
 docker run -d --restart=on-failure:6 -p ${host_port}:${expose_port} \
   --log-opt max-size=100m --log-opt max-file=1  \
-  -m 4G --name ${docker_container_name} ${docker_image_name}
+  --cpus=2 -m 4G --name ${docker_container_name} ${docker_image_name}
 
 set +x # 关闭shell命令打印模式
 

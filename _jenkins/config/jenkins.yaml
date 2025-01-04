@@ -649,7 +649,7 @@ jenkins:
           - "lastDuration"
           - "descriptionColumn"
           - "buildButton"
-        description: "停车Saas测试环境"
+        description: "澎泊停车SaaS测试环境"
         jobNames:
           - "park-saas-admin-web-test"
           - "park-saas-app-test"

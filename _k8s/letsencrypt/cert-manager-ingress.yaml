@@ -1,7 +1,7 @@
 # Author: 潘维吉
 # Description: 云原生K8S中使用cert-manager基于 ACME 协议与 Let's Encrypt 自动签发与续签免费的SSL证书
 
-# 创建一个集群级的签发机构  仅需一次  证书生成需要等待1分钟左右  Let's Encrypt限制每个 IP 地址每 3 小时最多可以请求 5 个证书 超出请分批执行创建证书
+# 创建一个集群级的签发机构  仅需一次  证书生成需要等待1分钟左右  域名解析ip正确 ingressClassName指定正确  Let's Encrypt限制每个 IP 地址每 3 小时最多可以请求 5 个证书 超出请分批执行创建证书
 # 重新生成证书 kubectl delete clusterissuer  issuerName  和 kubectl --namespace cert-manager  delete  Secret  letsencrypt-prod-key
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -53,11 +53,11 @@ metadata:
     acme.cert-manager.io/http01-edit-in-place: "true"
 
     # 负载均衡算法 如ip_hash
-    nginx.ingress.kubernetes.io/upstream-hash-by: "$host"
+    # nginx.ingress.kubernetes.io/upstream-hash-by: "$host"
     # Session保持配置
-    nginx.ingress.kubernetes.io/affinity: "cookie"
-    nginx.ingress.kubernetes.io/affinity-mode: "persistent"
-    nginx.ingress.kubernetes.io/session-cookie-name: "route"
+    # nginx.ingress.kubernetes.io/affinity: "cookie"
+    # nginx.ingress.kubernetes.io/affinity-mode: "persistent"
+    # nginx.ingress.kubernetes.io/session-cookie-name: "route"
 
     # 后端大文件上传大小 数据传输大小
     nginx.ingress.kubernetes.io/client-body-buffer-size: 1024m
@@ -111,7 +111,7 @@ spec:
         paths:
           - path: /
             backend:
-              #服务名称
+              #服务名称 确保正确 否则无法匹配具体服务
               service:
                 name: openpark-saas-admin-web-service
                 #服务端口
