@@ -75,7 +75,7 @@ mysqlslap -a --concurrency=50,100 --number-of-queries 1000  -uroot -p123456
 - 在Window上 先进入 D:\Program Files\MySQL\MySQL Server 8.1\bin 目录 再Powershell 输入  .\mysqlbinlog.exe
 - 根据pos位置恢复 BEGIN开始  COMMIT的结束位置  生成可以恢复的sql文件 查看数据使用--base64-output=decode-rows -v 查看设置好编码  datagrip 直接run sql script执行 recovery.sql
 - mysqlbinlog --no-defaults --skip-gtids=true --start-position='起始pos' --stop-position='结束end_log_pos' local_log_bin_file_path > recovery.sql ; 
-- sudo docker exec mysql mysqlbinlog –start-datetime='2022-04-20 10:01:00' –stop-datetime='2022-04-20 10:05:59' /path/to/mysql-bin.000001 | mysql -u username -p ;  根据时间段恢复
+- sudo docker exec mysql mysqlbinlog –start-datetime='2022-05-20 10:01:00' –stop-datetime='2022-05-20 10:05:59' /path/to/mysql-bin.000001 | mysql -u username -p ;  根据时间段恢复
 
 ####  MySQL书写顺序: select... from... join... on... where.... group by... having... order by... limit [offset,] (rows)
 ####  MySQL执行顺序: from...  on... join... where...group by... having.... select ... order by... limit
