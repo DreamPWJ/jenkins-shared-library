@@ -60,6 +60,11 @@ set global sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FO
 执行一次测试，分别50和100个并发，执行1000次总查询  mysqlslap是版本高于5.1的mysql自带的工具
 mysqlslap -a --concurrency=50,100 --number-of-queries 1000  -uroot -p123456
 
+#### MySQL同步备份数据
+
+- 默认官方mysqldump 速度慢 不支持增量 占用服务器资源
+- 增强DataX或Xtrabackup方案 支持实时增量数据同步 不锁表 不增加服务器负载 支持更大数据量的快速同步数据
+
 #### MySQL通过binlog日志恢复数据
 
 - show variables like '%log_bin%';  查看binlog是否开启 通常是my.cnf或my.ini设置log-bin=mysql-bin
