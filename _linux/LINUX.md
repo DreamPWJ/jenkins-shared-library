@@ -9,7 +9,6 @@ netstat -anp | grep 8080
 ps aux | grep tomcat
 ps -ef | grep rsync
 
-
 #### 内存最多的10个进程
 
 ps -aux | sort -k4nr | head -10
@@ -36,6 +35,11 @@ tail -f /var/log/cron
 - du -sh 查看整个当前文件的占用情况
 - du -lh --max-depth=1 查看当前目录子目录占用情况
 - ls -lh 查看每个文件的占用情况
+
+#### 压缩解压文件
+
+- tar -zcvf my.tar.gz /my
+- tar -xzvf my.tar.gz && rm -f my.tar.gz
 
 #### Linux扩容磁盘步骤  在线不停机扩容磁盘设置LVM（Logical Volume Manager）逻辑卷管理
 
