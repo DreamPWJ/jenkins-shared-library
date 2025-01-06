@@ -65,7 +65,7 @@ mysqlslap -a --concurrency=50,100 --number-of-queries 1000  -uroot -p123456
 - 默认官方mysqldump 速度慢 不支持增量 占用服务器资源
 - 增强DataX或Xtrabackup方案 支持实时增量数据同步 不锁表 不增加服务器负载 支持更大数据量的快速同步数据
 
-#### MySQL通过binlog日志恢复数据
+#### MySQL通过binlog日志恢复数据 或商业恢复工具Stellar Repair for MySQL
 
 - show variables like '%log_bin%';  查看binlog是否开启 通常是my.cnf或my.ini设置log-bin=mysql-bin
 - lock tables 表名 read;  锁表 防止数据被污染  根据需求选择 不阻塞业务情况    
