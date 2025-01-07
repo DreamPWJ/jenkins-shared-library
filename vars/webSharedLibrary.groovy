@@ -185,7 +185,7 @@ def call(String type = 'web', Map map) {
                     }
                 }
 
-                /*   stage('扫码代码') {
+                /*   stage('扫描代码') {
                        //failFast true  // 其他阶段失败 中止parallel块同级正在进行的并行阶段
                        parallel { */// 阶段并发执行
                 stage('代码质量') {
