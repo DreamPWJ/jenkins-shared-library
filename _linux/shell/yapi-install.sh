@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Author: 潘维吉
-# Description: API文档管理平台 YApi私有化部署  ApiFox也不错
+# Description: API文档管理平台 YApi私有化部署  Apifox也很不错
 
 cd /my
 
