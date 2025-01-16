@@ -60,7 +60,12 @@ set global sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FO
 执行一次测试，分别50和100个并发，执行1000次总查询  mysqlslap是版本高于5.1的mysql自带的工具
 mysqlslap -a --concurrency=50,100 --number-of-queries 1000  -uroot -p123456
 
-#### MySQL通过binlog日志恢复数据
+#### MySQL同步备份数据
+
+- 默认官方mysqldump 速度慢 不支持增量 占用服务器资源
+- 增强DataX或Xtrabackup方案 支持实时增量数据同步 不锁表 不增加服务器负载 支持更大数据量的快速同步数据
+
+#### MySQL通过binlog日志恢复数据 或商业恢复工具Stellar Repair for MySQL
 
 - show variables like '%log_bin%';  查看binlog是否开启 通常是my.cnf或my.ini设置log-bin=mysql-bin
 - lock tables 表名 read;  锁表 防止数据被污染  根据需求选择 不阻塞业务情况    
@@ -70,7 +75,7 @@ mysqlslap -a --concurrency=50,100 --number-of-queries 1000  -uroot -p123456
 - 在Window上 先进入 D:\Program Files\MySQL\MySQL Server 8.1\bin 目录 再Powershell 输入  .\mysqlbinlog.exe
 - 根据pos位置恢复 BEGIN开始  COMMIT的结束位置  生成可以恢复的sql文件 查看数据使用--base64-output=decode-rows -v 查看设置好编码  datagrip 直接run sql script执行 recovery.sql
 - mysqlbinlog --no-defaults --skip-gtids=true --start-position='起始pos' --stop-position='结束end_log_pos' local_log_bin_file_path > recovery.sql ; 
-- sudo docker exec mysql mysqlbinlog –start-datetime='2022-04-20 10:01:00' –stop-datetime='2022-04-20 10:05:59' /path/to/mysql-bin.000001 | mysql -u username -p ;  根据时间段恢复
+- sudo docker exec mysql mysqlbinlog –start-datetime='2022-05-20 10:01:00' –stop-datetime='2022-05-20 10:05:59' /path/to/mysql-bin.000001 | mysql -u username -p ;  根据时间段恢复
 
 ####  MySQL书写顺序: select... from... join... on... where.... group by... having... order by... limit [offset,] (rows)
 ####  MySQL执行顺序: from...  on... join... where...group by... having.... select ... order by... limit

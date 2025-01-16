@@ -6,7 +6,7 @@
 
 2. 找到或添加与备份上传相关的配置项，按照阿里云OSS的要求设置如下参数：
 
-# 在gitlab.rb文件中添加或修改以下配置
+#### 在gitlab.rb文件中添加或修改以下配置
 
 gitlab_rails['backup_upload_connection'] = {
 'provider' => 'aliyun',
@@ -14,12 +14,12 @@ gitlab_rails['backup_upload_connection'] = {
 'aliyun_accesskey_secret' => 'your_access_key_secret',
 'aliyun_oss_bucket' => 'your_bucket_name',
 
-# 如果bucket不是默认的公共读写权限，还需要提供endpoint和目录前缀
+#### 如果bucket不是默认的公共读写权限，还需要提供endpoint和目录前缀
 'aliyun_oss_endpoint' => 'https://oss-cn-shanghai.aliyuncs.com', # 根据实际区域更换
 
 }
 
-# 确保备份是启用的，并且配置了自动备份的时间间隔
+#### 确保备份是启用的，并且配置了自动备份的时间间隔
 gitlab_rails['backup_upload_remote_directory'] =  'gitlab/backup' # 备份文件在OSS上的存储路径前缀
 gitlab_rails['backup_keep_time'] = 604800 # 保留备份7天（以秒为单位，可根据需求调整）
 
@@ -34,8 +34,7 @@ gitlab_rails['backup_keep_time'] = 604800 # 保留备份7天（以秒为单位�
 
 5. GitLab将会根据你设定的时间计划执行备份任务，并将备份文件上传至你在阿里云OSS中指定的存储桶  
 
-
-### 执行GitLab的备份还原部署
+#### 执行GitLab的备份还原部署
 
 下载备份文件: ossutil cp "oss://your_bucket_name/path/to/backup.tar" /var/opt/gitlab/backups/
 

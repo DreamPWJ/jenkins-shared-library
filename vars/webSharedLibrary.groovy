@@ -185,7 +185,7 @@ def call(String type = 'web', Map map) {
                     }
                 }
 
-                /*   stage('扫码代码') {
+                /*   stage('扫描代码') {
                        //failFast true  // 其他阶段失败 中止parallel块同级正在进行的并行阶段
                        parallel { */// 阶段并发执行
                 stage('代码质量') {
@@ -969,7 +969,9 @@ def buildImage() {
     // Docker多阶段镜像构建处理
     Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
     // 构建Docker镜像  只构建一次
-    Docker.build(this, "${dockerBuildImageName}")
+    retry(2) { // 重试几次 可能网络等问题导致构建失败
+        Docker.build(this, "${dockerBuildImageName}")
+    }
 }
 
 /**

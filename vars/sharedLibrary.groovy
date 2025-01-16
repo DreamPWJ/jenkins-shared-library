@@ -211,7 +211,7 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                /*   stage('扫码代码') {
+                /*   stage('扫描代码') {
                        //failFast true  // 其他阶段失败 中止parallel块同级正在进行的并行阶段
                        parallel { */// 阶段并发执行
                 stage('代码质量') {
@@ -1334,8 +1334,9 @@ def buildImage(map) {
     // Docker多阶段镜像构建处理
     Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
     // 构建并上传Docker镜像仓库  只构建一次
-    Docker.build(this, "${dockerBuildImageName}")
-
+    retry(2) { // 重试几次 可能网络等问题导致构建失败
+        Docker.build(this, "${dockerBuildImageName}")
+    }
     // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
     if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
         def deployNum = 2  // 暂时区分两个不同环境文件 实际还存在每一个部署服务的环境配置文件都不一样
@@ -1566,7 +1567,9 @@ def integrationTesting() {
         // 创建冒烟测试报告
         Tests.createSmokeReport(this)
 
-        // 结合YApi接口管理做自动化API测试
+        // 结合YApi或者Apifox接口管理做自动化API测试
+        // sh " npm install -g apifox-cli "
+        // sh " apifox run --access-token "
         def yapiUrl = "http://yapi.panweiji.com"
         def testUrl = "${yapiUrl}/api/open/run_auto_test?${AUTO_TEST_PARAM}"
         // 执行接口测试
