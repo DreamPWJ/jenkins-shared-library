@@ -969,7 +969,9 @@ def buildImage() {
     // Docker多阶段镜像构建处理
     Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
     // 构建Docker镜像  只构建一次
-    Docker.build(this, "${dockerBuildImageName}")
+    retry(2) { // 重试几次 可能网络等问题导致构建失败
+        Docker.build(this, "${dockerBuildImageName}")
+    }
 }
 
 /**

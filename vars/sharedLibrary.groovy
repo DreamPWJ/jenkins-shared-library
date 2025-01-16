@@ -1334,8 +1334,9 @@ def buildImage(map) {
     // Docker多阶段镜像构建处理
     Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
     // 构建并上传Docker镜像仓库  只构建一次
-    Docker.build(this, "${dockerBuildImageName}")
-
+    retry(2) { // 重试几次 可能网络等问题导致构建失败
+        Docker.build(this, "${dockerBuildImageName}")
+    }
     // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
     if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
         def deployNum = 2  // 暂时区分两个不同环境文件 实际还存在每一个部署服务的环境配置文件都不一样
