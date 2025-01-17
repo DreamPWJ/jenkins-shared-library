@@ -127,10 +127,9 @@ fi
 # 限制容器CPU占用 防止同时部署情况导致其他服务无法访问
 cpu_cores=$(nproc)
 echo "物理CPU的个数: ${cpu_cores}"
-cpus_limit=$(awk "BEGIN {print $cpu_cores * 0.8}") # 使用百分多少的资源 防止整个服务器资源被占用停机
+cpus_limit=$(awk "BEGIN {print $cpu_cores * 0.6}") # 使用百分多少的资源 防止整个服务器资源被占用停机
 dynamic_run_args=${dynamic_run_args}" --cpus=${cpus_limit} "
 
-echo "构建暴露端口: ${host_port}"
 echo "运行动态参数: ${dynamic_run_args}"
 
 # 检查容器是否存在 停止容器
