@@ -88,6 +88,10 @@ cd /${deploy_folder}/web && cp -p nginx.conf ${deploy_file}/
 echo "进入部署文件目录构建镜像: ${deploy_file}"
 cd ${deploy_file}
 pwd
+
+# docker构建和运行动态参数处理
+dynamic_run_args=""
+
 # 进入部署文件所在目录并解压部署资源
 # tar -xzvf ${npm_package_folder}.tar.gz  && rm -f ${npm_package_folder}.tar.gz
 
@@ -120,6 +124,15 @@ if [[ "${is_success_images_code}" == 1 ]]; then
   exit 1
 fi
 
+# 限制容器CPU占用 防止同时部署情况导致其他服务无法访问
+cpu_cores=$(nproc)
+echo "物理CPU的个数: ${cpu_cores}"
+cpus_limit=$(awk "BEGIN {print $cpu_cores * 0.8}") # 使用百分多少的资源 防止整个服务器资源被占用停机
+dynamic_run_args=${dynamic_run_args}" --cpus=${cpus_limit} "
+
+echo "构建暴露端口: ${host_port}"
+echo "运行动态参数: ${dynamic_run_args}"
+
 # 检查容器是否存在 停止容器
 cd /${deploy_folder} && ./docker-common.sh stop_docker ${docker_container_name}
 
@@ -134,9 +147,9 @@ if [[ "${exist_port_code}" == 1 ]]; then
   exit 1
 fi
 
-echo -e "\033[32m 👨‍💻 启动运行Docker容器  映射端口: ${host_port}:${expose_port} \033[0m"
+echo -e "\033[32m 👨‍💻 启动运行Docker容器 环境: ${env_mode} 映射端口: ${host_port}:${expose_port} \033[0m"
 docker run -d --restart=on-failure:6 -p ${host_port}:${expose_port} \
-  --cpus=2 -m 4G --log-opt max-size=100m --log-opt max-file=1  \
+  -m 4G --log-opt max-size=100m --log-opt max-file=1  ${dynamic_run_args} \
   --name ${docker_container_name} ${docker_image_name}
 
 set +x # 关闭shell命令打印模式
