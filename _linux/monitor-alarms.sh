@@ -48,7 +48,7 @@ public_ip=$(curl -s ifconfig.me)
 current_datetime=$(date +'%Y-%m-%d %H:%M:%S')
 
 # 检查并发送告警
-if [ ${CPU_USAGE} -ge ${CPU_THRESHOLD} ]; then
+if [ ${CPU_USAGE} -gt ${CPU_THRESHOLD} ]; then
    # echo "警告：${HOSTNAME}上的CPU使用率已达到${CPU_USAGE}%！超过阈值${CPU_THRESHOLD}%。" | mail -s "CPU告警" admin@example.com
     DATA='{
         "msgtype": "markdown",
@@ -68,7 +68,7 @@ if [ ${CPU_USAGE} -ge ${CPU_THRESHOLD} ]; then
          --data-raw "$DATA"
 fi
 
-if [ ${MEMORY_USAGE%.*} -ge ${MEMORY_THRESHOLD} ]; then
+if [ ${MEMORY_USAGE%.*} -gt ${MEMORY_THRESHOLD} ]; then
     # echo "警告：${HOSTNAME}主机上的内存使用率已达到${MEMORY_USAGE}！超过阈值${MEMORY_THRESHOLD}%。" | mail -s "内存告警" admin@example.com
         DATA='{
             "msgtype": "markdown",
@@ -88,7 +88,7 @@ if [ ${MEMORY_USAGE%.*} -ge ${MEMORY_THRESHOLD} ]; then
              --data-raw "$DATA"
 fi
 
-if [ ${DISK_USAGE} -ge ${DISK_USAGE_THRESHOLD} ]; then
+if [ ${DISK_USAGE} -gt ${DISK_USAGE_THRESHOLD} ]; then
    # echo "警告：${HOSTNAME}主机上${DISK_PARTITION}分区的磁盘使用率已达到${DISK_USAGE}%！超过阈值${DISK_USAGE_THRESHOLD}%。" | mail -s "磁盘告警" admin@example.com
         DATA='{
             "msgtype": "markdown",
