@@ -5,6 +5,7 @@ package shared.library.devops
  * @date 2021/1/20 22:29
  * @email 406798106@qq.com
  * @description 发送邮件
+ * 使用Jenkins生态 Email Extension 插件
  */
 
 /**
