@@ -13,7 +13,7 @@ package shared.library.devops
  */
 def configQualityProfiles(projectName, lang, qpname) {
     def apiUrl = "qualityprofiles/add_project?language=${lang}&project=${projectName}&qualityProfile=${qpname}"
-    // 发请求
+    // 发送请求
     response = httpReq("POST", apiUrl, "")
     println(response)
 }
@@ -23,7 +23,7 @@ def configQualityProfiles(projectName, lang, qpname) {
  */
 def getQualityGateId(gateName) {
     def apiUrl = "qualitygates/show?name=${gateName}"
-    // 发请求
+    // 发送请求
     response = httpReq("GET", apiUrl, "")
     // 对返回的文本做JSON解析
     response = readJSON text: """${response.content}"""
@@ -39,7 +39,7 @@ def configQualityGate(projectKey, gateName) {
     // 获取质量阈id
     gateId = GetQualityGateId(gateName)
     apiUrl = "qualitygates/select?projectKey=${projectKey}&gateId=${gateId}"
-    // 发请求
+    // 发送请求
     response = httpReq("POST", apiUrl, "")
     println(response)
 }
@@ -78,7 +78,7 @@ def httpReq(requestType, requestUrl, requestBody) {
  */
 def searchProject(projectName) {
     def apiUrl = "projects/search?projects=${projectName}"
-    // 发请求
+    // 发送请求
     response = httpReq("GET", apiUrl, "")
     println "搜索的结果：${response}"
     // 对返回的文本做JSON解析
@@ -98,7 +98,7 @@ def searchProject(projectName) {
  */
 def createProject(projectName) {
     def apiUrl = "projects/create?name=${projectName}&project=${projectName}"
-    // 发请求
+    // 发送请求
     response = httpReq("POST", apiUrl, "")
     println(response)
 }
