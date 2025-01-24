@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Author: 潘维吉
 # Description: NFS分布式网络文件存储服务
-# 参考文章: https://cloud.tencent.com/developer/article/1914388
+# K8S部署nfs服务器参考文章: https://cloud.tencent.com/developer/article/1914388
 # 对外分别开通NFS服务的tcp 111 2049 端口 udp 111 4046端口并确保IP白名单可访问NFS服务
 # 并且默认客户端访问端口要小于1024否则被NFS服务端拒绝  如NAT网关导致NFS客户端端口号高于1024 在K8S集群报错is waiting to start: ContainerCreating Pod直接无法启动了
 
