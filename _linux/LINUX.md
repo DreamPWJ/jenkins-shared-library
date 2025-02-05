@@ -89,7 +89,6 @@ arp -a
 - 安装参考文章: https://developer.aliyun.com/article/927675  设置阿里云镜像源: http://mirrors.aliyun.com/ubuntu/
 - Ubuntu系统设置固定静态IP地址: _linux/network目录下有配置 命令如 sudo nano /etc/netplan/00-installer-config.yaml
 - CentOS系统设置固定静态IP地址: 在 /etc/sysconfig/network-scripts/ifcfg-* 配置 在VMware中使用自动桥接配置 网关使用宿主机相同的网关地址并且主网络开启桥接协议、 journalctl查看xfs_repair修复emergency mode紧急模式磁盘挂载故障
-  参考文章: https://cloud.tencent.com/developer/article/1721181
 - 固定IP可在路由器上设置静态地址 防止被DHCP动态分配
 - 开启Ubuntu系统 root用户访问ssh远程访问权限(sudo passwd root) : https://blog.csdn.net/boonya/article/details/121256380
   su root 再执行 sudo vim /etc/ssh/sshd_config 添加 PermitRootLogin yes 生效 sudo systemctl restart sshd

@@ -66,9 +66,9 @@ cat /var/lib/nfs/etab
 # sudo yum install nfs-utils -y
 # 创建一个用于nfs共享目录的挂载点
 # sudo mkdir -p /mnt/nfs_data
-# 挂在共享目录到客户端  在 vim /etc/fstab 内保存 nfs_server_ip:/mnt/ /mnt/ nfs defaults 0 1 重启等永久有效!!!  systemctl daemon-reload生效
+# 挂在共享目录到客户端  在 vim /etc/fstab 内保存 nfs_server_ip:/mnt/ /mnt/ nfs defaults 0 1 重启等永久有效!!!  systemctl daemon-reload 生效
 # 如果是要设置内网域名 在 cat /etc/hosts 下配置
-# 执行nfs网络挂载命令
+# 执行nfs网络挂载命令和授权客户端目录
 # sudo mount -t nfs -o nolock nfs_server_ip:/mnt/nfs_data /mnt/nfs_data
 # sudo chmod -R 777 /mnt/nfs_data/
 # 卸载共享目录到客户端
