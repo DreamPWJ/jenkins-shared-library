@@ -11,9 +11,9 @@
 def map = [:]
 
 // 远程服务器地址 k8s集群方式可填空或填公网代理负载IP
-map.put('remote_ip', '172.16.99.54')
+map.put('remote_ip', '172.16.99.53')
 // 工作服务器地址 同时支持N个服务器自动化分布式部署
-map.put('remote_worker_ips', [])
+map.put('remote_worker_ips', ['172.16.99.63'])
 // 远程服务器用户名
 map.put('remote_user_name', 'root')
 // 代理机或跳板机外网ip用于透传部署到内网目标机器 选填 目标机器外部无法直接访问情况填写内网ip
