@@ -36,7 +36,7 @@ spec:
       protocol: TCP
       targetPort: 443
   selector:
+    app.kubernetes.io/instance: lanneng-park # 根据实际需求修改
     app.kubernetes.io/component: controller
-    app.kubernetes.io/instance: lanneng-park
     app.kubernetes.io/name: ingress-nginx
   type: LoadBalancer
