@@ -69,8 +69,10 @@ EOF
         target_password=$(echo "$item_host" | jq -r '.target_password')
         target_port=$(echo "$item_host" | jq -r '.target_port')
         echo "target_host: $target_host ,  target_user_name: $target_user_name"
-        # 如果已经免密连接登录跳过设置
-
+        # 只设置当前要配置的服务器   如果已经免密连接登录跳过设置
+        if [[ "$target_host" != "$2" ]] ; then
+              continue  # 跳出本次循环
+        fi
         # 通过跳板机登录目标主机 ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22 '命令'
 
         # 建立跳板机到目标机的免密连接

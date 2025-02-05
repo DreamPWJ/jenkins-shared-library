@@ -86,7 +86,7 @@ class SecureShell implements Serializable {
 
                         if ("${ctx.isProxyJumpType}" == "true") {
                             // 执行跳板机方式免密登录脚本
-                            ctx.sh " cd _linux && chmod +x auto-proxy-ssh.sh && ./auto-proxy-ssh.sh ${remoteHostIp} "
+                            ctx.sh " cd _linux && chmod +x auto-proxy-ssh.sh && ./auto-proxy-ssh.sh ${remoteHostIp} ${ctx.remote.host} "
                         } else {
                             // 执行免密登录脚本
                             ctx.sh " cd _linux && chmod +x auto-ssh.sh && ./auto-ssh.sh ${remoteHostIp} "
