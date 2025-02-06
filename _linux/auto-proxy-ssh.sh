@@ -9,7 +9,7 @@
 # 执行命令： ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $jump_port $jump_user_name@$jump_host
 # 2. 跳板机再免密到目标机 同理1  执行命令：  ssh $jump_user_name@$jump_host -p $jump_port && ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $target_port $target_user_name@$target_host
 # 3. 最后将客户端的公钥 cat /root/.ssh/id_rsa.pub 放到内网目标机 vim /root/.ssh/authorized_keys 授信
-# 执行命令：ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $target_port -o "ProxyCommand ssh -W %h:%p $jump_user_name@$jump_host -p $jump_port" $target_user_name@$target_host
+# 执行命令：ssh-copy-id -i $HOME/.ssh/id_rsa.pub $target_user_name@$target_host -p $target_port -o "ProxyCommand ssh -W %h:%p $jump_user_name@$jump_host -p $jump_port"
 # 在目标主机上执行 systemctl restart sshd 生效
 # 在执行SSH跳板命令生效:  ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22
 
@@ -52,6 +52,7 @@ while read host; do
     # 清除之前授权信息  防止授权失败
     #ssh -p $jump_port $jump_user_name@$jump_host "rm -f ~/.ssh/authorized_keys"
 
+    # 建立CI/CD构建服务器到跳板机免密连接
   expect <<EOF
         spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $jump_port $jump_user_name@$jump_host
         expect {
@@ -99,8 +100,11 @@ EOF
 EOF
 
        # 建立访问机器通过跳板机到目标机的免密连接
+       echo "自动建立CI/CD构建服务器通过跳板机到目标机的免密SSH连接"
+       # 从 known_hosts 文件中移除指定主机的密钥记录
+       ssh-keygen -R $target_host
    expect <<EOF
-         spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $target_port -o "ProxyCommand ssh -W %h:%p $jump_user_name@$jump_host -p $jump_port" $target_user_name@$target_host
+         spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub  $target_user_name@$target_host -p $target_port -o "ProxyCommand ssh -W %h:%p $jump_user_name@$jump_host -p $jump_port"
          expect {
                  "yes/no" {send "yes\n";exp_continue}
                  "password" {send "$target_password\n"}

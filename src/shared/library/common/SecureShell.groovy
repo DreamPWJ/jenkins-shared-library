@@ -47,9 +47,7 @@ class SecureShell implements Serializable {
                     }
                     // 清除当前机器里关于远程服务器的缓存和公钥信息 可清空跳板机和服务器/root/.ssh/authorized_keys内的缓存数据
                     ctx.sh "ssh-keygen -R ${remoteHostIp}"
-                    if ("${ctx.isProxyJumpType}" == "true") {
-                        ctx.sh "ssh-keygen -f /root/.ssh/known_hosts -R ${ctx.remote.host}"
-                    }
+
                     /*    try {
                             // 刷新known_hosts中对应远程服务器公钥
                             ctx.sh "ssh-keyscan  ${remoteHostIp} >> ~/.ssh/known_hosts"
