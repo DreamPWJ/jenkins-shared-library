@@ -1473,35 +1473,33 @@ def manualApproval() {
  */
 def runProject(map) {
     try {
-        retry(2) { // 重试几次 可能网络等问题导致构建失败
-            // 初始化docker
-            initDocker()
+        // 初始化docker
+        initDocker()
 
-            if ("${IS_PUSH_DOCKER_REPO}" == 'true') {
-                // 拉取远程仓库Docker镜像
-                Docker.pull(this, "${dockerBuildImageName}")
-            }
-            if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-                sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/web " +
-                        "&& ./docker-release-web.sh '${SHELL_WEB_PARAMS_GETOPTS}' ' "
-            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-                // 部署之前的相关操作
-                beforeRunProject(map)
-                sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} " +
-                        "&& ./docker-release.sh '${SHELL_PARAMS_GETOPTS}' '  "
-            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
-                // Go.deploy(this)
-                sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/go " +
-                        "&& ./docker-release-go.sh '${SHELL_PARAMS_GETOPTS}' '  "
-            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-                sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/python " +
-                        "&& ./docker-release-python.sh '${SHELL_PARAMS_GETOPTS}' '  "
-            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) {
-                sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/cpp " +
-                        "&& ./docker-release-cpp.sh '${SHELL_PARAMS_GETOPTS}' '  "
-            }
-            Tools.printColor(this, "执行应用部署完成 ✅")
+        if ("${IS_PUSH_DOCKER_REPO}" == 'true') {
+            // 拉取远程仓库Docker镜像
+            Docker.pull(this, "${dockerBuildImageName}")
         }
+        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
+            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/web " +
+                    "&& ./docker-release-web.sh '${SHELL_WEB_PARAMS_GETOPTS}' ' "
+        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+            // 部署之前的相关操作
+            beforeRunProject(map)
+            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} " +
+                    "&& ./docker-release.sh '${SHELL_PARAMS_GETOPTS}' '  "
+        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
+            // Go.deploy(this)
+            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/go " +
+                    "&& ./docker-release-go.sh '${SHELL_PARAMS_GETOPTS}' '  "
+        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
+            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/python " +
+                    "&& ./docker-release-python.sh '${SHELL_PARAMS_GETOPTS}' '  "
+        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) {
+            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/cpp " +
+                    "&& ./docker-release-cpp.sh '${SHELL_PARAMS_GETOPTS}' '  "
+        }
+        Tools.printColor(this, "执行应用部署完成 ✅")
     } catch (error) {
         println error.getMessage()
         currentBuild.result = 'FAILURE'
