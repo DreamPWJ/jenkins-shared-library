@@ -135,7 +135,9 @@ class Docker implements Serializable {
                     if ("${ctx.GIT_PROJECT_FOLDER_NAME}" != "") { // Git目录区分项目
                         webProjectDir = "${ctx.GIT_PROJECT_FOLDER_NAME}"
                     }
-                    ctx.sh " docker pull nginx:stable " // 拉取基础镜像
+                    def dockerName = "nginx:stable"
+                    // 拉取基础镜像避免重复下载
+                    ctx.sh " [ -z \"\$(docker images -q ${dockerName})\" ] && docker pull ${dockerName} || echo \"基础镜像 ${dockerName} 已存在无需重新pull拉取\" "
                     ctx.sh """  cp -p ${ctx.env.WORKSPACE}/ci/.ci/web/default.conf ${ctx.env.WORKSPACE}/${webProjectDir} &&
                             cp -p ${ctx.env.WORKSPACE}/ci/.ci/web/nginx.conf ${ctx.env.WORKSPACE}/${webProjectDir} &&
                             cd ${ctx.env.WORKSPACE}/${webProjectDir} && pwd && \
@@ -162,12 +164,16 @@ class Docker implements Serializable {
                             // jdkPublisher = "container-registry.oracle.com/graalvm/native-image"  // GraalVM JDK with Native Image
                             // GraalVM JDK without Native Image
                             jdkPublisher = "container-registry.oracle.com/graalvm/jdk"
-                        }else {
-                            ctx.sh " docker pull ${jdkPublisher}:${ctx.JDK_VERSION} " // 拉取基础镜像
+                        } else {
+                            // 拉取基础镜像避免重复下载
+                            def dockerName = "${jdkPublisher}:${ctx.JDK_VERSION}"
+                            ctx.sh " [ -z \"\$(docker images -q ${dockerName})\" ] && docker pull ${dockerName} || echo \"基础镜像 ${dockerName} 已存在无需重新pull拉取\" "
                         }
                     } else if ("${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringMVC) {
                         dockerFileName = "Dockerfile.mvc"
-                        ctx.sh " docker pull tomcat:${ctx.TOMCAT_VERSION}-jre8 " // 拉取基础镜像
+                        // 拉取基础镜像避免重复下载
+                        def dockerName = "${ctx.TOMCAT_VERSION}-jre8"
+                        ctx.sh " [ -z \"\$(docker images -q ${dockerName})\" ] && docker pull ${dockerName} || echo \"基础镜像 ${dockerName} 已存在无需重新pull拉取\" "
                     }
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.GIT_PROJECT_FOLDER_NAME}/${ctx.mavenPackageLocationDir} && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
@@ -177,7 +183,9 @@ class Docker implements Serializable {
                             ${dockerPushDiffStr}
                             """
                 } else if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-                    ctx.sh " docker pull python:${ctx.CUSTOM_PYTHON_VERSION} " // 拉取基础镜像
+                    def dockerName = "python:${ctx.CUSTOM_PYTHON_VERSION}"
+                    // 拉取基础镜像避免重复下载
+                    ctx.sh " [ -z \"\$(docker images -q ${dockerName})\" ] && docker pull ${dockerName} || echo \"基础镜像 ${dockerName} 已存在无需重新pull拉取\" "
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.GIT_PROJECT_FOLDER_NAME} && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg EXPOSE_PORT="${exposePort}"  \
