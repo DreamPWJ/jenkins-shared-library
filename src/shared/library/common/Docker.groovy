@@ -257,14 +257,14 @@ class Docker implements Serializable {
     static def setDockerRegistry(ctx) {
         ctx.println("Docker镜像源设置 加速构建速度")
         ctx.sh """     
-sudo cat <<EOF >/etc/docker/daemon.json \
-{ \
-"registry-mirrors": [ \
-  "https://docker.lanneng.tech",  \
-  "https://em1sutsj.mirror.aliyuncs.com"  \
-],  \
-}  \
-EOF  \
+sudo cat <<EOF >/etc/docker/daemon.json 
+{ 
+"registry-mirrors": [ 
+  "https://docker.lanneng.tech",  
+  "https://em1sutsj.mirror.aliyuncs.com"  
+],  
+}  
+EOF  
              """
 
         // 让容器配置服务生效 reload 不会重启 Docker 服务，但会使新的配置生效
