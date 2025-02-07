@@ -105,8 +105,6 @@ EOF
        echo "自动建立CI/CD构建服务器通过跳板机到目标机的免密SSH连接"
        # 从 known_hosts 文件中移除指定主机的密钥记录
        ssh-keygen -R $target_host
-       systemctl restart sshd || true
-       systemctl restart ssh || true
    expect <<EOF
          spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub  -p $target_port -o "ProxyCommand ssh -W %h:%p $jump_user_name@$jump_host -p $jump_port"  $target_user_name@$target_host
          expect {
