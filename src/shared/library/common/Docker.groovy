@@ -135,6 +135,7 @@ class Docker implements Serializable {
                     if ("${ctx.GIT_PROJECT_FOLDER_NAME}" != "") { // Git目录区分项目
                         webProjectDir = "${ctx.GIT_PROJECT_FOLDER_NAME}"
                     }
+                    ctx.sh " docker pull nginx:stable " // 拉取基础镜像
                     ctx.sh """  cp -p ${ctx.env.WORKSPACE}/ci/.ci/web/default.conf ${ctx.env.WORKSPACE}/${webProjectDir} &&
                             cp -p ${ctx.env.WORKSPACE}/ci/.ci/web/nginx.conf ${ctx.env.WORKSPACE}/${webProjectDir} &&
                             cd ${ctx.env.WORKSPACE}/${webProjectDir} && pwd && \
@@ -161,9 +162,12 @@ class Docker implements Serializable {
                             // jdkPublisher = "container-registry.oracle.com/graalvm/native-image"  // GraalVM JDK with Native Image
                             // GraalVM JDK without Native Image
                             jdkPublisher = "container-registry.oracle.com/graalvm/jdk"
+                        }else {
+                            ctx.sh " docker pull ${jdkPublisher}:${ctx.JDK_VERSION} " // 拉取基础镜像
                         }
                     } else if ("${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringMVC) {
                         dockerFileName = "Dockerfile.mvc"
+                        ctx.sh " docker pull tomcat:${ctx.TOMCAT_VERSION}-jre8 " // 拉取基础镜像
                     }
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.GIT_PROJECT_FOLDER_NAME}/${ctx.mavenPackageLocationDir} && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
@@ -173,6 +177,7 @@ class Docker implements Serializable {
                             ${dockerPushDiffStr}
                             """
                 } else if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
+                    ctx.sh " docker pull python:${ctx.CUSTOM_PYTHON_VERSION} " // 拉取基础镜像
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.GIT_PROJECT_FOLDER_NAME} && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg EXPOSE_PORT="${exposePort}"  \
@@ -261,7 +266,7 @@ export DOCKER_REGISTRY_MIRROR=https://em1sutsj.mirror.aliyuncs.com
              """
 
         // 让容器配置服务生效 reload 不会重启 Docker 服务，但会使新的配置生效
-        ctx.sh " sudo systemctl reload docker "
+        // ctx.sh " sudo systemctl reload docker "
     }
 
 
