@@ -74,7 +74,7 @@ class Docker implements Serializable {
      */
     static def build(ctx, imageName, deployNum = 0) {
         // 设置镜像源 加速构建和解决网络不通等问题
-        setDockerRegistry(ctx)
+        // setDockerRegistry(ctx)
 
         // k8s用版本号方式给tag打标签
         if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
