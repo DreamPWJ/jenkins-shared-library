@@ -1,7 +1,7 @@
 #!/bin/bash
 # Author: 潘维吉
 # Description:  跳板机方式自动批量执行SSH ProxyJump免密登录 chmod +x auto-proxy-ssh.sh  在proxy_jump_hosts.json内批量设置机器的ip 用户名 密码
-# !!!注意当前机器先执行 ssh-keygen -t rsa
+# !!!注意当前机器先执行 ssh-keygen -t rsa  确保所有机器OpenSSH使用高版本才支持SSH跳板方式
 # 安全性高和定制化的数据建议保存为Jenkins的“Secret file”类型的凭据并获取 无需放在代码中
 
 # 透传跳板机实现自动登录授权 主要思路是： A访问B 需要把A的公钥放在B的授权列表里  然后重启ssh服务即可
@@ -95,6 +95,8 @@ EOF
                  "password" {send "$target_password\n"}
          }
 
+        send "echo "如果低版本OpenSSH_7.3p1不支持ssh命令跳板机方式访问""
+        send "$(ssh -V | head -n1 | awk '{print $3}')"
         send "exit\r"
 
         # 等待命令执行完成
