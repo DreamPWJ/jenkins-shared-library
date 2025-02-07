@@ -95,8 +95,8 @@ EOF
                  "password" {send "$target_password\n"}
          }
 
-        send "echo '如果低版本OpenSSH_7.3不支持SSH命令跳板机方式访问, 请先升级' \r"
-        send "$(ssh -V | head -n1 | awk '{print $3}') \r"
+        send "echo '🤚 如果低版本OpenSSH_7.3不支持SSH命令跳板机方式访问, 请先升级' \r"
+        send "echo $(ssh -V | head -n1 | awk '{print $3}') \r"
         send "exit\r"
 
         # 等待命令执行完成
