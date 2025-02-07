@@ -123,6 +123,9 @@ class Docker implements Serializable {
                 if ("${ctx.CUSTOM_DOCKERFILE_NAME}" != "") {
                     webDockerFileName = "${ctx.CUSTOM_DOCKERFILE_NAME}"
                     // 如Node构建环境 SSR方式等
+                    // 拉取基础镜像避免重复下载
+                    def dockerName = "node:lts"
+                    ctx.sh " [ -z \"\$(docker images -q ${dockerName})\" ] && docker pull ${dockerName} || echo \"基础镜像 ${dockerName} 已存在无需重新pull拉取\" "
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} && pwd && \
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
                             --build-arg EXPOSE_PORT="${ctx.SHELL_EXPOSE_PORT}" \
