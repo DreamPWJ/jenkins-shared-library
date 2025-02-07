@@ -73,6 +73,9 @@ class Docker implements Serializable {
      *  构建Docker镜像和多CPU平台架构镜像
      */
     static def build(ctx, imageName, deployNum = 0) {
+        // 设置镜像源 加速构建和解决网络不通等问题
+        setDockerRegistry(ctx)
+
         // k8s用版本号方式给tag打标签
         if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
             imageTag = Utils.getVersionNum(ctx)
@@ -246,5 +249,27 @@ class Docker implements Serializable {
             }
         }
     }
+
+    /**
+     *  Docker镜像源设置
+     *  加速构建和解决网络不通等问题
+     */
+    static def setDockerRegistry(ctx) {
+        ctx.println("Docker镜像源设置 加速构建速度")
+        ctx.sh """     
+sudo cat <<EOF >/etc/docker/daemon.json \
+{ \
+"registry-mirrors": [ \
+  "https://docker.lanneng.tech",  \
+  "https://em1sutsj.mirror.aliyuncs.com"  \
+],  \
+}  \
+EOF  \
+             """
+
+        // 让容器配置服务生效 reload 不会重启 Docker 服务，但会使新的配置生效
+        ctx.sh " sudo systemctl reload docker "
+    }
+
 
 }

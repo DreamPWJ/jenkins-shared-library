@@ -50,7 +50,7 @@ sudo cat <<EOF >/etc/docker/daemon.json
 {
 "registry-mirrors": [
   "https://docker.lanneng.tech",
-  "https://registry.docker-cn.com"
+  "https://em1sutsj.mirror.aliyuncs.com"
 ],
 "log-driver":"json-file",
 "log-opts": {
