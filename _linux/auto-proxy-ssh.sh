@@ -95,9 +95,9 @@ EOF
                  "password" {send "$target_password\n"}
          }
 
-        send "echo '🤚 如果OpenSSH版本低于7.3不支持SSH命令跳板机方式访问, 请先升级' \r"
-        send "uname -a \r"
-        send "ssh -V 2>&1 | awk '{print $1, $NF}' | grep -qE 'OpenSSH_[0-6]\.|OpenSSH_7\.[0-2]' && (sudo yum update -y openssh openssh-server openssh-clients || echo "Failed to update SSH.") || echo "SSH version is already 7.3 or higher, no need to update." \r"
+        #send "echo '🤚 如果OpenSSH版本低于7.3不支持SSH命令跳板机方式访问, 请先升级' \r"
+        #send "uname -a \r"
+        #send "ssh -V 2>&1 | awk '{print $1, $NF}' | grep -qE 'OpenSSH_[0-6]\.|OpenSSH_7\.[0-2]' && (sudo yum update -y openssh openssh-server openssh-clients || echo "Failed to update SSH.") || echo "SSH version is already 7.3 or higher, no need to update." \r"
         send "exit\r"
 
         # 等待命令执行完成
