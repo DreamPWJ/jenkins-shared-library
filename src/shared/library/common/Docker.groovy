@@ -257,13 +257,13 @@ class Docker implements Serializable {
     static def setDockerRegistry(ctx) {
         ctx.println("Docker镜像源设置 加速构建速度")
         ctx.sh """     
-sudo cat <<EOF >/etc/docker/daemon.json 
+sudo cat <<EOF >/etc/docker/daemon.json \
 { 
 "registry-mirrors": [ 
   "https://docker.lanneng.tech",  
   "https://em1sutsj.mirror.aliyuncs.com"  
 ],  
-}  
+}  \
 EOF  
              """
 
