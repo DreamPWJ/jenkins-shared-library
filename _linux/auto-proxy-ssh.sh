@@ -95,8 +95,8 @@ EOF
                  "password" {send "$target_password\n"}
          }
 
-        send "echo '🤚 如果低版本OpenSSH_7.3不支持SSH命令跳板机方式访问, 请先升级' \r"
-        send "echo $(ssh -V | head -n1 | awk '{print $3}') \r"
+        #send "echo '🤚 如果OpenSSH版本低于7.3不支持SSH命令跳板机方式访问, 请先升级' \r"
+        #send "echo $(ssh -V | head -n1 | awk '{print $3}') \r"
         send "exit\r"
 
         # 等待命令执行完成
@@ -104,7 +104,7 @@ EOF
 EOF
 
        # 建立访问机器通过跳板机到目标机的免密连接
-       echo "自动建立CI/CD构建服务器通过跳板机到目标机的免密SSH连接"
+       echo "自动建立CI/CD构建服务器通过跳板机到目标机的免密SSH连接 🤚 如果OpenSSH版本低于7.3不支持SSH命令跳板机方式访问, 请先升级"
        # 从 known_hosts 文件中移除指定主机的密钥记录
        ssh-keygen -R $target_host
    expect <<EOF
