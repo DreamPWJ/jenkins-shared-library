@@ -205,15 +205,21 @@ if [[ ${is_push_docker_repo} == false ]]; then
 
   if [[ ${java_framework_type} == 1 ]]; then
      docker_file_name="Dockerfile" # 默认Spring Boot框架 jar包
-     docker pull ${jdk_publisher}:${jdk_version} # 拉取基础镜像避免重复下载
+     # 拉取基础镜像避免重复下载
+     docker_pull_image_name=${jdk_publisher}:${jdk_version}
+     [ -z "$(docker images -q ${docker_pull_image_name})" ] && docker pull ${docker_pull_image_name} || echo "基础镜像 ${docker_pull_image_name} 已存在无需重新pull拉取"
   fi
   if [[ ${java_framework_type} == 2 ]]; then
     docker_file_name="Dockerfile.mvc" # Spring MVC框架 war包
-    docker pull tomcat:${tomcat_version}-jre8 # 拉取基础镜像避免重复下载
+    # 拉取基础镜像避免重复下载
+    docker_pull_image_name=tomcat:${tomcat_version}-jre8
+    [ -z "$(docker images -q ${docker_pull_image_name})" ] && docker pull ${docker_pull_image_name} || echo "基础镜像 ${docker_pull_image_name} 已存在无需重新pull拉取"
   fi
   if [[ ${is_spring_native} == true ]]; then
     docker_file_name="Dockerfile.native" # Spring Native原生镜像直接执行文件
-    docker pull ${jdk_publisher}:${jdk_version} # 拉取基础镜像避免重复下载
+    # 拉取基础镜像避免重复下载
+    docker_pull_image_name=${jdk_publisher}:${jdk_version}
+    [ -z "$(docker images -q ${docker_pull_image_name})" ] && docker pull ${docker_pull_image_name} || echo "基础镜像 ${docker_pull_image_name} 已存在无需重新pull拉取"
   fi
   # 对于简单项目无需重复构建镜像  将部署文件 docker run -v 做挂载映射 直接重启容器即可
   docker build -t ${docker_image_name} \
