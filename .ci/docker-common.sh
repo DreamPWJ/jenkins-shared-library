@@ -41,7 +41,7 @@ function is_success_images() {
   # 当前时间和镜像创建时间差
   docker_image_time_diff=$((($(date -d "$(date)" +%s)) - ${docker_image_create_time_stamp}))
   # 时间差大于等于多少秒 说明不是最新镜像
-  if [[ ${docker_image_time_diff} -ge 60 && $2 == false ]]; then
+  if [[ ${docker_image_time_diff} -ge 120 && $2 == false ]]; then
     #echo "当前时间与创建镜像的时间差: ${docker_image_time_diff}秒"
     echo -e "\033[31m  Docker镜像构建可能失败  ❌  \033[0m"
     echo "请查看错误日志(可能网络不通或镜像源失效或磁盘空间等问题)后, 再次尝试部署 🤪 "
