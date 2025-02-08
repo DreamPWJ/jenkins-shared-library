@@ -160,6 +160,7 @@ class Docker implements Serializable {
                 if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
                     def dockerFileName = ""
                     def jdkPublisher = "${ctx.JDK_PUBLISHER}"
+                    def dockerName = ""
                     if ("${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
                         dockerFileName = "Dockerfile"
                         if ("${ctx.IS_SPRING_NATIVE}" == 'true') { // Spring Native原生镜像可执行二进制文件
@@ -167,17 +168,19 @@ class Docker implements Serializable {
                             // jdkPublisher = "container-registry.oracle.com/graalvm/native-image"  // GraalVM JDK with Native Image
                             // GraalVM JDK without Native Image
                             jdkPublisher = "container-registry.oracle.com/graalvm/jdk"
+                            dockerName = "${jdkPublisher}:${ctx.JDK_VERSION}"
                         } else {
                             // 拉取基础镜像避免重复下载
-                            def dockerName = "${jdkPublisher}:${ctx.JDK_VERSION}"
-                            ctx.sh " [ -z \"\$(docker images -q ${dockerName})\" ] && docker pull ${dockerName} || echo \"基础镜像 ${dockerName} 已存在无需重新pull拉取\" "
+                            dockerName = "${jdkPublisher}:${ctx.JDK_VERSION}"
                         }
                     } else if ("${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringMVC) {
                         dockerFileName = "Dockerfile.mvc"
                         // 拉取基础镜像避免重复下载
-                        def dockerName = "${ctx.TOMCAT_VERSION}-jre8"
-                        ctx.sh " [ -z \"\$(docker images -q ${dockerName})\" ] && docker pull ${dockerName} || echo \"基础镜像 ${dockerName} 已存在无需重新pull拉取\" "
+                        dockerName = "${ctx.TOMCAT_VERSION}-jre8"
                     }
+
+                    ctx.sh " [ -z \"\$(docker images -q ${dockerName})\" ] && docker pull ${dockerName} || echo \"基础镜像 ${dockerName} 已存在无需重新pull拉取\" "
+
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.GIT_PROJECT_FOLDER_NAME}/${ctx.mavenPackageLocationDir} && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}" --build-arg EXPOSE_PORT="${exposePort}" --build-arg TOMCAT_VERSION=${ctx.TOMCAT_VERSION} \
