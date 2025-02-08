@@ -13,10 +13,16 @@ fi
 echo "查看linux内核或版本"
 lsb_release -a || cat /etc/redhat-release
 
-echo "更新yum包到最新、安装Docker相关依赖、设置yum源"
+echo "更新yum系统包到最新、安装Docker相关依赖、设置yum镜像源"
 # 设置yum源 https://download.docker.com/linux/centos/docker-ce.repo
-sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+# sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+# 升级centos系统最新小版本和依赖
+sudo yum clean all || true
+sudo yum makecache  || true
 sudo yum update -y || true
+
 # 安装需要的软件包， yum-util 提供yum-config-manager功能，另外两个是devicemapper驱动依赖的
 sudo yum install -y yum-utils device-mapper-persistent-data lvm2
 

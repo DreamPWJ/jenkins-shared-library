@@ -13,7 +13,7 @@ fi
 echo "查看linux内核或版本"
 lsb_release -a
 
-echo "更新包管理器 安装程序包 添加软件源信息"
+echo "更新包管理器 安装程序包 添加软件镜像源信息"
 #sudo add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable" || tru
 sudo apt-get update -y || true
 sudo apt-get upgrade -y || true
