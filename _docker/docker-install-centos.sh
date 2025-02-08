@@ -47,7 +47,6 @@ echo "设置国内镜像源 加速docker pull速度"
 sudo cat <<EOF >/etc/docker/daemon.json
 {
 "registry-mirrors": [
-  "https://docker.lanneng.tech",
   "https://em1sutsj.mirror.aliyuncs.com"
 ],
 "log-driver":"json-file",
