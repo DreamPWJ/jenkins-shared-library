@@ -16,7 +16,7 @@ class Web implements Serializable {
      */
     static def initMonoRepoEnv(ctx) {
         try {
-            ctx.sh "lerna --version"
+           // ctx.sh "lerna --version"  // 使用新方案pnpm组织monorepo仓库
         } catch (error) {
             // npm一般在root用户权限下
             ctx.sh "npm i -g lerna --unsafe-perm=true --allow-root"
@@ -69,7 +69,7 @@ class Web implements Serializable {
                     // TurboRepo解决Monorepo多项目构建缓慢问题 充分利用CPU性能并发构建提速  同时新版Lerna v5.1集成Nx实现加速构建
                     // 基于pnpm workspace的新的monorepo单仓多包方案
                     if (Git.isExistsChangeFile(ctx) || retryCount >= 2) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
-                        ctx.sh "lerna bootstrap --ci || true"  // --ci 选项调用npm ci而不是npm install
+                        // ctx.sh "lerna bootstrap --ci || true"  // --ci 选项调用npm ci而不是npm install
                         ctx.sh "pnpm install || true"  // 新版版本lerna命令 lerna bootstrap新版已被弃用
                         // lerna bootstrap指定作用域 加速下载依赖  --scope 限制 lerna bootstrap 在哪些包起作用 包的package.json文件中名称
                         // ctx.sh "lerna bootstrap --include-dependents --include-dependencies --scope ${ctx.PROJECT_NAME}"
