@@ -144,6 +144,7 @@ JSON_PARAMS:
   "IS_STATIC_RESOURCE" : true
   "IS_MONO_REPO" : true
   "IS_BEFORE_DEPLOY_NOTICE" : true
+  "GIT_PROJECT_FOLDER_NAME" : "projects/web"
 }
 */
 
