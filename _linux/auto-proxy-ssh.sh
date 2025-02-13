@@ -1,7 +1,7 @@
 #!/bin/bash
 # Author: 潘维吉
 # Description:  跳板机方式自动批量执行SSH ProxyJump免密登录 chmod +x auto-proxy-ssh.sh  在proxy_jump_hosts.json内批量设置机器的ip 用户名 密码
-# !!!注意当前机器先执行 ssh-keygen -t rsa
+# !!!注意当前机器先执行 ssh-keygen -t rsa  确保所有机器OpenSSH使用高版本才支持SSH跳板方式
 # 安全性高和定制化的数据建议保存为Jenkins的“Secret file”类型的凭据并获取 无需放在代码中
 
 # 透传跳板机实现自动登录授权 主要思路是： A访问B 需要把A的公钥放在B的授权列表里  然后重启ssh服务即可
@@ -52,6 +52,8 @@ while read host; do
     # 清除之前授权信息  防止授权失败
     #ssh -p $jump_port $jump_user_name@$jump_host "rm -f ~/.ssh/authorized_keys"
 
+    # 建立CI/CD构建服务器到跳板机免密连接
+    echo "自动建立CI/CD构建服务器到跳板机免密SSH连接"
   expect <<EOF
         spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $jump_port $jump_user_name@$jump_host
         expect {
@@ -69,11 +71,14 @@ EOF
         target_password=$(echo "$item_host" | jq -r '.target_password')
         target_port=$(echo "$item_host" | jq -r '.target_port')
         echo "target_host: $target_host ,  target_user_name: $target_user_name"
-        # 如果已经免密连接登录跳过设置
-
+        # 只设置当前要配置的服务器   如果已经免密连接登录跳过设置
+        if [[ "$target_host" != "$2" ]] ; then
+              continue  # 跳出本次循环
+        fi
         # 通过跳板机登录目标主机 ssh -J root@外网跳板机IP:22 root@内网目标机器IP -p 22 '命令'
 
         # 建立跳板机到目标机的免密连接
+        echo "自动建立跳板机到目标机的免密SSH连接"
   expect <<EOF
         # 启动spawn命令来启动一个新的进程 建立跳板机到目标机的免密连接 使用 -J 参数通过跳板机连接目标主机
         spawn ssh $jump_user_name@$jump_host -p $jump_port
@@ -90,6 +95,9 @@ EOF
                  "password" {send "$target_password\n"}
          }
 
+        #send "echo '🤚 如果OpenSSH版本低于7.3不支持SSH命令跳板机方式访问, 请先升级' \r"
+        #send "uname -a \r"
+        #send "ssh -V 2>&1 | awk '{print $1, $NF}' | grep -qE 'OpenSSH_[0-6]\.|OpenSSH_7\.[0-2]' && (sudo yum update -y openssh openssh-server openssh-clients || echo "Failed to update SSH.") || echo "SSH version is already 7.3 or higher, no need to update." \r"
         send "exit\r"
 
         # 等待命令执行完成
@@ -97,8 +105,11 @@ EOF
 EOF
 
        # 建立访问机器通过跳板机到目标机的免密连接
+       echo "自动建立CI/CD构建服务器通过跳板机到目标机的免密SSH连接 🤚 如果OpenSSH版本低于7.3不支持SSH命令跳板机方式访问, 请先升级"
+       # 从 known_hosts 文件中移除指定主机的密钥记录
+       ssh-keygen -R $target_host
    expect <<EOF
-         spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub -p $target_port -o "ProxyCommand ssh -W %h:%p $jump_user_name@$jump_host -p $jump_port" $target_user_name@$target_host
+         spawn ssh-copy-id -i $HOME/.ssh/id_rsa.pub  -p $target_port -o "ProxyCommand ssh -W %h:%p $jump_user_name@$jump_host -p $jump_port"  $target_user_name@$target_host
          expect {
                  "yes/no" {send "yes\n";exp_continue}
                  "password" {send "$target_password\n"}

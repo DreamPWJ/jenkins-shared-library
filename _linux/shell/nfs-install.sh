@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Author: 潘维吉
 # Description: NFS分布式网络文件存储服务
-# 参考文章: https://cloud.tencent.com/developer/article/1914388
+# K8S部署nfs服务器参考文章: https://cloud.tencent.com/developer/article/1914388
 # 对外分别开通NFS服务的tcp 111 2049 端口 udp 111 4046端口并确保IP白名单可访问NFS服务
 # 并且默认客户端访问端口要小于1024否则被NFS服务端拒绝  如NAT网关导致NFS客户端端口号高于1024 在K8S集群报错is waiting to start: ContainerCreating Pod直接无法启动了
 
@@ -26,7 +26,7 @@ sudo cat <<EOF >>/etc/exports
 /mnt/nfs_data/ *(insecure,rw,sync,no_all_squash,no_root_squash,no_subtree_check)
 EOF
 
-# NFS挂载目录永久配置 在 vim /etc/fstab 内保存 nfs_host_ip:/mnt/ /mnt/ nfs defaults 0 1 重启等永久有效!!!  systemctl daemon-reload
+# NFS挂载目录永久配置 在 vim /etc/fstab 内保存 nfs_server_ip:/mnt/ /mnt/ nfs defaults 0 1 重启等永久有效!!!  systemctl daemon-reload
 
 # reload载入配置生效
 exportfs -rv
@@ -66,9 +66,10 @@ cat /var/lib/nfs/etab
 # sudo yum install nfs-utils -y
 # 创建一个用于nfs共享目录的挂载点
 # sudo mkdir -p /mnt/nfs_data
-# 挂在共享目录到客户端  在 vim /etc/fstab 内保存 nfs_host_ip:/mnt/ /mnt/ nfs defaults 0 1 重启等永久有效!!!  systemctl daemon-reload生效
-# 如果是内网域名 在 cat /etc/hosts 下配置
-# sudo mount -t nfs -o nolock nfs_host_ip:/mnt/nfs_data /mnt/nfs_data
+# 挂在共享目录到客户端  在 vim /etc/fstab 内保存 nfs_server_ip:/mnt/ /mnt/ nfs defaults 0 1 重启等永久有效!!!  systemctl daemon-reload 生效
+# 如果是要设置内网域名 在 cat /etc/hosts 下配置
+# 执行nfs网络挂载命令和授权客户端目录
+# sudo mount -t nfs -o nolock nfs_server_ip:/mnt/nfs_data /mnt/nfs_data
 # sudo chmod -R 777 /mnt/nfs_data/
 # 卸载共享目录到客户端
 # umount -f /mnt/nfs_data

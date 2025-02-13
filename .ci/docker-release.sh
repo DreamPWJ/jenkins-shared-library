@@ -202,13 +202,23 @@ set -x # 开启shell命令打印模式
 # 是否是远程镜像仓库方式
 if [[ ${is_push_docker_repo} == false ]]; then
   echo "🏗️  开始构建Docker镜像(无缓存构建)"
-  docker_file_name="Dockerfile" # 默认Spring Boot框架 jar包
+
+  if [[ ${java_framework_type} == 1 ]]; then
+     docker_file_name="Dockerfile" # 默认Spring Boot框架 jar包
+     docker_pull_image_name=${jdk_publisher}:${jdk_version}
+  fi
   if [[ ${java_framework_type} == 2 ]]; then
-    docker_file_name="Dockerfile.mvc" # Spring MVC框架 war包
+     docker_file_name="Dockerfile.mvc" # Spring MVC框架 war包
+     docker_pull_image_name=tomcat:${tomcat_version}-jre8
   fi
   if [[ ${is_spring_native} == true ]]; then
-    docker_file_name="Dockerfile.native" # Spring Native原生镜像直接执行文件
+     docker_file_name="Dockerfile.native" # Spring Native原生镜像直接执行文件
+     docker_pull_image_name=${jdk_publisher}:${jdk_version}
   fi
+
+   # 拉取基础镜像避免重复下载
+  [ -z "$(docker images -q ${docker_pull_image_name})" ] && docker pull ${docker_pull_image_name} || echo "基础镜像 ${docker_pull_image_name} 已存在无需重新pull拉取"
+
   # 对于简单项目无需重复构建镜像  将部署文件 docker run -v 做挂载映射 直接重启容器即可
   docker build -t ${docker_image_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg PROJECT_NAME=${project_name} \

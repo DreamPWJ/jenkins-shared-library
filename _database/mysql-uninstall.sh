@@ -10,9 +10,7 @@ yum remove -y mysql
 
 echo "查看残留mysql相关文件  rm -rf 删除"
 find / -name mysql
-
 rm -rf /var/lib/mysql /var/lib/mysql/mysql /usr/lib64/mysql
-
 
 
 # Ubuntu版卸载MySql

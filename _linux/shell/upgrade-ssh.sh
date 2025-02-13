@@ -2,6 +2,9 @@
 # Author: 潘维吉
 # Description:  升级OpenSSH 版本  支持更高级特性 比如跳板机 jump host -J 模式
 
+# 一条shell命令判断和升级ssh版本
+# ssh -V 2>&1 | awk '{print $1, $NF}' | grep -qE 'OpenSSH_[0-6]\.|OpenSSH_7\.[0-2]' && (sudo yum update -y openssh openssh-server openssh-clients || echo "Failed to update SSH.") || echo "SSH version is already 7.3 or higher, no need to update."
+
 # 对比SSH版本号 因为低版本OpenSSH不支持ssh命令跳板机方式访问
 compare_ssh_versions() {
   # 将传入的版本字符串转化为数组
