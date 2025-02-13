@@ -76,7 +76,7 @@ map.put('is_before_deploy_notice', false)
 // 是否只通知发布变更记录
 map.put('is_only_notice_change_log', false)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', false)
+map.put('is_git_tag', true)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
@@ -136,6 +136,26 @@ JSON_PARAMS
     "K8S_POD_REPLICAS" : "2",
     "APPLICATION_DOMAIN" : "https://park-ai.pengbocloud.com"
 }
+
+lanneng-park-ai-server-k8s-prod
+蓝能停车AI智能体Python服务端 ❤️
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/ln_deepseek_chat.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "COMPUTER_LANGUAGE" : "3" ,
+   "PROJECT_NAME" : "lanneng-deepseek-chat" ,
+   "SHELL_PARAMS" : "lanneng-deepseek-chat python 8035 5000 prod",
+   "IS_K8S_DEPLOY" : true,
+   "K8S_POD_REPLICAS" : "1",
+   "CUSTOM_PYTHON_START_FILE" : "main.py",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/health-check",
+   "IS_DISABLE_K8S_HEALTH_CHECK" : true ,
+   "APPLICATION_DOMAIN" : "https://park-ai-api.pengbocloud.com" ,
+}
+
+
 
 */
 

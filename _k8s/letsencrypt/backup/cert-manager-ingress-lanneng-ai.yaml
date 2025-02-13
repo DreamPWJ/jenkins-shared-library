@@ -58,7 +58,9 @@ spec:
     - hosts:
         - park-ai.pengbocloud.com
       secretName: park-ai.pengbocloud.com-tls
-
+    - hosts:
+        - park-ai-api.pengbocloud.com
+      secretName: park-ai-api.pengbocloud.com-tls
 
   rules:
     #自定义域名
@@ -73,4 +75,17 @@ spec:
                 #服务端口
                 port:
                   number: 9107
+            pathType: Prefix
+
+    - host: park-ai-api.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: lanneng-deepseek-chat-python-service
+                #服务端口
+                port:
+                  number: 8035
             pathType: Prefix
