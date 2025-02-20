@@ -51,14 +51,14 @@ spec:
         name: cpu
         target:
           type: Utilization # 基于利用率进行扩缩容
-          averageUtilization: 80 # CPU超过多少  触发自动进行扩容
+          averageUtilization: 70 # CPU超过多少  触发自动进行扩容  目标Deployment中所有Pod的平均CPU利用率超过阈值扩容
 
     - type: Resource
       resource:
         name: memory
         target:
           type: Utilization
-          averageUtilization: 90  # 当内存超过多少时，触发自动进行扩容
+          averageUtilization: 80  # 当内存超过多少时，触发自动进行扩容
 
 
 ---
