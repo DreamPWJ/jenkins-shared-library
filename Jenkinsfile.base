@@ -138,13 +138,14 @@ JSON_PARAMS:
 
 可选参数如下
 {
-  "NPM_RUN_PARAMS" : "build"
-  "IS_ROLL_DEPLOY" : true
-  "IS_BLUE_GREEN_DEPLOY" : true
-  "IS_STATIC_RESOURCE" : true
-  "IS_MONO_REPO" : true
-  "IS_BEFORE_DEPLOY_NOTICE" : true
-  "GIT_PROJECT_FOLDER_NAME" : "projects/web"
+  "NPM_RUN_PARAMS" : "build",
+  "IS_MONO_REPO" : true,
+  "IS_ROLL_DEPLOY" : true,
+  "IS_K8S_DEPLOY" : true,
+  "IS_BLUE_GREEN_DEPLOY" : true,
+  "IS_STATIC_RESOURCE" : true,
+  "IS_K8S_HPA_QPS" : true,
+  "GIT_PROJECT_FOLDER_NAME" : "projects/web",
 }
 */
 
