@@ -11,17 +11,17 @@
 def map = [:]
 
 // 远程服务器地址 k8s集群方式可填空或填公网代理负载IP
-map.put('remote_ip', '172.16.99.66')
+map.put('remote_ip', '120.92.149.246')
 // 工作服务器地址 同时支持N个服务器自动化分布式部署
-map.put('remote_worker_ips', ['172.16.88.66'])
+map.put('remote_worker_ips', [])
 // 远程服务器用户名
 map.put('remote_user_name', 'root')
 // 代理机或跳板机外网ip用于透传部署到内网目标机器 选填 目标机器外部无法直接访问情况填写内网ip
-map.put('proxy_jump_ip', '58.58.179.222')
+map.put('proxy_jump_ip', ' ')
 // 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
 map.put('proxy_jump_user_name', 'root')
 // 自定义跳板机ssh和scp访问端口 默认22
-map.put('proxy_jump_port', '18000')
+map.put('proxy_jump_port', ' ')
 
 // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
 map.put('default_git_branch', ' ')
@@ -32,11 +32,11 @@ map.put('build_num_keep', 2)
 
 // 容器Docker相关参数
 // JVM内存设置
-map.put('docker_java_opts', '-Xmx3800m')
+map.put('docker_java_opts', '-Xmx1800m')
 // 容器最大cpu限制 m是千分之一 100m是0.1个CPU
-map.put('docker_limit_cpu', '1500m')
+map.put('docker_limit_cpu', '1200m')
 // 容器最大内存限制 不支持小数点形式设置
-map.put('docker_memory', '4G')
+map.put('docker_memory', '3G')
 // docker日志限制
 map.put('docker_log_opts', 'max-size=150m') // --log-opt max-size=50m --log-opt max-file=3
 // docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
@@ -44,22 +44,22 @@ map.put('docker_volume_mount', '')
 // Dockerfile多阶段构建 镜像名称
 map.put('docker_multistage_build_images', ' ')
 // 是否上传镜像到docker容器仓库
-map.put('is_push_docker_repo', false)
+map.put('is_push_docker_repo', true)
 // docker容器镜像仓库账号信任id
-map.put('docker_repo_credentials_id', '5553c9ed-5416-4bbf-b7fc-9d53ed856177')
+map.put('docker_repo_credentials_id', '73f6b3b0-4580-4acf-b04a-63892fcf9ba8')
 // docker镜像仓库注册地址
-map.put('docker_repo_registry', 'registry.cn-qingdao.aliyuncs.com')
+map.put('docker_repo_registry', 'hub-cn-shanghai-2.kce.ksyun.com')
 // docker仓库命名空间名称
-map.put('docker_repo_namespace', 'lexiang')
+map.put('docker_repo_namespace', 'lanneng')
 
 // K8S集群相关参数
 // K8S集群部署集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
-map.put('k8s_credentials_ids', ' ')
+map.put('k8s_credentials_ids', 'a1d2642d-296f-47a2-8d1a-087b46e3255e')
 // K8S集群私有镜像仓库拉取密钥 在集群内使用kubectl create secret命令生成
-map.put('k8s_image_pull_secrets', ' ')
+map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
 // 项目标签或项目简称
-map.put('project_tag', '枣庄枣庄智慧停车')
+map.put('project_tag', 'AI智能体')
 
 // 是否是生产环境
 map.put('is_prod', true)
@@ -68,7 +68,7 @@ map.put('is_same_server', false)
 // 是否进行优雅停机
 map.put('is_grace_shutdown', false)
 // 是否进行服务启动健康探测 K8S集群类型设置false
-map.put('is_health_check', true)
+map.put('is_health_check', false)
 // 是否Pipeline内脚本钉钉通知  总开关
 map.put('is_ding_notice', true)
 // 是否进行部署前通知
@@ -81,14 +81,14 @@ map.put('is_git_tag', true)
 map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
-map.put('jenkins_node', 'master')
-map.put('jenkins_node_frontend', 'node-2')
+map.put('jenkins_node', 'node-2')
+map.put('jenkins_node_frontend', 'node-3')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
-map.put('nodejs', 'Node14')
-map.put('maven', 'Maven3.6')
+map.put('nodejs', 'Node20')
+map.put('maven', 'Maven3.9')
 map.put('jdk_publisher', 'openjdk')
-map.put('jdk', '8')
+map.put('jdk', '21')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
@@ -117,71 +117,42 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.zaozhuang-epark-prod
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/lanneng/Jenkinsfile.lanneng-park-ai-k8s-prod
 
 /*
 
-zaozhuang-epark-server-prod
-枣庄智慧停车epark平台服务端
+lanneng-park-ai-k8s-prod
+蓝能停车AI智能体H5前端 ❤️
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/epark.git" ,
-   "BRANCH_NAME" : "main" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "epark-server" ,
-   "SHELL_PARAMS" : "epark server 8080 8080 prod",
-   "IS_ROLL_DEPLOY" : true,
-   "IS_MAVEN_SINGLE_MODULE" : true,
-   "JAVA_FRAMEWORK_TYPE" : "2",
-   "IS_DIFF_CONF_IN_DIFF_MACHINES": true,
-   "SOURCE_TARGET_CONFIG_DIR" : "resources/rizhao,resources",
-   "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/mnt/stor:/usr/local/tomcat/webapps/FileUpload,/mnt/stor1:/usr/local/tomcat/webapps/FileUpload/stor1,/mnt/stor/vpaas_m2m/epark/stor1/epark/thirdParkImgs:/usr/local/tomcat/webapps/FileUpload/vpaas_m2m/epark/stor1/epark/thirdParkImgs,/mnt/stor/vpaas_m2m/epark/stor1/epark/invoice:/usr/local/tomcat/webapps/FileUpload/vpaas_m2m/epark/stor1/epark/invoice,/mnt/stor/vpaas_m2m/epark/stor1/epark/leagureImg:/usr/local/tomcat/webapps/FileUpload/vpaas_m2m/epark/stor1/epark/leagureImg,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml,/my/tomcat/context.xml:/usr/local/tomcat/conf/context.xml" ,
-   "APPLICATION_DOMAIN" : "http://ggjtss.cn"
-}
-
-zaozhuang-open-epark-server-prod
-枣庄智慧停车open epark平台服务端
-JSON_PARAMS
-{
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/openEpark.git" ,
-   "BRANCH_NAME" : "main" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "open-epark-server" ,
-   "SHELL_PARAMS" : "open-epark server 8082 8080 prod",
-   "IS_ROLL_DEPLOY" : true,
-   "IS_MAVEN_SINGLE_MODULE" : true,
-   "JAVA_FRAMEWORK_TYPE" : "2",
-   "SOURCE_TARGET_CONFIG_DIR" : "resource/rizhao,resource",
-   "DOCKER_VOLUME_MOUNT" : "/my/open-epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server-open-epark.xml:/usr/local/tomcat/conf/server.xml"
-}
-
-
-zaozhuang-epark-h5-prod
-枣庄智慧停车H5 Web前端 新 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/rzhtc.git" ,
-    "BRANCH_NAME" : "rizhao" ,
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/frontend-monorepo.git" ,
+    "BRANCH_NAME" : "develop" ,
     "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "rzhtc" ,
-    "SHELL_PARAMS" : "rzhtc h5 9000 80 prod" ,
-    "NPM_RUN_PARAMS" : "build:rizhao",
-    "IS_ROLL_DEPLOY" : true,
-    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf"
-}
-
-zaozhuang-park-coupon-h5-prod
-枣庄智慧停车优惠券H5 Web前端 新 ❤️
-JSON_PARAMS
-{
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/park_coupon.git" ,
-    "BRANCH_NAME" : "master" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "park-coupon" ,
-    "SHELL_PARAMS" : "park-coupon h5 8008 80 prod" ,
+    "PROJECT_NAME" : "lanneng-ai-agent",
+    "SHELL_PARAMS" : "lanneng-ai agent 9107 80 prod",
     "NPM_RUN_PARAMS" : "build",
-    "IS_ROLL_DEPLOY" : true,
-    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf"
+    "GIT_PROJECT_FOLDER_NAME" : "projects/ai-agent",
+    "IS_K8S_DEPLOY" : true,
+    "K8S_POD_REPLICAS" : "2",
+    "APPLICATION_DOMAIN" : "https://park-ai.pengbocloud.com"
+}
+
+lanneng-park-ai-server-k8s-prod
+蓝能停车AI智能体Python服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/ln_deepseek_chat.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "COMPUTER_LANGUAGE" : "3" ,
+   "PROJECT_NAME" : "lanneng-deepseek-chat" ,
+   "SHELL_PARAMS" : "lanneng-deepseek-chat python 8035 5000 prod",
+   "IS_K8S_DEPLOY" : true,
+   "K8S_POD_REPLICAS" : "1",
+   "CUSTOM_PYTHON_START_FILE" : "main.py",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/health-check",
+   "IS_DISABLE_K8S_HEALTH_CHECK" : true ,
+   "APPLICATION_DOMAIN" : "https://park-ai-api.pengbocloud.com" ,
 }
 
 

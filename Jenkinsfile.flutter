@@ -91,7 +91,7 @@ JSON_PARAMS:
     "REPO_URL" : "https://github.com/DreamPWJ/panweiji-mobile/panweiji_life_manager.git",
     "DEFAULT_GIT_BRANCH" : "dev",
     "BUILD_SYSTEM_TYPES" : "Android,iOS",
-    "IOS_APP_IDENTIFIER" : "com.panweiji.propertyservice.store.flutter",
+    "IOS_APP_IDENTIFIER" : "com.panweiji.project.flutter",
     "IOS_SCHEME_NAME": "Runner",
     "COCOAPODS_VERSION": "1.11.2"
 }

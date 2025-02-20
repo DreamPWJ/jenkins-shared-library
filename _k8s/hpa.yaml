@@ -1,8 +1,8 @@
 # Author: 潘维吉
-# Description: 云原生K8S应用根据QPS自定义指标弹性扩缩容
+# Description: 云原生K8S应用根据默认指标和自定义指标自动弹性扩缩容
 
-apiVersion: autoscaling/v2beta2
-kind: HorizontalPodAutoscaler
+apiVersion: autoscaling/v2     # 水平自动扩缩容的稳定版本 API
+kind: HorizontalPodAutoscaler  # 水平自动扩缩容控制器
 metadata:
   name: {APP_NAME}-hpa
   namespace: default
@@ -14,23 +14,52 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {APP_NAME}-deployment
-  metrics:
-    - type: Pods
-      pods:
-        metric:
-          name: http_server_requests_qps  # 基于QPS自动伸缩 安装 prometheus-adapter 来实现基于自定义指标的 Pod 弹性伸缩
-        target:
-          type: AverageValue
-          averageValue: 300  # 当每个业务Pod的QPS指标平均值高于时，触发自动进行扩容
 
-#    - type: Resource
-#      resource:
-#        name: "cpu"
-#        targetAverageUtilization: 50 # CPU超过多少  触发自动进行扩容
-#    - type: Resource
-#      resource:
-#        name: "memory"
-#        targetAverageValue: 4000Mi # 当内存超过多少时，触发自动进行扩容
+  # 可配置的扩缩策略  behavior是k8s自带属性
+  behavior:
+    scaleUp: # 扩容策略
+      stabilizationWindowSeconds: 0 # 快速扩容值越小 最近多少秒内如果已经进行过扩缩容操作，就不会再次进行扩容，以防止频繁调整
+      policies:
+        - type: Percent # 按百分比扩容
+          value: 20     # 每次扩容增加当前副本数的百分之多少
+          periodSeconds: 60
+        - type: Pods         # 按固定 Pod 数量扩容
+          value: 1           # 每次扩容增加几个 Pod
+          periodSeconds: 60  # 表示每多少秒最多应用一次此策略
+      selectPolicy: Max      # 多个扩容策略中选择最大的扩容结果
+    scaleDown: # 缩容策略
+      stabilizationWindowSeconds: 300 # 在最近多少秒内如果已经进行过扩缩容操作，就不会再次进行缩容
+      policies:
+        - type: Percent
+          value: 10
+          periodSeconds: 120
+        - type: Pods
+          value: 1
+          periodSeconds: 120
+
+  metrics:
+    #    - type: Pods
+    #      pods:
+    #        metric:
+    #          name: http_server_requests_qps  # 基于QPS自动伸缩 安装 prometheus-adapter 来实现基于自定义指标的 Pod 弹性伸缩
+    #        target:
+    #          type: AverageValue
+    #          averageValue: 300  # 当每个业务Pod的QPS指标平均值高于时，触发自动进行扩容
+
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization # 基于利用率进行扩缩容
+          averageUtilization: 70 # CPU超过多少  触发自动进行扩容  目标Deployment中所有Pod的平均CPU利用率超过阈值扩容
+
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80  # 当内存超过多少时，触发自动进行扩容
+
 
 ---
 

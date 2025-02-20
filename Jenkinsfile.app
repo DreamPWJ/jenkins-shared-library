@@ -106,7 +106,7 @@ JSON_PARAMS:
     "REPO_URL" : "https://github.com/DreamPWJ/panweiji-mobile/ios-anhomemanager.git",
     "DEFAULT_GIT_BRANCH" : "dev",
     "CUSTOM_IOS_BUILD_TYPE" : "Test,PreRelease",
-    "IOS_APP_IDENTIFIER" : "com.panweiji.propertyservice.store",
+    "IOS_APP_IDENTIFIER" : "com.panweiji.project",
     "IOS_PROJECT_LEVEL_DIR" : "panweijiApp"
 }
 IOS_APP_REVIEW_INFO:

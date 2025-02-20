@@ -1,6 +1,6 @@
 #!/bin/bash
 # Author: 潘维吉
-# Description: 自动续签SSL证书
+# Description: Let’s Encrypt自动续签SSL证书
 
 # 定义要ping的网络地址 因网络不通等原因提供等待网络方式
 TARGET="acme-v02.api.letsencrypt.org"
