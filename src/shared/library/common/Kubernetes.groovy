@@ -197,7 +197,7 @@ class Kubernetes implements Serializable {
     static def deployHPA(ctx, map) {
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) { // QPS扩缩容 只限于服务端集成Prometheus监控
             // 安装k8s-prometheus-adpater
-            Helm.installPrometheus(ctx)
+            // Helm.installPrometheus(ctx)
 
             def yamlName = "hpa.yaml"
             ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
@@ -207,8 +207,9 @@ class Kubernetes implements Serializable {
 
             // 部署pod水平扩缩容
             ctx.sh "kubectl apply -f ${yamlName}"
+
             // 若安装正确，可用执行以下命令查询自定义指标 查看到 Custom Metrics API 返回配置的 QPS 相关指标 可能需要等待几分钟才能查询到
-            ctx.sh " kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 || true "
+            // ctx.sh " kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 || true "
             // kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/${k8sNameSpace}/pods/*/http_server_requests_qps"
 
             // 并发测试ab（apache benchmark） CentOS环境 sudo yum -y install httpd-tools    Ubuntu环境 sudo apt-get update && sudo apt-get -y install apache2-utils
