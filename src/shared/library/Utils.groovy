@@ -95,6 +95,24 @@ class Utils implements Serializable {
     }
 
     /**
+     * 比较语义化版本号的大小
+     */
+    static def compareVersions(String version1, String version2) {
+        def v1 = version1.replace("v","").tokenize('.')*.toInteger()
+        def v2 = version2.replace("v","").tokenize('.')*.toInteger()
+
+        // 逐个比较版本号的每一部分
+        for (int i = 0; i < Math.max(v1.size(), v2.size()); i++) {
+            def part1 = i < v1.size() ? v1[i] : 0
+            def part2 = i < v2.size() ? v2[i] : 0
+
+            if (part1 < part2) return -1
+            if (part1 > part2) return 1
+        }
+        return 0 // 版本号相等
+    }
+
+    /**
      * 获取时间差 并且格式化
      */
     static def getTimeDiff(start, end) {

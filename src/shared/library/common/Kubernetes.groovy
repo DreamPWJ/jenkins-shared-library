@@ -17,7 +17,7 @@ class Kubernetes implements Serializable {
 
     static def k8sYamlFile = "k8s.yaml" // k8s集群应用部署yaml定义文件
     static def pythonYamlFile = "k8s_yaml.py" // 使用Python动态处理Yaml文件
-    static def k8sNameSpace = "default" // k8s命名空间
+    static def k8sNameSpace = "default" // k8s默认命名空间
 
     /**
      * 声明式执行k8s集群部署
@@ -143,7 +143,7 @@ class Kubernetes implements Serializable {
                 " s#{APP_NAME}#${appName}#g;s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g;s#{DEFAULT_CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
                 " s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g;s#{MAX_CPU_SIZE}#${map.docker_limit_cpu}#g;s#{MAX_MEMORY_SIZE}#${map.docker_memory}#g;s#{JAVA_OPTS_XMX}#${map.docker_java_opts}#g; " +
-                " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g;s#{CUSTOM_HEALTH_CHECK_PATH}#${ctx.CUSTOM_HEALTH_CHECK_PATH}#g; " +
+                " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g;s#{CUSTOM_HEALTH_CHECK_PATH}#${ctx.CUSTOM_HEALTH_CHECK_PATH}#g;s#{K8S_NAMESPACE}#${k8sNameSpace}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYamlFile} > ${k8sYamlFile} "
 
         def pythonYamlParams = ""
@@ -206,9 +206,24 @@ class Kubernetes implements Serializable {
             def memoryUnit = "${map.docker_memory}".contains("G") ? "G" : "M"
             def memoryHPA = Math.floor(Integer.parseInt("${map.docker_memory}".replace(memoryUnit, "")) * 0.8 * 1024) + "M"
 
+            def k8sVersion = getK8sVersion(ctx)
+            def v0 = Utils.compareVersions(k8sVersion, "1.21.3")
+            def v1 = Utils.compareVersions(k8sVersion, "1.16.0")
+            def v2 = Utils.compareVersions(k8sVersion, "1.23.1")
+            ctx.println(k8sVersion)
+            ctx.println(v0)
+            ctx.println(v1)
+            ctx.println(v2)
+
+            def hpaApiVersion = "v2"
+            if (Utils.compareVersions(k8sVersion, "1.23.0") == -1) { // k8s低版本 使用低版本api
+                hpaApiVersion = "v2beta2"
+            }
+
             ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
                     " s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g; s#{K8S_POD_REPLICAS}#${ctx.K8S_POD_REPLICAS}#g; " +
-                    " s#{MAX_CPU_SIZE}#${cpuHPA}#g;s#{MAX_MEMORY_SIZE}#${memoryHPA}#g; " +
+                    " s#{MAX_CPU_SIZE}#${cpuHPA}#g;s#{MAX_MEMORY_SIZE}#${memoryHPA}#g;s#{K8S_NAMESPACE}#${k8sNameSpace}#g; " +
+                    " s#{HPA_API_VERSION}#${hpaApiVersion}#g; " +
                     " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
             ctx.sh " cat ${yamlName} "
 
@@ -332,6 +347,18 @@ class Kubernetes implements Serializable {
                 ctx.error("K8S集群中Pod服务部署启动失败 终止流水线运行 ❌")
             }
         }
+    }
+
+    /**
+     * 获取k8s版本号
+     */
+    static def getK8sVersion(ctx) {
+        def k8sVersion = ctx.sh(script: " kubectl version --short --output json ", returnStdout: true).trim()
+        ctx.echo "K8S版本信息: ${k8sVersion}"
+        // 解析json数据
+        def k8sVersionMap = ctx.readJSON text: k8sVersion
+        def version = k8sVersionMap.serverVersion.gitVersion
+        return version
     }
 
     /**
