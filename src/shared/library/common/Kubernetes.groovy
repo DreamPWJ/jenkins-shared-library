@@ -204,7 +204,8 @@ class Kubernetes implements Serializable {
             def cpuHPA = Integer.parseInt("${map.docker_limit_cpu}".replace("m", "")) * 0.7 + "m"
             println(cpuHPA)
             def memoryUnit = "${map.docker_memory}".contains("G") ? "G" : "M"
-            def memoryHPA = Integer.parseInt("${map.docker_memory}".replace(memoryUnit, "")) * 0.8 + memoryUnit
+            // 内存值不支持小数  转成成为M数据
+            def memoryHPA = Math.floor(Integer.parseInt("${map.docker_memory}".replace(memoryUnit, "")) * 0.8 * 1024) + "M"
 
             ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
                     " s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g; s#{K8S_POD_REPLICAS}#${ctx.K8S_POD_REPLICAS}#g; " +
@@ -214,6 +215,8 @@ class Kubernetes implements Serializable {
 
             // 部署Pod水平扩缩容  如果已存在不重新创建
             ctx.println("K8S集群执行部署Pod自动水平扩缩容 💕")
+            // 部署前删除旧HPA更新到最新yaml配置
+            // ctx.sh "kubectl delete hpa ${ctx.FULL_PROJECT_NAME}-hpa -n ${k8sNameSpace} || true "
             ctx.sh "kubectl get hpa ${ctx.FULL_PROJECT_NAME}-hpa -n ${k8sNameSpace} || kubectl apply -f ${yamlName}"
 
             // 若安装正确，可用执行以下命令查询自定义指标 查看到 Custom Metrics API 返回配置的 QPS 相关指标 可能需要等待几分钟才能查询到
