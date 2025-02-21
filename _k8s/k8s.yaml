@@ -5,7 +5,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {APP_NAME}-deployment
-  namespace: default
+  namespace: {K8S_NAMESPACE}
   labels:
     app: {APP_COMMON_NAME}     # Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
 
@@ -112,7 +112,7 @@ spec:
 #                      values:
 #                        - {APP_COMMON_NAME}
 #                namespaces:
-#                  - default
+#                  - {K8S_NAMESPACE}
 #                topologyKey: kubernetes.io/hostname         # pod不会调度到同一节点 在节点上起作用
       # 私有镜像拉取密钥配置   参考文档：https://kubernetes.io/docs/concepts/containers/images/#creating-a-secret-with-a-docker-config
       # kubectl create secret docker-registry panweiji2022 --docker-server=registry.cn-qingdao.aliyuncs.com  --docker-username=2000160180 --docker-password=panweiji@2022--docker-email=406798106@qq.com --namespace=default
@@ -132,7 +132,7 @@ kind: Service
 
 metadata:
   name: {APP_COMMON_NAME}-service
-  namespace: default
+  namespace: {K8S_NAMESPACE}
   labels:
     app: {APP_COMMON_NAME}-service
   annotations:

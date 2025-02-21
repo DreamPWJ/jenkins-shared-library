@@ -95,6 +95,35 @@ class Utils implements Serializable {
     }
 
     /**
+     * 比较语义化版本号的大小
+     */
+    static int compareVersions(String version1, String version2) {
+        // 去掉版本号中的 v 字符
+        def cleanVersion1 = version1.replaceFirst('v', '')
+        def cleanVersion2 = version2.replaceFirst('v', '')
+
+        // 将版本号按 . 分割成数组
+        def parts1 = cleanVersion1.tokenize('.')
+        def parts2 = cleanVersion2.tokenize('.')
+
+        // 获取两个版本号数组的最大长度
+        def maxLength = Math.max(parts1.size(), parts2.size())
+
+        for (int i = 0; i < maxLength; i++) {
+            // 获取当前位置的版本号部分，如果越界则默认为 0
+            def num1 = i < parts1.size() ? parts1[i].toInteger() : 0
+            def num2 = i < parts2.size() ? parts2[i].toInteger() : 0
+
+            if (num1 < num2) {
+                return -1
+            } else if (num1 > num2) {
+                return 1
+            }
+        }
+        return 0
+    }
+
+    /**
      * 获取时间差 并且格式化
      */
     static def getTimeDiff(start, end) {

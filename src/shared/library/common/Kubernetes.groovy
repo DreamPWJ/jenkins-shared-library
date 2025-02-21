@@ -17,7 +17,7 @@ class Kubernetes implements Serializable {
 
     static def k8sYamlFile = "k8s.yaml" // k8s集群应用部署yaml定义文件
     static def pythonYamlFile = "k8s_yaml.py" // 使用Python动态处理Yaml文件
-    static def k8sNameSpace = "default" // k8s命名空间
+    static def k8sNameSpace = "default" // k8s默认命名空间
 
     /**
      * 声明式执行k8s集群部署
@@ -55,8 +55,8 @@ class Kubernetes implements Serializable {
                 // 七层负载和灰度发布配置部署ingress
                 // ingressNginxDeploy(ctx, map)
 
-                // 部署Pod弹性水平扩缩容 基于QPS自动伸缩  只需要初始化一次
-                if ("${ctx.IS_K8S_HPA_QPS}" == 'true') {
+                // 部署Pod弹性水平扩缩容 可基于QPS自动伸缩  只需要初始化一次
+                if ("${ctx.IS_K8S_AUTO_SCALING}" == 'true') {
                     deployHPA(ctx, map)
                 }
 
@@ -143,7 +143,7 @@ class Kubernetes implements Serializable {
                 " s#{APP_NAME}#${appName}#g;s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g;s#{DEFAULT_CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
                 " s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g;s#{MAX_CPU_SIZE}#${map.docker_limit_cpu}#g;s#{MAX_MEMORY_SIZE}#${map.docker_memory}#g;s#{JAVA_OPTS_XMX}#${map.docker_java_opts}#g; " +
-                " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g;s#{CUSTOM_HEALTH_CHECK_PATH}#${ctx.CUSTOM_HEALTH_CHECK_PATH}#g; " +
+                " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g;s#{CUSTOM_HEALTH_CHECK_PATH}#${ctx.CUSTOM_HEALTH_CHECK_PATH}#g;s#{K8S_NAMESPACE}#${k8sNameSpace}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYamlFile} > ${k8sYamlFile} "
 
         def pythonYamlParams = ""
@@ -191,24 +191,42 @@ class Kubernetes implements Serializable {
     }
 
     /**
-     * 基于QPS部署pod水平扩缩容
+     * 部署Pod自动水平扩缩容  可基于基于QPS
      * 参考文档：https://imroc.cc/k8s/best-practice/custom-metrics-hpa
      */
     static def deployHPA(ctx, map) {
-        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) { // QPS扩缩容 只限于服务端集成Prometheus监控
+        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) { // 后端并发量大需要扩容  如果是QPS扩缩容 只限于服务端集成Prometheus监控
             // 安装k8s-prometheus-adpater
-            Helm.installPrometheus(ctx)
+            // Helm.installPrometheus(ctx)
 
             def yamlName = "hpa.yaml"
+            // 如果cpu或内存达到限额百分之多少 进行自动扩容
+            def cpuHPA = Integer.parseInt("${map.docker_limit_cpu}".replace("m", "")) * 0.7 + "m"
+            // 内存值不支持小数  转成成为M数据
+            def memoryUnit = "${map.docker_memory}".contains("G") ? "G" : "M"
+            def memoryHPA = Math.floor(Integer.parseInt("${map.docker_memory}".replace(memoryUnit, "")) * 0.8 * 1024) + "M"
+
+            def k8sVersion = getK8sVersion(ctx)
+            def hpaApiVersion = "v2"
+            if (Utils.compareVersions(k8sVersion, "1.23.0") == -1) { // k8s低版本 使用低版本api
+                hpaApiVersion = "v2beta2"
+            }
+
             ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
                     " s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g; s#{K8S_POD_REPLICAS}#${ctx.K8S_POD_REPLICAS}#g; " +
+                    " s#{MAX_CPU_SIZE}#${cpuHPA}#g;s#{MAX_MEMORY_SIZE}#${memoryHPA}#g;s#{K8S_NAMESPACE}#${k8sNameSpace}#g; " +
+                    " s#{HPA_API_VERSION}#${hpaApiVersion}#g; " +
                     " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
             ctx.sh " cat ${yamlName} "
 
-            // 部署pod水平扩缩容
-            ctx.sh "kubectl apply -f ${yamlName}"
+            // 部署Pod水平扩缩容  如果已存在不重新创建
+            ctx.println("K8S集群执行部署Pod自动水平扩缩容 💕")
+            // 部署前删除旧HPA更新到最新yaml配置
+            // ctx.sh "kubectl delete hpa ${ctx.FULL_PROJECT_NAME}-hpa -n ${k8sNameSpace} || true "
+            ctx.sh "kubectl get hpa ${ctx.FULL_PROJECT_NAME}-hpa -n ${k8sNameSpace} || kubectl apply -f ${yamlName}"
+
             // 若安装正确，可用执行以下命令查询自定义指标 查看到 Custom Metrics API 返回配置的 QPS 相关指标 可能需要等待几分钟才能查询到
-            ctx.sh " kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 || true "
+            // ctx.sh " kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 || true "
             // kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/${k8sNameSpace}/pods/*/http_server_requests_qps"
 
             // 并发测试ab（apache benchmark） CentOS环境 sudo yum -y install httpd-tools    Ubuntu环境 sudo apt-get update && sudo apt-get -y install apache2-utils
@@ -321,6 +339,18 @@ class Kubernetes implements Serializable {
                 ctx.error("K8S集群中Pod服务部署启动失败 终止流水线运行 ❌")
             }
         }
+    }
+
+    /**
+     * 获取k8s版本号
+     */
+    static def getK8sVersion(ctx) {
+        def k8sVersion = ctx.sh(script: " kubectl version --short --output json ", returnStdout: true).trim()
+        // 解析json数据
+        def k8sVersionMap = ctx.readJSON text: k8sVersion
+        def version = k8sVersionMap.serverVersion.gitVersion
+        ctx.echo "K8S版本: ${version}"
+        return version
     }
 
     /**

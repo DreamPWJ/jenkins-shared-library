@@ -772,8 +772,8 @@ def getInitParams(map) {
     IS_NEXT_JS = jsonParams.IS_NEXT_JS ? jsonParams.IS_NEXT_JS : false
     // 服务器部署时不同机器的代码配置是否不相同
     IS_DIFF_CONF_IN_DIFF_MACHINES = jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES ? jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES : false
-    // 是否开启基于QPS自定义指标的K8S水平弹性扩缩容
-    IS_K8S_HPA_QPS = jsonParams.IS_K8S_HPA_QPS ? jsonParams.IS_K8S_HPA_QPS : false
+    // 是否开启K8S自动水平弹性扩缩容
+    IS_K8S_AUTO_SCALING = jsonParams.IS_K8S_AUTO_SCALING ? jsonParams.IS_K8S_AUTO_SCALING : false
     // 是否禁用K8S健康探测
     IS_DISABLE_K8S_HEALTH_CHECK = jsonParams.IS_DISABLE_K8S_HEALTH_CHECK ? jsonParams.IS_DISABLE_K8S_HEALTH_CHECK : false
     // 是否开启Spring Native原生镜像 显著提升性能同时降低资源使用
@@ -798,8 +798,8 @@ def getInitParams(map) {
     SOURCE_TARGET_CONFIG_DIR = jsonParams.SOURCE_TARGET_CONFIG_DIR ? jsonParams.SOURCE_TARGET_CONFIG_DIR.trim() : ""
     // 不同项目通过文件目录区分放在相同的仓库中 设置Git代码项目文件夹名称 用于找到相关应用源码
     GIT_PROJECT_FOLDER_NAME = jsonParams.GIT_PROJECT_FOLDER_NAME ? jsonParams.GIT_PROJECT_FOLDER_NAME.trim() : ""
-    // K8S集群 Pod初始化副本数量 默认值3个节点  分布式2n+1容灾性   K8S中yaml不配置的replicas默认值是1
-    K8S_POD_REPLICAS = jsonParams.K8S_POD_REPLICAS ? jsonParams.K8S_POD_REPLICAS.trim() : 3
+    // K8S集群 Pod初始化副本数量  高并发建议分布式2n+1节点容灾性
+    K8S_POD_REPLICAS = jsonParams.K8S_POD_REPLICAS ? jsonParams.K8S_POD_REPLICAS.trim() : 2
     // 应用服务访问完整域名或代理服务器IP 带https或http前缀 用于反馈显示等
     APPLICATION_DOMAIN = jsonParams.APPLICATION_DOMAIN ? jsonParams.APPLICATION_DOMAIN.trim() : ""
     // NFS网络文件服务地址
