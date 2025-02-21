@@ -14,7 +14,8 @@ class Qodana implements Serializable {
      * 文档: https://www.jetbrains.com/help/qodana/jenkins.html
      */
     static def analyse(ctx) {
-        ctx.sh " qodana  "  // --show-report
+        def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
+        ctx.sh " qodana  --save-report --report-dir=${qodanaReportDir} "
 
         // 仅分析新增代码 增量代码分析 --paths-to-exclude 参数来指定只分析变化的文件  https://www.jetbrains.com/help/qodana/analyze-pr.html
         // def gitStartHash = "" // 获取两次提交之间的更改文件列表 用逗号分隔的文件列表传递给Qodana
@@ -38,12 +39,11 @@ class Qodana implements Serializable {
         archiveArtifacts artifacts: 'qodana-reports/qodana.html', fingerprint: true
         */
 
-        def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana"
 
         // 发布 HTML 报告 显示在左侧菜单栏 需要安装插件 https://plugins.jenkins.io/htmlpublisher/
         ctx.publishHTML(target: [
                 reportName           : 'Qodana质量报告',
-                reportDir            : "${qodanaReportDir}/report",
+                reportDir            : "${qodanaReportDir}/",
                 reportFiles          : 'index.html',
                 alwaysLinkToLastBuild: true,
                 keepAll              : true

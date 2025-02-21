@@ -136,7 +136,7 @@ JSON_PARAMS:
     "SHELL_PARAMS" : "health app 8080 8080 prod" ,
 }
 
-可选参数如下
+部分可选参数示例如下:
 {
   "NPM_RUN_PARAMS" : "build",
   "IS_MONO_REPO" : true,
