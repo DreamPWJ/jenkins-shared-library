@@ -202,9 +202,8 @@ class Kubernetes implements Serializable {
             def yamlName = "hpa.yaml"
             // 如果cpu或内存达到限额百分之多少 进行自动扩容
             def cpuHPA = Integer.parseInt("${map.docker_limit_cpu}".replace("m", "")) * 0.7 + "m"
-            println(cpuHPA)
-            def memoryUnit = "${map.docker_memory}".contains("G") ? "G" : "M"
             // 内存值不支持小数  转成成为M数据
+            def memoryUnit = "${map.docker_memory}".contains("G") ? "G" : "M"
             def memoryHPA = Math.floor(Integer.parseInt("${map.docker_memory}".replace(memoryUnit, "")) * 0.8 * 1024) + "M"
 
             ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
