@@ -191,11 +191,11 @@ class Kubernetes implements Serializable {
     }
 
     /**
-     * 基于QPS部署pod水平扩缩容
+     * 部署Pod自动水平扩缩容  可基于基于QPS
      * 参考文档：https://imroc.cc/k8s/best-practice/custom-metrics-hpa
      */
     static def deployHPA(ctx, map) {
-        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) { // QPS扩缩容 只限于服务端集成Prometheus监控
+        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) { // 如果是QPS扩缩容 只限于服务端集成Prometheus监控
             // 安装k8s-prometheus-adpater
             // Helm.installPrometheus(ctx)
 
@@ -205,7 +205,8 @@ class Kubernetes implements Serializable {
                     " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
             ctx.sh " cat ${yamlName} "
 
-            // 部署pod水平扩缩容  如果已存在不重新创建
+            // 部署Pod水平扩缩容  如果已存在不重新创建
+            ctx.println("K8S集群执行部署Pod自动水平扩缩容 💕")
             ctx.sh "kubectl get hpa ${ctx.FULL_PROJECT_NAME}-hpa -n ${k8sNameSpace} || kubectl apply -f ${yamlName}"
 
             // 若安装正确，可用执行以下命令查询自定义指标 查看到 Custom Metrics API 返回配置的 QPS 相关指标 可能需要等待几分钟才能查询到
