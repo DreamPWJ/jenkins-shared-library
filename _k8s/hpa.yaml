@@ -1,8 +1,8 @@
 # Author: 潘维吉
 # Description: 云原生K8S应用根据默认指标和自定义指标QPS等自动水平弹性扩缩容
 
-apiVersion: autoscaling/v2     # 水平自动扩缩容的稳定版本 API
-kind: HorizontalPodAutoscaler  # 水平自动扩缩容控制器
+apiVersion: autoscaling/v2beta2    # 自动扩缩容的稳定版本API  k8s高版本可去掉beta
+kind: HorizontalPodAutoscaler      # 水平自动扩缩容控制器
 metadata:
   name: {APP_NAME}-hpa
   namespace: default
