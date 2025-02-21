@@ -207,14 +207,6 @@ class Kubernetes implements Serializable {
             def memoryHPA = Math.floor(Integer.parseInt("${map.docker_memory}".replace(memoryUnit, "")) * 0.8 * 1024) + "M"
 
             def k8sVersion = getK8sVersion(ctx)
-            def v0 = Utils.compareVersions(k8sVersion, "1.21.3")
-            def v1 = Utils.compareVersions(k8sVersion, "1.16.0")
-            def v2 = Utils.compareVersions(k8sVersion, "1.23.1")
-            ctx.println(k8sVersion)
-            ctx.println(v0)
-            ctx.println(v1)
-            ctx.println(v2)
-
             def hpaApiVersion = "v2"
             if (Utils.compareVersions(k8sVersion, "1.23.0") == -1) { // k8s低版本 使用低版本api
                 hpaApiVersion = "v2beta2"
@@ -354,10 +346,10 @@ class Kubernetes implements Serializable {
      */
     static def getK8sVersion(ctx) {
         def k8sVersion = ctx.sh(script: " kubectl version --short --output json ", returnStdout: true).trim()
-        ctx.echo "K8S版本信息: ${k8sVersion}"
         // 解析json数据
         def k8sVersionMap = ctx.readJSON text: k8sVersion
         def version = k8sVersionMap.serverVersion.gitVersion
+        ctx.echo "K8S版本: ${version}"
         return version
     }
 
