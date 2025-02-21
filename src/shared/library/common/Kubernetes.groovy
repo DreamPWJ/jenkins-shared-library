@@ -195,7 +195,7 @@ class Kubernetes implements Serializable {
      * 参考文档：https://imroc.cc/k8s/best-practice/custom-metrics-hpa
      */
     static def deployHPA(ctx, map) {
-        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) { // 如果是QPS扩缩容 只限于服务端集成Prometheus监控
+        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) { // 后端并发量大需要扩容  如果是QPS扩缩容 只限于服务端集成Prometheus监控
             // 安装k8s-prometheus-adpater
             // Helm.installPrometheus(ctx)
 
