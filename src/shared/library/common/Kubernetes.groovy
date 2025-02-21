@@ -191,7 +191,7 @@ class Kubernetes implements Serializable {
     }
 
     /**
-     * 部署Pod自动水平扩缩容  可基于基于QPS
+     * 部署Pod自动水平扩缩容  可基于QPS自定义参数
      * 参考文档：https://imroc.cc/k8s/best-practice/custom-metrics-hpa
      */
     static def deployHPA(ctx, map) {
@@ -207,7 +207,7 @@ class Kubernetes implements Serializable {
             def memoryHPA = Math.floor(Integer.parseInt("${map.docker_memory}".replace(memoryUnit, "")) * 0.8 * 1024) + "M"
 
             def k8sVersion = getK8sVersion(ctx)
-            def hpaApiVersion = "v2"
+            def hpaApiVersion = "v2" // 默认使用新的稳定版本
             if (Utils.compareVersions(k8sVersion, "1.23.0") == -1) { // k8s低版本 使用低版本api
                 hpaApiVersion = "v2beta2"
             }
