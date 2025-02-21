@@ -144,7 +144,7 @@ JSON_PARAMS:
   "IS_K8S_DEPLOY" : true,
   "IS_BLUE_GREEN_DEPLOY" : true,
   "IS_STATIC_RESOURCE" : true,
-  "IS_K8S_HPA_QPS" : true,
+  "IS_K8S_AUTO_SCALING" : true,
   "GIT_PROJECT_FOLDER_NAME" : "projects/web",
 }
 */

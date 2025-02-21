@@ -1,5 +1,5 @@
 # Author: 潘维吉
-# Description: 云原生K8S应用根据默认指标和自定义指标自动弹性扩缩容
+# Description: 云原生K8S应用根据默认指标和自定义指标QPS等自动水平弹性扩缩容
 
 apiVersion: autoscaling/v2     # 水平自动扩缩容的稳定版本 API
 kind: HorizontalPodAutoscaler  # 水平自动扩缩容控制器
@@ -15,7 +15,7 @@ spec:
     kind: Deployment
     name: {APP_NAME}-deployment
 
-  # 可配置的扩缩策略  behavior是k8s自带属性
+  # 可配置的扩缩行为  behavior是k8s自定义扩缩容策略
   behavior:
     scaleUp: # 扩容策略
       stabilizationWindowSeconds: 0 # 越快速扩容值越小 稳定窗口 最近多少秒内如果已经进行过扩缩容操作，就不会再次进行扩容，以防止频繁调整
@@ -50,17 +50,20 @@ spec:
       resource:
         name: cpu
         target:
-          type: Utilization # 基于利用率进行扩缩容
-          averageUtilization: 70 # CPU超过多少  触发自动进行扩容  目标Deployment中所有Pod的平均CPU利用率超过阈值扩容
+          type: Utilization # 基于Deployment平均利用率进行扩缩容
+          averageUtilization: 70 # 目标Deployment中所有Pod的平均CPU利用率超过阈值扩容  CPU平均利用率超过多少  触发自动进行扩容
 
     - type: Resource
       resource:
         name: memory
         target:
           type: Utilization
-          averageUtilization: 80  # 当内存超过多少时，触发自动进行扩容
+          averageUtilization: 80  # 当内存平均利用率超过多少时，触发自动进行扩容
 
 
 ---
 
 #  kubectl get hpa
+#  kubectl describe hpa
+#  kubectl delete hpa
+#  kubectl autoscale deployment {APP_NAME}-deployment --cpu-percent=80 --min=1 --max=3

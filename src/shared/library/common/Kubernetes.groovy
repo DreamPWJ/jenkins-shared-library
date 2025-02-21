@@ -55,8 +55,8 @@ class Kubernetes implements Serializable {
                 // 七层负载和灰度发布配置部署ingress
                 // ingressNginxDeploy(ctx, map)
 
-                // 部署Pod弹性水平扩缩容 基于QPS自动伸缩  只需要初始化一次
-                if ("${ctx.IS_K8S_HPA_QPS}" == 'true') {
+                // 部署Pod弹性水平扩缩容 可基于QPS自动伸缩  只需要初始化一次
+                if ("${ctx.IS_K8S_AUTO_SCALING}" == 'true') {
                     deployHPA(ctx, map)
                 }
 
@@ -205,8 +205,8 @@ class Kubernetes implements Serializable {
                     " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
             ctx.sh " cat ${yamlName} "
 
-            // 部署pod水平扩缩容
-            ctx.sh "kubectl apply -f ${yamlName}"
+            // 部署pod水平扩缩容  如果已存在不重新创建
+            ctx.sh "kubectl get hpa ${ctx.FULL_PROJECT_NAME}-hpa -n ${k8sNameSpace} || kubectl apply -f ${yamlName}"
 
             // 若安装正确，可用执行以下命令查询自定义指标 查看到 Custom Metrics API 返回配置的 QPS 相关指标 可能需要等待几分钟才能查询到
             // ctx.sh " kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 || true "
