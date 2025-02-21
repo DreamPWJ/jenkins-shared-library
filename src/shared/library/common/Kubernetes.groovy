@@ -200,8 +200,14 @@ class Kubernetes implements Serializable {
             // Helm.installPrometheus(ctx)
 
             def yamlName = "hpa.yaml"
+            // 如果cpu或内存达到限额百分之多少 进行自动扩容
+            def cpuHPA = "${map.docker_limit_cpu}".replace("m", "") * 0.7 + "m"
+            def memoryUnit = "${map.docker_memory}".contains("G") ? "G" : "M"
+            def memoryHPA = "${map.docker_memory}".replace(memoryUnit, "") * 0.8 + memoryUnit
+
             ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
                     " s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g; s#{K8S_POD_REPLICAS}#${ctx.K8S_POD_REPLICAS}#g; " +
+                    " s#{MAX_CPU_SIZE}#${cpuHPA}#g;s#{MAX_MEMORY_SIZE}#${memoryHPA}#g; " +
                     " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
             ctx.sh " cat ${yamlName} "
 
