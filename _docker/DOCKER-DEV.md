@@ -78,9 +78,12 @@ gitlab/gitlab-ce:latest
 
 #### 基于Docker安装部署大模型Ollama和Open WebUI容器镜像
 docker pull ollama/ollama
+docker pull ghcr.io/open-webui/open-webui:main
+
 #### 只有CPU模式部署
 docker run -d --restart always -p 11434:11434 --cpus=8 -m 16096m -v /my/ollama:/root/.ollama --name ollama ollama/ollama
 docker run -d --restart always -p 3100:8080 --add-host=host.docker.internal:host-gateway -v /my/ollama:/root/.ollama  -v /my/open-webui:/app/backend/data --name open-webui  ghcr.io/open-webui/open-webui:main
+docker exec -it ollama  ollama run deepseek-r1:7b
 
 #### 基于Docker安装部署ZenTao禅道项目管理软件
 #### 从Docker Hub里拉取ZenTao禅道镜像最新版来部署
