@@ -236,7 +236,7 @@ def call(String type = 'web-java', Map map) {
                            }*/
                         docker {
                             // js、jvm、php、jvm-android、go、python、php。 jvm-community是免费版
-                            image 'jetbrains/qodana-jvm-community:latest' // 设置镜像类型和版本号 latest
+                            image "jetbrains/${qodanaImagesName}:latest" // 设置镜像类型和版本号 latest
                             args " --entrypoint='' -v ${env.WORKSPACE}:/data/project/ -v ${env.WORKSPACE}/qodana-report/:/data/results/ -v $HOME/.m2/:/root/.m2/ "
                             reuseNode true // 使用根节点
                         }
@@ -907,7 +907,8 @@ def getInitParams(map) {
     isHealthCheckFail = false
     // 计算应用启动时间
     healthCheckTimeDiff = "未知"
-
+    // Qodana代码质量准备不同语言的镜像名称
+    qodanaImagesName = ""
 }
 
 /**
@@ -934,12 +935,20 @@ def initInfo() {
     dockerReleaseWorkerShellName = ""
     if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
         dockerReleaseWorkerShellName = "docker-release-worker.sh"
+        qodanaImagesName = "qodana-jvm"
     } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
         dockerReleaseWorkerShellName = "go/docker-release-worker-go.sh"
+        qodanaImagesName = "qodana-go"
     } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
         dockerReleaseWorkerShellName = "python/docker-release-worker-python.sh"
+        qodanaImagesName = "qodana-python"
     } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) {
         dockerReleaseWorkerShellName = "cpp/docker-release-worker-cpp.sh"
+        qodanaImagesName = "qodana-clang"
+    }
+    // 前端项目
+    if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
+        qodanaImagesName = "qodana-js"
     }
 
     // 是否跳板机穿透方式部署
