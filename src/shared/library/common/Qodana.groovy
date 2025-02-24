@@ -49,8 +49,8 @@ class Qodana implements Serializable {
         ctx.publishHTML(target: [
                 reportDir            : "${qodanaReportDir}",
                 reportFiles          : 'index.html',
-                reportName           : 'Qodana Report',
-                reportTitles         : 'Qodana Report Title',
+                reportName           : 'Qodana-Report',
+                reportTitles         : 'Qodana-Report-Title',
                 alwaysLinkToLastBuild: true,
                 keepAll              : true,
                 allowMissing         : false,
