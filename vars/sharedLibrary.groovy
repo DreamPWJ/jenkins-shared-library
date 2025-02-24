@@ -2088,6 +2088,9 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                 deployType = "部署方式: K8S集群金丝雀发布"
             } else {
                 k8sPodContent = "K8S集群部署Pod节点数: **${K8S_POD_REPLICAS}**个"
+                if ("${IS_K8S_AUTO_SCALING}" == "true") {
+                    deployType = deployType + "+自动弹性扩缩容"
+                }
             }
         }
         def projectTypeName = ""

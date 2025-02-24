@@ -14,10 +14,9 @@ class Qodana implements Serializable {
      * 文档: https://www.jetbrains.com/help/qodana/jenkins.html
      */
     static def analyse(ctx) {
-
+        // 设置Qodana Cloud 项目访问token
         ctx.sh "export QODANA_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0IjoiYjhPcmEiLCJvcmdhbml6YXRpb24iOiJBYldWYiIsInRva2VuIjoicDBZa1AifQ.HnRUk9HsuqzOwN_iMzkcUiFQIsA23GTDpa_yb9oT2Dg"
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
-
 
         ctx.println("Qodana开始扫描分析代码...")
         ctx.sh " qodana  --save-report --report-dir=${qodanaReportDir} "
