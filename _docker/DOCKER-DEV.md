@@ -1,9 +1,10 @@
 #### 设置镜像源  解决pull下载慢卡住问题  注意：镜像源不维护了可能导致latest不是最新的版本 
-##### 可使用CloudFlare Workers方案做Docker镜像源网络代理  或使用阿里云账号下专属镜像加速 或者临时镜像源设置 如: docker pull docker.lanneng.tech/repo-name/images:version 
+##### 可使用CloudFlare Workers方案做Docker镜像源网络代理  或阿里云账号下专属镜像加速但只针对阿里云产品有效 或者临时镜像源设置 如: docker pull docker.lanneng.tech/repo-name/images:version 
 docker info
 sudo cat <<EOF >/etc/docker/daemon.json
 {
 "registry-mirrors": [
+  "https://docker.lanneng.tech",
   "https://em1sutsj.mirror.aliyuncs.com"
 ],
 "log-driver":"json-file",
