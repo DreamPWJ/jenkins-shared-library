@@ -45,11 +45,13 @@ class Qodana implements Serializable {
 
         // 发布 HTML 报告 显示在左侧菜单栏 报告服务运行才能展示  直接点击Html打开无效  需要安装插件 https://plugins.jenkins.io/htmlpublisher/
         ctx.publishHTML(target: [
-                reportName           : 'Qodana质量报告',
-                reportDir            : "${qodanaReportDir}/",
+                reportDir            : "${qodanaReportDir}",
                 reportFiles          : 'index.html',
+                reportName           : 'Qodana Report',
+                reportTitles         : 'Qodana Report Title',
                 alwaysLinkToLastBuild: true,
-                keepAll              : true
+                keepAll              : true,
+                allowMissing         : false,
         ])
 
         // 归档生成的 SARIF 报告文件

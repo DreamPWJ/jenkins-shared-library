@@ -60,10 +60,11 @@ def call(String type = 'web-java', Map map) {
                 string(name: 'ROLLBACK_BUILD_ID', defaultValue: '0', description: "DEPLOY_MODE基于" + GlobalVars.rollback + "部署方式, 输入对应保留的回滚构建记录ID, " +
                         "默认0是回滚到上一次连续构建, 当前归档模式的回滚仅适用于在master节点构建的任务")
                 booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行Docker/K8S集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
+                booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', defaultValue: false, description: "是否执行静态代码质量分析检测, 交付可读、易维护和安全的高质量代码 🔦")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
-                        description: '是否执行服务启动健康检测 否: 可大幅减少流水线持续时间 分布式部署不建议取消  K8S使用默认的健康探测')
+                        description: '是否执行服务启动健康检测 否: 可大幅减少流水线持续时间 分布式部署不建议取消  K8S使用默认的健康探测 🌡️')
                 booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}",
-                        description: '是否在生产环境中自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录')
+                        description: '是否在生产环境中自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录 📄')
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 📢 ")
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
                 //booleanParam(name: 'IS_DEPLOY_MULTI_ENV', defaultValue: false, description: '是否同时部署当前job项目多环境 如dev test等')
@@ -223,12 +224,11 @@ def call(String type = 'web-java', Map map) {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             // 是否进行代码质量分析  && fileExists("sonar-project.properties") == true 代码根目录配置sonar-project.properties文件才进行代码质量分析
-                            // return ("${IS_CODE_QUALITY_ANALYSIS}" == 'true' )
-                            return false
+                            return "${IS_CODE_QUALITY_ANALYSIS}" == 'true'
                         }
                     }
                     agent {
-                        // label "node-1"  // 执行节点 分布式执行 可在不同服务上执行不同任务
+                        label "node-3"  // 执行节点 分布式执行 可在不同服务上执行不同任务
                         /*   docker {
                                // sonarqube环境  构建完成自动删除容器
                                image "sonarqube:community"
@@ -778,8 +778,8 @@ def getInitParams(map) {
     IS_DISABLE_K8S_HEALTH_CHECK = jsonParams.IS_DISABLE_K8S_HEALTH_CHECK ? jsonParams.IS_DISABLE_K8S_HEALTH_CHECK : false
     // 是否开启Spring Native原生镜像 显著提升性能同时降低资源使用
     IS_SPRING_NATIVE = jsonParams.IS_SPRING_NATIVE ? jsonParams.IS_SPRING_NATIVE : false
-    // 是否进行代码质量分析的总开关
-    IS_CODE_QUALITY_ANALYSIS = jsonParams.IS_CODE_QUALITY_ANALYSIS ? jsonParams.IS_CODE_QUALITY_ANALYSIS : false
+    // 是否进行代码质量分析的开关
+    IS_CODE_QUALITY_ANALYSIS = jsonParams.IS_CODE_QUALITY_ANALYSIS ? jsonParams.IS_CODE_QUALITY_ANALYSIS : params.IS_CODE_QUALITY_ANALYSIS
     // 是否进集成测试
     IS_INTEGRATION_TESTING = jsonParams.IS_INTEGRATION_TESTING ? jsonParams.IS_INTEGRATION_TESTING : false
 

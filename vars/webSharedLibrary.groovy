@@ -123,7 +123,6 @@ def call(String type = 'web', Map map) {
                 IS_AUTO_TRIGGER = false // 是否是代码提交自动触发构建
                 IS_GEN_QR_CODE = false // 生成二维码 方便手机端扫描
                 IS_ARCHIVE = false // 是否归档
-                IS_CODE_QUALITY_ANALYSIS = false // 是否进行代码质量分析的总开关
                 IS_INTEGRATION_TESTING = false // 是否进集成测试
                 IS_ONLY_NOTICE_CHANGE_LOG = "${map.is_only_notice_change_log}" // 是否只通知发布变更记录
             }
