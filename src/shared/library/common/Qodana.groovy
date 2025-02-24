@@ -14,10 +14,13 @@ class Qodana implements Serializable {
      * 文档: https://www.jetbrains.com/help/qodana/jenkins.html
      */
     static def analyse(ctx) {
+        // 如果需要连接Qodana Cloud服务需要访问token  非社区版都需要Qodana Cloud配合
+        ctx.sh "export QODANA_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0IjoiYjhPcmEiLCJvcmdhbml6YXRpb24iOiJBYldWYiIsInRva2VuIjoicDBZa1AifQ.HnRUk9HsuqzOwN_iMzkcUiFQIsA23GTDpa_yb9oT2Dg"
+
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
 
         ctx.println("Qodana开始扫描分析代码...")
-        ctx.println("Qodana离线报告需要Web服务运行起来才能展示, 直接点击HTML单文件打开不显示")
+        // Qodana离线报告需要Web服务运行起来才能展示, 直接点击HTML单文件打开不显示
         ctx.sh " qodana  --save-report --report-dir=${qodanaReportDir} "
 
         // 仅分析新增代码 增量代码分析 --paths-to-exclude 参数来指定只分析变化的文件  https://www.jetbrains.com/help/qodana/analyze-pr.html
