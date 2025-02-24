@@ -14,11 +14,10 @@ class Qodana implements Serializable {
      * 文档: https://www.jetbrains.com/help/qodana/jenkins.html
      */
     static def analyse(ctx) {
-        // 设置Qodana Cloud 项目访问token
-        // ctx.sh "export QODANA_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0IjoiYjhPcmEiLCJvcmdhbml6YXRpb24iOiJBYldWYiIsInRva2VuIjoicDBZa1AifQ.HnRUk9HsuqzOwN_iMzkcUiFQIsA23GTDpa_yb9oT2Dg"
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
 
         ctx.println("Qodana开始扫描分析代码...")
+        ctx.println("Qodana离线报告需要Web服务运行起来才能展示, 直接点击HTML单文件打开不显示")
         ctx.sh " qodana  --save-report --report-dir=${qodanaReportDir} "
 
         // 仅分析新增代码 增量代码分析 --paths-to-exclude 参数来指定只分析变化的文件  https://www.jetbrains.com/help/qodana/analyze-pr.html
@@ -44,7 +43,7 @@ class Qodana implements Serializable {
         */
 
 
-        // 发布 HTML 报告 显示在左侧菜单栏 需要安装插件 https://plugins.jenkins.io/htmlpublisher/
+        // 发布 HTML 报告 显示在左侧菜单栏 报告服务运行才能展示  直接点击Html打开无效  需要安装插件 https://plugins.jenkins.io/htmlpublisher/
         ctx.publishHTML(target: [
                 reportName           : 'Qodana质量报告',
                 reportDir            : "${qodanaReportDir}/",
