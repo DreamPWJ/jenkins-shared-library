@@ -935,13 +935,13 @@ def initInfo() {
     dockerReleaseWorkerShellName = ""
     if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
         dockerReleaseWorkerShellName = "docker-release-worker.sh"
-        qodanaImagesName = "qodana-jvm"
+        qodanaImagesName = "qodana-jvm-community"
     } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
         dockerReleaseWorkerShellName = "go/docker-release-worker-go.sh"
         qodanaImagesName = "qodana-go"
     } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
         dockerReleaseWorkerShellName = "python/docker-release-worker-python.sh"
-        qodanaImagesName = "qodana-python"
+        qodanaImagesName = "qodana-python-community"
     } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) {
         dockerReleaseWorkerShellName = "cpp/docker-release-worker-cpp.sh"
         qodanaImagesName = "qodana-clang"
