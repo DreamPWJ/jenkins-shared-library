@@ -76,10 +76,10 @@ sudo docker run -d --restart=always -p 8000:80  --cpus=2 -m 4096m --name gitlab-
 -v /my/gitlab/config:/etc/gitlab -v /my/gitlab/logs:/var/log/gitlab -v /my/gitlab/data:/var/opt/gitlab  \
 gitlab/gitlab-ce:latest
 
-#### 基于Docker安装部署大模型ollama容器镜像
+#### 基于Docker安装部署大模型Ollama和Open WebUI容器镜像
 docker pull ollama/ollama
 #### 只有CPU模式部署
-docker run -d --restart always -p 11434:11434 --cpus=4 -m 8096m -v /my/ollama:/root/.ollama --name ollama ollama/ollama
+docker run -d --restart always -p 11434:11434 --cpus=8 -m 16096m -v /my/ollama:/root/.ollama --name ollama ollama/ollama
 docker run -d --restart always -p 3100:8080 --add-host=host.docker.internal:host-gateway -v /my/ollama:/root/.ollama  -v /my/open-webui:/app/backend/data --name open-webui  ghcr.io/open-webui/open-webui:main
 
 #### 基于Docker安装部署ZenTao禅道项目管理软件
