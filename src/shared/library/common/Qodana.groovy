@@ -57,9 +57,9 @@ class Qodana implements Serializable {
 
 
         if (isApplyFixes) {  // 是否自动修复并提交PR审核
-            def changes = ctx.sh(script: 'git status --porcelain || true', returnStdout: true).trim()
+            def changes = ctx.sh(script: 'git status --porcelain', returnStdout: true).trim()
             // 检查是否有变更
-            if (!changes) {
+            if (!changes || changes == "") {
                 return
             }
             ctx.withCredentials([ctx.usernamePassword(credentialsId: ctx.GIT_CREDENTIALS_ID,
@@ -74,7 +74,6 @@ class Qodana implements Serializable {
                 ctx.sh("""
                    git config --global user.email "406798106@qq.com"
                    git config --global user.name ${ctx.GIT_USERNAME}
-                   git pull ${userPassWordUrl}
                    """)
                 // 创建新分支
                 def branchName = "qodana-auto-fixes"
