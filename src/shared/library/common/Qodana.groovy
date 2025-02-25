@@ -10,34 +10,50 @@ package shared.library.common
 class Qodana implements Serializable {
 
     /**
-     * 分析
+     * 分析代码
      * 文档: https://www.jetbrains.com/help/qodana/jenkins.html
      */
+    @NonCPS
     static def analyse(ctx) {
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
-        def earliestCommit = null
+        def isCodeDiff = false // 是否增量代码检测
+        def isFailThreshold = false // 是否设置质量阈值
+        def isApplyFixes = false // 是否自动修复
+        def earliestCommit = null  // 变更记录
 
-        // 获取jenkins变更记录 用于增量代码分析  优先尝试 changeSets
-        def changeSets = ctx.currentBuild.changeSets
-        if (changeSets != null && !changeSets.isEmpty()) {
-            for (changeSet in changeSets) {
-                def commits = changeSet.items
-                if (commits != null && commits.length > 0) {
-                    earliestCommit = commits[0].commitId
+        if (isCodeDiff) { // 是否增量代码检测
+            // 获取jenkins变更记录 用于增量代码分析  优先尝试 changeSets
+            def changeSets = ctx.currentBuild.changeSets
+            if (changeSets != null && !changeSets.isEmpty()) {
+                for (changeSet in changeSets) {
+                    def commits = changeSet.items
+                    if (commits != null && commits.length > 0) {
+                        earliestCommit = commits[0].commitId
+                    }
                 }
             }
+            ctx.env.EARLIEST_COMMIT = earliestCommit
         }
-        ctx.env.EARLIEST_COMMIT = earliestCommit
 
         ctx.println("Qodana开始扫描分析代码质量...")
         // 如果需要连接Qodana Cloud服务需要访问token  非社区版都需要Qodana Cloud配合
         ctx.sh "export QODANA_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0IjoiYjhPcmEiLCJvcmdhbml6YXRpb24iOiJBYldWYiIsInRva2VuIjoicDBZa1AifQ.HnRUk9HsuqzOwN_iMzkcUiFQIsA23GTDpa_yb9oT2Dg"
+        def qodanaParams = ""
+        if (isCodeDiff) { // 是否增量代码检测
+            qodanaParams = qodanaParams + " --diff-start=${ctx.env.EARLIEST_COMMIT} "
+        }
+        if (isFailThreshold) { // 是否设置质量阈值 避免大量累计技术债务
+            qodanaParams = qodanaParams + " --fail-threshold 100 "
+        }
+        if (isApplyFixes) { // 是否自动修复
+            qodanaParams = qodanaParams + " --apply-fixes "
+        }
         // Qodana离线报告需要Web服务运行起来才能展示, 直接点击HTML单文件打开不显示
-        ctx.sh " qodana scan --save-report --apply-fixes --fail-threshold 100 --diff-start=${ctx.env.EARLIEST_COMMIT} --report-dir=${qodanaReportDir} "
+        ctx.sh " qodana scan --save-report ${qodanaParams} --report-dir=${qodanaReportDir} "
 
         // 自动修复并提交PR审核
         def changes = ctx.sh(script: 'git status --porcelain', returnStdout: true).trim()
-        if (changes) {   // 检查是否有变更
+        if (isApplyFixes && changes) {   // 检查是否有变更
             ctx.withCredentials([ctx.usernamePassword(credentialsId: ctx.GIT_CREDENTIALS_ID,
                     usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                 ctx.script {
@@ -77,7 +93,7 @@ class Qodana implements Serializable {
 
         // 发布 HTML 报告 显示在左侧菜单栏  需要安装插件 https://plugins.jenkins.io/htmlpublisher/
         // 确保Jenkins已调整CSP允许JavaScript执行
-        System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;")
+        ctx.System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;")
         ctx.publishHTML(target: [
                 reportDir            : "${qodanaReportDir}",
                 reportFiles          : 'index.html',
