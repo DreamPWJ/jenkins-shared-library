@@ -1,17 +1,50 @@
-version: 1.0
-failThreshold: 0
+# Qodana 配置文件版本
+version: "1.0"
+
+# 指定分析的语言和工具（这里是 Java）
+linter: jetbrains/qodana-jvm:latest
+
+# 检查规则配置
 profile:
-  name: qodana.recommended
-include:
-  - name: SomeInspectionId
+  name: "Recommended"  # 使用 Qodana 推荐的检查规则
+  # 可选：自定义规则路径
+  # path: ./custom-inspections.xml
+
+# 排除分析的路径（可选）
 exclude:
-  - name: Annotator
-  - name: AnotherInspectionId
+  - name: "All"  # 排除特定检查
     paths:
-      - relative/path
-      - another/relative/path
-  - name: All
+      - src/test  # 排除测试目录
+      - src/main/resources  # 排除资源文件
+  - name: "UnusedDeclaration"  # 排除未使用声明的检查
     paths:
-      - /src/main/java/com
-      - benchmarks
-      - tools
+      - src/main/java/com/example/generated  # 排除生成代码
+
+# 包含特定检查（可选）
+include:
+  - name: "JavaSpecificCheck"  # 示例检查名称
+
+# 质量门设置（失败条件）
+failureConditions:
+  severityThresholds:
+    any: 20          # 总问题数阈值
+    critical: 5      # 严重问题阈值
+    high: 10         # 高优先级问题阈值
+    moderate: 15     # 中等问题阈值
+  testCoverageThresholds:
+    fresh: 70       # 新代码测试覆盖率阈值（百分比）
+    total: 80       # 总代码覆盖率阈值（百分比）
+
+# Java 特定配置（可选）
+properties:
+  java:
+    sourceDirs: "src/main/java"  # 指定源代码目录
+    testDirs: "src/test/java"    # 指定测试代码目录
+    compiledClasses: "target/classes"  # 指定编译后的类文件目录
+    # 可选：指定 JDK 版本
+    jdkVersion: "21"
+
+# 报告输出设置（可选）
+report:
+  generateHtml: true  # 生成 HTML 报告
+  outputDir: "qodana-report"  # 报告输出目录

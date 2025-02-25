@@ -51,9 +51,13 @@ class Qodana implements Serializable {
         // Qodana离线报告需要Web服务运行起来才能展示, 直接点击HTML单文件打开不显示
         ctx.sh " qodana scan --save-report ${qodanaParams} --report-dir=${qodanaReportDir} "
 
-        // 自动修复并提交PR审核
-        def changes = ctx.sh(script: 'git status --porcelain', returnStdout: true).trim()
-        if (isApplyFixes && changes) {   // 检查是否有变更
+
+        if (isApplyFixes) {  // 是否自动修复并提交PR审核
+            def changes = ctx.sh(script: 'git status --porcelain || true', returnStdout: true).trim()
+            // 检查是否有变更
+            if (!changes) {
+                return
+            }
             ctx.withCredentials([ctx.usernamePassword(credentialsId: ctx.GIT_CREDENTIALS_ID,
                     usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                 ctx.script {
