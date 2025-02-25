@@ -20,11 +20,13 @@ class Qodana implements Serializable {
         // 如果需要连接Qodana Cloud服务需要访问token  非社区版都需要Qodana Cloud配合
         ctx.sh "export QODANA_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0IjoiYjhPcmEiLCJvcmdhbml6YXRpb24iOiJBYldWYiIsInRva2VuIjoicDBZa1AifQ.HnRUk9HsuqzOwN_iMzkcUiFQIsA23GTDpa_yb9oT2Dg"
         // Qodana离线报告需要Web服务运行起来才能展示, 直接点击HTML单文件打开不显示
-        ctx.sh " qodana  --save-report --report-dir=${qodanaReportDir} "
+        ctx.sh " qodana --save-report --report-dir=${qodanaReportDir} "
 
         // 仅分析新增代码 增量代码分析 --paths-to-exclude 参数来指定只分析变化的文件  https://www.jetbrains.com/help/qodana/analyze-pr.html
         // def gitStartHash = "" // 获取两次提交之间的更改文件列表 用逗号分隔的文件列表传递给Qodana
         // ctx.sh " qodana inspect --diff-start=${gitStartHash} "
+
+        // 自动修复PR
 
 /*      // CLI 应该从具有 qodana.yaml
         def qodanaFile = "${ctx.env.WORKSPACE}/ci/_jenkins/qodana/qodana.yaml"

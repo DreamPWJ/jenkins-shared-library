@@ -76,7 +76,7 @@ sudo docker run -d --restart=always -p 8000:80  --cpus=2 -m 4096m --name gitlab-
 -v /my/gitlab/config:/etc/gitlab -v /my/gitlab/logs:/var/log/gitlab -v /my/gitlab/data:/var/opt/gitlab  \
 gitlab/gitlab-ce:latest
 
-#### 基于Docker安装部署大模型Ollama和Open WebUI容器镜像
+#### 基于Docker安装部署大模型Ollama和Open WebUI、Dify容器镜像
 docker pull ollama/ollama
 docker pull ghcr.io/open-webui/open-webui:main
 
