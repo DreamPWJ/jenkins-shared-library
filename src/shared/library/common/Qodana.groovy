@@ -72,7 +72,7 @@ class Qodana implements Serializable {
                 def branchName = "qodana-auto-fix"
                 // 推送变更文件到远程仓库
                 ctx.sh("""
-                  git checkout -b ${branchName}
+                  git rev-parse --verify ${branchName} >/dev/null 2>&1 && git checkout ${branchName} || git checkout -b ${branchName}
                   git add *.java
                   git commit -m "fix: Qodana auto fix [${ctx.PROJECT_NAME}#${ctx.env.BUILD_NUMBER}]"
                   git push ${userPassWordUrl}
