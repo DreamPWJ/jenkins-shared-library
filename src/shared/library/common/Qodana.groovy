@@ -38,7 +38,7 @@ class Qodana implements Serializable {
             ctx.env.EARLIEST_COMMIT = earliestCommit
         }
 
-        ctx.println("Qodana开始扫描分析代码质量...")
+        ctx.println("Qodana开始扫描分析代码质量 ... 🔍")
         // 如果需要连接Qodana Cloud服务需要访问token  非社区版都需要Qodana Cloud配合
         ctx.sh "export QODANA_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0IjoiMFdyb2wiLCJvcmdhbml6YXRpb24iOiJBYldWYiIsInRva2VuIjoiQWFnWEQifQ.UDs8IAUYybCfboTXm3Q8QdePzRbwdCZQzZIpf1rj208"
         def qodanaParams = ""
@@ -58,6 +58,7 @@ class Qodana implements Serializable {
 
         if (isApplyFixes) {  // 是否自动修复并提交PR审核
             def changes = ctx.sh(script: 'git status --porcelain', returnStdout: true).trim()
+            ctx.println(changes)
             // 检查是否有变更
             if (!changes || changes == "") {
                 return
@@ -79,9 +80,9 @@ class Qodana implements Serializable {
                 def branchName = "qodana-auto-fixes"
                 // 推送变更文件到远程仓库
                 ctx.sh("""
-                  ctx.sh "git checkout -b ${branchName}"
-                  ctx.sh 'git add .'
-                  ctx.sh "git commit -m \\"fix: Qodana auto fixes [${ctx.PROJECT_NAME}-${ctx.env.BUILD_NUMBER}]\\""
+                  git checkout -b ${branchName}"
+                  git add .
+                  git commit -m "fix: Qodana auto fixes [${ctx.PROJECT_NAME}-${ctx.env.BUILD_NUMBER}]"
                   git push ${userPassWordUrl}
                    """)
             }
