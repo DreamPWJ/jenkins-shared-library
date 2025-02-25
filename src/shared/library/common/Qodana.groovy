@@ -30,8 +30,11 @@ class Qodana implements Serializable {
             if (changeSets != null && !changeSets.isEmpty()) {
                 for (changeSet in changeSets) {
                     def commits = changeSet.items
-                    if (commits != null && commits.length > 0) {
+                    if (commits != null && commits.length > 1) {
                         earliestCommit = commits[0].commitId
+                    }
+                    if (commits != null && commits.length == 1) {
+                        earliestCommit = ctx.env.EARLIEST_COMMIT = ctx.sh(script: 'git rev-parse HEAD^', returnStdout: true).trim()
                     }
                 }
             }
