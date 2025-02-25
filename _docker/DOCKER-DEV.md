@@ -61,7 +61,7 @@ sudo docker run -d --restart=always -p 8000:8080 -p 50000:50000 \
 -v /etc/localtime:/etc/localtime:ro -v $(which bash):/bin/bash  \
 -v $(which docker):/usr/bin/docker -v /var/run/docker.sock:/var/run/docker.sock \
 -v /my/jenkins:/var/jenkins_home -v /my/jenkins/ssh:/root/.ssh  \
--e JAVA_OPTS="-Duser.timezone=Asia/Shanghai -Dhudson.model.DirectoryBrowserSupport.CSP=\"default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';\""  \
+-e JAVA_OPTS="-Duser.timezone=Asia/Shanghai"  \
 -v "$HOME":/home --privileged --name jenkins jenkins/jenkins:lts \
 && sudo chown -R 1000:1000 /my/jenkins
 
