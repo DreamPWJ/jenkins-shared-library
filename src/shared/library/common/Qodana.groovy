@@ -27,20 +27,8 @@ class Qodana implements Serializable {
         def earliestCommit = null  // 变更记录
 
         if (isCodeDiff) { // 是否增量代码检测
-            // 获取jenkins变更记录 用于增量代码分析  优先尝试 changeSets
-            def changeSets = ctx.currentBuild.changeSets
-            if (changeSets != null && !changeSets.isEmpty()) {
-                for (changeSet in changeSets) {
-                    def commits = changeSet.items
-                    if (commits != null && commits.length > 1) {
-                        earliestCommit = commits[0].commitId
-                    }
-                    if (commits != null && commits.length == 1) {
-                        earliestCommit =  ctx.sh(script: 'git rev-parse HEAD^', returnStdout: true).trim()
-                    }
-                }
-            }
-            ctx.env.EARLIEST_COMMIT = earliestCommit
+            // 获取jenkins变更记录 用于增量代码分析 从父提交到当前提交的代码变更
+            ctx.env.EARLIEST_COMMIT =  ctx.sh(script: 'git rev-parse HEAD^', returnStdout: true).trim()
         }
 
         // 如果需要连接Qodana Cloud服务需要访问token  非社区版都需要Qodana Cloud配合
