@@ -13,7 +13,6 @@ class Qodana implements Serializable {
      * 分析代码
      * 文档: https://www.jetbrains.com/help/qodana/jenkins.html
      */
-    @NonCPS
     static def analyse(ctx) {
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
         def isCodeDiff = false // 是否增量代码检测
