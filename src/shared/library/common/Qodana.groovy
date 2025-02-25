@@ -21,7 +21,7 @@ class Qodana implements Serializable {
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
         def isCodeDiff = true // 是否增量代码检测
         def isFailThreshold = true // 是否设置质量阈值
-        def isApplyFixes = false // 是否自动修复
+        def isApplyFixes = true // 是否自动修复
         def earliestCommit = null  // 变更记录
 
         if (isCodeDiff) { // 是否增量代码检测
@@ -46,7 +46,8 @@ class Qodana implements Serializable {
             qodanaParams = qodanaParams + " --diff-start=${ctx.env.EARLIEST_COMMIT} "
         }
         if (isFailThreshold) { // 是否设置质量阈值 避免大量累计技术债务
-            qodanaParams = qodanaParams + " --fail-threshold 100 "
+            int failNum = 1000 // 质量门最大错误数 全量和增量检测动态改变
+            qodanaParams = qodanaParams + " --fail-threshold ${failNum} "
         }
         if (isApplyFixes) { // 是否自动修复
             qodanaParams = qodanaParams + " --apply-fixes "
