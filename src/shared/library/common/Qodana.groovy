@@ -23,7 +23,7 @@ class Qodana implements Serializable {
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
         def isCodeDiff = true // 是否增量代码检测
         def isFailThreshold = true // 是否设置质量阈值
-        def isApplyFixes = true // 是否自动修复
+        def isApplyFixes = false // 是否自动修复
         def earliestCommit = null  // 变更记录
 
         if (isCodeDiff) { // 是否增量代码检测
@@ -112,7 +112,7 @@ class Qodana implements Serializable {
         // if ("${ctx.params.IS_DING_NOTICE}" == 'true')  // 是否钉钉通知
         DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "静态代码分析质量报告 [${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}](${ctx.env.JOB_URL}${reportName})  📑",
                 "\n\n  #### 代码质量分析结果: [查看报表](${ctx.env.JOB_URL}${reportName}) 📈"
-                        + "\n  ##### - 持续交付可读、易维护和安全的高质量代码 ✨ "
+                        + "\n- 持续交付可读、易维护和安全的高质量代码 ✨ "
                         + "\n  ###### 执行人: ${ctx.BUILD_USER} \n ###### 完成时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
     }
 
