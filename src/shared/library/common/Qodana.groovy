@@ -82,7 +82,7 @@ class Qodana implements Serializable {
                 ctx.sh("""
                   git checkout -b ${branchName}
                   git add *.java
-                  git commit -m "fix: Qodana auto fix [${ctx.PROJECT_NAME}-${ctx.env.BUILD_NUMBER}]"
+                  git commit -m "fix: Qodana auto fix [${ctx.PROJECT_NAME}#${ctx.env.BUILD_NUMBER}]"
                   git push ${userPassWordUrl}
                    """)
             }
