@@ -67,7 +67,7 @@ map.put('is_prod', false)
 map.put('is_same_server', false)
 // 是否进行优雅停机
 map.put('is_grace_shutdown', false)
-// 是否进行服务启动健康探测 K8S集群类型设置false
+// 是否进行服务启动健康探测 K8S集群类型设置false使用自带健康探测
 map.put('is_health_check', false)
 // 是否Pipeline内脚本钉钉通知  总开关
 map.put('is_ding_notice', false)

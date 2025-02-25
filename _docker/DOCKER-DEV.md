@@ -1,9 +1,10 @@
 #### 设置镜像源  解决pull下载慢卡住问题  注意：镜像源不维护了可能导致latest不是最新的版本 
-##### 可使用CloudFlare Workers方案做Docker镜像源网络代理  或使用阿里云账号下专属镜像加速 或者临时镜像源设置 如: docker pull docker.lanneng.tech/repo-name/images:version 
+##### 可使用CloudFlare Workers方案做Docker镜像源网络代理  或阿里云账号下专属镜像加速但只针对阿里云产品有效 或者临时镜像源设置 如: docker pull docker.lanneng.tech/repo-name/images:version 
 docker info
 sudo cat <<EOF >/etc/docker/daemon.json
 {
 "registry-mirrors": [
+  "https://docker.lanneng.tech",
   "https://em1sutsj.mirror.aliyuncs.com"
 ],
 "log-driver":"json-file",
@@ -56,10 +57,11 @@ docker pull jenkins/jenkins:lts
 
 #### 添加挂载映射本地数据卷权限 sudo chown -R 1000:1000 /my/jenkins  将宿主机的docker命令挂载到容器中  -v /my/jenkins/plugins.txt:/var/jenkins_home/plugins.txt
 sudo docker run -d --restart=always -p 8000:8080 -p 50000:50000 \
--u root --cpus=2 -m 4096m -e JAVA_OPTS=-Duser.timezone=Asia/Shanghai \
+-u root --cpus=2 -m 4096m  \
 -v /etc/localtime:/etc/localtime:ro -v $(which bash):/bin/bash  \
 -v $(which docker):/usr/bin/docker -v /var/run/docker.sock:/var/run/docker.sock \
 -v /my/jenkins:/var/jenkins_home -v /my/jenkins/ssh:/root/.ssh  \
+-e JAVA_OPTS="-Duser.timezone=Asia/Shanghai"  \
 -v "$HOME":/home --privileged --name jenkins jenkins/jenkins:lts \
 && sudo chown -R 1000:1000 /my/jenkins
 
@@ -74,6 +76,18 @@ docker pull gitlab/gitlab-ce
 sudo docker run -d --restart=always -p 8000:80  --cpus=2 -m 4096m --name gitlab-ce \
 -v /my/gitlab/config:/etc/gitlab -v /my/gitlab/logs:/var/log/gitlab -v /my/gitlab/data:/var/opt/gitlab  \
 gitlab/gitlab-ce:latest
+
+#### 基于Docker安装部署大模型Ollama和Open WebUI、Dify容器镜像
+docker pull ollama/ollama
+docker pull ghcr.io/open-webui/open-webui:main
+
+#### 只有CPU模式部署
+docker run -d --restart always -p 11434:11434 --cpus=8 -m 16096m -v /my/ollama:/root/.ollama --name ollama ollama/ollama
+
+docker run -d --restart always -p 3100:8080 --cpus=2 -m 4096m  --add-host=host.docker.internal:host-gateway -v /my/ollama:/root/.ollama  \
+ -v /my/open-webui:/app/backend/data  --name open-webui  ghcr.io/open-webui/open-webui:main
+
+docker exec -it ollama  ollama run deepseek-r1:7b
 
 #### 基于Docker安装部署ZenTao禅道项目管理软件
 #### 从Docker Hub里拉取ZenTao禅道镜像最新版来部署

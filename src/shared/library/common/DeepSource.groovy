@@ -12,7 +12,7 @@ class DeepSource implements Serializable {
      * 分析
      * 文档: https://deepsource.io/docs/cli/usage
      */
-    static def analyse(ctx) {
+    static def analyse(ctx, map) {
         // CLI 应该从具有.deepsource.toml
         def deepsourceFile = "${ctx.env.WORKSPACE}/ci/_jenkins/deepsource/.deepsource.toml"
         ctx.sh "export DEEPSOURCE_DSN=${deepsourceFile}"
@@ -29,5 +29,5 @@ class DeepSource implements Serializable {
         ctx.sh "curl https://deepsource.io/cli | sh"
         // ctx.sh "brew install deepsourcelabs/cli/deepsource"
     }
-    
+
 }

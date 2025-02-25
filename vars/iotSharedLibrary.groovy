@@ -87,7 +87,6 @@ def call(String type = 'iot', Map map) {
                 IS_PROD = "${map.is_prod}" // 是否是生产环境
                 IS_AUTO_TRIGGER = false // 是否是自动触发构建
                 IS_ARCHIVE = true // 是否归档
-                IS_CODE_QUALITY_ANALYSIS = false // 是否进行代码质量分析的总开关
                 IS_INTEGRATION_TESTING = false // 是否进集成测试
                 IS_ONLY_NOTICE_CHANGE_LOG = "${map.is_only_notice_change_log}" // 是否只通知发布变更记录
             }
@@ -179,7 +178,7 @@ def call(String type = 'iot', Map map) {
                         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                             script {
                                 // codeQualityAnalysis()
-                                Qodana.analyse(this)
+                                Qodana.analyse(this, map)
                             }
                         }
                     }
