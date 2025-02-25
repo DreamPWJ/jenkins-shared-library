@@ -12,6 +12,7 @@ class Qodana implements Serializable {
     /**
      * 分析代码
      * 文档: https://www.jetbrains.com/help/qodana/jenkins.html
+     * 全量分析 + 增量分析 每次构建或者每次提交代码时都扫描代码
      */
     static def analyse(ctx) {
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
@@ -105,6 +106,8 @@ class Qodana implements Serializable {
 
         // 归档生成的报告文件
         // ctx.archiveArtifacts artifacts: "${qodanaReportDir}/**", allowEmptyArchive: true
+
+        // 钉钉通知质量报告 形成信息闭环
 
     }
 
