@@ -18,6 +18,8 @@ class Qodana implements Serializable {
      * 全量分析 + 增量分析 每次构建或者每次提交代码时都扫描代码
      */
     static def analyse(ctx, map) {
+        ctx.println("Qodana开始扫描分析代码质量 ... 🔍")
+
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
         def isCodeDiff = true // 是否增量代码检测
         def isFailThreshold = true // 是否设置质量阈值
@@ -34,14 +36,13 @@ class Qodana implements Serializable {
                         earliestCommit = commits[0].commitId
                     }
                     if (commits != null && commits.length == 1) {
-                        earliestCommit = ctx.env.EARLIEST_COMMIT = ctx.sh(script: 'git rev-parse HEAD^', returnStdout: true).trim()
+                        earliestCommit =  ctx.sh(script: 'git rev-parse HEAD^', returnStdout: true).trim()
                     }
                 }
             }
             ctx.env.EARLIEST_COMMIT = earliestCommit
         }
 
-        ctx.println("Qodana开始扫描分析代码质量 ... 🔍")
         // 如果需要连接Qodana Cloud服务需要访问token  非社区版都需要Qodana Cloud配合
         ctx.sh "export QODANA_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0IjoiMFdyb2wiLCJvcmdhbml6YXRpb24iOiJBYldWYiIsInRva2VuIjoiQWFnWEQifQ.UDs8IAUYybCfboTXm3Q8QdePzRbwdCZQzZIpf1rj208"
         def qodanaParams = ""
