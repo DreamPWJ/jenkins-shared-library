@@ -45,7 +45,7 @@ class Qodana implements Serializable {
             qodanaParams = qodanaParams + " --apply-fixes "
         }
         // Qodana离线报告需要Web服务运行起来才能展示, 直接点击HTML单文件打开不显示
-        ctx.sh " qodana scan --save-report ${qodanaParams} --report-dir=${qodanaReportDir} "
+        ctx.sh " qodana scan --save-report ${qodanaParams} --baseline qodana-baseline --report-dir=${qodanaReportDir} --cache-dir=${ctx.env.WORKSPACE}/.qodana/cache "
 
 
         if (isApplyFixes) {  // 是否自动修复并提交PR审核
