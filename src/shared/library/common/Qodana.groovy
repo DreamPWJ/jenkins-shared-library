@@ -4,7 +4,7 @@ package shared.library.common
  * @author 潘维吉
  * @date 2022/06/28 13:22
  * @email 406798106@qq.com
- * @description Qodana是一个代码质量监控平台 JetBrains公司出品
+ * @description Qodana是一个代码质量监控平台 报告更直观 JetBrains公司出品
  * 官网： https://www.jetbrains.com/qodana/
  */
 class Qodana implements Serializable {
@@ -15,20 +15,54 @@ class Qodana implements Serializable {
      */
     static def analyse(ctx) {
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
-        // 获取当前分支的最近一次提交和前一次提交
-        def startHash = ctx.sh(script: 'git rev-parse HEAD^', returnStdout: true).trim()
+        def earliestCommit = null
+
+        // 获取jenkins变更记录 用于增量代码分析  优先尝试 changeSets
+        def changeSets = ctx.currentBuild.changeSets
+        if (changeSets != null && !changeSets.isEmpty()) {
+            for (changeSet in changeSets) {
+                def commits = changeSet.items
+                if (commits != null && commits.length > 0) {
+                    earliestCommit = commits[0].commitId
+                }
+            }
+        }
+        ctx.env.EARLIEST_COMMIT = earliestCommit
 
         ctx.println("Qodana开始扫描分析代码质量...")
         // 如果需要连接Qodana Cloud服务需要访问token  非社区版都需要Qodana Cloud配合
         ctx.sh "export QODANA_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0IjoiYjhPcmEiLCJvcmdhbml6YXRpb24iOiJBYldWYiIsInRva2VuIjoicDBZa1AifQ.HnRUk9HsuqzOwN_iMzkcUiFQIsA23GTDpa_yb9oT2Dg"
         // Qodana离线报告需要Web服务运行起来才能展示, 直接点击HTML单文件打开不显示
-        ctx.sh " qodana scan --save-report --diff-start=${startHash} --report-dir=${qodanaReportDir} "
+        ctx.sh " qodana scan --save-report --apply-fixes --fail-threshold 100 --diff-start=${ctx.env.EARLIEST_COMMIT} --report-dir=${qodanaReportDir} "
 
-        // 仅分析新增代码 增量代码分析 --paths-to-exclude 参数来指定只分析变化的文件  https://www.jetbrains.com/help/qodana/analyze-pr.html
-        // def gitStartHash = "" // 获取两次提交之间的更改文件列表 用逗号分隔的文件列表传递给Qodana
-        // ctx.sh " qodana inspect --diff-start=${gitStartHash} "
-
-        // 自动修复PR
+        // 自动修复并提交PR审核
+        def changes = ctx.sh(script: 'git status --porcelain', returnStdout: true).trim()
+        if (changes) {   // 检查是否有变更
+            ctx.withCredentials([ctx.usernamePassword(credentialsId: ctx.GIT_CREDENTIALS_ID,
+                    usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                ctx.script {
+                    ctx.env.ENCODED_GIT_PASSWORD = URLEncoder.encode(ctx.GIT_PASSWORD, "UTF-8")
+                }
+                def repoUrlProtocol = ctx.REPO_URL.toString().split("://")[0]
+                def userPassWordUrl = repoUrlProtocol + "://${ctx.GIT_USERNAME.replace("@", "%40")}:${ctx.ENCODED_GIT_PASSWORD.replace("@", "%40")}" +
+                        "@${ctx.REPO_URL.toString().replace("http://", "").replace("https://", "")} "
+                // 先从远程下载最新代码  防止推送的时候冲突
+                ctx.sh("""
+                   git config --global user.email "406798106@qq.com"
+                   git config --global user.name ${ctx.GIT_USERNAME}
+                   git pull ${userPassWordUrl}
+                   """)
+                // 创建新分支
+                def branchName = "qodana-auto-fixes"
+                // 推送变更文件到远程仓库
+                ctx.sh("""
+                  ctx.sh "git checkout -b ${branchName}"
+                  ctx.sh 'git add .'
+                  ctx.sh "git commit -m \\"fix: Qodana auto fixes [${ctx.PROJECT_NAME}-${ctx.env.BUILD_NUMBER}]\\""
+                  git push ${userPassWordUrl}
+                   """)
+            }
+        }
 
 /*      // CLI 应该从具有 qodana.yaml
         def qodanaFile = "${ctx.env.WORKSPACE}/ci/_jenkins/qodana/qodana.yaml"
@@ -40,17 +74,10 @@ class Qodana implements Serializable {
         ctx.sh "chmod +x qodana-reports"
         ctx.sh "qodana --show-report ${qualityGate}"*/
 
-        // 展示HTML报告
-/*      sh "mkdir -p /var/www/qodana/${config.qodana_path}"
-        sh "cp -r qodana-reports/report/* /var/www/qodana/${config.qodana_path}/"
-        // make a html-file we can archive in jenkins, that will redirect to our vhost that hosts the above folder
-        sh "echo '<html><head><meta http-equiv=\"refresh\" content=\"0; url=https://qodana-host/${config.qodana_path}\" /></head></html>' > qodana-reports/qodana.html"
-        archiveArtifacts artifacts: 'qodana-reports/qodana.html', fingerprint: true
-        */
-
 
         // 发布 HTML 报告 显示在左侧菜单栏  需要安装插件 https://plugins.jenkins.io/htmlpublisher/
-        // 确保Jenkins已调整CSP允许JavaScript执行:  System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;")
+        // 确保Jenkins已调整CSP允许JavaScript执行
+        System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;")
         ctx.publishHTML(target: [
                 reportDir            : "${qodanaReportDir}",
                 reportFiles          : 'index.html',
