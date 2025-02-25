@@ -19,7 +19,7 @@ class Qodana implements Serializable {
      */
     static def analyse(ctx, map) {
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
-        def isCodeDiff = false // 是否增量代码检测
+        def isCodeDiff = true // 是否增量代码检测
         def isFailThreshold = false // 是否设置质量阈值
         def isApplyFixes = false // 是否自动修复
         def earliestCommit = null  // 变更记录
