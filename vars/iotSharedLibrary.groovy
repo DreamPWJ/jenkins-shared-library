@@ -178,7 +178,7 @@ def call(String type = 'iot', Map map) {
                         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                             script {
                                 // codeQualityAnalysis()
-                                Qodana.analyse(this)
+                                Qodana.analyse(this, map)
                             }
                         }
                     }

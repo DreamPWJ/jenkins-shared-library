@@ -17,7 +17,7 @@ class Qodana implements Serializable {
      * 文档: https://www.jetbrains.com/help/qodana/jenkins.html
      * 全量分析 + 增量分析 每次构建或者每次提交代码时都扫描代码
      */
-    static def analyse(ctx) {
+    static def analyse(ctx, map) {
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
         def isCodeDiff = false // 是否增量代码检测
         def isFailThreshold = false // 是否设置质量阈值
@@ -117,8 +117,8 @@ class Qodana implements Serializable {
 
         // 钉钉通知质量报告 形成信息闭环
         DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "静态代码分析质量报告 [${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}](${ctx.env.JOB_URL}/${reportName})  📑",
-                + "\n  ### 代码质量分析结果: [查看](${ctx.env.JOB_URL}/${reportName}) 📈" +
-                        + "\n  ##### 交付可读、易维护和安全的高质量代码 ✨ "
+                +"\n  ### 代码质量分析结果: [查看](${ctx.env.JOB_URL}/${reportName}) 📈" +
+                        +"\n  ##### 交付可读、易维护和安全的高质量代码 ✨ "
                         + "\n  ###### 执行人: ${ctx.BUILD_USER} \n ###### 完成时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
     }
 
