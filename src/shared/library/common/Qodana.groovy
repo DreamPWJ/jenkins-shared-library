@@ -20,7 +20,7 @@ class Qodana implements Serializable {
     static def analyse(ctx, map) {
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
         def isCodeDiff = true // 是否增量代码检测
-        def isFailThreshold = false // 是否设置质量阈值
+        def isFailThreshold = true // 是否设置质量阈值
         def isApplyFixes = false // 是否自动修复
         def earliestCommit = null  // 变更记录
 
@@ -40,7 +40,7 @@ class Qodana implements Serializable {
 
         ctx.println("Qodana开始扫描分析代码质量...")
         // 如果需要连接Qodana Cloud服务需要访问token  非社区版都需要Qodana Cloud配合
-        ctx.sh "export QODANA_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0IjoiYjhPcmEiLCJvcmdhbml6YXRpb24iOiJBYldWYiIsInRva2VuIjoicDBZa1AifQ.HnRUk9HsuqzOwN_iMzkcUiFQIsA23GTDpa_yb9oT2Dg"
+        ctx.sh "export QODANA_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0IjoiMFdyb2wiLCJvcmdhbml6YXRpb24iOiJBYldWYiIsInRva2VuIjoiQWFnWEQifQ.UDs8IAUYybCfboTXm3Q8QdePzRbwdCZQzZIpf1rj208"
         def qodanaParams = ""
         if (isCodeDiff) { // 是否增量代码检测
             qodanaParams = qodanaParams + " --diff-start=${ctx.env.EARLIEST_COMMIT} "
