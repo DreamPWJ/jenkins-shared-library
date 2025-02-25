@@ -1,5 +1,8 @@
 package shared.library.common
 
+import shared.library.Utils
+import shared.library.common.*
+
 /**
  * @author 潘维吉
  * @date 2022/06/28 13:22
@@ -96,12 +99,13 @@ class Qodana implements Serializable {
 
 
         // 发布 HTML 报告 显示在左侧菜单栏  需要安装插件 https://plugins.jenkins.io/htmlpublisher/
-        // 确保Jenkins已调整CSP允许JavaScript执行
-        ctx.System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;")
+        // 在页面系统管理脚本命令杭州执行 确保Jenkins已调整CSP允许JavaScript执行
+        // System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;")
+        def reportName = "Qodana-Report"
         ctx.publishHTML(target: [
                 reportDir            : "${qodanaReportDir}",
                 reportFiles          : 'index.html',
-                reportName           : 'Qodana-Report',
+                reportName           : reportName,
                 reportTitles         : 'Qodana-Report-Title',
                 alwaysLinkToLastBuild: true,
                 keepAll              : true,
@@ -112,7 +116,10 @@ class Qodana implements Serializable {
         // ctx.archiveArtifacts artifacts: "${qodanaReportDir}/**", allowEmptyArchive: true
 
         // 钉钉通知质量报告 形成信息闭环
-
+        DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "静态代码分析质量报告 [${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}](${ctx.env.JOB_URL}/${reportName})  📑",
+                + "\n  ### 代码质量分析结果: [查看](${ctx.env.JOB_URL}/${reportName}) 📈" +
+                        + "\n  ##### 交付可读、易维护和安全的高质量代码 ✨ "
+                        + "\n  ###### 执行人: ${ctx.BUILD_USER} \n ###### 完成时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
     }
 
 }
