@@ -30,14 +30,14 @@ class Qodana implements Serializable {
 
         if (isCodeDiff) { // 是否增量代码检测
             // 获取jenkins变更记录 用于增量代码分析 从父提交到当前提交的代码变更
-            ctx.env.EARLIEST_COMMIT = ctx.sh(script: 'git rev-parse HEAD^', returnStdout: true).trim()
+            earliestCommit = ctx.sh(script: 'git rev-parse HEAD^', returnStdout: true).trim()
         }
 
         // 如果需要连接Qodana Cloud服务需要访问token  非社区版都需要Qodana Cloud配合
         // ctx.sh "export QODANA_TOKEN="
         def qodanaParams = ""
-        if (isCodeDiff) { // 是否增量代码检测
-            qodanaParams = qodanaParams + " --diff-start=${ctx.env.EARLIEST_COMMIT} "
+        if (isCodeDiff && earliestCommit != null && earliestCommit != "") { // 是否增量代码检测
+            qodanaParams = qodanaParams + " --diff-start=${earliestCommit} "
         }
         if (isFailThreshold) { // 是否设置质量阈值 避免大量累计技术债务
             int failNum = 1000 // 质量门最大错误数 全量和增量检测动态改变
@@ -52,7 +52,6 @@ class Qodana implements Serializable {
         // Qodana离线报告需要Web服务运行起来才能展示, 直接点击HTML单文件打开不显示
         ctx.sh " qodana scan --save-report ${qodanaParams} " +
                 " --source-directory ${ctx.env.WORKSPACE} --report-dir=${qodanaReportDir}  "
-        // --baseline qodana-baseline
 
         if (isApplyFixes) {  // 是否自动修复并提交PR审核
             def changes = ctx.sh(script: 'git status --porcelain', returnStdout: true).trim()
