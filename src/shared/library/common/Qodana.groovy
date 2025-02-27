@@ -99,9 +99,9 @@ class Qodana implements Serializable {
                 reportFiles          : 'index.html',
                 reportName           : "${reportName}",
                 reportTitles         : 'Qodana-Report-CI/CD',
-                alwaysLinkToLastBuild: true,
-                keepAll              : true,
+                alwaysLinkToLastBuild: false,
                 allowMissing         : false,
+                keepAll              : true,
         ])
 
         // 归档生成的报告文件
