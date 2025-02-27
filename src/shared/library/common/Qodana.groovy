@@ -32,7 +32,7 @@ class Qodana implements Serializable {
         }
 
         // 如果需要连接Qodana Cloud服务需要访问token  非社区版都需要Qodana Cloud配合
-        ctx.sh "export QODANA_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0IjoiMFdyb2wiLCJvcmdhbml6YXRpb24iOiJBYldWYiIsInRva2VuIjoiQWFnWEQifQ.UDs8IAUYybCfboTXm3Q8QdePzRbwdCZQzZIpf1rj208"
+        // ctx.sh "export QODANA_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0IjoiMFdyb2wiLCJvcmdhbml6YXRpb24iOiJBYldWYiIsInRva2VuIjoiQWFnWEQifQ.UDs8IAUYybCfboTXm3Q8QdePzRbwdCZQzZIpf1rj208"
         def qodanaParams = ""
         if (isCodeDiff) { // 是否增量代码检测
             qodanaParams = qodanaParams + " --diff-start=${ctx.env.EARLIEST_COMMIT} "
@@ -93,7 +93,7 @@ class Qodana implements Serializable {
 
         // 发布 HTML 报告 显示在左侧菜单栏  需要安装插件 https://plugins.jenkins.io/htmlpublisher/
         // 在页面系统管理脚本命令杭州执行 确保Jenkins已调整CSP允许JavaScript执行
-        // System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;")
+        ctx.env.System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;")
         def reportName = "Qodana-Report"
         ctx.publishHTML(target: [
                 reportDir            : "${qodanaReportDir}",
@@ -111,9 +111,9 @@ class Qodana implements Serializable {
         // 钉钉通知质量报告 形成信息闭环
         // if ("${ctx.params.IS_DING_NOTICE}" == 'true')  // 是否钉钉通知
         DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "静态代码分析质量报告 [${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}](${ctx.env.JOB_URL}${reportName})  📑",
-                "\n\n  #### 代码质量分析结果: [查看报表](${ctx.env.JOB_URL}${reportName}) 📈"
-                        + "\n- 持续交付可读、易维护和安全的高质量代码 ✨ "
-                        + "\n  ###### 执行人: ${ctx.BUILD_USER} \n ###### 完成时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
+                "\n\n #### 代码质量分析结果: [查看报表](${ctx.env.JOB_URL}${reportName}) 📈"
+                        + "\n 持续交付可读、易维护和安全的高质量代码 ✨ "
+                        + "\n ###### 执行人: ${ctx.BUILD_USER} \n ###### 完成时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
     }
 
 }
