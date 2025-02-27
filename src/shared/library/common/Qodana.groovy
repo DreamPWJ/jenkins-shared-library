@@ -48,9 +48,12 @@ class Qodana implements Serializable {
         }
         if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) { // 自定义yaml检测规则文件
             qodanaParams = qodanaParams + " --config " + qodanaYamlPath + "qodana.yaml"
+            def mavenOneLevel = "${map.maven_one_level}".trim() != "" ? "${map.maven_one_level}/" : "${map.maven_one_level}".trim()
+            // 实际要扫描的项目的路径
+            qodanaParams = qodanaParams + " --project-dir ${ctx.env.WORKSPACE}/${mavenOneLevel}${ctx.PROJECT_NAME} "
         }
         // Qodana离线报告需要Web服务运行起来才能展示, 直接点击HTML单文件打开不显示
-        ctx.sh " qodana scan --save-report ${qodanaParams} " +
+        ctx.sh " qodana scan --save-report ${qodanaParams}" +
                 " --source-directory ${ctx.env.WORKSPACE} --report-dir=${qodanaReportDir}  "
 
         if (isApplyFixes) {  // 是否自动修复并提交PR审核
