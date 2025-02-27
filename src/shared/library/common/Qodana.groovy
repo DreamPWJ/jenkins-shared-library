@@ -21,9 +21,10 @@ class Qodana implements Serializable {
         ctx.println("Qodana开始扫描分析代码质量 ... 🔍")
 
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
+        def qodanaYamlPath = "${ctx.env.WORKSPACE}/ci/_jenkins/qodana/" // Qodana YAML 配置文件路径
         def isCodeDiff = true // 是否增量代码检测
         def isFailThreshold = true // 是否设置质量阈值
-        def isApplyFixes = false // 是否自动修复
+        def isApplyFixes = false // 是否自动修复  社区版不支持高级功能
         def earliestCommit = null  // 变更记录
 
         if (isCodeDiff) { // 是否增量代码检测
@@ -32,7 +33,7 @@ class Qodana implements Serializable {
         }
 
         // 如果需要连接Qodana Cloud服务需要访问token  非社区版都需要Qodana Cloud配合
-        // ctx.sh "export QODANA_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0IjoiMFdyb2wiLCJvcmdhbml6YXRpb24iOiJBYldWYiIsInRva2VuIjoiQWFnWEQifQ.UDs8IAUYybCfboTXm3Q8QdePzRbwdCZQzZIpf1rj208"
+        // ctx.sh "export QODANA_TOKEN="
         def qodanaParams = ""
         if (isCodeDiff) { // 是否增量代码检测
             qodanaParams = qodanaParams + " --diff-start=${ctx.env.EARLIEST_COMMIT} "
@@ -43,6 +44,9 @@ class Qodana implements Serializable {
         }
         if (isApplyFixes) { // 是否自动修复
             qodanaParams = qodanaParams + " --apply-fixes "
+        }
+        if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) { // 自定义yaml检测规则文件
+            qodanaParams = qodanaParams + " --config " + qodanaYamlPath + "qodana.yaml"
         }
         // Qodana离线报告需要Web服务运行起来才能展示, 直接点击HTML单文件打开不显示
         ctx.sh " qodana scan --save-report ${qodanaParams} " +
