@@ -2,6 +2,7 @@ package shared.library.common
 
 import shared.library.Utils
 import shared.library.common.*
+import shared.library.GlobalVars
 
 /**
  * @author 潘维吉
