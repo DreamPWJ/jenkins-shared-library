@@ -44,6 +44,6 @@ properties:
     compiledClasses: "target/classes" # 编译输出目录（Maven 默认）
 
 # 报告输出设置
-report:
-  generateHtml: true  # 生成 HTML 报告
-  outputDir: "qodana-report"  # 报告输出目录
+#report:
+#  generateHtml: true  # 生成 HTML 报告
+#  outputDir: "qodana-report"  # 报告输出目录
