@@ -25,21 +25,16 @@ exclude:
   - name: "UnusedDeclaration"  # 排除未使用声明的检查
     paths:
       - src/main/java/com/example/generated  # 生成代码目录
-
-inspections:
-  # 启用 Javadoc 相关检查
-  - name: 'MissingJavadoc'
-    enabled: false
-  - name: 'JavadocReference'
-    enabled: false
-  # 启用 imports 相关检查
-  - name: 'UnusedImport'
-    enabled: false
-  - name: 'RedundantImport'
-    enabled: false
-  # 启用 Lombok 相关检查
-  - name: 'LombokProcessor'
-    enabled: false
+  # 排除 Javadoc 相关的检查
+  - name: "JavadocDeclaration"  # 缺失 Javadoc
+  - name: "MissingJavadoc"      # 未提供 Javadoc
+  - name: "JavadocReference"    # Javadoc 引用错误
+  # 排除 Imports 相关的检查
+  - name: "UnusedImport"        # 未使用的导入
+  - name: "RedundantImport"     # 冗余导入
+  - name: "ImportOrder"         # 导入顺序问题
+  # 排除 Lombok 相关的常见误判检查
+  - name: "UnusedDeclaration"   # 未使用的声明（Lombok 生成的代码可能触发）
 
 # 质量门设置
 failureConditions:
