@@ -23,7 +23,7 @@ class Qodana implements Serializable {
 
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
         def qodanaYamlPath = "${ctx.env.WORKSPACE}/ci/_jenkins/qodana/" // Qodana YAML 配置文件路径
-        def isCodeDiff = true // 是否增量代码检测
+        def isCodeDiff = false // 是否增量代码检测
         def isFailThreshold = true // 是否设置质量阈值
         def isApplyFixes = false // 是否自动修复  社区版不支持高级功能
         def earliestCommit = null  // 变更记录
