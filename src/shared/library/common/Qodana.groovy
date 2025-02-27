@@ -93,7 +93,7 @@ class Qodana implements Serializable {
                 reportDir            : "${qodanaReportDir}",
                 reportFiles          : 'index.html',
                 reportName           : "${reportName}",
-                reportTitles         : 'Qodana-Report-Title',
+                reportTitles         : 'Qodana-Report-CI/CD',
                 alwaysLinkToLastBuild: true,
                 keepAll              : true,
                 allowMissing         : false,
@@ -103,7 +103,7 @@ class Qodana implements Serializable {
         // ctx.archiveArtifacts artifacts: "${qodanaReportDir}/**", allowEmptyArchive: true
 
         // 钉钉通知质量报告 形成信息闭环
-        // if ("${ctx.params.IS_DING_NOTICE}" == 'true')  // 是否钉钉通知
+        // if ("${ctx.IS_CODE_QUALITY_ANALYSIS}" == 'true')  // 是否钉钉通知
         DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "![screenshot](https://blog.jetbrains.com/wp-content/uploads/2022/06/DSGN-13163-Static-analysis-with-Qodana-banners_featured.png) "
                 + " 静态代码分析质量报告 ${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}  📑",
                 "\n\n #### 代码质量分析结果: [查看报表](${ctx.env.JOB_URL}${reportName}) 📈"
