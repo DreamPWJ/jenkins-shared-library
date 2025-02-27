@@ -94,7 +94,11 @@ class Qodana implements Serializable {
 
         // 发布 HTML 报告 显示在左侧菜单栏  需要安装插件 https://plugins.jenkins.io/htmlpublisher/
         // 在页面系统管理脚本命令杭州执行 确保Jenkins已调整CSP允许JavaScript执行
-        ctx.env.System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;")
+        try {
+            System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;")
+        } catch (e) {
+            ctx.println("Jenkins调整CSP允许JavaScript执行失败")
+        }
         def reportName = "Qodana-Report"
         ctx.publishHTML(target: [
                 reportDir            : "${qodanaReportDir}",
