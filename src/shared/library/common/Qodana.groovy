@@ -28,7 +28,7 @@ class Qodana implements Serializable {
 
         if (isCodeDiff) { // 是否增量代码检测
             // 获取jenkins变更记录 用于增量代码分析 从父提交到当前提交的代码变更
-            ctx.env.EARLIEST_COMMIT =  ctx.sh(script: 'git rev-parse HEAD^', returnStdout: true).trim()
+            ctx.env.EARLIEST_COMMIT = ctx.sh(script: 'git rev-parse HEAD^', returnStdout: true).trim()
         }
 
         // 如果需要连接Qodana Cloud服务需要访问token  非社区版都需要Qodana Cloud配合
@@ -46,7 +46,8 @@ class Qodana implements Serializable {
         }
         // Qodana离线报告需要Web服务运行起来才能展示, 直接点击HTML单文件打开不显示
         ctx.sh " qodana scan --save-report ${qodanaParams} " +
-                " --source-directory ${ctx.env.WORKSPACE} --report-dir=${qodanaReportDir}  "  // --baseline qodana-baseline
+                " --source-directory ${ctx.env.WORKSPACE} --report-dir=${qodanaReportDir}  "
+        // --baseline qodana-baseline
 
         if (isApplyFixes) {  // 是否自动修复并提交PR审核
             def changes = ctx.sh(script: 'git status --porcelain', returnStdout: true).trim()
@@ -110,7 +111,8 @@ class Qodana implements Serializable {
 
         // 钉钉通知质量报告 形成信息闭环
         // if ("${ctx.params.IS_DING_NOTICE}" == 'true')  // 是否钉钉通知
-        DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "静态代码分析质量报告 [${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}](${ctx.env.JOB_URL}${reportName})  📑",
+        DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "![screenshot](https://blog.jetbrains.com/wp-content/uploads/2022…-Static-analysis-with-Qodana-banners_featured.png) "
+                + "### 静态代码分析质量报告 ${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}  📑",
                 "\n\n #### 代码质量分析结果: [查看报表](${ctx.env.JOB_URL}${reportName}) 📈"
                         + "\n 持续交付可读、易维护和安全的高质量代码 ✨ "
                         + "\n ###### 执行人: ${ctx.BUILD_USER} \n ###### 完成时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
