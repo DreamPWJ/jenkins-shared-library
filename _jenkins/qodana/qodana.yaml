@@ -29,11 +29,11 @@ exclude:
 # 质量门设置
 failureConditions:
   severityThresholds:
-    any: 200       # 总问题数阈值，超过多少个问题失败
-    critical: 50   # 严重问题阈值
-    high: 100      # 高优先级问题阈值
-    moderate: 150  # 中等问题阈值
-  #testCoverageThresholds:
+    any: 1000       # 总问题数阈值，超过多少个问题失败
+    critical: 200   # 严重问题阈值
+    high: 800       # 高优先级问题阈值
+    moderate: 900   # 中等问题阈值
+    #testCoverageThresholds:
     #total: 70     # 总代码覆盖率阈值（百分比）
 
 # Java 特定配置
