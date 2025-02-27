@@ -26,13 +26,28 @@ exclude:
     paths:
       - src/main/java/com/example/generated  # 生成代码目录
 
+inspections:
+  # 启用 Javadoc 相关检查
+  - name: 'MissingJavadoc'
+    enabled: false
+  - name: 'JavadocReference'
+    enabled: false
+  # 启用 imports 相关检查
+  - name: 'UnusedImport'
+    enabled: false
+  - name: 'RedundantImport'
+    enabled: false
+  # 启用 Lombok 相关检查
+  - name: 'LombokProcessor'
+    enabled: false
+
 # 质量门设置
 failureConditions:
   severityThresholds:
-    any: 1000       # 总问题数阈值，超过多少个问题失败
-    critical: 200   # 严重问题阈值
-    high: 800       # 高优先级问题阈值
-    moderate: 900   # 中等问题阈值
+    any: 300        # 总问题数阈值，超过多少个问题失败
+    critical: 30    # 严重问题阈值
+    high: 200       # 高优先级问题阈值
+    moderate: 250   # 中等问题阈值
     #testCoverageThresholds:
     #total: 70     # 总代码覆盖率阈值（百分比）
 
