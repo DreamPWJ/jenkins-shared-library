@@ -14,8 +14,8 @@
   tasks:
     - name: Upload files
       ansible.builtin.copy:
-        src: /root/tmp.txt  # 本地文件路径
-        dest: /home/panweiji
+        src: /my/tmp.txt  # 本地文件路径
+        dest: /my/panweiji
       delegate_to: "{{ item.host }}"
       vars:
         ansible_port: "{{ item.port }}"
