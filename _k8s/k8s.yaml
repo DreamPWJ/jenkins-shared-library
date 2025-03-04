@@ -10,7 +10,7 @@ metadata:
     app: {APP_COMMON_NAME}     # Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
 
 spec:
-  replicas: {K8S_POD_REPLICAS}       # replicas默认值是1
+  replicas: {K8S_POD_REPLICAS}       # pod默认副本数
   #minReplicas: 1                    # 最小副本数
   #maxReplicas: 10                   # 最大副本数
   selector:
@@ -33,7 +33,7 @@ spec:
         - name: {APP_COMMON_NAME}
           image: {IMAGE_URL}:{IMAGE_TAG}
           imagePullPolicy: Always       # 获取镜像的策略 Always表示总是下载最新镜像 IfNotPresent表示优先使用本地镜像，否则下载镜像，Never表示仅使用本地镜像
-          resources: # 合理设置内存 防止内存溢出 导致整个服务器宕机 如0/3 nodes are available: 3 Insufficient memory
+          resources: # 对Pod的资源限制机制 合理设置CPU 内存 防止CPU打满 内存溢出 导致整个服务器宕机
             requests:
               cpu: 100m  # cpu请求 容器启动的初始可用数量
               memory: 200Mi # 内存请求 容器启动的初始可用数量 不能大于limits设置值

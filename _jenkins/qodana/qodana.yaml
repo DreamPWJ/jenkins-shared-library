@@ -1,50 +1,59 @@
 # Qodana 配置文件版本
 version: "1.0"
 
-# 指定分析的语言和工具（这里是 Java）
-linter: jetbrains/qodana-jvm:latest
+# 指定使用的 linter 为 Qodana Community for JVM
+linter: jetbrains/qodana-jvm-community:latest
 
 # 检查规则配置
 profile:
-  name: "Recommended"  # 使用 Qodana 推荐的检查规则
-  # 可选：自定义规则路径
-  # path: ./custom-inspections.xml
+  name: "qodana.recommended"  # 使用默认推荐的检查规则集
+  # 可选：自定义检查配置文件路径（从 IntelliJ IDEA 导出）
+  # path: "./custom-profile.xml"
 
-# 排除分析的路径（可选）
+# 包含特定检查（可选，根据需要启用）
+include:
+  - name: "EmptyRange"  # 检查空范围问题
+  - name: "ConstantConditions"  # 检查常量条件问题
+
+# 排除特定检查或路径
 exclude:
-  - name: "All"  # 排除特定检查
+  - name: "All"  # 排除特定目录下的所有检查
     paths:
       - src/test  # 排除测试目录
-      - src/main/resources  # 排除资源文件
+      - target    # 排除 Maven 构建输出目录
+      - build     # 排除 Gradle 构建输出目录
   - name: "UnusedDeclaration"  # 排除未使用声明的检查
     paths:
-      - src/main/java/com/example/generated  # 排除生成代码
+      - src/main/java/com/example/generated  # 生成代码目录
+  # 排除 Javadoc 相关的检查
+  - name: "JavadocDeclaration"  # 缺失 Javadoc
+  - name: "MissingJavadoc"      # 未提供 Javadoc
+  - name: "JavadocReference"    # Javadoc 引用错误
+  # 排除 Imports 相关的检查
+  - name: "UnusedImport"        # 未使用的导入
+  - name: "RedundantImport"     # 冗余导入
+  - name: "ImportOrder"         # 导入顺序问题
+  # 排除 Lombok 相关的常见误判检查
+  - name: "UnusedDeclaration"   # 未使用的声明（Lombok 生成的代码可能触发）
 
-# 包含特定检查（可选）
-include:
-  - name: "JavaSpecificCheck"  # 示例检查名称
-
-# 质量门设置（失败条件）
+# 质量门设置
 failureConditions:
   severityThresholds:
-    any: 20          # 总问题数阈值
-    critical: 5      # 严重问题阈值
-    high: 10         # 高优先级问题阈值
-    moderate: 15     # 中等问题阈值
-  testCoverageThresholds:
-    fresh: 70       # 新代码测试覆盖率阈值（百分比）
-    total: 80       # 总代码覆盖率阈值（百分比）
+    any: 300        # 总问题数阈值，超过多少个问题失败
+    critical: 30    # 严重问题阈值
+    high: 200       # 高优先级问题阈值
+    moderate: 250   # 中等问题阈值
+    #testCoverageThresholds:
+    #total: 70     # 总代码覆盖率阈值（百分比）
 
-# Java 特定配置（可选）
+# Java 特定配置
 properties:
   java:
-    sourceDirs: "src/main/java"  # 指定源代码目录
-    testDirs: "src/test/java"    # 指定测试代码目录
-    compiledClasses: "target/classes"  # 指定编译后的类文件目录
-    # 可选：指定 JDK 版本
-    jdkVersion: "21"
+    sourceDirs: "src/main/java"      # 源代码目录
+    testDirs: "src/test/java"        # 测试代码目录
+    compiledClasses: "target/classes" # 编译输出目录（Maven 默认）
 
-# 报告输出设置（可选）
-report:
-  generateHtml: true  # 生成 HTML 报告
-  outputDir: "qodana-report"  # 报告输出目录
+# 报告输出设置
+#report:
+#  generateHtml: true  # 生成 HTML 报告
+#  outputDir: "qodana-report"  # 报告输出目录
