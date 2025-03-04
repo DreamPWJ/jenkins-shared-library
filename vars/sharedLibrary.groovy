@@ -1524,6 +1524,7 @@ def runProject(map) {
  */
 def healthCheck(map, params = '') { // 可选参数
     Tools.printColor(this, "开始应用服务健康探测, 请耐心等待... 🚀 ")
+    def healthCheckParams = null
     if (params?.trim()) { // 为null或空判断
         // 单机分布式部署从服务
         healthCheckParams = params
