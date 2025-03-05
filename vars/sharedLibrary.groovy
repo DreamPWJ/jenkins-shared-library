@@ -582,7 +582,7 @@ def call(String type = 'web-java', Map map) {
                     steps {
                         script {
                             // 自动打tag和生成CHANGELOG.md文件
-                            docker.image("bitnami/git:latest").inside { // 因使用了Git高级特性 所以需确保最新版本
+                            docker.image("bitnami/git:latest").inside(" --entrypoint='' ") { // 因使用了Git高级特性 所以需确保最新版本
                                 gitTagLog()
                             }
                             // 钉钉通知变更记录
