@@ -5,6 +5,8 @@
 # Kibana:通过Web端的可视化界面来查看日志
 
 #启动命令 cd /my && docker-compose  -f docker-compose.elk.yaml up -d
+#销毁命令 cd /tmp && docker compose down --rmi all
+
 version: '3.7'
 services:
   elasticsearch:
