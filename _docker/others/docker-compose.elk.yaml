@@ -1,11 +1,11 @@
 # 使用docker-compose.yaml脚本启动ELK服务
 # ELK中各个服务的作用
-# Elasticsearch:用于存储收集到的日志信息；
-# Logstash:用于收集日志，SpringBoot应用整合了Logstash以后会把日志发送给Logstash,Logstash再把日志转发给Elasticsearch；
-# Kibana:通过Web端的可视化界面来查看日志
+# Elasticsearch: 用于存储收集到的日志信息；
+# Logstash: 用于收集日志，SpringBoot应用整合了Logstash以后会把日志发送给Logstash,Logstash再把日志转发给Elasticsearch；
+# Kibana: 通过Web端的可视化界面来查看日志
 
-#启动命令 cd /my && docker-compose  -f docker-compose.elk.yaml up -d
-#销毁命令 cd /tmp && docker compose down --rmi all
+# 启动命令 cd /my && docker-compose  -f docker-compose.elk.yaml up -d
+# 销毁命令 cd /tmp && docker compose down --rmi all
 
 version: '3.7'
 services:
