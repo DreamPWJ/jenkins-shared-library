@@ -111,12 +111,12 @@ class Kubernetes implements Serializable {
             ctx.println("应用服务扩展端口: " + containerPort)
         }
 
-        // 不同配置环境的相同应用
+        // 不同配置环境的相同应用 或者 定时任务在应用代码内无分布式处理机制情况
         if ("${ctx.IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
             if (deployNum != 0) { // k8s内相同应用不同容器镜像标签部署
                 appName += "-node"
                 imageTag += Docker.imageNodeTag + deployNum
-                k8sPodReplicas = Integer.parseInt(k8sPodReplicas) - 1 // 除主节点其它节点相同
+                k8sPodReplicas = Integer.parseInt(k8sPodReplicas) - 1 // 除主节点其它节点配置相同
             } else {
                 k8sPodReplicas = 1  // 主节点只部署一个
             }
@@ -211,7 +211,7 @@ class Kubernetes implements Serializable {
             // 不同配置环境的相同应用 或者 定时任务在应用代码内无分布式处理机制情况
             if ("${ctx.IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
                 if (deployNum != 0) { // 第二次以后环境部署
-                    k8sPodReplicas = Integer.parseInt(k8sPodReplicas) - 1 // 除主节点其它节点相同
+                    k8sPodReplicas = Integer.parseInt(k8sPodReplicas) - 1 // 除主节点其它节点配置相同
                 } else {
                     k8sPodReplicas = 1  // 主节点只部署一个  避免定时任务重复执行
                     maxK8sPodReplicas = 1
