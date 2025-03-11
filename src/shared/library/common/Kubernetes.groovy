@@ -207,11 +207,13 @@ class Kubernetes implements Serializable {
             def memoryHPA = Math.floor(Integer.parseInt("${map.docker_memory}".replace(memoryUnit, "")) * 0.8 * 1024) + "M"
             // 不同配置环境的相同应用 或者 定时任务在应用代码内无分布式处理机制情况
             def k8sPodReplicas = "${ctx.K8S_POD_REPLICAS}"
+            def maxK8sPodReplicas = Integer.parseInt(k8sPodReplicas) * 2  // 默认最大扩容数量是基础pod节点的2倍
             if ("${ctx.IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
                 if (deployNum != 0) { // 第二次以后环境部署
                     k8sPodReplicas = Integer.parseInt(k8sPodReplicas) - 1 // 除主节点其它节点相同
                 } else {
                     k8sPodReplicas = 1  // 主节点只部署一个  避免定时任务重复执行
+                    maxK8sPodReplicas = 1
                 }
             }
             def k8sVersion = getK8sVersion(ctx)
@@ -221,7 +223,7 @@ class Kubernetes implements Serializable {
             }
 
             ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
-                    " s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g; s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g; " +
+                    " s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g;s#{MAX_K8S_POD_REPLICAS}#${maxK8sPodReplicas}#g; " +
                     " s#{MAX_CPU_SIZE}#${cpuHPA}#g;s#{MAX_MEMORY_SIZE}#${memoryHPA}#g;s#{K8S_NAMESPACE}#${k8sNameSpace}#g; " +
                     " s#{HPA_API_VERSION}#${hpaApiVersion}#g; " +
                     " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
