@@ -1,9 +1,10 @@
 #version: '3.7'： 表示使用第三代语法来构建 docker-compose.yml 文件
 version: '3.7'
-#启动命令 cd /tmp && docker-compose  up -d
-#在docker-compose.yml中定义变量，引用在外部同目录.env文件中进行变量定义
-#Docker Embedded DNS服务，docker-compose默认采用隔离的network(将compose中的service都放入一组自定义的bridge network)，所以docker-compose中的容器就可以通过制定name的方式互相发现对方
-#services: 用来表示 compose 需要启动的服务，服务分别为：mysql 、nginx 、redis、rabbitmq、app等
+# 启动命令 cd /tmp && docker-compose  up -d
+# 销毁命令 cd /tmp && docker compose down --rmi all
+# 在docker-compose.yml中定义变量，引用在外部同目录.env文件中进行变量定义
+# Docker Embedded DNS服务，docker-compose默认采用隔离的network(将compose中的service都放入一组自定义的bridge network)，所以docker-compose中的容器就可以通过制定name的方式互相发现对方
+# services: 用来表示 compose 需要启动的服务，服务分别为：mysql 、nginx 、redis、rabbitmq、app等
 services:
   mysql:
     #镜像容器名称

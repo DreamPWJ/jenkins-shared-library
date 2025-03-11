@@ -582,7 +582,7 @@ def call(String type = 'web-java', Map map) {
                     steps {
                         script {
                             // 自动打tag和生成CHANGELOG.md文件
-                            docker.image("bitnami/git:latest").inside { // 因使用了Git高级特性 所以需确保最新版本
+                            docker.image("bitnami/git:latest").inside(" --entrypoint='' ") { // 因使用了Git高级特性 所以需确保最新版本
                                 gitTagLog()
                             }
                             // 钉钉通知变更记录
@@ -1524,6 +1524,7 @@ def runProject(map) {
  */
 def healthCheck(map, params = '') { // 可选参数
     Tools.printColor(this, "开始应用服务健康探测, 请耐心等待... 🚀 ")
+    def healthCheckParams = null
     if (params?.trim()) { // 为null或空判断
         // 单机分布式部署从服务
         healthCheckParams = params

@@ -138,7 +138,6 @@ JSON_PARAMS
    "NFS_MOUNT_PATHS" : "/usr/local/tomcat/webapps/FileUpload:/mnt/stor,/usr/local/tomcat/webapps/FileUpload/stor1:/mnt/stor1,/usr/local/tomcat/webapps/FileUpload/vpaas_m2m/epark/stor1/epark/thirdParkImgs:/mnt/stor/vpaas_m2m/epark/stor1/epark/thirdParkImgs,/usr/local/tomcat/webapps/FileUpload/vpaas_m2m/epark/stor1/epark/ocr:/mnt/stor/vpaas_m2m/epark/stor1/epark/ocr,/usr/local/tomcat/webapps/FileUpload/vpaas_m2m/epark/stor1/epark/invoice:/mnt/stor/vpaas_m2m/epark/stor1/epark/invoice,/usr/local/tomcat/webapps/FileUpload/vpaas_m2m/epark/stor1/epark/leagureImgs:/mnt/stor/vpaas_m2m/epark/stor1/epark/leagureImgs",
    "DOCKER_VOLUME_MOUNT" : "/my/epark-server/tomcat/logs:/usr/local/tomcat/logs,/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml,/my/tomcat/context.xml:/usr/local/tomcat/conf/context.xml" ,
    "IS_K8S_DEPLOY" : true,
-   "IS_K8S_AUTO_SCALING" : true,
    "K8S_POD_REPLICAS" : "3",
    "APPLICATION_DOMAIN" : "https://epark.pengbocloud.com",
 }
@@ -154,6 +153,7 @@ JSON_PARAMS
    "SHELL_PARAMS" : "open-epark server 8091 8080 prod",
    "IS_MAVEN_SINGLE_MODULE" : true,
    "IS_K8S_DEPLOY" : true,
+   "IS_K8S_AUTO_SCALING" : true,
    "JAVA_FRAMEWORK_TYPE" : "2",
    "K8S_POD_REPLICAS" : "3",
    "SOURCE_TARGET_CONFIG_DIR" : "resource/rizhao-k8s,resource",

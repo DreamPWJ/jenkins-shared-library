@@ -47,17 +47,17 @@ class Kubernetes implements Serializable {
 
                 // 查看个组件的状态  如 kubectl get svc
                 ctx.sh """ 
-                    kubectl get pod
-                    kubectl top pod
-                    kubectl top nodes
+                    kubectl get pod || true
+                    kubectl top pod || true
+                    kubectl top nodes || true
                     """
 
                 // 七层负载和灰度发布配置部署ingress
                 // ingressNginxDeploy(ctx, map)
 
-                // 部署Pod弹性水平扩缩容 可基于QPS自动伸缩  只需要初始化一次
+                // 部署Pod弹性水平扩缩容 可基于QPS自动伸缩  只需要初始化一次 定时任务没做分布式处理情况不建议扩缩容
                 if ("${ctx.IS_K8S_AUTO_SCALING}" == 'true') {
-                    deployHPA(ctx, map)
+                    deployHPA(ctx, map, deployNum)
                 }
 
                 // 删除服务
@@ -111,12 +111,12 @@ class Kubernetes implements Serializable {
             ctx.println("应用服务扩展端口: " + containerPort)
         }
 
-        // 不同配置环境的相同应用
+        // 不同配置环境的相同应用 或者 定时任务在应用代码内无分布式处理机制情况
         if ("${ctx.IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
             if (deployNum != 0) { // k8s内相同应用不同容器镜像标签部署
                 appName += "-node"
                 imageTag += Docker.imageNodeTag + deployNum
-                k8sPodReplicas = Integer.parseInt(k8sPodReplicas) - 1 // 除主节点其它节点相同
+                k8sPodReplicas = Integer.parseInt(k8sPodReplicas) - 1 // 除主节点其它节点配置相同
             } else {
                 k8sPodReplicas = 1  // 主节点只部署一个
             }
@@ -194,7 +194,7 @@ class Kubernetes implements Serializable {
      * 部署Pod自动水平扩缩容  可基于QPS自定义参数
      * 参考文档：https://imroc.cc/k8s/best-practice/custom-metrics-hpa
      */
-    static def deployHPA(ctx, map) {
+    static def deployHPA(ctx, map, deployNum = 0) {
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) { // 后端并发量大需要扩容  如果是QPS扩缩容 只限于服务端集成Prometheus监控
             // 安装k8s-prometheus-adpater
             // Helm.installPrometheus(ctx)
@@ -205,7 +205,18 @@ class Kubernetes implements Serializable {
             // 内存值不支持小数  转成成为M数据
             def memoryUnit = "${map.docker_memory}".contains("G") ? "G" : "M"
             def memoryHPA = Math.floor(Integer.parseInt("${map.docker_memory}".replace(memoryUnit, "")) * 0.8 * 1024) + "M"
-
+            def k8sPodReplicas = "${ctx.K8S_POD_REPLICAS}"
+            // 最大扩容数量设置为基础pod节点的倍数 默认为2倍 避免过多扩容节点导致资源耗尽
+            def maxK8sPodReplicas = Integer.parseInt(k8sPodReplicas) * 2
+            // 不同配置环境的相同应用 或者 定时任务在应用代码内无分布式处理机制情况
+            if ("${ctx.IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
+                if (deployNum != 0) { // 第二次以后环境部署
+                    k8sPodReplicas = Integer.parseInt(k8sPodReplicas) - 1 // 除主节点其它节点配置相同
+                } else {
+                    k8sPodReplicas = 1  // 主节点只部署一个  避免定时任务重复执行
+                    maxK8sPodReplicas = 1
+                }
+            }
             def k8sVersion = getK8sVersion(ctx)
             def hpaApiVersion = "v2" // 默认使用新的稳定版本
             if (Utils.compareVersions(k8sVersion, "1.23.0") == -1) { // k8s低版本 使用低版本api
@@ -213,7 +224,7 @@ class Kubernetes implements Serializable {
             }
 
             ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
-                    " s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g; s#{K8S_POD_REPLICAS}#${ctx.K8S_POD_REPLICAS}#g; " +
+                    " s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g;s#{MAX_K8S_POD_REPLICAS}#${maxK8sPodReplicas}#g; " +
                     " s#{MAX_CPU_SIZE}#${cpuHPA}#g;s#{MAX_MEMORY_SIZE}#${memoryHPA}#g;s#{K8S_NAMESPACE}#${k8sNameSpace}#g; " +
                     " s#{HPA_API_VERSION}#${hpaApiVersion}#g; " +
                     " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
@@ -261,7 +272,7 @@ class Kubernetes implements Serializable {
         // 新版发布全部完成老版本下线等待时间, 隔多长时间下线旧应用, 单位秒  流量全部切到新版本后下线旧应用等待保证稳定性
 
         ctx.sh "kubectl apply -f ingress.yaml"
-        ctx.sh "kubectl get ingress"
+        ctx.sh "kubectl get ingress || true"
         // 系统运行一段时间后，当新版本服务已经稳定并且符合预期后，需要下线老版本的服务 ，仅保留新版本服务在线上运行。
         // 为了达到该目标，需要将旧版本的Service指向新版本服务的Deployment，并且删除旧版本的Deployment和新版本的Service。
 
