@@ -722,7 +722,7 @@ def previewUpload() {
         // 微信CI返回的结果文件存储
         wxCiResultFile = "wx-ci-result.json"
         sh "rm -f ${wxCiResultFile}"
-        wxPreviewQrcodeName = "preview-qrcode-v${MINI_VERSION_NUM}" // 微信预览码图片名称
+        wxPreviewQrcodeName = "preview-qrcode-v${MINI_VERSION_NUM}.jpg" // 微信预览码图片名称
 
         println("执行小程序自动化预览上传 🚀 ")
         // 执行自动化预览上传

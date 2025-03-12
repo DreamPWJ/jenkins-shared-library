@@ -33,7 +33,7 @@ const projectConfig = require('./project.config.json');
                 privateKeyPath: process.cwd() + '/private.key', // 获取argv.p 执行node deploy.js -p
                 // 忽略不需要打包的文件
                 ignores: ['node_modules/**/*', '.git/*', 'ci/*', 'ci@tmp/*', 'deploy.js', 'private.key',
-                    'yarn.lock', 'package-lock.json', '*.md', '*.cer', `${qrcodeName}.jpg`],
+                    'yarn.lock', 'package-lock.json', '*.md', '*.cer', `${qrcodeName}`],
             });
 
             if (isNeedNpm === 'true') {  // 在有需要的时候构建npm
@@ -77,7 +77,7 @@ const projectConfig = require('./project.config.json');
                     // 生成预览图片二维码
                     const previewConfig = Object.assign({}, defaults, {
                         qrcodeFormat: 'image', // 返回二维码文件的格式 "image" 或 "base64"， 默认值 "terminal" 供调试用
-                        qrcodeOutputDest: `${qrcodeName}.jpg`,
+                        qrcodeOutputDest: `${qrcodeName}`,
                         // pagePath: 'pages/index/index', // 预览页面
                         // searchQuery: 'a=1&b=2',  // 预览参数 [注意!]这里的`&`字符在命令行中应写成转义字符`\&`
                     });
