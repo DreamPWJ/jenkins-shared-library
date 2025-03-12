@@ -389,7 +389,7 @@ def getInitParams(map) {
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [build]的前端项目参数
     NPM_BUILD_DIRECTORY = jsonParams.NPM_BUILD_DIRECTORY ? jsonParams.NPM_BUILD_DIRECTORY.trim() : "" // npm 构建目录
     PROJECT_CHINESE_NAME = jsonParams.PROJECT_CHINESE_NAME ? jsonParams.PROJECT_CHINESE_NAME.trim() : "" // 自定义项目中文名称
-    // 小程序体验码url地址
+    // 小程序体验码url地址 微信后台获取体验版本固定地址
     MINI_EXPERIENCE_CODE_URL = jsonParams.MINI_EXPERIENCE_CODE_URL ? jsonParams.MINI_EXPERIENCE_CODE_URL.trim() : ""
     // 小程序码url地址
     MINI_CODE_URL = jsonParams.MINI_CODE_URL ? jsonParams.MINI_CODE_URL.trim() : ""
