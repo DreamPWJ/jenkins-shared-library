@@ -12,7 +12,7 @@
 def map = [:]
 
 // 保持构建的最大个数
-map.put('build_num_keep', 2)
+map.put('build_num_keep', 3)
 
 // 默认要构建的Git分支
 map.put('default_git_branch', 'develop')
@@ -25,7 +25,7 @@ map.put('is_only_notice_change_log', false)
 map.put('is_git_tag', true)
 
 // 项目标签或项目简称
-map.put('project_tag', '澎泊车')
+map.put('project_tag', '澎泊停车')
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
 map.put('jenkins_node', 'node-3')
