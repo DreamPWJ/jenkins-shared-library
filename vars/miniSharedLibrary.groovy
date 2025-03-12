@@ -762,7 +762,7 @@ def miniInfo() {
 def previewImageUpload(map) {
     wxPreviewQrcodeUrl = "" // 微信预览码图片访问Url
     // 源文件地址
-    def sourceFile = "${env.WORKSPACE}/${PROJECT_NAME == "" ? "" : "${PROJECT_NAME}/"}${wxPreviewQrcodeName}.jpg"
+    def sourceFile = "${env.WORKSPACE}/${PROJECT_NAME == "" ? "" : "${PROJECT_NAME}/"}${wxPreviewQrcodeName}"
     def targetFile = "mini/${env.JOB_NAME}/${wxPreviewQrcodeName}-${env.BUILD_NUMBER}.jpg" // 目标文件
     wxPreviewQrcodeUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
     println "${wxPreviewQrcodeUrl}"
