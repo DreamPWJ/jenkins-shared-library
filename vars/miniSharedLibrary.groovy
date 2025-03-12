@@ -647,15 +647,14 @@ def buildProject() {
 
     // 安装微信小程序CI依赖工具
     try {
-        retry(3) {
-            println("本地离线安装miniprogram-ci")
-            sh " npm install miniprogram-ci --save "
-            // sh " yarn add miniprogram-ci --dev --offline "
-        }
+        println("本地离线安装miniprogram-ci")
+        sh " yarn add miniprogram-ci --dev --offline "
     } catch (e) {
         println(e.getMessage())
-        println("远程线上安装miniprogram-ci")
-        sh " yarn add miniprogram-ci --dev || npm install miniprogram-ci || pnpm install miniprogram-ci "
+        retry(3) {
+            println("远程线上安装miniprogram-ci")
+            sh " yarn add miniprogram-ci --dev || npm install miniprogram-ci --save || pnpm install miniprogram-ci --dev "
+        }
     }
 
     if ("${IS_MONO_REPO}" == "true") {
