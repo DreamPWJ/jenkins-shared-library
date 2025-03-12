@@ -648,13 +648,12 @@ def buildProject() {
     // 安装微信小程序CI依赖工具
     try {
         println("本地离线安装miniprogram-ci")
-        sh "yarn add miniprogram-ci --dev --offline"
+        sh " yarn add miniprogram-ci --dev --offline "
     } catch (e) {
         println(e.getMessage())
         println("远程线上安装miniprogram-ci")
-        sh "yarn add miniprogram-ci --dev"
+        sh " yarn add miniprogram-ci --dev || npm install miniprogram-ci || pnpm install miniprogram-ci "
     }
-    //sh "npm i -D miniprogram-ci"
 
     if ("${IS_MONO_REPO}" == "true") {
         monoRepoProjectPackage = "/projects"
