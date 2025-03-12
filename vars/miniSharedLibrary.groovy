@@ -40,11 +40,11 @@ def call(String type = 'wx-mini', Map map) {
                 text(name: 'VERSION_DESC', defaultValue: "${Constants.MINI_DEFAULT_VERSION_COPYWRITING}",
                         description: '填写小程序版本描述文案(文案会显示在钉钉通知、小程序平台、Git Tag、CHANGELOG.md等, ' +
                                 '不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊')
-                booleanParam(name: 'IS_AUTO_SUBMIT_FOR_REVIEW', defaultValue: true,
-                        description: "是否自动提交审核 (⚠️确保CI机器人提交的已为体验版并在小程序平台列表第一个, 同时满足${Constants.RELEASE_TYPE}正式版才会自动提审)")
                 choice(name: 'CI_ROBOT', choices: "1\n2\n3\n4\n5\n6\n7\n8\n9\n10",
                         description: '选择指定的ci机器人 (同一个机器人上传成功后自动设置为体验版本, 不同机器人实现多版本并存) 🤖')
-                booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}", description: "是否正式环境自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录")
+                booleanParam(name: 'IS_AUTO_SUBMIT_FOR_REVIEW', defaultValue: true,
+                        description: "是否自动提交审核 (⚠️确保CI机器人提交的已为体验版并在小程序平台列表第一个, 同时满足${Constants.RELEASE_TYPE}正式版才会自动提审)")
+                booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}", description: "是否正式环境自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录 📄")
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 📢 ")
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
             }
