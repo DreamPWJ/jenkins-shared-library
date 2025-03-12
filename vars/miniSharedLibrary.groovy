@@ -647,8 +647,11 @@ def buildProject() {
 
     // 安装微信小程序CI依赖工具
     try {
-        println("本地离线安装miniprogram-ci")
-        sh " yarn add miniprogram-ci --dev --offline "
+        retry(3) {
+            println("本地离线安装miniprogram-ci")
+            sh " npm install miniprogram-ci --save "
+            // sh " yarn add miniprogram-ci --dev --offline "
+        }
     } catch (e) {
         println(e.getMessage())
         println("远程线上安装miniprogram-ci")
@@ -1004,6 +1007,11 @@ def dingNotice(int type, msg = '', atMobiles = '') {
             }
 
             if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
+                // 如果gitChangeLog为空 赋值提醒文案
+                if ("${gitChangeLog}" == '') {
+                    gitChangeLog = "无版本变更记录 🈳"
+                }
+
                 dingtalk(
                         robot: "${DING_TALK_CREDENTIALS_ID}",
                         type: 'MARKDOWN',

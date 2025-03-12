@@ -986,6 +986,10 @@ def dingNotice(int type, msg = '', atMobiles = '') {
         } else if (type == 3) { // 变更记录
             def gitChangeLog = changeLog.genChangeLog(this, 20).replaceAll("\\;", "\n")
             if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
+                // 如果gitChangeLog为空 赋值提醒文案
+                if ("${gitChangeLog}" == '') {
+                    gitChangeLog = "无版本变更记录 🈳"
+                }
                 dingtalk(
                         robot: "${DING_TALK_CREDENTIALS_ID}",
                         type: 'MARKDOWN',
