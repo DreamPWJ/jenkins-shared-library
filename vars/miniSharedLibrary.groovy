@@ -729,6 +729,7 @@ def previewUpload() {
         sh "node deploy.js --type=${params.BUILD_TYPE} --v=${MINI_VERSION_NUM} --desc='${params.VERSION_DESC}' " +
                 " --isNeedNpm='${IS_MINI_NATIVE_NEED_NPM}' --buildDir=${NPM_BUILD_DIRECTORY} --wxCiResultFile='${wxCiResultFile}' " +
                 " --qrcodeName=${wxPreviewQrcodeName} --robot=${params.CI_ROBOT}"
+        sh "chmod +x ${wxPreviewQrcodeName}"
     }
     println("小程序预览上传成功 ✅")
 }
