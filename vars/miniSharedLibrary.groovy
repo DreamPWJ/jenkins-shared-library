@@ -267,16 +267,14 @@ def call(String type = 'wx-mini', Map map) {
                         // 只显示当前阶段stage失败  而整个流水线构建显示成功
                         // catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                         script {
-                            submitAudit()
-                            /*               parallel( // 步骤内并发执行
-                                                   '提审': {
-                                                       submitAudit()
-                                                   },
-                                                   '授权': {
-                                                       submitAuthorization(map)
-                                                   })*/
+                            parallel( // 步骤内并发执行
+                                    '提审': {
+                                        submitAudit()
+                                    },
+                                    '授权': {
+                                        submitAuthorization(map)
+                                    })
                         }
-                        // }
                     }
                 }
 
@@ -403,7 +401,7 @@ def getInitParams(map) {
     PROJECT_NAME = jsonParams.PROJECT_NAME ? jsonParams.PROJECT_NAME.trim() : ""
 
     try {
-        miniReviewInfo = " --demoUser=''  --demoPassword='' "
+        miniReviewInfo = " --demoUser=''  --demoPassword='' " // 审核需要登录的账号密码
         // 小程序信息
         miniJobInfo = readJSON text: "${MINI_JOB_INFO}"
         if (miniJobInfo) {
@@ -852,31 +850,6 @@ def submitAuthorization(map) {
 }
 
 /**
- * 总会执行统一处理方法
- */
-def alwaysPost() {
-    try {
-        // 使用jenkins 的 description setter 插件 显示html需要在全局安全设置-》标记格式器 选择
-        if ("${params.BUILD_TYPE}" == "${Constants.DEVELOP_TYPE}") { // 开发版
-            currentBuild.description = "<img src=${wxPreviewQrcodeUrl} width=250 height=250 > " +
-                    "<br/> 开发版预览码 ( 二维码有效期半小时 ⚠️ )"
-        } else if ("${params.BUILD_TYPE}" == "${Constants.TRIAL_TYPE}") { // 体验版
-            currentBuild.description = "<img src=${MINI_EXPERIENCE_CODE_URL} width=250 height=250 > " +
-                    "<br/> 体验版体验码 ( 上传成功自动设置为体验版本 )" +
-                    "<br/> <a href='${Constants.WECHAT_PUBLIC_PLATFORM_URL}'> 👉提交审核</a> "
-        } else if ("${params.BUILD_TYPE}" == "${Constants.RELEASE_TYPE}") { // 正式版
-            currentBuild.description = "<img src=${MINI_CODE_URL} width=250 height=250 > " +
-                    "<br/> 正式版小程序码" +
-                    "<br/> <a href='${Constants.WECHAT_PUBLIC_PLATFORM_URL}'> 👉微信公众平台</a> "
-        }
-        currentBuild.description += "\n  <br/> ${PROJECT_CHINESE_NAME} v${MINI_VERSION_NUM}  <br/> 大小: ${miniTotalPackageSize} " +
-                " <br/> 分支: ${BRANCH_NAME} <br/> 发布人: ${BUILD_USER}"
-    } catch (e) {
-        println(e.getMessage())
-    }
-}
-
-/**
  * 生成tag和变更日志
  */
 def gitTagLog() {
@@ -902,6 +875,31 @@ def gitTagLog() {
         }
         // 生成tag和变更日志
         gitTagLog.genTagAndLog(this, tagVersion, gitChangeLog, "${REPO_URL}", "${GIT_CREDENTIALS_ID}")
+    }
+}
+
+/**
+ * 总会执行统一处理方法
+ */
+def alwaysPost() {
+    try {
+        // 使用jenkins 的 description setter 插件 显示html需要在全局安全设置-》标记格式器 选择
+        if ("${params.BUILD_TYPE}" == "${Constants.DEVELOP_TYPE}") { // 开发版
+            currentBuild.description = "<img src=${wxPreviewQrcodeUrl} width=250 height=250 > " +
+                    "<br/> 开发版预览码 ( 二维码有效期半小时 ⚠️ )"
+        } else if ("${params.BUILD_TYPE}" == "${Constants.TRIAL_TYPE}") { // 体验版
+            currentBuild.description = "<img src=${MINI_EXPERIENCE_CODE_URL} width=250 height=250 > " +
+                    "<br/> 体验版体验码 ( 上传成功自动设置为体验版本 )" +
+                    "<br/> <a href='${Constants.WECHAT_PUBLIC_PLATFORM_URL}'> 👉提交审核</a> "
+        } else if ("${params.BUILD_TYPE}" == "${Constants.RELEASE_TYPE}") { // 正式版
+            currentBuild.description = "<img src=${MINI_CODE_URL} width=250 height=250 > " +
+                    "<br/> 正式版小程序码" +
+                    "<br/> <a href='${Constants.WECHAT_PUBLIC_PLATFORM_URL}'> 👉微信公众平台</a> "
+        }
+        currentBuild.description += "\n  <br/> ${PROJECT_CHINESE_NAME} v${MINI_VERSION_NUM}  <br/> 大小: ${miniTotalPackageSize} " +
+                " <br/> 分支: ${BRANCH_NAME} <br/> 发布人: ${BUILD_USER}"
+    } catch (e) {
+        println(e.getMessage())
     }
 }
 
