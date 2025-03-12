@@ -56,7 +56,7 @@ JSON_PARAMS:
 {
   "PROJECT_TYPE" : "2",
   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/mini-monorepo.git",
-  "DEFAULT_GIT_BRANCH" : "feature/infra",
+  "DEFAULT_GIT_BRANCH" : "develop",
   "PROJECT_CHINESE_NAME" : "澎泊停车",
   "IS_MONO_REPO" : true,
   "PROJECT_NAME" : "pengbo-mini",
