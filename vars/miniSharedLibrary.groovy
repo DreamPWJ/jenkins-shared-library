@@ -651,7 +651,7 @@ def buildProject() {
     try {
         println("本地离线安装miniprogram-ci")
         // sh "yarn add miniprogram-ci --dev --offline"
-        sh " npm i miniprogram-ci  "
+        sh " pnpm install miniprogram-ci  "
     } catch (e) {
         println(e.getMessage())
         println("远程线上安装miniprogram-ci")
