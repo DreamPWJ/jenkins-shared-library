@@ -1897,7 +1897,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                             title: "${appInfoName} ${SYSTEM_TYPE_NAME} v${appInfoVersion} 发布通知",
                             text: [
                                     "![screenshot](${qrCodeOssUrl == "" ? uploadResultBuildQRCodeURL : qrCodeOssUrl})",
-                                    "### [${appInfoName}${PROJECT_TAG} ${SYSTEM_TYPE_NAME} ${crossPlatformTitle} v${appInfoVersion} #${env.BUILD_NUMBER}](${env.JOB_URL})",
+                                    "[${appInfoName}${PROJECT_TAG} ${SYSTEM_TYPE_NAME} ${crossPlatformTitle} v${appInfoVersion} #${env.BUILD_NUMBER}](${env.JOB_URL})",
                                     "###### ${rollbackTag}",
                                     "##### 版本信息",
                                     "- 构建分支: ${BRANCH_NAME}",
@@ -1931,7 +1931,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                             title: "${appInfoName} ${SYSTEM_TYPE_NAME} v${appInfoVersion} 发布通知",
                             text: [
                                     "![screenshot](${qrCodeOssUrl == "" ? uploadResultBuildQRCodeURL : qrCodeOssUrl})",
-                                    "### [${appInfoName}${PROJECT_TAG}${"${PROJECT_TYPE}".toInteger() == GlobalVars.ios ? "${iosEnvTypeMark}iOS ‍🍏️" : "${androidEnvTypeMark}Android 🤖"} v${appInfoVersion} #${env.BUILD_NUMBER}](${env.JOB_URL})",
+                                    "[${appInfoName}${PROJECT_TAG}${"${PROJECT_TYPE}".toInteger() == GlobalVars.ios ? "${iosEnvTypeMark}iOS ‍🍏️" : "${androidEnvTypeMark}Android 🤖"} v${appInfoVersion} #${env.BUILD_NUMBER}](${env.JOB_URL})",
                                     "###### ${rollbackTag}",
                                     "##### 版本信息",
                                     "- 构建分支: ${BRANCH_NAME}",

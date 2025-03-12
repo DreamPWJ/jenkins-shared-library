@@ -973,7 +973,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                     title: "${PROJECT_CHINESE_NAME} 小程序 v${MINI_VERSION_NUM} 发布通知",
                     text: [
                             "![screenshot](${codeUrl})",
-                            "### [${PROJECT_CHINESE_NAME}${PROJECT_TAG}${buildTypeMsg}小程序🌱 v${MINI_VERSION_NUM} #${env.BUILD_NUMBER}](${env.JOB_URL})",
+                            "[${PROJECT_CHINESE_NAME}${PROJECT_TAG}${buildTypeMsg}小程序🌱 v${MINI_VERSION_NUM} #${env.BUILD_NUMBER}](${env.JOB_URL})",
                             "###### ${rollbackTag}",
                             "##### 版本信息",
                             "- 构建分支: ${BRANCH_NAME}",
