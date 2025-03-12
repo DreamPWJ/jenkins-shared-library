@@ -61,7 +61,7 @@ JSON_PARAMS:
   "IS_MONO_REPO" : true,
   "PROJECT_NAME" : "pengbo-mini",
   "NPM_RUN_PARAMS": "build:weapp",
-  "MINI_EXPERIENCE_CODE_URL": "https://mp.weixin.qq.com/wxopen/basicprofile?actio…om=0.9759051152710687&token=1971374033&lang=zh_CN"
+  "MINI_EXPERIENCE_CODE_URL": "https://archive-artifacts-pipeline.oss-cn-shanghai.aliyuncs.com/pengbo-mini/trial-code.jpg"
 }
 
 */
