@@ -438,7 +438,7 @@ def getInitParams(map) {
     // monorepo方式项目多包复用父包 如 projects
     monoRepoProjectPackage = ""
     // 自动化UI工具版本
-    playwrightVersion = "1.46.0"
+    playwrightVersion = "1.51.0"
 }
 
 /**
