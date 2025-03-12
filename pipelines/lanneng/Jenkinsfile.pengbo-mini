@@ -18,11 +18,11 @@ map.put('build_num_keep', 2)
 map.put('default_git_branch', 'develop')
 
 // 是否Pipeline内脚本钉钉通知  总开关
-map.put('is_ding_notice', false)
+map.put('is_ding_notice', true)
 // 是否只通知发布变更记录
 map.put('is_only_notice_change_log', false)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', false)
+map.put('is_git_tag', true)
 
 // 项目标签或项目简称
 map.put('project_tag', '澎泊车')
