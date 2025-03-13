@@ -56,7 +56,7 @@ class Kubernetes implements Serializable {
                 // ingressNginxDeploy(ctx, map)
 
                 // 部署Pod弹性水平扩缩容 可基于QPS自动伸缩  只需要初始化一次 定时任务没做分布式处理情况不建议扩缩容
-                if ("${ctx.IS_K8S_AUTO_SCALING}" == 'true') {
+                if ("${ctx.IS_CANARY_DEPLOY}" != 'true' && "${ctx.IS_K8S_AUTO_SCALING}" == 'true') {
                     deployHPA(ctx, map, deployNum)
                 }
 
