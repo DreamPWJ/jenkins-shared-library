@@ -1,4 +1,4 @@
-import { chromium } from '@playwright/test';
+import { chromium } from '@playwright/browser-chromium';
 const yargs = require('yargs');
 const argv = yargs.argv;
 
