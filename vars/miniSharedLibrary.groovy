@@ -664,9 +664,11 @@ def buildProject() {
 
     if ("${IS_MONO_REPO}" == "true") {
         monoRepoProjectPackage = "/projects"
-        println("安装依赖 📥")
-        sh "pnpm install"
-        sh "npm run bootstrap:all"
+        retry(3) {
+            println("安装依赖 📥")
+            sh "pnpm install"
+            sh "npm run bootstrap:all"
+        }
     }
     dir("${env.WORKSPACE}${monoRepoProjectPackage}/${PROJECT_NAME}") {
         // println("安装依赖 📥")
