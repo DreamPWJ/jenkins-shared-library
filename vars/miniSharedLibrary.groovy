@@ -649,11 +649,11 @@ def buildProject() {
     // 安装微信小程序CI依赖工具
     try {
         // 判断是否存在miniprogram-ci包
-        if (!fileExists("${env.WORKSPACE}/node_modules/miniprogram-ci")) {
+        //if (!fileExists("${env.WORKSPACE}/node_modules/miniprogram-ci")) {
             println("本地离线安装miniprogram-ci")
             // sh " yarn add miniprogram-ci --dev --offline "
             sh 'npm install miniprogram-ci --prefer-offline' // 参数优先使用本地缓存，减少网络请
-        }
+        //}
     } catch (e) {
         println(e.getMessage())
         retry(3) {
