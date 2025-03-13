@@ -672,7 +672,7 @@ def buildProject() {
             }
         } catch (e) {
             println(e.getMessage())
-            sh "rm -rf node_modules"
+            sh "rm -rf node_modules && rm -f *lock*"
             sh "pnpm install"
             sh "npm run bootstrap:all"
         }
