@@ -664,12 +664,18 @@ def buildProject() {
 
     if ("${IS_MONO_REPO}" == "true") {
         monoRepoProjectPackage = "/projects"
-        retry(3) {
-            println("安装依赖 📥")
-            sh "pnpm install"
-            sh "npm run bootstrap:all"
+        try {
+            retry(3) {
+                println("安装依赖 📥")
+                sh "pnpm install"
+                sh "npm run bootstrap:all"
+            }
+        } catch (e) {
+            println(e.getMessage())
+            sh "rm -rf node_modules"
         }
     }
+
     dir("${env.WORKSPACE}${monoRepoProjectPackage}/${PROJECT_NAME}") {
         // println("安装依赖 📥")
         // sh "yarn"
@@ -686,7 +692,7 @@ def buildProject() {
             }
 
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.taro) {
-            // sh "rm -rf node_modules"
+
             sh "npm run '${NPM_RUN_PARAMS}'"
         }
     }
