@@ -171,6 +171,7 @@ def call(String type = 'wx-mini', Map map) {
                             // Node环境  构建完成自动删除容器
                             //image "node:${NODE_VERSION.replace('Node', '')}"
                             image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                            args " -v /my/jenkins/npm_cache:/app/node_modules "
                             reuseNode true // 使用根节点
                         }
                     }
@@ -648,7 +649,8 @@ def buildProject() {
     // 安装微信小程序CI依赖工具
     try {
         println("本地离线安装miniprogram-ci")
-        sh " yarn add miniprogram-ci --dev --offline "
+        // sh " yarn add miniprogram-ci --dev --offline "
+        sh 'npm install miniprogram-ci --prefer-offline' // 参数优先使用本地缓存，减少网络请
     } catch (e) {
         println(e.getMessage())
         retry(3) {
