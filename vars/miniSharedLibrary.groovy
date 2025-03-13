@@ -665,7 +665,7 @@ def buildProject() {
     if ("${IS_MONO_REPO}" == "true") {
         monoRepoProjectPackage = "/projects"
         try {
-            retry(3) {
+            retry(2) {
                 println("安装依赖 📥")
                 sh "pnpm install"
                 sh "npm run bootstrap:all"
@@ -673,6 +673,8 @@ def buildProject() {
         } catch (e) {
             println(e.getMessage())
             sh "rm -rf node_modules"
+            sh "pnpm install"
+            sh "npm run bootstrap:all"
         }
     }
 
