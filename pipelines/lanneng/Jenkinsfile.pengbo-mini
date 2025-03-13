@@ -31,7 +31,7 @@ map.put('project_tag', ' ')
 map.put('jenkins_node', 'node-3')
 
 // 构建环境变量
-map.put('nodejs', 'Node22')
+map.put('nodejs', 'Node20')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
