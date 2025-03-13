@@ -171,7 +171,7 @@ def call(String type = 'wx-mini', Map map) {
                             // Node环境  构建完成自动删除容器
                             //image "node:${NODE_VERSION.replace('Node', '')}"
                             image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
-                            args " -v /my/jenkins/npm_cache:/app/node_modules "
+                            // args " -v /my/jenkins/npm_cache:/app/node_modules "
                             reuseNode true // 使用根节点
                         }
                     }
@@ -650,15 +650,15 @@ def buildProject() {
     try {
         // 判断是否存在miniprogram-ci包
         //if (!fileExists("${env.WORKSPACE}/node_modules/miniprogram-ci")) {
-            println("本地离线安装miniprogram-ci")
-            // sh " yarn add miniprogram-ci --dev --offline "
-            sh 'npm install miniprogram-ci --prefer-offline' // 参数优先使用本地缓存，减少网络请
+        println("本地离线安装miniprogram-ci")
+        // sh " yarn add miniprogram-ci --dev --offline "
+        sh 'npm install miniprogram-ci --prefer-offline' // 参数优先使用本地缓存，减少网络请
         //}
     } catch (e) {
         println(e.getMessage())
         retry(3) {
             println("远程线上安装miniprogram-ci")
-            sh " yarn add miniprogram-ci --dev || npm install miniprogram-ci --save || pnpm install miniprogram-ci --dev "
+            sh " pnpm install miniprogram-ci  || yarn add miniprogram-ci  || npm install miniprogram-ci  "
         }
     }
 
@@ -792,7 +792,7 @@ def submitAudit() {
     // 自动化审核提交
     try {
         timeout(time: 20, unit: 'MINUTES') { // 下载playwright支持的浏览器下载比较耗时
-            docker.image("mcr.microsoft.com/playwright:v${playwrightVersion}-noble").inside {
+            docker.image("mcr.microsoft.com/playwright:v${playwrightVersion}-noble").inside(" --ipc=host --cap-add=SYS_ADMIN ") {
                 // sh "playwright --version"
                 PlayWright.miniPlatform(this)
             }
