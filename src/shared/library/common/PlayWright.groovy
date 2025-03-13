@@ -23,6 +23,7 @@ class PlayWright implements Serializable {
             // ctx.sh "npx playwright install chromium" // 安装浏览器驱动文件（文件较大下载有点慢）
         } catch (error) {
             ctx.sh "npm init playwright@${playwrightVersion}"
+            // ctx.sh "pnpm create playwright"
             ctx.sh "npm i -D yargs"
             // ctx.sh "npm i -D @playwright/test"
             ctx.sh "pip3 install playwright==${playwrightVersion}" // 安装浏览器驱动文件（文件较大下载有点慢）
