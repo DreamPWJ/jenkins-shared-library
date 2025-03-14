@@ -1,3 +1,7 @@
+# Author: 潘维吉
+# Description: 云原生K8S部署Nginx
+# kubectl apply -f nginx-k8s.yaml
+
 apiVersion: v1
 kind: Service
 metadata:

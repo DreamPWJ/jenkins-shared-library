@@ -1,0 +1,22 @@
+# Author: 潘维吉
+# Description: 云原生K8S部署EMQX
+# kubectl apply -f emqx-k8s.yaml
+
+apiVersion: apps.emqx.io/v2beta1
+kind: EMQX
+metadata:
+  name: emqx-cluster
+  namespace: emqx-operator-system
+spec:
+  image: emqx:5
+  listenersServiceTemplate:
+    spec:
+      type: LoadBalancer  # 或 NodePort
+  dashboardServiceTemplate:
+    spec:
+      type: LoadBalancer
+
+
+
+# 查看服务端口
+# kubectl get svc -n emqx-operator-system
