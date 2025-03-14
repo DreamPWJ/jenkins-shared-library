@@ -11,8 +11,6 @@ metadata:
 
 spec:
   replicas: {K8S_POD_REPLICAS}       # Pod节点默认副本数
-  #minReplicas: 1                    # 最小副本数 HPA内配置
-  #maxReplicas: 10                   # 最大副本数 HPA内配置
   selector:
     matchLabels:
       app: {APP_COMMON_NAME}

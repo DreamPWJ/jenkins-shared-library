@@ -1,4 +1,5 @@
-#
+# Author: 潘维吉
+# Description: 云原生K8S部署Redis
 # Redis Cluster service
 # 参考地址: https://github.com/sobotklp/kubernetes-redis-cluster/blob/master/redis-cluster.yml
 # kubectl apply -f redis-cluster.yaml

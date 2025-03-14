@@ -56,7 +56,7 @@ class Kubernetes implements Serializable {
                 // ingressNginxDeploy(ctx, map)
 
                 // 部署Pod弹性水平扩缩容 可基于QPS自动伸缩  只需要初始化一次 定时任务没做分布式处理情况不建议扩缩容
-                if ("${ctx.IS_K8S_AUTO_SCALING}" == 'true') {
+                if ("${ctx.IS_CANARY_DEPLOY}" != 'true' && "${ctx.IS_K8S_AUTO_SCALING}" == 'true') {
                     deployHPA(ctx, map, deployNum)
                 }
 
@@ -201,13 +201,13 @@ class Kubernetes implements Serializable {
 
             def yamlName = "hpa.yaml"
             // 如果cpu或内存达到限额百分之多少 进行自动扩容
-            def cpuHPA = Integer.parseInt("${map.docker_limit_cpu}".replace("m", "")) * 0.7 + "m"
+            def cpuHPA = Integer.parseInt("${map.docker_limit_cpu}".replace("m", "")) * 0.8 + "m"
             // 内存值不支持小数  转成成为M数据
             def memoryUnit = "${map.docker_memory}".contains("G") ? "G" : "M"
-            def memoryHPA = Math.floor(Integer.parseInt("${map.docker_memory}".replace(memoryUnit, "")) * 0.8 * 1024) + "M"
+            def memoryHPA = Math.floor(Integer.parseInt("${map.docker_memory}".replace(memoryUnit, "")) * 0.9 * 1024) + "M"
             def k8sPodReplicas = "${ctx.K8S_POD_REPLICAS}"
-            // 最大扩容数量设置为基础pod节点的倍数 默认为2倍 避免过多扩容节点导致资源耗尽
-            def maxK8sPodReplicas = Integer.parseInt(k8sPodReplicas) * 2
+            // 最大扩容数量设置为基础pod节点的倍数 默认为2倍或者+1 避免过多扩容节点导致资源耗尽
+            def maxK8sPodReplicas = Integer.parseInt(k8sPodReplicas) + 1
             // 不同配置环境的相同应用 或者 定时任务在应用代码内无分布式处理机制情况
             if ("${ctx.IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
                 if (deployNum != 0) { // 第二次以后环境部署

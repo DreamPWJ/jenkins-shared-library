@@ -23,5 +23,6 @@ kubectl scale -n default statefulset redis-cluster --replicas=2
 
 
 ### 清理
+
 kubectl delete statefulset redis-cluster
 kubectl delete configmap,service,pvc -l app=redis-cluster

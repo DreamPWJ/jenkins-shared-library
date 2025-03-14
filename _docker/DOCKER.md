@@ -35,7 +35,7 @@ docker run -d --restart=always  -p 2181:2181 \
 --cpus=2 -m 2048m --log-opt max-size=200m --log-opt max-file=1   \
 --privileged=true  --name zookeeper  zookeeper:latest
 
-#### EMQX物联网MQTT代理服务器 Dashboard地址http://127.0.0.1:18083  用户名 admin 与默认密码 public 建议更换默认密码防止被攻击 容器删除后丢失数据建议更换存储数据源
+#### EMQX物联网MQTT代理服务器 Dashboard地址http://127.0.0.1:18083  用户名 admin 与默认密码 public 建议更换默认密码防止被攻击 容器删除后丢失数据建议更换存储数据源写入 SHA2(CONCAT('salt', 'public')
 ##### 容器内默认配置文件 变更重启  /opt/emqx/etc/emqx.conf   emqx宿主机卷存储地址 /var/lib/docker/volumes/mqtt-emqx/_data/etc   安全letsencrypt ssl服务证书存放在etc/certs/下面生效
 docker pull emqx/emqx:latest
 
@@ -43,17 +43,18 @@ docker volume create mqtt-emqx && docker inspect mqtt-emqx
 
 docker run -d --restart=always  -p 18083:18083 -p 1883:1883 -p 8083:8083 -p 8084:8084 -p 8883:8883  \
 -e TZ="Asia/Shanghai" -v mqtt-emqx:/opt/emqx  \
+-v /my/emqx/data:/opt/emqx/data -v /my/emqx/etc:/opt/emqx/etc -v /my/emqx/log:/opt/emqx/log \
 --cpus=2 -m 2048m  --log-opt max-size=200m --log-opt max-file=1  \
 --privileged --name emqx  emqx/emqx:latest
 
 #### 安装 分布式任务调度平台XXL-JOB服务 在浏览器中使用http://ip:8081/xxl-job-admin/ 默认用户名 admin 密码 123456
-docker pull xuxueli/xxl-job-admin:2.4.2
+docker pull xuxueli/xxl-job-admin:3.0.0
 
 docker run -d --restart=always -p 8081:8080  \
 -e PARAMS="--spring.config.location=/application.properties" \
 -v /my/xxl-job/applogs:/data/applogs  -v /my/xxl-job/application.properties:/application.properties \
 --cpus=2 -m 2048m --log-opt max-size=200m --log-opt max-file=1   \
---name xxl-job-admin xuxueli/xxl-job-admin:2.4.2
+--name xxl-job-admin xuxueli/xxl-job-admin:3.0.0
 
 #### RocketMQ消息队列服务  官方文档： https://github.com/apache/rocketmq-docker
 #### 已运行的容器动态修改内存限制 docker update --memory 1024m --memory-swap -1 rocketmq-broker

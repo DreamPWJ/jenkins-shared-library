@@ -40,11 +40,11 @@ def call(String type = 'wx-mini', Map map) {
                 text(name: 'VERSION_DESC', defaultValue: "${Constants.MINI_DEFAULT_VERSION_COPYWRITING}",
                         description: '填写小程序版本描述文案(文案会显示在钉钉通知、小程序平台、Git Tag、CHANGELOG.md等, ' +
                                 '不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊')
-                booleanParam(name: 'IS_AUTO_SUBMIT_FOR_REVIEW', defaultValue: true,
-                        description: "是否自动提交审核 (⚠️确保CI机器人提交的已为体验版并在小程序平台列表第一个, 同时满足${Constants.RELEASE_TYPE}正式版才会自动提审)")
                 choice(name: 'CI_ROBOT', choices: "1\n2\n3\n4\n5\n6\n7\n8\n9\n10",
                         description: '选择指定的ci机器人 (同一个机器人上传成功后自动设置为体验版本, 不同机器人实现多版本并存) 🤖')
-                booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}", description: "是否正式环境自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录")
+                booleanParam(name: 'IS_AUTO_SUBMIT_FOR_REVIEW', defaultValue: true,
+                        description: "是否自动提交审核 (⚠️确保CI机器人提交的已为体验版并在小程序平台列表第一个, 同时满足${Constants.RELEASE_TYPE}正式版才会自动提审)")
+                booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}", description: "是否正式环境自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录 📄")
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 📢 ")
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
             }
@@ -171,6 +171,7 @@ def call(String type = 'wx-mini', Map map) {
                             // Node环境  构建完成自动删除容器
                             //image "node:${NODE_VERSION.replace('Node', '')}"
                             image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                            // args " -v /my/jenkins/npm_cache:/app/node_modules "
                             reuseNode true // 使用根节点
                         }
                     }
@@ -267,16 +268,14 @@ def call(String type = 'wx-mini', Map map) {
                         // 只显示当前阶段stage失败  而整个流水线构建显示成功
                         // catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                         script {
-                            submitAudit()
-                            /*               parallel( // 步骤内并发执行
-                                                   '提审': {
-                                                       submitAudit()
-                                                   },
-                                                   '授权': {
-                                                       submitAuthorization(map)
-                                                   })*/
+                            parallel( // 步骤内并发执行
+                                    '提审': {
+                                        submitAudit()
+                                    },
+                                    '授权': {
+                                        submitAuthorization(map)
+                                    })
                         }
-                        // }
                     }
                 }
 
@@ -391,7 +390,7 @@ def getInitParams(map) {
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [build]的前端项目参数
     NPM_BUILD_DIRECTORY = jsonParams.NPM_BUILD_DIRECTORY ? jsonParams.NPM_BUILD_DIRECTORY.trim() : "" // npm 构建目录
     PROJECT_CHINESE_NAME = jsonParams.PROJECT_CHINESE_NAME ? jsonParams.PROJECT_CHINESE_NAME.trim() : "" // 自定义项目中文名称
-    // 小程序体验码url地址
+    // 小程序体验码url地址 微信后台获取体验版本固定地址可上传到阿里云OSS对象存储中
     MINI_EXPERIENCE_CODE_URL = jsonParams.MINI_EXPERIENCE_CODE_URL ? jsonParams.MINI_EXPERIENCE_CODE_URL.trim() : ""
     // 小程序码url地址
     MINI_CODE_URL = jsonParams.MINI_CODE_URL ? jsonParams.MINI_CODE_URL.trim() : ""
@@ -403,7 +402,7 @@ def getInitParams(map) {
     PROJECT_NAME = jsonParams.PROJECT_NAME ? jsonParams.PROJECT_NAME.trim() : ""
 
     try {
-        miniReviewInfo = " --demoUser=''  --demoPassword='' "
+        miniReviewInfo = " --demoUser=''  --demoPassword='' " // 审核需要登录的账号密码
         // 小程序信息
         miniJobInfo = readJSON text: "${MINI_JOB_INFO}"
         if (miniJobInfo) {
@@ -440,7 +439,7 @@ def getInitParams(map) {
     // monorepo方式项目多包复用父包 如 projects
     monoRepoProjectPackage = ""
     // 自动化UI工具版本
-    playwrightVersion = "1.46.0"
+    playwrightVersion = "1.51.0"
 }
 
 /**
@@ -649,21 +648,36 @@ def buildProject() {
 
     // 安装微信小程序CI依赖工具
     try {
+        // 判断是否存在miniprogram-ci包
+        //if (!fileExists("${env.WORKSPACE}/node_modules/miniprogram-ci")) {
         println("本地离线安装miniprogram-ci")
-        sh "yarn add miniprogram-ci --dev --offline"
+        // sh " yarn add miniprogram-ci --dev --offline "
+        sh 'npm install miniprogram-ci --prefer-offline' // 参数优先使用本地缓存，减少网络请
+        //}
     } catch (e) {
         println(e.getMessage())
-        println("远程线上安装miniprogram-ci")
-        sh "yarn add miniprogram-ci --dev"
+        retry(3) {
+            println("远程线上安装miniprogram-ci")
+            sh " pnpm install miniprogram-ci  || yarn add miniprogram-ci  || npm install miniprogram-ci  "
+        }
     }
-    //sh "npm i -D miniprogram-ci"
 
     if ("${IS_MONO_REPO}" == "true") {
         monoRepoProjectPackage = "/projects"
-        println("安装依赖 📥")
-        sh "pnpm install"
-        sh "npm run bootstrap:all"
+        try {
+            retry(2) {
+                println("安装依赖 📥")
+                sh "pnpm install"
+                sh "npm run bootstrap:all"
+            }
+        } catch (e) {
+            println(e.getMessage())
+            sh "rm -rf node_modules && rm -f *lock*"
+            sh "pnpm install"
+            sh "npm run bootstrap:all"
+        }
     }
+
     dir("${env.WORKSPACE}${monoRepoProjectPackage}/${PROJECT_NAME}") {
         // println("安装依赖 📥")
         // sh "yarn"
@@ -680,7 +694,7 @@ def buildProject() {
             }
 
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.taro) {
-            // sh "rm -rf node_modules"
+
             sh "npm run '${NPM_RUN_PARAMS}'"
         }
     }
@@ -723,13 +737,14 @@ def previewUpload() {
         // 微信CI返回的结果文件存储
         wxCiResultFile = "wx-ci-result.json"
         sh "rm -f ${wxCiResultFile}"
-        wxPreviewQrcodeName = "preview-qrcode-v${MINI_VERSION_NUM}" // 微信预览码图片名称
+        wxPreviewQrcodeName = "preview-qrcode-v${MINI_VERSION_NUM}.jpg" // 微信预览码图片名称
 
         println("执行小程序自动化预览上传 🚀 ")
         // 执行自动化预览上传
         sh "node deploy.js --type=${params.BUILD_TYPE} --v=${MINI_VERSION_NUM} --desc='${params.VERSION_DESC}' " +
                 " --isNeedNpm='${IS_MINI_NATIVE_NEED_NPM}' --buildDir=${NPM_BUILD_DIRECTORY} --wxCiResultFile='${wxCiResultFile}' " +
                 " --qrcodeName=${wxPreviewQrcodeName} --robot=${params.CI_ROBOT}"
+        // sh "chmod +x ${wxPreviewQrcodeName} || true"
     }
     println("小程序预览上传成功 ✅")
 }
@@ -762,7 +777,7 @@ def miniInfo() {
 def previewImageUpload(map) {
     wxPreviewQrcodeUrl = "" // 微信预览码图片访问Url
     // 源文件地址
-    def sourceFile = "${env.WORKSPACE}/${PROJECT_NAME == "" ? "" : "${PROJECT_NAME}/"}${wxPreviewQrcodeName}.jpg"
+    def sourceFile = "${env.WORKSPACE}/${PROJECT_NAME == "" ? "" : "${PROJECT_NAME}/"}${wxPreviewQrcodeName}"
     def targetFile = "mini/${env.JOB_NAME}/${wxPreviewQrcodeName}-${env.BUILD_NUMBER}.jpg" // 目标文件
     wxPreviewQrcodeUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
     println "${wxPreviewQrcodeUrl}"
@@ -777,7 +792,7 @@ def submitAudit() {
     // 自动化审核提交
     try {
         timeout(time: 20, unit: 'MINUTES') { // 下载playwright支持的浏览器下载比较耗时
-            docker.image("mcr.microsoft.com/playwright:v${playwrightVersion}-jammy").inside {
+            docker.image("mcr.microsoft.com/playwright:v${playwrightVersion}-noble").inside(" --ipc=host --cap-add=SYS_ADMIN ") {
                 // sh "playwright --version"
                 PlayWright.miniPlatform(this)
             }
@@ -851,31 +866,6 @@ def submitAuthorization(map) {
 }
 
 /**
- * 总会执行统一处理方法
- */
-def alwaysPost() {
-    try {
-        // 使用jenkins 的 description setter 插件 显示html需要在全局安全设置-》标记格式器 选择
-        if ("${params.BUILD_TYPE}" == "${Constants.DEVELOP_TYPE}") { // 开发版
-            currentBuild.description = "<img src=${wxPreviewQrcodeUrl} width=250 height=250 > " +
-                    "<br/> 开发版预览码 ( 二维码有效期半小时 ⚠️ )"
-        } else if ("${params.BUILD_TYPE}" == "${Constants.TRIAL_TYPE}") { // 体验版
-            currentBuild.description = "<img src=${MINI_EXPERIENCE_CODE_URL} width=250 height=250 > " +
-                    "<br/> 体验版体验码 ( 上传成功自动设置为体验版本 )" +
-                    "<br/> <a href='${Constants.WECHAT_PUBLIC_PLATFORM_URL}'> 👉提交审核</a> "
-        } else if ("${params.BUILD_TYPE}" == "${Constants.RELEASE_TYPE}") { // 正式版
-            currentBuild.description = "<img src=${MINI_CODE_URL} width=250 height=250 > " +
-                    "<br/> 正式版小程序码" +
-                    "<br/> <a href='${Constants.WECHAT_PUBLIC_PLATFORM_URL}'> 👉微信公众平台</a> "
-        }
-        currentBuild.description += "\n  <br/> ${PROJECT_CHINESE_NAME} v${MINI_VERSION_NUM}  <br/> 大小: ${miniTotalPackageSize} " +
-                " <br/> 分支: ${BRANCH_NAME} <br/> 发布人: ${BUILD_USER}"
-    } catch (e) {
-        println(e.getMessage())
-    }
-}
-
-/**
  * 生成tag和变更日志
  */
 def gitTagLog() {
@@ -901,6 +891,31 @@ def gitTagLog() {
         }
         // 生成tag和变更日志
         gitTagLog.genTagAndLog(this, tagVersion, gitChangeLog, "${REPO_URL}", "${GIT_CREDENTIALS_ID}")
+    }
+}
+
+/**
+ * 总会执行统一处理方法
+ */
+def alwaysPost() {
+    try {
+        // 使用jenkins 的 description setter 插件 显示html需要在全局安全设置-》标记格式器 选择
+        if ("${params.BUILD_TYPE}" == "${Constants.DEVELOP_TYPE}") { // 开发版
+            currentBuild.description = "<img src=${wxPreviewQrcodeUrl} width=250 height=250 > " +
+                    "<br/> 开发版预览码 ( 二维码有效期半小时 ⚠️ )"
+        } else if ("${params.BUILD_TYPE}" == "${Constants.TRIAL_TYPE}") { // 体验版
+            currentBuild.description = "<img src=${MINI_EXPERIENCE_CODE_URL} width=250 height=250 > " +
+                    "<br/> 体验版体验码 ( 上传成功自动设置为体验版本 )" +
+                    "<br/> <a href='${Constants.WECHAT_PUBLIC_PLATFORM_URL}'> 👉提交审核</a> "
+        } else if ("${params.BUILD_TYPE}" == "${Constants.RELEASE_TYPE}") { // 正式版
+            currentBuild.description = "<img src=${MINI_CODE_URL} width=250 height=250 > " +
+                    "<br/> 正式版小程序码" +
+                    "<br/> <a href='${Constants.WECHAT_PUBLIC_PLATFORM_URL}'> 👉微信公众平台</a> "
+        }
+        currentBuild.description += "\n  <br/> ${PROJECT_CHINESE_NAME} v${MINI_VERSION_NUM}  <br/> 大小: ${miniTotalPackageSize} " +
+                " <br/> 分支: ${BRANCH_NAME} <br/> 发布人: ${BUILD_USER}"
+    } catch (e) {
+        println(e.getMessage())
     }
 }
 
@@ -1007,6 +1022,11 @@ def dingNotice(int type, msg = '', atMobiles = '') {
             }
 
             if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
+                // 如果gitChangeLog为空 赋值提醒文案
+                if ("${gitChangeLog}" == '') {
+                    gitChangeLog = "无版本变更记录 🈳"
+                }
+
                 dingtalk(
                         robot: "${DING_TALK_CREDENTIALS_ID}",
                         type: 'MARKDOWN',

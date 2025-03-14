@@ -2047,6 +2047,10 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                 }
 
                 if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
+                    // 如果gitChangeLog为空 赋值提醒文案
+                    if ("${gitChangeLog}" == '') {
+                        gitChangeLog = "无版本变更记录 🈳"
+                    }
                     if ("${PROJECT_TYPE}".toInteger() == GlobalVars.flutter || "${PROJECT_TYPE}".toInteger() == GlobalVars.reactNative || "${PROJECT_TYPE}".toInteger() == GlobalVars.unity) {
                         dingtalk(
                                 robot: "${dingId}",

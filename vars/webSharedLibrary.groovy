@@ -1390,6 +1390,10 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                     }
                 } catch (e) {
                 }
+                // 如果gitChangeLog为空 赋值提醒文案
+                if ("${gitChangeLog}" == '') {
+                    gitChangeLog = "无版本变更记录 🈳"
+                }
                 dingtalk(
                         robot: "${DING_TALK_CREDENTIALS_ID}",
                         type: 'MARKDOWN',
