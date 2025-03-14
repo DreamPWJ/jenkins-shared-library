@@ -56,14 +56,14 @@ Y | y)
     --privileged=true --name zookeeper zookeeper:latest
 
   echo "基于Docker安装部署分布式任务调度平台XXL-JOB"
-  docker pull xuxueli/xxl-job-admin:2.4.2
+  docker pull xuxueli/xxl-job-admin:3.0.0
 
   # 默认密码是admin  123456  访问添加/xxl-job-admin路径
   docker run -d --restart=always -p 8081:8080 \
     -e PARAMS="--spring.config.location=/application.properties" \
     -v /my/xxl-job/applogs:/data/applogs -v /my/xxl-job/application.properties:/application.properties \
     -m 2048m --log-opt max-size=200m --log-opt max-file=1   \
-    --name xxl-job-admin xuxueli/xxl-job-admin:2.4.2
+    --name xxl-job-admin xuxueli/xxl-job-admin:3.0.0
 
   echo -e "\033[32m中间件服务全部安装结束  ✔ \033[0m"
   ;;

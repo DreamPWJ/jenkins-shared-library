@@ -56,7 +56,9 @@ CREATE TABLE `xxl_job_log`
     `alarm_status`              tinyint(4) NOT NULL DEFAULT '0' COMMENT '告警状态：0-默认、1-无需告警、2-告警成功、3-告警失败',
     PRIMARY KEY (`id`),
     KEY `I_trigger_time` (`trigger_time`),
-    KEY `I_handle_code` (`handle_code`)
+    KEY `I_handle_code` (`handle_code`),
+    KEY `I_jobid_jobgroup` (`job_id`,`job_group`),
+    KEY `I_job_id` (`job_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -94,7 +96,7 @@ CREATE TABLE `xxl_job_registry`
     `registry_value` varchar(255) NOT NULL,
     `update_time`    datetime DEFAULT NULL,
     PRIMARY KEY (`id`),
-    KEY `i_g_k_v` (`registry_group`, `registry_key`, `registry_value`)
+    UNIQUE KEY `i_g_k_v` (`registry_group`, `registry_key`, `registry_value`) USING BTREE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -129,8 +131,12 @@ CREATE TABLE `xxl_job_lock`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
+
+## —————————————————————— init data ——————————————————
+
 INSERT INTO `xxl_job_group`(`id`, `app_name`, `title`, `address_type`, `address_list`, `update_time`)
 VALUES (1, 'xxl-job-executor-sample', '示例执行器', 0, NULL, '2018-11-03 22:21:31');
+
 INSERT INTO `xxl_job_info`(`id`, `job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`,
                            `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`,
                            `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`,
@@ -139,8 +145,10 @@ INSERT INTO `xxl_job_info`(`id`, `job_group`, `job_desc`, `add_time`, `update_ti
 VALUES (1, 1, '测试任务1', '2018-11-03 22:21:31', '2018-11-03 22:21:31', 'XXL', '', 'CRON', '0 0 0 * * ? *',
         'DO_NOTHING', 'FIRST', 'demoJobHandler', '', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '', 'GLUE代码初始化',
         '2018-11-03 22:21:31', '');
+
 INSERT INTO `xxl_job_user`(`id`, `username`, `password`, `role`, `permission`)
 VALUES (1, 'admin', 'e10adc3949ba59abbe56e057f20f883e', 1, NULL);
+
 INSERT INTO `xxl_job_lock` (`lock_name`)
 VALUES ('schedule_lock');
 
