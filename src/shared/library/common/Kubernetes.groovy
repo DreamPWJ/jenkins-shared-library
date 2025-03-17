@@ -207,7 +207,7 @@ class Kubernetes implements Serializable {
             def memoryHPA = Math.floor(Integer.parseInt("${map.docker_memory}".replace(memoryUnit, "")) * 0.9 * 1024) + "M"
             def k8sPodReplicas = "${ctx.K8S_POD_REPLICAS}"
             // 最大扩容数量设置为基础pod节点的倍数 默认为2倍或者+1 避免过多扩容节点导致资源耗尽
-            def maxK8sPodReplicas = Integer.parseInt(k8sPodReplicas) + 1
+            def maxK8sPodReplicas = Integer.parseInt(k8sPodReplicas) + 1 // * 2
             // 不同配置环境的相同应用 或者 定时任务在应用代码内无分布式处理机制情况
             if ("${ctx.IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
                 if (deployNum != 0) { // 第二次以后环境部署
@@ -220,7 +220,7 @@ class Kubernetes implements Serializable {
             def k8sVersion = getK8sVersion(ctx)
             def hpaApiVersion = "v2" // 默认使用新的稳定版本
             if (Utils.compareVersions(k8sVersion, "1.23.0") == -1) { // k8s低版本 使用低版本api
-                hpaApiVersion = "v2beta2"
+                hpaApiVersion = hpaApiVersion + "beta2"
             }
 
             ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
