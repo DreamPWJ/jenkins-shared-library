@@ -8,7 +8,13 @@ metadata:
   name: emqx-cluster
   namespace: emqx-operator-system
 spec:
-  image: emqx:5
+  image: emqx:latest
+  volumes:
+    - /my/emqx/etc:/opt/emqx/etc
+    - /my/emqx/data:/opt/emqx/data
+    - /my/emqx/log:/opt/emqx/log
+  environment:
+    EMQX_DEFAULT_PASSWORD: emqx@2025
   listenersServiceTemplate:
     spec:
       type: LoadBalancer  # 或 NodePort

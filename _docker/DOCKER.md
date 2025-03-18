@@ -39,10 +39,14 @@ docker run -d --restart=always  -p 2181:2181 \
 ##### 容器内默认配置文件 变更重启  /opt/emqx/etc/emqx.conf   emqx宿主机卷存储地址 /var/lib/docker/volumes/mqtt-emqx/_data/etc   安全letsencrypt ssl服务证书存放在etc/certs/下面生效
 docker pull emqx/emqx:latest
 
-docker volume create mqtt-emqx && docker inspect mqtt-emqx
+- 启动临时容器并复制配置 先复制容器内默认配置到宿主机
+docker run -d --name emqx_temp emqx/emqx:latest
+docker cp emqx_temp:/opt/emqx /my/emqx
+chmod -R 777 /my/emqx && chown -R 1000:1000 /my/emqx
+docker rm -f emqx_temp
 
 docker run -d --restart=always  -p 18083:18083 -p 1883:1883 -p 8083:8083 -p 8084:8084 -p 8883:8883  \
--e TZ="Asia/Shanghai" -v mqtt-emqx:/opt/emqx  \
+-e TZ="Asia/Shanghai" -e EMQX_DEFAULT_PASSWORD=emqx@2025 \
 -v /my/emqx/data:/opt/emqx/data -v /my/emqx/etc:/opt/emqx/etc -v /my/emqx/log:/opt/emqx/log \
 --cpus=2 -m 2048m  --log-opt max-size=200m --log-opt max-file=1  \
 --privileged --name emqx  emqx/emqx:latest

@@ -54,7 +54,7 @@ spec:
           type: AverageValue
           averageValue: "{MAX_CPU_SIZE}" # CPU 目标使用量
           #type: Utilization # 基于Deployment平均利用率进行扩缩容 #  Utilization = (实际使用量 / requests) * 100%
-          #averageUtilization: 70 # 目标Deployment中所有Pod的平均CPU利用率超过阈值扩容  CPU平均利用率超过多少  触发自动进行扩容
+          #averageUtilization: 80 # 目标Deployment中所有Pod的平均CPU利用率超过阈值扩容  CPU平均利用率超过多少  触发自动进行扩容
 
     - type: Resource
       resource:
@@ -63,7 +63,7 @@ spec:
           type: AverageValue
           averageValue: "{MAX_MEMORY_SIZE}i" # 内存目标使用量
           #type: Utilization #  resources.requests配置是 HPA计算 Utilization 的基数
-          #averageUtilization: 80  # 当内存平均利用率超过多少时，触发自动进行扩容
+          #averageUtilization: 90  # 当内存平均利用率超过多少时，触发自动进行扩容
 
 
 ---
