@@ -44,6 +44,7 @@ docker run -d --name emqx_temp emqx/emqx:latest
 docker cp emqx_temp:/opt/emqx /my/emqx
 chmod -R 777 /my/emqx && chown -R 1000:1000 /my/emqx
 docker rm -f emqx_temp
+docker volume create mqtt-emqx && docker inspect mqtt-emqx
 
 docker run -d --restart=always  -p 18083:18083 -p 1883:1883 -p 8083:8083 -p 8084:8084 -p 8883:8883  \
 -e TZ="Asia/Shanghai" -e EMQX_DEFAULT_PASSWORD=emqx@2025 \
