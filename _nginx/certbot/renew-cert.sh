@@ -47,7 +47,7 @@ chmod 600 /my/credentials.ini || true
 sudo certbot renew
 
 # 重新加载nginx配置才会生效
-docker exec proxy-nginx nginx -t -c /etc/nginx/nginx.conf
+docker exec proxy-nginx nginx -t -c /etc/nginx/nginx.conf || true
 docker exec proxy-nginx nginx -s reload || true
 
 # 针对证书目录有要求情况  复制证书文件到另一个目录 并授权
