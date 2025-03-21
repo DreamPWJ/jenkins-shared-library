@@ -59,6 +59,10 @@ class Utils implements Serializable {
                 ctx.timeout(time: 1, unit: 'MINUTES') {
                     // 查询到符合语义化版本的Tag  防止tag不符合标准 导致生成的版本号无法连续 导致tag混乱  按照最新时间和版本大小的tag排序
                     // 需要git 2.0以上的版本支持高级语法
+                    // 更新标签
+                    ctx.sh """
+                          git fetch --tags --force || true
+                          """
                     def versionNumArray = getShEchoResult(ctx, "git tag --sort=taggerdate  | sort -V", false).toString().split(" ") as ArrayList
                     for (int i = 0; i < versionNumArray.size(); i++) {
                         if (isRegexMatcher(regex, versionNumArray[i])) {
