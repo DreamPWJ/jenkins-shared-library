@@ -58,8 +58,8 @@ class Utils implements Serializable {
             if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd || "${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
                 ctx.timeout(time: 1, unit: 'MINUTES') {
                     // 查询到符合语义化版本的Tag  防止tag不符合标准 导致生成的版本号无法连续 导致tag混乱  按照最新时间和版本大小的tag排序
-                    // 需要git 2.0以上的版本支持高级语法
-                    // 更新标签
+                    // 需要Git 2.0以上的版本支持高级语法
+                    // 先更新标签 后按照标签时间和版本号排序
                     ctx.sh """
                           git fetch --tags --force || true
                           """
