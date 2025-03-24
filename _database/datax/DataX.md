@@ -4,11 +4,7 @@
 
 #### 安装DataX
 
-cd /my
-wget http://datax-opensource.oss-cn-hangzhou.aliyuncs.com/datax.tar.gz
-tar -xzvf datax.tar.gz  && rm -rf /my/datax/plugin/*/._*
-
-cd /my/datax/bin && python2 datax.py /my/datax/job/datax_job.json
+- https://github.com/alibaba/DataX/blob/master/userGuid.md
 
 #### 参考文章
 
