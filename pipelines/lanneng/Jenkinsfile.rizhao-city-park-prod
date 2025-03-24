@@ -204,7 +204,7 @@ JSON_PARAMS
 
 /*
 
-city-watch-park-ai-k8s-prod
+city-watch-park-ai-prod
 日照市城管局停车AI智能体H5前端 ❤️
 JSON_PARAMS
 {
@@ -220,7 +220,7 @@ JSON_PARAMS
     "APPLICATION_DOMAIN" : "https://park-ai.pengboche.com"
 }
 
-city-watch-park-ai-server-k8s-prod
+city-watch-park-ai-server-prod
 日照市城管局停车AI智能体Python服务端
 JSON_PARAMS
 {
