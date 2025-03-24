@@ -21,7 +21,7 @@ FROM python:$PYTHON_VERSION
 #COPY-MULTISTAGE-BUILD-IMAGES
 
 # Docker 将此路径用作所有后续命令的默认位置
-# WORKDIR /app
+WORKDIR /app
 
 # 指定切换用户
 USER root
@@ -57,7 +57,7 @@ RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
 EXPOSE $EXPOSE_PORT
 
 # 根据主文件默认名称 app.py  CMD中的"$MY_VAR"变量设置成 docker run -e MY_VAR=value 运行变量 否则无法获取
-CMD python $PYTHON_START_FILE
+CMD python /app/$PYTHON_START_FILE
 
 # Flask部署 启动命令
 #CMD ["python", "-m" , "flask", "run", "--host=0.0.0.0"]
