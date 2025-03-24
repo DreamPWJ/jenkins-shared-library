@@ -7,7 +7,6 @@
 ARG PYTHON_VERSION
 ARG PROJECT_NAME
 ARG EXPOSE_PORT
-ARG PYTHON_START_FILE
 
 # Dockerfile多阶段构建 参考文档: https://docs.docker.com/develop/develop-images/multistage-build/
 # 示例 FROM golang:1.16 下行注释的KEY值动态替换
@@ -29,6 +28,8 @@ USER root
 # 设置时区
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# python默认启动文件名
+ENV PYTHON_START_FILE="app.py"
 
 # 更新默认的apk仓库，并添加额外的、速度较快的国内源（这里以阿里云为例）
 #RUN echo "https://mirrors.aliyun.com/alpine/v3.19/main" > /etc/apk/repositories && \

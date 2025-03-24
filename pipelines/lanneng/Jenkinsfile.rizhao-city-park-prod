@@ -215,6 +215,7 @@ JSON_PARAMS
     "SHELL_PARAMS" : "city-watch-ai agent 9107 80 prod",
     "NPM_RUN_PARAMS" : "build",
     "GIT_PROJECT_FOLDER_NAME" : "projects/ai-agent",
+    "NODE_VERSION": "20" ,
     "IS_ROLL_DEPLOY" : true,
     "APPLICATION_DOMAIN" : "https://park-ai.pengboche.com"
 }
