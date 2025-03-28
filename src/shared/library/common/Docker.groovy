@@ -97,6 +97,9 @@ class Docker implements Serializable {
             // 是否使用buildkit构建多CPU架构支持
             def isBuildKit = "${ctx.IS_DOCKER_BUILD_MULTI_PLATFORM}" == 'true' ? true : false
 
+            // DOCKER_BUILDKIT 是 Docker 引入的一种新型构建引擎，从Docker 18.09 开始默认支持（但需手动启用）。替代传统的构建方式，通过并行化、智能缓存和更高效的资源管理来优化镜像构建过程
+            ctx.sh """  export DOCKER_BUILDKIT=1
+                       """
             if (isBuildKit) { // 构建多CPU架构镜像
                 // docker buildx 多CPU架构支持 Building Multi-Arch Images for Arm and x86 with Docker Desktop
                 // docker buildx create --name mybuilder && docker buildx use mybuilder && docker buildx build --platform linux/amd64 .
@@ -105,9 +108,6 @@ class Docker implements Serializable {
                 // 解决buildx报错error: failed to solve: rpc error: code = Unknown desc = failed to solve with frontend dockerfile.v0
                 // Docker desktop -> Settings -> Docker Engine -> Change the "features": { buildkit: true} to "features": { buildkit: false}
 
-                // 是否开启Buildkit 是下一代的镜像构建组件
-                ctx.sh """  export DOCKER_BUILDKIT=1
-                       """
                 // 在Docker容器内使用Buildkit
                 /* ctx.sh """  DOCKER_CLI_EXPERIMENTAL=enabled
                             """  */

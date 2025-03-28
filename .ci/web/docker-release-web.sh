@@ -112,7 +112,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
   docker_pull_image_name=nginx:stable
   [ -z "$(docker images -q ${docker_pull_image_name})" ] && docker pull ${docker_pull_image_name} || echo "基础镜像 ${docker_pull_image_name} 已存在无需重新pull拉取"
 
-  docker build -t ${docker_image_name} \
+    DOCKER_BUILDKIT=1 docker build -t ${docker_image_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg NPM_PACKAGE_FOLDER=${npm_package_folder} \
     --build-arg PROJECT_NAME=${project_name} --build-arg WEB_STRIP_COMPONENTS=${web_strip_components} \
     -f /${deploy_folder}/web/Dockerfile . --no-cache

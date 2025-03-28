@@ -157,7 +157,7 @@ set -x # 开启shell命令打印模式
 # 是否是远程镜像仓库方式
 if [[ ${is_push_docker_repo} == false ]]; then
   echo "🏗️  开始构建Docker镜像(无缓存构建)"
-  docker build -t ${docker_image_name} \
+    DOCKER_BUILDKIT=1 docker build -t ${docker_image_name} \
     --build-arg PROJECT_NAME=${project_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} \
     --build-arg EXPOSE_PORT="${build_expose_ports}" \
