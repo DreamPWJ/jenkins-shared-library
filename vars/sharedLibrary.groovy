@@ -1560,6 +1560,10 @@ def healthCheck(map, params = '') { // 可选参数
             println '分布式部署情况, 服务启动失败, 自动中止取消job, 防止继续部署导致其他应用服务挂掉 。'
             IS_ROLL_DEPLOY = false
         }
+
+        // 服务启动失败回滚到上一个版本  保证服务高可用性
+        // Docker.rollBack(this, "${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}")
+
         IS_ARCHIVE = false // 不归档
         currentBuild.result = 'FAILURE' // 失败  不稳定UNSTABLE 取消ABORTED
         error("健康检测失败, 终止当前Pipeline运行 ❌")

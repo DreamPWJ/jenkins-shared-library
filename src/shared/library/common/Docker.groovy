@@ -284,5 +284,18 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
         // ctx.sh " sudo systemctl reload docker "
     }
 
+    /**
+     *  Docker镜像容器回滚版本
+     *  当服务启动失败的时候 回滚服务版本 保证服务高可用
+     */
+    static def rollback(ctx, imageName) {
+        ctx.println("执行Docker镜像容器回滚版本")
+        // 版本控制策略
+        ctx.sh " docker tag myapp:latest myapp:v1.2.3_\$(date +%Y%m%d%H%M) "
+        // 快速回滚操作
+        ctx.sh " docker stop <container_name> && docker rm <container_name> "
+        // 启动上一个稳定版本容器
+        ctx.sh " docker run -d --name <new_container> myapp:v1.2.3_20250327_1530"
+    }
 
 }

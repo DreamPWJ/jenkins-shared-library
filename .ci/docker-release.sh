@@ -220,7 +220,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
   [ -z "$(docker images -q ${docker_pull_image_name})" ] && docker pull ${docker_pull_image_name} || echo "基础镜像 ${docker_pull_image_name} 已存在无需重新pull拉取"
 
   # 对于简单项目无需重复构建镜像  将部署文件 docker run -v 做挂载映射 直接重启容器即可
-  docker build -t ${docker_image_name} \
+  DOCKER_BUILDKIT=1 docker build -t ${docker_image_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg PROJECT_NAME=${project_name} \
     --build-arg EXPOSE_PORT="${build_expose_ports}" --build-arg JDK_PUBLISHER=${jdk_publisher} --build-arg JDK_VERSION=${jdk_version} \
     --build-arg TOMCAT_VERSION=${tomcat_version} --build-arg JAVA_OPTS="-Xms128m ${docker_java_opts}" \
