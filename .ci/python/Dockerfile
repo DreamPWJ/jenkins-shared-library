@@ -24,7 +24,7 @@ FROM python:$PYTHON_VERSION
 WORKDIR /app
 
 # 指定切换用户
-USER root
+#USER root
 
 # 设置时区
 ENV TZ=Asia/Shanghai
