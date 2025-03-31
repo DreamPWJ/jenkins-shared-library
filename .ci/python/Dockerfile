@@ -50,7 +50,7 @@ RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
  && pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
- && pwd && chmod 777 -R . && ls -l
+ && pwd && ls -l
 
 
 # 暴露端口
