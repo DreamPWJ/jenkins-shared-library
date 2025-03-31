@@ -125,6 +125,9 @@ cd /${deploy_folder} && ./docker-common.sh exist_docker_file
 # 检测是否存在部署文件夹 如果不存在创建一个
 cd /${deploy_folder} && ./docker-common.sh mkdir_deploy_file ${deploy_file}
 
+# 是否开启BuildKit新引擎
+cd /${deploy_folder} && ./docker-common.sh is_enable_buildkit
+
 # 复制字体文件
 #if [[ ! -f "*.ttc" ]]; then
 #  touch *.ttc && chmod +x *.ttc # 兼容不需字体的项目 创建空文件  临时方案
@@ -220,7 +223,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
   [ -z "$(docker images -q ${docker_pull_image_name})" ] && docker pull ${docker_pull_image_name} || echo "基础镜像 ${docker_pull_image_name} 已存在无需重新pull拉取"
 
   # 对于简单项目无需重复构建镜像  将部署文件 docker run -v 做挂载映射 直接重启容器即可
-  DOCKER_BUILDKIT=1 docker build -t ${docker_image_name} \
+    docker build -t ${docker_image_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg PROJECT_NAME=${project_name} \
     --build-arg EXPOSE_PORT="${build_expose_ports}" --build-arg JDK_PUBLISHER=${jdk_publisher} --build-arg JDK_VERSION=${jdk_version} \
     --build-arg TOMCAT_VERSION=${tomcat_version} --build-arg JAVA_OPTS="-Xms128m ${docker_java_opts}" \
