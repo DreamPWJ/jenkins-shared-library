@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 # Author: 潘维吉
 # Version 1.0.0
 # Description: 自定义构建Python语言镜像
@@ -49,7 +50,7 @@ COPY python.tar.gz .
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
- && pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
+ && --mount=type=cache,target=/root/.cache/pip  pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
  && pwd && ls -l
 
 
