@@ -231,10 +231,10 @@ JSON_PARAMS
    "PROJECT_NAME" : "city-watch-deepseek-chat" ,
    "SHELL_PARAMS" : "city-watch-deepseek-chat python 8035 5000 prod",
    "CUSTOM_PYTHON_START_FILE" : "main_rzzhtc.py",
-   "IS_ROLL_DEPLOY" : true,
    "APPLICATION_DOMAIN" : "https://park-ai-api.pengboche.com" ,
 }
 
+REMOTE_IP: 192.168.0.5
 
 */
 
