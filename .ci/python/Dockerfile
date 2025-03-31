@@ -36,7 +36,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 安装依赖环境  --no-install-recommends不安装那些被推荐但非必需的依赖包
 RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && apt-get clean || true && apt-get update || true \
-    && --mount=type=cache,target=/var/cache/apt apt install -y --no-install-recommends libgl1-mesa-glx || true
+    && apt install -y --no-install-recommends libgl1-mesa-glx || true
 
 # 下载项目依赖包
 #COPY requirements.txt requirements.txt
@@ -49,7 +49,7 @@ COPY python.tar.gz .
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
- && --mount=type=cache,target=/var/cache/pip  pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
+ && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
  && pwd && ls -l
 
 
