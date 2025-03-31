@@ -16,7 +16,7 @@ function show_args() {
 # 是否开启BuildKit新引擎
 function is_enable_buildkit() {
  # 版本比对（≥时启用BuildKit）
- min_docker_version=19.03
+ min_docker_version=18.09
  server_docker_version=$(docker version --format '{{.Server.Version}}' 2>/dev/null | cut -d '.' -f1-2)
   if (( $(echo "$server_docker_version >= $min_docker_version" | bc -l) )); then
       echo "检测到当前Docker版本$server_docker_version 高于 $min_docker_version, 已启用BuildKit新引擎模式"
