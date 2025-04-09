@@ -48,7 +48,7 @@ COPY python.tar.gz .
 # 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包
 # 启用 BuildKit 方式指定缓存目录 --mount=type=cache,target=/var/cache/pip
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
- && mv requirement.txt requirements.txt || true \
+ #&& mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
  && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
  && pwd && ls -l
