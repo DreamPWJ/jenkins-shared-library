@@ -29,6 +29,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                    git stash || true
                    git checkout ${ctx.BRANCH_NAME} || true
                    git pull ${userPassWordUrl} || true
+                   git fetch --tags --force ${userPassWordUrl} || true
                    """)
             }
 

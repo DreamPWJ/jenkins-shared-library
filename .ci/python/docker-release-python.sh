@@ -106,6 +106,9 @@ cd /${deploy_folder} && ./docker-common.sh exist_docker_file
 # 检测是否存在部署文件夹 如果不存在创建一个
 cd /${deploy_folder} && ./docker-common.sh mkdir_deploy_file ${deploy_file}
 
+# 是否开启BuildKit新引擎
+cd /${deploy_folder} && ./docker-common.sh is_enable_buildkit
+
 echo "进入部署文件目录构建镜像: ${deploy_file}"
 cd ${deploy_file}
 pwd
@@ -157,7 +160,7 @@ set -x # 开启shell命令打印模式
 # 是否是远程镜像仓库方式
 if [[ ${is_push_docker_repo} == false ]]; then
   echo "🏗️  开始构建Docker镜像(无缓存构建)"
-  docker build -t ${docker_image_name} \
+    docker build -t ${docker_image_name} \
     --build-arg PROJECT_NAME=${project_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} \
     --build-arg EXPOSE_PORT="${build_expose_ports}" \
@@ -203,7 +206,7 @@ echo "👨‍💻 启动运行Docker容器 环境: ${env_mode} 映射端口: ${h
 docker run -d --restart=always -p ${host_port}:${expose_port} \
   -e "PROJECT_NAME=${project_name}" \
   -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1   ${dynamic_run_args} \
-  -e "REMOTE_DEBUGGING_PARAM=${remote_debugging_param}" -e "PYTHON_START_FILE=${python_start_file}" \
+  -e PYTHON_START_FILE="${python_start_file}" -e "REMOTE_DEBUGGING_PARAM=${remote_debugging_param}"  \
   -v /${deploy_folder}/${project_name}/logs:/logs \
   --name ${docker_container_name} ${docker_image_name}
 

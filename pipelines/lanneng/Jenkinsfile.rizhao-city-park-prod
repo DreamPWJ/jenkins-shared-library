@@ -82,10 +82,10 @@ map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
 map.put('jenkins_node', 'node-2')
-map.put('jenkins_node_frontend', 'node-2')
+map.put('jenkins_node_frontend', 'node-3')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
-map.put('nodejs', 'Node16')
+map.put('nodejs', 'Node18')
 map.put('maven', 'Maven3.6')
 map.put('jdk_publisher', 'openjdk')
 map.put('jdk', '11')
@@ -189,7 +189,6 @@ JSON_PARAMS
    "IS_ROLL_DEPLOY" : true,
    "APPLICATION_DOMAIN" : "https://admin-api.pengboche.com",
 }
-REMOTE_IP: 192.168.0.5
 
 city-watch-oauth2-prod
 日照市智慧停车平台OAuth2服务端集群
@@ -202,6 +201,40 @@ JSON_PARAMS
    "SHELL_PARAMS" : "city-watch oauth2 6868 6868 prod",
    "IS_ROLL_DEPLOY" : true
 }
+
+/*
+
+city-watch-park-ai-prod
+日照市城管局停车AI智能体H5前端 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/frontend-monorepo.git" ,
+    "BRANCH_NAME" : "develop" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "city-watch-ai-agent",
+    "SHELL_PARAMS" : "city-watch-ai agent 9107 80 prod",
+    "NPM_RUN_PARAMS" : "build chengguan",
+    "GIT_PROJECT_FOLDER_NAME" : "projects/ai-agent",
+    "NODE_VERSION": "20" ,
+    "IS_ROLL_DEPLOY" : true,
+    "APPLICATION_DOMAIN" : "https://park-ai.pengboche.com"
+}
+
+city-watch-park-ai-server-prod
+日照市城管局停车AI智能体Python服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/ln_deepseek_chat.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "COMPUTER_LANGUAGE" : "3" ,
+   "PROJECT_NAME" : "city-watch-deepseek-chat" ,
+   "SHELL_PARAMS" : "city-watch-deepseek-chat python 8035 5000 prod",
+   "CUSTOM_PYTHON_START_FILE" : "main_rzzhtc.py",
+   "APPLICATION_DOMAIN" : "https://park-ai-api.pengboche.com" ,
+}
+
+REMOTE_IP: 192.168.0.5
 
 */
 

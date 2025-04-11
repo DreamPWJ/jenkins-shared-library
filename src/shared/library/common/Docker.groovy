@@ -97,6 +97,9 @@ class Docker implements Serializable {
             // 是否使用buildkit构建多CPU架构支持
             def isBuildKit = "${ctx.IS_DOCKER_BUILD_MULTI_PLATFORM}" == 'true' ? true : false
 
+            // DOCKER_BUILDKIT 是 Docker 引入的一种新型构建引擎，从Docker 18.09 开始默认支持（但需手动启用）。替代传统的构建方式，通过并行化、智能缓存和更高效的资源管理来优化镜像构建过程
+            ctx.sh """  export DOCKER_BUILDKIT=1
+                       """
             if (isBuildKit) { // 构建多CPU架构镜像
                 // docker buildx 多CPU架构支持 Building Multi-Arch Images for Arm and x86 with Docker Desktop
                 // docker buildx create --name mybuilder && docker buildx use mybuilder && docker buildx build --platform linux/amd64 .
@@ -105,9 +108,6 @@ class Docker implements Serializable {
                 // 解决buildx报错error: failed to solve: rpc error: code = Unknown desc = failed to solve with frontend dockerfile.v0
                 // Docker desktop -> Settings -> Docker Engine -> Change the "features": { buildkit: true} to "features": { buildkit: false}
 
-                // 是否开启Buildkit 是下一代的镜像构建组件
-                ctx.sh """  export DOCKER_BUILDKIT=1
-                       """
                 // 在Docker容器内使用Buildkit
                 /* ctx.sh """  DOCKER_CLI_EXPERIMENTAL=enabled
                             """  */
@@ -284,5 +284,18 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
         // ctx.sh " sudo systemctl reload docker "
     }
 
+    /**
+     *  Docker镜像容器回滚版本
+     *  当服务启动失败的时候 回滚服务版本 保证服务高可用
+     */
+    static def rollback(ctx, imageName) {
+        ctx.println("执行Docker镜像容器回滚版本")
+        // 版本控制策略
+        ctx.sh " docker tag myapp:latest myapp:v1.2.3_\$(date +%Y%m%d%H%M) "
+        // 快速回滚操作
+        ctx.sh " docker stop <container_name> && docker rm <container_name> "
+        // 启动上一个稳定版本容器
+        ctx.sh " docker run -d --name <new_container> myapp:v1.2.3_20250327_1530"
+    }
 
 }

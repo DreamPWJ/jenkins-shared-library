@@ -45,11 +45,12 @@ RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && ap
 #COPY . .
 COPY python.tar.gz .
 
-# 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包  利用 --cache-dir 指定缓存目录
+# 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包
+# 启用 BuildKit 方式指定缓存目录 --mount=type=cache,target=/var/cache/pip
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
- && mv requirement.txt requirements.txt || true \
+ #&& mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
- && pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
+ && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  || true \
  && pwd && ls -l
 
 
@@ -57,7 +58,7 @@ RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
 EXPOSE $EXPOSE_PORT
 
 # 根据主文件默认名称 app.py  CMD中的"$MY_VAR"变量设置成 docker run -e MY_VAR=value 运行变量 否则无法获取
-CMD ["python", "$PYTHON_START_FILE"]
+CMD python /app/$PYTHON_START_FILE
 
 # Flask部署 启动命令
 #CMD ["python", "-m" , "flask", "run", "--host=0.0.0.0"]
