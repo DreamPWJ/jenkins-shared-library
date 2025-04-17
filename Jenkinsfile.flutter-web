@@ -25,7 +25,7 @@ map.put('proxy_jump_port', '22')
 map.put('default_git_branch', ' ')
 
 // 保持构建的最大个数
-map.put('build_num_keep', 1)
+map.put('build_num_keep', 2)
 
 // 容器Docker相关参数
 // docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割

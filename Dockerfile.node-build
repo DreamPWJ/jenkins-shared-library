@@ -4,9 +4,10 @@
 
 # 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
 # ARG EXPOSE_PORT
+ARG NODE_VERSION
 
 # 基础镜像
-FROM node:22
+FROM node:${NODE_VERSION:-22}
 
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
 #LABEL author="潘维吉"

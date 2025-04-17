@@ -28,7 +28,7 @@ map.put('default_git_branch', ' ')
 map.put('default_frontend_git_branch', ' ')
 
 // 保持构建的最大个数
-map.put('build_num_keep', 2)
+map.put('build_num_keep', 3)
 
 // 容器Docker相关参数
 // JVM内存设置

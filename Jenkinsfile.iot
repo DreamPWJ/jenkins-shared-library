@@ -14,7 +14,7 @@ def map = [:]
 map.put('default_git_branch', ' ')
 
 // 保持构建的最大个数
-map.put('build_num_keep', 2)
+map.put('build_num_keep', 3)
 
 // 项目标签或项目简称
 map.put('project_tag', 'IoT物联网')
