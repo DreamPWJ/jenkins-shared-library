@@ -3,7 +3,7 @@
 # Description: 自定义K8S云原生构建部署环境
 
 # 多阶段进行 利用Python语言便利性自定义脚本处理等
-FROM python:3.12-slim AS pybuilder
+FROM python:3.12-slim AS builder
 WORKDIR /app
 # 安装依赖（使用虚拟环境）
 RUN python -m venv /app/venv && pip install ruamel.yaml
@@ -14,14 +14,14 @@ FROM dtzar/helm-kubectl:latest
 
 #COPY --from=0 / /
 
-ENV PYTHONUNBUFFERED=1
+#ENV PYTHONUNBUFFERED=1
 
 # 更新默认的apk仓库，并添加额外的、速度较快的国内源（这里以阿里云为例）
 #RUN echo "https://mirrors.aliyun.com/alpine/v3.19/main" > /etc/apk/repositories && \
 #    echo "https://mirrors.aliyun.com/alpine/v3.19/community" >> /etc/apk/repositories
 
 # Python环境 从构建阶段复制虚拟环境
-COPY --from=pybuilder /app/venv /app/venv
+COPY --from=builder /app/venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
 
 
