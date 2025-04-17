@@ -1,0 +1,27 @@
+# syntax=docker/dockerfile:1
+# Author: 潘维吉
+# Version 1.0.0
+# Description: 自定义K8S云原生构建部署环境
+
+# 多阶段进行
+FROM dtzar/helm-kubectl:latest AS builder
+
+# 使用 Python 官方镜像作为基础镜像
+FROM python:3.12
+
+WORKDIR /app
+
+# 安装必要的系统依赖
+# RUN  apt-get install -y wget
+
+COPY --from=builder  .  .
+
+# Python动态处理yaml文件
+RUN python --version && kubectl version  &&  pip3 install ruamel.yaml
+
+
+
+# 自定义构建镜像
+# DOCKER_BUILDKIT=1 docker build -t panweiji/k8s:latest  -f /my/Dockerfile.k8s . --no-cache --load
+# 上传镜像 先 docker login 登录
+# docker push panweiji/k8s:latest
