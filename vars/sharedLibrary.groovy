@@ -260,6 +260,13 @@ def call(String type = 'web-java', Map map) {
                     }
                     agent {
                         // label "linux"
+                        /* dockerfile {
+                          filename 'Dockerfile.node-build' // 在WORKSPACE工作区代码目录
+                          dir "${env.WORKSPACE}/ci"
+                          // additionalBuildArgs  '--build-arg version=1.0.2'
+                          // args " -v /${env.WORKSPACE}:/tmp "
+                          reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
+                      }*/
                         docker {
                             // Node环境  构建完成自动删除容器
                             //image "node:${NODE_VERSION.replace('Node', '')}"
