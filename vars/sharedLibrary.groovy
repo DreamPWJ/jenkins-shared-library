@@ -589,9 +589,9 @@ def call(String type = 'web-java', Map map) {
                     steps {
                         script {
                             // 自动打tag和生成CHANGELOG.md文件
-                  /*          docker.image("bitnami/git:latest").inside(" --entrypoint='' ") { // 因使用了Git高级特性 所以需确保最新版本
-                                gitTagLog()
-                            }*/
+                            // docker.image("bitnami/git:latest").inside(" --entrypoint='' ") { // 因使用了Git高级特性 所以需确保最新版本
+                            gitTagLog()
+                            // }
                             // 钉钉通知变更记录
                             dingNotice(map, 3)
                         }
@@ -2027,9 +2027,8 @@ def gitTagLog() {
                 // sh ' git fetch --tags ' // 拉取远程分支上所有的tags 需要设置用户名密码
                 // 获取本地当前分支最新tag名称 git describe --abbrev=0 --tags  获取远程仓库最新tag命令 git ls-remote   获取所有分支的最新tag名称命令 git describe --tags `git rev-list --tags --max-count=1`
                 // 不同分支下的独立打的tag可能导致tag版本错乱的情况  过滤掉非语义化版本的tag版本号
-                latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")
-                def maxVersionTag = Git.getGitTagMaxVersion(this)
-                println "最大语义化版本号为: ${maxVersionTag} "
+                // latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")
+                latestTag = Git.getGitTagMaxVersion(this)
 
                 // 生成语义化版本号
                 tagVersion = Utils.genSemverVersion(this, latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
