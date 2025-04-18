@@ -100,6 +100,42 @@ class Git implements Serializable {
     }
 
     /**
+     * git获取最大语义化版本号
+     */
+    static def getGitTagMaxVersion(ctx) {
+        // 执行 git tag -l 命令获取所有标签
+        def tags = ctx.sh(returnStdout: true, script: 'git tag -l').trim().split('\n')
+        def validTags = []
+        def pattern = ~/^[0-9]+\.[0-9]+\.[0-9]+$/
+        // 筛选出符合语义化版本号格式的标签
+        for (tag in tags) {
+            if (tag ==~ pattern) {
+                validTags.add(tag)
+            }
+        }
+        // 对语义化版本号进行排序
+        validTags.sort { a, b ->
+            def aParts = a.split('\\.').collect { it.toInteger() }
+            def bParts = b.split('\\.').collect { it.toInteger() }
+            for (int i = 0; i < Math.min(aParts.size(), bParts.size()); i++) {
+                if (aParts[i] != bParts[i]) {
+                    return aParts[i] - bParts[i]
+                }
+            }
+            return aParts.size() - bParts.size()
+        }
+        // 获取最大的语义化版本号
+        def latestTag = validTags.isEmpty() ? null : validTags.last()
+        if (latestTag) {
+            echo "最大的语义化版本号是: ${latestTag}"
+            return latestTag
+        } else {
+            echo "未找到符合语义化版本号格式的标签。"
+            return "1.0.0"
+        }
+    }
+
+    /**
      * git提交记录
      */
     static def getGitCommitMsg(ctx, num = 1) {

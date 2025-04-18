@@ -2028,6 +2028,8 @@ def gitTagLog() {
                 // 获取本地当前分支最新tag名称 git describe --abbrev=0 --tags  获取远程仓库最新tag命令 git ls-remote   获取所有分支的最新tag名称命令 git describe --tags `git rev-list --tags --max-count=1`
                 // 不同分支下的独立打的tag可能导致tag版本错乱的情况  过滤掉非语义化版本的tag版本号
                 latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")
+                def maxVersionTag = Git.getGitTagMaxVersion(this)
+                println "最大语义化版本号为: ${maxVersionTag} "
 
                 // 生成语义化版本号
                 tagVersion = Utils.genSemverVersion(this, latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
