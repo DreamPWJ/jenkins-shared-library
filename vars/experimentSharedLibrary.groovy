@@ -642,7 +642,10 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def test() {
-    Git.getGitTagMaxVersion(this)
+
+    def maxVersion = Git.getGitTagMaxVersion(this)
+    println("结果: ${maxVersion}")
+
 }
 
 
