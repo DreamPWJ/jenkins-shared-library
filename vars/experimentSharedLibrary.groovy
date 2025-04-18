@@ -637,10 +637,6 @@ def pullProjectCode() {
                   userRemoteConfigs                : [[credentialsId: "${GIT_CREDENTIALS_ID}", url: "${REPO_URL}"]]
         ])
     }
-    // 是否存在CI代码
-    dir("${env.WORKSPACE}/ci") {
-        existCiCode()
-    }
 
     // 实验开发调试
 
