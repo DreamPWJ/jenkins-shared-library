@@ -72,7 +72,7 @@ map.put('is_prod', false)
 map.put('is_same_server', true)
 // 是否进行优雅停机
 map.put('is_grace_shutdown', false)
-// 是否进行服务启动健康探测  K8S集群类型设置false
+// 是否进行服务启动健康探测  K8S集群类型设置false使用自带健康探测
 map.put('is_health_check', true)
 // 是否Pipeline内脚本钉钉通知  总开关
 map.put('is_ding_notice', true)
@@ -90,10 +90,10 @@ map.put('jenkins_node', 'master')
 map.put('jenkins_node_frontend', 'master')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
-map.put('nodejs', 'Node14')
-map.put('maven', 'Maven3.6')
-map.put('jdk_publisher', 'openjdk')
-map.put('jdk', '11')
+map.put('nodejs', 'Node20')
+map.put('maven', 'Maven3.9')
+map.put('jdk_publisher', 'amazoncorretto')
+map.put('jdk', '21')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
