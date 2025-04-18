@@ -118,7 +118,7 @@ map.put('maven_one_level', ' ')
 map.put('maven_setting_xml', ' ')
 
 // 调用核心通用Pipeline
-sharedLibrary(map)
+experimentSharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
