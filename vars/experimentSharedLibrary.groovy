@@ -183,7 +183,7 @@ def call(String type = 'experiment', Map map) {
                             // 重试几次
                             retry(3) {
                                 pullProjectCode()
-                                pullCIRepo()
+                               // pullCIRepo()
                             }
 
                         }
