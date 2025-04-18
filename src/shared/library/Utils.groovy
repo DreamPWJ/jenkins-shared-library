@@ -57,9 +57,21 @@ class Utils implements Serializable {
 
             if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd || "${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
                 ctx.timeout(time: 1, unit: 'MINUTES') {
+
+                    ctx.withCredentials([ctx.usernamePassword(credentialsId: ctx.GIT_CREDENTIALS_ID,
+                            usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                        ctx.script {
+                            ctx.env.ENCODED_GIT_PASSWORD = URLEncoder.encode(ctx.GIT_PASSWORD, "UTF-8")
+                        }
+                        def repoUrlProtocol = ctx.REPO_URL.toString().split("://")[0]
+                        def userPassWordUrl = repoUrlProtocol + "://${ctx.GIT_USERNAME.replace("@", "%40")}:${ctx.ENCODED_GIT_PASSWORD.replace("@", "%40")}" +
+                                "@${ctx.REPO_URL.toString().replace("http://", "").replace("https://", "")} "
+                        // 更新远程所有分支tag标签  先更新标签 后按照标签时间和版本号排序
+                        ctx.sh("git fetch --tags --force ${userPassWordUrl} || true")
+                    }
+
                     // 查询到符合语义化版本的Tag  防止tag不符合标准 导致生成的版本号无法连续 导致tag混乱  按照最新时间和版本大小的tag排序
                     // --sort=taggerdate  需要Git 2.0以上的版本支持高级语法
-                    ctx.sh("git fetch --tags --force || true") // 更新远程所有分支tag标签  先更新标签 后按照标签时间和版本号排序
                     def versionNumArray = getShEchoResult(ctx, "git tag -l --sort=taggerdate  | sort -V", false).toString().split(" ") as ArrayList
                     for (int i = 0; i < versionNumArray.size(); i++) {
                         if (isRegexMatcher(regex, versionNumArray[i])) {
