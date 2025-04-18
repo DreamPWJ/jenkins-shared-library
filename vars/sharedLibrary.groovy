@@ -1097,7 +1097,7 @@ def pullProjectCode() {
         // https仓库下载报错处理 The certificate issuer's certificate has expired.  Check your system date and time.
         sh "git config --global http.sslVerify false || true"
         // 在node节点工具位置选项配置 which git的路径 才能拉取代码!!!
-        // 对于大体积仓库或网络不好情况 自定义代码下载超时时间 默认10分钟
+        // 对于大体积仓库或网络不好情况 自定义代码下载超时时间 
         checkout([$class           : 'GitSCM',
                   branches         : [[name: "*/${BRANCH_NAME}"]],
                   extensions       : [[$class: 'CloneOption', timeout: 30]],
