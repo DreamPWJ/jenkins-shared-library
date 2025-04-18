@@ -102,6 +102,7 @@ class Git implements Serializable {
     /**
      * git获取最大语义化版本号
      */
+    @NonCPS
     static def getGitTagMaxVersion(ctx) {
         ctx.withCredentials([ctx.usernamePassword(credentialsId: ctx.GIT_CREDENTIALS_ID,
                 usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
