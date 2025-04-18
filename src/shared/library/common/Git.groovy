@@ -115,10 +115,10 @@ class Git implements Serializable {
             // 获取最大的语义化版本号
             def latestTag = validTags.isEmpty() ? null : validTags.last()
             if (latestTag) {
-                echo "最大的语义化版本号是: ${latestTag}"
+                ctx.echo "最大的语义化版本号是: ${latestTag}"
                 return latestTag
             } else {
-                echo "未找到符合语义化版本号格式的标签。"
+                ctx.echo "未找到符合语义化版本号格式的标签。"
                 return "1.0.0"
             }
         }
