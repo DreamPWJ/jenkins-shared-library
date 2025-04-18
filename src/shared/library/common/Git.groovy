@@ -103,6 +103,18 @@ class Git implements Serializable {
      * git获取最大语义化版本号
      */
     static def getGitTagMaxVersion(ctx) {
+        ctx.withCredentials([ctx.usernamePassword(credentialsId: ctx.GIT_CREDENTIALS_ID,
+                usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+            ctx.script {
+                ctx.env.ENCODED_GIT_PASSWORD = URLEncoder.encode(ctx.GIT_PASSWORD, "UTF-8")
+            }
+            def repoUrlProtocol = ctx.REPO_URL.toString().split("://")[0]
+            def userPassWordUrl = repoUrlProtocol + "://${ctx.GIT_USERNAME.replace("@", "%40")}:${ctx.ENCODED_GIT_PASSWORD.replace("@", "%40")}" +
+                    "@${ctx.REPO_URL.toString().replace("http://", "").replace("https://", "")} "
+            // 更新远程所有分支tag标签  先更新标签 后按照标签时间和版本号排序
+            ctx.sh("git fetch --tags --force ${userPassWordUrl} || true")
+        }
+
         // 执行 git tag -l 命令获取所有标签
         def tags = ctx.sh(returnStdout: true, script: 'git tag -l').trim().split('\n')
         def validTags = []

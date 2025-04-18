@@ -55,33 +55,6 @@ class Utils implements Serializable {
             versionNum = versionNum.replaceAll("v", "").replaceAll("V", "") // 去掉前缀
             def regex = '^(([0-9]|([1-9]([0-9]*))).){2}([0-9]|([1-9]([0-9]*)))([-](([0-9A-Za-z]|([1-9A-Za-z]([0-9A-Za-z]*)))[.]){0,}([0-9A-Za-z]|([1-9A-Za-z]([0-9A-Za-z]*)))){0,1}([+](([0-9A-Za-z]{1,})[.]){0,}([0-9A-Za-z]{1,})){0,1}$'
 
-            if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd || "${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-                ctx.timeout(time: 1, unit: 'MINUTES') {
-
-                    ctx.withCredentials([ctx.usernamePassword(credentialsId: ctx.GIT_CREDENTIALS_ID,
-                            usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-                        ctx.script {
-                            ctx.env.ENCODED_GIT_PASSWORD = URLEncoder.encode(ctx.GIT_PASSWORD, "UTF-8")
-                        }
-                        def repoUrlProtocol = ctx.REPO_URL.toString().split("://")[0]
-                        def userPassWordUrl = repoUrlProtocol + "://${ctx.GIT_USERNAME.replace("@", "%40")}:${ctx.ENCODED_GIT_PASSWORD.replace("@", "%40")}" +
-                                "@${ctx.REPO_URL.toString().replace("http://", "").replace("https://", "")} "
-                        // 更新远程所有分支tag标签  先更新标签 后按照标签时间和版本号排序
-                        ctx.sh("git fetch --tags --force ${userPassWordUrl} || true")
-                    }
-
-                    // 查询到符合语义化版本的Tag  防止tag不符合标准 导致生成的版本号无法连续 导致tag混乱  按照最新时间和版本大小的tag排序
-                    // --sort=taggerdate  需要Git 2.0以上的版本支持高级语法
-                    def versionNumArray = getShEchoResult(ctx, "git tag -l --sort=version:refname", false).toString().split(" ") as ArrayList
-                    for (int i = 0; i < versionNumArray.size(); i++) {
-                        if (isRegexMatcher(regex, versionNumArray[i])) {
-                            versionNum = versionNumArray[i] //.split("-")[0].trim() 查找到最大的语义化版本号
-                            ctx.println("最大的语义化版本号为: " + versionNum)
-                        }
-                    }
-                }
-            }
-
             def version = ""
             if (isRegexMatcher(regex, versionNum)) {
                 version = versionNum.split("\\.")
