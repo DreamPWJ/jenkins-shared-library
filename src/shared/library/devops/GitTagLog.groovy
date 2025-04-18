@@ -27,6 +27,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                    git config --global user.email "406798106@qq.com"
                    git config --global user.name ${GIT_USERNAME}
                    git config --global pull.rebase false  || true
+                   git config --global push.default simple  || true
                    git fetch --tags --force ${userPassWordUrl} || true
                    git pull ${userPassWordUrl} || true
                    git stash || true
