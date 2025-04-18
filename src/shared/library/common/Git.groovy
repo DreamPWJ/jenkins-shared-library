@@ -92,7 +92,7 @@ class Git implements Serializable {
             ctx.sh("git fetch --tags --force ${userPassWordUrl} || true")
 
             // 执行 git tag -l 命令获取所有标签
-            def tags = ctx.sh(returnStdout: true, script: 'git tag -l').trim().split('\n')
+            def tags = ctx.sh(returnStdout: true, script: 'git tag -l').trim().replaceAll("v", "").replaceAll("V", "").split('\n')
             def validTags = []
             def pattern = ~/^[0-9]+\.[0-9]+\.[0-9]+$/
             // 筛选出符合语义化版本号格式的标签
