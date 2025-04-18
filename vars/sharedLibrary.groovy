@@ -1097,7 +1097,7 @@ def pullProjectCode() {
         // https仓库下载报错处理 The certificate issuer's certificate has expired.  Check your system date and time.
         sh "git config --global http.sslVerify false || true"
         // 在node节点工具位置选项配置 which git的路径 才能拉取代码!!!
-        // 对于大体积仓库或网络不好情况 自定义代码下载超时时间 
+        // 对于大体积仓库或网络不好情况 自定义代码下载超时时间
         checkout([$class           : 'GitSCM',
                   branches         : [[name: "*/${BRANCH_NAME}"]],
                   extensions       : [[$class: 'CloneOption', timeout: 30]],
@@ -2024,6 +2024,17 @@ def gitTagLog() {
                 tagVersion = "${params.VERSION_NUM}".trim()
                 println "手填的自定义版本号为: ${tagVersion} "
             } else {
+                withCredentials([usernamePassword(credentialsId: GIT_CREDENTIALS_ID,
+                        usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                    script {
+                        env.ENCODED_GIT_PASSWORD = URLEncoder.encode(GIT_PASSWORD, "UTF-8")
+                    }
+                    def repoUrlProtocol = REPO_URL.toString().split("://")[0]
+                    def userPassWordUrl = repoUrlProtocol + "://${GIT_USERNAME.replace("@", "%40")}:${ENCODED_GIT_PASSWORD.replace("@", "%40")}" +
+                            "@${REPO_URL.toString().replace("http://", "").replace("https://", "")} "
+                    // 更新远程所有分支tag标签  先更新标签 后按照标签时间和版本号排序
+                    sh("git fetch --tags --force ${userPassWordUrl} || true")
+                }
                 // sh ' git fetch --tags ' // 拉取远程分支上所有的tags 需要设置用户名密码
                 // 获取本地当前分支最新tag名称 git describe --abbrev=0 --tags  获取远程仓库最新tag命令 git ls-remote   获取所有分支的最新tag名称命令 git describe --tags `git rev-list --tags --max-count=1`
                 // 不同分支下的独立打的tag可能导致tag版本错乱的情况  过滤掉非语义化版本的tag版本号
