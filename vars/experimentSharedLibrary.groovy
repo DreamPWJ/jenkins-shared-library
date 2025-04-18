@@ -172,7 +172,7 @@ def call(String type = 'experiment', Map map) {
                     }
                 }
 
-                stage('实验室') {
+                stage('未来实验室') {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
@@ -196,20 +196,17 @@ def call(String type = 'experiment', Map map) {
                 always {
                     script {
                         echo '总是运行，无论成功、失败还是其他状态'
-                        alwaysPost()
                     }
                 }
                 success {
                     script {
                         echo '当前成功时运行'
-                        deletePackagedOutput()
-                        //deployMultiEnv()
+
                     }
                 }
                 failure {
                     script {
                         echo '当前失败时才运行'
-                        dingNotice(map, 0, "CI/CD流水线失败 ❌")
                     }
                 }
                 unstable {
@@ -640,7 +637,37 @@ def pullProjectCode() {
 
     // 实验开发调试
 
-    Git.getGitTagMaxVersion(this)
+   // Git.getGitTagMaxVersion(this)
+    // 执行 git tag -l 命令获取所有标签
+    def tags = sh(returnStdout: true, script: 'git tag -l').trim().split('\n')
+    def validTags = []
+    def pattern = ~/^[0-9]+\.[0-9]+\.[0-9]+$/
+    // 筛选出符合语义化版本号格式的标签
+    for (tag in tags) {
+        if (tag ==~ pattern) {
+            validTags.add(tag)
+        }
+    }
+    // 对语义化版本号进行排序
+    validTags.sort { a, b ->
+        def aParts = a.split('\\.').collect { it.toInteger() }
+        def bParts = b.split('\\.').collect { it.toInteger() }
+        for (int i = 0; i < Math.min(aParts.size(), bParts.size()); i++) {
+            if (aParts[i] != bParts[i]) {
+                return aParts[i] - bParts[i]
+            }
+        }
+        return aParts.size() - bParts.size()
+    }
+    // 获取最大的语义化版本号
+    def latestTag = validTags.isEmpty() ? null : validTags.last()
+    if (latestTag) {
+        echo "最大的语义化版本号是: ${latestTag}"
+        return latestTag
+    } else {
+        echo "未找到符合语义化版本号格式的标签。"
+        return "1.0.0"
+    }
 
 }
 
