@@ -77,29 +77,6 @@ class Git implements Serializable {
     }
 
     /**
-     * 获取GIT某个时间段的提交记录，并且去除merge信息
-     * --since 为时间戳或者日期格式
-     */
-    @NonCPS
-    static def getGitLogByTime(ctx, int maxRecordsNum = 100) {
-        def gitLogs = ""
-        try {
-            // 如 git log --pretty=format:" %s @%an %cr (%H) ; " -n 10 --since='2023-03-28 15:55:00' --no-merges
-            def jenkins = Jenkins.instance.getItem(ctx.env.JOB_NAME)
-            def lsb = jenkins.getLastSuccessfulBuild()  // 上次成功的构建
-            def lsbTime = lsb.getTime().format("yyyy-MM-dd HH:mm:ss")
-            ctx.println("上次成功构建时间: " + lsbTime)
-            gitLogs = Utils.getShEchoResult(ctx, "git log --pretty=format:\"- %s @%an ;\" -n ${maxRecordsNum}  --since='${lsbTime}' --no-merges")
-            // 针对变更记录数组遍历可进行特殊化处理
-            return gitLogs
-        } catch (error) {
-            ctx.println "获取GIT某个时间段的提交记录失败"
-            ctx.println error.getMessage()
-        }
-        return gitLogs
-    }
-
-    /**
      * git获取最大语义化版本号
      */
     static def getGitTagMaxVersion(ctx) {
@@ -146,6 +123,30 @@ class Git implements Serializable {
             }
         }
     }
+
+    /**
+     * 获取GIT某个时间段的提交记录，并且去除merge信息
+     * --since 为时间戳或者日期格式
+     */
+    @NonCPS
+    static def getGitLogByTime(ctx, int maxRecordsNum = 100) {
+        def gitLogs = ""
+        try {
+            // 如 git log --pretty=format:" %s @%an %cr (%H) ; " -n 10 --since='2023-03-28 15:55:00' --no-merges
+            def jenkins = Jenkins.instance.getItem(ctx.env.JOB_NAME)
+            def lsb = jenkins.getLastSuccessfulBuild()  // 上次成功的构建
+            def lsbTime = lsb.getTime().format("yyyy-MM-dd HH:mm:ss")
+            ctx.println("上次成功构建时间: " + lsbTime)
+            gitLogs = Utils.getShEchoResult(ctx, "git log --pretty=format:\"- %s @%an ;\" -n ${maxRecordsNum}  --since='${lsbTime}' --no-merges")
+            // 针对变更记录数组遍历可进行特殊化处理
+            return gitLogs
+        } catch (error) {
+            ctx.println "获取GIT某个时间段的提交记录失败"
+            ctx.println error.getMessage()
+        }
+        return gitLogs
+    }
+
 
     /**
      * git提交记录

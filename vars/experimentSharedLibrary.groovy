@@ -8,7 +8,7 @@ import shared.library.devops.GitTagLog
 /**
  * @author 潘维吉
  * @description 通用核心共享Pipeline脚本库
- * 实验性流水  用于研发测试新功能
+ * 实验性流水线 用于高效研发测试新功能等
  */
 def call(String type = 'experiment', Map map) {
     echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: 前端${map.jenkins_node_frontend} , 后端${map.jenkins_node} "
@@ -183,7 +183,8 @@ def call(String type = 'experiment', Map map) {
                             // 重试几次
                             retry(3) {
                                 pullProjectCode()
-                               // pullCIRepo()
+                                // pullCIRepo()
+                                test()
                             }
 
                         }
@@ -635,40 +636,13 @@ def pullProjectCode() {
         ])
     }
 
-    // 实验开发调试
+}
 
-   // Git.getGitTagMaxVersion(this)
-    // 执行 git tag -l 命令获取所有标签
-    def tags = sh(returnStdout: true, script: 'git tag -l').trim().split('\n')
-    def validTags = []
-    def pattern = ~/^[0-9]+\.[0-9]+\.[0-9]+$/
-    // 筛选出符合语义化版本号格式的标签
-    for (tag in tags) {
-        if (tag ==~ pattern) {
-            validTags.add(tag)
-        }
-    }
-    // 对语义化版本号进行排序
-    validTags.sort { a, b ->
-        def aParts = a.split('\\.').collect { it.toInteger() }
-        def bParts = b.split('\\.').collect { it.toInteger() }
-        for (int i = 0; i < Math.min(aParts.size(), bParts.size()); i++) {
-            if (aParts[i] != bParts[i]) {
-                return aParts[i] - bParts[i]
-            }
-        }
-        return aParts.size() - bParts.size()
-    }
-    // 获取最大的语义化版本号
-    def latestTag = validTags.isEmpty() ? null : validTags.last()
-    if (latestTag) {
-        echo "最大的语义化版本号是: ${latestTag}"
-        return latestTag
-    } else {
-        echo "未找到符合语义化版本号格式的标签。"
-        return "1.0.0"
-    }
-
+/**
+ * 实验开发调试
+ */
+def test() {
+    Git.getGitTagMaxVersion(this)
 }
 
 
