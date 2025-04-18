@@ -12,3 +12,5 @@ logs/
 node_modules/
 .cache/
 dist/
+.idea/
+.vscode/

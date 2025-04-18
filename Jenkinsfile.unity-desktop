@@ -12,7 +12,7 @@
 def map = [:]
 
 // 保持构建的最大个数
-map.put('build_num_keep', 1)
+map.put('build_num_keep', 2)
 
 // 默认要构建的Git分支
 map.put('default_git_branch', 'master')

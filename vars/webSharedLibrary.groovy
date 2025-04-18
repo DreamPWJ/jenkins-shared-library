@@ -405,12 +405,18 @@ def call(String type = 'web', Map map) {
                         }
                     }
                     agent { // agent语法文档： https://www.jenkins.io/doc/book/pipeline/syntax/#agent
-                        dockerfile {
+  /*                      dockerfile {
                             filename 'Dockerfile.k8s' // 在WORKSPACE工作区代码目录
                             dir "${env.WORKSPACE}/ci"
                             // additionalBuildArgs  '--build-arg version=1.0.2'
                             // args " -v /${env.WORKSPACE}:/tmp "
                             reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
+                        }*/
+                        docker {
+                            //  构建完成自动删除容器
+                            image "panweiji/k8s:latest" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                            // args " "
+                            reuseNode true // 使用根节点
                         }
                     }
                     steps {
@@ -777,7 +783,7 @@ def pullProjectCode() {
         println "Git构建分支是: ${BRANCH_NAME} 📇"
         // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
         // println "${git}"
-        // 对于大体积仓库或网络不好情况 自定义代码下载超时时间 默认10分钟
+        // 对于大体积仓库或网络不好情况 自定义代码下载超时时间 
         checkout([$class           : 'GitSCM',
                   branches         : [[name: "*/${BRANCH_NAME}"]],
                   extensions       : [[$class: 'CloneOption', timeout: 30]],
@@ -1257,7 +1263,8 @@ def gitTagLog() {
                 // sh ' git fetch --tags ' // 拉取远程分支上所有的tags 需要设置用户名密码
                 // 获取本地当前分支最新tag名称 git describe --abbrev=0 --tags  获取远程仓库最新tag命令 git ls-remote   获取所有分支的最新tag名称命令 git describe --tags `git rev-list --tags --max-count=1`
                 // 不同分支下的独立打的tag可能导致tag版本错乱的情况  过滤掉非语义化版本的tag版本号
-                latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")
+                // latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")
+                latestTag = Git.getGitTagMaxVersion(this)
 
                 // 生成语义化版本号
                 tagVersion = Utils.genSemverVersion(this, latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?

@@ -23,15 +23,16 @@ rm -f /var/lib/docker/overlay2/*/diff/etc/nginx/on || true
 # 隐藏占用情况 查找进程没有关闭导致内核无法回收占用空间的隐藏要删除的文件
 lsof -w | grep 'deleted' | awk '{print $2}' | xargs kill -9  || true
 
+# 移除 Docker 构建缓存  CI/CD服务器或服务端构建镜像显著有效
+docker builder prune --force  || true
+
 # 清除所有未使用或悬挂的图像 容器 卷和网络
 docker system prune -a --force || true
 
-# 移除所有未使用的镜像（包括没有被任何容器使用的镜像） 如/var/lib/docker/overlay2占用
+# 移除所有未使用的镜像（包括没有被任何容器使用的镜像） 如/var/lib/docker/overlay2占用  注意将删除所有images镜像
 docker image prune -a --force || true
 # 移除所有未使用的卷
 docker volume prune --force  || true
-# 移除 Docker 构建缓存
-docker builder prune --force  || true
 
 AFTER_TOTAL_FREE=$(df -h  / | awk '/\// {print $4}' | sed 's/G//')
 echo " After clean free space is $AFTER_TOTAL_FREE GB! "
