@@ -70,7 +70,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                     sh("""
                           git add ${changeLogFileName}
                           git commit ${changeLogFileName}  -m "${GlobalVars.gitCommitChangeLogDocs}: 发布 v${tagVersion}" 
-                          git pull ${userPassWordUrl} || true
+                          git pull ${userPassWordUrl} --allow-unrelated-histories || true
                           git push ${userPassWordUrl}
                            """)
                 } catch (e) {
