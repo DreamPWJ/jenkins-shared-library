@@ -79,6 +79,7 @@ class Git implements Serializable {
     /**
      * git获取最大语义化版本号
      */
+    @NonCPS
     static def getGitTagMaxVersion(ctx) {
         ctx.withCredentials([ctx.usernamePassword(credentialsId: ctx.GIT_CREDENTIALS_ID,
                 usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
@@ -103,14 +104,9 @@ class Git implements Serializable {
             }
             // 对语义化版本号进行排序
             validTags.sort { a, b ->
-                ctx.println(a)
-                ctx.println(b)
                 def aParts = a.split('\\.').collect { it.toInteger() }
                 def bParts = b.split('\\.').collect { it.toInteger() }
-                ctx.println(a)
-                ctx.println(b)
-                for (int i = 0; i < 3; i++) {
-                    ctx.println(i)
+                for (int i = 0; i < Math.min(aParts.size(), bParts.size()); i++) {
                     if (aParts[i] != bParts[i]) {
                         return aParts[i] - bParts[i]
                     }
