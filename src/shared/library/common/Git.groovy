@@ -103,7 +103,8 @@ class Git implements Serializable {
             }
             // 对语义化版本号进行排序
             validTags.sort { a, b ->
-                println(a)
+                ctx.println(a)
+                ctx.println(b)
                 def aParts = a.split('\\.').collect { it.toInteger() }
                 def bParts = b.split('\\.').collect { it.toInteger() }
                 for (int i = 0; i < Math.min(aParts.size(), bParts.size()); i++) {
