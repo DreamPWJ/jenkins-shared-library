@@ -112,6 +112,7 @@ class Git implements Serializable {
                 }
                 return aParts.size() - bParts.size()
             }
+            ctx.println(validTags.toString())
             // 获取最大的语义化版本号
             def latestTag = validTags.isEmpty() ? null : validTags.last()
             if (latestTag) {
