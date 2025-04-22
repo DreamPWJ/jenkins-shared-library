@@ -105,8 +105,7 @@ class Git implements Serializable {
             validTags.sort { a, b ->
                 def aParts = a.split('\\.').collect { it.toInteger() }
                 def bParts = b.split('\\.').collect { it.toInteger() }
-                ctx.println(aParts + " | " + bParts)
-                for (int i = 0; i < Math.min(aParts.size(), bParts.size()); i++) {
+                for (int i = 0; i < 3; i++) {
                     if (aParts[i] != bParts[i]) {
                         return aParts[i] - bParts[i]
                     }
