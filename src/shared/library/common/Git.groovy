@@ -98,14 +98,14 @@ class Git implements Serializable {
             // 筛选出符合语义化版本号格式的标签
             for (tag in tags) {
                 if (tag ==~ pattern) {
-                    validTags.add(tag.toString())
+                    validTags.add(tag)
                 }
             }
             // 对语义化版本号进行排序
             validTags.sort { a, b ->
                 def aParts = a.split('\\.').collect { it.toInteger() }
                 def bParts = b.split('\\.').collect { it.toInteger() }
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < Math.min(aParts.size(), bParts.size()); i++) {
                     if (aParts[i] != bParts[i]) {
                         return aParts[i] - bParts[i]
                     }
