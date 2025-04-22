@@ -101,59 +101,11 @@ class Git implements Serializable {
                     validTags.add(tag)
                 }
             }
-            // 版本解析器：将字符串转换为可比较的结构
-            def parseVersion = { String v ->
-                // 分离元数据（不参与比较）
-                def (mainPart, _) = v.split(/\+/, 2)
-                // 分离主版本和先行版本
-                def parts = mainPart.split(/-/, 2)
-                def mainVersions = parts[0].split(/\./).collect { it.toInteger() }
-                // 补全主版本号（如 "1.2" → [1,2,0]）
-                while (mainVersions.size() < 3) mainVersions << 0
-                // 处理先行版本（如 "beta.1" → ["beta", 1]）
-                def preRelease = parts.size() > 1 ?
-                        parts[1].split(/\./).collect { it.isNumber() ? it.toInteger() : it } : []
-                [major: mainVersions[0], minor: mainVersions[1], patch: mainVersions[2], pre: preRelease]
-            }
-
-            // 对语义化版本号进行排序
-            validTags.sort { a, b ->
-                def verA = parseVersion(a)
-                def verB = parseVersion(b)
-
-                // 主版本号比较
-                def majorCompare = verA.major <=> verB.major
-                if (majorCompare != 0) return majorCompare
-
-                // 次版本号比较
-                def minorCompare = verA.minor <=> verB.minor
-                if (minorCompare != 0) return minorCompare
-
-                // 修订号比较
-                def patchCompare = verA.patch <=> verB.patch
-                if (patchCompare != 0) return patchCompare
-
-                // 先行版本比较（无先行版本的版本优先级更高）
-                if (verA.pre.empty && !verB.pre.empty) return 1
-                if (!verA.pre.empty && verB.pre.empty) return -1
-
-                // 逐项对比先行版本标识符
-                for (i in 0..<[verA.pre.size(), verB.pre.size()].max()) {
-                    def itemA = i < verA.pre.size() ? verA.pre[i] : null
-                    def itemB = i < verB.pre.size() ? verB.pre[i] : null
-                    // 数字优先于字母
-                    if (itemA instanceof Integer && itemB instanceof String) return -1
-                    if (itemA instanceof String && itemB instanceof Integer) return 1
-                    // 同类型比较
-                    def itemCompare = itemA <=> itemB
-                    if (itemCompare != 0) return itemCompare
-                }
-                return 0
-            }
-
-            ctx.println(validTags.toString())
+            // 排序
+            def vsortTags = sortSemVer(validTags)
+            ctx.println(vsortTags.toString())
             // 获取最大的语义化版本号
-            def latestTag = validTags.isEmpty() ? null : validTags.last()
+            def latestTag = vsortTags.isEmpty() ? null : vsortTags.last()
             if (latestTag) {
                 ctx.echo "最大的Git Tag语义化版本号是: ${latestTag}"
                 return latestTag
@@ -164,6 +116,60 @@ class Git implements Serializable {
         }
     }
 
+    /**
+     *  语义化版本排序函数
+     */
+    def sortSemVer(List versions) {
+        // 版本解析器：将字符串转换为可比较的结构
+        def parseVersion = { String v ->
+            // 分离元数据（不参与比较）
+            def (mainPart, _) = v.split(/\+/, 2)
+            // 分离主版本和先行版本
+            def parts = mainPart.split(/-/, 2)
+            def mainVersions = parts[0].split(/\./).collect { it.toInteger() }
+            // 补全主版本号（如 "1.2" → [1,2,0]）
+            while (mainVersions.size() < 3) mainVersions << 0
+            // 处理先行版本（如 "beta.1" → ["beta", 1]）
+            def preRelease = parts.size() > 1 ?
+                    parts[1].split(/\./).collect { it.isNumber() ? it.toInteger() : it } : []
+            [major: mainVersions[0], minor: mainVersions[1], patch: mainVersions[2], pre: preRelease]
+        }
+
+        // 自定义比较闭包
+        versions.sort { a, b ->
+            def verA = parseVersion(a)
+            def verB = parseVersion(b)
+
+            // 主版本号比较
+            def majorCompare = verA.major <=> verB.major
+            if (majorCompare != 0) return majorCompare
+
+            // 次版本号比较
+            def minorCompare = verA.minor <=> verB.minor
+            if (minorCompare != 0) return minorCompare
+
+            // 修订号比较
+            def patchCompare = verA.patch <=> verB.patch
+            if (patchCompare != 0) return patchCompare
+
+            // 先行版本比较（无先行版本的版本优先级更高）
+            if (verA.pre.empty && !verB.pre.empty) return 1
+            if (!verA.pre.empty && verB.pre.empty) return -1
+
+            // 逐项对比先行版本标识符
+            for (i in 0..<[verA.pre.size(), verB.pre.size()].max()) {
+                def itemA = i < verA.pre.size() ? verA.pre[i] : null
+                def itemB = i < verB.pre.size() ? verB.pre[i] : null
+                // 数字优先于字母
+                if (itemA instanceof Integer && itemB instanceof String) return -1
+                if (itemA instanceof String && itemB instanceof Integer) return 1
+                // 同类型比较
+                def itemCompare = itemA <=> itemB
+                if (itemCompare != 0) return itemCompare
+            }
+            return 0
+        }
+    }
     /**
      * 获取GIT某个时间段的提交记录，并且去除merge信息
      * --since 为时间戳或者日期格式
