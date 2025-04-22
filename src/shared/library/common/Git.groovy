@@ -102,7 +102,7 @@ class Git implements Serializable {
                 }
             }
             // 排序
-            def vsortTags = sortSemVer(validTags as List)
+            def vsortTags = sortSemVer(validTags)
             ctx.println(vsortTags.toString())
             // 获取最大的语义化版本号
             def latestTag = vsortTags.isEmpty() ? null : vsortTags.last()
@@ -119,7 +119,7 @@ class Git implements Serializable {
     /**
      *  语义化版本排序函数
      */
-    def sortSemVer(List versions) {
+    static def sortSemVer(ArrayList versions) {
         // 版本解析器：将字符串转换为可比较的结构
         def parseVersion = { String v ->
             // 分离元数据（不参与比较）
