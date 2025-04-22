@@ -102,9 +102,9 @@ class Git implements Serializable {
                 }
             }
             // 对语义化版本号进行排序
-            def sortTags = validTags.sort { a, b ->
-                def aParts = a.split('\\.').collect { it.toInteger() }
-                def bParts = b.split('\\.').collect { it.toInteger() }
+            validTags.sort { a, b ->
+                def aParts = a.toString().split('\\.').collect { it.toInteger() }
+                def bParts = b.toString().split('\\.').collect { it.toInteger() }
                 for (int i = 0; i < Math.min(aParts.size(), bParts.size()); i++) {
                     if (aParts[i] != bParts[i]) {
                         return aParts[i] - bParts[i]
@@ -112,9 +112,9 @@ class Git implements Serializable {
                 }
                 return aParts.size() - bParts.size()
             }
-            ctx.println(sortTags.toString())
+            ctx.println(validTags.toString())
             // 获取最大的语义化版本号
-            def latestTag = sortTags.isEmpty() ? null : sortTags.last()
+            def latestTag = validTags.isEmpty() ? "1.0.0" : validTags.last()
             if (latestTag) {
                 ctx.echo "最大的Git Tag语义化版本号是: ${latestTag}"
                 return latestTag
