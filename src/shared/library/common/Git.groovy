@@ -101,11 +101,11 @@ class Git implements Serializable {
                     validTags.add(tag.toString())
                 }
             }
-            ctx.println(validTags.toString())
             // 对语义化版本号进行排序
             validTags.sort { a, b ->
                 def aParts = a.split('\\.').collect { it.toInteger() }
                 def bParts = b.split('\\.').collect { it.toInteger() }
+                ctx.println(aParts + " | " + bParts)
                 for (int i = 0; i < Math.min(aParts.size(), bParts.size()); i++) {
                     if (aParts[i] != bParts[i]) {
                         return aParts[i] - bParts[i]
