@@ -102,7 +102,7 @@ class Git implements Serializable {
                 }
             }
             // 排序
-            def vsortTags = sortSemVer(validTags)
+            def vsortTags = sortSemVer(validTags as List)
             ctx.println(vsortTags.toString())
             // 获取最大的语义化版本号
             def latestTag = vsortTags.isEmpty() ? null : vsortTags.last()
