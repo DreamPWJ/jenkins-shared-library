@@ -77,7 +77,7 @@ class Git implements Serializable {
     }
 
     /**
-     * git获取最大语义化版本号
+     * git获取tag最大语义化版本号
      */
     static def getGitTagMaxVersion(ctx) {
         ctx.withCredentials([ctx.usernamePassword(credentialsId: ctx.GIT_CREDENTIALS_ID,
@@ -105,7 +105,7 @@ class Git implements Serializable {
             versionSort(validTags)
             ctx.println(validTags.toString())
             // 获取最大的语义化版本号
-            def latestTag = validTags.isEmpty() ? "1.0.0" : validTags.last()
+            def latestTag = validTags.isEmpty() ? null : validTags.last()
             if (latestTag) {
                 ctx.echo "最大的Git Tag语义化版本号是: ${latestTag}"
                 return latestTag
@@ -121,6 +121,7 @@ class Git implements Serializable {
      */
     @NonCPS
     public static java.util.List versionSort(java.util.ArrayList validTags) {
+        // sort方法需要@NonCPS避免序列化限制  否则只执行一次
         validTags.sort { a, b ->
             def aParts = a.split('\\.').collect { it.toInteger() }
             def bParts = b.split('\\.').collect { it.toInteger() }
