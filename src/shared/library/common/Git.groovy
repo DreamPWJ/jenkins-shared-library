@@ -109,7 +109,7 @@ class Git implements Serializable {
                 def bParts = b.split('\\.').collect { it.toInteger() }
                 ctx.println(a)
                 ctx.println(b)
-                for (int i = 0; i < ctx.Math.min(aParts.size(), bParts.size()); i++) {
+                for (int i = 0; i < 3; i++) {
                     ctx.println(i)
                     if (aParts[i] != bParts[i]) {
                         return aParts[i] - bParts[i]
