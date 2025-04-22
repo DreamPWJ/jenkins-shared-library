@@ -117,7 +117,7 @@ class Git implements Serializable {
             }
 
             // 对语义化版本号进行排序
-            validTags{ a, b ->
+            validTags.sort { a, b ->
                 def verA = parseVersion(a)
                 def verB = parseVersion(b)
 
