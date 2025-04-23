@@ -405,13 +405,13 @@ def call(String type = 'web', Map map) {
                         }
                     }
                     agent { // agent语法文档： https://www.jenkins.io/doc/book/pipeline/syntax/#agent
-  /*                      dockerfile {
-                            filename 'Dockerfile.k8s' // 在WORKSPACE工作区代码目录
-                            dir "${env.WORKSPACE}/ci"
-                            // additionalBuildArgs  '--build-arg version=1.0.2'
-                            // args " -v /${env.WORKSPACE}:/tmp "
-                            reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
-                        }*/
+                        /*                      dockerfile {
+                                                  filename 'Dockerfile.k8s' // 在WORKSPACE工作区代码目录
+                                                  dir "${env.WORKSPACE}/ci"
+                                                  // additionalBuildArgs  '--build-arg version=1.0.2'
+                                                  // args " -v /${env.WORKSPACE}:/tmp "
+                                                  reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
+                                              }*/
                         docker {
                             //  构建完成自动删除容器
                             image "panweiji/k8s:latest" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求

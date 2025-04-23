@@ -77,7 +77,7 @@ class Git implements Serializable {
     }
 
     /**
-     * git获取最大语义化版本号
+     * git获取tag最大语义化版本号
      */
     static def getGitTagMaxVersion(ctx) {
         ctx.withCredentials([ctx.usernamePassword(credentialsId: ctx.GIT_CREDENTIALS_ID,
@@ -92,7 +92,7 @@ class Git implements Serializable {
             ctx.sh("git fetch --tags --force ${userPassWordUrl} || true")
 
             // 执行 git tag -l 命令获取所有标签
-            def tags = ctx.sh(returnStdout: true, script: 'git tag -l').trim().split('\n')
+            def tags = ctx.sh(returnStdout: true, script: 'git tag -l').trim().replaceAll("v", "").replaceAll("V", "").split('\n')
             def validTags = []
             def pattern = ~/^[0-9]+\.[0-9]+\.[0-9]+$/
             // 筛选出符合语义化版本号格式的标签
@@ -102,25 +102,35 @@ class Git implements Serializable {
                 }
             }
             // 对语义化版本号进行排序
-            validTags.sort { a, b ->
-                def aParts = a.split('\\.').collect { it.toInteger() }
-                def bParts = b.split('\\.').collect { it.toInteger() }
-                for (int i = 0; i < Math.min(aParts.size(), bParts.size()); i++) {
-                    if (aParts[i] != bParts[i]) {
-                        return aParts[i] - bParts[i]
-                    }
-                }
-                return aParts.size() - bParts.size()
-            }
+            versionSort(validTags)
+            ctx.println(validTags.toString())
             // 获取最大的语义化版本号
             def latestTag = validTags.isEmpty() ? null : validTags.last()
             if (latestTag) {
-                ctx.echo "最大的语义化版本号是: ${latestTag}"
+                ctx.echo "最大的Git Tag语义化版本号是: ${latestTag}"
                 return latestTag
             } else {
-                ctx.echo "未找到符合语义化版本号格式的标签。"
+                ctx.echo "未找到Git Tag符合语义化版本号格式的标签。"
                 return "1.0.0"
             }
+        }
+    }
+
+    /**
+     * 语义化版本排序
+     */
+    @NonCPS
+    public static java.util.List versionSort(java.util.ArrayList validTags) {
+        // sort方法需要@NonCPS避免序列化限制  否则只执行一次
+        validTags.sort { a, b ->
+            def aParts = a.split('\\.').collect { it.toInteger() }
+            def bParts = b.split('\\.').collect { it.toInteger() }
+            for (int i = 0; i < Math.min(aParts.size(), bParts.size()); i++) {
+                if (aParts[i] != bParts[i]) {
+                    return aParts[i] - bParts[i]
+                }
+            }
+            return aParts.size() - bParts.size()
         }
     }
 
