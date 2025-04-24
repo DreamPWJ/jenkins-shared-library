@@ -78,7 +78,7 @@ done
 
 # 从服务标记名称
 worker_name_sign="worker"
- # docker镜像名称 如果未指定标签，则默认使用`latest`
+# docker镜像名称 如果未指定标签，则默认使用`latest`
 docker_image_name=${project_name_prefix}/${project_type}-${env_mode}
 # docker容器名称
 docker_container_name=${project_name_prefix}-${project_type}-${worker_name_sign}-${env_mode}

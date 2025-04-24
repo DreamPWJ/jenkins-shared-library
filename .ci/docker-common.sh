@@ -28,7 +28,7 @@ function is_enable_buildkit() {
 
 # 重命名上一个版本镜像tag 用于回滚版本控制策略
 function set_docker_rollback_tag() {
-  if [ "$(docker images -a | grep $1)" ]; then
+  if [ "$(docker images  | grep $1)" ]; then
     echo "重命名上一个版本镜像tag 用于回滚版本控制策略"
     docker rmi $1:previous || true
     docker tag $1:latest $1:previous || true
@@ -101,6 +101,11 @@ function remove_docker_dangling_images() {
 
 # 根据镜像名称获取所有ID并删除旧镜像  不适合远程镜像仓库情况
 function remove_docker_image() {
+  if [ "$(docker images | grep $1 | grep previous)" ]; then
+      echo "存在previous标签的回滚版本镜像 不执行删除"
+      # 不再执行后面的程序
+      return 0
+  fi
   if [[ $1 ]]; then
     # 根据镜像名称查询镜像ID组
     #docker_image_ids=$(docker images -q --filter reference=docker_image_name)
