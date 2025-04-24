@@ -81,10 +81,8 @@ function is_success_images() {
 }
 }
 EOF
-
     # 让容器配置服务生效
     sudo systemctl reload docker  # reload 不会重启 Docker 服务，但会使新的配置生效
-
     exit 1
   fi
 }
@@ -101,7 +99,7 @@ function remove_docker_dangling_images() {
   fi
 }
 
-# 根据镜像名称获取所有ID并删除旧镜像  不适合远程镜像情况
+# 根据镜像名称获取所有ID并删除旧镜像  不适合远程镜像仓库情况
 function remove_docker_image() {
   if [[ $1 ]]; then
     # 根据镜像名称查询镜像ID组
