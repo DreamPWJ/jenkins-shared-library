@@ -122,7 +122,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     --build-arg PROJECT_NAME=${project_name} --build-arg WEB_STRIP_COMPONENTS=${web_strip_components} \
     -f /${deploy_folder}/web/Dockerfile . --no-cache
 else
-  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}-${project_type}-${env_mode}
+  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
 fi
 
 # 根据镜像创建时间判断镜像是否构建成功

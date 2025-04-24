@@ -288,15 +288,31 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
      *  Docker镜像容器回滚版本
      *  当服务启动失败的时候 回滚服务版本 保证服务高可用
      */
-    static def rollback(ctx, imageName) {
+    static def rollback(ctx, imageName, containerName) {
         ctx.println("执行Docker镜像容器回滚版本")
         // 重命名上一个版本镜像tag 回滚版本控制策略
-        ctx.sh "docker rmi ${imageName}:previous || true "
-        ctx.sh "docker tag ${imageName}:latest ${imageName}:previous || true "
-        // 快速回滚操作
-        ctx.sh " docker stop <container_name> && docker rm <container_name> "
-        // 启动上一个稳定版本容器
-        ctx.sh " docker run -d --name <new_container> ${imageName}:previous"
+        // ctx.sh "docker rmi ${imageName}:previous || true "
+        // ctx.sh "docker tag ${imageName}:latest ${imageName}:previous || true "
+
+        // 多参数化运行Docker镜像服务
+        runDockerImage(ctx, imageName, containerName)
+    }
+
+    /**
+     *  多参数化运行Docker镜像服务
+     */
+    static def runDockerImage(ctx, imageName, containerName) {
+        ctx.println("多参数化运行Docker镜像服务: " + imageName)
+        // 先停止老容器在启动新容器
+        ctx.sh " docker stop <container_name> || true && docker rm <container_name>  || true"
+        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
+            if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+                // 启动稳定版本容器
+                ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} " +
+                        " ' cd /${ctx.DEPLOY_FOLDER} && docker run -d --restart=on-failure:16 " +
+                        " --name <new_container> ${imageName}:previous ' "
+            }
+        }
     }
 
 }

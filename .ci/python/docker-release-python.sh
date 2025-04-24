@@ -168,7 +168,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     --build-arg PYTHON_START_FILE="${python_start_file}" \
     -f /${deploy_folder}/python/Dockerfile . --no-cache
 else
-  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}-${project_type}-${env_mode}
+  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
 fi
 
 # 根据镜像创建时间判断镜像是否构建成功

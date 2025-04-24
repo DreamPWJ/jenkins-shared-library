@@ -99,12 +99,11 @@ function remove_docker_dangling_images() {
   fi
 }
 
-# 根据镜像名称获取所有ID并删除旧镜像  不适合远程镜像仓库情况
+# 根据镜像名称获取所有ID并删除旧镜像  K8S默认使用自带垃圾回收策略
 function remove_docker_image() {
   if [ "$(docker images | grep $1 | grep previous)" ]; then
       echo "存在previous标签的回滚版本镜像 不执行删除"
-      # 不再执行后面的程序
-      return 0
+      return 0  # 不再执行后面的程序
   fi
   if [[ $1 ]]; then
     # 根据镜像名称查询镜像ID组

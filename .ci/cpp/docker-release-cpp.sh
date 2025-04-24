@@ -158,7 +158,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     --build-arg EXPOSE_PORT="${build_expose_ports}" \
     -f /${deploy_folder}/cpp/Dockerfile . --no-cache
 else
-  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}-${project_type}-${env_mode}
+  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
 fi
 
 # 根据镜像创建时间判断镜像是否构建成功

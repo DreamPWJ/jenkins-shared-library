@@ -231,7 +231,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     --build-arg TOMCAT_VERSION=${tomcat_version} --build-arg JAVA_OPTS="-Xms128m ${docker_java_opts}" \
     -f /${deploy_folder}/${docker_file_name} . --no-cache
 else
-  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}-${project_type}-${env_mode}
+  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
 fi
 
 # 根据镜像创建时间判断镜像是否构建成功
@@ -313,5 +313,5 @@ fi
 # 👉 手动单独部署Docker应用场景 不依赖自动化CI/CD和自定义Dockerfile情况 更高版本JDK使用镜像 如 amazoncorretto:21
 # docker run -d --restart=always -p 8080:8080 --name project-name-java \
 # -v "$(pwd)/app.jar:/app/app.jar"  \
-# openjdk:11-jdk-slim java -jar /app/app.jar
+# java -jar /app/app.jar
 
