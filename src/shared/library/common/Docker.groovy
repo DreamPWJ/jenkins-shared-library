@@ -290,12 +290,13 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
      */
     static def rollback(ctx, imageName) {
         ctx.println("执行Docker镜像容器回滚版本")
-        // 版本控制策略
-        ctx.sh " docker tag myapp:latest myapp:v1.2.3_\$(date +%Y%m%d%H%M) "
+        // 重命名上一个版本镜像tag 回滚版本控制策略
+        ctx.sh "docker rmi ${imageName}:previous || true "
+        ctx.sh "docker tag ${imageName}:latest ${imageName}:previous || true "
         // 快速回滚操作
         ctx.sh " docker stop <container_name> && docker rm <container_name> "
         // 启动上一个稳定版本容器
-        ctx.sh " docker run -d --name <new_container> myapp:v1.2.3_20250327_1530"
+        ctx.sh " docker run -d --name <new_container> ${imageName}:previous"
     }
 
 }

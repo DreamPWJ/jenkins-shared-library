@@ -85,7 +85,7 @@ done
 
 # 当前日期格式
 date=$(date '+%Y%m%d-%H%M')
-# docker镜像名称
+ # docker镜像名称 如果未指定标签，则默认使用`latest`
 docker_image_name=${project_name_prefix}/${project_type}-${env_mode}
 # docker容器名称
 docker_container_name=${project_name_prefix}-${project_type}-${env_mode}

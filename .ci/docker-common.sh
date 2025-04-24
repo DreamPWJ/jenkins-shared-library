@@ -26,6 +26,15 @@ function is_enable_buildkit() {
   fi
 }
 
+# 重命名上一个版本镜像tag 用于回滚版本控制策略
+function set_docker_rollback_tag() {
+  if [ "$(docker images -a | grep $1)" ]; then
+    echo "重命名上一个版本镜像tag 用于回滚版本控制策略"
+    docker rmi $1:previous || true
+    docker tag $1:latest $1:previous || true
+  fi
+}
+
 # 部署前操作检查容器是否存在 停止容器
 function stop_docker() {
   if [ "$(docker ps -a | grep $1)" ]; then
