@@ -323,12 +323,12 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
                 // 启动稳定版本容器
                 ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} " +
                         " ' cd /${ctx.DEPLOY_FOLDER} && " +
-                        " docker run -d --restart=on-failure:16 --privileged=true --pid=host  " +
+                        " docker run -d --restart=on-failure:16 --privileged=true --pid=host " +
                         " -p ${ctx.SHELL_HOST_PORT}:${ctx.SHELL_EXPOSE_PORT} " +
-                        " -e \"SPRING_PROFILES_ACTIVE=${ctx.SHELL_ENV_MODE}\" -e \"PROJECT_NAME=${ctx.PROJECT_NAME}\"  " +
-                        " -e \"JAVA_OPTS=-Xms128m ${map.docker_java_opts}\" -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1  " +
-                        "  -e HOST_NAME=\$(hostname)" +
-                        "  ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs " +
+                        " -e \"SPRING_PROFILES_ACTIVE=${ctx.SHELL_ENV_MODE}\" -e \"PROJECT_NAME=${ctx.PROJECT_NAME}\" " +
+                        " -e \"JAVA_OPTS=-Xms128m ${map.docker_java_opts}\" -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1 " +
+                        " -e HOST_NAME=\$(hostname) " +
+                        " ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs " +
                         " --name ${containerName} ${imageName}:previous ' "
             }
         }
