@@ -307,6 +307,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
      */
     static def runDockerImage(ctx, map, imageName, containerName) {
         ctx.println("多参数化运行Docker镜像服务: " + imageName)
+        def dockerRollBackTag = "previous"  // 回滚版本tag
         // 先停止老容器在启动新容器
         try {
             ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host}  ' docker stop ${containerName} --time=1 || true' "
@@ -323,7 +324,14 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
             }
         }
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-
+            ctx.println("执行Web服务Docker镜像回滚运行")
+            ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} " +
+                    " ' cd /${ctx.DEPLOY_FOLDER} && " +
+                    " docker run -d --restart=on-failure:6  " +
+                    " -p ${ctx.SHELL_HOST_PORT}:${ctx.SHELL_EXPOSE_PORT} " +
+                    " -m 4G --log-opt max-size=100m --log-opt max-file=1" +
+                    " ${dockerVolumeMount} " +
+                    " --name ${containerName} ${imageName}:${dockerRollBackTag} ' "
         } else if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
             if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
                 // 启动稳定版本容器
@@ -336,7 +344,18 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
                         " -e \"JAVA_OPTS=-Xms128m ${map.docker_java_opts}\" -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1 " +
                         " -e HOST_NAME=\$(hostname) " +
                         " ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs " +
-                        " --name ${containerName} ${imageName}:previous ' "
+                        " --name ${containerName} ${imageName}:${dockerRollBackTag} ' "
+            } else if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
+                ctx.println("执行Python服务Docker镜像回滚运行")
+                ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} " +
+                        " ' cd /${ctx.DEPLOY_FOLDER} && " +
+                        " docker run -d --restart=on-failure:16 --privileged=true --pid=host " +
+                        " -p ${ctx.SHELL_HOST_PORT}:${ctx.SHELL_EXPOSE_PORT} " +
+                        " -e \"PROJECT_NAME=${ctx.PROJECT_NAME}\" -e PYTHON_START_FILE=\"${ctx.CUSTOM_PYTHON_START_FILE}\" " +
+                        " -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1 " +
+                        " -e HOST_NAME=\$(hostname) " +
+                        " ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs " +
+                        " --name ${containerName} ${imageName}:${dockerRollBackTag} ' "
             }
         }
 
