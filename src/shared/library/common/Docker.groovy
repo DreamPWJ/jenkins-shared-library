@@ -325,6 +325,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
 
             if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
                 // 启动稳定版本容器
+                ctx.println("执行Java服务Docker镜像回滚运行")
                 ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} " +
                         " ' cd /${ctx.DEPLOY_FOLDER} && " +
                         " docker run -d --restart=on-failure:16 --privileged=true --pid=host " +
