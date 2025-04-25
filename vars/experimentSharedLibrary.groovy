@@ -182,7 +182,7 @@ def call(String type = 'experiment', Map map) {
                             // 按顺序执行代码
                                 pullProjectCode()
                                 // pullCIRepo()
-                                test()
+                                test(map)
                         }
                     }
                 }
@@ -390,6 +390,10 @@ def getInitParams(map) {
 
     // 项目全名 防止项目名称重复
     FULL_PROJECT_NAME = "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}"
+    // Docker镜像名称
+    dockerImageName = "${SHELL_PROJECT_NAME}/${SHELL_PROJECT_TYPE}-${SHELL_ENV_MODE}"
+    // Docker容器名称
+    dockerContainerName = "${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}"
 
     // 获取通讯录
     contactPeoples = ""
@@ -637,10 +641,12 @@ def pullProjectCode() {
 /**
  * 实验开发调试
  */
-def test() {
+def test(map) {
 
-    def maxVersion = Git.getGitTagMaxVersion(this)
-    println("结果: ${maxVersion}")
+    // 服务启动失败回滚到上一个版本  保证服务高可用性
+     Docker.rollBack(this, map, "${dockerImageName}", "${dockerContainerName}")
+/*    def maxVersion = Git.getGitTagMaxVersion(this)
+    println("结果: ${maxVersion}")*/
 
 }
 

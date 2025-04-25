@@ -1571,7 +1571,7 @@ def healthCheck(map, params = '') { // 可选参数
         }
 
         // 服务启动失败回滚到上一个版本  保证服务高可用性
-        // Docker.rollBack(this,"${dockerImageName}", "${dockerContainerName}")
+        // Docker.rollBack(this, map, "${dockerImageName}", "${dockerContainerName}")
 
         IS_ARCHIVE = false // 不归档
         currentBuild.result = 'FAILURE' // 失败  不稳定UNSTABLE 取消ABORTED
