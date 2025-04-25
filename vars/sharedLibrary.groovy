@@ -1559,8 +1559,6 @@ def healthCheck(map, params = '') { // 可选参数
         isHealthCheckFail = true
         Tools.printColor(this, "${healthCheckMsg} ❌", "red")
         println("👉 健康检测失败原因分析: 查看应用服务启动日志是否失败")
-        // 钉钉失败通知
-        dingNotice(map, 1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
         // 打印应用服务启动失败日志 方便快速排查错误
         Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志开始 START 👇 ------------", "red")
         sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'docker logs ${dockerContainerName} "
@@ -1570,6 +1568,8 @@ def healthCheck(map, params = '') { // 可选参数
             IS_ROLL_DEPLOY = false
         }
 
+        // 钉钉失败通知
+        dingNotice(map, 1, "**失败或超时或已回滚❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
         // 服务启动失败回滚到上一个版本  保证服务高可用性
         Docker.rollbackServer(this, map, "${dockerImageName}", "${dockerContainerName}")
 
