@@ -288,14 +288,58 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
      *  Docker镜像容器回滚版本
      *  当服务启动失败的时候 回滚服务版本 保证服务高可用
      */
-    static def rollback(ctx, imageName) {
-        ctx.println("执行Docker镜像容器回滚版本")
-        // 版本控制策略
-        ctx.sh " docker tag myapp:latest myapp:v1.2.3_\$(date +%Y%m%d%H%M) "
-        // 快速回滚操作
-        ctx.sh " docker stop <container_name> && docker rm <container_name> "
-        // 启动上一个稳定版本容器
-        ctx.sh " docker run -d --name <new_container> myapp:v1.2.3_20250327_1530"
+    static def rollbackServer(ctx, map, imageName, containerName) {
+        try {
+            ctx.println("执行Docker镜像容器回滚版本")
+            // 重命名上一个版本镜像tag 回滚版本控制策略
+            // ctx.sh " docker rmi ${imageName}:previous || true "
+            // ctx.sh " docker tag ${imageName}:latest ${imageName}:previous || true "
+            // 多参数化运行Docker镜像服务
+            runDockerImage(ctx, map, imageName, containerName)
+        } catch (error) {
+            ctx.println("Docker回滚服务版本失败")
+            ctx.println(error.getMessage())
+        }
+    }
+
+    /**
+     *  多参数化运行Docker镜像服务
+     */
+    static def runDockerImage(ctx, map, imageName, containerName) {
+        ctx.println("多参数化运行Docker镜像服务: " + imageName)
+        // 先停止老容器在启动新容器
+        try {
+            ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host}  ' docker stop ${containerName} --time=1 || true' "
+            ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host}  ' docker rm ${containerName} || true ' "
+        } catch (error) {
+            ctx.println("停止Docker容器服务失败")
+        }
+        def dockerVolumeMount = "" // 挂载宿主机目录到容器目录
+        // 挂载数据 逗号分隔的字符串 遍历组合
+        if ("${ctx.DOCKER_VOLUME_MOUNT}".trim() != "") {
+            def dockerVolumeMountList = "${ctx.DOCKER_VOLUME_MOUNT}".split(",")
+            dockerVolumeMountList.each {
+                dockerVolumeMount += " -v ${it} "
+            }
+        }
+        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
+
+        } else if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
+            if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+                // 启动稳定版本容器
+                ctx.println("执行Java服务Docker镜像回滚运行")
+                ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} " +
+                        " ' cd /${ctx.DEPLOY_FOLDER} && " +
+                        " docker run -d --restart=on-failure:16 --privileged=true --pid=host " +
+                        " -p ${ctx.SHELL_HOST_PORT}:${ctx.SHELL_EXPOSE_PORT} " +
+                        " -e \"SPRING_PROFILES_ACTIVE=${ctx.SHELL_ENV_MODE}\" -e \"PROJECT_NAME=${ctx.PROJECT_NAME}\" " +
+                        " -e \"JAVA_OPTS=-Xms128m ${map.docker_java_opts}\" -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1 " +
+                        " -e HOST_NAME=\$(hostname) " +
+                        " ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs " +
+                        " --name ${containerName} ${imageName}:previous ' "
+            }
+        }
+
     }
 
 }

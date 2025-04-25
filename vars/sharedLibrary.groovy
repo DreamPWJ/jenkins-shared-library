@@ -874,6 +874,10 @@ def getInitParams(map) {
 
     // 项目全名 防止项目名称重复
     FULL_PROJECT_NAME = "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}"
+    // Docker镜像名称
+    dockerImageName = "${SHELL_PROJECT_NAME}/${SHELL_PROJECT_TYPE}-${SHELL_ENV_MODE}"
+    // Docker容器名称
+    dockerContainerName = "${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}"
 
     // 获取通讯录
     contactPeoples = ""
@@ -1346,13 +1350,11 @@ def cppBuildProject() {
  * 可通过ssh在不同机器上构建镜像
  */
 def buildImage(map) {
-    // 定义镜像唯一构建名称
-    dockerBuildImageName = "${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}"
     // Docker多阶段镜像构建处理
     Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
     // 构建并上传Docker镜像仓库  只构建一次
     retry(2) { // 重试几次 可能网络等问题导致构建失败
-        Docker.build(this, "${dockerBuildImageName}")
+        Docker.build(this, "${dockerImageName}")
     }
     // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
     if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
@@ -1363,7 +1365,7 @@ def buildImage(map) {
         // Docker多阶段镜像构建处理
         Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
         // 构建并上传Docker镜像仓库  多节点部署只构建一次
-        Docker.build(this, "${dockerBuildImageName}", deployNum)
+        Docker.build(this, "${dockerImageName}", deployNum)
     }
 }
 
@@ -1496,7 +1498,7 @@ def runProject(map) {
 
             if ("${IS_PUSH_DOCKER_REPO}" == 'true') {
                 // 拉取远程仓库Docker镜像
-                Docker.pull(this, "${dockerBuildImageName}")
+                Docker.pull(this, "${dockerImageName}")
             }
             if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
                 sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/web " +
@@ -1558,18 +1560,22 @@ def healthCheck(map, params = '') { // 可选参数
         Tools.printColor(this, "${healthCheckMsg} ❌", "red")
         println("👉 健康检测失败原因分析: 查看应用服务启动日志是否失败")
         // 钉钉失败通知
-        dingNotice(map, 1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
-        // 打印应用服务启动失败日志 方便快速排查错误
-        Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志开始 START 👇 ------------", "red")
-        sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'docker logs ${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}' "
-        Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志结束 END 👆 ------------", "red")
+        dingNotice(map, 1, "**失败或超时或已回滚❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
+
+        try {
+            // 打印应用服务启动失败日志 方便快速排查错误
+            Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志开始 START 👇 ------------", "red")
+            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'docker logs ${dockerContainerName} "
+            Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志结束 END 👆 ------------", "red")
+        } catch (e) {
+        }
         if ("${IS_ROLL_DEPLOY}" == 'true' || "${IS_BLUE_GREEN_DEPLOY}" == 'true') {
             println '分布式部署情况, 服务启动失败, 自动中止取消job, 防止继续部署导致其他应用服务挂掉 。'
             IS_ROLL_DEPLOY = false
         }
 
         // 服务启动失败回滚到上一个版本  保证服务高可用性
-        // Docker.rollBack(this, "${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}")
+        Docker.rollbackServer(this, map, "${dockerImageName}", "${dockerContainerName}")
 
         IS_ARCHIVE = false // 不归档
         currentBuild.result = 'FAILURE' // 失败  不稳定UNSTABLE 取消ABORTED
@@ -1616,8 +1622,6 @@ def integrationTesting() {
 def blueGreenDeploy(map) {
     // 蓝绿部署: 好处是只用一个主单点服务资源实现部署过程中不间断提供服务
     // 1、先启动部署一个临时服务将流量切到蓝服务器上  2、再部署真正提供服务的绿服务器  3、部署完绿服务器,销毁蓝服务器,将流量切回到绿服务器
-    // 镜像容器名称
-    dockerContainerName = "${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}"
     // 先判断是否在一台服务器部署
     if ("${IS_SAME_SERVER}" == 'false') { // 不同服务器蓝绿部署
         def mainServerIp = remote.host // 主服务器IP

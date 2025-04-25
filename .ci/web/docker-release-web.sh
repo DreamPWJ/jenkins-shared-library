@@ -59,7 +59,7 @@ done
 
 # 当前日期格式
 date=$(date '+%Y%m%d-%H%M')
-# docker镜像名称
+# docker镜像名称 如果未指定标签，则默认使用`latest`
 docker_image_name=${project_name_prefix}/${project_type}-${env_mode}
 # docker容器名称
 docker_container_name=${project_name_prefix}-${project_type}-${env_mode}
@@ -105,6 +105,8 @@ docker_image_ids=$(docker images -q --filter reference=${docker_image_name})
 cd /${deploy_folder} && ./docker-common.sh get_cpu_rate && cd /${deploy_file}
 # 获取系统磁盘资源 如果硬盘资源不足 停止容器构建或自动清理空间
 cd /${deploy_folder} && ./docker-common.sh get_disk_space && cd /${deploy_file}
+# 重命名上一个版本镜像tag 用于回滚版本控制策略
+cd /${deploy_folder} && ./docker-common.sh set_docker_rollback_tag ${docker_image_name} && cd /${deploy_file}
 
 set -x # 开启shell命令打印模式
 
@@ -120,7 +122,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     --build-arg PROJECT_NAME=${project_name} --build-arg WEB_STRIP_COMPONENTS=${web_strip_components} \
     -f /${deploy_folder}/web/Dockerfile . --no-cache
 else
-  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}-${project_type}-${env_mode}
+  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
 fi
 
 # 根据镜像创建时间判断镜像是否构建成功

@@ -85,7 +85,7 @@ done
 
 # 当前日期格式
 date=$(date '+%Y%m%d-%H%M')
-# docker镜像名称
+# docker镜像名称 如果未指定标签，则默认使用`latest`
 docker_image_name=${project_name_prefix}/${project_type}-${env_mode}
 # docker容器名称
 docker_container_name=${project_name_prefix}-${project_type}-${env_mode}
@@ -155,6 +155,13 @@ echo "远程调试参数: ${remote_debugging_param}"
 # 根据镜像名称查询镜像ID 用于删除无效的镜像
 docker_image_ids=$(docker images -q --filter reference=${docker_image_name})
 
+# 获取系统CPU使用率 如果CPU占用高 则排队延迟部署 避免并发部署等导致资源阻塞
+cd /${deploy_folder} && ./docker-common.sh get_cpu_rate && cd /${deploy_file}
+# 获取系统磁盘资源 如果硬盘资源不足 停止容器构建或自动清理空间
+cd /${deploy_folder} && ./docker-common.sh get_disk_space && cd /${deploy_file}
+# 重命名上一个版本镜像tag 用于回滚版本控制策略
+cd /${deploy_folder} && ./docker-common.sh set_docker_rollback_tag ${docker_image_name} && cd /${deploy_file}
+
 set -x # 开启shell命令打印模式
 
 # 是否是远程镜像仓库方式
@@ -168,7 +175,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     --build-arg PYTHON_START_FILE="${python_start_file}" \
     -f /${deploy_folder}/python/Dockerfile . --no-cache
 else
-  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}-${project_type}-${env_mode}
+  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
 fi
 
 # 根据镜像创建时间判断镜像是否构建成功

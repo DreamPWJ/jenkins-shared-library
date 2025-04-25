@@ -634,6 +634,10 @@ def getInitParams(map) {
 
     // 项目全名 防止项目名称重复
     FULL_PROJECT_NAME = "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}"
+    // Docker镜像名称
+    dockerImageName = "${SHELL_PROJECT_NAME}/${SHELL_PROJECT_TYPE}-${SHELL_ENV_MODE}"
+    // Docker容器名称
+    dockerContainerName = "${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}"
 
     // 目标系统类型 1. Npm生态与静态web项目 2. Flutter For Web 3. ReactNative For Web 4. Unity For Web
     switch ("${WEB_PROJECT_TYPE}".toInteger()) {
@@ -969,13 +973,11 @@ def nodeBuildProject() {
  * 可通过ssh在不同机器上构建镜像
  */
 def buildImage() {
-    // 定义镜像唯一构建名称
-    dockerBuildImageName = "${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}"
     // Docker多阶段镜像构建处理
     Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
     // 构建Docker镜像  只构建一次
     retry(2) { // 重试几次 可能网络等问题导致构建失败
-        Docker.build(this, "${dockerBuildImageName}")
+        Docker.build(this, "${dockerImageName}")
     }
 }
 
@@ -1006,7 +1008,7 @@ def runProject(map) {
     try {
         if ("${IS_PUSH_DOCKER_REPO}" == 'true') {
             // 拉取远程仓库Docker镜像
-            Docker.pull(this, "${dockerBuildImageName}")
+            Docker.pull(this, "${dockerImageName}")
         }
         sh " ssh  ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/web " +
                 "&& ./docker-release-web.sh '${SHELL_WEB_PARAMS_GETOPTS}' ' "
@@ -1047,7 +1049,7 @@ def healthCheck(map, params = '') { // 可选参数
         dingNotice(map, 1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
         // 打印应用服务启动失败日志 方便快速排查错误
         Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志开始 START 👇 ------------", "red")
-        sh " ssh  ${remote.user}@${remote.host} 'docker logs ${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}' "
+        sh " ssh  ${remote.user}@${remote.host} 'docker logs ${dockerContainerName}' "
         Tools.printColor(this, "------------ 应用服务${healthCheckUrl} 启动异常日志结束 END 👆 ------------", "red")
         if ("${IS_ROLL_DEPLOY}" == 'true' || "${IS_BLUE_GREEN_DEPLOY}" == 'true') {
             println '分布式部署情况, 服务启动失败, 自动中止取消job, 防止继续部署导致其他应用服务挂掉 。'

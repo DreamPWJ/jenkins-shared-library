@@ -19,10 +19,19 @@ function is_enable_buildkit() {
  min_docker_version=19.03
  server_docker_version=$(docker version --format '{{.Server.Version}}' 2>/dev/null | cut -d '.' -f1-2)
   if (( $(echo "$server_docker_version >= $min_docker_version" | bc -l) )); then
-      echo "检测到当前Docker版本$server_docker_version 高于等于 $min_docker_version, 已启用BuildKit新引擎模式"
+      echo "检测到当前Docker版本 $server_docker_version 高于等于 $min_docker_version, 已启用BuildKit新引擎模式"
       export DOCKER_BUILDKIT=1
   else
-      echo "检测到当前Docker版本$server_docker_version 低于 $min_docker_version, BuildKit新引擎不可用"
+      echo "检测到当前Docker版本 $server_docker_version 低于 $min_docker_version, BuildKit新引擎不可用"
+  fi
+}
+
+# 重命名上一个版本镜像tag 用于回滚版本控制策略
+function set_docker_rollback_tag() {
+  if [ "$(docker images  | grep $1)" ]; then
+    echo "重命名上一个版本镜像tag 用于回滚版本控制策略"
+    docker rmi $1:previous || true
+    docker tag $1:latest $1:previous || true
   fi
 }
 
@@ -72,10 +81,8 @@ function is_success_images() {
 }
 }
 EOF
-
     # 让容器配置服务生效
     sudo systemctl reload docker  # reload 不会重启 Docker 服务，但会使新的配置生效
-
     exit 1
   fi
 }
@@ -92,8 +99,12 @@ function remove_docker_dangling_images() {
   fi
 }
 
-# 根据镜像名称获取所有ID并删除旧镜像  不适合远程镜像情况
+# 根据镜像名称获取所有ID并删除旧镜像  K8S默认使用自带垃圾回收策略
 function remove_docker_image() {
+  if [ "$(docker images | grep $1 | grep previous)" ]; then
+      echo "存在previous标签的回滚版本镜像 不执行删除"
+      return 0  # 不再执行后面的程序
+  fi
   if [[ $1 ]]; then
     # 根据镜像名称查询镜像ID组
     #docker_image_ids=$(docker images -q --filter reference=docker_image_name)

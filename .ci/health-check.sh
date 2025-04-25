@@ -44,7 +44,7 @@ if [[ ${project_type} == 1 ]]; then
   done
 elif [[ ${project_type} == 2 ]]; then
   # 循环检测次数
-  back_end_loop_num=180
+  back_end_loop_num=120
   # 循环检测服务端启动健康状态
   for i in $(seq 1 ${back_end_loop_num}); do
     if [[ ${i} -ge ${back_end_loop_num} ]]; then

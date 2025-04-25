@@ -83,7 +83,7 @@ done
 
 # 当前日期格式
 date=$(date '+%Y%m%d-%H%M')
-# docker镜像名称
+# docker镜像名称 如果未指定标签，则默认使用`latest`
 docker_image_name=${project_name_prefix}/${project_type}-${env_mode}
 # docker容器名称
 docker_container_name=${project_name_prefix}-${project_type}-${env_mode}
@@ -158,7 +158,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     --build-arg EXPOSE_PORT="${build_expose_ports}" \
     -f /${deploy_folder}/go/Dockerfile . --no-cache
 else
-  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}-${project_type}-${env_mode}
+  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
 fi
 
 # 根据镜像创建时间判断镜像是否构建成功
