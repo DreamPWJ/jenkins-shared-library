@@ -295,7 +295,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
         // ctx.sh "docker tag ${imageName}:latest ${imageName}:previous || true "
 
         // 多参数化运行Docker镜像服务
-        runDockerImage(ctx, map, imageName, containerName)
+        // runDockerImage(ctx, map, imageName, containerName)
     }
 
     /**
