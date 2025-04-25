@@ -288,14 +288,14 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
      *  Docker镜像容器回滚版本
      *  当服务启动失败的时候 回滚服务版本 保证服务高可用
      */
-    static def rollback(ctx, map, imageName, containerName) {
+    static def rollbackServer(ctx, map, imageName, containerName) {
         ctx.println("执行Docker镜像容器回滚版本")
         // 重命名上一个版本镜像tag 回滚版本控制策略
         // ctx.sh "docker rmi ${imageName}:previous || true "
         // ctx.sh "docker tag ${imageName}:latest ${imageName}:previous || true "
 
         // 多参数化运行Docker镜像服务
-        // runDockerImage(ctx, map, imageName, containerName)
+        runDockerImage(ctx, map, imageName, containerName)
     }
 
     /**
