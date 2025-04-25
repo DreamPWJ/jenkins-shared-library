@@ -310,19 +310,20 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
         ctx.println("多参数化运行Docker镜像服务: " + imageName)
         // 先停止老容器在启动新容器
         ctx.sh " docker stop ${containerName} --time=1 || true && docker rm ${containerName} || true "
-
+        ctx.println("0")
         def dockerVolumeMount = "" // 挂载宿主机目录到容器目录
-        // ctx.DOCKER_VOLUME_MOUNT是逗号分隔的字符串  遍历组合
+        // 挂载数据 逗号分隔的字符串 遍历组合
         if ("${ctx.DOCKER_VOLUME_MOUNT}".trim() != "") {
             def dockerVolumeMountList = "${ctx.DOCKER_VOLUME_MOUNT}".split(",")
             dockerVolumeMountList.each {
                 dockerVolumeMount += " -v ${it} "
             }
         }
+        ctx.println("1")
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-
+            ctx.println("2")
         } else if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-
+            ctx.println("3")
             if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
                 // 启动稳定版本容器
                 ctx.println("执行Java服务Docker镜像回滚运行")
@@ -337,6 +338,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
                         " --name ${containerName} ${imageName}:previous ' "
             }
         }
+
     }
 
 }
