@@ -180,9 +180,9 @@ def call(String type = 'experiment', Map map) {
                     steps {
                         script {
                             // 按顺序执行代码
-                                pullProjectCode()
-                                // pullCIRepo()
-                                test(map)
+                            pullProjectCode()
+                            // pullCIRepo()
+                            test(map)
                         }
                     }
                 }
@@ -643,8 +643,8 @@ def pullProjectCode() {
  */
 def test(map) {
 
-    ctx.println("服务启动失败回滚到上一个版本  保证服务高可用性")
-     Docker.rollBack(this, map, "${dockerImageName}", "${dockerContainerName}")
+    println("服务启动失败回滚到上一个版本  保证服务高可用性")
+    Docker.rollBack(this, map, "${dockerImageName}", "${dockerContainerName}")
 /*  def maxVersion = Git.getGitTagMaxVersion(this)
     println("结果: ${maxVersion}")
     */
