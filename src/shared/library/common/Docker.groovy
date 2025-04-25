@@ -309,7 +309,8 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
     static def runDockerImage(ctx, map, imageName, containerName) {
         ctx.println("多参数化运行Docker镜像服务: " + imageName)
         // 先停止老容器在启动新容器
-        ctx.sh " docker stop ${containerName} --time=1 || true && docker rm ${containerName} || true "
+        ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host}  'docker stop ${containerName} --time=1  || true' "
+        ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host}  'docker rm ${containerName} || true ' "
         ctx.println("0")
         def dockerVolumeMount = "" // 挂载宿主机目录到容器目录
         // 挂载数据 逗号分隔的字符串 遍历组合
