@@ -305,17 +305,15 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
     /**
      *  多参数化运行Docker镜像服务
      */
-    @NonCPS
     static def runDockerImage(ctx, map, imageName, containerName) {
         ctx.println("多参数化运行Docker镜像服务: " + imageName)
         // 先停止老容器在启动新容器
         try {
-            ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host}  'docker stop ${containerName} --time=1  || true' "
-            ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host}  'docker rm ${containerName} || true ' "
+            ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host}  ' docker stop ${containerName} --time=1 || true' "
+            ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host}  ' docker rm ${containerName} || true ' "
         } catch (error) {
             ctx.println("停止Docker容器服务失败")
         }
-        ctx.println("0")
         def dockerVolumeMount = "" // 挂载宿主机目录到容器目录
         // 挂载数据 逗号分隔的字符串 遍历组合
         if ("${ctx.DOCKER_VOLUME_MOUNT}".trim() != "") {
@@ -324,11 +322,9 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
                 dockerVolumeMount += " -v ${it} "
             }
         }
-        ctx.println("1")
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-            ctx.println("2")
+
         } else if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-            ctx.println("3")
             if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
                 // 启动稳定版本容器
                 ctx.println("执行Java服务Docker镜像回滚运行")
