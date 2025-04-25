@@ -315,7 +315,6 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
             ctx.println("停止Docker容器服务失败")
         }
         def dockerVolumeMount = "" // 挂载宿主机目录到容器目录
-        ctx.DOCKER_VOLUME_MOUNT="test:test,one:one"
         // 挂载数据 逗号分隔的字符串 遍历组合
         if ("${ctx.DOCKER_VOLUME_MOUNT}".trim() != "") {
             def dockerVolumeMountList = "${ctx.DOCKER_VOLUME_MOUNT}".split(",")
