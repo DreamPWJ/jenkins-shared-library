@@ -1,5 +1,5 @@
 简体中文 | [English](./README.en.md)  
-[文档](https://deepwiki.com/DreamPWJ/jenkins-shared-library)
+[文档](https://deepwiki.com/DreamPWJ/jenkins-shared-library?lang=zh-CN)
 
 # One For All DevOps MonoRepo
 

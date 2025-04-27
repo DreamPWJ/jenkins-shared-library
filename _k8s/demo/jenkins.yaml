@@ -28,7 +28,7 @@ spec:
             - "updates.jenkins-ci.org"
       containers:
         - name: jenkins
-          image: jenkins/jenkins:2.211
+          image: jenkins/jenkins:2.507
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 30080
