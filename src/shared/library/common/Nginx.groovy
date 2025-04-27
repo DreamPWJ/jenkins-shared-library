@@ -8,7 +8,7 @@ package shared.library.common
  */
 class Nginx implements Serializable {
 
-    static def sshCommand = "root@39.96.19.25"
+    static def sshCommand = "root@39.96.19.66"
     static def nginxConfFolder = "/etc/nginx/conf.d"
 
     /**

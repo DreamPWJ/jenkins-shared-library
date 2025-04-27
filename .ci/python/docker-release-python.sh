@@ -167,6 +167,10 @@ set -x # 开启shell命令打印模式
 # 是否是远程镜像仓库方式
 if [[ ${is_push_docker_repo} == false ]]; then
   echo "🏗️  开始构建Docker镜像(无缓存构建)"
+    # 拉取基础镜像避免重复下载
+    docker_pull_image_name=python:${python_version}
+    [ -z "$(docker images -q ${docker_pull_image_name})" ] && docker pull ${docker_pull_image_name} || echo "基础镜像 ${docker_pull_image_name} 已存在 无需重新pull拉取镜像"
+
     docker build -t ${docker_image_name} \
     --build-arg PROJECT_NAME=${project_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} \
@@ -210,10 +214,10 @@ if [[ ${is_prod} == false && ${remote_debug_port} ]]; then
 fi
 
 echo "👨‍💻 启动运行Docker容器 环境: ${env_mode} 映射端口: ${host_port}:${expose_port}"
-docker run -d --restart=always -p ${host_port}:${expose_port} \
-  -e "PROJECT_NAME=${project_name}" \
+docker run -d --restart=on-failure:16 -p ${host_port}:${expose_port} --privileged=true --pid=host \
+  -e "PROJECT_NAME=${project_name}" -e PYTHON_START_FILE="${python_start_file}" \
   -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1   ${dynamic_run_args} \
-  -e PYTHON_START_FILE="${python_start_file}" -e "REMOTE_DEBUGGING_PARAM=${remote_debugging_param}"  \
+  -e "REMOTE_DEBUGGING_PARAM=${remote_debugging_param}" -e HOST_NAME=$(hostname) \
   -v /${deploy_folder}/${project_name}/logs:/logs \
   --name ${docker_container_name} ${docker_image_name}
 

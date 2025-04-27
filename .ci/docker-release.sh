@@ -222,7 +222,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
   fi
 
    # 拉取基础镜像避免重复下载
-  [ -z "$(docker images -q ${docker_pull_image_name})" ] && docker pull ${docker_pull_image_name} || echo "基础镜像 ${docker_pull_image_name} 已存在无需重新pull拉取"
+  [ -z "$(docker images -q ${docker_pull_image_name})" ] && docker pull ${docker_pull_image_name} || echo "基础镜像 ${docker_pull_image_name} 已存在 无需重新pull拉取镜像"
 
   # 对于简单项目无需重复构建镜像  将部署文件 docker run -v 做挂载映射 直接重启容器即可
     docker build -t ${docker_image_name} \

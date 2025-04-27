@@ -26,12 +26,9 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                 sh("""
                    git config --global user.email "406798106@qq.com"
                    git config --global user.name ${GIT_USERNAME}
-                   git config --global pull.rebase false  || true
-                   git config --global push.default simple  || true
                    git fetch --tags --force ${userPassWordUrl} || true
                    git pull ${userPassWordUrl} || true
-                   git stash || true
-                   git checkout ${ctx.BRANCH_NAME} || true                 
+                   git stash || true            
                    """)
             }
 
@@ -70,7 +67,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                     sh("""
                           git add ${changeLogFileName}
                           git commit ${changeLogFileName}  -m "${GlobalVars.gitCommitChangeLogDocs}: 发布 v${tagVersion}" 
-                          git push ${userPassWordUrl}
+                          git push origin ${ctx.BRANCH_NAME} ${userPassWordUrl}
                            """)
                 } catch (e) {
                     println "推送${changeLogFileName}变更日志异常"

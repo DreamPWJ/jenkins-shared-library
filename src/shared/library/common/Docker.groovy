@@ -125,7 +125,7 @@ class Docker implements Serializable {
                     // 如Node构建环境 SSR方式等
                     // 拉取基础镜像避免重复下载
                     def dockerImagesName = "node:lts"
-                    ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在无需重新pull拉取\" "
+                    ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} && pwd && \
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
                             --build-arg EXPOSE_PORT="${ctx.SHELL_EXPOSE_PORT}" \
@@ -140,7 +140,7 @@ class Docker implements Serializable {
                     }
                     def dockerImagesName = "nginx:stable"
                     // 拉取基础镜像避免重复下载
-                    ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在无需重新pull拉取\" "
+                    ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
                     ctx.sh """  cp -p ${ctx.env.WORKSPACE}/ci/.ci/web/default.conf ${ctx.env.WORKSPACE}/${webProjectDir} &&
                             cp -p ${ctx.env.WORKSPACE}/ci/.ci/web/nginx.conf ${ctx.env.WORKSPACE}/${webProjectDir} &&
                             cd ${ctx.env.WORKSPACE}/${webProjectDir} && pwd && \
@@ -179,7 +179,7 @@ class Docker implements Serializable {
                         dockerImagesName = "${ctx.TOMCAT_VERSION}-jre8"
                     }
 
-                    ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在无需重新pull拉取\" "
+                    ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
 
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.GIT_PROJECT_FOLDER_NAME}/${ctx.mavenPackageLocationDir} && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
@@ -191,7 +191,7 @@ class Docker implements Serializable {
                 } else if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
                     def dockerImagesName = "python:${ctx.CUSTOM_PYTHON_VERSION}"
                     // 拉取基础镜像避免重复下载
-                    ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在无需重新pull拉取\" "
+                    ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.GIT_PROJECT_FOLDER_NAME} && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg EXPOSE_PORT="${exposePort}"  \
@@ -307,6 +307,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
      */
     static def runDockerImage(ctx, map, imageName, containerName) {
         ctx.println("多参数化运行Docker镜像服务: " + imageName)
+        def dockerRollBackTag = "previous"  // 回滚版本tag
         // 先停止老容器在启动新容器
         try {
             ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host}  ' docker stop ${containerName} --time=1 || true' "
@@ -323,7 +324,14 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
             }
         }
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-
+            ctx.println("执行Web服务Docker镜像回滚运行")
+            ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} " +
+                    " ' cd /${ctx.DEPLOY_FOLDER} && " +
+                    " docker run -d --restart=on-failure:6  " +
+                    " -p ${ctx.SHELL_HOST_PORT}:${ctx.SHELL_EXPOSE_PORT} " +
+                    " -m 4G --log-opt max-size=100m --log-opt max-file=1" +
+                    " ${dockerVolumeMount} " +
+                    " --name ${containerName} ${imageName}:${dockerRollBackTag} ' "
         } else if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
             if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
                 // 启动稳定版本容器
@@ -336,7 +344,18 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
                         " -e \"JAVA_OPTS=-Xms128m ${map.docker_java_opts}\" -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1 " +
                         " -e HOST_NAME=\$(hostname) " +
                         " ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs " +
-                        " --name ${containerName} ${imageName}:previous ' "
+                        " --name ${containerName} ${imageName}:${dockerRollBackTag} ' "
+            } else if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
+                ctx.println("执行Python服务Docker镜像回滚运行")
+                ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} " +
+                        " ' cd /${ctx.DEPLOY_FOLDER} && " +
+                        " docker run -d --restart=on-failure:16 --privileged=true --pid=host " +
+                        " -p ${ctx.SHELL_HOST_PORT}:${ctx.SHELL_EXPOSE_PORT} " +
+                        " -e \"PROJECT_NAME=${ctx.PROJECT_NAME}\" -e PYTHON_START_FILE=\"${ctx.CUSTOM_PYTHON_START_FILE}\" " +
+                        " -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1 " +
+                        " -e HOST_NAME=\$(hostname) " +
+                        " ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs " +
+                        " --name ${containerName} ${imageName}:${dockerRollBackTag} ' "
             }
         }
 
