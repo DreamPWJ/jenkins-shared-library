@@ -1,4 +1,7 @@
 logs/
+log/
+**/logs/
+**/log/
 **/*.log
 **/*.log*
 **/log/**
@@ -6,11 +9,17 @@ logs/
 **/logs/*.log
 **/logs/*.txt
 **/tomcat/**
-.git
+.git/
+.svn/
 *.md
-**/node_modules/**
+*.tmp
+*.log
+**/node_modules/
 node_modules/
 .cache/
 dist/
 .idea/
 .vscode/
+*.swp
+.DS_Store
+Thumbs.db
