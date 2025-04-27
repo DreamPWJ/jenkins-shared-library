@@ -643,8 +643,8 @@ def pullProjectCode() {
  */
 def test(map) {
 
-    println("服务启动失败回滚到上一个版本  保证服务高可用性")
-    Docker.rollbackServer(this, map, "${dockerImageName}", "${dockerContainerName}")
+/*  println("服务启动失败回滚到上一个版本  保证服务高可用性")
+    Docker.rollbackServer(this, map, "${dockerImageName}", "${dockerContainerName}")*/
 /*  def maxVersion = Git.getGitTagMaxVersion(this)
     println("结果: ${maxVersion}")
     */

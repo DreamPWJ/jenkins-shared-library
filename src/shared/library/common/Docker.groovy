@@ -125,7 +125,7 @@ class Docker implements Serializable {
                     // 如Node构建环境 SSR方式等
                     // 拉取基础镜像避免重复下载
                     def dockerImagesName = "node:lts"
-                    ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在无需重新pull拉取\" "
+                    ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} && pwd && \
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
                             --build-arg EXPOSE_PORT="${ctx.SHELL_EXPOSE_PORT}" \
@@ -140,7 +140,7 @@ class Docker implements Serializable {
                     }
                     def dockerImagesName = "nginx:stable"
                     // 拉取基础镜像避免重复下载
-                    ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在无需重新pull拉取\" "
+                    ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
                     ctx.sh """  cp -p ${ctx.env.WORKSPACE}/ci/.ci/web/default.conf ${ctx.env.WORKSPACE}/${webProjectDir} &&
                             cp -p ${ctx.env.WORKSPACE}/ci/.ci/web/nginx.conf ${ctx.env.WORKSPACE}/${webProjectDir} &&
                             cd ${ctx.env.WORKSPACE}/${webProjectDir} && pwd && \
@@ -179,7 +179,7 @@ class Docker implements Serializable {
                         dockerImagesName = "${ctx.TOMCAT_VERSION}-jre8"
                     }
 
-                    ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在无需重新pull拉取\" "
+                    ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
 
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.GIT_PROJECT_FOLDER_NAME}/${ctx.mavenPackageLocationDir} && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
@@ -191,7 +191,7 @@ class Docker implements Serializable {
                 } else if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
                     def dockerImagesName = "python:${ctx.CUSTOM_PYTHON_VERSION}"
                     // 拉取基础镜像避免重复下载
-                    ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在无需重新pull拉取\" "
+                    ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.GIT_PROJECT_FOLDER_NAME} && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg EXPOSE_PORT="${exposePort}"  \
