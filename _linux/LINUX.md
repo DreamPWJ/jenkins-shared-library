@@ -80,6 +80,7 @@ arp -a
 #### 设置Linux服务器DNS服务 nameserver设置如 114.114.114.114, 223.5.5.5, 223.6.6.6, 8.8.8.8, 1.1.1.1
 
 - sudo vim /etc/resolv.conf
+- 锁死 chattr +i /etc/resolv.conf 防止重启系统数据丢失
 
 #### 安装Ubuntu服务器系统或VMware ESXI裸机虚拟化
 
