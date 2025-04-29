@@ -11,10 +11,11 @@ log
 *.log
 **/tomcat/logs/**
 tmp
+*/*/temp
+*.tmp
 .git
 .svn
 *.md
-*.tmp
 **/node_modules
 node_modules
 .cache
