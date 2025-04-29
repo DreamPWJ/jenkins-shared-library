@@ -9,7 +9,7 @@ log
 **/logs/*.log
 **/logs/*.txt
 *.log
-**/tomcat/logs/**
+tomcat/logs/
 tmp
 */*/temp
 *.tmp
@@ -19,7 +19,6 @@ tmp
 **/node_modules
 node_modules
 .cache
-dist
 .idea
 .vscode
 *.swp
