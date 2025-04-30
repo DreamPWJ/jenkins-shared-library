@@ -3,7 +3,7 @@
 
 /**
  * @author 潘维吉
- * @description 核心Pipeline代码 针对Web项目和JAVA项目CI/CD的脚本
+ * @description 核心Pipeline代码 针对Web前端项目和JAVA等后端项目CI/CD的脚本
  * 注意 本文件在Git位置和名称不能随便改动 配置在jenkins里
  */
 
@@ -122,7 +122,7 @@ sharedLibrary(map)
 /*
 
 lanneng-park-led-server-k8s-prod
-蓝能停车LED屏控ython服务端
+蓝能停车LED屏控Python服务端
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/lingxin.git" ,

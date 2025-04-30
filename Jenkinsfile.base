@@ -3,7 +3,7 @@
 
 /**
  * @author 潘维吉
- * @description 核心Pipeline代码 针对Web项目和JAVA项目CI/CD的脚本
+ * @description 核心Pipeline代码 针对Web前端项目和JAVA等后端项目CI/CD的脚本
  * 注意 本文件在Git位置和名称不能随便改动 配置在jenkins里
  */
 // Pipeline可能需要安装的插件
