@@ -1252,7 +1252,7 @@ def mavenBuildProject(map, deployNum = 0) {
         dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
             sh " tar -zcvf ${sourceCodeDeployName}.tar.gz  ./ "
         }
-        return
+        return 0
     }
     if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
         // 动态切换Maven内的对应的JDK版本
