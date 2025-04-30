@@ -1233,8 +1233,6 @@ def nodeBuildProject() {
         if ("${IS_MONO_REPO}" == 'true') {
             sh "cd ${monoRepoProjectDir} && tar -zcvf ${NPM_PACKAGE_FOLDER}.tar.gz ${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 "
         } else {
-            // 代码内微信认证文件复制
-            // sh " cp MP_verify_*.txt ${NPM_PACKAGE_FOLDER} "
             sh "tar -zcvf ${NPM_PACKAGE_FOLDER}.tar.gz ${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 "
         }
 
@@ -1250,7 +1248,7 @@ def mavenBuildProject(map, deployNum = 0) {
     // 源码直接部署 无需打包 只需要压缩上传到服务器上
     if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {
         dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
-            sh " tar -zcvf ${sourceCodeDeployName}.tar.gz --exclude='*.ttc' ./ "
+            sh " tar -zcvf ${sourceCodeDeployName}.tar.gz  ./ >/dev/null 2>&1  "
             Tools.printColor(this, "源码压缩包成功 ✅")
         }
         return
