@@ -789,6 +789,8 @@ def getInitParams(map) {
     IS_CODE_QUALITY_ANALYSIS = jsonParams.IS_CODE_QUALITY_ANALYSIS ? jsonParams.IS_CODE_QUALITY_ANALYSIS : params.IS_CODE_QUALITY_ANALYSIS
     // 是否进集成测试
     IS_INTEGRATION_TESTING = jsonParams.IS_INTEGRATION_TESTING ? jsonParams.IS_INTEGRATION_TESTING : false
+    // 是否直接源码部署 无需打包 自定义命令启动
+    IS_SOURCE_CODE_DEPLOY = jsonParams.IS_SOURCE_CODE_DEPLOY ? jsonParams.IS_SOURCE_CODE_DEPLOY : false
 
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
@@ -920,6 +922,8 @@ def getInitParams(map) {
     healthCheckTimeDiff = "未知"
     // Qodana代码质量准备不同语言的镜像名称
     qodanaImagesName = ""
+    // 源码部署的打包文件名称
+    sourceCodeDeployName = "source-code"
 }
 
 /**
@@ -1243,6 +1247,13 @@ def nodeBuildProject() {
  * Maven编译构建
  */
 def mavenBuildProject(map, deployNum = 0) {
+    // 源码直接部署 无需打包 只需要压缩上传到服务器上
+    if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {
+        dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
+            sh " tar -zcvf ${sourceCodeDeployName}.tar.gz  ./ "
+        }
+        return
+    }
     if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
         // 动态切换Maven内的对应的JDK版本
         Java.switchJDKByJenv(this, "${JDK_VERSION}")
