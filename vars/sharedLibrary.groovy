@@ -1127,15 +1127,6 @@ def pullProjectCode() {
     dir("${env.WORKSPACE}/ci") {
         existCiCode()
     }
-
-    // 源码直接部署 无需打包 只需要压缩上传到服务器上
-    if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {
-        dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
-            sh " tar -zcvf ${sourceCodeDeployName}.tar.gz  ./ "
-            Tools.printColor(this, "源码压缩包成功 ✅")
-        }
-        return
-    }
 }
 
 /**
@@ -1256,6 +1247,14 @@ def nodeBuildProject() {
  * Maven编译构建
  */
 def mavenBuildProject(map, deployNum = 0) {
+    // 源码直接部署 无需打包 只需要压缩上传到服务器上
+    if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {
+        dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
+            sh " tar -zcvf ${sourceCodeDeployName}.tar.gz --exclude='*.ttc' ./ "
+            Tools.printColor(this, "源码压缩包成功 ✅")
+        }
+        return
+    }
     if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
         // 动态切换Maven内的对应的JDK版本
         Java.switchJDKByJenv(this, "${JDK_VERSION}")
