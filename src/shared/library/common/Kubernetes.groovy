@@ -150,7 +150,7 @@ class Kubernetes implements Serializable {
         def isYamlUseSession = ""
         def yamlVolumeMounts = ""
         def yamlNfsParams = ""
-        def setYamlArags = ""
+        def setYamlArgs = ""
         def setPythonParams = ""
         def isK8sHealthProbe = ""
 
@@ -167,7 +167,7 @@ class Kubernetes implements Serializable {
         // java动态设置k8s yaml args参数
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java
                 && "${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${ctx.IS_SPRING_NATIVE}" == "false") {
-            setYamlArags = " --set_yaml_arags='${map.docker_java_opts}' "
+            setYamlArgs = " --set_yaml_args='${map.docker_java_opts}' "
         }
         // 设置python语言相关的参数
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
@@ -178,7 +178,7 @@ class Kubernetes implements Serializable {
             isK8sHealthProbe = " --is_k8s_health_probe=true "
         }
 
-        pythonYamlParams = isYamlUseSession + yamlVolumeMounts + yamlNfsParams + yamlDefaultPort + setYamlArags + setPythonParams + isK8sHealthProbe
+        pythonYamlParams = isYamlUseSession + yamlVolumeMounts + yamlNfsParams + yamlDefaultPort + setYamlArgs + setPythonParams + isK8sHealthProbe
         if ("${pythonYamlParams}".trim() != "") {
             ctx.dir("${ctx.env.WORKSPACE}/ci/_k8s") {
                 ctx.println("使用Python的ruamel包动态配置K8S的Yaml文件: " + pythonYamlParams)

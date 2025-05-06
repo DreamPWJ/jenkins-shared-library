@@ -26,7 +26,7 @@ parser.add_argument('--nfs_params', type=str, default=None)
 parser.add_argument('--default_port', type=int, default=None)
 parser.add_argument('--remote_debug_port', type=int, default=None)
 parser.add_argument('--is_use_session', type=bool, default=False)
-parser.add_argument('--set_yaml_arags', type=str, default=None)
+parser.add_argument('--set_yaml_args', type=str, default=None)
 parser.add_argument('--set_python_start_file', type=str, default=None)
 parser.add_argument('--is_k8s_health_probe', type=bool, default=False)
 
@@ -109,12 +109,12 @@ if nfs_params is not None:
     )
 
 # Java动态设置k8s  yaml args参数
-set_yaml_arags = args.set_yaml_arags
-if set_yaml_arags is not None:
-    print(set_yaml_arags)
+set_yaml_args = args.set_yaml_args
+if set_yaml_args is not None:
+    print(set_yaml_args)
     # 适配Java Spring Boot框架容器动态启动命令  比如 JVM堆栈内存控制
     yaml_containers[0]["command"] = ["java"]  # 覆盖或补充 ENTRYPOINT 或 CMD
-    yaml_containers[0]["args"] = ["-jar", "-Xms128m", set_yaml_arags,
+    yaml_containers[0]["args"] = ["-jar", "-Xms128m", set_yaml_args,
                                   "-Djava.security.egd=file:/dev/./urandom", "/server.jar"]
 
 # 设置python语言相关的参数

@@ -1,17 +1,14 @@
 # Author: 潘维吉
 # Version 1.0.0
-# Description: 自定义构建JDK Spring Boot项目镜像
+# Description: 源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
 
 # 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
 ARG JDK_PUBLISHER
 ARG JDK_VERSION
 ARG DEPLOY_FOLDER
 ARG PROJECT_NAME
+ARG SOURCE_CODE_DEPLOY_NAME
 ARG EXPOSE_PORT
-
-# Dockerfile多阶段构建 参考文档: https://docs.docker.com/develop/develop-images/multistage-build/
-# 示例 FROM golang:1.16 下行注释的KEY值动态替换
-#FROM-MULTISTAGE-BUILD-IMAGES
 
 # Spring官方推荐的JDK提供商: https://bell-sw.com/libericajdk/
 # JDK基础镜像 默认值变量方式 ${JDK_VERSION:-11}
@@ -38,8 +35,13 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 #DOCKER-FILE-RUN-COMMAND
 
 # 将部署文件复制到docker内根目录
-COPY  *.jar  /server.jar
+COPY  ${SOURCE_CODE_DEPLOY_NAME}.tar.gz /${SOURCE_CODE_DEPLOY_NAME}
 
+# 解压文件到当前文件夹下并删除压缩文件
+RUN cd /${SOURCE_CODE_DEPLOY_NAME} \
+ && tar -xzvf ${SOURCE_CODE_DEPLOY_NAME}.tar.gz --strip-components 1 >/dev/null 2>&1 \
+ && rm -f ${SOURCE_CODE_DEPLOY_NAME}.tar.gz
+ 
 # 对外暴露端口
 EXPOSE  $EXPOSE_PORT
 
@@ -47,5 +49,5 @@ EXPOSE  $EXPOSE_PORT
 HEALTHCHECK --start-period=10s --interval=30s --timeout=30s --retries=3 \
     CMD curl --fail http://localhost:$DOCKER_SERVICE_PORT || exit 1
 
-# 运行jar包命令 远程调式  启动命令: java -jar app.jar  开启JDK特性功能预览功能(预览特性不稳定建议关闭) --enable-preview
+# 运行jar包命令   启动命令 java -jar app.jar
 ENTRYPOINT "java" "-jar" $JAVA_OPTS $REMOTE_DEBUGGING_PARAM  "-Djava.security.egd=file:/dev/./urandom" "/server.jar"
