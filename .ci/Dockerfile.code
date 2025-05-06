@@ -39,11 +39,11 @@ ARG SOURCE_CODE_FILE
 #DOCKER-FILE-RUN-COMMAND
 
 # 将部署文件复制到docker内根目录
-COPY  ${SOURCE_CODE_FILE}.tar.gz .
+COPY $SOURCE_CODE_FILE.tar.gz .
 
 # 解压文件到当前文件夹下并删除压缩文件
-RUN pwd && ls -l && tar -xzvf ${SOURCE_CODE_FILE}.tar.gz --strip-components 1 >/dev/null 2>&1 \
- && rm -f ${SOURCE_CODE_FILE}.tar.gz
+RUN pwd && ls -l && tar -xzvf $SOURCE_CODE_FILE.tar.gz --strip-components 1 >/dev/null 2>&1 \
+ && rm -f $SOURCE_CODE_FILE.tar.gz
  
 # 对外暴露端口 k8s在yaml设置端口
 EXPOSE  $EXPOSE_PORT
