@@ -40,12 +40,12 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # 将部署文件复制到docker内根目录
 COPY  *.jar  /server.jar
 
-# 对外暴露端口
+# 对外暴露端口 k8s在yaml设置端口
 EXPOSE  $EXPOSE_PORT
 
 # 健康检查 HTTP响应200为健康 如果服务不可用或未响应，Docker可以标记容器为不健康，并根据配置采取行动，如自动重启容器
 HEALTHCHECK --start-period=10s --interval=30s --timeout=30s --retries=3 \
     CMD curl --fail http://localhost:$DOCKER_SERVICE_PORT || exit 1
 
-# 运行jar包命令 远程调式  启动命令: java -jar app.jar  开启JDK特性功能预览功能(预览特性不稳定建议关闭) --enable-preview
+# 运行jar包命令 远程调式  启动命令: java -jar app.jar  在k8s动态设置启动参数
 ENTRYPOINT "java" "-jar" $JAVA_OPTS $REMOTE_DEBUGGING_PARAM  "-Djava.security.egd=file:/dev/./urandom" "/server.jar"
