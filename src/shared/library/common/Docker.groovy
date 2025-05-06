@@ -124,7 +124,7 @@ class Docker implements Serializable {
                 def dockerImagesName = "${jdkPublisher}:${ctx.JDK_VERSION}"
                 ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
 
-                ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.GIT_PROJECT_FOLDER_NAME} && pwd &&
+                ctx.sh """ cd ${ctx.env.WORKSPACE}/ && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}" --build-arg EXPOSE_PORT="${ctx.SHELL_EXPOSE_PORT}" --build-arg TOMCAT_VERSION=${ctx.TOMCAT_VERSION} \
                             --build-arg JDK_PUBLISHER=${jdkPublisher} --build-arg JDK_VERSION=${ctx.JDK_VERSION} --build-arg JAVA_OPTS="-Xms128m ${ctx.DOCKER_JAVA_OPTS}" \
