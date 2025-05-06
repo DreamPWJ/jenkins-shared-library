@@ -42,8 +42,8 @@ ARG SOURCE_CODE_FILE
 COPY ${SOURCE_CODE_FILE}.tar.gz .
 
 # 解压文件到当前文件夹下并删除压缩文件
-RUN pwd  \
- && tar -xzvf ${SOURCE_CODE_FILE}.tar.gz --strip-components 1 \
+RUN pwd \
+ && tar -xzvf ${SOURCE_CODE_FILE}.tar.gz --strip-components 0  >/dev/null 2>&1  \
  && rm -f ${SOURCE_CODE_FILE}.tar.gz \
  && ls -l
  
