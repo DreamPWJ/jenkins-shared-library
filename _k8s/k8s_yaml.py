@@ -113,10 +113,11 @@ if nfs_params is not None:
 set_custom_startup_command = args.set_custom_startup_command
 if set_custom_startup_command is not None:
     print(set_custom_startup_command)
-    #yaml_containers[0]["command"] = [set_custom_startup_command]  # 覆盖或补充 ENTRYPOINT 或 CMD
-    yaml_containers[0]["command"] = ["java"]  # 覆盖或补充 ENTRYPOINT 或 CMD
-    yaml_containers[0]["args"] = ["-jar", "-Xms128m",
-                                  "-Dfile.encoding=UTF-8", "/app/ListenWebService.jar"]
+    yaml_containers[0]["command"] = [set_custom_startup_command]  # 覆盖或补充 ENTRYPOINT 或 CMD
+    # yaml_containers[0]["command"] = ["java"]  # 覆盖或补充 ENTRYPOINT 或 CMD
+    # yaml_containers[0]["args"] = ["-jar", "-Xms128m",
+    #                               "-Dfile.encoding=UTF-8", "/app/ListenWebService.jar"]
+
 # Java动态设置k8s  yaml args参数
 set_yaml_args = args.set_yaml_args
 if set_yaml_args is not None and set_custom_startup_command is None :
