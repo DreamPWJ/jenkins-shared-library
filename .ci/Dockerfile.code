@@ -20,6 +20,9 @@ FROM ${JDK_PUBLISHER}:${JDK_VERSION}
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
 #LABEL author="潘维吉"
 
+# Docker 将此路径用作所有后续命令的默认位置
+WORKDIR /app
+
 # 挂载数据卷 docker删除后数据不丢失 docker run -v 映射
 VOLUME /logs
 
@@ -36,7 +39,7 @@ ARG SOURCE_CODE_FILE
 #DOCKER-FILE-RUN-COMMAND
 
 # 将部署文件复制到docker内根目录
-COPY  ${SOURCE_CODE_FILE}.tar.gz /${SOURCE_CODE_FILE}
+COPY  ${SOURCE_CODE_FILE}.tar.gz /
 
 # 解压文件到当前文件夹下并删除压缩文件
 RUN cd /${SOURCE_CODE_FILE} \
