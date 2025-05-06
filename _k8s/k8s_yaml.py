@@ -26,6 +26,7 @@ parser.add_argument('--nfs_params', type=str, default=None)
 parser.add_argument('--default_port', type=int, default=None)
 parser.add_argument('--remote_debug_port', type=int, default=None)
 parser.add_argument('--is_use_session', type=bool, default=False)
+parser.add_argument('--set_custom_startup_command', type=str, default=None)
 parser.add_argument('--set_yaml_args', type=str, default=None)
 parser.add_argument('--set_python_start_file', type=str, default=None)
 parser.add_argument('--is_k8s_health_probe', type=bool, default=False)
@@ -107,6 +108,12 @@ if nfs_params is not None:
     yaml_volume.extend(
         [*nsf_server_yaml]
     )
+
+# 自定义启动命令
+set_custom_startup_command = args.set_custom_startup_command
+if set_custom_startup_command is not None:
+    print(set_custom_startup_command)
+    yaml_containers[0]["command"] = [set_custom_startup_command]  # 覆盖或补充 ENTRYPOINT 或 CMD
 
 # Java动态设置k8s  yaml args参数
 set_yaml_args = args.set_yaml_args
