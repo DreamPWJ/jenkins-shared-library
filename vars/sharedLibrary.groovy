@@ -304,7 +304,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return (IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
+                        expression { return (IS_SOURCE_CODE_DEPLOY == false && IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
                     }
                     agent {
                         docker {
@@ -387,7 +387,7 @@ def call(String type = 'web-java', Map map) {
                 stage('制作镜像') {
                     when {
                         beforeAgent true
-                        expression { return ("${IS_PUSH_DOCKER_REPO}" == 'true') }
+                        expression { return ("${IS_PUSH_DOCKER_REPO}" == 'true' && IS_SOURCE_CODE_DEPLOY == false) }
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
                     steps {
@@ -1127,6 +1127,24 @@ def pullProjectCode() {
     dir("${env.WORKSPACE}/ci") {
         existCiCode()
     }
+    // 源码直接部署方式
+    sourceCodeDeploy()
+
+}
+
+/**
+ * 源码直接部署方式
+ * 无需打包 只需要压缩上传到服务器上执行命令启动
+ */
+def sourceCodeDeploy() {
+    // 源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
+    if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {
+        dir("${env.WORKSPACE}/") { // 源码在特定目录下
+            sh " rm -f ${sourceCodeDeployName}.tar.gz &&  tar --warning=no-file-changed -zcvf  ${sourceCodeDeployName}.tar.gz --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
+            Tools.printColor(this, "源码压缩打包成功 ✅")
+        }
+        // return // 后续代码不执行
+    }
 }
 
 /**
@@ -1245,14 +1263,6 @@ def nodeBuildProject() {
  * Maven编译构建
  */
 def mavenBuildProject(map, deployNum = 0) {
-    // 源码直接部署 无需打包 只需要压缩上传到服务器上
-    if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {
-        dir("${env.WORKSPACE}/") { // 源码在特定目录下
-            sh " rm -f ${sourceCodeDeployName}.tar.gz &&  tar --warning=no-file-changed -zcvf  ${sourceCodeDeployName}.tar.gz --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
-            Tools.printColor(this, "源码压缩打包成功 ✅")
-        }
-        return
-    }
     if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
         // 动态切换Maven内的对应的JDK版本
         Java.switchJDKByJenv(this, "${JDK_VERSION}")
@@ -1417,7 +1427,9 @@ def uploadRemote(filePath, map) {
     }
     println("上传部署文件到部署服务器中... 🚀 ")
     // 基于scp或rsync同步文件到远程服务器
-    if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
+    if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
+        sh " scp ${proxyJumpSCPText} ${sourceCodeDeployName}.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
+    } else if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
                 sh " scp ${proxyJumpSCPText} ${npmPackageLocation} " +
