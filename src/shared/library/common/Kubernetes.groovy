@@ -168,7 +168,7 @@ class Kubernetes implements Serializable {
         // 自定义启动命令
         if ("${ctx.IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
             // 1. 直接执行自定义命令  2. 执行命令文件
-            setCustomStartupCommand = " --set_custom_startup_command='java -Dfile.encoding=UTF-8 -jar /app/ListenWebService.jar' "
+            setCustomStartupCommand = " --set_custom_startup_command='${ctx.CUSTOM_STARTUP_COMMAND}' "
         }
         // java动态设置k8s yaml args参数
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java
