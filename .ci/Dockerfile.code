@@ -7,7 +7,6 @@ ARG JDK_PUBLISHER
 ARG JDK_VERSION
 ARG DEPLOY_FOLDER
 ARG PROJECT_NAME
-ARG SOURCE_CODE_FILE
 ARG EXPOSE_PORT
 
 # Spring官方推荐的JDK提供商: https://bell-sw.com/libericajdk/
@@ -30,6 +29,8 @@ USER root
 # 设置时区
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+ARG SOURCE_CODE_FILE
 
 # 动态下载安装相关依赖 下行注释的KEY值动态替换
 #DOCKER-FILE-RUN-COMMAND
