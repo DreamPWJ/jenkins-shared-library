@@ -7,7 +7,7 @@ ARG JDK_PUBLISHER
 ARG JDK_VERSION
 ARG DEPLOY_FOLDER
 ARG PROJECT_NAME
-ARG SOURCE_CODE_DEPLOY_NAME
+ARG SOURCE_CODE_NAME
 ARG EXPOSE_PORT
 
 # Spring官方推荐的JDK提供商: https://bell-sw.com/libericajdk/
@@ -35,12 +35,12 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 #DOCKER-FILE-RUN-COMMAND
 
 # 将部署文件复制到docker内根目录
-COPY  ${SOURCE_CODE_DEPLOY_NAME}.tar.gz /${SOURCE_CODE_DEPLOY_NAME}
+COPY  ${SOURCE_CODE_NAME}.tar.gz /${SOURCE_CODE_NAME}
 
 # 解压文件到当前文件夹下并删除压缩文件
-RUN cd /${SOURCE_CODE_DEPLOY_NAME} \
- && tar -xzvf ${SOURCE_CODE_DEPLOY_NAME}.tar.gz --strip-components 1 >/dev/null 2>&1 \
- && rm -f ${SOURCE_CODE_DEPLOY_NAME}.tar.gz
+RUN cd /${SOURCE_CODE_NAME} \
+ && tar -xzvf ${SOURCE_CODE_NAME}.tar.gz --strip-components 1 >/dev/null 2>&1 \
+ && rm -f ${SOURCE_CODE_NAME}.tar.gz
  
 # 对外暴露端口 k8s在yaml设置端口
 EXPOSE  $EXPOSE_PORT

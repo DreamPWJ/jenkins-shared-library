@@ -128,7 +128,7 @@ class Docker implements Serializable {
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}" --build-arg EXPOSE_PORT="${ctx.SHELL_EXPOSE_PORT}" --build-arg TOMCAT_VERSION=${ctx.TOMCAT_VERSION} \
                             --build-arg JDK_PUBLISHER=${jdkPublisher} --build-arg JDK_VERSION=${ctx.JDK_VERSION} --build-arg JAVA_OPTS="-Xms128m ${ctx.DOCKER_JAVA_OPTS}" \
-                            --build-arg SOURCE_CODE_DEPLOY_NAME=${ctx.sourceCodeDeployName}  \
+                            --build-arg SOURCE_CODE_NAME=${ctx.sourceCodeDeployName}  \
                             -f ${ctx.env.WORKSPACE}/ci/.ci/${codeDockerFileName} . --no-cache \
                             ${dockerPushDiffStr}
                             """
