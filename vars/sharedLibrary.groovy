@@ -1247,8 +1247,8 @@ def nodeBuildProject() {
 def mavenBuildProject(map, deployNum = 0) {
     // 源码直接部署 无需打包 只需要压缩上传到服务器上
     if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {
-        dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
-            sh " rm -f ${sourceCodeDeployName}.tar.gz &&  tar --warning=no-file-changed -zcvf  ${sourceCodeDeployName}.tar.gz --exclude='*.log' --exclude='*.tar.gz' ./ "
+        dir("${env.WORKSPACE}/") { // 源码在特定目录下
+            sh " rm -f ${sourceCodeDeployName}.tar.gz &&  tar --warning=no-file-changed -zcvf  ${sourceCodeDeployName}.tar.gz --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
             Tools.printColor(this, "源码压缩打包成功 ✅")
         }
         return
