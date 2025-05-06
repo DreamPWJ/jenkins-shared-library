@@ -35,7 +35,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 #DOCKER-FILE-RUN-COMMAND
 
 # 将部署文件复制到docker内根目录
-COPY  $SOURCE_CODE_NAME.tar.gz /$SOURCE_CODE_NAME
+COPY  ${SOURCE_CODE_NAME}.tar.gz /${SOURCE_CODE_NAME}
 
 # 解压文件到当前文件夹下并删除压缩文件
 RUN cd /${SOURCE_CODE_NAME} \
