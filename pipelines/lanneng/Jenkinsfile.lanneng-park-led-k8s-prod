@@ -129,7 +129,7 @@ JSON_PARAMS
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "lanneng-led-sdk" ,
-   "SHELL_PARAMS" : "lanneng-led sdk 8090 8090 prod 8090 10012",
+   "SHELL_PARAMS" : "lanneng-led sdk 18090 8090 prod 8090 10012",
    "GIT_PROJECT_FOLDER_NAME" : "ListenWebServer",
    "IS_SOURCE_CODE_DEPLOY" : true,
    "IS_K8S_DEPLOY" : true,

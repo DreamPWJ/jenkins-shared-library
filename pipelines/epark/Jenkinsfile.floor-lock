@@ -44,7 +44,7 @@ map.put('docker_volume_mount', '')
 // Dockerfile多阶段构建 镜像名称
 map.put('docker_multistage_build_images', ' ')
 // 是否上传镜像到docker容器仓库
-map.put('is_push_docker_repo', true)
+map.put('is_push_docker_repo', false)
 // docker容器镜像仓库账号信任id
 map.put('docker_repo_credentials_id', '6b186cac-2f4d-49dd-810b-3a8227ea3115')
 // docker镜像仓库注册地址
@@ -59,7 +59,7 @@ map.put('k8s_credentials_ids', ' ')
 map.put('k8s_image_pull_secrets', ' ')
 
 // 项目标签或项目简称
-map.put('project_tag', '地锁控制器')
+map.put('project_tag', '设备控制器')
 
 // 是否是生产环境
 map.put('is_prod', false)
@@ -76,16 +76,16 @@ map.put('is_before_deploy_notice', false)
 // 是否只通知发布变更记录
 map.put('is_only_notice_change_log', false)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', true)
+map.put('is_git_tag', false)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
-map.put('jenkins_node', 'node-2')
-map.put('jenkins_node_frontend', 'node-2')
+map.put('jenkins_node', 'node-3')
+map.put('jenkins_node_frontend', 'node-3')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
-map.put('nodejs', 'Node14')
+map.put('nodejs', 'Node20')
 map.put('maven', 'Maven3.6')
 map.put('jdk_publisher', 'openjdk')
 map.put('jdk', '11')
@@ -133,6 +133,20 @@ JSON_PARAMS
    "SHELL_PARAMS" : "floor-lock app 8099 8080 sit",
 }
 
+lanneng-park-led-sdk-sit
+蓝能停车LED屏控Java SDK服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/lingxin.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "lanneng-led-sdk" ,
+   "SHELL_PARAMS" : "lanneng-led sdk 18090 8090 prod 18091 10012",
+   "GIT_PROJECT_FOLDER_NAME" : "ListenWebServer",
+   "IS_SOURCE_CODE_DEPLOY" : true,
+   "DOCKER_VOLUME_MOUNT" : "/my/lingxin/listen-web-server:/app",
+   "CUSTOM_STARTUP_COMMAND" : "java -Dfile.encoding=UTF-8 -jar /app/ListenWebService.jar",
+}
 
 */
 

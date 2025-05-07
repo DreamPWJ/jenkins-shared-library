@@ -46,11 +46,11 @@ map.put('docker_multistage_build_images', ' ')
 // 是否上传镜像到docker容器仓库
 map.put('is_push_docker_repo', false)
 // docker容器镜像仓库账号信任id
-map.put('docker_repo_credentials_id', '5553c9ed-5416-4bbf-b7fc-9d53ed856177')
+map.put('docker_repo_credentials_id', '6b186cac-2f4d-49dd-810b-3a8227ea3115')
 // docker镜像仓库注册地址
-map.put('docker_repo_registry', 'registry.cn-qingdao.aliyuncs.com')
+map.put('docker_repo_registry', 'registry.cn-shanghai.aliyuncs.com')
 // docker仓库命名空间名称
-map.put('docker_repo_namespace', 'lexiang')
+map.put('docker_repo_namespace', 'lannengkeji')
 
 // K8S集群相关参数
 // K8S集群部署集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
