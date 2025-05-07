@@ -1004,7 +1004,7 @@ def getShellParams(map) {
                 // GraalVM JDK without Native Image
                 jdkPublisher = "container-registry.oracle.com/graalvm/jdk"
             }
-            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION} -s ${jdkPublisher} -t ${IS_SPRING_NATIVE} -u ${IS_SOURCE_CODE_DEPLOY} -v ${CUSTOM_STARTUP_COMMAND} "
+            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION} -s ${jdkPublisher} -t ${IS_SPRING_NATIVE} -u ${IS_SOURCE_CODE_DEPLOY} "
         }
 
         // Python项目参数
@@ -1029,6 +1029,9 @@ def getShellParams(map) {
         if ("${SHELL_PARAMS_ARRAY.length}" == '7') {
             SHELL_EXTEND_PORT = SHELL_PARAMS_ARRAY[6]
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -z ${SHELL_EXTEND_PORT}"
+        }
+        if ("${CUSTOM_STARTUP_COMMAND}" != "") {
+            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -v ${CUSTOM_STARTUP_COMMAND}"
         }
         // println "${SHELL_PARAMS_GETOPTS}"
     }
