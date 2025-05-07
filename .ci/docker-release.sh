@@ -92,7 +92,7 @@ while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:" opt; do
     is_source_code_deploy=$OPTARG # 是否源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
     ;;
   v)
-    echo "custom_startup_command=${OPTARG//#/ }"
+    echo "custom_startup_command=${OPTARG//#/ }"  # 处理shell无法传递空格问题
     custom_startup_command="${OPTARG//#/ }" # 自定义服务部署启动命令
     ;;
   y)
