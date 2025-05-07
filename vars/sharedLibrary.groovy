@@ -1034,7 +1034,7 @@ def getShellParams(map) {
             // 处理shell无法传递空格问题
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -v ${CUSTOM_STARTUP_COMMAND}.replaceAll(/\\s+/, '#') "
         }
-        // println "${SHELL_PARAMS_GETOPTS}"
+        println "${SHELL_PARAMS_GETOPTS}"
     }
 }
 
