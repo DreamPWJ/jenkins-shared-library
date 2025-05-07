@@ -1031,7 +1031,8 @@ def getShellParams(map) {
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -z ${SHELL_EXTEND_PORT}"
         }
         if ("${CUSTOM_STARTUP_COMMAND}" != "") {
-            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -v \"${CUSTOM_STARTUP_COMMAND}\" "
+            // 处理shell无法传递空格问题
+            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -v "${CUSTOM_STARTUP_COMMAND..replaceAll(/\s+/, '#')}" "
         }
         // println "${SHELL_PARAMS_GETOPTS}"
     }

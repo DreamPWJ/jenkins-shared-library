@@ -88,8 +88,8 @@ while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:" opt; do
     is_spring_native=$OPTARG # 是否打包Spring Native原生镜像
     ;;
   u)
-    echo "is_source_code_deploy=$OPTARG"
-    is_source_code_deploy=$OPTARG # 是否源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
+    echo "is_source_code_deploy=${OPTARG//#/ }"
+    is_source_code_deploy=${OPTARG//#/ } # 是否源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
     ;;
   v)
     echo "custom_startup_command=$OPTARG"
