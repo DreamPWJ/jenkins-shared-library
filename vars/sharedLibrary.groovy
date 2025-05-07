@@ -1031,7 +1031,7 @@ def getShellParams(map) {
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -z ${SHELL_EXTEND_PORT}"
         }
         if ("${CUSTOM_STARTUP_COMMAND}" != "") {
-            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -v ${CUSTOM_STARTUP_COMMAND}"
+            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -v \""${CUSTOM_STARTUP_COMMAND}"\" "
         }
         // println "${SHELL_PARAMS_GETOPTS}"
     }
