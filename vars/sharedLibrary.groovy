@@ -1004,7 +1004,7 @@ def getShellParams(map) {
                 // GraalVM JDK without Native Image
                 jdkPublisher = "container-registry.oracle.com/graalvm/jdk"
             }
-            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION} -s ${jdkPublisher} -t ${IS_SPRING_NATIVE}"
+            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION} -s ${jdkPublisher} -t ${IS_SPRING_NATIVE} -u ${IS_SOURCE_CODE_DEPLOY} -v ${CUSTOM_STARTUP_COMMAND} "
         }
 
         // Python项目参数
@@ -1457,8 +1457,8 @@ def uploadRemote(filePath, map) {
             // C++语言打包产物 上传包到远程服务器
             sh "cd ${filePath} && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
         }
-        Tools.printColor(this, "上传部署文件到部署服务器完成 ✅")
     }
+    Tools.printColor(this, "上传部署文件到部署服务器完成 ✅")
 }
 
 /**

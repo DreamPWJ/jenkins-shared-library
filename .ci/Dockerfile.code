@@ -8,6 +8,7 @@ ARG JDK_VERSION
 ARG DEPLOY_FOLDER
 ARG PROJECT_NAME
 ARG EXPOSE_PORT
+ARG CUSTOM_STARTUP_COMMAND
 
 # Spring官方推荐的JDK提供商: https://bell-sw.com/libericajdk/
 # JDK基础镜像 默认值变量方式 ${JDK_VERSION:-11}
@@ -33,7 +34,7 @@ USER root
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-ARG SOURCE_CODE_FILE
+ARG SOURCE_CODE_FILE=source-code
 
 # 动态下载安装相关依赖 下行注释的KEY值动态替换
 #DOCKER-FILE-RUN-COMMAND
@@ -55,4 +56,4 @@ HEALTHCHECK --start-period=10s --interval=30s --timeout=30s --retries=3 \
     CMD curl --fail http://localhost:$DOCKER_SERVICE_PORT || exit 1
 
 # 运行jar包命令   启动命令 java -jar app.jar  在k8s动态设置启动参数
-ENTRYPOINT "java" "-jar" $JAVA_OPTS $REMOTE_DEBUGGING_PARAM  "-Djava.security.egd=file:/dev/./urandom" "/server.jar"
+ENTRYPOINT $CUSTOM_STARTUP_COMMAND $JAVA_OPTS $REMOTE_DEBUGGING_PARAM
