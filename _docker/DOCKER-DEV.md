@@ -168,3 +168,6 @@ tar -xzvf my.tar.gz && rm -f my.tar.gz
 - ls -lh 查看每个文件的占用情况
 - sudo du -h --max-depth=1 /  根目录每个文件的大小
 - du -lh --max-depth=1 查看当前目录子目录占用情况
+
+#### 处理网络不通问题
+systemctl restart network || service network restart && sudo systemctl daemon-reload && sudo systemctl restart docker

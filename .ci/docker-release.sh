@@ -87,6 +87,14 @@ while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:" opt; do
     echo "is_spring_native=$OPTARG"
     is_spring_native=$OPTARG # 是否打包Spring Native原生镜像
     ;;
+  u)
+    echo "is_source_code_deploy=$OPTARG"
+    is_source_code_deploy=$OPTARG # 是否源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
+    ;;
+  v)
+    echo "custom_startup_command=${OPTARG//#/ }"  # 处理shell无法传递空格问题
+    custom_startup_command="${OPTARG//#/ }" # 自定义服务部署启动命令
+    ;;
   y)
     echo "remote_debug_port=$OPTARG"
     remote_debug_port=$OPTARG # 远程调试端口
@@ -208,9 +216,9 @@ set -x # 开启shell命令打印模式
 if [[ ${is_push_docker_repo} == false ]]; then
   echo "🏗️  开始构建Docker镜像(无缓存构建)"
 
+  docker_pull_image_name=${jdk_publisher}:${jdk_version}
   if [[ ${java_framework_type} == 1 ]]; then
      docker_file_name="Dockerfile" # 默认Spring Boot框架 jar包
-     docker_pull_image_name=${jdk_publisher}:${jdk_version}
   fi
   if [[ ${java_framework_type} == 2 ]]; then
      docker_file_name="Dockerfile.mvc" # Spring MVC框架 war包
@@ -218,7 +226,9 @@ if [[ ${is_push_docker_repo} == false ]]; then
   fi
   if [[ ${is_spring_native} == true ]]; then
      docker_file_name="Dockerfile.native" # Spring Native原生镜像直接执行文件
-     docker_pull_image_name=${jdk_publisher}:${jdk_version}
+  fi
+  if [[ ${is_source_code_deploy} == true ]]; then
+     docker_file_name="Dockerfile.code" # 源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
   fi
 
    # 拉取基础镜像避免重复下载
@@ -271,6 +281,7 @@ docker run -d --restart=on-failure:16 -p ${host_port}:${expose_port} --privilege
   -e "SPRING_PROFILES_ACTIVE=${env_mode}" -e "PROJECT_NAME=${project_name}" -e "DOCKER_SERVICE_PORT=${build_expose_ports}" \
   -e "JAVA_OPTS=-Xms128m ${docker_java_opts}" -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1  ${dynamic_run_args} \
   -e "REMOTE_DEBUGGING_PARAM=${remote_debugging_param}" -e HOST_NAME=$(hostname) \
+  -e "CUSTOM_STARTUP_COMMAND=${custom_startup_command}" \
   -v /${deploy_folder}/${project_name}/logs:/logs \
   --name ${docker_container_name} ${docker_image_name}
 

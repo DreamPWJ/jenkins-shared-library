@@ -1,5 +1,5 @@
 #!groovy
-@Library('jenkins-shared-library@master') _
+@Library('jenkins-shared-library@dev') _
 
 /**
  * @author 潘维吉
@@ -11,7 +11,7 @@
 def map = [:]
 
 // 远程服务器地址 k8s集群方式可填空或填公网代理负载IP
-map.put('remote_ip', '120.92.140.41')
+map.put('remote_ip', '120.92.149.246')
 // 工作服务器地址 同时支持N个服务器自动化分布式部署
 map.put('remote_worker_ips', [])
 // 远程服务器用户名
@@ -34,7 +34,7 @@ map.put('build_num_keep', 3)
 // JVM内存设置
 map.put('docker_java_opts', '-Xmx1800m')
 // 容器最大cpu限制 m是千分之一 100m是0.1个CPU
-map.put('docker_limit_cpu', '1000m')
+map.put('docker_limit_cpu', '1200m')
 // 容器最大内存限制 不支持小数点形式设置
 map.put('docker_memory', '2G')
 // docker日志限制
@@ -54,12 +54,12 @@ map.put('docker_repo_namespace', 'lanneng')
 
 // K8S集群相关参数
 // K8S集群部署集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
-map.put('k8s_credentials_ids', '74a3d376-cb4c-4a20-9bf7-7300a5eaa84d')
+map.put('k8s_credentials_ids', 'a1d2642d-296f-47a2-8d1a-087b46e3255e')
 // K8S集群私有镜像仓库拉取密钥 在集群内使用kubectl create secret命令生成
 map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
 // 项目标签或项目简称
-map.put('project_tag', 'PDF渲染器')
+map.put('project_tag', 'LED屏控')
 
 // 是否是生产环境
 map.put('is_prod', true)
@@ -76,16 +76,16 @@ map.put('is_before_deploy_notice', false)
 // 是否只通知发布变更记录
 map.put('is_only_notice_change_log', false)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', false)
+map.put('is_git_tag', true)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
-map.put('jenkins_node', 'master')
-map.put('jenkins_node_frontend', 'master')
+map.put('jenkins_node', 'node-2')
+map.put('jenkins_node_frontend', 'node-3')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
-map.put('nodejs', 'Node14')
+map.put('nodejs', 'Node20')
 map.put('maven', 'Maven3.6')
 map.put('jdk_publisher', 'openjdk')
 map.put('jdk', '11')
@@ -99,7 +99,7 @@ map.put('oss_credentials_id', ' ')
 // 直连方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接
 map.put('ssh_hosts_id', ' ')
 // 跳板机方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接
-map.put('proxy_jump_hosts_id', ' ')
+map.put('proxy_jump_hosts_id', '47226244-73ca-48b9-be2d-f3413f62701a')
 
 // 服务器上部署所在的文件夹名称
 map.put('deploy_folder', "my")
@@ -117,24 +117,48 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/epark/Jenkinsfile.lanneng-pdfjs-reader
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/lanneng/Jenkinsfile.lanneng-park-led-k8s-prod
 
 /*
 
-pdf-js-k8s-prod
-PDF渲染器Web前端-k8s集群 ❤️
+lanneng-park-led-sdk-k8s-prod
+蓝能停车LED屏控Java SDK服务端
 JSON_PARAMS
 {
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/pdf-js.git" ,
-    "BRANCH_NAME" : "master" ,
-    "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "pdf-js-web" ,
-    "SHELL_PARAMS" : "pdf-js web 8010 80 prod" ,
-    "IS_STATIC_RESOURCE" : true,
-    "IS_K8S_DEPLOY" : true,
-    "K8S_POD_REPLICAS" : "3",
-    "APPLICATION_DOMAIN" : "https://pdf-js.pengbocloud.com",
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/lingxin.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "lanneng-led-sdk" ,
+   "SHELL_PARAMS" : "lanneng-led sdk 18090 8090 prod 8090 10012",
+   "GIT_PROJECT_FOLDER_NAME" : "ListenWebServer",
+   "IS_SOURCE_CODE_DEPLOY" : true,
+   "IS_K8S_DEPLOY" : true,
+   "K8S_POD_REPLICAS" : "1",
+   "IS_DISABLE_K8S_HEALTH_CHECK" : true ,
+   "CUSTOM_STARTUP_COMMAND" : "java -Dfile.encoding=UTF-8 -jar /app/ListenWebService.jar",
+   "APPLICATION_DOMAIN" : "https://park-led-sdk.pengbocloud.com" ,
+   "DOCKER_VOLUME_MOUNT" : "/my/lingxin/listen-web-server:/app",
 }
+
+
+lanneng-park-led-server-k8s-prod
+蓝能停车LED屏控Python服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/lingxin.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "COMPUTER_LANGUAGE" : "3" ,
+   "PROJECT_NAME" : "lanneng-led" ,
+   "SHELL_PARAMS" : "lanneng-led python 8036 5000 prod",
+   "IS_K8S_DEPLOY" : true,
+   "K8S_POD_REPLICAS" : "1",
+   "CUSTOM_PYTHON_START_FILE" : "main.py",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/health-check",
+   "IS_DISABLE_K8S_HEALTH_CHECK" : true ,
+   "APPLICATION_DOMAIN" : "https://park-led-api.pengbocloud.com" ,
+}
+
 
 */
 

@@ -304,7 +304,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return (IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
+                        expression { return (IS_SOURCE_CODE_DEPLOY == false && IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
                     }
                     agent {
                         docker {
@@ -789,6 +789,8 @@ def getInitParams(map) {
     IS_CODE_QUALITY_ANALYSIS = jsonParams.IS_CODE_QUALITY_ANALYSIS ? jsonParams.IS_CODE_QUALITY_ANALYSIS : params.IS_CODE_QUALITY_ANALYSIS
     // 是否进集成测试
     IS_INTEGRATION_TESTING = jsonParams.IS_INTEGRATION_TESTING ? jsonParams.IS_INTEGRATION_TESTING : false
+    // 是否直接源码部署 无需打包 自定义命令启动
+    IS_SOURCE_CODE_DEPLOY = jsonParams.IS_SOURCE_CODE_DEPLOY ? jsonParams.IS_SOURCE_CODE_DEPLOY : false
 
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
@@ -821,6 +823,8 @@ def getInitParams(map) {
     CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.10.0"
     // 自定义Python启动文件名称 默认app.py文件
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
+    // 自定义服务部署启动命令
+    CUSTOM_STARTUP_COMMAND = jsonParams.CUSTOM_STARTUP_COMMAND ? jsonParams.CUSTOM_STARTUP_COMMAND.trim() : ""
 
     // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值
     if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
@@ -920,6 +924,8 @@ def getInitParams(map) {
     healthCheckTimeDiff = "未知"
     // Qodana代码质量准备不同语言的镜像名称
     qodanaImagesName = ""
+    // 源码部署的打包文件名称
+    sourceCodeDeployName = "source-code"
 }
 
 /**
@@ -998,7 +1004,7 @@ def getShellParams(map) {
                 // GraalVM JDK without Native Image
                 jdkPublisher = "container-registry.oracle.com/graalvm/jdk"
             }
-            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION} -s ${jdkPublisher} -t ${IS_SPRING_NATIVE}"
+            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -q ${JAVA_FRAMEWORK_TYPE} -r ${TOMCAT_VERSION} -s ${jdkPublisher} -t ${IS_SPRING_NATIVE} -u ${IS_SOURCE_CODE_DEPLOY} "
         }
 
         // Python项目参数
@@ -1024,7 +1030,11 @@ def getShellParams(map) {
             SHELL_EXTEND_PORT = SHELL_PARAMS_ARRAY[6]
             SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -z ${SHELL_EXTEND_PORT}"
         }
-        // println "${SHELL_PARAMS_GETOPTS}"
+        if ("${CUSTOM_STARTUP_COMMAND}" != "") {
+            // 处理shell无法传递空格问题
+            SHELL_PARAMS_GETOPTS = "${SHELL_PARAMS_GETOPTS} -v " + "${CUSTOM_STARTUP_COMMAND}".replaceAll(" ", "#")
+        }
+        println "${SHELL_PARAMS_GETOPTS}"
     }
 }
 
@@ -1122,6 +1132,24 @@ def pullProjectCode() {
     // 是否存在CI代码
     dir("${env.WORKSPACE}/ci") {
         existCiCode()
+    }
+    // 源码直接部署方式
+    sourceCodeDeploy()
+
+}
+
+/**
+ * 源码直接部署方式
+ * 无需打包 只需要压缩上传到服务器上执行命令启动
+ */
+def sourceCodeDeploy() {
+    // 源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
+    if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {
+        dir("${env.WORKSPACE}/") { // 源码在特定目录下
+            sh " rm -f ${sourceCodeDeployName}.tar.gz &&  tar --warning=no-file-changed -zcvf  ${sourceCodeDeployName}.tar.gz --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
+            Tools.printColor(this, "源码压缩打包成功 ✅")
+        }
+        // return // 后续代码不执行
     }
 }
 
@@ -1229,8 +1257,6 @@ def nodeBuildProject() {
         if ("${IS_MONO_REPO}" == 'true') {
             sh "cd ${monoRepoProjectDir} && tar -zcvf ${NPM_PACKAGE_FOLDER}.tar.gz ${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 "
         } else {
-            // 代码内微信认证文件复制
-            // sh " cp MP_verify_*.txt ${NPM_PACKAGE_FOLDER} "
             sh "tar -zcvf ${NPM_PACKAGE_FOLDER}.tar.gz ${NPM_PACKAGE_FOLDER} >/dev/null 2>&1 "
         }
 
@@ -1407,7 +1433,9 @@ def uploadRemote(filePath, map) {
     }
     println("上传部署文件到部署服务器中... 🚀 ")
     // 基于scp或rsync同步文件到远程服务器
-    if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
+    if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
+        sh " scp ${proxyJumpSCPText} ${sourceCodeDeployName}.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
+    } else if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
                 sh " scp ${proxyJumpSCPText} ${npmPackageLocation} " +
@@ -1433,8 +1461,8 @@ def uploadRemote(filePath, map) {
             // C++语言打包产物 上传包到远程服务器
             sh "cd ${filePath} && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
         }
-        Tools.printColor(this, "上传部署文件到部署服务器完成 ✅")
     }
+    Tools.printColor(this, "上传部署文件到部署服务器完成 ✅")
 }
 
 /**
@@ -1811,7 +1839,7 @@ def syncScript() {
             Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
             // scp -r  递归复制整个目录 复制部署脚本和配置文件到服务器
             sh " chmod -R 777 .ci && scp ${proxyJumpSCPText} -r .ci/*  ${remote.user}@${remote.host}:/${DEPLOY_FOLDER}/ "
-            // 处理 .dockerignore文件被忽略了
+            // 处理 .dockerignore文件被忽略了 .dockerignore 必须位于构建上下文根目录 docker build 命令的最后一个参数决定 如 .
             sh " scp ${proxyJumpSCPText} .ci/.dockerignore  ${remote.user}@${remote.host}:${projectDeployFolder} "
         } catch (error) {
             println "复制部署脚本和配置文件到服务器失败 ❌"

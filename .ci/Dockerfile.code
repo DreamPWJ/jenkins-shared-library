@@ -1,6 +1,6 @@
 # Author: 潘维吉
 # Version 1.0.0
-# Description: 自定义构建JDK Spring Boot项目镜像
+# Description: 源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
 
 # 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
 ARG JDK_PUBLISHER
@@ -8,10 +8,7 @@ ARG JDK_VERSION
 ARG DEPLOY_FOLDER
 ARG PROJECT_NAME
 ARG EXPOSE_PORT
-
-# Dockerfile多阶段构建 参考文档: https://docs.docker.com/develop/develop-images/multistage-build/
-# 示例 FROM golang:1.16 下行注释的KEY值动态替换
-#FROM-MULTISTAGE-BUILD-IMAGES
+ARG CUSTOM_STARTUP_COMMAND
 
 # Spring官方推荐的JDK提供商: https://bell-sw.com/libericajdk/
 # JDK基础镜像 默认值变量方式 ${JDK_VERSION:-11}
@@ -24,6 +21,9 @@ FROM ${JDK_PUBLISHER}:${JDK_VERSION}
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
 #LABEL author="潘维吉"
 
+# Docker 将此路径用作所有后续命令的默认位置
+WORKDIR /app
+
 # 挂载数据卷 docker删除后数据不丢失 docker run -v 映射
 VOLUME /logs
 
@@ -34,12 +34,20 @@ USER root
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+ARG SOURCE_CODE_FILE=source-code
+
 # 动态下载安装相关依赖 下行注释的KEY值动态替换
 #DOCKER-FILE-RUN-COMMAND
 
 # 将部署文件复制到docker内根目录
-COPY  *.jar  /server.jar
+COPY ${SOURCE_CODE_FILE}.tar.gz .
 
+# 解压文件到当前文件夹下并删除压缩文件
+RUN pwd \
+ && tar -xzvf ${SOURCE_CODE_FILE}.tar.gz --strip-components 2  >/dev/null 2>&1  \
+ && rm -f ${SOURCE_CODE_FILE}.tar.gz \
+ && ls -l
+ 
 # 对外暴露端口 k8s在yaml设置端口
 EXPOSE  $EXPOSE_PORT
 
@@ -47,5 +55,5 @@ EXPOSE  $EXPOSE_PORT
 HEALTHCHECK --start-period=10s --interval=30s --timeout=30s --retries=3 \
     CMD curl --fail http://localhost:$DOCKER_SERVICE_PORT || exit 1
 
-# 运行jar包命令 远程调式  启动命令: java -jar app.jar  在k8s动态设置启动参数
-ENTRYPOINT "java" "-jar" $JAVA_OPTS $REMOTE_DEBUGGING_PARAM  "-Djava.security.egd=file:/dev/./urandom" "/server.jar"
+# 运行jar包命令   启动命令 java -jar app.jar  在k8s动态设置启动参数
+CMD $CUSTOM_STARTUP_COMMAND

@@ -26,7 +26,8 @@ parser.add_argument('--nfs_params', type=str, default=None)
 parser.add_argument('--default_port', type=int, default=None)
 parser.add_argument('--remote_debug_port', type=int, default=None)
 parser.add_argument('--is_use_session', type=bool, default=False)
-parser.add_argument('--set_yaml_arags', type=str, default=None)
+parser.add_argument('--set_custom_startup_command', type=str, default=None)
+parser.add_argument('--set_yaml_args', type=str, default=None)
 parser.add_argument('--set_python_start_file', type=str, default=None)
 parser.add_argument('--is_k8s_health_probe', type=bool, default=False)
 
@@ -108,18 +109,24 @@ if nfs_params is not None:
         [*nsf_server_yaml]
     )
 
+# 自定义启动命令
+set_custom_startup_command = args.set_custom_startup_command
+if set_custom_startup_command is not None:
+    print(set_custom_startup_command)
+    yaml_containers[0]["command"] = set_custom_startup_command.split()  # 覆盖或补充 ENTRYPOINT 或 CMD
+
 # Java动态设置k8s  yaml args参数
-set_yaml_arags = args.set_yaml_arags
-if set_yaml_arags is not None:
-    print(set_yaml_arags)
+set_yaml_args = args.set_yaml_args
+if set_yaml_args is not None and set_custom_startup_command is None :
+    print(set_yaml_args)
     # 适配Java Spring Boot框架容器动态启动命令  比如 JVM堆栈内存控制
     yaml_containers[0]["command"] = ["java"]  # 覆盖或补充 ENTRYPOINT 或 CMD
-    yaml_containers[0]["args"] = ["-jar", "-Xms128m", set_yaml_arags,
+    yaml_containers[0]["args"] = ["-jar", "-Xms128m", set_yaml_args,
                                   "-Djava.security.egd=file:/dev/./urandom", "/server.jar"]
 
 # 设置python语言相关的参数
 set_python_start_file = args.set_python_start_file
-if set_python_start_file is not None:
+if set_python_start_file is not None and set_custom_startup_command is None :
     print(set_python_start_file)
     # 启动命令
     yaml_containers[0]["command"] = ["python"]  # 覆盖或补充 ENTRYPOINT 或 CMD
