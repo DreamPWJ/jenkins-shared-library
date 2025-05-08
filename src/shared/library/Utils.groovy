@@ -83,6 +83,7 @@ class Utils implements Serializable {
 
     /**
      * 比较语义化版本号的大小
+     * 等于 0  大于 1  小于 -1
      */
     static int compareVersions(String version1, String version2) {
         // 去掉版本号中的 v 字符

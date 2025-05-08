@@ -103,6 +103,13 @@ class Kubernetes implements Serializable {
         def imageTag = Docker.imageTag
         def k8sPodReplicas = "${ctx.K8S_POD_REPLICAS}"
 
+        def k8sVersion = getK8sVersion(ctx)
+        // k8s高版本默认containerd轻量 高性能 已移除对Docker作为容器运行时不再内置 Dockershim 组件负责与 Docker 通信的桥接层
+        if (Utils.compareVersions(k8sVersion, "1.24.0") == 1 || Utils.compareVersions(k8sVersion, "1.24.0") == 0) {
+            // 新版 Docker 构建的镜像默认符合 OCI（Open Container Initiative）规范仍可在K8S环境 containerd、CRI-O 等运行时中无缝运行
+            // ctx.sh " ctr version "  // containerd版本号 containerd是Docker引擎基础组件所有默认自带
+        }
+
         // 判断是否存在扩展端口
         def yamlDefaultPort = ""
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && ctx.SHELL_EXTEND_PORT != "") {
