@@ -1,6 +1,6 @@
 # Author: 潘维吉
 # Version 1.0.0
-# Description: 源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
+# Description: 源码直接部署 无需打包 只需要压缩上传到服务器上执行自定义命令启动
 
 # 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
 ARG JDK_PUBLISHER
