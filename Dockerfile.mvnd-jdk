@@ -7,43 +7,51 @@ ARG JDK_VERSION
 ARG MVND_VERSION
 
 # 基础镜像
-FROM ${JDK_PUBLISHER}:${JDK_VERSION:-21}
+ARG UBUNTU_VERSION=25.04
+FROM ubuntu:${UBUNTU_VERSION}
 
-# 设置环境变量
-ENV MVND_VERSION=${MVND_VERSION:-1.0.2} \
-    MVND_HOME=/opt/mvnd \
-    JAVA_HOME=/opt/java/openjdk \
-    PATH=${PATH}:/opt/mvnd/bin
-
-# 设置工作目录
+# Set working directory
 WORKDIR /app
 
-# 使用国内镜像源加速（适合中国用户）
-#RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list || true && \
-#    apt-get update && \
-#    apt-get install -y --no-install-recommends \
-#        git \
-#        curl \
-#        && apt-get clean && \
-#        rm -rf /var/lib/apt/lists/*
+# 设置环境
+ENV DEBIAN_FRONTEND=noninteractive \
+    JAVA_HOME=/opt/java \
+    MVND_HOME=/opt/mvnd \
+    PATH=$PATH:/opt/java/bin:/opt/mvnd/bin
 
-# 安装 mvnd
-RUN curl -sL --retry 3 --retry-delay 5 --connect-timeout 10 https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/mvnd.tar.gz && \
-    tar -xzf /tmp/mvnd.tar.gz -C /opt && \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        curl \
+        wget \
+        unzip \
+        tzdata && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install OpenJDK
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        openjdk-${JDK_VERSION}-jdk && \
+    rm -rf /var/lib/apt/lists/* && \
+    ln -s /usr/lib/jvm/java-${JDK_VERSION}-openjdk-amd64 ${JAVA_HOME}
+
+# Download and install mvnd
+RUN curl -L --retry 3 --retry-delay 5 --connect-timeout 10 \
+        -o /tmp/mvnd.zip \
+        https://mirror.ghproxy.com/https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.zip && \
+    unzip /tmp/mvnd.zip -d /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
-    rm /tmp/mvnd.tar.gz && \
+    rm /tmp/mvnd.zip && \
+    chmod +x ${MVND_HOME}/bin/mvnd
+
+# Verify installations
+RUN java -version && \
     mvnd --version
 
-# 配置 Maven 国内镜像（阿里云）
-RUN mkdir -p ~/.m2 && \
-    echo '<settings><mirrors><mirror><id>aliyunmaven</id><mirrorOf>central</mirrorOf><name>aliyun maven</name><url>https://maven.aliyun.com/repository/public</url></mirror></mirrors></settings>' > ~/.m2/settings.xml
-
-# 默认命令
-CMD ["bash"]
-
+# Default command (can be overridden)
+CMD ["/bin/bash"]
 
 
 # 自定义构建镜像
-# DOCKER_BUILDKIT=1 docker build -t panweiji/mvnd-jdk:latest  -f /my/Dockerfile.mvnd-jdk . --no-cache --load
+# DOCKER_BUILDKIT=1 docker build --build-arg MVND_VERSION=1.0.2 --build-arg JDK_PUBLISHER=amazoncorretto --build-arg JDK_VERSION=21 -t panweiji/mvnd-jdk:latest  -f /my/Dockerfile.mvnd-jdk . --no-cache --load
 # 上传镜像 先 docker login 登录
 # docker push panweiji/mvnd-jdk:latest
