@@ -19,14 +19,17 @@ if [[ ! $(command -v expect) ]]; then
   apt-get install -y expect || true
   brew install expect || true
 fi
-
+  echo "111111111111 "
 while read host; do
+    echo "22222222222222 "
   ip=$(echo $host | cut -d " " -f1) # 注意ip不要有空格
   port=$(echo $host | cut -d " " -f2)
   username=$(echo $host | cut -d " " -f3)
   password=$(echo $host | cut -d " " -f4)
-  echo "SSH免密登录信息 : $ip:$port  $username : $password "
-  echo "SSH免密登录传入参数 : $1 "
+  echo "SSH免密登录信息 : $ip "
+  echo "SSH免密登录信息 : $port "
+  echo "SSH免密登录信息 : $username"
+  echo "SSH免密登录信息 : $password"
 
   # 只设置当前要配置的服务器   如果已经免密连接登录跳过设置
   if [[ "$ip" != "$1" ]] ; then
