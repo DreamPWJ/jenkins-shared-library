@@ -7,10 +7,10 @@ ARG JDK_VERSION
 ARG MVND_VERSION
 
 # 使用 Adoptium Temurin JDK 作为基础镜像（基于 Ubuntu）
-FROM ${JDK_PUBLISHER}:${JDK_VERSION:-21}
+FROM ${JDK_PUBLISHER}:${JDK_VERSION}
 
 # 设置环境变量
-ENV MVND_VERSION=${MVND_VERSION:-1.0.2} \
+ENV MVND_VERSION=${MVND_VERSION} \
     MVND_HOME=/opt/mvnd \
     JAVA_HOME=/opt/java/openjdk \
     PATH=${PATH}:/opt/mvnd/bin
