@@ -33,14 +33,12 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/lib/jvm/java-${JDK_VERSION}-openjdk-amd64 ${JAVA_HOME}
 
-# Download and install mvnd
-RUN curl -L --retry 3 --retry-delay 5 --connect-timeout 10 \
-        -o /tmp/mvnd.zip \
-        https://mirror.ghproxy.com/https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.zip && \
-    unzip /tmp/mvnd.zip -d /opt && \
+# 安装 mvnd
+RUN curl -sL https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/mvnd.tar.gz && \
+    tar -xzf /tmp/mvnd.tar.gz -C /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
-    rm /tmp/mvnd.zip && \
-    chmod +x ${MVND_HOME}/bin/mvnd
+    rm /tmp/mvnd.tar.gz && \
+    mvnd --version
 
 # Verify installations
 RUN java -version && \
