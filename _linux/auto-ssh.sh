@@ -23,10 +23,12 @@ while read host; do
   port=$(echo $host | cut -d " " -f2)
   username=$(echo $host | cut -d " " -f3)
   password=$(echo $host | cut -d " " -f4)
+  echo "SSH免密登录信息 : $ip : $port  $username : $password "
 
   # 只设置当前要配置的服务器   如果已经免密连接登录跳过设置
   if [[ "$ip" != "$1" ]] ; then
         continue  # 跳出本次循环
+        echo "跳过 $ip 免密连接登录"
   fi
 
   # 清除之前授权信息  防止授权失败
