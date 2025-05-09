@@ -260,13 +260,6 @@ def call(String type = 'web-java', Map map) {
                     }
                     agent {
                         // label "linux"
-                        /* dockerfile {
-                          filename 'Dockerfile.node-build' // 在WORKSPACE工作区代码目录
-                          dir "${env.WORKSPACE}/ci"
-                          // additionalBuildArgs  '--build-arg version=1.0.2'
-                          // args " -v /${env.WORKSPACE}:/tmp "
-                          reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
-                      }*/
                         docker {
                             // Node环境  构建完成自动删除容器
                             //image "node:${NODE_VERSION.replace('Node', '')}"
@@ -313,13 +306,6 @@ def call(String type = 'web-java', Map map) {
                             args " -v /var/cache/maven/.m2:/root/.m2 "
                             reuseNode true // 使用根节点
                         }
-           /*             dockerfile {
-                            filename 'Dockerfile.mvnd-jdk' // 在WORKSPACE工作区代码目录
-                            dir "${env.WORKSPACE}/ci"
-                            additionalBuildArgs  "--build-arg MVND_VERSION=1.0.2 --build-arg JDK_VERSION=${JDK_VERSION}"
-                            args " -v /var/cache/maven/.m2:/root/.m2 "
-                            reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
-                        }*/
                     }
                     steps {
                         script {
@@ -535,13 +521,6 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                     agent { // agent语法文档： https://www.jenkins.io/doc/book/pipeline/syntax/#agent
-                        /*   dockerfile {
-                              filename 'Dockerfile.k8s' // 在WORKSPACE工作区代码目录
-                              dir "${env.WORKSPACE}/ci"
-                              // additionalBuildArgs  '--build-arg version=1.0.2'
-                              // args " -v /${env.WORKSPACE}:/tmp "
-                              reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
-                          } */
                         docker {
                             //   构建完成自动删除容器
                             image "panweiji/k8s:latest"
