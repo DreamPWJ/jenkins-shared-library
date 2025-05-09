@@ -2,11 +2,12 @@
 # Version 1.0.0
 # Description: 自定义mvnd与JDK构建部署环境
 
+ARG JDK_PUBLISHER
 ARG JDK_VERSION
 ARG MVND_VERSION
 
 # 使用 Adoptium Temurin JDK 作为基础镜像（基于 Ubuntu）
-FROM eclipse-temurin:${JDK_VERSION:-21}-jdk-jammy
+FROM ${JDK_PUBLISHER}:${JDK_VERSION:-21}
 
 # 设置环境变量
 ENV MVND_VERSION=${MVND_VERSION:-1.0.2} \
