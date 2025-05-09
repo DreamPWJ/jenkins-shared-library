@@ -19,13 +19,13 @@ ENV MVND_VERSION=${MVND_VERSION:-1.0.2} \
 WORKDIR /app
 
 # 使用国内镜像源加速（适合中国用户）
-RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list || true && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
-        git \
-        curl \
-        && apt-get clean && \
-        rm -rf /var/lib/apt/lists/*
+#RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list || true && \
+#    apt-get update && \
+#    apt-get install -y --no-install-recommends \
+#        git \
+#        curl \
+#        && apt-get clean && \
+#        rm -rf /var/lib/apt/lists/*
 
 # 安装 mvnd
 RUN curl -sL https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/mvnd.tar.gz && \
