@@ -70,7 +70,7 @@ map.put('is_grace_shutdown', false)
 // 是否进行服务启动健康探测 K8S集群类型设置false使用自带健康探测
 map.put('is_health_check', true)
 // 是否Pipeline内脚本钉钉通知  总开关
-map.put('is_ding_notice', false)
+map.put('is_ding_notice', true)
 // 是否进行部署前通知
 map.put('is_before_deploy_notice', false)
 // 是否只通知发布变更记录

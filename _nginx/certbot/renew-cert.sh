@@ -66,3 +66,5 @@ docker exec proxy-nginx nginx -s reload || true
 # service crond restart , Ubuntu 使用 sudo service cron restart # 重启crond生效
 # crontab -l # 查看crond列表
 # GNU nano编辑器CTRL+O 再 CTRL+X 保存退出
+
+# certbot certonly --authenticator=dns-aliyun --dns-aliyun-credentials='/my/credentials.ini' --email 406798106@qq.com  -d "panweiji.com"
