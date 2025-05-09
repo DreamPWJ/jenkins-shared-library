@@ -180,6 +180,15 @@ def call(String type = 'experiment', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
+                    agent {
+                        dockerfile {
+                            filename 'Dockerfile.mvnd-jdk' // 在WORKSPACE工作区代码目录
+                            dir "${env.WORKSPACE}/ci"
+                            additionalBuildArgs "--build-arg MVND_VERSION=1.0.2 --build-arg JDK_VERSION=${JDK_VERSION}"
+                            args " -v /var/cache/maven/.m2:/root/.m2 "
+                            reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
+                        }
+                    }
                     steps {
                         script {
                             test(map)
@@ -643,6 +652,8 @@ def pullProjectCode() {
  */
 def test(map) {
 
+    sh "mvnd --version"
+    sh "mvnd  install "
 /*  println("服务启动失败回滚到上一个版本  保证服务高可用性")
     Docker.rollbackServer(this, map, "${dockerImageName}", "${dockerContainerName}")*/
 /*  def maxVersion = Git.getGitTagMaxVersion(this)
