@@ -182,7 +182,7 @@ def call(String type = 'experiment', Map map) {
                     }
                     agent {
                         dockerfile {
-                            filename 'Dockerfile.k8s' // 在WORKSPACE工作区代码目录
+                            filename 'Dockerfile.mvnd-jdk' // 在WORKSPACE工作区代码目录
                             // label 'latest'
                             dir "${env.WORKSPACE}/ci"
                             // additionalBuildArgs "--build-arg MVND_VERSION=1.0.2 --build-arg JDK_VERSION=${JDK_VERSION}"
