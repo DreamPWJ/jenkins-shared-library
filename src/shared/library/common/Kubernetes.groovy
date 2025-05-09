@@ -113,6 +113,7 @@ class Kubernetes implements Serializable {
         // 判断是否存在扩展端口
         def yamlDefaultPort = ""
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && ctx.SHELL_EXTEND_PORT != "") {
+            hostPort = "${ctx.SHELL_EXTEND_PORT}" // 宿主机端口
             containerPort = "${ctx.SHELL_EXTEND_PORT}"
             yamlDefaultPort = " --default_port=${ctx.SHELL_HOST_PORT} "
             ctx.println("应用服务扩展端口: " + containerPort)
