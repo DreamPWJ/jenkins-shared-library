@@ -28,7 +28,7 @@ WORKDIR /app
 #        rm -rf /var/lib/apt/lists/*
 
 # 安装 mvnd
-RUN curl -sL https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/mvnd.tar.gz && \
+RUN curl -sL --retry 3 --retry-delay 5 --connect-timeout 10 https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/mvnd.tar.gz && \
     tar -xzf /tmp/mvnd.tar.gz -C /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
     rm /tmp/mvnd.tar.gz && \
