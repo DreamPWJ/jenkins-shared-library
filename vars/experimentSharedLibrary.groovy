@@ -170,7 +170,7 @@ def call(String type = 'experiment', Map map) {
                             getUserInfo()
                             // 按顺序执行代码
                             pullProjectCode()
-                            // pullCIRepo()
+                            pullCIRepo()
                         }
                     }
                 }
