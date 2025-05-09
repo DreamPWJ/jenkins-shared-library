@@ -44,7 +44,7 @@ map.put('docker_volume_mount', '')
 // Dockerfile多阶段构建 镜像名称
 map.put('docker_multistage_build_images', ' ')
 // 是否上传镜像到docker容器仓库
-map.put('is_push_docker_repo', true)
+map.put('is_push_docker_repo', false)
 // docker容器镜像仓库账号信任id
 map.put('docker_repo_credentials_id', '73f6b3b0-4580-4acf-b04a-63892fcf9ba8')
 // docker镜像仓库注册地址
