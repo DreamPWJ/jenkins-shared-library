@@ -29,15 +29,15 @@ RUN apt-get update && \
     ln -s /usr/lib/jvm/java-${JDK_VERSION}-openjdk-amd64 ${JAVA_HOME}
 
 # 安装 mvnd
-RUN curl -L "https://get.sdkman.io" | bash && \
-    sdk install mvnd
-#RUN #echo "nameserver 8.8.8.8\nnameserver 114.114.114.114" > /etc/resolv.conf && \
-#    #echo "20.205.243.166 github.com\n151.101.1.194 github.global.ssl.fastly.net" >> /etc/hosts && \
-#    curl -L https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/mvnd.tar.gz && \
-#    unzip -xzf /tmp/mvnd.tar.gz -d /opt && \
-#    mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
-#    rm -f /tmp/mvnd.tar.gz && \
-#    export PATH=$MVND_HOME/bin:$PATH
+#RUN curl -L "https://get.sdkman.io" | bash && \
+#    sdk install mvnd
+RUN echo "nameserver 8.8.8.8\nnameserver 114.114.114.114" > /etc/resolv.conf && \
+    echo "20.205.243.166 github.com\n151.101.1.194 github.global.ssl.fastly.net" >> /etc/hosts && \
+    curl -L https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/mvnd.tar.gz && \
+    unzip -xzf /tmp/mvnd.tar.gz -d /opt && \
+    mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
+    rm -f /tmp/mvnd.tar.gz && \
+    export PATH=$MVND_HOME/bin:$PATH
 
 # 验证版本
 RUN java -version && \
