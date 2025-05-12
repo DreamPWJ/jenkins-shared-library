@@ -1,6 +1,6 @@
 # Author: 潘维吉
 # Version 1.0.0
-# Description: 源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
+# Description: 源码直接部署 无需打包 只需要压缩上传到服务器上执行自定义命令启动
 
 # 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
 ARG JDK_PUBLISHER
@@ -55,5 +55,5 @@ EXPOSE  $EXPOSE_PORT
 HEALTHCHECK --start-period=10s --interval=30s --timeout=30s --retries=3 \
     CMD curl --fail http://localhost:$DOCKER_SERVICE_PORT || exit 1
 
-# 运行jar包命令   启动命令 java -jar app.jar  在k8s动态设置启动参数
-CMD $CUSTOM_STARTUP_COMMAND
+# 运行jar包命令  启动命令 java -jar app.jar  在k8s动态设置启动参数
+CMD $CUSTOM_STARTUP_COMMAND  $JAVA_OPTS

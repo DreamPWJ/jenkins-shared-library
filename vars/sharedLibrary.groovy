@@ -1140,10 +1140,9 @@ def pullProjectCode() {
 
 /**
  * 源码直接部署方式
- * 无需打包 只需要压缩上传到服务器上执行命令启动
+ * 无需打包 只需要压缩上传到服务器上执行自定义命令启动
  */
 def sourceCodeDeploy() {
-    // 源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
     if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {
         dir("${env.WORKSPACE}/") { // 源码在特定目录下
             sh " rm -f ${sourceCodeDeployName}.tar.gz &&  tar --warning=no-file-changed -zcvf  ${sourceCodeDeployName}.tar.gz --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
@@ -1230,7 +1229,7 @@ def nodeBuildProject() {
 
                             println("执行Node构建 🏗️  ")
                             sh " rm -rf ${NPM_PACKAGE_FOLDER} || true "
-                            sh " npm run '${NPM_RUN_PARAMS}' "
+                            sh " pwd && npm run '${NPM_RUN_PARAMS}' "
                         }
                     } catch (e) {
                         println(e.getMessage())
@@ -1433,7 +1432,7 @@ def uploadRemote(filePath, map) {
     }
     println("上传部署文件到部署服务器中... 🚀 ")
     // 基于scp或rsync同步文件到远程服务器
-    if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
+    if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行自定义命令启动
         sh " scp ${proxyJumpSCPText} ${sourceCodeDeployName}.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
     } else if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {

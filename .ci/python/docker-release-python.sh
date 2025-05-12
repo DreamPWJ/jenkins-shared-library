@@ -218,6 +218,7 @@ docker run -d --restart=on-failure:16 -p ${host_port}:${expose_port} --privilege
   -e "PROJECT_NAME=${project_name}" -e PYTHON_START_FILE="${python_start_file}" \
   -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1   ${dynamic_run_args} \
   -e "REMOTE_DEBUGGING_PARAM=${remote_debugging_param}" -e HOST_NAME=$(hostname) \
+  -e "DOCKER_SERVICE_PORT=${build_expose_ports}" \
   -v /${deploy_folder}/${project_name}/logs:/logs \
   --name ${docker_container_name} ${docker_image_name}
 

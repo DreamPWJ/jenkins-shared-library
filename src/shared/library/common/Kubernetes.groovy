@@ -103,9 +103,19 @@ class Kubernetes implements Serializable {
         def imageTag = Docker.imageTag
         def k8sPodReplicas = "${ctx.K8S_POD_REPLICAS}"
 
+/*        def k8sVersion = getK8sVersion(ctx)
+        // k8s高版本默认containerd轻量 高性能 已移除对Docker作为容器运行时不再内置 Dockershim 组件负责与 Docker 通信的桥接层
+        if (Utils.compareVersions(k8sVersion, "1.24.0") == 1 || Utils.compareVersions(k8sVersion, "1.24.0") == 0) {
+            // 新版 Docker 构建的镜像默认符合 OCI（Open Container Initiative）规范仍可在K8S环境 containerd、CRI-O 等运行时中无缝运行
+            // ctx.sh " ctr version "  // containerd版本号 containerd是Docker引擎基础组件所有默认自带
+        }*/
+
         // 判断是否存在扩展端口
         def yamlDefaultPort = ""
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && ctx.SHELL_EXTEND_PORT != "") {
+            if ("${ctx.IS_SOURCE_CODE_DEPLOY}" == 'true'){
+                hostPort = "${ctx.SHELL_EXTEND_PORT}" // 宿主机端口
+            }
             containerPort = "${ctx.SHELL_EXTEND_PORT}"
             yamlDefaultPort = " --default_port=${ctx.SHELL_HOST_PORT} "
             ctx.println("应用服务扩展端口: " + containerPort)
@@ -166,7 +176,7 @@ class Kubernetes implements Serializable {
             yamlNfsParams = " --nfs_server=${ctx.NFS_SERVER}  --nfs_params=${ctx.NFS_MOUNT_PATHS} "
         }
         // 自定义启动命令
-        if ("${ctx.IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
+        if ("${ctx.IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行自定义命令启动
             // 1. 直接执行自定义命令  2. 执行命令文件
             setCustomStartupCommand = " --set_custom_startup_command='${ctx.CUSTOM_STARTUP_COMMAND}' "
         }

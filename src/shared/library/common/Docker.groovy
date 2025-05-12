@@ -118,7 +118,7 @@ class Docker implements Serializable {
                 ctx.println("开始制作Docker镜像并上传远程仓库 🏗️ ")
             }
 
-            if ("${ctx.IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行命令启动
+            if ("${ctx.IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行自定义命令启动
                 def codeDockerFileName = "Dockerfile.code"
                 def jdkPublisher = "${ctx.JDK_PUBLISHER}"
                 def dockerImagesName = "${jdkPublisher}:${ctx.JDK_VERSION}"
