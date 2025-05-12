@@ -32,13 +32,14 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/lib/jvm/java-${JDK_VERSION}-openjdk-amd64 ${JAVA_HOME}
 
-# 安装 mvnd  国内镜像加速方案downloads.apache.org替换github.com
+# 安装 mvnd  国内镜像加速方案mirrors.aliyun.com替换github.com
 RUN #echo "nameserver 8.8.8.8\nnameserver 114.114.114.114" > /etc/resolv.conf && \
     #echo "20.205.243.166 github.com\n151.101.1.194 github.global.ssl.fastly.net" >> /etc/hosts && \
-    curl -L https://downloads.apache.org/maven/mvnd/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/mvnd.tar.gz && \
+    curl -L https://mirrors.aliyun.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/mvnd.tar.gz && \
     tar -xzf /tmp/mvnd.tar.gz -C /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
-    rm /tmp/mvnd.tar.gz
+    rm /tmp/mvnd.tar.gz && \
+    export PATH=$MVND_HOME/bin:$PATH
 
 # 验证版本
 RUN java -version && \
