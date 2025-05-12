@@ -55,5 +55,5 @@ EXPOSE  $EXPOSE_PORT
 HEALTHCHECK --start-period=10s --interval=30s --timeout=30s --retries=3 \
     CMD curl --fail http://localhost:$DOCKER_SERVICE_PORT || exit 1
 
-# 运行jar包命令   启动命令 java -jar app.jar  在k8s动态设置启动参数
+# 运行jar包命令  启动命令 java -jar app.jar  在k8s动态设置启动参数
 CMD $CUSTOM_STARTUP_COMMAND  $JAVA_OPTS

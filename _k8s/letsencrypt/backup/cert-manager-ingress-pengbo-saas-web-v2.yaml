@@ -69,6 +69,9 @@ spec:
     - hosts:
         - merchant.pengbocloud.com
       secretName: merchant.pengbocloud.com-tls
+    - hosts:
+        - park-reservation.pengbocloud.com
+      secretName: park-reservation.pengbocloud.com-tls
   rules:
     #自定义域名
     - host: admin-web.pengbocloud.com
@@ -108,4 +111,17 @@ spec:
                 #服务端口
                 port:
                   number: 9013
+            pathType: Prefix
+
+    - host: park-reservation.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: lanneng-park-reservation-h5-service
+                #服务端口
+                port:
+                  number: 9108
             pathType: Prefix
