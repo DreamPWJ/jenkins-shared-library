@@ -3,8 +3,7 @@
 # Description: 自定义mvnd与JDK构建部署环境
 
 # 基础镜像
-ARG UBUNTU_VERSION=25.04
-FROM ubuntu:${UBUNTU_VERSION}
+FROM ubuntu:latest
 
 ARG JDK_VERSION
 ARG MVND_VERSION
@@ -36,7 +35,7 @@ RUN apt-get update && \
 # 安装 mvnd
 RUN echo "nameserver 8.8.8.8\nnameserver 114.114.114.114" > /etc/resolv.conf && \
     echo "20.205.243.166 github.com\n151.101.1.194 github.global.ssl.fastly.net" >> /etc/hosts && \
-    wget --show-progress https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/mvnd.tar.gz && \
+    curl -L https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/mvnd.tar.gz && \
     tar -xzf /tmp/mvnd.tar.gz -C /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
     rm /tmp/mvnd.tar.gz
