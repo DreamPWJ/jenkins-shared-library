@@ -18,11 +18,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PATH=$PATH:/opt/java/bin:/opt/mvnd/bin
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        curl \
-        wget \
-        unzip \
-        tzdata && \
+    apt-get install -y --no-install-recommends  curl  wget  zip  unzip  && \
     rm -rf /var/lib/apt/lists/*
 
 # 安装 OpenJDK
@@ -33,7 +29,7 @@ RUN apt-get update && \
     ln -s /usr/lib/jvm/java-${JDK_VERSION}-openjdk-amd64 ${JAVA_HOME}
 
 # 安装 mvnd
-RUN curl -s "https://get.sdkman.io" | bash && \
+RUN curl -L "https://get.sdkman.io" | bash && \
     sdk install mvnd
 #RUN #echo "nameserver 8.8.8.8\nnameserver 114.114.114.114" > /etc/resolv.conf && \
 #    #echo "20.205.243.166 github.com\n151.101.1.194 github.global.ssl.fastly.net" >> /etc/hosts && \
