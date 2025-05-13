@@ -166,22 +166,28 @@ def call(String type = 'wx-mini', Map map) {
                         expression { return true }
                         //expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.taro) }
                     }
-                    agent {
-                        docker {
-                            // Node环境  构建完成自动删除容器
-                            //image "node:${NODE_VERSION.replace('Node', '')}"
-                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
-                            // args " -v /my/jenkins/npm_cache:/app/node_modules "
-                            reuseNode true // 使用根节点
-                        }
-                    }
+                    /*    agent {
+                            docker {
+                                // Node环境  构建完成自动删除容器
+                                //image "node:${NODE_VERSION.replace('Node', '')}"
+                                image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                                // args " -v /my/jenkins/npm_cache:/app/node_modules "
+                                reuseNode true // 使用根节点
+                            }
+                        }*/
                     /* tools {
                           // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
                           nodejs "${NODE_VERSION}"
                       }*/
                     steps {
                         script {
-                            buildProject()
+                            def nodeVersion = "${NODE_VERSION.replace('Node', '')}"
+                            def dockerImageName = "panweiji/node-build"
+                            def dockerImageTag = "${nodeVersion}"
+                            Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
+                            docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
+                                buildProject(map)
+                            }
                         }
                     }
                 }
@@ -639,7 +645,7 @@ def getProjectName() {
 /**
  * 构建编译打包
  */
-def buildProject() {
+def buildProject(map) {
     // 初始化Node环境变量
     // Node.initEnv(this)
 
