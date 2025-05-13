@@ -180,7 +180,7 @@ def call(String type = 'experiment', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                    agent {
+/*                    agent {
                         dockerfile {
                             filename 'Dockerfile.mvnd-jdk' // 在WORKSPACE工作区代码目录
                             label "panweiji/mvnd-jdk-${JDK_PUBLISHER}-${JDK_VERSION}:latest"
@@ -189,10 +189,10 @@ def call(String type = 'experiment', Map map) {
                             args " -v /var/cache/maven/.m2:/root/.m2  "
                             reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
                         }
-                    }
+                    }*/
                     steps {
                         script {
-                            test(map)
+                            futureLab(map)
                         }
                     }
                 }
@@ -651,13 +651,38 @@ def pullProjectCode() {
 /**
  * 实验开发调试
  */
-def test(map) {
+def futureLab(map) {
 
-    sh "mvnd --version"
-    sh "mvn --version"
-    sh "java --version"
+    def nodeVersion = "${"Node20".replace('Node', '')}"
+    def dockerImageName = "panweiji/node-build"
+    def dockerImageTag = "${nodeVersion}"
+    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
+    docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
+        sh "node -v"
+        sh "npm -v"
+        sh "yarn --version"
+        sh "pnpm --version"
+    }
+/*
+    def mvndVersion = "1.0.2"
+    def jdkVersion = "21"
+    def dockerImageName = "panweiji/mvnd-jdk"
+    def dockerImageTag = "${mvndVersion}-${jdkVersion}"
+    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk", dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}")
 
-    // sh "mvnd  install "
+    docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+        sh "mvnd --version"
+        sh "mvn --version"
+        sh "java --version"
+
+
+        sh "mvnd clean install -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
+        //sh "mvnd  install"
+        //sh "mvn  install"
+    }
+*/
+
+
 /*  println("服务启动失败回滚到上一个版本  保证服务高可用性")
     Docker.rollbackServer(this, map, "${dockerImageName}", "${dockerContainerName}")*/
 /*  def maxVersion = Git.getGitTagMaxVersion(this)

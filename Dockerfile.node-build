@@ -20,14 +20,18 @@ ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 自定义环境
-RUN node -v && npm -v && npm install -g yarn && npm install -g pnpm && npm config set registry https://registry.npmmirror.com \
+RUN node -v && npm -v && npm config set registry https://registry.npmmirror.com && npm install -g pnpm --unsafe-perm && npm install -g yarn  \
  && yarn config set registry https://registry.npmmirror.com && pnpm config set registry https://registry.npmmirror.com \
  && npm i -g lerna && npm i -g dotenv-cli && npm i -g cross-env \
  && npm i -g rimraf && npm i -g yargs \
  && npm i -g playwright && npm i -g app-info-parser || true  && npm install -g miniprogram-ci || true
 
+
 # 对外暴露端口
 # EXPOSE  $EXPOSE_PORT
+
+# 默认启动命令
+CMD ["/bin/bash"]
 
 # 构建镜像
 # DOCKER_BUILDKIT=1 docker build -t panweiji/node:22  -f /my/Dockerfile.node-build . --no-cache --load

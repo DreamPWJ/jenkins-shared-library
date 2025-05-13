@@ -67,6 +67,9 @@ spec:
     - hosts:
         - epark-coupon.pengbocloud.com
       secretName: epark-coupon.pengbocloud.com-tls
+    - hosts:
+        - epark-card.pengbocloud.com
+      secretName: epark-card.pengbocloud.com-tls
 
   rules:
     #自定义域名
@@ -129,4 +132,16 @@ spec:
                 #服务端口
                 port:
                   number: 9002
+            pathType: Prefix
+    - host: epark-card.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: park-card-web-service
+                #服务端口
+                port:
+                  number: 18804
             pathType: Prefix
