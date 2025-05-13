@@ -46,7 +46,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* \
     && ln -s /usr/bin/python3 /usr/bin/python
 # Python动态处理yaml文件
-RUN pip install ruamel.yaml
+RUN sudo pip -i https://pypi.tuna.tsinghua.edu.cn/simple  install ruamel.yaml
 
 # 设置默认命令
 CMD ["/bin/bash"]
