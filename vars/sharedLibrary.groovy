@@ -1269,7 +1269,7 @@ def nodeBuildProject(map) {
 /**
  * Maven编译构建*/
 def mavenBuildProject(map, deployNum = 0) {
-    def mavenCommandType = "mvnd" // 新构建引擎
+    def mavenCommandType = "mvn" // 新构建引擎
     if ("${IS_PROD}" == 'true') {
         mavenCommandType = "mvn"
     }
