@@ -654,10 +654,11 @@ def pullProjectCode() {
 def test(map) {
 
     sh "mvnd --version"
-    sh "mvn --version"
+    //sh "mvn --version"
     sh "java --version"
 
-    // sh "mvnd  install "
+     sh "mvnd  install "
+     sh "mvn  install "
 /*  println("服务启动失败回滚到上一个版本  保证服务高可用性")
     Docker.rollbackServer(this, map, "${dockerImageName}", "${dockerContainerName}")*/
 /*  def maxVersion = Git.getGitTagMaxVersion(this)
