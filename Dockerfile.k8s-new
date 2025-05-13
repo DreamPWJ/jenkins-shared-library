@@ -27,15 +27,6 @@ RUN apt-get update && apt-get install -y \
     software-properties-common \
     && rm -rf /var/lib/apt/lists/*
 
-# 安装Python 3和pip
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip python3-full \
-    && rm -rf /var/lib/apt/lists/* \
-    && ln -s /usr/bin/python3 /usr/bin/python
-# Python动态处理yaml文件
-RUN pip install ruamel.yaml
-
 # 安装kubectl
 RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
     && chmod +x kubectl \
@@ -48,6 +39,14 @@ RUN curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | tee /usr/share/
     && apt-get install -y helm \
     && rm -rf /var/lib/apt/lists/*
 
+# 安装Python 3和pip
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip python3-full \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -s /usr/bin/python3 /usr/bin/python
+# Python动态处理yaml文件
+RUN pip install ruamel.yaml
 
 # 设置默认命令
 CMD ["/bin/bash"]
