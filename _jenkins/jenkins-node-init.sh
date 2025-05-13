@@ -39,7 +39,7 @@ if [[ ! $(command -v mvn) ]]; then
   maven_version=3.9.9
   mkdir -p /opt/maven && cd /opt/maven
   wget https://archive.apache.org/dist/maven/maven-3/${maven_version}/binaries/apache-maven-${maven_version}-bin.tar.gz
-  tar -xzvf apache-maven-${maven_version}-bin.tar.gz
+  tar -xzvf apache-maven-${maven_version}-bin.tar.gz --strip-components=1
 
   # 写入数据到文件输出重定向 双 >> 是追加 , 单 > 是覆盖
   # export JAVA_HOME=/usr/bin/java

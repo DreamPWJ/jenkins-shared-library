@@ -45,7 +45,7 @@ RUN curl -L https://github.lanneng.tech/apache/maven-mvnd/releases/download/${MV
 # 安装 Maven
 RUN mkdir -p ${MAVEN_HOME} && cd ${MAVEN_HOME} && \
     curl -L https://mirrors.aliyun.com/apache/maven/maven-3/${MAVEN_VERSION}/binaries/${MAVEN_TAR} -o ${MAVEN_HOME}/${MAVEN_TAR} && \
-    tar -xzvf ${MAVEN_TAR} && \
+    tar -xzvf ${MAVEN_TAR} --strip-components=1 && \
     export PATH=${MAVEN_HOME}/bin:$PATH
 
 # 验证版本
