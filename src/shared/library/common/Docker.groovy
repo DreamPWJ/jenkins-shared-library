@@ -378,7 +378,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
     /**
      * 根据Dockerfile构建镜像
      */
-    static def buildDockerImage(ctx, map, dockerFilePath, imageName, imageTag ,buildParams) {
+    static def buildDockerImage(ctx, map, dockerFilePath, imageName, imageTag, buildParams) {
         ctx.println("根据Dockerfile构建镜像")
         // 构建镜像 判断镜像是否存在
         // docker image inspect ${imageName}:${imageTag} >/dev/null 2>&1 ||
