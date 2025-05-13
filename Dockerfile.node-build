@@ -20,7 +20,7 @@ ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 自定义环境
-RUN node -v && npm -v && npm install -g yarn && npm install -g pnpm && npm config set registry https://registry.npmmirror.com \
+RUN node -v && npm -v && npm config set registry https://registry.npmmirror.com && npm install -g yarn && npm install -g pnpm   \
  && yarn config set registry https://registry.npmmirror.com && pnpm config set registry https://registry.npmmirror.com \
  && npm i -g lerna && npm i -g dotenv-cli && npm i -g cross-env \
  && npm i -g rimraf && npm i -g yargs \
