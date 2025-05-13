@@ -34,21 +34,18 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* \
     && ln -s /usr/bin/python3 /usr/bin/python
 
-## 安装kubectl
-#RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
-#    && chmod +x kubectl \
-#    && mv kubectl /usr/local/bin/
-#
-## 安装helm
-#RUN curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | tee /usr/share/keyrings/helm.gpg > /dev/null \
-#    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list \
-#    && apt-get update \
-#    && apt-get install -y helm \
-#    && rm -rf /var/lib/apt/lists/*
+# 安装kubectl
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
+    && chmod +x kubectl \
+    && mv kubectl /usr/local/bin/
 
-# 多阶段构建
-FROM dtzar/helm-kubectl:latest as k8s
-COPY --from=builder /app /app
+# 安装helm
+RUN curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | tee /usr/share/keyrings/helm.gpg > /dev/null \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list \
+    && apt-get update \
+    && apt-get install -y helm \
+    && rm -rf /var/lib/apt/lists/*
+
 
 # 设置默认命令
 CMD ["/bin/bash"]
