@@ -2,8 +2,18 @@
 # Version 1.0.0
 # Description: 自定义K8S云原生构建部署环境
 
+ARG K8S_VERSION
+ARG HELM_VERSION
+ARG PYTHON_VERSION
+
 # 使用最新的Ubuntu作为基础镜像
 FROM ubuntu:latest
+
+# 设置工作目录
+WORKDIR /app
+
+# 指定切换用户
+USER root
 
 # 设置非交互式安装以避免提示
 ENV DEBIAN_FRONTEND=noninteractive
@@ -35,9 +45,6 @@ RUN curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | tee /usr/share/
     && apt-get update \
     && apt-get install -y helm \
     && rm -rf /var/lib/apt/lists/*
-
-# 设置工作目录
-WORKDIR /app
 
 # 设置默认命令
 CMD ["/bin/bash"]
