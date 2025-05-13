@@ -12,6 +12,9 @@ ARG MAVEN_VERSION=3.9.9
 # 设置工作目录
 WORKDIR /app
 
+# 指定切换用户
+USER root
+
 # 设置环境
 ENV DEBIAN_FRONTEND=noninteractive \
     JAVA_HOME=/opt/java \
@@ -43,7 +46,7 @@ RUN curl -L https://github.lanneng.tech/apache/maven-mvnd/releases/download/${MV
     export PATH=$MVND_HOME/bin:$PATH
 
 # 安装 Maven
-RUN  sudo ln -s ${MVND_HOME}/mvn/bin/mvn ${MAVEN_HOME}
+RUN   ln -s ${MVND_HOME}/mvn/bin/mvn ${MAVEN_HOME}
 #    mkdir -p ${MAVEN_HOME} && cd ${MAVEN_HOME} && \
 #    curl -L https://mirrors.aliyun.com/apache/maven/maven-3/${MAVEN_VERSION}/binaries/${MAVEN_TAR} -o ${MAVEN_HOME}/${MAVEN_TAR} && \
 #    tar -xzvf ${MAVEN_TAR} --strip-components=1 && \
