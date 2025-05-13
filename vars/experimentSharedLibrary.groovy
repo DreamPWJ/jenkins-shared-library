@@ -192,7 +192,7 @@ def call(String type = 'experiment', Map map) {
                     }*/
                     steps {
                         script {
-                            test(map)
+                            futureLab(map)
                         }
                     }
                 }
@@ -651,7 +651,7 @@ def pullProjectCode() {
 /**
  * 实验开发调试
  */
-def test(map) {
+def futureLab(map) {
     def mvndVersion = "1.0.2"
     def jdkVersion = "21"
     def dockerImageName = "panweiji/mvnd-jdk"
@@ -664,7 +664,7 @@ def test(map) {
         sh "java --version"
 
 
-        sh "mvnd clean install -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
+        sh "mvnd clean install -T 4 -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvnd  install"
         //sh "mvn  install"
     }
