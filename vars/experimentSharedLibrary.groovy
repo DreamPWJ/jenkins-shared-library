@@ -658,7 +658,7 @@ def futureLab(map) {
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.k8s-new", dockerImageName, dockerImageTag, "")
     docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
         sh "python -V"
-        sh "kubectl version"
+        sh "kubectl version --client"
         sh "helm version"
     }
 
