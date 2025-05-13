@@ -315,16 +315,29 @@ def call(String type = 'web-java', Map map) {
                                args " -v /var/cache/maven/.m2:/root/.m2  "
                                reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
                            }*/
-       /*          docker {
-                            // JDK MAVEN 环境  构建完成自动删除容器  graalvm使用csanchez/maven镜像  容器仓库：https://hub.docker.com/_/maven/
-                            image "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
-                            args " -v /var/cache/maven/.m2:/root/.m2 "
-                            reuseNode true // 使用根节点
-                        }*/
+                        /* docker {
+                                    // JDK MAVEN 环境  构建完成自动删除容器  graalvm使用csanchez/maven镜像  容器仓库：https://hub.docker.com/_/maven/
+                                    image "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
+                                    args " -v /var/cache/maven/.m2:/root/.m2 "
+                                    reuseNode true // 使用根节点
+                                }*/
                     }
                     steps {
                         script {
-                            mavenBuildProject(map)
+                            if ("${IS_PROD}" == 'true') {
+                                docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+                                    mavenBuildProject(map)
+                                }
+                            } else { // 测试环境验证新特性
+                                def mvndVersion = "1.0.2"
+                                def jdkVersion = "${JDK_VERSION}"
+                                def dockerImageName = "panweiji/mvnd-jdk"
+                                def dockerImageTag = "${mvndVersion}-${jdkVersion}"
+                                Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk", dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}")
+                                docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+                                    mavenBuildProject(map)
+                                }
+                            }
                         }
                     }
                 }
@@ -1276,11 +1289,15 @@ def nodeBuildProject() {
  * Maven编译构建
  */
 def mavenBuildProject(map, deployNum = 0) {
+    def mavenCommandType = "mvnd" // 新构建引擎
+    if ("${IS_PROD}" == 'true') {
+        mavenCommandType = "mvn"
+    }
     if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
         // 动态切换Maven内的对应的JDK版本
         Java.switchJDKByJenv(this, "${JDK_VERSION}")
     }
-    sh "mvn --version"
+    sh "${mavenCommandType} --version"
     dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
         // 自动替换不同分布式部署节点的环境文件  deployNum部署节点数
         Deploy.replaceEnvFile(this, deployNum)
@@ -1290,15 +1307,15 @@ def mavenBuildProject(map, deployNum = 0) {
         def isMavenTest = "${IS_RUN_MAVEN_TEST}" == "true" ? "" : "-Dmaven.test.skip=true"  // 是否Maven单元测试
         retry(2) {
             // 对于Spring Boot 3.x及Spring Native与GaalVM集成的项目，通过以下命令来构建原生镜像  特性：性能明显提升 使用资源明显减少
-            // sh " mvn clean package -Pnative -Dmaven.compile.fork=true -Dmaven.test.skip=true "
+            // sh " ${mavenCommandType} clean package -Pnative -Dmaven.compile.fork=true -Dmaven.test.skip=true "
             def springNativeBuildParams = ""
             if ("${IS_SPRING_NATIVE}" == "true") { // 构建原生镜像包
                 springNativeBuildParams = " -Pnative "
                 // 可以使用mvnd守护进程加速构建
                 if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') {
-                    sh "mvn clean package -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
+                    sh "${mavenCommandType} clean package -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 } else { // 多模块情况
-                    sh "mvn clean package -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
+                    sh "${mavenCommandType} clean package -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 }
             } else if ("${MAVEN_SETTING_XML}" == "") {
                 // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
@@ -1306,10 +1323,10 @@ def mavenBuildProject(map, deployNum = 0) {
                     MAVEN_ONE_LEVEL = ""
                     // 在pom.xml文件目录下执行 规范是pom.xml在代码根目录
                     // def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
-                    sh "mvn clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
+                    sh "${mavenCommandType} clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 } else {  // 多模块情况
                     // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
-                    sh "mvn clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
+                    sh "${mavenCommandType} clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 }
             } else {
                 // 基于自定义setting.xml文件方式打包 如私有包等
