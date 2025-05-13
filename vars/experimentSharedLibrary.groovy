@@ -658,7 +658,10 @@ def futureLab(map) {
     def dockerImageTag = "${nodeVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
     docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
-        nodeBuildProject(map)
+        sh "node -v"
+        sh "npm -v"
+        sh "yarn --version"
+        sh "pnpm --version"
     }
 /*
     def mvndVersion = "1.0.2"
