@@ -13,7 +13,7 @@ class Maven implements Serializable {
      */
     static def mvndPackage(ctx) {
         ctx.sh "mvnd --version"
-        ctx.sh "mvnd clean install -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am ${ctx.isMavenTest}"
+        ctx.sh "mvnd clean install -Dquickly -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am ${ctx.isMavenTest}"
     }
 
     /**
