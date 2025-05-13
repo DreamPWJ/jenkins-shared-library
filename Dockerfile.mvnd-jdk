@@ -46,11 +46,11 @@ RUN curl -L https://github.lanneng.tech/apache/maven-mvnd/releases/download/${MV
 RUN mkdir -p ${MAVEN_HOME} && cd ${MAVEN_HOME} && \
     curl -L https://mirrors.aliyun.com/apache/maven/maven-3/${MAVEN_VERSION}/binaries/${MAVEN_TAR} -o ${MAVEN_HOME}/${MAVEN_TAR} && \
     tar -xzvf ${MAVEN_TAR} --strip-components=1 && \
-    echo "export MAVEN_HOME=${MAVEN_HOME}" >> /etc/profile && echo 'export PATH=$MAVEN_HOME/bin:$PATH' >> /etc/profile && . /etc/profile
+    export MAVEN_HOME=${MAVEN_HOME} && export PATH=${MAVEN_HOME}/bin:$PATH
 
 # 验证版本
 RUN java -version && \
-    mvnd --version && mvn -v
+    mvnd --version && echo $MAVEN_HOME
 
 # 默认启动命令
 CMD ["/bin/bash"]
