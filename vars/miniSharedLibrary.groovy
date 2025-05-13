@@ -262,13 +262,13 @@ def call(String type = 'wx-mini', Map map) {
                                     && "${params.IS_AUTO_SUBMIT_FOR_REVIEW}" == 'true')
                         }
                     }
-                    /*                agent {
-                                        docker {
-                                            // Node环境  构建完成自动删除容器
-                                            //image "node:${NODE_VERSION.replace('Node', '')}"
-                                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
-                                            reuseNode true // 使用根节点
-                                        }
+                    /* agent {
+                         docker {
+                             // Node环境  构建完成自动删除容器
+                             //image "node:${NODE_VERSION.replace('Node', '')}"
+                             image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
+                             reuseNode true // 使用根节点
+                         }
                                     }*/
                     steps {
                         // 只显示当前阶段stage失败  而整个流水线构建显示成功
