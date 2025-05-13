@@ -22,7 +22,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 ENV PATH="/usr/local/lib/node_modules/bin:${PATH}"
 
 # 自定义环境
-RUN node -v && npm -v && npm config set registry https://registry.npmmirror.com && npm install -g yarn && npm install -g pnpm   \
+RUN node -v && npm -v && npm config set registry https://registry.npmmirror.com && npm install -g yarn && npm install -g pnpm --unsafe-perm  \
  && ln -s /usr/local/nodejs/bin/pnpm /usr/local/bin/pnpm  \
  && yarn config set registry https://registry.npmmirror.com && pnpm config set registry https://registry.npmmirror.com \
  && npm i -g lerna && npm i -g dotenv-cli && npm i -g cross-env \
