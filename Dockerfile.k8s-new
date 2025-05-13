@@ -46,9 +46,9 @@ RUN apt-get update && apt-get install -y \
 #    && apt-get install -y helm \
 #    && rm -rf /var/lib/apt/lists/*
 
+# 多阶段构建
 FROM dtzar/helm-kubectl:latest as k8s
-
-COPY --from=0 / /
+COPY --from=builder /app /
 
 # 设置默认命令
 CMD ["/bin/bash"]
