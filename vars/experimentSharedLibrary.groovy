@@ -658,7 +658,7 @@ def test(map) {
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk", dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}")
 
-    docker.image("${mavenDockerName}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+    docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
         sh "mvnd --version"
         sh "mvn --version"
         sh "java --version"
