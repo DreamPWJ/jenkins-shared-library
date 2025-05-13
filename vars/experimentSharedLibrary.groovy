@@ -655,10 +655,11 @@ def futureLab(map) {
 
     def dockerImageName = "panweiji/k8s-build"
     def dockerImageTag = "latest"
-    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.k8s", dockerImageName, dockerImageTag, "")
+    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.k8s-new", dockerImageName, dockerImageTag, "")
     docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
         sh "python -V"
         sh "kubectl version"
+        sh "helm version"
     }
 
 /*    def nodeVersion = "${"Node20".replace('Node', '')}"
