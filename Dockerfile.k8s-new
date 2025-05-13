@@ -7,7 +7,7 @@ ARG HELM_VERSION
 ARG PYTHON_VERSION
 
 # 使用最新的Ubuntu作为基础镜像
-FROM ubuntu:latest as builder
+FROM ubuntu:latest
 
 # 设置工作目录
 WORKDIR /app
