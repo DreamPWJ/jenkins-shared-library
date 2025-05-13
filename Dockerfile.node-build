@@ -29,6 +29,9 @@ RUN node -v && npm -v && npm install -g yarn && npm install -g pnpm && npm confi
 # 对外暴露端口
 # EXPOSE  $EXPOSE_PORT
 
+# 默认启动命令
+CMD ["/bin/bash"]
+
 # 构建镜像
 # DOCKER_BUILDKIT=1 docker build -t panweiji/node:22  -f /my/Dockerfile.node-build . --no-cache --load
 # 上传镜像 先 docker login 登录
