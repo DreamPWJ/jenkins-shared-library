@@ -658,7 +658,7 @@ def test(map) {
     sh "java --version"
 
     // -Dquickly
-    sh "mvnd  clean install -pl pengbo-park/pengbo-park-app -am -T 2C -Dmaven.compile.fork=true -Dmaven.test.skip=true"
+    sh "mvnd  clean install -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
     //sh "mvnd  install"
     //sh "mvn  install"
 
