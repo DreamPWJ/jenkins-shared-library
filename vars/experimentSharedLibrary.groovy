@@ -652,6 +652,15 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
+
+    def nodeVersion = "${"Node20".replace('Node', '')}"
+    def dockerImageName = "panweiji/node-build"
+    def dockerImageTag = "${nodeVersion}"
+    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
+    docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
+        nodeBuildProject(map)
+    }
+/*
     def mvndVersion = "1.0.2"
     def jdkVersion = "21"
     def dockerImageName = "panweiji/mvnd-jdk"
@@ -668,6 +677,7 @@ def futureLab(map) {
         //sh "mvnd  install"
         //sh "mvn  install"
     }
+*/
 
 
 /*  println("服务启动失败回滚到上一个版本  保证服务高可用性")
