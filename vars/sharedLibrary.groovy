@@ -306,22 +306,22 @@ def call(String type = 'web-java', Map map) {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression { return (IS_SOURCE_CODE_DEPLOY == false && IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
                     }
-                    agent {
-                        /* dockerfile {
-                               filename 'Dockerfile.mvnd-jdk' // 在WORKSPACE工作区代码目录
-                               label "panweiji/mvnd-jdk-${JDK_PUBLISHER}-${JDK_VERSION}:latest"
-                               dir "${env.WORKSPACE}/ci"
-                               additionalBuildArgs "--build-arg MVND_VERSION=1.0.2 --build-arg JDK_PUBLISHER=${JDK_PUBLISHER} --build-arg JDK_VERSION=${JDK_VERSION}"
-                               args " -v /var/cache/maven/.m2:/root/.m2  "
-                               reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
-                           }*/
-                        /* docker {
-                                    // JDK MAVEN 环境  构建完成自动删除容器  graalvm使用csanchez/maven镜像  容器仓库：https://hub.docker.com/_/maven/
-                                    image "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
-                                    args " -v /var/cache/maven/.m2:/root/.m2 "
-                                    reuseNode true // 使用根节点
-                                }*/
-                    }
+              /*      agent {
+                        dockerfile {
+                            filename 'Dockerfile.mvnd-jdk' // 在WORKSPACE工作区代码目录
+                            label "panweiji/mvnd-jdk-${JDK_PUBLISHER}-${JDK_VERSION}:latest"
+                            dir "${env.WORKSPACE}/ci"
+                            additionalBuildArgs "--build-arg MVND_VERSION=1.0.2 --build-arg JDK_PUBLISHER=${JDK_PUBLISHER} --build-arg JDK_VERSION=${JDK_VERSION}"
+                            args " -v /var/cache/maven/.m2:/root/.m2  "
+                            reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
+                        }
+                        docker {
+                            // JDK MAVEN 环境  构建完成自动删除容器  graalvm使用csanchez/maven镜像  容器仓库：https://hub.docker.com/_/maven/
+                            image "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
+                            args " -v /var/cache/maven/.m2:/root/.m2 "
+                            reuseNode true // 使用根节点
+                        }
+                    }*/
                     steps {
                         script {
                             if ("${IS_PROD}" == 'true') {
