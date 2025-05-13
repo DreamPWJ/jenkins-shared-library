@@ -36,20 +36,21 @@ fi
 
 if [[ ! $(command -v mvn) ]]; then
   echo "安装Maven" # export HOMEBREW_BOTTLE_DOMAIN=''
+  maven_version=3.9.9
   mkdir -p /opt/maven && cd /opt/maven
-  wget https://archive.apache.org/dist/maven/maven-3/3.9.8/binaries/apache-maven-3.9.8-bin.tar.gz
-  tar -xzvf apache-maven-3.9.8-bin.tar.gz
+  wget https://archive.apache.org/dist/maven/maven-3/${maven_version}/binaries/apache-maven-${maven_version}-bin.tar.gz
+  tar -xzvf apache-maven-${maven_version}-bin.tar.gz
 
   # 写入数据到文件输出重定向 双 >> 是追加 , 单 > 是覆盖
   # export JAVA_HOME=/usr/bin/java
   # JAVA_HOME配置是有bin目录的层级文件夹
-  echo '
+  echo "
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.21.0.9-1.el7_9.x86_64
 export JRE_HOME=$JAVA_HOME/jre
 export CLASSPATH=$JAVA_HOME/lib:$JRE_HOME/lib:$CLASSPATH
-export MAVEN_HOME=/opt/maven/apache-maven-3.9.8
+export MAVEN_HOME=/opt/maven/apache-maven-${maven_version}
 export PATH=$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH
-' >>/etc/profile
+" >>/etc/profile
 
   . /etc/profile
 

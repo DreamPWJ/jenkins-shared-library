@@ -7,6 +7,7 @@ FROM ubuntu:latest
 
 ARG JDK_VERSION
 ARG MVND_VERSION
+ARG MAVEN_VERSION=3.9.9
 
 # 设置工作目录
 WORKDIR /app
@@ -14,7 +15,8 @@ WORKDIR /app
 # 设置环境
 ENV DEBIAN_FRONTEND=noninteractive \
     JAVA_HOME=/opt/java \
-    MVND_HOME=/opt/mvnd \
+    MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz  \
+    MAVEN_HOME=/opt/maven MAVEN_TAR=apache-maven-${MAVEN_VERSION}-bin.tar.gz \
     PATH=$PATH:/opt/java/bin:/opt/mvnd/bin
 
 RUN apt-get update && \
@@ -34,15 +36,21 @@ RUN apt-get update && \
 #echo "nameserver 8.8.8.8\nnameserver 114.114.114.114" > /etc/resolv.conf && \
     #echo "20.205.243.166 github.com\n151.101.1.194 github.global.ssl.fastly.net" >> /etc/hosts && \
 
-RUN curl -L https://github.lanneng.tech/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/mvnd.tar.gz && \
-    tar -xzf /tmp/mvnd.tar.gz -C /opt && \
+RUN curl -L https://github.lanneng.tech/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
+    tar -xzf /tmp/${MVND_TAR} -C /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
-    rm -f /tmp/mvnd.tar.gz && \
+    rm -f /tmp/${MVND_TAR} && \
     export PATH=$MVND_HOME/bin:$PATH
+
+# 安装 Maven
+RUN mkdir -p ${MAVEN_HOME} && cd ${MAVEN_HOME} && \
+    curl -L https://mirrors.aliyun.com/apache/maven/maven-3/${MAVEN_VERSION}/binaries/${MAVEN_TAR} -o /tmp/${MAVEN_TAR} && \
+    tar -xzvf ${MAVEN_TAR} && \
+    export PATH=${MAVEN_HOME}/bin:$PATH
 
 # 验证版本
 RUN java -version && \
-    mvnd --version
+    mvnd --version && mvn -v
 
 # 默认启动命令
 CMD ["/bin/bash"]
