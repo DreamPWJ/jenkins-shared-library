@@ -51,7 +51,7 @@ class Node implements Serializable {
         }
 
         // 设置镜像源 加速下载
-        ctx.sh "yarn config set registry ${npmMirror}"
+        ctx.sh "yarn config set registry ${npmMirror} || true"
         ctx.sh "pnpm config set registry ${npmMirror} || true"
     }
 
