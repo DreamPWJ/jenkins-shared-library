@@ -19,15 +19,15 @@ USER root
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-ENV PATH="/usr/local/lib/node_modules/bin:${PATH}"
-
 # 自定义环境
 RUN node -v && npm -v && npm config set registry https://registry.npmmirror.com && npm install -g yarn && npm install -g pnpm --unsafe-perm  \
- && ln -s /usr/local/nodejs/bin/pnpm /usr/local/bin/pnpm  \
+ && ln -s /usr/local/lib/node_modules/pnpm/bin/pnpm.cjs /usr/local/bin/pnpm  \
  && yarn config set registry https://registry.npmmirror.com && pnpm config set registry https://registry.npmmirror.com \
  && npm i -g lerna && npm i -g dotenv-cli && npm i -g cross-env \
  && npm i -g rimraf && npm i -g yargs \
  && npm i -g playwright && npm i -g app-info-parser || true  && npm install -g miniprogram-ci || true
+
+ENV PATH="/usr/local/lib/node_modules/bin:${PATH}"
 
 # 对外暴露端口
 # EXPOSE  $EXPOSE_PORT
