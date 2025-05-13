@@ -30,7 +30,7 @@ RUN apt-get update && apt-get install -y \
 # 安装Python 3和pip
 RUN apt-get update && apt-get install -y \
     python3 \
-    python3-pip \
+    python3-pip python3-full \
     && rm -rf /var/lib/apt/lists/* \
     && ln -s /usr/bin/python3 /usr/bin/python
 # Python动态处理yaml文件
