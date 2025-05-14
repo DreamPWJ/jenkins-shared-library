@@ -43,8 +43,8 @@ COPY python.tar.gz .
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
-    if [ $IS_NEED_INSTALL == true ]; then \
- && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
+ &&  if [ $IS_NEED_INSTALL == true ]; then \
+    pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
     fi \
  && pwd && ls -l
 
