@@ -51,7 +51,7 @@ COPY python.tar.gz .
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
- && --mount=type=cache,target=/root/.cache/pip \
+ && mkdir -p /root/.cache/pip && --mount=type=cache,target=/root/.cache/pip \
  && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
  && pwd && ls -l
 
