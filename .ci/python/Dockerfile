@@ -14,6 +14,7 @@ ARG PYTHON_START_FILE
 #FROM-MULTISTAGE-BUILD-IMAGES
 
 # 依赖基础镜像 多阶段构建复用docker缓存层加速构建
+# syntax=docker/dockerfile:1.4
 FROM python:${PYTHON_VERSION}-slim
 
 # 多阶段构建镜像 从上一个镜像内复制环境到本镜像
