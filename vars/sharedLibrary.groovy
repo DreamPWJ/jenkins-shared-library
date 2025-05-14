@@ -347,7 +347,7 @@ def call(String type = 'web-java', Map map) {
                                 def dockerImageTag = "${mvndVersion}-${jdkVersion}"
                                 Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk", dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}")
                                 docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-                                    mavenBuildProject(map)
+                                    mavenBuildProject(map, 0, "mvnd")
                                 }
                             } else {
                                 docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
@@ -1304,11 +1304,8 @@ def nodeBuildProject(map) {
 /**
  * Maven编译构建
  */
-def mavenBuildProject(map, deployNum = 0) {
-    def mavenCommandType = "mvn" // 新构建引擎
-    if ("${IS_PROD}" == 'true') {
-        mavenCommandType = "mvn"
-    }
+def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
+    def mavenCommandType = mavenType // 构建引擎类型
     if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
         // 动态切换Maven内的对应的JDK版本
         Java.switchJDKByJenv(this, "${JDK_VERSION}")
