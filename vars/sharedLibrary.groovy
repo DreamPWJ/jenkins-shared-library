@@ -336,11 +336,11 @@ def call(String type = 'web-java', Map map) {
                           }*/
                     steps {
                         script {
-                           // if ("${IS_PROD}" == 'true') {
+                            if ("${IS_PROD}" == 'true') {
                                 docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
                                     mavenBuildProject(map)
                                 }
-             /*               } else { // 测试环境验证新特性
+                            } else if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) { // 测试环境验证新特性
                                 def mvndVersion = "1.0.2"
                                 def jdkVersion = "${JDK_VERSION}"
                                 def dockerImageName = "panweiji/mvnd-jdk"
@@ -349,7 +349,11 @@ def call(String type = 'web-java', Map map) {
                                 docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
                                     mavenBuildProject(map)
                                 }
-                            }*/
+                            } else {
+                                docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+                                    mavenBuildProject(map)
+                                }
+                            }
                         }
                     }
                 }
