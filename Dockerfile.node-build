@@ -24,7 +24,7 @@ RUN node -v && npm -v && npm config set registry https://registry.npmmirror.com 
  && yarn config set registry https://registry.npmmirror.com && pnpm config set registry https://registry.npmmirror.com \
  && npm i -g lerna && npm i -g dotenv-cli && npm i -g cross-env \
  && npm i -g rimraf && npm i -g yargs \
- && npm i -g playwright && npm i -g app-info-parser || true  && npm install -g miniprogram-ci || true
+ && npm i -g playwright && npm i -g app-info-parser || true  && npm install miniprogram-ci || true
 
 
 # 对外暴露端口

@@ -1,0 +1,58 @@
+# Author: 潘维吉
+# Version 1.0.0
+# Description: 自定义K8S云原生构建部署环境
+
+ARG K8S_VERSION
+ARG HELM_VERSION
+ARG PYTHON_VERSION
+
+# 使用最新的Ubuntu作为基础镜像
+FROM ubuntu:latest
+
+# 设置工作目录
+WORKDIR /app
+
+# 指定切换用户
+USER root
+
+# 设置非交互式安装以避免提示
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 更新包列表并安装基本工具
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    gnupg \
+    lsb-release \
+    software-properties-common \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装kubectl
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
+    && chmod +x kubectl \
+    && mv kubectl /usr/local/bin/
+
+# 安装helm
+RUN curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | tee /usr/share/keyrings/helm.gpg > /dev/null \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list \
+    && apt-get update \
+    && apt-get install -y helm \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装Python 3和pip
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip python3-full \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -s /usr/bin/python3 /usr/bin/python
+# Python动态处理yaml文件
+RUN sudo pip -i https://pypi.tuna.tsinghua.edu.cn/simple  install ruamel.yaml
+
+# 设置默认命令
+CMD ["/bin/bash"]
+
+
+# 自定义构建镜像
+# DOCKER_BUILDKIT=1 docker build -t panweiji/k8s:latest  -f /my/Dockerfile.k8s . --no-cache --load
+# 上传镜像 先 docker login 登录
+# docker push panweiji/k8s:latest
