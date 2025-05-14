@@ -263,7 +263,7 @@ def call(String type = 'web-java', Map map) {
                         *//* dockerfile {
                           filename 'Dockerfile.node-build' // 在WORKSPACE工作区代码目录
                           dir "${env.WORKSPACE}/ci"
-                          // additionalBuildArgs  '--build-arg version=1.0.2'
+                          // additionalBuildArgs  '--build-arg version=1.0.0'
                           // args " -v /${env.WORKSPACE}:/tmp "
                           reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
                       }*//*
@@ -568,7 +568,7 @@ def call(String type = 'web-java', Map map) {
                         /*   dockerfile {
                               filename 'Dockerfile.k8s' // 在WORKSPACE工作区代码目录
                               dir "${env.WORKSPACE}/ci"
-                              // additionalBuildArgs  '--build-arg version=1.0.2'
+                              // additionalBuildArgs  '--build-arg version=1.0.0'
                               // args " -v /${env.WORKSPACE}:/tmp "
                               reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
                           } */
