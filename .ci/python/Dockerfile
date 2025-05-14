@@ -35,8 +35,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 #    echo "https://mirrors.aliyun.com/alpine/v3.19/community" >> /etc/apk/repositories \
 
 # 安装特定项目依赖环境  --no-install-recommends不安装那些被推荐但非必需的依赖包
-#RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && apt-get clean || true && apt-get update || true \
-#    && apt install -y --no-install-recommends libgl1-mesa-glx || true
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && apt-get clean || true && apt-get update || true \
+    && apt install -y --no-install-recommends libgl1-mesa-glx || true
 
 # 下载项目依赖包
 #COPY requirements.txt requirements.txt
@@ -59,8 +59,3 @@ EXPOSE $EXPOSE_PORT
 
 # 根据主文件默认名称 app.py  CMD中的"$MY_VAR"变量设置成 docker run -e MY_VAR=value 运行变量 否则无法获取
 CMD python /app/$PYTHON_START_FILE
-
-# Flask部署 启动命令
-#CMD ["python", "-m" , "flask", "run", "--host=0.0.0.0"]
-# FastAPI部署 启动命令
-#CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${EXPOSE_PORT}"]
