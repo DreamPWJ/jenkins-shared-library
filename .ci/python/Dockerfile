@@ -34,7 +34,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 #RUN echo "https://mirrors.aliyun.com/alpine/v3.19/main" > /etc/apk/repositories && \
 #    echo "https://mirrors.aliyun.com/alpine/v3.19/community" >> /etc/apk/repositories \
 
-# 安装依赖环境  --no-install-recommends不安装那些被推荐但非必需的依赖包
+# 安装特定项目依赖环境  --no-install-recommends不安装那些被推荐但非必需的依赖包
 RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && apt-get clean || true && apt-get update || true \
     && apt install -y --no-install-recommends libgl1-mesa-glx || true
 

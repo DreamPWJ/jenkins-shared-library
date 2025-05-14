@@ -129,7 +129,8 @@ JSON_PARAMS
     "COMPUTER_LANGUAGE" : "3" ,
     "PROJECT_NAME" : "test-python" ,
     "SHELL_PARAMS" : "test-python demo 8079 5000 sit",
-    "IS_BLUE_GREEN_DEPLOY" : true
+    "CUSTOM_PYTHON_START_FILE" : "main.py",
+    "CUSTOM_PYTHON_VERSION" : "3.12.0",
 }
 
 */
