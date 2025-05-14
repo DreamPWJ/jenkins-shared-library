@@ -29,9 +29,11 @@ RUN apt-get update && apt-get install -y \
 
 # 安装kubectl  mirrors.aliyun.com/kubernetes-release镜像代替dl.k8s.io
 ARG K8S_MIRROR=https://dl.k8s.io
-RUN curl -LO "${K8S_MIRROR}/release/$(curl -L -s ${K8S_MIRROR}/release/stable.txt)/bin/linux/amd64/kubectl" \
-    && chmod +x kubectl \
-    && mv kubectl /usr/local/bin/
+RUN curl -LO "https://mirrors.aliyun.com/kubernetes/apt/pool/kubectl_$(curl -s https://mirrors.aliyun.com/kubernetes/apt/dists/kubernetes-xenial/main/binary-amd64/Packages | grep 'Package: kubectl' | awk '{print $2}')_amd64.deb" \
+ && dpkg -i kubectl_*.deb
+#    curl -LO "${K8S_MIRROR}/release/$(curl -L -s ${K8S_MIRROR}/release/stable.txt)/bin/linux/amd64/kubectl" \
+#    && chmod +x kubectl \
+#    && mv kubectl /usr/local/bin/
 
 # 安装helm 官方镜像源baltocdn.com/helm
 ARG HELM_MIRROR=https://mirrors.aliyun.com/helm
