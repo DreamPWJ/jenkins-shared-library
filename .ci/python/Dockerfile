@@ -8,10 +8,17 @@ ARG PYTHON_VERSION
 ARG PROJECT_NAME
 ARG EXPOSE_PORT
 ARG PYTHON_START_FILE
-ARG IS_NEED_INSTALL=true
+
+# Dockerfile多阶段构建 参考文档: https://docs.docker.com/develop/develop-images/multistage-build/
+# 示例 FROM golang:1.16 下行注释的KEY值动态替换
+#FROM-MULTISTAGE-BUILD-IMAGES
 
 # 依赖基础镜像 多阶段构建复用docker缓存层加速构建
 FROM python:$PYTHON_VERSION
+
+# 多阶段构建镜像 从上一个镜像内复制环境到本镜像
+# 示例 COPY --from=0 / /   下行注释的KEY值动态替换
+#COPY-MULTISTAGE-BUILD-IMAGES
 
 # Docker 将此路径用作所有后续命令的默认位置
 WORKDIR /app
@@ -43,9 +50,7 @@ COPY python.tar.gz .
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
- &&  if [ $IS_NEED_INSTALL == true ]; then \
-    pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
-    fi \
+ && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
  && pwd && ls -l
 
 
