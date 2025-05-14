@@ -3,7 +3,7 @@
 # Description: 自定义K8S云原生构建部署环境
 
 # 多阶段进行 利用Python语言便利性自定义脚本处理等
-#FROM python:3.12.0-alpine
+#FROM python:3.12.0
 
 # 基础镜像
 FROM dtzar/helm-kubectl:latest

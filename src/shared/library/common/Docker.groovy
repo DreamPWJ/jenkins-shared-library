@@ -203,7 +203,7 @@ class Docker implements Serializable {
                             ${dockerPushDiffStr}
                             """
                 } else if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-                    def dockerImagesName = "python:${ctx.CUSTOM_PYTHON_VERSION}-alpine"
+                    def dockerImagesName = "python:${ctx.CUSTOM_PYTHON_VERSION}"
                     // 拉取基础镜像避免重复下载
                     ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.GIT_PROJECT_FOLDER_NAME} && pwd &&
