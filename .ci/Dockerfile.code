@@ -11,7 +11,7 @@ ARG EXPOSE_PORT
 ARG CUSTOM_STARTUP_COMMAND
 
 # Spring官方推荐的JDK提供商: https://bell-sw.com/libericajdk/
-# JDK基础镜像 默认值变量方式 ${JDK_VERSION:-11}
+# JDK基础镜像 默认值变量方式 ${JDK_VERSION:-21}
 FROM ${JDK_PUBLISHER}:${JDK_VERSION}
 
 # 多阶段构建镜像 从上一个镜像内复制环境到本镜像
