@@ -25,7 +25,8 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     lsb-release \
     software-properties-common \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && echo "nameserver 8.8.8.8\nnameserver 114.114.114.114" > /etc/resolv.conf
 
 # 安装kubectl  官方地址 dl.k8s.io
 ARG K8S_MIRROR=https://dl.k8s.io
