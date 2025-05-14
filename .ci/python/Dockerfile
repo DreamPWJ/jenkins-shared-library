@@ -14,7 +14,7 @@ ARG PYTHON_START_FILE
 #FROM-MULTISTAGE-BUILD-IMAGES
 
 # 依赖基础镜像 多阶段构建复用docker缓存层加速构建
-FROM python:$PYTHON_VERSION
+FROM python:${PYTHON_VERSION}-alpine
 
 # 多阶段构建镜像 从上一个镜像内复制环境到本镜像
 # 示例 COPY --from=0 / /   下行注释的KEY值动态替换
