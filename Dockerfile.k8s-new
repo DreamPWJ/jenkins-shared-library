@@ -34,7 +34,7 @@ RUN curl -LO "${K8S_MIRROR}/release/$(curl -L -s ${K8S_MIRROR}/release/stable.tx
     && mv kubectl /usr/local/bin/
 
 # 安装helm 官方地址 baltocdn.com/helm
-ARG HELM_MIRROR=https://mirrors.aliyun.com/helm
+ARG HELM_MIRROR=baltocdn.com/helm
 RUN curl ${HELM_MIRROR}/signing.asc | gpg --dearmor | tee /usr/share/keyrings/helm.gpg > /dev/null \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] ${HELM_MIRROR}/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list \
     && apt-get update \
