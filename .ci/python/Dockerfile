@@ -14,7 +14,6 @@ ARG PYTHON_START_FILE
 #FROM-MULTISTAGE-BUILD-IMAGES
 
 # 依赖基础镜像 多阶段构建复用docker缓存层加速构建
-# syntax=docker/dockerfile:1.4
 FROM python:${PYTHON_VERSION}-slim
 
 # 多阶段构建镜像 从上一个镜像内复制环境到本镜像
@@ -36,8 +35,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 #    echo "https://mirrors.aliyun.com/alpine/v3.19/community" >> /etc/apk/repositories \
 
 # 安装特定项目依赖环境  --no-install-recommends不安装那些被推荐但非必需的依赖包
-#RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && apt-get clean || true && apt-get update || true \
-#    && apt install -y --no-install-recommends libgl1-mesa-glx || true
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && apt-get clean || true && apt-get update || true \
+    && apt install -y --no-install-recommends libgl1-mesa-glx || true
 
 # 下载项目依赖包
 #COPY requirements.txt requirements.txt
@@ -51,7 +50,6 @@ COPY python.tar.gz .
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
- && mkdir -p /root/.cache/pip && --mount=type=cache,target=/root/.cache/pip \
  && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
  && pwd && ls -l
 
