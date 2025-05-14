@@ -8,6 +8,6 @@ RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
 
 # 构建镜像
-# docker build -t panweiji/opengl:latest  -f /my/Dockerfile.opengl . --no-cache --load
+# docker build -t panweiji/opengl:latest  -f /my/Dockerfile.opengl . --no-cache
 # 上传镜像
 # docker push panweiji/opengl:latest
