@@ -283,7 +283,7 @@ def call(String type = 'web-java', Map map) {
                                 docker.image("panweiji/node:${NODE_VERSION.replace('Node', '')}").inside("") {
                                     nodeBuildProject(map)
                                 }
-                            } else { // 测试环境验证新特性
+                            } else { // 验证新特性
                                 def nodeVersion = "${NODE_VERSION.replace('Node', '')}"
                                 def dockerImageName = "panweiji/node-build"
                                 def dockerImageTag = "${nodeVersion}"
@@ -340,7 +340,7 @@ def call(String type = 'web-java', Map map) {
                                 docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
                                     mavenBuildProject(map)
                                 }
-                            } else if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) { // 测试环境验证新特性
+                            } else if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11) {
                                 def mvndVersion = "1.0.2"
                                 def jdkVersion = "${JDK_VERSION}"
                                 def dockerImageName = "panweiji/mvnd-jdk"
