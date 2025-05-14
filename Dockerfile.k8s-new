@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # 安装kubectl  mirrors.aliyun.com/kubernetes-release镜像代替dl.k8s.io
-ARG K8S_MIRROR=https://registry.aliyuncs.com/google_containers
+ARG K8S_MIRROR=https://dl.k8s.io
 RUN curl -LO "${K8S_MIRROR}/release/$(curl -L -s ${K8S_MIRROR}/release/stable.txt)/bin/linux/amd64/kubectl" \
     && chmod +x kubectl \
     && mv kubectl /usr/local/bin/
