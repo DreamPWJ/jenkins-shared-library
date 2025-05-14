@@ -14,7 +14,6 @@ ARG PYTHON_START_FILE
 #FROM-MULTISTAGE-BUILD-IMAGES
 
 # 依赖基础镜像 多阶段构建复用docker缓存层加速构建
-# syntax=docker/dockerfile:1.4
 FROM python:${PYTHON_VERSION}-slim
 
 # 多阶段构建镜像 从上一个镜像内复制环境到本镜像
@@ -51,7 +50,6 @@ COPY python.tar.gz .
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
- && --mount=type=cache,target=/var/cache/pip  \
  && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
  && pwd && ls -l
 
