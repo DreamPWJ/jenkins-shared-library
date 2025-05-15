@@ -230,6 +230,21 @@ JSON_PARAMS
 }
 REMOTE_IP: 172.16.99.51
 
+
+htc-traffic-server-prod
+好停车诱导屏服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/traffic.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "induction-screen" ,
+   "SHELL_PARAMS" : "induction-screen server 8083 8082 rizhao",
+   "IS_MAVEN_SINGLE_MODULE" : true
+}
+
+REMOTE_IP: 172.16.99.53
+
 */
 
 
