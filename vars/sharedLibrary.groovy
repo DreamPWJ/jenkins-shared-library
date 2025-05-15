@@ -279,11 +279,11 @@ def call(String type = 'web-java', Map map) {
                     steps {
                         script {
                             // echo "Docker环境内Node构建方式"
-                            if ("${IS_PROD}" == 'true') {
+                      /*      if ("${IS_PROD}" == 'true') {
                                 docker.image("panweiji/node:${NODE_VERSION.replace('Node', '')}").inside("") {
                                     nodeBuildProject(map)
                                 }
-                            } else { // 验证新特性
+                            } else {*/ // 验证新特性
                                 def nodeVersion = "${NODE_VERSION.replace('Node', '')}"
                                 def dockerImageName = "panweiji/node-build"
                                 def dockerImageTag = "${nodeVersion}"
@@ -291,7 +291,7 @@ def call(String type = 'web-java', Map map) {
                                 docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
                                     nodeBuildProject(map)
                                 }
-                            }
+                           // }
                         }
                     }
                 }
@@ -336,11 +336,11 @@ def call(String type = 'web-java', Map map) {
                           }*/
                     steps {
                         script {
-                            if ("${IS_PROD}" == 'true') {
+                          /*  if ("${IS_PROD}" == 'true') {
                                 docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
                                     mavenBuildProject(map)
                                 }
-                            } else if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11) { // mvnd支持条件
+                            } else*/ if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11) { // mvnd支持条件
                                 def mvndVersion = "1.0.2"
                                 def jdkVersion = "${JDK_VERSION}"
                                 def dockerImageName = "panweiji/mvnd-jdk"
