@@ -23,7 +23,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PATH=$PATH:/opt/java/bin:/opt/mvnd/bin
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends  curl  wget  zip  unzip  && \
+    apt-get install -y --no-install-recommends curl wget zip unzip gzip  && \
     rm -rf /var/lib/apt/lists/*
 
 # 安装 OpenJDK
