@@ -29,17 +29,17 @@ RUN apt-get update && apt-get install -y \
 
 # 安装kubectl  官方地址 dl.k8s.io
 ARG K8S_MIRROR=https://dl.k8s.lanneng.tech
-RUN curl -LO "${K8S_MIRROR}/release/$(curl -L -s ${K8S_MIRROR}/release/stable.txt)/bin/linux/amd64/kubectl" \
+RUN curl -L "${K8S_MIRROR}/release/$(curl -L -s ${K8S_MIRROR}/release/stable.txt)/bin/linux/amd64/kubectl" \
     && chmod +x kubectl \
     && mv kubectl /usr/local/bin/
 
 # 安装helm 官方地址 baltocdn.com/helm
-ARG HELM_MIRROR=baltocdn.com/helm
-RUN curl ${HELM_MIRROR}/signing.asc | gpg --dearmor | tee /usr/share/keyrings/helm.gpg > /dev/null \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] ${HELM_MIRROR}/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list \
-    && apt-get update \
-    && apt-get install -y helm \
-    && rm -rf /var/lib/apt/lists/*
+#ARG HELM_MIRROR=baltocdn.com/helm
+#RUN curl ${HELM_MIRROR}/signing.asc | gpg --dearmor | tee /usr/share/keyrings/helm.gpg > /dev/null \
+#    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] ${HELM_MIRROR}/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list \
+#    && apt-get update \
+#    && apt-get install -y helm \
+#    && rm -rf /var/lib/apt/lists/*
 
 # 安装Python 3和pip
 RUN apt-get update && apt-get install -y \
