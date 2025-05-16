@@ -336,11 +336,11 @@ def call(String type = 'web-java', Map map) {
                           }*/
                     steps {
                         script {
-                          /*  if ("${IS_PROD}" == 'true') {
+                           if ("${IS_PROD}" == 'true') {
                                 docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
                                     mavenBuildProject(map)
                                 }
-                            } else*/ if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11) { // mvnd支持条件
+                            } else if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11) { // mvnd支持条件
                                 def mvndVersion = "1.0.2"
                                 def jdkVersion = "${JDK_VERSION}"
                                 def dockerImageName = "panweiji/mvnd-jdk"
