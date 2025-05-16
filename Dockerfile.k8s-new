@@ -51,7 +51,8 @@ RUN apt-get update && apt-get install -y \
 RUN python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple  ruamel.yaml
 
 #  验证服务
-RUN kubectl version --client && helm version &&  python3 -V
+RUN kubectl version --client &&  python3 -V
+# && helm version
 
 # 设置默认命令
 CMD ["/bin/bash"]

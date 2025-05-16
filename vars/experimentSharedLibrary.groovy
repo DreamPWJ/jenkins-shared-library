@@ -659,7 +659,7 @@ def futureLab(map) {
     docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
         sh "python -V"
         sh "kubectl version --client"
-        sh "helm version"
+        // sh "helm version"
     }
 
 /*    def nodeVersion = "${"Node20".replace('Node', '')}"
