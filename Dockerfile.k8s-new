@@ -48,7 +48,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* \
     && ln -s /usr/bin/python3 /usr/bin/python
 # Python动态处理yaml文件
-RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple  ruamel.yaml
+RUN pip install ruamel.yaml
 
 #  验证服务
 RUN kubectl version --client &&  python3 -V
