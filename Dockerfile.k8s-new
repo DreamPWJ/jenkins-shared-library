@@ -44,7 +44,6 @@ RUN curl -LO "${K8S_MIRROR}/release/$(curl -L -s ${K8S_MIRROR}/release/stable.tx
 # 安装Python 3和pip
 RUN apt-get install -y  python3  \
 && ln -sf python3 /usr/bin/python \
-&& pip3 install --no-cache --upgrade pip setuptools
 
 # Python动态处理yaml文件
 RUN pip install ruamel.yaml
