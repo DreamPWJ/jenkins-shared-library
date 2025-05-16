@@ -39,7 +39,7 @@ RUN apt-get update && \
 #echo "nameserver 8.8.8.8\nnameserver 114.114.114.114" > /etc/resolv.conf && \
     #echo "20.205.243.166 github.com\n151.101.1.194 github.global.ssl.fastly.net" >> /etc/hosts && \
 
-RUN curl -L https://github.lanneng.tech/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
+RUN curl -L https://git.code.lanneng.tech/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
     tar -xzf /tmp/${MVND_TAR} -C /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
     rm -f /tmp/${MVND_TAR} && \
