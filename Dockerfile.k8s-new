@@ -44,11 +44,11 @@ RUN curl -L "${K8S_MIRROR}/release/$(curl -L -s ${K8S_MIRROR}/release/stable.txt
 # 安装Python 3和pip
 RUN apt-get update && apt-get install -y \
     python3 \
-    python3-pip python3-full \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/* \
     && ln -s /usr/bin/python3 /usr/bin/python
 # Python动态处理yaml文件
-RUN python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple  ruamel.yaml
+RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple  ruamel.yaml
 
 #  验证服务
 RUN kubectl version --client &&  python3 -V
