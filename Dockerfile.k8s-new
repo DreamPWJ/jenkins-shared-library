@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install -y \
 
 # 安装kubectl  官方地址 dl.k8s.io
 ARG K8S_MIRROR=https://dl.k8s.lanneng.tech
-RUN curl -L "${K8S_MIRROR}/release/$(curl -L -s ${K8S_MIRROR}/release/stable.txt)/bin/linux/amd64/kubectl" \
+RUN curl -LO "${K8S_MIRROR}/release/$(curl -L -s ${K8S_MIRROR}/release/stable.txt)/bin/linux/amd64/kubectl" \
     && chmod +x kubectl \
     && mv kubectl /usr/local/bin/
 
