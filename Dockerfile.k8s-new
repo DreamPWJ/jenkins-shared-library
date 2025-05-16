@@ -24,8 +24,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
     lsb-release \
-    software-properties-common \
-   # && rm -rf /var/lib/apt/lists/*
+    software-properties-common
 
 # 安装kubectl  官方地址 dl.k8s.io
 ARG K8S_MIRROR=https://dl.k8s.lanneng.tech
