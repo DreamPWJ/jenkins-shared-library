@@ -675,7 +675,7 @@ def futureLab(map) {
     }*/
 
     def mvndVersion = "1.0.2"
-    def jdkVersion = "21"
+    def jdkVersion = "11"
     def dockerImageName = "panweiji/mvnd-jdk"
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk", dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}")
@@ -686,7 +686,7 @@ def futureLab(map) {
         sh "java --version"
 
 
-        sh "mvnd clean install -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
+        //sh "mvnd clean install -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvnd  install"
         //sh "mvn  install"
     }
