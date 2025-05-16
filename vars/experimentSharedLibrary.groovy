@@ -653,16 +653,16 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
-    def dockerImageName = "panweiji/k8s-build"
+/*    def dockerImageName = "panweiji/k8s-build"
     def dockerImageTag = "latest"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.k8s-new", dockerImageName, dockerImageTag, "")
     docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
         sh "python -V"
         sh "kubectl version --client"
         // sh "helm version"
-    }
+    }*/
 
-/*    def nodeVersion = "${"Node20".replace('Node', '')}"
+    def nodeVersion = "${"Node20".replace('Node', '')}"
     def dockerImageName = "panweiji/node-build"
     def dockerImageTag = "${nodeVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
@@ -672,7 +672,7 @@ def futureLab(map) {
         sh "yarn --version"
         sh "pnpm --version"
         // sh "playwright --version"
-    }*/
+    }
 
 /*
     def mvndVersion = "1.0.2"
