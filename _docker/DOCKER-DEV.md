@@ -84,8 +84,8 @@ docker pull ghcr.io/open-webui/open-webui:main
 #### 只有CPU模式部署
 docker run -d --restart always -p 11434:11434 --cpus=8 -m 16096m -v /my/ollama:/root/.ollama --name ollama ollama/ollama
 
-docker run -d --restart always -p 3100:8080 --cpus=2 -m 4096m  --add-host=host.docker.internal:host-gateway -v /my/ollama:/root/.ollama  \
- -v /my/open-webui:/app/backend/data  --name open-webui  ghcr.io/open-webui/open-webui:main
+docker run -d --restart always -p 3100:8080 --cpus=2 -m 4096m --add-host=host.docker.internal:host-gateway -v /my/ollama:/root/.ollama \
+ -v /my/open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main
 
 docker exec -it ollama  ollama run deepseek-r1:7b
 
@@ -119,7 +119,7 @@ docker pull mritd/shadowsocks
 
 #### 启动运行容器 -m 加密方式 -k 密码
 sudo docker run -dt --restart=always -p 8888:6433 --name shadowsocks-server mritd/shadowsocks \
--s "-s 0.0.0.0 -p 6433 -m chacha20-ietf-poly1305 -k guigu321 "
+-s "-s 0.0.0.0 -p 6433 -m chacha20-ietf-poly1305 -k guigu321"
 
 #### 搭建OPEN VPN服务 参考步骤: https://github.com/Nyr/openvpn-install
 ./openvpn-install.sh
