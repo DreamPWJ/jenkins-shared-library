@@ -674,7 +674,7 @@ def futureLab(map) {
         // sh "playwright --version"
     }*/
 
-    def mvndVersion = "2.0.0-rc-3"
+    def mvndVersion = "1.0.2"
     def jdkVersion = "21"
     def dockerImageName = "panweiji/mvnd-jdk"
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
@@ -686,8 +686,8 @@ def futureLab(map) {
         sh "mvn --version"
         sh "java --version"
 
-        sh "mvnd clean install -pl pengbo-park/pengbo-park-app -am  -Dmaven.test.skip=true"
-        sh "mvn clean install  -pl pengbo-park/pengbo-park-app -am  -Dmaven.test.skip=true"
+        sh "mvnd clean install -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
+        sh "mvn clean install  -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvnd  install"
         //sh "mvn  install"
     }
