@@ -6,6 +6,9 @@ FROM python:${PYTHON_VERSION}-slim
 # Set working directory
 WORKDIR /app
 
+# 指定切换用户
+USER root
+
 # Set environment variables
 ENV PIP_CACHE_DIR=/pip-cache \
     PIP_NO_CACHE_DIR=false \
@@ -21,11 +24,9 @@ RUN mkdir -p /pip-cache && \
 
 ARG INSTALL_PACKAGES
 
-RUN echo "动态安装依赖 $INSTALL_PACKAGES"
 # Install system dependencies and clean up
 RUN if [ -n "$INSTALL_PACKAGES" ]; then \
          echo "动态安装依赖 $INSTALL_PACKAGES" && \
-         sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && \
          apt-get clean && \
          apt-get update && \
          apt-get install -y --no-install-recommends $INSTALL_PACKAGES || true \
