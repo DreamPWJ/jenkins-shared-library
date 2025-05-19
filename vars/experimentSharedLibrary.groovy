@@ -684,7 +684,7 @@ def futureLab(map) {
         sh "mvnd --version"
         sh "mvn --version"
         sh "java --version"
-
+        sh "export MAVEN_OPTS=\"-Xmx4g -Xms2g -XX:+UseG1GC\""
 
         sh "mvnd clean install -T8 -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         sh "mvn clean install -T8 -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
