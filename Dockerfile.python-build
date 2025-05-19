@@ -10,22 +10,18 @@ WORKDIR /app
 USER root
 
 # Set environment variables
-ENV PIP_CACHE_DIR=/pip-cache \
-    PIP_NO_CACHE_DIR=false \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+#ENV PIP_CACHE_DIR=/pip-cache \
+#    PIP_NO_CACHE_DIR=false \
+#    PYTHONDONTWRITEBYTECODE=1 \
+#    PYTHONUNBUFFERED=1
 
 # 挂载数据卷 docker删除后数据不丢失 docker run -v 映射
-VOLUME $PIP_CACHE_DIR
+#VOLUME $PIP_CACHE_DIR
 
 # Create pip cache directory
-RUN mkdir -p /pip-cache && \
-    chmod -R 777 /pip-cache \
-
-RUN echo "deb http://mirrors.ustc.edu.cn/debian/ stable main contrib non-free" > /etc/apt/sources.list && \
-    echo "deb http://mirrors.ustc.edu.cn/debian-security stable/updates main contrib non-free" >> /etc/apt/sources.list && \
-    echo "deb http://mirrors.ustc.edu.cn/debian/ stable-updates main contrib non-free" >> /etc/apt/sources.list
-
+#RUN mkdir -p /pip-cache && \
+#    chmod -R 777 /pip-cache
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list
 
 ARG INSTALL_PACKAGES
 
