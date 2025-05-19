@@ -19,12 +19,13 @@ RUN mkdir -p /pip-cache && \
     chmod -R 777 /pip-cache
 
 # Install system dependencies and clean up
-ARG APT_PACKAGES=""
-RUN if [ -n "$APT_PACKAGES" ]; then \
-        apt-get update && \
-        apt-get install -y --no-install-recommends $APT_PACKAGES && \
-        apt-get clean && \
-        rm -rf /var/lib/apt/lists/*; \
+ARG INSTALL_PACKAGES=""
+RUN if [ -n "$INSTALL_PACKAGES" ]; then \
+        sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && \
+         apt-get clean && \
+         apt-get update && \
+         apt-get install -y --no-install-recommends $INSTALL_PACKAGES && \
+         rm -rf /var/lib/apt/lists/*; \
     fi
 
 # Copy requirements.txt (if it exists) to calculate hash

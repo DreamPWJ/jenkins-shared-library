@@ -655,7 +655,7 @@ def futureLab(map) {
 
     def dockerImageName = "panweiji/python-build"
     def dockerImageTag = "latest"
-    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.python-build", dockerImageName, dockerImageTag, "")
+    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.python-build", dockerImageName, dockerImageTag, "--build-arg INSTALL_PACKAGES=libgl1-mesa-glx")
     docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
         sh "python -V"
     }
