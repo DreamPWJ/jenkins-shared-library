@@ -46,7 +46,7 @@ RUN curl -L https://git.code.lanneng.tech/apache/maven-mvnd/releases/download/${
     ln -s ${MVND_HOME}/mvn/bin/mvn /usr/local/bin/mvn && \
     export PATH=$MVND_HOME/bin:$PATH
 
-# 安装 Maven
+# 安装 Maven 在mvnd自带Maven
 # RUN
 #    mkdir -p ${MAVEN_HOME} && cd ${MAVEN_HOME} && \
 #    curl -L https://mirrors.aliyun.com/apache/maven/maven-3/${MAVEN_VERSION}/binaries/${MAVEN_TAR} -o ${MAVEN_HOME}/${MAVEN_TAR} && \
