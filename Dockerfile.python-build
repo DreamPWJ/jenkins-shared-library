@@ -1,6 +1,5 @@
 # Use an official Python runtime as a parent image
 ARG PYTHON_VERSION
-ARG INSTALL_PACKAGES
 
 FROM python:${PYTHON_VERSION}-slim
 
@@ -20,6 +19,7 @@ VOLUME $PIP_CACHE_DIR
 RUN mkdir -p /pip-cache && \
     chmod -R 777 /pip-cache
 
+ARG INSTALL_PACKAGES
 # Install system dependencies and clean up
 RUN if [ -n "$INSTALL_PACKAGES" ]; then \
          echo "动态安装依赖 $INSTALL_PACKAGES" && \
