@@ -25,7 +25,8 @@ RUN if [ -n "$INSTALL_PACKAGES" ]; then \
          sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && \
          apt-get clean && \
          apt-get update && \
-         apt-get install -y --no-install-recommends $INSTALL_PACKAGES
+         apt-get install -y --no-install-recommends $INSTALL_PACKAGES \
+         rm -rf /var/lib/apt/lists/*; \
     fi
 
 # Copy requirements.txt (if it exists) to calculate hash
