@@ -674,19 +674,20 @@ def futureLab(map) {
         // sh "playwright --version"
     }*/
 
-    def mvndVersion = "1.0.2"
+    def mvndVersion = "2.0.0-rc-3"
     def jdkVersion = "21"
     def dockerImageName = "panweiji/mvnd-jdk"
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk", dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}")
 
     docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+
         sh "mvnd --version"
         sh "mvn --version"
         sh "java --version"
 
-        sh "mvnd clean install  -Dquickly -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
-        sh "mvn clean install  -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
+        sh "mvnd clean install -pl pengbo-park/pengbo-park-app -am  -Dmaven.test.skip=true"
+        sh "mvn clean install  -pl pengbo-park/pengbo-park-app -am  -Dmaven.test.skip=true"
         //sh "mvnd  install"
         //sh "mvn  install"
     }
