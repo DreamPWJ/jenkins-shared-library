@@ -1,5 +1,7 @@
 # Use an official Python runtime as a parent image
-ARG PYTHON_VERSION=3.12
+ARG PYTHON_VERSION
+ARG INSTALL_PACKAGES
+
 FROM python:${PYTHON_VERSION}-slim
 
 # Set working directory
@@ -19,7 +21,6 @@ RUN mkdir -p /pip-cache && \
     chmod -R 777 /pip-cache
 
 # Install system dependencies and clean up
-ARG INSTALL_PACKAGES=""
 RUN if [ -n "$INSTALL_PACKAGES" ]; then \
         sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && \
          apt-get clean && \
