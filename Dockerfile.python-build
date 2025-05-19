@@ -20,8 +20,12 @@ VOLUME $PIP_CACHE_DIR
 
 # Create pip cache directory
 RUN mkdir -p /pip-cache && \
-    chmod -R 777 /pip-cache
-RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list
+    chmod -R 777 /pip-cache \
+
+RUN echo "deb http://mirrors.ustc.edu.cn/debian/ stable main contrib non-free" > /etc/apt/sources.list && \
+    echo "deb http://mirrors.ustc.edu.cn/debian-security stable/updates main contrib non-free" >> /etc/apt/sources.list && \
+    echo "deb http://mirrors.ustc.edu.cn/debian/ stable-updates main contrib non-free" >> /etc/apt/sources.list
+
 
 ARG INSTALL_PACKAGES
 
