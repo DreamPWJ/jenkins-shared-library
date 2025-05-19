@@ -22,10 +22,11 @@ RUN mkdir -p /pip-cache && \
 
 # Install system dependencies and clean up
 RUN if [ -n "$INSTALL_PACKAGES" ]; then \
+         echo "动态安装依赖 $INSTALL_PACKAGES" && \
          sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && \
          apt-get clean && \
          apt-get update && \
-         apt-get install -y --no-install-recommends $INSTALL_PACKAGES \
+         apt-get install -y --no-install-recommends $INSTALL_PACKAGES || true \
          rm -rf /var/lib/apt/lists/*; \
     fi
 
@@ -43,19 +44,7 @@ RUN if [ -f requirements.txt ]; then \
 COPY requirements.txt.sha256* /app/previous_requirements.txt.sha256
 
 # Install Python dependencies only if requirements.txt has changed
-RUN if [ -f previous_requirements.txt.sha256 ] && [ -f requirements.txt.sha256 ]; then \
-        if cmp -s requirements.txt.sha256 previous_requirements.txt.sha256; then \
-            echo "requirements.txt unchanged, skipping pip install"; \
-        else \
-            if [ -f requirements.txt ]; then \
-                pip install --no-warn-script-location -r requirements.txt; \
-            fi; \
-        fi; \
-    else \
-        if [ -f requirements.txt ]; then \
-            pip install --no-warn-script-location -r requirements.txt; \
-        fi; \
-    fi
+RUN pip install --no-warn-script-location -r requirements.txt
 
 # Save current hash for next build
 RUN cp requirements.txt.sha256 previous_requirements.txt.sha256
