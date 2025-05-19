@@ -653,8 +653,7 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
-
-    def pythonVersion = 3.12
+    def pythonVersion = "3.12"
     def installPackages = "libgl1-mesa-glx"
     def dockerImageName = "panweiji/python-build"
     def dockerImageTag = pythonVersion + installPackages == "" ? "" : "-project-name"
