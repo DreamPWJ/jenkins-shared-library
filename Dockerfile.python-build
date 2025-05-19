@@ -35,7 +35,7 @@ COPY requirements.txt* /app/
 COPY requirement.txt* /app/
 
 
-RUN mv requirement.txt requirements.txt || true && pip install --no-warn-script-location -r requirements.txt
+RUN mv requirement.txt requirements.txt || true && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # Copy application code
 COPY . /app
