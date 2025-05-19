@@ -1,7 +1,7 @@
 # Use an official Python runtime as a parent image
 ARG PYTHON_VERSION
 
-FROM python:${PYTHON_VERSION}-slim
+FROM python:${PYTHON_VERSION}
 
 # Set working directory
 WORKDIR /app
@@ -30,7 +30,7 @@ RUN if [ -n "$INSTALL_PACKAGES" ]; then \
          echo "动态安装依赖 $INSTALL_PACKAGES" && \
          apt-get clean && \
          apt-get update && \
-         apt-get install -y --no-install-recommends $INSTALL_PACKAGES || true \
+         apt-get install -y --no-install-recommends $INSTALL_PACKAGES \
          rm -rf /var/lib/apt/lists/*; \
     fi
 
