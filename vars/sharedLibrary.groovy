@@ -1460,46 +1460,48 @@ def uploadOss(map) {
  * 上传部署文件到远程云端
  */
 def uploadRemote(filePath, map) {
-    // 应用包部署目录
-    projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
-    // ssh免密登录检测和设置
-    autoSshLogin(map)
-    timeout(time: 2, unit: 'MINUTES') {
-        // 同步脚本和配置到部署服务器
-        syncScript()
-    }
-    println("上传部署文件到部署服务器中... 🚀 ")
-    // 基于scp或rsync同步文件到远程服务器
-    if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行自定义命令启动
-        sh " scp ${proxyJumpSCPText} ${sourceCodeDeployName}.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
-    } else if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
-        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-            dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
-                sh " scp ${proxyJumpSCPText} ${npmPackageLocation} " +
-                        "${remote.user}@${remote.host}:${projectDeployFolder}"
-            }
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-            // 上传前删除部署目录的jar包 防止名称修改等导致多个部署目标jar包存在  jar包需要唯一性
-            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd ${projectDeployFolder} && rm -f *.${javaPackageType}' "
-            dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
-                // 上传构建包到远程服务器
-                sh " scp ${proxyJumpSCPText} ${mavenPackageLocation} ${remote.user}@${remote.host}:${projectDeployFolder} "
-            }
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
-            // Go语言打包产物 上传包到远程服务器
-            sh "cd ${filePath} && scp ${proxyJumpSCPText} main.go ${remote.user}@${remote.host}:${projectDeployFolder} "
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-            // Python语言打包产物 上传包到远程服务器
-            // sh "cd ${filePath}/dist && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
-            dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
-                sh "scp ${proxyJumpSCPText} python.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
-            }
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) {
-            // C++语言打包产物 上传包到远程服务器
-            sh "cd ${filePath} && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
+    retry(2) {   // 重试几次 可能网络等问题导致上传失败
+        // 应用包部署目录
+        projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
+        // ssh免密登录检测和设置
+        autoSshLogin(map)
+        timeout(time: 2, unit: 'MINUTES') {
+            // 同步脚本和配置到部署服务器
+            syncScript()
         }
+        println("上传部署文件到部署服务器中... 🚀 ")
+        // 基于scp或rsync同步文件到远程服务器
+        if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行自定义命令启动
+            sh " scp ${proxyJumpSCPText} ${sourceCodeDeployName}.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
+        } else if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
+            if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
+                dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
+                    sh " scp ${proxyJumpSCPText} ${npmPackageLocation} " +
+                            "${remote.user}@${remote.host}:${projectDeployFolder}"
+                }
+            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+                // 上传前删除部署目录的jar包 防止名称修改等导致多个部署目标jar包存在  jar包需要唯一性
+                sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd ${projectDeployFolder} && rm -f *.${javaPackageType}' "
+                dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
+                    // 上传构建包到远程服务器
+                    sh " scp ${proxyJumpSCPText} ${mavenPackageLocation} ${remote.user}@${remote.host}:${projectDeployFolder} "
+                }
+            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
+                // Go语言打包产物 上传包到远程服务器
+                sh "cd ${filePath} && scp ${proxyJumpSCPText} main.go ${remote.user}@${remote.host}:${projectDeployFolder} "
+            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
+                // Python语言打包产物 上传包到远程服务器
+                // sh "cd ${filePath}/dist && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
+                dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
+                    sh "scp ${proxyJumpSCPText} python.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
+                }
+            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) {
+                // C++语言打包产物 上传包到远程服务器
+                sh "cd ${filePath} && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
+            }
+        }
+        Tools.printColor(this, "上传部署文件到部署服务器完成 ✅")
     }
-    Tools.printColor(this, "上传部署文件到部署服务器完成 ✅")
 }
 
 /**
