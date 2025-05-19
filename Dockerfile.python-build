@@ -20,6 +20,8 @@ RUN mkdir -p /pip-cache && \
     chmod -R 777 /pip-cache
 
 ARG INSTALL_PACKAGES
+
+RUN echo "动态安装依赖 $INSTALL_PACKAGES"
 # Install system dependencies and clean up
 RUN if [ -n "$INSTALL_PACKAGES" ]; then \
          echo "动态安装依赖 $INSTALL_PACKAGES" && \
@@ -35,7 +37,8 @@ COPY requirements.txt* /app/
 COPY requirement.txt* /app/
 
 
-RUN mv requirement.txt requirements.txt || true && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+#RUN mv requirement.txt requirements.txt || true && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pwd && ls
 
 # Copy application code
 COPY . /app
