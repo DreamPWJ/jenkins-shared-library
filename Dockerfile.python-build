@@ -32,22 +32,10 @@ RUN if [ -n "$INSTALL_PACKAGES" ]; then \
 
 # Copy requirements.txt (if it exists) to calculate hash
 COPY requirements.txt* /app/
+COPY requirement.txt* /app/
 
-# Calculate hash of requirements.txt if it exists, otherwise use empty file
-RUN if [ -f requirements.txt ]; then \
-        sha256sum requirements.txt > requirements.txt.sha256; \
-    else \
-        touch empty.txt && sha256sum empty.txt > requirements.txt.sha256; \
-    fi
 
-# Copy previous hash if it exists (will be mounted from host)
-COPY requirements.txt.sha256* /app/previous_requirements.txt.sha256
-
-# Install Python dependencies only if requirements.txt has changed
-RUN pip install --no-warn-script-location -r requirements.txt
-
-# Save current hash for next build
-RUN cp requirements.txt.sha256 previous_requirements.txt.sha256
+RUN mv requirement.txt requirements.txt || true && pip install --no-warn-script-location -r requirements.txt
 
 # Copy application code
 COPY . /app
