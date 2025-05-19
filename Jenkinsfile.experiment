@@ -81,7 +81,7 @@ map.put('is_git_tag', false)
 map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
-map.put('jenkins_node', 'node-2')
+map.put('jenkins_node', 'node-3')
 map.put('jenkins_node_frontend', 'node-3')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.9
@@ -124,11 +124,19 @@ experimentSharedLibrary(map)
 /*
 JSON_PARAMS:
 {
-    "REPO_URL" : "https://github.com/DreamPWJ/health.git" ,
-    "BRANCH_NAME" : "prod" ,
-    "PROJECT_TYPE" : "2" ,
-    "PROJECT_NAME" : "health-app" ,
-    "SHELL_PARAMS" : "health app 8080 8080 prod" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+   "BRANCH_NAME" : "feature/infra" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "iot-car-lock-app" ,
+   "SHELL_PARAMS" : "iot-car-lock-app test 8185 8178 sit"
+}
+
+{
+   "REPO_URL" : "https://github.com/DreamPWJ/health.git" ,
+   "BRANCH_NAME" : "prod" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "health-app" ,
+   "SHELL_PARAMS" : "health app 8080 8080 prod" ,
 }
 
 可选参数如下

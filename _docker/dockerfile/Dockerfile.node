@@ -5,15 +5,11 @@
 # 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
 # ARG EXPOSE_PORT
 
-
 # 指定我们的基础镜像是node 如果指定的镜像不存在默认会自动从Docker Hub上下载
-FROM node:14
+FROM node:24
 
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
 #LABEL author="潘维吉"
-
-# 挂载数据卷 docker删除后数据不丢失 docker run -v 映射
-VOLUME /logs
 
 # 指定切换用户
 USER root

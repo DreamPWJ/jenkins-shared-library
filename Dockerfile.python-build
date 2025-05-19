@@ -1,0 +1,65 @@
+# Use an official Python runtime as a parent image
+ARG PYTHON_VERSION=3.12
+FROM python:${PYTHON_VERSION}-slim
+
+# Set working directory
+WORKDIR /app
+
+# Set environment variables
+ENV PIP_CACHE_DIR=/pip-cache \
+    PIP_NO_CACHE_DIR=false \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+# 挂载数据卷 docker删除后数据不丢失 docker run -v 映射
+VOLUME $PIP_CACHE_DIR
+
+# Create pip cache directory
+RUN mkdir -p /pip-cache && \
+    chmod -R 777 /pip-cache
+
+# Install system dependencies and clean up
+ARG APT_PACKAGES=""
+RUN if [ -n "$APT_PACKAGES" ]; then \
+        apt-get update && \
+        apt-get install -y --no-install-recommends $APT_PACKAGES && \
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/*; \
+    fi
+
+# Copy requirements.txt (if it exists) to calculate hash
+COPY requirements.txt* /app/
+
+# Calculate hash of requirements.txt if it exists, otherwise use empty file
+RUN if [ -f requirements.txt ]; then \
+        sha256sum requirements.txt > requirements.txt.sha256; \
+    else \
+        touch empty.txt && sha256sum empty.txt > requirements.txt.sha256; \
+    fi
+
+# Copy previous hash if it exists (will be mounted from host)
+COPY requirements.txt.sha256* /app/previous_requirements.txt.sha256
+
+# Install Python dependencies only if requirements.txt has changed
+RUN if [ -f previous_requirements.txt.sha256 ] && [ -f requirements.txt.sha256 ]; then \
+        if cmp -s requirements.txt.sha256 previous_requirements.txt.sha256; then \
+            echo "requirements.txt unchanged, skipping pip install"; \
+        else \
+            if [ -f requirements.txt ]; then \
+                pip install --no-warn-script-location -r requirements.txt; \
+            fi; \
+        fi; \
+    else \
+        if [ -f requirements.txt ]; then \
+            pip install --no-warn-script-location -r requirements.txt; \
+        fi; \
+    fi
+
+# Save current hash for next build
+RUN cp requirements.txt.sha256 previous_requirements.txt.sha256
+
+# Copy application code
+COPY . /app
+
+# Default command
+CMD ["python", "app.py"]

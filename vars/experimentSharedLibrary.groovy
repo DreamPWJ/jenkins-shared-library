@@ -653,6 +653,13 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
+    def dockerImageName = "panweiji/python-build"
+    def dockerImageTag = "latest"
+    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.python-build", dockerImageName, dockerImageTag, "")
+    docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
+        sh "python -V"
+    }
+
 /*    def dockerImageName = "panweiji/k8s-build"
     def dockerImageTag = "latest"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.k8s-new", dockerImageName, dockerImageTag, "")
@@ -674,6 +681,7 @@ def futureLab(map) {
         // sh "playwright --version"
     }*/
 
+/*
     def mvndVersion = "1.0.2"
     def jdkVersion = "21"
     def dockerImageName = "panweiji/mvnd-jdk"
@@ -691,6 +699,7 @@ def futureLab(map) {
         //sh "mvnd  install"
         //sh "mvn  install"
     }
+*/
 
 
 /*  println("服务启动失败回滚到上一个版本  保证服务高可用性")
