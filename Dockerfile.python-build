@@ -21,7 +21,7 @@ USER root
 # Create pip cache directory
 #RUN mkdir -p /pip-cache && \
 #    chmod -R 777 /pip-cache
-RUN touch /etc/apt/sources.list && chmod +x /etc/apt/sources.list && echo  'deb http://mirrors.aliyun.com/ubuntu/ jammy main restricted universe multiverse >> /etc/apt/sources.list
+RUN touch /etc/apt/sources.list && chmod +x /etc/apt/sources.list && echo  'deb http://mirrors.aliyun.com/ubuntu/ jammy main restricted universe multiverse' >> /etc/apt/sources.list
 
 ARG INSTALL_PACKAGES
 
