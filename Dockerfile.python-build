@@ -26,7 +26,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 #RUN mkdir -p /pip-cache && \
 #    chmod -R 777 /pip-cache
 #RUN touch /etc/apt/sources.list && chmod +x /etc/apt/sources.list && echo  'deb http://mirrors.aliyun.com/ubuntu/ jammy main restricted universe multiverse' >> /etc/apt/sources.list
-RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && apt-get clean || true && apt-get update || true \
+    && apt install -y --no-install-recommends libgl1-mesa-glx || true
 
 ARG INSTALL_PACKAGES
 
