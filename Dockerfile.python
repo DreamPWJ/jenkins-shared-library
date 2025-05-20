@@ -44,7 +44,6 @@ ARG INSTALL_PACKAGES
 # Install system dependencies and clean up
 RUN if [ -n "$INSTALL_PACKAGES" ]; then \
          echo "动态安装依赖 $INSTALL_PACKAGES" && \
-         sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && \
          apt install -y --no-install-recommends $INSTALL_PACKAGES && \
          rm -rf /var/lib/apt/lists/*; \
     fi
