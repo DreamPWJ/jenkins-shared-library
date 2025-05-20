@@ -38,8 +38,9 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     software-properties-common \
 
-ARG INSTALL_PACKAGES
 RUN python3 -V
+
+ARG INSTALL_PACKAGES
 # Install system dependencies and clean up
 RUN if [ -n "$INSTALL_PACKAGES" ]; then \
          echo "动态安装依赖 $INSTALL_PACKAGES" && \
