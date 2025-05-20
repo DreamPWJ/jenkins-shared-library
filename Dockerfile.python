@@ -45,9 +45,7 @@ ARG INSTALL_PACKAGES
 RUN if [ -n "$INSTALL_PACKAGES" ]; then \
          echo "动态安装依赖 $INSTALL_PACKAGES" && \
          sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && \
-         apt-get clean || true && \
-         apt-get update|| true && \
-         apt-get install -y --no-install-recommends $INSTALL_PACKAGES && \
+         apt install -y --no-install-recommends $INSTALL_PACKAGES && \
          rm -rf /var/lib/apt/lists/*; \
     fi
 
