@@ -6,7 +6,7 @@ ARG PYTHON_VERSION=3.10
 ENV PYTHONUNBUFFERED=1
 
 # 更新包列表并安装必要的依赖
-RUN apt-get update && apt-get install -y \
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list  && apt-get update && apt-get install -y \
     python${PYTHON_VERSION} \
     python3-pip \
     libgl1-mesa-glx \
