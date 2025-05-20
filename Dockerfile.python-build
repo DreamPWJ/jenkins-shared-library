@@ -1,7 +1,7 @@
 # Use an official Python runtime as a parent image
 ARG PYTHON_VERSION
 
-FROM python:${PYTHON_VERSION}-slim
+FROM ubuntu:latest
 
 # Set working directory
 WORKDIR /app
@@ -28,10 +28,7 @@ ARG INSTALL_PACKAGES
 # Install system dependencies and clean up
 RUN if [ -n "$INSTALL_PACKAGES" ]; then \
          echo "动态安装依赖 $INSTALL_PACKAGES" && \
-         apt-get clean && \
-         apt-get update && \
-         apt-get install -y --no-install-recommends $INSTALL_PACKAGES && \
-         rm -rf /var/lib/apt/lists/*; \
+         apt-get install -y --no-install-recommends $INSTALL_PACKAGES ; \
     fi
 
 # Copy requirements.txt (if it exists) to calculate hash
