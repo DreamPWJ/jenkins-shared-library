@@ -657,7 +657,7 @@ def futureLab(map) {
     def installPackages = "libgl1-mesa-glx" // 动态安装依赖包
     def dockerImageName = "panweiji/python-build"
     def dockerImageTag = pythonVersion + "" + (installPackages == "" ? "" : "-" + installPackages.replaceAll(" ", "-"))
-    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.python-build", dockerImageName, dockerImageTag, "--build-arg PYTHON_VERSION=${pythonVersion} --build-arg INSTALL_PACKAGES=${installPackages}")
+    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/.ci/python/Dockerfile", dockerImageName, dockerImageTag, "--build-arg PYTHON_VERSION=${pythonVersion} --build-arg INSTALL_PACKAGES=${installPackages}")
     docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
         sh "python -V"
     }
