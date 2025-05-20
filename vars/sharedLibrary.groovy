@@ -279,19 +279,19 @@ def call(String type = 'web-java', Map map) {
                     steps {
                         script {
                             // echo "Docker环境内Node构建方式"
-                            if ("${IS_PROD}" == 'true') {
-                                docker.image("panweiji/node:${NODE_VERSION.replace('Node', '')}").inside("") {
-                                    nodeBuildProject(map)
-                                }
-                            } else { // 验证新特性
-                                def nodeVersion = "${NODE_VERSION.replace('Node', '')}"
-                                def dockerImageName = "panweiji/node-build"
-                                def dockerImageTag = "${nodeVersion}"
-                                Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
-                                docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
-                                    nodeBuildProject(map)
-                                }
+                            /*   if ("${IS_PROD}" == 'true') {
+                                   docker.image("panweiji/node:${NODE_VERSION.replace('Node', '')}").inside("") {
+                                       nodeBuildProject(map)
+                                   }
+                               } else {*/ // 验证新特性
+                            def nodeVersion = "${NODE_VERSION.replace('Node', '')}"
+                            def dockerImageName = "panweiji/node-build"
+                            def dockerImageTag = "${nodeVersion}"
+                            Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
+                            docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
+                                nodeBuildProject(map)
                             }
+                            // }
                         }
                     }
                 }
@@ -1262,7 +1262,7 @@ def nodeBuildProject(map) {
                                 // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
                                 println("安装依赖 📥")
                                 // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱但依赖lock文件
-                                sh " pnpm install || yarn install || npm install || npm ci "
+                                sh " npm install || pnpm install || yarn install || npm ci "
                                 // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
                             }
 
