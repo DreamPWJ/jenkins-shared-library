@@ -1,7 +1,7 @@
 # Use an official Python runtime as a parent image
 ARG PYTHON_VERSION
 
-FROM ubuntu:latest
+FROM python:${PYTHON_VERSION}-slim
 
 # Set working directory
 WORKDIR /app
@@ -21,14 +21,17 @@ USER root
 # Create pip cache directory
 #RUN mkdir -p /pip-cache && \
 #    chmod -R 777 /pip-cache
-#RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list
 
 ARG INSTALL_PACKAGES
 
 # Install system dependencies and clean up
 RUN if [ -n "$INSTALL_PACKAGES" ]; then \
          echo "动态安装依赖 $INSTALL_PACKAGES" && \
-         apt-get install -y --no-install-recommends $INSTALL_PACKAGES ; \
+         apt-get clean && \
+         apt-get update && \
+         apt-get install -y --no-install-recommends $INSTALL_PACKAGES && \
+         rm -rf /var/lib/apt/lists/*; \
     fi
 
 # Copy requirements.txt (if it exists) to calculate hash
