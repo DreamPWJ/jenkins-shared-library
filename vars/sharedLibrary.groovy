@@ -1262,7 +1262,7 @@ def nodeBuildProject(map) {
                                 // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
                                 println("安装依赖 📥")
                                 // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱但依赖lock文件
-                                sh " pnpm install || npm install || npm ci || yarn install "
+                                sh " npm install || pnpm install || npm ci || yarn install "
                                 // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
                             }
 
