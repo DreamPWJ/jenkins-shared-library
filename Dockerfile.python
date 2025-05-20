@@ -38,7 +38,7 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     lsb-release \
     software-properties-common
 
-RUN python3 -V
+RUN python3 -V &&  apt install -y --no-install-recommends libgl1-mesa-glx
 
 ARG INSTALL_PACKAGES
 # Install system dependencies and clean up
