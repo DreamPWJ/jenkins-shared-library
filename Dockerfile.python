@@ -36,7 +36,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
     lsb-release \
-    software-properties-common \
+    software-properties-common
 
 RUN python3 -V
 
