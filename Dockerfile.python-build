@@ -27,6 +27,17 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 #RUN mkdir -p /pip-cache && \
 #    chmod -R 777 /pip-cache
 
+# 设置非交互式安装以避免提示
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 更新包列表并安装基本工具
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    gnupg \
+    lsb-release \
+    software-properties-common \
+
 ARG INSTALL_PACKAGES
 RUN python3 -V
 # Install system dependencies and clean up
