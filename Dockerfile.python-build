@@ -28,7 +28,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 #    chmod -R 777 /pip-cache
 
 ARG INSTALL_PACKAGES
-RUN python -V
+RUN python3 -V
 # Install system dependencies and clean up
 RUN if [ -n "$INSTALL_PACKAGES" ]; then \
          echo "动态安装依赖 $INSTALL_PACKAGES" && \
