@@ -42,7 +42,7 @@ RUN if [ -n "$INSTALL_PACKAGES" ]; then \
 RUN ln -sf python3 /usr/bin/python && python -V
 
 # 安装pip
-RUN apt-get install -y python3-pip && pip --version
+RUN apt-get install -y python3-pip python3-full && pip --version
 
 # 下载项目依赖包
 #COPY requirements.txt requirements.txt
@@ -56,7 +56,7 @@ COPY python.tar.gz .
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
- && /usr/lib/python3/dist-packages/pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
+ && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
  && pwd && ls -l
 
 # 暴露端口
