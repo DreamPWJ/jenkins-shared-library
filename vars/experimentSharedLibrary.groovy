@@ -653,7 +653,7 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
-    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
+/*    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
         // 压缩源码文件 加速传输
         Python.codePackage(this)
     }
@@ -664,16 +664,16 @@ def futureLab(map) {
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.python", dockerImageName, dockerImageTag, "--build-arg PYTHON_VERSION=${pythonVersion} --build-arg INSTALL_PACKAGES=${installPackages}")
     docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
         sh "python -V"
-    }
+    }*/
 
-/*    def dockerImageName = "panweiji/k8s-build"
+    def dockerImageName = "panweiji/k8s-build"
     def dockerImageTag = "latest"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.k8s-new", dockerImageName, dockerImageTag, "")
     docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
         sh "python -V"
         sh "kubectl version --client"
         // sh "helm version"
-    }*/
+    }
 
 /*    def nodeVersion = "${"Node20".replace('Node', '')}"
     def dockerImageName = "panweiji/node-build"
