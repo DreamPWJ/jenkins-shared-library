@@ -3,6 +3,8 @@
 # Description: 自定义构建Python语言镜像
 
 ARG PYTHON_VERSION
+ARG EXPOSE_PORT
+ARG PYTHON_START_FILE
 
 # 依赖基础镜像
 #FROM python:${PYTHON_VERSION}-slim
@@ -32,23 +34,29 @@ RUN apt-get clean && apt-get update && apt-get install -y curl wget software-pro
 ARG INSTALL_PACKAGES
 RUN if [ -n "$INSTALL_PACKAGES" ]; then \
          echo "动态安装依赖 $INSTALL_PACKAGES" && \
-         apt install -y --no-install-recommends $INSTALL_PACKAGES && \
-         rm -rf /var/lib/apt/lists/*; \
+         apt install -y --no-install-recommends $INSTALL_PACKAGES ; \
     fi
 
 # 创建软链接（将 python 指向 python3）确保python命令生效
 RUN ln -s /usr/bin/python3 /usr/bin/python && python -V
 
-# Copy requirements.txt (if it exists) to calculate hash
-COPY requirements.txt* /app/
-COPY requirement.txt* /app/
+# 下载项目依赖包
+#COPY requirements.txt requirements.txt
 
+# 复制代码到容器 ADD 会自动解压，COPY 不会解压  注意tar.gz不能使用中划线命名
+#COPY . .
+COPY python.tar.gz .
 
-#RUN mv requirement.txt requirements.txt || true && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-RUN pwd && ls
+# 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包
+# Docker 19.03后版本可启用 BuildKit 方式指定缓存目录 --mount=type=cache,target=/var/cache/pip
+RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
+ && mv requirement.txt requirements.txt || true \
+ && rm -f *.tar.gz \
+ && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
+ && pwd && ls -l
 
-# Copy application code
-COPY . /app
+# 暴露端口
+EXPOSE $EXPOSE_PORT
 
-# Default command
-CMD ["python", "app.py"]
+# 根据主文件默认名称 app.py  CMD中的"$MY_VAR"变量设置成 docker run -e MY_VAR=value 运行变量 否则无法获取
+CMD python /app/$PYTHON_START_FILE
