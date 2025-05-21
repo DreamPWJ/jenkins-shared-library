@@ -1,11 +1,18 @@
-# Use an official Python runtime as a parent image
+# Author: 潘维吉
+# Version 1.0.0
+# Description: 自定义构建Python语言镜像
+
 ARG PYTHON_VERSION
 
+# 依赖基础镜像
 #FROM python:${PYTHON_VERSION}-slim
 FROM  ubuntu:latest
 
-# Set working directory
+# 设置工作目录
 WORKDIR /app
+
+# 挂载数据卷 docker删除后数据不丢失 docker run -v 映射
+VOLUME /app
 
 # 指定切换用户
 USER root
@@ -14,34 +21,22 @@ USER root
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Set environment variables
-#ENV PIP_CACHE_DIR=/pip-cache \
-#    PIP_NO_CACHE_DIR=false \
-#    PYTHONDONTWRITEBYTECODE=1 \
-#    PYTHONUNBUFFERED=1
-
-# 挂载数据卷 docker删除后数据不丢失 docker run -v 映射
-#VOLUME $PIP_CACHE_DIR
-
-# Create pip cache directory
-#RUN mkdir -p /pip-cache && \
-#    chmod -R 777 /pip-cache
-
-# 设置非交互式安装以避免提示
+# 设置环境变量
 ENV DEBIAN_FRONTEND=noninteractive
+    PIP_CACHE_DIR=/app
 
 # 更新包列表并安装基本工具
 RUN apt-get clean && apt-get update && apt-get install -y curl wget software-properties-common
 
+# 动态安装依赖环境包
 ARG INSTALL_PACKAGES
-# Install system dependencies and clean up
 RUN if [ -n "$INSTALL_PACKAGES" ]; then \
          echo "动态安装依赖 $INSTALL_PACKAGES" && \
          apt install -y --no-install-recommends $INSTALL_PACKAGES && \
          rm -rf /var/lib/apt/lists/*; \
     fi
 
-# 创建软链接（将 python 指向 python3）
+# 创建软链接（将 python 指向 python3）确保python命令生效
 RUN ln -s /usr/bin/python3 /usr/bin/python && python -V
 
 # Copy requirements.txt (if it exists) to calculate hash
