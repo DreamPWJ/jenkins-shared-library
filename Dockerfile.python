@@ -29,7 +29,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1
 
 # 更新包列表并安装基本工具
-RUN apt-get clean && apt-get update && apt-get install -y curl wget tar software-properties-common
+RUN apt-get clean && apt-get update && apt-get install -y curl wget tar software-properties-common \
+     python3  python3-pip python3-venv build-essential
 
 # 动态安装依赖环境包
 ARG INSTALL_PACKAGES
@@ -39,10 +40,10 @@ RUN if [ -n "$INSTALL_PACKAGES" ]; then \
     fi
 
 # 创建软链接（将 python 指向 python3）确保python命令生效
-RUN ln -sf python3 /usr/bin/python && python -V
-
+RUN ln -sf python3 /usr/bin/python && python3 -m venv /opt/venv && python -V
+ENV PATH="/opt/venv/bin:$PATH"
 # 安装pip 创建独立的虚拟环境（如 venv）隔离项目依赖，避免污染系统环境
-RUN apt-get install -y  python3-pip && rm -f /usr/bin/pip || true && ln -s /usr/bin/pip3 /usr/bin/pip &&  pip install --no-cache-dir --upgrade pip && pip --version && which pip
+#RUN apt-get install -y python3-pip && rm -f /usr/bin/pip || true && ln -s /usr/bin/pip3 /usr/bin/pip && pip install --no-cache-dir --upgrade pip && pip --version && which pip
 
 # 下载项目依赖包
 #COPY requirements.txt requirements.txt
@@ -56,7 +57,7 @@ COPY python.tar.gz .
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
- && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
+ && pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
  && pwd && ls -l
 
 # 暴露端口
