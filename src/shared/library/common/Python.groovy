@@ -11,6 +11,17 @@ import shared.library.Utils
 class Python implements Serializable {
 
     /**
+     * 源码打包压缩
+     */
+    static def codePackage(ctx) {
+        // 压缩打包
+        // 压缩源码文件 加速传输
+        def pythonPackageName = "python.tar.gz"
+        ctx.sh " rm -rf *.tar.gz "
+        ctx.sh " tar --warning=no-file-changed -pzcvf ${pythonPackageName} --exclude '*.md' --exclude '*.pyc' --exclude .git --exclude ci --exclude ci@tmp --exclude '*.log' --exclude '*.docx' --exclude '*.xlsx' * >/dev/null 2>&1 "
+    }
+
+    /**
      * 构建
      * Python作为解析型语言无需提供制品包方式 可以直接使用源码部署
      * 参考镜像构建: https://docs.docker.com/language/python/build-images/

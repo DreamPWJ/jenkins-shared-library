@@ -653,6 +653,10 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
+    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
+        // 压缩源码文件 加速传输
+        Python.codePackage(this)
+    }
     def pythonVersion = "3.10"
     def installPackages = "libglx-mesa0" // 动态安装依赖包
     def dockerImageName = "panweiji/python"

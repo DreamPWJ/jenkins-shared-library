@@ -1393,11 +1393,8 @@ def goBuildProject() {
  */
 def pythonBuildProject() {
     dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
-        // Python.build(this)  // 是否需要打包Python应用  不打包情况可直接用源码运行
         // 压缩源码文件 加速传输
-        def pythonPackageName = "python.tar.gz"
-        sh " rm -rf *.tar.gz "
-        sh " tar --warning=no-file-changed -pzcvf ${pythonPackageName} --exclude '*.md' --exclude '*.pyc' --exclude .git --exclude ci --exclude ci@tmp --exclude '*.log' --exclude '*.docx' --exclude '*.xlsx' * >/dev/null 2>&1 "
+        Python.codePackage(this)
     }
     Tools.printColor(this, "Python语言构建成功 ✅")
 }
