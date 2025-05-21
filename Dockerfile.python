@@ -38,7 +38,7 @@ RUN if [ -n "$INSTALL_PACKAGES" ]; then \
     fi
 
 # 创建软链接（将 python 指向 python3）确保python命令生效
-RUN ln -s /usr/bin/python3 /usr/bin/python && python -V
+RUN apt-get install -y python3-pip  && ln -s /usr/bin/python3 /usr/bin/python && python -V
 
 # 下载项目依赖包
 #COPY requirements.txt requirements.txt
@@ -56,7 +56,7 @@ RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && pwd && ls -l
 
 # 暴露端口
-EXPOSE $EXPOSE_PORT
+EXPOSE 5000
 
 # 根据主文件默认名称 app.py  CMD中的"$MY_VAR"变量设置成 docker run -e MY_VAR=value 运行变量 否则无法获取
-CMD python /app/$PYTHON_START_FILE
+CMD python /app/mian.py
