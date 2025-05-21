@@ -31,20 +31,19 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 ENV DEBIAN_FRONTEND=noninteractive
 
 # 更新包列表并安装基本工具
-RUN apt-get clean && apt-get update && apt-get install -y \
-    curl \
-    wget \
-    gnupg \
-    lsb-release \
-    software-properties-common
+#RUN apt-get clean && apt-get update && apt-get install -y \
+#    curl \
+#    wget \
+#    gnupg \
+#    lsb-release \
+#    software-properties-common
 
 RUN python -V
 ARG INSTALL_PACKAGES
 # Install system dependencies and clean up
 RUN if [ -n "$INSTALL_PACKAGES" ]; then \
          echo "动态安装依赖 $INSTALL_PACKAGES" && \
-         apt install -y --no-install-recommends $INSTALL_PACKAGES && \
-         rm -rf /var/lib/apt/lists/*; \
+         apt install -y --no-install-recommends $INSTALL_PACKAGES ; \
     fi
 
 # Copy requirements.txt (if it exists) to calculate hash
