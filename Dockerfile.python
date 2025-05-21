@@ -42,7 +42,7 @@ RUN if [ -n "$INSTALL_PACKAGES" ]; then \
 RUN ln -sf python3 /usr/bin/python && python -V
 
 # 安装pip 创建独立的虚拟环境（如 venv）隔离项目依赖，避免污染系统环境
-RUN python3 -m ensurepip --upgrade && pip --version && which pip
+RUN apt-get install -y  python3-pip &&  ln -s /usr/bin/pip3 /usr/bin/pip &&  pip install --no-cache-dir --upgrade pip && pip --version && which pip
 
 # 下载项目依赖包
 #COPY requirements.txt requirements.txt
