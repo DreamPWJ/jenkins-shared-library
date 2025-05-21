@@ -40,14 +40,18 @@ RUN curl -LO "${K8S_MIRROR}/release/$(curl -L -s ${K8S_MIRROR}/release/stable.tx
 #    && apt-get install -y helm \
 #    && rm -rf /var/lib/apt/lists/*
 
-# 安装Python 3和pip  Ubuntu系统默认自带Python环境
-RUN apt-get install -y python3 python3-pip
+# 安装Python 3和pip   确保python命令生效
+RUN apt-get install -y python3 python3-pip python3-venv build-essential && \
+    ln -sf python3 /usr/bin/python && python3 -m venv /opt/venv
+
+# 设置python环境
+ENV PATH="/opt/venv/bin:$PATH"
 
 # Python动态处理yaml文件
-RUN pip3 install ruamel.yaml
+RUN pip install ruamel.yaml
 
 # 验证服务是否安装成功
-RUN kubectl version --client &&  python3 -V
+RUN kubectl version --client &&  python -V
 # && helm version
 
 # 设置默认命令
