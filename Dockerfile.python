@@ -41,7 +41,8 @@ RUN if [ -n "$INSTALL_PACKAGES" ]; then \
          rm -rf /var/lib/apt/lists/*; \
     fi
 
-RUN python -V
+# 创建软链接（将 python 指向 python3）
+RUN ln -s /usr/bin/python3 /usr/bin/python && python -V
 
 # Copy requirements.txt (if it exists) to calculate hash
 COPY requirements.txt* /app/
