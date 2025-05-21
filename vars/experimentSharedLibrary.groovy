@@ -654,7 +654,7 @@ def pullProjectCode() {
 def futureLab(map) {
 
     def pythonVersion = "3.10"
-    def installPackages = "libgl1-mesa-glx" // 动态安装依赖包
+    def installPackages = "libglx-mesa0" // 动态安装依赖包
     def dockerImageName = "panweiji/python"
     def dockerImageTag = pythonVersion + "" + (installPackages == "" ? "" : "-" + installPackages.replaceAll(" ", "-"))
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.python", dockerImageName, dockerImageTag, "--build-arg PYTHON_VERSION=${pythonVersion} --build-arg INSTALL_PACKAGES=${installPackages}")
