@@ -25,7 +25,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 设置环境变量
 ENV DEBIAN_FRONTEND=noninteractive \
-    PIP_CACHE_DIR=/app
+    PIP_CACHE_DIR=/app \
+    PYTHONUNBUFFERED=1
 
 # 更新包列表并安装基本工具
 RUN apt-get clean && apt-get update && apt-get install -y curl wget software-properties-common
@@ -38,7 +39,8 @@ RUN if [ -n "$INSTALL_PACKAGES" ]; then \
     fi
 
 # 创建软链接（将 python 指向 python3）确保python命令生效
-RUN apt-get install -y python3-pip  && ln -s /usr/bin/python3 /usr/bin/python && python -V
+RUN  ln -sf python3 /usr/bin/python && python -V  && \
+     apt-get install -y python3-pip && pip3 install --no-cache --upgrade pip setuptools
 
 # 下载项目依赖包
 #COPY requirements.txt requirements.txt
