@@ -8,7 +8,7 @@ ARG PYTHON_START_FILE
 
 # 依赖基础镜像
 #FROM python:${PYTHON_VERSION}-slim
-FROM  ubuntu:latest
+FROM ubuntu:latest
 
 # 设置工作目录
 WORKDIR /app
@@ -42,7 +42,7 @@ RUN if [ -n "$INSTALL_PACKAGES" ]; then \
 RUN ln -sf python3 /usr/bin/python && python -V
 
 # 安装pip
-RUN apt-get install -y python3-pip && pip install --no-cache --upgrade pip setuptools
+RUN apt-get install -y python3-pip && pip3 --version
 
 # 下载项目依赖包
 #COPY requirements.txt requirements.txt
