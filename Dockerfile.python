@@ -42,7 +42,7 @@ RUN if [ -n "$INSTALL_PACKAGES" ]; then \
 RUN ln -sf python3 /usr/bin/python && python -V  \
 
 # 安装pip3
-RUN apt-get install -y python3-pip && python3 -m ensurepip && pip3 install --no-cache --upgrade pip setuptools
+RUN apt-get install -y python3-pip && pip3 install --no-cache --upgrade pip setuptools
 
 # 下载项目依赖包
 #COPY requirements.txt requirements.txt
