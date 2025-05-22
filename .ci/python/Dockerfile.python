@@ -41,7 +41,6 @@ RUN if [ -n "$INSTALL_PACKAGES" ]; then \
 
 # 确保python命令生效
 RUN ln -sf python3 /usr/bin/python && python3 -m venv /opt/venv && python -V
-RUN pip3 install --no-cache --upgrade pip setuptools
 
 # 设置python环境
 ENV PATH="/opt/venv/bin:$PATH"
@@ -58,7 +57,7 @@ COPY python.tar.gz .
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
- && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
+ && pip install -r requirements.txt  \
  && pwd && ls -l
 
 # 暴露端口
