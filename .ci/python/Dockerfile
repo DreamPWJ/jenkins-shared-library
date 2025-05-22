@@ -9,19 +9,14 @@ ARG PROJECT_NAME
 ARG EXPOSE_PORT
 ARG PYTHON_START_FILE
 
-# Dockerfile多阶段构建 参考文档: https://docs.docker.com/develop/develop-images/multistage-build/
-# 示例 FROM golang:1.16 下行注释的KEY值动态替换
-#FROM-MULTISTAGE-BUILD-IMAGES
-
-# 依赖基础镜像 多阶段构建复用docker缓存层加速构建
+# 依赖基础镜像
 FROM python:${PYTHON_VERSION}-slim
-
-# 多阶段构建镜像 从上一个镜像内复制环境到本镜像
-# 示例 COPY --from=0 / /   下行注释的KEY值动态替换
-#COPY-MULTISTAGE-BUILD-IMAGES
 
 # Docker 将此路径用作所有后续命令的默认位置
 WORKDIR /app
+
+# 挂载数据卷 docker删除后数据不丢失 docker run -v 映射
+VOLUME /app
 
 # 指定切换用户
 USER root
@@ -30,19 +25,19 @@ USER root
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# 更新默认的apk仓库，并添加额外的、速度较快的国内源（这里以阿里云为例）
-#RUN echo "https://mirrors.aliyun.com/alpine/v3.19/main" > /etc/apk/repositories && \
-#    echo "https://mirrors.aliyun.com/alpine/v3.19/community" >> /etc/apk/repositories \
+# 设置环境变量
+ENV DEBIAN_FRONTEND=noninteractive \
+    PIP_CACHE_DIR=/app/pip_cache \
+    PYTHONUNBUFFERED=1
 
-# 安装特定项目依赖环境  --no-install-recommends不安装那些被推荐但非必需的依赖包
-RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && apt-get clean || true && apt-get update || true \
-    && apt install -y --no-install-recommends libgl1-mesa-glx || true
-
-# 下载项目依赖包
-#COPY requirements.txt requirements.txt
+# 动态安装依赖环境包 安装特定项目依赖环境  --no-install-recommends不安装那些被推荐但非必需的依赖包
+ARG CUSTOM_INSTALL_PACKAGES
+RUN if [ -n "$CUSTOM_INSTALL_PACKAGES" ]; then \
+    sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && apt-get clean || true && apt-get update || true \
+    && apt-get install -y --no-install-recommends $CUSTOM_INSTALL_PACKAGES ; \
+    fi
 
 # 复制代码到容器 ADD 会自动解压，COPY 不会解压  注意tar.gz不能使用中划线命名
-#COPY . .
 COPY python.tar.gz .
 
 # 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包

@@ -864,6 +864,8 @@ def getInitParams(map) {
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
     // 自定义服务部署启动命令
     CUSTOM_STARTUP_COMMAND = jsonParams.CUSTOM_STARTUP_COMMAND ? jsonParams.CUSTOM_STARTUP_COMMAND.trim() : ""
+    // 自定义服务部署安装包 多个空格分隔
+    CUSTOM_INSTALL_PACKAGES = jsonParams.CUSTOM_INSTALL_PACKAGES ? jsonParams.CUSTOM_INSTALL_PACKAGES.trim() : ""
 
     // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值
     if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值

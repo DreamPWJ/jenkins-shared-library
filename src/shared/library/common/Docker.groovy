@@ -210,6 +210,7 @@ class Docker implements Serializable {
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg EXPOSE_PORT="${exposePort}"  \
                             --build-arg PYTHON_VERSION=${ctx.CUSTOM_PYTHON_VERSION} --build-arg PYTHON_START_FILE=${ctx.CUSTOM_PYTHON_START_FILE} \
+                            --build-arg CUSTOM_INSTALL_PACKAGES=${ctx.CUSTOM_INSTALL_PACKAGES} \
                             -f ${ctx.env.WORKSPACE}/ci/.ci/python/Dockerfile . --no-cache \
                             ${dockerPushDiffStr}
                             """
@@ -368,7 +369,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
                         " -e \"PROJECT_NAME=${ctx.PROJECT_NAME}\" -e PYTHON_START_FILE=\"${ctx.CUSTOM_PYTHON_START_FILE}\" " +
                         " -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1 " +
                         " -e HOST_NAME=\$(hostname) " +
-                        " ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs " +
+                        " ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/app:/app " +
                         " --name ${containerName} ${imageName}:${dockerRollBackTag} ' "
             }
         }
