@@ -211,7 +211,7 @@ class Docker implements Serializable {
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg EXPOSE_PORT="${exposePort}"  \
                             --build-arg PYTHON_VERSION=${ctx.CUSTOM_PYTHON_VERSION} --build-arg PYTHON_START_FILE=${ctx.CUSTOM_PYTHON_START_FILE} \
                             --build-arg CUSTOM_INSTALL_PACKAGES=${ctx.CUSTOM_INSTALL_PACKAGES} \
-                            -f ${ctx.env.WORKSPACE}/ci/.ci/python/Dockerfile . --no-cache \
+                            -f ${ctx.env.WORKSPACE}/ci/.ci/python/Dockerfile .  \
                             ${dockerPushDiffStr}
                             """
                 }
