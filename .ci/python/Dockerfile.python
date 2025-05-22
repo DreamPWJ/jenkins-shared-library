@@ -30,14 +30,15 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 # 更新包列表并安装基本工具
 RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list && \
-     apt-get install -y curl wget tar software-properties-common \
-     python3  python3-pip python3-venv build-essential
+     apt-get update && apt-get install -y curl wget tar software-properties-common \
+     python3  python3-pip python3-venv build-essential \
+     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 动态安装依赖环境包
 ARG INSTALL_PACKAGES
 RUN if [ -n "$INSTALL_PACKAGES" ]; then \
          echo "动态安装依赖 $INSTALL_PACKAGES" && \
-         apt install -y --no-install-recommends $INSTALL_PACKAGES ; \
+         apt-get install -y --no-install-recommends $INSTALL_PACKAGES ; \
     fi
 
 # 确保python命令生效
