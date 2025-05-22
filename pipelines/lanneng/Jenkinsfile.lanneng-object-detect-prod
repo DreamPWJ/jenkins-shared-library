@@ -136,6 +136,7 @@ JSON_PARAMS
    "K8S_POD_REPLICAS" : "2",
    "CUSTOM_PYTHON_START_FILE" : "app_onnx.py",
    "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check" ,
+    "CUSTOM_INSTALL_PACKAGES" : "libgl1-mesa-glx",
    "APPLICATION_DOMAIN" : "https://object-detect-api.pengbocloud.com" ,
 }
 
