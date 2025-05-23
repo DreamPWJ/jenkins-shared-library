@@ -10,6 +10,7 @@ class Maven implements Serializable {
 
     /**
      * 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
+     * 多核cpu构建速度比较明显快 核数少构建速度差距不大
      */
     static def mvndPackage(ctx) {
         ctx.sh "mvnd --version"

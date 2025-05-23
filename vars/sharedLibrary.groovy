@@ -263,7 +263,7 @@ def call(String type = 'web-java', Map map) {
                         *//* dockerfile {
                           filename 'Dockerfile.node-build' // 在WORKSPACE工作区代码目录
                           dir "${env.WORKSPACE}/ci"
-                          // additionalBuildArgs  '--build-arg version=1.0.2'
+                          // additionalBuildArgs  '--build-arg version=1.0.0'
                           // args " -v /${env.WORKSPACE}:/tmp "
                           reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
                       }*//*
@@ -279,19 +279,19 @@ def call(String type = 'web-java', Map map) {
                     steps {
                         script {
                             // echo "Docker环境内Node构建方式"
-                            if ("${IS_PROD}" == 'true') {
-                                docker.image("panweiji/node:${NODE_VERSION.replace('Node', '')}").inside("") {
-                                    nodeBuildProject(map)
-                                }
-                            } else { // 验证新特性
-                                def nodeVersion = "${NODE_VERSION.replace('Node', '')}"
-                                def dockerImageName = "panweiji/node-build"
-                                def dockerImageTag = "${nodeVersion}"
-                                Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
-                                docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
-                                    nodeBuildProject(map)
-                                }
+                            /*   if ("${IS_PROD}" == 'true') {
+                                   docker.image("panweiji/node:${NODE_VERSION.replace('Node', '')}").inside("") {
+                                       nodeBuildProject(map)
+                                   }
+                               } else {*/ // 验证新特性
+                            def nodeVersion = "${NODE_VERSION.replace('Node', '')}"
+                            def dockerImageName = "panweiji/node-build"
+                            def dockerImageTag = "${nodeVersion}"
+                            Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
+                            docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
+                                nodeBuildProject(map)
                             }
+                            // }
                         }
                     }
                 }
@@ -336,11 +336,13 @@ def call(String type = 'web-java', Map map) {
                           }*/
                     steps {
                         script {
-                            if ("${IS_PROD}" == 'true') {
-                                docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-                                    mavenBuildProject(map)
-                                }
-                            } else if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11) {
+                            /* if ("${IS_PROD}" == 'true') {
+                                  docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+                                      mavenBuildProject(map)
+                                  }
+                              } else*/
+                            if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11) {
+                                // mvnd支持条件
                                 def mvndVersion = "1.0.2"
                                 def jdkVersion = "${JDK_VERSION}"
                                 def dockerImageName = "panweiji/mvnd-jdk"
@@ -568,7 +570,7 @@ def call(String type = 'web-java', Map map) {
                         /*   dockerfile {
                               filename 'Dockerfile.k8s' // 在WORKSPACE工作区代码目录
                               dir "${env.WORKSPACE}/ci"
-                              // additionalBuildArgs  '--build-arg version=1.0.2'
+                              // additionalBuildArgs  '--build-arg version=1.0.0'
                               // args " -v /${env.WORKSPACE}:/tmp "
                               reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
                           } */
@@ -862,6 +864,8 @@ def getInitParams(map) {
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
     // 自定义服务部署启动命令
     CUSTOM_STARTUP_COMMAND = jsonParams.CUSTOM_STARTUP_COMMAND ? jsonParams.CUSTOM_STARTUP_COMMAND.trim() : ""
+    // 自定义服务部署安装包 多个空格分隔
+    CUSTOM_INSTALL_PACKAGES = jsonParams.CUSTOM_INSTALL_PACKAGES ? jsonParams.CUSTOM_INSTALL_PACKAGES.trim() : ""
 
     // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值
     if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
@@ -1260,7 +1264,7 @@ def nodeBuildProject(map) {
                                 // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
                                 println("安装依赖 📥")
                                 // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱但依赖lock文件
-                                sh " pnpm install || yarn install || npm install || npm ci "
+                                sh " npm install || pnpm install || npm ci || yarn install "
                                 // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
                             }
 
@@ -1391,11 +1395,8 @@ def goBuildProject() {
  */
 def pythonBuildProject() {
     dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
-        // Python.build(this)  // 是否需要打包Python应用  不打包情况可直接用源码运行
         // 压缩源码文件 加速传输
-        def pythonPackageName = "python.tar.gz"
-        sh " rm -rf *.tar.gz "
-        sh " tar --warning=no-file-changed -pzcvf ${pythonPackageName} --exclude '*.md' --exclude '*.pyc' --exclude .git --exclude ci --exclude ci@tmp --exclude '*.log' --exclude '*.docx' --exclude '*.xlsx' * >/dev/null 2>&1 "
+        Python.codePackage(this)
     }
     Tools.printColor(this, "Python语言构建成功 ✅")
 }
@@ -1460,46 +1461,48 @@ def uploadOss(map) {
  * 上传部署文件到远程云端
  */
 def uploadRemote(filePath, map) {
-    // 应用包部署目录
-    projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
-    // ssh免密登录检测和设置
-    autoSshLogin(map)
-    timeout(time: 2, unit: 'MINUTES') {
-        // 同步脚本和配置到部署服务器
-        syncScript()
-    }
-    println("上传部署文件到部署服务器中... 🚀 ")
-    // 基于scp或rsync同步文件到远程服务器
-    if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行自定义命令启动
-        sh " scp ${proxyJumpSCPText} ${sourceCodeDeployName}.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
-    } else if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
-        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-            dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
-                sh " scp ${proxyJumpSCPText} ${npmPackageLocation} " +
-                        "${remote.user}@${remote.host}:${projectDeployFolder}"
-            }
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-            // 上传前删除部署目录的jar包 防止名称修改等导致多个部署目标jar包存在  jar包需要唯一性
-            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd ${projectDeployFolder} && rm -f *.${javaPackageType}' "
-            dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
-                // 上传构建包到远程服务器
-                sh " scp ${proxyJumpSCPText} ${mavenPackageLocation} ${remote.user}@${remote.host}:${projectDeployFolder} "
-            }
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
-            // Go语言打包产物 上传包到远程服务器
-            sh "cd ${filePath} && scp ${proxyJumpSCPText} main.go ${remote.user}@${remote.host}:${projectDeployFolder} "
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-            // Python语言打包产物 上传包到远程服务器
-            // sh "cd ${filePath}/dist && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
-            dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
-                sh "scp ${proxyJumpSCPText} python.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
-            }
-        } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) {
-            // C++语言打包产物 上传包到远程服务器
-            sh "cd ${filePath} && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
+    retry(2) {   // 重试几次 可能网络等问题导致上传失败
+        // 应用包部署目录
+        projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
+        // ssh免密登录检测和设置
+        autoSshLogin(map)
+        timeout(time: 2, unit: 'MINUTES') {
+            // 同步脚本和配置到部署服务器
+            syncScript()
         }
+        println("上传部署文件到部署服务器中... 🚀 ")
+        // 基于scp或rsync同步文件到远程服务器
+        if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行自定义命令启动
+            sh " scp ${proxyJumpSCPText} ${sourceCodeDeployName}.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
+        } else if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
+            if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
+                dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
+                    sh " scp ${proxyJumpSCPText} ${npmPackageLocation} " +
+                            "${remote.user}@${remote.host}:${projectDeployFolder}"
+                }
+            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+                // 上传前删除部署目录的jar包 防止名称修改等导致多个部署目标jar包存在  jar包需要唯一性
+                sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd ${projectDeployFolder} && rm -f *.${javaPackageType}' "
+                dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
+                    // 上传构建包到远程服务器
+                    sh " scp ${proxyJumpSCPText} ${mavenPackageLocation} ${remote.user}@${remote.host}:${projectDeployFolder} "
+                }
+            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
+                // Go语言打包产物 上传包到远程服务器
+                sh "cd ${filePath} && scp ${proxyJumpSCPText} main.go ${remote.user}@${remote.host}:${projectDeployFolder} "
+            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
+                // Python语言打包产物 上传包到远程服务器
+                // sh "cd ${filePath}/dist && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
+                dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
+                    sh "scp ${proxyJumpSCPText} python.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
+                }
+            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) {
+                // C++语言打包产物 上传包到远程服务器
+                sh "cd ${filePath} && scp ${proxyJumpSCPText} app ${remote.user}@${remote.host}:${projectDeployFolder} "
+            }
+        }
+        Tools.printColor(this, "上传部署文件到部署服务器完成 ✅")
     }
-    Tools.printColor(this, "上传部署文件到部署服务器完成 ✅")
 }
 
 /**

@@ -84,7 +84,7 @@ map.put('is_need_sass', false)
 map.put('jenkins_node', 'node-2')
 map.put('jenkins_node_frontend', 'node-2')
 
-// 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
+// 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.9
 map.put('nodejs', 'Node18')
 map.put('maven', 'Maven3.6')
 map.put('jdk_publisher', 'openjdk')
@@ -136,6 +136,7 @@ JSON_PARAMS
    "K8S_POD_REPLICAS" : "2",
    "CUSTOM_PYTHON_START_FILE" : "app_onnx.py",
    "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check" ,
+    "CUSTOM_INSTALL_PACKAGES" : "libgl1-mesa-glx",
    "APPLICATION_DOMAIN" : "https://object-detect-api.pengbocloud.com" ,
 }
 

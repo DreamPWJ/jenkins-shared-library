@@ -4,6 +4,6 @@
 
 ARG JDK_VERSION
 
-# 基础镜像 默认值变量方式 ${JDK_VERSION:-11}
-FROM maven:3.8-openjdk-${JDK_VERSION:-11}
+# 基础镜像 默认值变量方式 ${JDK_VERSION:-21}
+FROM maven:3.9-openjdk-${JDK_VERSION:-21}
 

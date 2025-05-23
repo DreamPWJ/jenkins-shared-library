@@ -203,14 +203,15 @@ class Docker implements Serializable {
                             ${dockerPushDiffStr}
                             """
                 } else if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-                    def dockerImagesName = "python:${ctx.CUSTOM_PYTHON_VERSION}"
+                    def dockerImagesName = "python:${ctx.CUSTOM_PYTHON_VERSION}-slim"
                     // 拉取基础镜像避免重复下载
                     ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.GIT_PROJECT_FOLDER_NAME} && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg EXPOSE_PORT="${exposePort}"  \
                             --build-arg PYTHON_VERSION=${ctx.CUSTOM_PYTHON_VERSION} --build-arg PYTHON_START_FILE=${ctx.CUSTOM_PYTHON_START_FILE} \
-                            -f ${ctx.env.WORKSPACE}/ci/.ci/python/Dockerfile . --no-cache \
+                            --build-arg CUSTOM_INSTALL_PACKAGES=${ctx.CUSTOM_INSTALL_PACKAGES} \
+                            -f ${ctx.env.WORKSPACE}/ci/.ci/python/Dockerfile .  \
                             ${dockerPushDiffStr}
                             """
                 }
@@ -368,7 +369,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
                         " -e \"PROJECT_NAME=${ctx.PROJECT_NAME}\" -e PYTHON_START_FILE=\"${ctx.CUSTOM_PYTHON_START_FILE}\" " +
                         " -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1 " +
                         " -e HOST_NAME=\$(hostname) " +
-                        " ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs " +
+                        " ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/app:/app " +
                         " --name ${containerName} ${imageName}:${dockerRollBackTag} ' "
             }
         }
@@ -378,11 +379,15 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
     /**
      * 根据Dockerfile构建镜像
      */
-    static def buildDockerImage(ctx, map, dockerFilePath, imageName, imageTag, buildParams) {
+    static def buildDockerImage(ctx, map, dockerFilePath, imageName, imageTag, buildParams, isReBuild = false) {
         ctx.println("根据自定义Dockerfile构建增强环境的镜像")
         // 构建镜像 判断镜像是否存在
-        ctx.sh " docker image inspect ${imageName}:${imageTag} >/dev/null 2>&1 || " +
-                " DOCKER_BUILDKIT=1 docker build ${buildParams} -t ${imageName}:${imageTag}  -f ${dockerFilePath} .  --load "
+        def imagesExistCommand = ""
+        if (!isReBuild) { // 是否重新构建镜像
+            imagesExistCommand = " docker image inspect ${imageName}:${imageTag} >/dev/null 2>&1 || "
+        }
+        ctx.sh " ${imagesExistCommand} " +
+                " DOCKER_BUILDKIT=1 docker build ${buildParams} -t ${imageName}:${imageTag}  -f ${dockerFilePath} . --no-cache "
     }
 
 

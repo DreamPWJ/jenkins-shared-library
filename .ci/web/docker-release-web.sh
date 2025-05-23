@@ -120,7 +120,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     docker build -t ${docker_image_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg NPM_PACKAGE_FOLDER=${npm_package_folder} \
     --build-arg PROJECT_NAME=${project_name} --build-arg WEB_STRIP_COMPONENTS=${web_strip_components} \
-    -f /${deploy_folder}/web/Dockerfile . --no-cache
+    -f /${deploy_folder}/web/Dockerfile .
 else
   docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
 fi

@@ -3,7 +3,7 @@
 # Description: 自定义K8S云原生构建部署环境
 
 # 多阶段进行 利用Python语言便利性自定义脚本处理等
-#FROM python:3.12.0
+#FROM python:3.12.0-slim
 
 # 基础镜像
 FROM dtzar/helm-kubectl:latest
@@ -28,6 +28,6 @@ RUN pip install ruamel.yaml
 
 
 # 自定义构建镜像
-# DOCKER_BUILDKIT=1 docker build -t panweiji/k8s:latest  -f /my/Dockerfile.k8s . --no-cache --load
+# DOCKER_BUILDKIT=1 docker build -t panweiji/k8s:latest  -f /my/Dockerfile.k8s . --no-cache
 # 上传镜像 先 docker login 登录
 # docker push panweiji/k8s:latest

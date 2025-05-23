@@ -34,6 +34,6 @@ RUN node -v && npm -v && npm config set registry https://registry.npmmirror.com 
 CMD ["/bin/bash"]
 
 # 构建镜像
-# DOCKER_BUILDKIT=1 docker build -t panweiji/node:22  -f /my/Dockerfile.node-build . --no-cache --load
+# DOCKER_BUILDKIT=1 docker build -t panweiji/node:22  -f /my/Dockerfile.node-build . --no-cache
 # 上传镜像 先 docker login 登录
 # docker push panweiji/node:22

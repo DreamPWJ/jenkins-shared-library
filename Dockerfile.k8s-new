@@ -24,35 +24,41 @@ RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
     lsb-release \
-    software-properties-common \
-    && rm -rf /var/lib/apt/lists/*
+    software-properties-common
 
-# 安装kubectl
-RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
+# 安装kubectl  官方地址 dl.k8s.io
+ARG K8S_MIRROR=https://dl.k8s.lanneng.tech
+RUN curl -LO "${K8S_MIRROR}/release/$(curl -L -s ${K8S_MIRROR}/release/stable.txt)/bin/linux/amd64/kubectl" \
     && chmod +x kubectl \
     && mv kubectl /usr/local/bin/
 
-# 安装helm
-RUN curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | tee /usr/share/keyrings/helm.gpg > /dev/null \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list \
-    && apt-get update \
-    && apt-get install -y helm \
-    && rm -rf /var/lib/apt/lists/*
+# 安装helm 官方地址 baltocdn.com/helm
+#ARG HELM_MIRROR=baltocdn.com/helm
+#RUN curl ${HELM_MIRROR}/signing.asc | gpg --dearmor | tee /usr/share/keyrings/helm.gpg > /dev/null \
+#    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] ${HELM_MIRROR}/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list \
+#    && apt-get update \
+#    && apt-get install -y helm \
+#    && rm -rf /var/lib/apt/lists/*
 
-# 安装Python 3和pip
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip python3-full \
-    && rm -rf /var/lib/apt/lists/* \
-    && ln -s /usr/bin/python3 /usr/bin/python
+# 安装Python 3和pip   确保python命令生效
+RUN apt-get install -y python3 python3-pip python3-venv build-essential && \
+    ln -sf python3 /usr/bin/python && python3 -m venv /opt/venv
+
+# 设置python环境
+ENV PATH="/opt/venv/bin:$PATH"
+
 # Python动态处理yaml文件
-RUN sudo pip -i https://pypi.tuna.tsinghua.edu.cn/simple  install ruamel.yaml
+RUN pip install ruamel.yaml -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+
+# 验证服务是否安装成功
+RUN kubectl version --client &&  python -V
+# && helm version
 
 # 设置默认命令
 CMD ["/bin/bash"]
 
 
 # 自定义构建镜像
-# DOCKER_BUILDKIT=1 docker build -t panweiji/k8s:latest  -f /my/Dockerfile.k8s . --no-cache --load
+# DOCKER_BUILDKIT=1 docker build -t panweiji/k8s:latest  -f /my/Dockerfile.k8s . --no-cache
 # 上传镜像 先 docker login 登录
 # docker push panweiji/k8s:latest

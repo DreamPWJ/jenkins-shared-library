@@ -49,7 +49,7 @@ docker volume create mqtt-emqx && docker inspect mqtt-emqx
 docker run -d --restart=always  -p 18083:18083 -p 1883:1883 -p 8083:8083 -p 8084:8084 -p 8883:8883  \
 -e TZ="Asia/Shanghai" \
 -v /my/emqx/data:/opt/emqx/data -v /my/emqx/etc:/opt/emqx/etc -v /my/emqx/log:/opt/emqx/log \
---cpus=2 -m 2048m  --log-opt max-size=200m --log-opt max-file=1  \
+--cpus=2 -m 4096m  --log-opt max-size=200m --log-opt max-file=1  \
 --privileged --name emqx  emqx/emqx:latest
 
 #### 安装 分布式任务调度平台XXL-JOB服务 在浏览器中使用http://ip:8081/xxl-job-admin/ 默认用户名 admin 密码 123456

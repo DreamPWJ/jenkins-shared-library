@@ -1,7 +1,6 @@
 # Author: 潘维吉
 # Version 1.0.0
 # Description: 自定义构建Python语言镜像
-# 参考文档: https://docs.docker.com/language/python/build-images/
 
 # 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
 ARG PYTHON_VERSION
@@ -10,9 +9,10 @@ ARG EXPOSE_PORT
 ARG PYTHON_START_FILE
 
 # 依赖基础镜像
-FROM python:${PYTHON_VERSION}-slim
+#FROM python:${PYTHON_VERSION}-slim
+FROM ubuntu:latest
 
-# Docker 将此路径用作所有后续命令的默认位置
+# 设置工作目录
 WORKDIR /app
 
 # 挂载数据卷 docker删除后数据不丢失 docker run -v 映射
@@ -30,14 +30,30 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PIP_CACHE_DIR=/app/pip_cache \
     PYTHONUNBUFFERED=1
 
+# 更新包列表并安装基本工具
+RUN  sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list && \
+     apt-get update && apt-get install -y curl wget tar software-properties-common \
+     python3 python3-pip python3-venv build-essential && \
+     apt-get clean
+
 # 动态安装依赖环境包 安装特定项目依赖环境  --no-install-recommends不安装那些被推荐但非必需的依赖包
 ARG CUSTOM_INSTALL_PACKAGES
 RUN if [ -n "$CUSTOM_INSTALL_PACKAGES" ]; then \
-    sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g'  /etc/apt/sources.list && apt-get clean || true && apt-get update || true \
-    && apt-get install -y --no-install-recommends $CUSTOM_INSTALL_PACKAGES ; \
+         echo "动态安装依赖 $CUSTOM_INSTALL_PACKAGES" && \
+         apt-get install -y --no-install-recommends $CUSTOM_INSTALL_PACKAGES ; \
     fi
 
+# 确保python命令生效
+RUN ln -sf python3 /usr/bin/python && python3 -m venv /opt/venv && python -V
+
+# 设置python环境
+ENV PATH="/opt/venv/bin:$PATH"
+
+# 下载项目依赖包
+#COPY requirements.txt requirements.txt
+
 # 复制代码到容器 ADD 会自动解压，COPY 不会解压  注意tar.gz不能使用中划线命名
+#COPY . .
 COPY python.tar.gz .
 
 # 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包
@@ -45,12 +61,11 @@ COPY python.tar.gz .
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
- && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
+ && pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com \
  && pwd && ls -l
 
-
 # 暴露端口
-EXPOSE $EXPOSE_PORT
+EXPOSE 5000
 
 # 根据主文件默认名称 app.py  CMD中的"$MY_VAR"变量设置成 docker run -e MY_VAR=value 运行变量 否则无法获取
-CMD python /app/$PYTHON_START_FILE
+CMD python /app/main.py

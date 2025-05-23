@@ -168,7 +168,7 @@ set -x # 开启shell命令打印模式
 if [[ ${is_push_docker_repo} == false ]]; then
   echo "🏗️  开始构建Docker镜像(无缓存构建)"
     # 拉取基础镜像避免重复下载
-    docker_pull_image_name=python:${python_version}
+    docker_pull_image_name=python:${python_version}-slim
     [ -z "$(docker images -q ${docker_pull_image_name})" ] && docker pull ${docker_pull_image_name} || echo "基础镜像 ${docker_pull_image_name} 已存在 无需重新pull拉取镜像"
 
     docker build -t ${docker_image_name} \
@@ -177,6 +177,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     --build-arg EXPOSE_PORT="${build_expose_ports}" \
     --build-arg PYTHON_VERSION="${python_version}" \
     --build-arg PYTHON_START_FILE="${python_start_file}" \
+    --build-arg CUSTOM_INSTALL_PACKAGES="" \
     -f /${deploy_folder}/python/Dockerfile . --no-cache
 else
   docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
@@ -219,7 +220,7 @@ docker run -d --restart=on-failure:16 -p ${host_port}:${expose_port} --privilege
   -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1   ${dynamic_run_args} \
   -e "REMOTE_DEBUGGING_PARAM=${remote_debugging_param}" -e HOST_NAME=$(hostname) \
   -e "DOCKER_SERVICE_PORT=${build_expose_ports}" \
-  -v /${deploy_folder}/${project_name}/logs:/logs \
+  -v /${deploy_folder}/${project_name}/logs:/logs -v /${deploy_folder}/${project_name}/app:/app \
   --name ${docker_container_name} ${docker_image_name}
 
 set +x # 关闭shell命令打印模式

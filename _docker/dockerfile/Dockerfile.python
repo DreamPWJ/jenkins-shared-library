@@ -8,7 +8,7 @@ ARG PROJECT_NAME
 ARG EXPOSE_PORT
 
 # 依赖基础镜像
-FROM python:3.10.0-slim
+FROM python:3.12.0-slim
 
 # 复制构建包到容器
 COPY app /app

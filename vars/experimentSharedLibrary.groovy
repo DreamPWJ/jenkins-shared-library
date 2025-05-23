@@ -653,14 +653,27 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
-    def dockerImageName = "panweiji/k8s-build"
+    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
+        // 压缩源码文件 加速传输
+        Python.codePackage(this)
+    }
+    def pythonVersion = "3.10"
+    def installPackages = "libglx-mesa0" // 动态安装依赖包
+    def dockerImageName = "panweiji/python"
+    def dockerImageTag = pythonVersion + "" + (installPackages == "" ? "" : "-" + installPackages.replaceAll(" ", "-"))
+    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/.ci/python/Dockerfile.python", dockerImageName, dockerImageTag, "--build-arg PYTHON_VERSION=${pythonVersion} --build-arg CUSTOM_INSTALL_PACKAGES=${installPackages}", true)
+    docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
+        sh "python -V"
+    }
+
+/*    def dockerImageName = "panweiji/k8s-build"
     def dockerImageTag = "latest"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.k8s-new", dockerImageName, dockerImageTag, "")
     docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
         sh "python -V"
         sh "kubectl version --client"
-        sh "helm version"
-    }
+        // sh "helm version"
+    }*/
 
 /*    def nodeVersion = "${"Node20".replace('Node', '')}"
     def dockerImageName = "panweiji/node-build"
@@ -673,6 +686,7 @@ def futureLab(map) {
         sh "pnpm --version"
         // sh "playwright --version"
     }*/
+
 /*
     def mvndVersion = "1.0.2"
     def jdkVersion = "21"
@@ -681,12 +695,13 @@ def futureLab(map) {
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk", dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}")
 
     docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+
         sh "mvnd --version"
         sh "mvn --version"
         sh "java --version"
 
-
-        sh "mvnd clean install -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
+        //sh "mvnd clean install -T2 -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
+        //sh "mvn clean install  -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvnd  install"
         //sh "mvn  install"
     }

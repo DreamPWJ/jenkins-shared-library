@@ -84,7 +84,7 @@ map.put('is_need_sass', false)
 map.put('jenkins_node', 'master')
 map.put('jenkins_node_frontend', 'node-2')
 
-// 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.6
+// 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.9
 map.put('nodejs', 'Node14')
 map.put('maven', 'Maven3.6')
 map.put('jdk_publisher', 'openjdk')
@@ -229,6 +229,34 @@ JSON_PARAMS
     "APPLICATION_DOMAIN" : "http://idc.pengbocloud.com:18804"
 }
 REMOTE_IP: 172.16.99.51
+
+htc-traffic-server-prod
+好停车诱导屏服务端
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/traffic.git" ,
+   "BRANCH_NAME" : "main" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "induction-screen" ,
+   "SHELL_PARAMS" : "induction-screen server 8083 8801 rizhao",
+   "IS_MAVEN_SINGLE_MODULE" : true
+}
+REMOTE_IP: 172.16.99.53
+
+htc-traffic-server-web-prod
+好停车诱导屏 Web前端 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/parktraffic-vue.git" ,
+    "BRANCH_NAME" : "main" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "induction-screen" ,
+    "SHELL_PARAMS" : "induction-screen web 8009 80 prod" ,
+    "NODE_VERSION" : "10",
+    "NPM_RUN_PARAMS" : "build",
+    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf",
+}
+REMOTE_IP: 172.16.99.53
 
 */
 
