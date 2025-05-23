@@ -47,7 +47,7 @@ class Web implements Serializable {
      */
     static def monorepoBuild(ctx) {
         // 初始化monorepo仓库依赖环境
-        initMonoRepoEnv(ctx)
+        // initMonoRepoEnv(ctx)
         ctx.timeout(time: 30, unit: 'MINUTES') {
             // ctx.sh " lerna clean -y "
             try {
@@ -76,7 +76,7 @@ class Web implements Serializable {
                     }
 
                     // 执行基础通用包编译和自定义脚本处理工作  会有无效的包被编译  可检测git提交是否包含核心通用模块文件变更 如果有才编译
-                    ctx.sh "npm run build:all"
+                    ctx.sh "npm run bootstrap:all"
                     // 定位到具体业务包执行构建打包命令
                     ctx.sh "cd ${ctx.monoRepoProjectDir} && npm run ${ctx.NPM_RUN_PARAMS}" // >/dev/null 2>&1
                 }
