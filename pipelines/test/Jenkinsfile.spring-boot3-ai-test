@@ -131,7 +131,7 @@ JSON_PARAMS
    "PROJECT_NAME" : "spring-ai-demo" ,
    "SHELL_PARAMS" : "spring-ai demo 8123 8080 dev",
    "IS_MAVEN_SINGLE_MODULE" : true,
-   "GIT_PROJECT_FOLDER_NAME" : "single-module-projects/spring-ai-demo",
+   "GIT_PROJECT_FOLDER_NAME" : "single-module-projects/project-demos/spring-ai-demo",
 }
 
 
