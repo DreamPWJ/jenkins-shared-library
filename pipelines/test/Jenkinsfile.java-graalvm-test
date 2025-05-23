@@ -132,7 +132,7 @@ JSON_PARAMS
    "SHELL_PARAMS" : "graalvm-demo app 8121 8180 dev",
    "IS_MAVEN_SINGLE_MODULE" : true,
    "IS_SPRING_NATIVE" : true,
-   "GIT_PROJECT_FOLDER_NAME" : "single-module-projects/graalvm-demo",
+   "GIT_PROJECT_FOLDER_NAME" : "single-module-projects/project-demos/graalvm-demo",
 }
 
 

@@ -341,7 +341,7 @@ def call(String type = 'web-java', Map map) {
                                       mavenBuildProject(map)
                                   }
                               } else*/
-                            if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
+                            if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11) {
                                 // mvnd支持条件
                                 def mvndVersion = "1.0.2"
                                 def jdkVersion = "${JDK_VERSION}"
