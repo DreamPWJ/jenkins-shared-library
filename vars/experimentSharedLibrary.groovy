@@ -707,9 +707,9 @@ def futureLab(map) {
         //sh "mvn  install"
     }
 */
-
+/*
     def k8sPodReplicas = Integer.parseInt("3")
-    println("等于 " + k8sPodReplicas * 3 - 1)
+    println("等于 " + k8sPodReplicas * 3 - 1)*/
 /*  println("服务启动失败回滚到上一个版本  保证服务高可用性")
     Docker.rollbackServer(this, map, "${dockerImageName}", "${dockerContainerName}")*/
 /*  def maxVersion = Git.getGitTagMaxVersion(this)
