@@ -113,7 +113,7 @@ class Kubernetes implements Serializable {
         // 判断是否存在扩展端口
         def yamlDefaultPort = ""
         if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && ctx.SHELL_EXTEND_PORT != "") {
-            if ("${ctx.IS_SOURCE_CODE_DEPLOY}" == 'true'){
+            if ("${ctx.IS_SOURCE_CODE_DEPLOY}" == 'true') {
                 hostPort = "${ctx.SHELL_EXTEND_PORT}" // 宿主机端口
             }
             containerPort = "${ctx.SHELL_EXTEND_PORT}"
@@ -341,10 +341,12 @@ class Kubernetes implements Serializable {
                     // yaml内容中包含初始化时间和启动完成时间 shell中自动解析所有内容，建议yq进行实际的YAML解析
                     ctx.echo "Waiting for all pods to be ready. Currently Ready: $readyCount / Total: $totalPods ,  podStatusPhase: $podStatusPhase"
                     if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-                        ctx.sleep 10 // 每隔多少秒检查一次
+                        def sleepTime = 10 - whileCount
+                        ctx.sleep sleepTime < 3 ? 3 : sleepTime // 每隔多少秒检查一次
                     }
                     if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-                        ctx.sleep 5 // 每隔多少秒检查一次
+                        def sleepTime = 5 - whileCount
+                        ctx.sleep sleepTime < 2 ? 2 : sleepTime // 每隔多少秒检查一次
                     }
                 }
             }
