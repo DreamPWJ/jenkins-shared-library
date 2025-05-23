@@ -653,7 +653,7 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
-    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
+/*    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
         // 压缩源码文件 加速传输
         Python.codePackage(this)
     }
@@ -664,7 +664,7 @@ def futureLab(map) {
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/.ci/python/Dockerfile.python", dockerImageName, dockerImageTag, "--build-arg PYTHON_VERSION=${pythonVersion} --build-arg CUSTOM_INSTALL_PACKAGES=${installPackages}", true)
     docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
         sh "python -V"
-    }
+    }*/
 
 /*    def dockerImageName = "panweiji/k8s-build"
     def dockerImageTag = "latest"
@@ -675,7 +675,7 @@ def futureLab(map) {
         // sh "helm version"
     }*/
 
-/*    def nodeVersion = "${"Node20".replace('Node', '')}"
+    def nodeVersion = "${"Node20".replace('Node', '')}"
     def dockerImageName = "panweiji/node-build"
     def dockerImageTag = "${nodeVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
@@ -685,10 +685,10 @@ def futureLab(map) {
         sh "yarn --version"
         sh "pnpm --version"
         // sh "playwright --version"
-    }*/
+    }
 
-/*
-    def mvndVersion = "1.0.2"
+
+/*    def mvndVersion = "1.0.2"
     def jdkVersion = "21"
     def dockerImageName = "panweiji/mvnd-jdk"
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
@@ -704,8 +704,8 @@ def futureLab(map) {
         //sh "mvn clean install  -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvnd  install"
         //sh "mvn  install"
-    }
-*/
+    }*/
+
 
 
 /*  println("服务启动失败回滚到上一个版本  保证服务高可用性")
