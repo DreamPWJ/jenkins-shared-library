@@ -318,6 +318,7 @@ class Kubernetes implements Serializable {
         ctx.println("K8S集群所有Pod节点健康探测中, 请耐心等待... 🚀")
         def deploymentName = "${ctx.FULL_PROJECT_NAME}" // labels.app标签值
         def namespace = k8sNameSpace
+        def k8sPodReplicas = Integer.parseInt(ctx.K8S_POD_REPLICAS) // 部署pod数
         ctx.sleep 3 // 等待检测  需要等待容器镜像下载如Pending状态等  可以先判断容器下载完成后再执行下面的检测
         // 等待所有Pod达到Ready状态
         ctx.timeout(time: 12, unit: 'MINUTES') { // 设置超时时间
@@ -341,11 +342,11 @@ class Kubernetes implements Serializable {
                     // yaml内容中包含初始化时间和启动完成时间 shell中自动解析所有内容，建议yq进行实际的YAML解析
                     ctx.echo "Waiting for all pods to be ready. Currently Ready: $readyCount / Total: $totalPods ,  podStatusPhase: $podStatusPhase"
                     if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-                        def sleepTime = 10 - whileCount
+                        def sleepTime = k8sPodReplicas * 3 - whileCount
                         ctx.sleep sleepTime < 3 ? 3 : sleepTime // 每隔多少秒检查一次
                     }
                     if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-                        def sleepTime = 5 - whileCount
+                        def sleepTime = k8sPodReplicas * 2 - whileCount
                         ctx.sleep sleepTime < 2 ? 2 : sleepTime // 每隔多少秒检查一次
                     }
                 }
