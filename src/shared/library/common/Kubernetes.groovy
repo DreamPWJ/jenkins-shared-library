@@ -46,8 +46,8 @@ class Kubernetes implements Serializable {
                     """
 
                 // 查看个组件的状态  如 kubectl get svc
+                // kubectl get pod || true
                 ctx.sh """ 
-                    kubectl get pod || true
                     kubectl top pod || true
                     kubectl top nodes || true
                     """
