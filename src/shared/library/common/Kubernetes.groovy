@@ -346,7 +346,7 @@ class Kubernetes implements Serializable {
                         ctx.sleep sleepTime < 3 ? 3 : sleepTime // 每隔多少秒检查一次
                     }
                     if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-                        def sleepTime = k8sPodReplicas * 3 - whileCount
+                        def sleepTime = k8sPodReplicas * 2 - whileCount
                         ctx.sleep sleepTime < 2 ? 2 : sleepTime // 每隔多少秒检查一次
                     }
                 }
