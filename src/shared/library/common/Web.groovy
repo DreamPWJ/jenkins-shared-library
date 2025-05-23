@@ -15,7 +15,7 @@ class Web implements Serializable {
      * 初始化monorepo仓库依赖环境
      */
     static def initMonoRepoEnv(ctx) {
-        try {
+/*        try {
            // ctx.sh "lerna --version"  // 使用新方案pnpm组织monorepo仓库
         } catch (error) {
             // npm一般在root用户权限下
@@ -33,7 +33,7 @@ class Web implements Serializable {
             ctx.sh "dotenv --help"
         } catch (error) {
             ctx.sh "yarn global add dotenv-cli"
-        }
+        }*/
         try {
             ctx.sh "rimraf --help"
         } catch (error) {
@@ -47,7 +47,7 @@ class Web implements Serializable {
      */
     static def monorepoBuild(ctx) {
         // 初始化monorepo仓库依赖环境
-        // initMonoRepoEnv(ctx)
+        initMonoRepoEnv(ctx)
         ctx.timeout(time: 30, unit: 'MINUTES') {
             // ctx.sh " lerna clean -y "
             try {
