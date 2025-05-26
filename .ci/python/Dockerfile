@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1.4
 # Author: 潘维吉
 # Version 1.0.0
 # Description: 自定义构建Python语言镜像
