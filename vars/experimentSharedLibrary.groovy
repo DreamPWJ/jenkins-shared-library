@@ -432,12 +432,10 @@ def getInitParams(map) {
     qrCodeOssUrl = ""
     // Java构建包OSS地址Url
     javaOssUrl = ""
-    // Web构建包大小
-    webPackageSize = ""
     // Java打包类型 jar、war
     javaPackageType = ""
-    // Java构建包大小
-    javaPackageSize = ""
+    // 构建包大小
+    buildPackageSize = ""
     // Maven打包后产物的位置
     mavenPackageLocation = ""
     // 是否健康检测失败状态

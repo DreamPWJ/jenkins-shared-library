@@ -951,12 +951,10 @@ def getInitParams(map) {
     qrCodeOssUrl = ""
     // Java构建包OSS地址Url
     javaOssUrl = ""
-    // Web构建包大小
-    webPackageSize = ""
     // Java打包类型 jar、war
     javaPackageType = ""
-    // Java构建包大小
-    javaPackageSize = ""
+    // 构建包大小
+    buildPackageSize = ""
     // Maven打包后产物的位置
     mavenPackageLocation = ""
     // 是否健康检测失败状态
@@ -1290,8 +1288,8 @@ def nodeBuildProject(map) {
         // React框架默认打包目录是build , Angular框架默认打包目录是多层级的等  重命名到定义的目录名称
         sh "rm -rf ${NPM_PACKAGE_FOLDER} && mv build ${NPM_PACKAGE_FOLDER}"
     }*/
-        webPackageSize = Utils.getFolderSize(this, npmPackageLocationDir)
-        println(webPackageSize)
+        buildPackageSize = Utils.getFolderSize(this, npmPackageLocationDir)
+        println(buildPackageSize)
         Tools.printColor(this, "Web打包成功 ✅")
         // 压缩文件夹 易于加速传输
         if ("${IS_MONO_REPO}" == 'true') {
@@ -1374,8 +1372,8 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
             mavenPackageLocation = "${mavenPackageLocationDir}" + "/spring-native-graalvm"
         }
         println(mavenPackageLocation)
-        javaPackageSize = Utils.getFileSize(this, mavenPackageLocation)
-        println(javaPackageSize)
+        buildPackageSize = Utils.getFileSize(this, mavenPackageLocation)
+        println(buildPackageSize)
         Tools.printColor(this, "Maven打包成功 ✅")
         // 上传部署文件到OSS
         uploadOss(map)
@@ -2056,13 +2054,13 @@ def alwaysPost() {
                     "<a href='${noticeHealthCheckUrl}'> 👉URL访问地址</a> " +
                     "<br/> 项目: ${PROJECT_NAME}" +
                     "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
-                    "<br/> 大小: ${webPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
+                    "<br/> 大小: ${buildPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
             currentBuild.description = "<a href='${noticeHealthCheckUrl}'> 👉API访问地址</a> " +
                     "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉直接下载构建${javaPackageType}包</a>" : ""}" +
                     "<br/> 项目: ${PROJECT_NAME}" +
                     "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
-                    "<br/> 环境: ${releaseEnvironment}   大小: ${javaPackageSize} <br/> 分支: ${BRANCH_NAME}  <br/> 发布人: ${BUILD_USER}"
+                    "<br/> 环境: ${releaseEnvironment}   大小: ${buildPackageSize} <br/> 分支: ${BRANCH_NAME}  <br/> 发布人: ${BUILD_USER}"
         }
     } catch (error) {
         println error.getMessage()
@@ -2237,7 +2235,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                     "##### 版本信息",
                                     "- Nginx Web服务启动${msg}",
                                     "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
-                                    "- Node版本: ${NODE_VERSION}   包大小: ${webPackageSize}",
+                                    "- Node版本: ${NODE_VERSION}   包大小: ${buildPackageSize}",
                                     "${monorepoProjectName}",
                                     "##### ${deployType}",
                                     "##### ${k8sPodContent}",
@@ -2259,7 +2257,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                 } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
                     def javaInfo = ""
                     if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-                        javaInfo = "构建版本: JDK${JDK_VERSION}   包大小: ${javaPackageSize}"
+                        javaInfo = "构建版本: JDK${JDK_VERSION}   包大小: ${buildPackageSize}"
                         if ("${javaOssUrl}".trim() != '') {
                             javaInfo = javaInfo + "\n [直接下载构建${javaPackageType}包](${javaOssUrl})  👈"
                         }

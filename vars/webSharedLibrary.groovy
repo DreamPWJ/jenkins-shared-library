@@ -678,8 +678,6 @@ def getInitParams(map) {
     tagVersion = ""
     // 扫描二维码地址
     qrCodeOssUrl = ""
-    // Web构建包大小
-    webPackageSize = ""
     // 是否健康检测失败状态
     isHealthCheckFail = false
     // 计算应用启动时间
@@ -946,7 +944,7 @@ def nodeBuildProject() {
         // React框架默认打包目录是build , Angular框架默认打包目录是多层级的等  重命名到定义的目录名称
         sh "rm -rf ${NPM_PACKAGE_FOLDER} && mv build ${NPM_PACKAGE_FOLDER}"
     }*/
-        webPackageSize = Utils.getFolderSize(this, npmPackageLocationDir)
+        buildPackageSize = Utils.getFolderSize(this, npmPackageLocationDir)
         Tools.printColor(this, "Web打包成功 ✅")
         // 压缩文件夹 易于加速传输
         if ("${IS_MONO_REPO}" == 'true') {
@@ -1231,7 +1229,7 @@ def alwaysPost() {
                 "<a href='${noticeHealthCheckUrl}'> 👉URL访问地址</a> " +
                 "<br/> 项目: ${PROJECT_NAME}" +
                 "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
-                "<br/> 大小: ${webPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
+                "<br/> 大小: ${buildPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
     } catch (error) {
         println error.getMessage()
     }
@@ -1352,7 +1350,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             "##### 版本信息",
                             "- Nginx Web服务启动${msg}",
                             "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
-                            "- Node版本: ${NODE_VERSION}   包大小: ${webPackageSize}",
+                            "- Node版本: ${NODE_VERSION}   包大小: ${buildPackageSize}",
                             "${monorepoProjectName}",
                             "###### ${rollbackTag}",
                             "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
