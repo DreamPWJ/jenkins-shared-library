@@ -653,7 +653,7 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
-/*    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
+    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
         // 压缩源码文件 加速传输
         Python.codePackage(this)
     }
@@ -664,7 +664,7 @@ def futureLab(map) {
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/.ci/python/Dockerfile.python", dockerImageName, dockerImageTag, "--build-arg PYTHON_VERSION=${pythonVersion} --build-arg CUSTOM_INSTALL_PACKAGES=${installPackages}", true)
     docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
         sh "python -V"
-    }*/
+    }
 
 /*    def dockerImageName = "panweiji/k8s-build"
     def dockerImageTag = "latest"
