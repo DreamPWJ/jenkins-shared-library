@@ -658,7 +658,7 @@ def futureLab(map) {
         Python.codePackage(this)
     }
     def pythonVersion = "3.10"
-    def installPackages = "libglx-mesa0" // 动态安装依赖包
+    def installPackages = "" // 动态安装依赖包
     def dockerImageName = "panweiji/python"
     def dockerImageTag = pythonVersion + "" + (installPackages == "" ? "" : "-" + installPackages.replaceAll(" ", "-"))
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/.ci/python/Dockerfile.python", dockerImageName, dockerImageTag, "--build-arg PYTHON_VERSION=${pythonVersion} --build-arg CUSTOM_INSTALL_PACKAGES=${installPackages}", true)
