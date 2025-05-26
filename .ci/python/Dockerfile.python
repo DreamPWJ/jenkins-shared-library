@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.4
+# syntax=docker/dockerfile:1.6
 # Author: 潘维吉
 # Version 1.0.0
 # Description: 自定义构建Python语言镜像
@@ -62,8 +62,9 @@ COPY python.tar.gz .
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
- && --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com \
- && pwd && ls -l
+
+RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+
 
 # 暴露端口
 EXPOSE 5000
