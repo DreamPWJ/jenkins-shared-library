@@ -18,6 +18,7 @@ class Python implements Serializable {
         // 压缩源码文件 加速传输
         def pythonPackageName = "python.tar.gz"
         ctx.sh " rm -rf *.tar.gz "
+        ctx.sh " mv requirement.txt requirements.txt || true"
         ctx.sh " tar --warning=no-file-changed -pzcvf ${pythonPackageName} --exclude '*.md' --exclude '*.pyc' --exclude .git --exclude ci --exclude ci@tmp --exclude '*.log' --exclude '*.docx' --exclude '*.xlsx' * >/dev/null 2>&1 "
     }
 
