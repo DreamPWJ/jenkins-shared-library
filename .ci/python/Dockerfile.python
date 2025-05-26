@@ -28,7 +28,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 设置环境变量
 ENV DEBIAN_FRONTEND=noninteractive \
-    PIP_CACHE_DIR=/app/pip_cache \
+    PIP_CACHE_DIR=/app/cache/pip  \
     PYTHONUNBUFFERED=1
 
 # 更新包列表并安装基本工具
@@ -62,7 +62,7 @@ RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz
 # Docker 19.03后版本可启用 BuildKit 方式指定缓存目录 --mount=type=cache,target=$PIP_CACHE_DIR
-RUN --mount=type=cache,target=$PIP_CACHE_DIR pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+RUN --mount=type=bind,source=/my/cache/pip,target=$PIP_CACHE_DIR pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 
 
 # 暴露端口
