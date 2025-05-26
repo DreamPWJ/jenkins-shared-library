@@ -29,7 +29,7 @@ class Node implements Serializable {
     static def setMirror(ctx) {
         // 每次流水线执行都将执行 会产生无效的浪费  后面优化一下
         ctx.sh "node -v && npm -v"  // node和npm版本信息
-        if (true) { // 内置镜像已经初始化设置 无需重复设置
+        if (true) { // 内置镜像已经初始化设置 无需重复设置 减少流水线构建时间
             return
         }
         def npmMirror = "" // NPM镜像
