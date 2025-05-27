@@ -2264,7 +2264,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                     }
                     def pythonInfo = ""
                     if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-                        pythonInfo = "运行版本: Python ${CUSTOM_PYTHON_VERSION} "
+                        pythonInfo = "运行版本: Python${CUSTOM_PYTHON_VERSION} 包大小: ${buildPackageSize}"
                     }
                     dingtalk(
                             robot: "${DING_TALK_CREDENTIALS_ID}",
