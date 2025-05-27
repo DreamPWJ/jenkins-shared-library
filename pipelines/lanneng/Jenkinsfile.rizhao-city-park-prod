@@ -81,7 +81,7 @@ map.put('is_git_tag', true)
 map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
-map.put('jenkins_node', 'node-3')
+map.put('jenkins_node', 'node-2')
 map.put('jenkins_node_frontend', 'node-3')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.9
