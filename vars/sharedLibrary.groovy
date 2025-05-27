@@ -1307,7 +1307,7 @@ def nodeBuildProject(map) {
  * Maven编译构建
  */
 def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
-    def mavenCommandType = mavenType // 构建引擎类型
+     mavenCommandType = mavenType // 构建引擎类型
     if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
         // 动态切换Maven内的对应的JDK版本
         Java.switchJDKByJenv(this, "${JDK_VERSION}")
