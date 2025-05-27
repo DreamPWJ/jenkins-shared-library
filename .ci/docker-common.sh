@@ -170,7 +170,7 @@ function get_disk_space() {
         echo "🚨 Warning: Free space is below $MIN_FREE_SPACE GB!"
         echo -e "\033[31m当前系统磁盘空间不足, 可能导致Docker镜像构建失败 🚨  \033[0m"
         echo "======== 开始自动清理Docker日志 ========"
-        docker builder prune || true #  移除 Docker 构建缓存  CI/CD服务器或服务端构建镜像显著有效
+        docker builder prune --force || true #  移除 Docker 构建缓存  CI/CD服务器或服务端构建镜像显著有效
         sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
         #rm -rf /my/**/log* && rm -f /my/**/*.log || true
         # 删除所有 .log 文件
