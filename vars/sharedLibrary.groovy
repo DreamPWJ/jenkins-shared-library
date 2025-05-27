@@ -1330,7 +1330,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
                 if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') {
                     sh "${mavenCommandType} clean package -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 } else { // 多模块情况
-                    sh "${mavenCommandType} clean package -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
+                    sh "${mavenCommandType} clean package -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am  -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 }
             } else if ("${MAVEN_SETTING_XML}" == "") {
                 // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
@@ -1341,7 +1341,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
                     sh "${mavenCommandType} clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 } else {  // 多模块情况
                     // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
-                    sh "${mavenCommandType} clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
+                    sh "${mavenCommandType} clean install -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 }
             } else {
                 // 基于自定义setting.xml文件方式打包 如私有包等
