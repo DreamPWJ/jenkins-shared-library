@@ -1347,7 +1347,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
                 // 基于自定义setting.xml文件方式打包 如私有包等
                 // Maven.packageBySettingFile(this)
                 def settingsFile = "${env.WORKSPACE}/ci/_jenkins/maven/${MAVEN_SETTING_XML}"
-                ctx.sh "${mavenCommandType} clean install -T 2C -s ${settingsFile} -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am  -Dmaven.compile.fork=true  ${isMavenTest} ${springNativeBuildParams}"
+                sh "${mavenCommandType} clean install -T 2C -s ${settingsFile} -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am  -Dmaven.compile.fork=true  ${isMavenTest} ${springNativeBuildParams}"
             }
 
             // 获取pom文件信息
