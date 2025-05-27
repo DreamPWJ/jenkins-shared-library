@@ -34,7 +34,7 @@ spec:
           resources: # 对Pod的资源限制机制 合理设置CPU 内存 防止CPU打满 内存溢出 导致整个服务器宕机
             requests: # 资源请求 调度器根据值选择满足资源的节点
               cpu: 300m  # cpu请求 容器启动的初始可用数量
-              memory: 300Mi # 内存请求 容器启动的初始可用数量 不能大于limits设置值
+              memory: 500Mi # 内存请求 容器启动的初始可用数量 不能大于limits设置值
               ephemeral-storage: "1Gi"  # 容器需要的最小临时存储量
             limits:
               # m是千分之一  100m是0.1个CPU  限制最大cpu防止资源溢出 导致整个集群全部不可用
@@ -86,7 +86,7 @@ spec:
             timeoutSeconds: 2
             successThreshold: 1      # 连续探测1次成功表示成功
             failureThreshold: 3
-      terminationGracePeriodSeconds: 10  # 优雅终止宽限期 默认30秒 缩短 Pod 终止等待时
+      terminationGracePeriodSeconds: 5  # 优雅终止宽限期 默认30秒 缩短 Pod 终止等待时
       restartPolicy: Always         # Pod的重启策略 Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Never表示不再重启该Pod
       # 新特性topologySpreadConstraints分布约束代替affinity亲和度 实现均匀部署pod到不同的node 拓扑分布约束 在K8s v1.18版本进入beta阶段默认启用 参考文档： https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/topology-spread-constraints/
       topologySpreadConstraints:    # 配置一个拓扑分布约束
@@ -119,8 +119,8 @@ spec:
   strategy:
     type: RollingUpdate  # 滚动更新 “RollingUpdate”是默认值   Recreate类型在创建新 Pod 之前，所有现有的 Pod 会被杀死
     rollingUpdate:  # 滚动更新速率控制
-      maxSurge: 25%   # 默认值为 25% 过期望副本数最大比例或最大值  值越小，越能保证服务稳定，更新越平滑  可为整数（比如 3），也可是百分百，向上取整
-      maxUnavailable: 50%  # 默认值为 25% 最大不可用副本数最大比例或最大值  值调的越大，副本更新速度越快
+      maxSurge: 50%   # 允许同时创建的最大新 Pod 数量 默认值25% 期望副本数最大比例或最大值  值越小，越能保证服务稳定，更新越平滑  可为整数（比如 3），也可是百分百，向上取整
+      maxUnavailable: 50%  # 允许同时销毁的旧 Pod 数量 默认值25% 最大不可用副本数最大比例或最大值  值调的越大，副本更新速度越快
 
 ---
 
