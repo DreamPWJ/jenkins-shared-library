@@ -14,13 +14,12 @@ class Python implements Serializable {
      * 源码打包压缩
      */
     static def codePackage(ctx) {
-        // 压缩打包
-        // 压缩源码文件 加速传输
+        // 压缩打包 压缩源码文件 加速传输
         def pythonPackageName = "python.tar.gz"
         ctx.sh " rm -rf *.tar.gz "
         ctx.sh " mv requirement.txt requirements.txt || true"
         ctx.sh " tar --warning=no-file-changed -pzcvf ${pythonPackageName} --exclude '*.md' --exclude '*.pyc' --exclude .git --exclude ci --exclude ci@tmp --exclude '*.log' --exclude '*.docx' --exclude '*.xlsx' * >/dev/null 2>&1 "
-        ctx.buildPackageSize = Utils.getFileSize(this, pythonPackageName)
+        ctx.buildPackageSize = Utils.getFileSize(ctx, pythonPackageName)
     }
 
     /**
