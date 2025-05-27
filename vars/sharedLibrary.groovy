@@ -1307,7 +1307,7 @@ def nodeBuildProject(map) {
  * Maven编译构建
  */
 def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
-     mavenCommandType = mavenType // 构建引擎类型
+    def mavenCommandType = mavenType // 构建引擎类型
     if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
         // 动态切换Maven内的对应的JDK版本
         Java.switchJDKByJenv(this, "${JDK_VERSION}")
@@ -1345,7 +1345,9 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
                 }
             } else {
                 // 基于自定义setting.xml文件方式打包 如私有包等
-                Maven.packageBySettingFile(this)
+                // Maven.packageBySettingFile(this)
+                def settingsFile = "${env.WORKSPACE}/ci/_jenkins/maven/${MAVEN_SETTING_XML}"
+                ctx.sh "${mavenCommandType} clean install -T 2C -s ${settingsFile} -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am  -Dmaven.compile.fork=true  ${isMavenTest} ${springNativeBuildParams}"
             }
 
             // 获取pom文件信息
