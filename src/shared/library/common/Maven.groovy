@@ -12,23 +12,24 @@ class Maven implements Serializable {
      * 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
      * 多核cpu构建速度比较明显快 核数少构建速度差距不大
      */
-    static def mvndPackage(ctx) {
+    static def mvndPackage(ctx, isMavenTest) {
         ctx.sh "mvnd --version"
-        ctx.sh "mvnd clean install -Dquickly -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am ${ctx.isMavenTest}"
+        ctx.sh "mvnd clean install -Dquickly -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am ${isMavenTest}"
     }
 
     /**
      * Maven基于自定义setting文件方式打包
      */
-    static def packageBySettingFile(ctx) {
-        // Managed files自定义settings.xml方式 安装 Config File Provider插件
-        /* ctx.configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
-             ctx.sh "mvn -s $MAVEN_SETTINGS clean install -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am ${ctx.isMavenTest}"
-         }*/
+    static def packageBySettingFile(ctx, map, mavenCommandType, isMavenTest, springNativeBuildParams) {
+        // 自定义私有库settings.xml方式 使用Secret file凭据存储
+        ctx.withCredentials([ctx.file(credentialsId: "${map.maven_settings_xml_id}", variable: 'MAVEN_SETTINGS')]) {
+            def data = ctx.readFile(file: "${ctx.MAVEN_SETTINGS}")
+            def fileName = "settings.xml"
+            // 使用 Groovy 代码写入文件
+            ctx.writeFile file: fileName, text: data
+            ctx.sh "${mavenCommandType} clean install -T 2C -s $fileName -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am -Dmaven.compile.fork=true  ${isMavenTest} ${springNativeBuildParams}"
+        }
 
-        // -s settings.xml文件路径  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
-        def settingsFile = "${ctx.env.WORKSPACE}/ci/_jenkins/maven/${ctx.MAVEN_SETTING_XML}"
-        ctx.sh "${ctx.mavenCommandType} -s ${settingsFile} -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am -T 2C -Dmaven.compile.fork=true clean install ${ctx.isMavenTest} ${ctx.springNativeBuildParams}"
     }
 
     /**

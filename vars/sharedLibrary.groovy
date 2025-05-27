@@ -60,7 +60,7 @@ def call(String type = 'web-java', Map map) {
                 string(name: 'ROLLBACK_BUILD_ID', defaultValue: '0', description: "DEPLOY_MODE基于" + GlobalVars.rollback + "部署方式, 输入对应保留的回滚构建记录ID, " +
                         "默认0是回滚到上一次连续构建, 当前归档模式的回滚仅适用于在master节点构建的任务")
                 booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行Docker/K8S集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
-                booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', defaultValue: false, description: "是否执行静态代码质量分析检测 交付可读、易维护和安全的高质量代码 🔦")
+                booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', defaultValue: false, description: "是否执行静态代码质量分析检测 生成质量报告, 交付可读、易维护和安全的高质量代码 🔦")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
                         description: '是否执行服务启动健康检测  K8S使用默认的健康探测 🌡️')
                 booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}",
@@ -341,7 +341,7 @@ def call(String type = 'web-java', Map map) {
                                       mavenBuildProject(map)
                                   }
                               } else*/
-                            if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11) {
+                            if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
                                 // mvnd支持条件
                                 def mvndVersion = "1.0.2"
                                 def jdkVersion = "${JDK_VERSION}"
@@ -833,8 +833,6 @@ def getInitParams(map) {
 
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
-    // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
-    MAVEN_SETTING_XML = jsonParams.MAVEN_SETTING_XML ? jsonParams.MAVEN_SETTING_XML.trim() : "${map.maven_setting_xml}".trim()
     AUTO_TEST_PARAM = jsonParams.AUTO_TEST_PARAM ? jsonParams.AUTO_TEST_PARAM.trim() : ""  // 自动化集成测试参数
     // Java框架类型 1. Spring Boot  2. Spring MVC
     JAVA_FRAMEWORK_TYPE = jsonParams.JAVA_FRAMEWORK_TYPE ? jsonParams.JAVA_FRAMEWORK_TYPE.trim() : "1"
@@ -951,12 +949,10 @@ def getInitParams(map) {
     qrCodeOssUrl = ""
     // Java构建包OSS地址Url
     javaOssUrl = ""
-    // Web构建包大小
-    webPackageSize = ""
     // Java打包类型 jar、war
     javaPackageType = ""
-    // Java构建包大小
-    javaPackageSize = ""
+    // 构建包大小
+    buildPackageSize = ""
     // Maven打包后产物的位置
     mavenPackageLocation = ""
     // 是否健康检测失败状态
@@ -1290,8 +1286,8 @@ def nodeBuildProject(map) {
         // React框架默认打包目录是build , Angular框架默认打包目录是多层级的等  重命名到定义的目录名称
         sh "rm -rf ${NPM_PACKAGE_FOLDER} && mv build ${NPM_PACKAGE_FOLDER}"
     }*/
-        webPackageSize = Utils.getFolderSize(this, npmPackageLocationDir)
-        println(webPackageSize)
+        buildPackageSize = Utils.getFolderSize(this, npmPackageLocationDir)
+        println(buildPackageSize)
         Tools.printColor(this, "Web打包成功 ✅")
         // 压缩文件夹 易于加速传输
         if ("${IS_MONO_REPO}" == 'true') {
@@ -1314,7 +1310,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
         // 动态切换Maven内的对应的JDK版本
         Java.switchJDKByJenv(this, "${JDK_VERSION}")
     }
-    sh "${mavenCommandType} --version"
+    // sh "${mavenCommandType} --version" // 打印Maven与JDK版本用于调试
     dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
         // 自动替换不同分布式部署节点的环境文件  deployNum部署节点数
         Deploy.replaceEnvFile(this, deployNum)
@@ -1332,9 +1328,9 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
                 if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') {
                     sh "${mavenCommandType} clean package -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 } else { // 多模块情况
-                    sh "${mavenCommandType} clean package -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
+                    sh "${mavenCommandType} clean package -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am  -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 }
-            } else if ("${MAVEN_SETTING_XML}" == "") {
+            } else if ("${map.maven_settings_xml_id}".trim() == "") { // 是否自定义maven仓库
                 // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
                 if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') { // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
                     MAVEN_ONE_LEVEL = ""
@@ -1343,11 +1339,11 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
                     sh "${mavenCommandType} clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 } else {  // 多模块情况
                     // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
-                    sh "${mavenCommandType} clean install -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
+                    sh "${mavenCommandType} clean install -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 }
             } else {
                 // 基于自定义setting.xml文件方式打包 如私有包等
-                Maven.packageBySettingFile(this)
+                Maven.packageBySettingFile(this, map, mavenCommandType, isMavenTest, springNativeBuildParams)
             }
 
             // 获取pom文件信息
@@ -1374,8 +1370,8 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
             mavenPackageLocation = "${mavenPackageLocationDir}" + "/spring-native-graalvm"
         }
         println(mavenPackageLocation)
-        javaPackageSize = Utils.getFileSize(this, mavenPackageLocation)
-        println(javaPackageSize)
+        buildPackageSize = Utils.getFileSize(this, mavenPackageLocation)
+        println(buildPackageSize)
         Tools.printColor(this, "Maven打包成功 ✅")
         // 上传部署文件到OSS
         uploadOss(map)
@@ -2056,13 +2052,13 @@ def alwaysPost() {
                     "<a href='${noticeHealthCheckUrl}'> 👉URL访问地址</a> " +
                     "<br/> 项目: ${PROJECT_NAME}" +
                     "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
-                    "<br/> 大小: ${webPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
+                    "<br/> 大小: ${buildPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
             currentBuild.description = "<a href='${noticeHealthCheckUrl}'> 👉API访问地址</a> " +
                     "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉直接下载构建${javaPackageType}包</a>" : ""}" +
                     "<br/> 项目: ${PROJECT_NAME}" +
                     "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
-                    "<br/> 环境: ${releaseEnvironment}   大小: ${javaPackageSize} <br/> 分支: ${BRANCH_NAME}  <br/> 发布人: ${BUILD_USER}"
+                    "<br/> 环境: ${releaseEnvironment}   大小: ${buildPackageSize} <br/> 分支: ${BRANCH_NAME}  <br/> 发布人: ${BUILD_USER}"
         }
     } catch (error) {
         println error.getMessage()
@@ -2237,7 +2233,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                     "##### 版本信息",
                                     "- Nginx Web服务启动${msg}",
                                     "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
-                                    "- Node版本: ${NODE_VERSION}   包大小: ${webPackageSize}",
+                                    "- Node版本: ${NODE_VERSION}   包大小: ${buildPackageSize}",
                                     "${monorepoProjectName}",
                                     "##### ${deployType}",
                                     "##### ${k8sPodContent}",
@@ -2259,14 +2255,14 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                 } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
                     def javaInfo = ""
                     if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-                        javaInfo = "构建版本: JDK${JDK_VERSION}   包大小: ${javaPackageSize}"
+                        javaInfo = "构建版本: JDK${JDK_VERSION}   包大小: ${buildPackageSize}"
                         if ("${javaOssUrl}".trim() != '') {
                             javaInfo = javaInfo + "\n [直接下载构建${javaPackageType}包](${javaOssUrl})  👈"
                         }
                     }
                     def pythonInfo = ""
                     if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-                        pythonInfo = "运行版本: Python ${CUSTOM_PYTHON_VERSION} "
+                        pythonInfo = "运行版本: Python${CUSTOM_PYTHON_VERSION}   包大小: ${buildPackageSize}"
                     }
                     dingtalk(
                             robot: "${DING_TALK_CREDENTIALS_ID}",

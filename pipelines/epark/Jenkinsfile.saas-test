@@ -109,8 +109,8 @@ map.put('npm_package_folder', "dist")
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
 map.put('maven_one_level', 'openpark-saas')
-// Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
-map.put('maven_setting_xml', ' ')
+// Maven自定义settings.xml文件Secret file凭据  如设置私有库或镜像源情况
+map.put('maven_settings_xml_id', ' ')
 
 // 调用核心通用Pipeline
 sharedLibrary(map)
@@ -198,6 +198,21 @@ JSON_PARAMS
     "NODE_VERSION": "16" ,
     "NPM_RUN_PARAMS" : "build-merchant:test",
 }
+
+pengbo-park-h5-test
+澎泊车SaaS 2.0 停车场用户H5平台 Web前端 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/mini-monorepo.git" ,
+    "BRANCH_NAME" : "develop" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "pengbo-mini" ,
+    "SHELL_PARAMS" : "pengbo-mini h5 9018 80 test" ,
+    "NODE_VERSION": "20" ,
+    "NPM_RUN_PARAMS" : "build:h5",
+    "IS_MONO_REPO" : true,
+}
+
 
 java-monorepo-docs-test
 Java  MonoRepo技术文档 ❤️

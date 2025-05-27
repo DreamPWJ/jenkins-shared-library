@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.6
 # Author: 潘维吉
 # Version 1.0.0
 # Description: 自定义构建Python语言镜像
@@ -16,7 +17,7 @@ FROM ubuntu:latest
 WORKDIR /app
 
 # 挂载数据卷 docker删除后数据不丢失 docker run -v 映射
-VOLUME /app
+#VOLUME /app
 
 # 指定切换用户
 USER root
@@ -27,14 +28,13 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 设置环境变量
 ENV DEBIAN_FRONTEND=noninteractive \
-    PIP_CACHE_DIR=/app/pip_cache \
+    PIP_CACHE_DIR=/app/cache/pip  \
     PYTHONUNBUFFERED=1
 
 # 更新包列表并安装基本工具
 RUN  sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list && \
      apt-get update && apt-get install -y curl wget tar software-properties-common \
-     python3 python3-pip python3-venv build-essential && \
-     apt-get clean
+     python3 python3-pip python3-venv build-essential
 
 # 动态安装依赖环境包 安装特定项目依赖环境  --no-install-recommends不安装那些被推荐但非必需的依赖包
 ARG CUSTOM_INSTALL_PACKAGES
@@ -57,12 +57,14 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY python.tar.gz .
 
 # 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包
-# Docker 19.03后版本可启用 BuildKit 方式指定缓存目录 --mount=type=cache,target=/var/cache/pip
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
- && mv requirement.txt requirements.txt || true \
+ # && mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
- && pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com \
- && pwd && ls -l
+ && ls -l
+
+# Docker 19.03后版本可启用 BuildKit 方式指定缓存目录 --mount=type=cache,target=$PIP_CACHE_DIR
+ARG IS_NEED_INSTALL="true"
+RUN --mount=type=cache,target=$PIP_CACHE_DIR pip install --no-cache-dir -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 
 # 暴露端口
 EXPOSE 5000

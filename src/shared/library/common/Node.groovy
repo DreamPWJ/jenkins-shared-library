@@ -29,30 +29,33 @@ class Node implements Serializable {
     static def setMirror(ctx) {
         // 每次流水线执行都将执行 会产生无效的浪费  后面优化一下
         ctx.sh "node -v && npm -v"  // node和npm版本信息
+        if (true) { // 内置镜像已经初始化设置 无需重复设置 减少流水线构建时间
+            return
+        }
         def npmMirror = "" // NPM镜像
         if (false) { // 是否使用官方镜像
             npmMirror = "https://registry.npmjs.org" // 官方镜像
         } else { // 其他国内镜像加速下载
             npmMirror = "https://registry.npmmirror.com" // 新淘宝镜像
         }
-
         // 设置镜像源 加速下载
         ctx.sh "npm config set registry ${npmMirror}"
 
-        try {
-            ctx.sh "yarn --version"
-        } catch (error) {
-            ctx.sh "npm install -g yarn || true" // 动态配置或固定yarn版本号 防止版本变化兼容性问题
-        }
         try {
             ctx.sh "pnpm --version"
         } catch (error) {
             ctx.sh "npm install -g pnpm || true"
         }
 
+        try {
+            ctx.sh "yarn --version"
+        } catch (error) {
+            ctx.sh "npm install -g yarn || true" // 动态配置或固定yarn版本号 防止版本变化兼容性问题
+        }
+
         // 设置镜像源 加速下载
-        ctx.sh "yarn config set registry ${npmMirror} || true"
         ctx.sh "pnpm config set registry ${npmMirror} || true"
+        ctx.sh "yarn config set registry ${npmMirror} || true"
     }
 
     /**

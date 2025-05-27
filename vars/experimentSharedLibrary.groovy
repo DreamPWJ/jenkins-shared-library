@@ -60,7 +60,7 @@ def call(String type = 'experiment', Map map) {
                 string(name: 'ROLLBACK_BUILD_ID', defaultValue: '0', description: "DEPLOY_MODE基于" + GlobalVars.rollback + "部署方式, 输入对应保留的回滚构建记录ID, " +
                         "默认0是回滚到上一次连续构建, 当前归档模式的回滚仅适用于在master节点构建的任务")
                 booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行Docker/K8S集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
-                booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', defaultValue: false, description: "是否执行静态代码质量分析检测 交付可读、易维护和安全的高质量代码 🔦")
+                booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', defaultValue: false, description: "是否执行静态代码质量分析检测 生成质量报告， 交付可读、易维护和安全的高质量代码 🔦")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
                         description: '是否执行服务启动健康检测  K8S使用默认的健康探测 🌡️')
                 booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}",
@@ -318,8 +318,6 @@ def getInitParams(map) {
 
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
-    // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
-    MAVEN_SETTING_XML = jsonParams.MAVEN_SETTING_XML ? jsonParams.MAVEN_SETTING_XML.trim() : "${map.maven_setting_xml}".trim()
     AUTO_TEST_PARAM = jsonParams.AUTO_TEST_PARAM ? jsonParams.AUTO_TEST_PARAM.trim() : ""  // 自动化集成测试参数
     // Java框架类型 1. Spring Boot  2. Spring MVC
     JAVA_FRAMEWORK_TYPE = jsonParams.JAVA_FRAMEWORK_TYPE ? jsonParams.JAVA_FRAMEWORK_TYPE.trim() : "1"
@@ -432,12 +430,10 @@ def getInitParams(map) {
     qrCodeOssUrl = ""
     // Java构建包OSS地址Url
     javaOssUrl = ""
-    // Web构建包大小
-    webPackageSize = ""
     // Java打包类型 jar、war
     javaPackageType = ""
-    // Java构建包大小
-    javaPackageSize = ""
+    // 构建包大小
+    buildPackageSize = ""
     // Maven打包后产物的位置
     mavenPackageLocation = ""
     // 是否健康检测失败状态
@@ -658,7 +654,7 @@ def futureLab(map) {
         Python.codePackage(this)
     }
     def pythonVersion = "3.10"
-    def installPackages = "libglx-mesa0" // 动态安装依赖包
+    def installPackages = "" // 动态安装依赖包
     def dockerImageName = "panweiji/python"
     def dockerImageTag = pythonVersion + "" + (installPackages == "" ? "" : "-" + installPackages.replaceAll(" ", "-"))
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/.ci/python/Dockerfile.python", dockerImageName, dockerImageTag, "--build-arg PYTHON_VERSION=${pythonVersion} --build-arg CUSTOM_INSTALL_PACKAGES=${installPackages}", true)
@@ -687,6 +683,7 @@ def futureLab(map) {
         // sh "playwright --version"
     }*/
 
+
 /*
     def mvndVersion = "1.0.2"
     def jdkVersion = "21"
@@ -706,8 +703,9 @@ def futureLab(map) {
         //sh "mvn  install"
     }
 */
-
-
+/*
+    def k8sPodReplicas = Integer.parseInt("3")
+    println("等于 " + k8sPodReplicas * 3 - 1)*/
 /*  println("服务启动失败回滚到上一个版本  保证服务高可用性")
     Docker.rollbackServer(this, map, "${dockerImageName}", "${dockerContainerName}")*/
 /*  def maxVersion = Git.getGitTagMaxVersion(this)

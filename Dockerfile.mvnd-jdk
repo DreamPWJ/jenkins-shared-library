@@ -54,8 +54,7 @@ RUN curl -L https://git.code.lanneng.tech/apache/maven-mvnd/releases/download/${
 #    export MAVEN_HOME=${MAVEN_HOME} && export PATH=${MAVEN_HOME}/bin:$PATH
 
 # 验证版本
-#RUN java -version && \
-#    mvnd --version && mvn -v
+#RUN java -version && mvnd --version && mvn -v
 
 # 默认启动命令
 CMD ["/bin/bash"]
@@ -64,4 +63,4 @@ CMD ["/bin/bash"]
 # 自定义构建镜像
 # DOCKER_BUILDKIT=1 docker build --build-arg MVND_VERSION=1.0.2 --build-arg JDK_VERSION=21 -t panweiji/mvnd-jdk:latest  -f /my/Dockerfile.mvnd-jdk . --no-cache
 # 上传镜像 先 docker login 登录
-# docker push panweiji/mvnd-jdk:latest
+# docker push panweiji/mvnd-jdk:1.0.2-21

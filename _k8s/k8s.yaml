@@ -30,11 +30,11 @@ spec:
       containers:
         - name: {APP_COMMON_NAME}
           image: {IMAGE_URL}:{IMAGE_TAG}
-          imagePullPolicy: Always       # 获取镜像的策略 Always表示总是下载最新镜像 IfNotPresent表示优先使用本地镜像，否则下载镜像，Never表示仅使用本地镜像
+          imagePullPolicy: Always  # 获取镜像的策略 Always表示总是下载最新镜像 IfNotPresent表示优先使用本地镜像，否则下载镜像，Never表示仅使用本地镜像
           resources: # 对Pod的资源限制机制 合理设置CPU 内存 防止CPU打满 内存溢出 导致整个服务器宕机
-            requests:
-              cpu: 100m  # cpu请求 容器启动的初始可用数量
-              memory: 200Mi # 内存请求 容器启动的初始可用数量 不能大于limits设置值
+            requests: # 资源请求 调度器根据值选择满足资源的节点
+              cpu: 300m  # cpu请求 容器启动的初始可用数量
+              memory: 500Mi # 内存请求 容器启动的初始可用数量 不能大于limits设置值
               ephemeral-storage: "1Gi"  # 容器需要的最小临时存储量
             limits:
               # m是千分之一  100m是0.1个CPU  限制最大cpu防止资源溢出 导致整个集群全部不可用
@@ -63,10 +63,7 @@ spec:
           lifecycle:
             preStop:
               exec:
-                command:
-                  - sleep
-                  - 5s   # 等待 kube-proxy 完成规则同步再开始停止容器内进程
-
+                command: ["sleep", "5"]  # 等待 kube-proxy 完成规则同步再开始停止容器内进程 仅保留必要的最小等待时间
           # 对节点（就绪探测）服务可用性进行检测， initialDelaySeconds启动多少秒后开始，periodSeconds每多少秒检测一次，timeoutSeconds超时时间秒
           readinessProbe: #  Pod 未就绪时，它会从服务负载均衡器中删除   Readiness探针在容器的整个生命周期内运行在容器上
             #tcpSocket: # TCP 端口连通性探测 轻量级，无需应用层协议支持
@@ -75,7 +72,7 @@ spec:
               path: {CUSTOM_HEALTH_CHECK_PATH}
               port: {DEFAULT_CONTAINER_PORT}
             initialDelaySeconds: 1   # 探针在容器启动后的多少秒才开始执行  如GraalVM启动毫秒级
-            periodSeconds: 10        # 探针执行频率。默认是10秒，最小1秒
+            periodSeconds: 2         # 探针执行频率。默认是10秒，最小1秒
             timeoutSeconds: 1        # 探测超时时间。默认1秒，最小1秒
             successThreshold: 1      # 连续探测1次成功表示成功
             failureThreshold: 60     # 探测成功后，最少连续探测失败多少次才被认定为失败。默认是3。最小值是1
@@ -89,7 +86,7 @@ spec:
             timeoutSeconds: 2
             successThreshold: 1      # 连续探测1次成功表示成功
             failureThreshold: 3
-
+      terminationGracePeriodSeconds: 5  # 优雅终止宽限期 默认30秒 缩短 Pod 终止等待时
       restartPolicy: Always         # Pod的重启策略 Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Never表示不再重启该Pod
       # 新特性topologySpreadConstraints分布约束代替affinity亲和度 实现均匀部署pod到不同的node 拓扑分布约束 在K8s v1.18版本进入beta阶段默认启用 参考文档： https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/topology-spread-constraints/
       topologySpreadConstraints:    # 配置一个拓扑分布约束
@@ -119,11 +116,11 @@ spec:
       imagePullSecrets:
         - name: {K8S_IMAGE_PULL_SECRETS}
   # K8S部署更新策略
-#  strategy:
-#    type: RollingUpdate  # 滚动更新 “RollingUpdate”是默认值   Recreate类型在创建新 Pod 之前，所有现有的 Pod 会被杀死
-#    rollingUpdate:  # 滚动更新速率控制
-#      maxSurge: 25%   # 过期望副本数最大比例或最大值  值越小，越能保证服务稳定，更新越平滑  可为整数（比如 3），也可是百分百，向上取整。 maxSurge 默认值为 25%
-#      maxUnavailable: 25%  # 最大不可用副本数最大比例或最大值  值调的越大，副本更新速度越快
+  strategy:
+    type: RollingUpdate  # 滚动更新 “RollingUpdate”是默认值   Recreate类型在创建新 Pod 之前，所有现有的 Pod 会被杀死
+    rollingUpdate:  # 滚动更新速率控制
+      maxSurge: 50%   # 允许同时创建的最大新 Pod 数量 默认值25% 期望副本数最大比例或最大值  值越小，越能保证服务稳定，更新越平滑  可为整数（比如 3），也可是百分百，向上取整
+      maxUnavailable: 50%  # 允许同时销毁的旧 Pod 数量 默认值25% 最大不可用副本数最大比例或最大值  值调的越大，副本更新速度越快
 
 ---
 

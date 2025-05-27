@@ -109,8 +109,8 @@ map.put('npm_package_folder', "dist")
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
 map.put('maven_one_level', ' ')
-// Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
-map.put('maven_setting_xml', ' ')
+// Maven自定义settings.xml文件Secret file凭据  如设置私有库或镜像源情况
+map.put('maven_settings_xml_id', ' ')
 
 // 调用核心通用Pipeline
 sharedLibrary(map)
