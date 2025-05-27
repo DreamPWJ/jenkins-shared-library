@@ -32,9 +32,9 @@ spec:
           image: {IMAGE_URL}:{IMAGE_TAG}
           imagePullPolicy: Always       # 获取镜像的策略 Always表示总是下载最新镜像 IfNotPresent表示优先使用本地镜像，否则下载镜像，Never表示仅使用本地镜像
           resources: # 对Pod的资源限制机制 合理设置CPU 内存 防止CPU打满 内存溢出 导致整个服务器宕机
-            requests:
-              cpu: 100m  # cpu请求 容器启动的初始可用数量
-              memory: 200Mi # 内存请求 容器启动的初始可用数量 不能大于limits设置值
+            requests: # 资源请求 调度器根据值选择满足资源的节点
+              cpu: 500m  # cpu请求 容器启动的初始可用数量
+              memory: 500Mi # 内存请求 容器启动的初始可用数量 不能大于limits设置值
               ephemeral-storage: "1Gi"  # 容器需要的最小临时存储量
             limits:
               # m是千分之一  100m是0.1个CPU  限制最大cpu防止资源溢出 导致整个集群全部不可用
