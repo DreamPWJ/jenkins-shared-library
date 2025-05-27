@@ -833,8 +833,6 @@ def getInitParams(map) {
 
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
-    // Maven自定义指定settings.xml文件  如设置私有库或镜像源情况
-    MAVEN_SETTING_XML = jsonParams.MAVEN_SETTING_XML ? jsonParams.MAVEN_SETTING_XML.trim() : "${map.maven_setting_xml}".trim()
     AUTO_TEST_PARAM = jsonParams.AUTO_TEST_PARAM ? jsonParams.AUTO_TEST_PARAM.trim() : ""  // 自动化集成测试参数
     // Java框架类型 1. Spring Boot  2. Spring MVC
     JAVA_FRAMEWORK_TYPE = jsonParams.JAVA_FRAMEWORK_TYPE ? jsonParams.JAVA_FRAMEWORK_TYPE.trim() : "1"
@@ -1332,7 +1330,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
                 } else { // 多模块情况
                     sh "${mavenCommandType} clean package -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am  -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
                 }
-            } else if ("${MAVEN_SETTING_XML}" == "") {
+            } else if ("${map.maven_settings_xml_id}".trim() == "") { // 是否自定义maven仓库
                 // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
                 if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') { // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
                     MAVEN_ONE_LEVEL = ""
@@ -1345,9 +1343,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
                 }
             } else {
                 // 基于自定义setting.xml文件方式打包 如私有包等
-                // Maven.packageBySettingFile(this, map, mavenCommandType, isMavenTest, springNativeBuildParams)
-                def settingsFile = "${env.WORKSPACE}/ci/_jenkins/maven/${MAVEN_SETTING_XML}"
-                sh "${mavenCommandType} clean install -T 2C -s ${settingsFile} -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am  -Dmaven.compile.fork=true  ${isMavenTest} ${springNativeBuildParams}"
+                Maven.packageBySettingFile(this, map, mavenCommandType, isMavenTest, springNativeBuildParams)
             }
 
             // 获取pom文件信息
