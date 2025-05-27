@@ -63,10 +63,7 @@ spec:
           lifecycle:
             preStop:
               exec:
-                command:
-                  - sleep
-                  - 5s   # 等待 kube-proxy 完成规则同步再开始停止容器内进程
-
+                command: ["sleep", "5"]  # 等待 kube-proxy 完成规则同步再开始停止容器内进程 仅保留必要的最小等待时间
           # 对节点（就绪探测）服务可用性进行检测， initialDelaySeconds启动多少秒后开始，periodSeconds每多少秒检测一次，timeoutSeconds超时时间秒
           readinessProbe: #  Pod 未就绪时，它会从服务负载均衡器中删除   Readiness探针在容器的整个生命周期内运行在容器上
             #tcpSocket: # TCP 端口连通性探测 轻量级，无需应用层协议支持
