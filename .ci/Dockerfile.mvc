@@ -23,7 +23,7 @@ FROM tomcat:${TOMCAT_VERSION}-jre8
 #LABEL author="潘维吉"
 
 # 挂载数据卷 docker删除后数据不丢失 docker run -v 映射
-VOLUME /logs
+#VOLUME /logs
 
 # 指定切换用户
 USER root
