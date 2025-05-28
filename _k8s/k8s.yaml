@@ -31,7 +31,7 @@ spec:
         - name: {APP_COMMON_NAME}
           image: {IMAGE_URL}:{IMAGE_TAG}
           imagePullPolicy: Always  # 获取镜像的策略 Always表示总是下载最新镜像 IfNotPresent表示优先使用本地镜像，否则下载镜像，Never表示仅使用本地镜像
-          securityContext: # 容器安全级别配置
+          securityContext: # 容器安全级别配置增强
             readOnlyRootFilesystem: true      # 将容器根文件系统设为只读 防止恶意写入关键目录
             allowPrivilegeEscalation: false   # 禁止进程通过 sudo 等方式提高权限 防止病毒控制
           resources: # 对Pod的资源限制机制 合理设置CPU 内存 防止CPU打满 内存溢出 导致整个服务器宕机
@@ -132,7 +132,7 @@ spec:
   strategy:
     type: RollingUpdate  # 滚动更新 “RollingUpdate”是默认值   Recreate类型在创建新 Pod 之前，所有现有的 Pod 会被杀死
     rollingUpdate:  # 滚动更新速率控制
-      maxSurge: 50%   # 允许同时创建的最大新 Pod 数量 默认值25% 期望副本数最大比例或最大值  值越小，越能保证服务稳定，更新越平滑  可为整数（比如 3），也可是百分百，向上取整
+      maxSurge: 30%        # 允许同时创建的最大新 Pod 数量 默认值25% 期望副本数最大比例或最大值  值越小，越能保证服务稳定，更新越平滑  可为整数（比如 3），也可是百分百，向上取整
       maxUnavailable: 50%  # 允许同时销毁的旧 Pod 数量 默认值25% 最大不可用副本数最大比例或最大值  值调的越大，副本更新速度越快
 
 ---
@@ -165,4 +165,4 @@ spec:
 #  sessionAffinity: ClientIP            # 集群Session共享设置为 "ClientIP" 注意只适用NodePort类型 （默认值是 "None"值 Service向后台Pod转发规则是轮询），来基于客户端的IP地址选择固定会话Pod关联
 #  sessionAffinityConfig:
 #    clientIP:
-#      timeoutSeconds: 10800            # 保持时间 秒
+#      timeoutSeconds: 7200            # 保持时间 秒
