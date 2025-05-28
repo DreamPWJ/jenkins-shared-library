@@ -58,11 +58,11 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                 sh("""
                           git tag -a ${tagVersion} -m '${gitChangeLog}'
                           git push ${userPassWordUrl} ${tagVersion}
+                          git checkout ${ctx.BRANCH_NAME}
                            """)
                 writeFile file: "${changeLogFileName}", text: "## ${tagVersion}\n`${Utils.formatDate()}`<br><br>\n${gitChangeLog}\n${changeLogFile}"
                 try {
                     sh("""
-                          git checkout ${ctx.BRANCH_NAME}
                           git add ${changeLogFileName}
                           git commit ${changeLogFileName}  -m "${GlobalVars.gitCommitChangeLogDocs}: 发布 v${tagVersion}" 
                           git push ${userPassWordUrl}
