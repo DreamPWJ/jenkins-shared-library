@@ -133,7 +133,7 @@ class Kubernetes implements Serializable {
         }
 
         // 是否执行K8S默认的健康探测
-        def terminationGracePeriodSeconds = 30 // k8s默认30s
+        def terminationGracePeriodSeconds = 30 // k8s默认30s 因为无健康探测就不知道应用是否启动成功 延长旧pod销毁时间 可减少对外服务中断时长
         if ("${ctx.IS_DISABLE_K8S_HEALTH_CHECK}" == "false") {
             terminationGracePeriodSeconds = 5 // 开启健康探测情况减少pod优雅关闭时间 加速部署 探测到新pod启动成功快速销毁旧pod
         }
