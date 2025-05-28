@@ -147,6 +147,7 @@ if default_port is not None:
 # 是否禁止执行K8S默认的健康探测
 is_k8s_health_probe = args.is_k8s_health_probe
 if is_k8s_health_probe:
+    del yaml_containers[0]["startupProbe"]
     del yaml_containers[0]["readinessProbe"]
     del yaml_containers[0]["livenessProbe"]
 
