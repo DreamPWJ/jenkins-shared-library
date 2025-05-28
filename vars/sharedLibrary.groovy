@@ -1105,22 +1105,6 @@ def getUserInfo() {
 }
 
 /**
- * 获取CI代码库
- */
-def pullCIRepo() {
-    // 同步部署脚本和配置文件等
-    sh ' mkdir -p ci && chmod -R 777 ci'
-    dir("${env.WORKSPACE}/ci") {
-        def reg = ~/^\*\// // 正则匹配去掉*/字符
-        // 根据jenkins配置的scm分支 获取相应分支下脚本和配置 支持多分支构建
-        scmBranchName = scm.branches[0].name - reg
-        println "Jenkinsfile文件和CI代码库分支: ${scmBranchName}"
-        // 拉取Git上的部署文件 无需人工上传
-        git url: "${GlobalVars.CI_REPO_URL}", branch: "${scmBranchName}", changelog: false, credentialsId: "${CI_GIT_CREDENTIALS_ID}"
-    }
-}
-
-/**
  * 获取项目代码
  */
 def pullProjectCode() {
@@ -1170,9 +1154,26 @@ def pullProjectCode() {
     dir("${env.WORKSPACE}/ci") {
         existCiCode()
     }
+
     // 源码直接部署方式
     sourceCodeDeploy()
 
+}
+
+/**
+ * 获取CI代码库
+ */
+def pullCIRepo() {
+    // 同步部署脚本和配置文件等
+    sh ' mkdir -p ci && chmod -R 777 ci'
+    dir("${env.WORKSPACE}/ci") {
+        def reg = ~/^\*\// // 正则匹配去掉*/字符
+        // 根据jenkins配置的scm分支 获取相应分支下脚本和配置 支持多分支构建
+        scmBranchName = scm.branches[0].name - reg
+        println "Jenkinsfile文件和CI代码库分支: ${scmBranchName}"
+        // 拉取Git上的部署文件 无需人工上传
+        git url: "${GlobalVars.CI_REPO_URL}", branch: "${scmBranchName}", changelog: false, credentialsId: "${CI_GIT_CREDENTIALS_ID}"
+    }
 }
 
 /**

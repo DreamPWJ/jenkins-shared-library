@@ -132,6 +132,12 @@ class Kubernetes implements Serializable {
             }
         }
 
+        // 是否执行K8S默认的健康探测
+        def terminationGracePeriodSeconds = 30 // k8s默认30s 因为无健康探测就不知道应用是否启动成功 延长旧pod销毁时间 可减少对外服务中断时长
+        if ("${ctx.IS_DISABLE_K8S_HEALTH_CHECK}" == "false") {
+            terminationGracePeriodSeconds = 5 // 开启健康探测情况减少pod优雅关闭时间 加速部署 探测到新pod启动成功快速销毁旧pod
+        }
+
         // 灰度发布  金丝雀发布  A/B测试
         def canaryFlag = "canary"
         if ("${ctx.IS_CANARY_DEPLOY}" == 'true') {
@@ -154,6 +160,7 @@ class Kubernetes implements Serializable {
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g;s#{DEFAULT_CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
                 " s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g;s#{MAX_CPU_SIZE}#${map.docker_limit_cpu}#g;s#{MAX_MEMORY_SIZE}#${map.docker_memory}#g;s#{JAVA_OPTS_XMX}#${map.docker_java_opts}#g; " +
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g;s#{CUSTOM_HEALTH_CHECK_PATH}#${ctx.CUSTOM_HEALTH_CHECK_PATH}#g;s#{K8S_NAMESPACE}#${k8sNameSpace}#g; " +
+                " s#{K8S_GRACE_PERIOD_SECONDS}#${terminationGracePeriodSeconds}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYamlFile} > ${k8sYamlFile} "
 
         def pythonYamlParams = ""
@@ -342,7 +349,7 @@ class Kubernetes implements Serializable {
                     // yaml内容中包含初始化时间和启动完成时间 shell中自动解析所有内容，建议yq进行实际的YAML解析
                     ctx.echo "Waiting for all pods to be ready. Currently Ready: $readyCount / Total: $totalPods ,  podStatusPhase: $podStatusPhase"
                     if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-                        def sleepTime = k8sPodReplicas * 4 - whileCount
+                        def sleepTime = k8sPodReplicas * 3 - whileCount
                         ctx.sleep sleepTime < 3 ? 3 : sleepTime // 每隔多少秒检查一次
                     }
                     if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {

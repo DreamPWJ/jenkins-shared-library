@@ -64,29 +64,42 @@ spec:
             preStop:
               exec:
                 command: ["sleep", "5"]  # 等待 kube-proxy 完成规则同步再开始停止容器内进程 仅保留必要的最小等待时间
-          # 对节点（就绪探测）服务可用性进行检测， initialDelaySeconds启动多少秒后开始，periodSeconds每多少秒检测一次，timeoutSeconds超时时间秒
+          # startupProbe（启动探针）检测容器是否完成启动 在 startupProbe 成功之前，其他探针（readinessProbe 和 livenessProbe）不会启动
+          startupProbe:
+            httpGet:
+              path: {CUSTOM_HEALTH_CHECK_PATH}
+              port: {DEFAULT_CONTAINER_PORT}
+            initialDelaySeconds: 0     # 探针在容器启动后的多少秒才开始执行  如GraalVM启动毫秒级
+            periodSeconds: 2           # 探针执行频率。默认是10秒，最小1秒
+            timeoutSeconds: 1          # 探测超时时间。默认1秒，最小1秒
+            successThreshold: 1        # 连续探测1次成功表示成功
+            failureThreshold: 80       # 允许最多多少次失败
+          # readinessProbe（就绪探测）服务可用性进行检测 确保容器准备好处理请求后才被加入负载均衡
           readinessProbe: #  Pod 未就绪时，它会从服务负载均衡器中删除   Readiness探针在容器的整个生命周期内运行在容器上
             #tcpSocket: # TCP 端口连通性探测 轻量级，无需应用层协议支持
-            #  port: 8080  # 探测目标端口
+            #port: 8080  # 探测目标端口
             httpGet:  # 任何大于或等于 200 且小于 400 的代码都表示成功。任何其他代码表示失败
               path: {CUSTOM_HEALTH_CHECK_PATH}
               port: {DEFAULT_CONTAINER_PORT}
-            initialDelaySeconds: 1   # 探针在容器启动后的多少秒才开始执行  如GraalVM启动毫秒级
-            periodSeconds: 2         # 探针执行频率。默认是10秒，最小1秒
+            initialDelaySeconds: 1   # 探针在容器启动后的多少秒才开始执行
+            periodSeconds: 10        # 探针执行频率。默认是10秒，最小1秒
             timeoutSeconds: 1        # 探测超时时间。默认1秒，最小1秒
             successThreshold: 1      # 连续探测1次成功表示成功
-            failureThreshold: 60     # 探测成功后，最少连续探测失败多少次才被认定为失败。默认是3。最小值是1
-          # LivenessProbe（存活探测） 对Pod内个容器健康检查的设置，当探测无响应几次后将自动重启该容器
+            failureThreshold: 3      # 探测成功后，最少连续探测失败多少次才被认定为失败。默认是3。最小值是1
+          # livenessProbe（存活探测） 对Pod内个容器健康检查的设置，当探测无响应几次后将自动重启该容器
           livenessProbe:
             httpGet:
               path: {CUSTOM_HEALTH_CHECK_PATH}
               port: {DEFAULT_CONTAINER_PORT}
-            initialDelaySeconds: 180
-            periodSeconds: 60
+            initialDelaySeconds: 60
+            periodSeconds: 30
             timeoutSeconds: 2
-            successThreshold: 1      # 连续探测1次成功表示成功
+            successThreshold: 1       # 连续探测1次成功表示成功
             failureThreshold: 3
-      terminationGracePeriodSeconds: 5  # 优雅终止宽限期 默认30秒 缩短 Pod 终止等待时
+          #securityContext: # 容器安全级别配置增强
+            #readOnlyRootFilesystem: true      # 将容器根文件系统设为只读 防止恶意写入关键目录 可能导致容器无法启动
+            #allowPrivilegeEscalation: false   # 禁止进程通过 sudo 等方式提高权限 防止病毒控制 可能影响业务
+      terminationGracePeriodSeconds: {K8S_GRACE_PERIOD_SECONDS}  # 优雅终止宽限期 默认30秒 减少时间可缩短Pod销毁等待时 根据是否有健康绪探测变化值大小
       restartPolicy: Always         # Pod的重启策略 Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Never表示不再重启该Pod
       # 新特性topologySpreadConstraints分布约束代替affinity亲和度 实现均匀部署pod到不同的node 拓扑分布约束 在K8s v1.18版本进入beta阶段默认启用 参考文档： https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/topology-spread-constraints/
       topologySpreadConstraints:    # 配置一个拓扑分布约束
@@ -119,7 +132,7 @@ spec:
   strategy:
     type: RollingUpdate  # 滚动更新 “RollingUpdate”是默认值   Recreate类型在创建新 Pod 之前，所有现有的 Pod 会被杀死
     rollingUpdate:  # 滚动更新速率控制
-      maxSurge: 50%   # 允许同时创建的最大新 Pod 数量 默认值25% 期望副本数最大比例或最大值  值越小，越能保证服务稳定，更新越平滑  可为整数（比如 3），也可是百分百，向上取整
+      maxSurge: 30%        # 允许同时创建的最大新 Pod 数量 默认值25% 期望副本数最大比例或最大值  值越小，越能保证服务稳定，更新越平滑  可为整数（比如 3），也可是百分百，向上取整
       maxUnavailable: 50%  # 允许同时销毁的旧 Pod 数量 默认值25% 最大不可用副本数最大比例或最大值  值调的越大，副本更新速度越快
 
 ---
@@ -152,4 +165,4 @@ spec:
 #  sessionAffinity: ClientIP            # 集群Session共享设置为 "ClientIP" 注意只适用NodePort类型 （默认值是 "None"值 Service向后台Pod转发规则是轮询），来基于客户端的IP地址选择固定会话Pod关联
 #  sessionAffinityConfig:
 #    clientIP:
-#      timeoutSeconds: 10800            # 保持时间 秒
+#      timeoutSeconds: 7200            # 保持时间 秒

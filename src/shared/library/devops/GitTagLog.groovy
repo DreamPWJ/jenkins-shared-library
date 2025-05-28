@@ -25,11 +25,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
             ctx.retry(2) {
                 sh("""
                    git config --global user.email "406798106@qq.com"
-                   git config --global user.name ${GIT_USERNAME}
-                   git config --global credential.helper store
-                   git fetch --tags --force ${userPassWordUrl} || true
-                   git pull ${userPassWordUrl} || true
-                   git stash || true            
+                   git config --global user.name ${GIT_USERNAME}       
                    """)
             }
 
@@ -66,26 +62,14 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                 writeFile file: "${changeLogFileName}", text: "## ${tagVersion}\n`${Utils.formatDate()}`<br><br>\n${gitChangeLog}\n${changeLogFile}"
                 try {
                     sh("""
+                          git checkout ${ctx.BRANCH_NAME}
                           git add ${changeLogFileName}
                           git commit ${changeLogFileName}  -m "${GlobalVars.gitCommitChangeLogDocs}: 发布 v${tagVersion}" 
-                          git push origin HEAD:${ctx.BRANCH_NAME} ${userPassWordUrl}
+                          git push ${userPassWordUrl}
                            """)
                 } catch (e) {
                     println "推送${changeLogFileName}变更日志异常"
                     println e.getMessage()
-                    // 当前分支处于分离状态 fatal: You are not currently on a branch
-/*                   def tempBranch = "pan-wei-ji-temp-branch"
-                    sh("""
-                          git branch -D ${tempBranch} || true
-                          git branch ${tempBranch}
-                          git fetch ${userPassWordUrl}
-                          git checkout ${ctx.BRANCH_NAME}
-                          git merge ${tempBranch}
-                          git push ${userPassWordUrl}
-                          git branch -d ${tempBranch} 
-                          git merge --abort || true
-                          git reset --merge || true
-                           """)*/
                 }
                 //}
                 //}
