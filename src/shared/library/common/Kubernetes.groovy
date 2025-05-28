@@ -132,6 +132,12 @@ class Kubernetes implements Serializable {
             }
         }
 
+        // 是否执行K8S默认的健康探测
+        def terminationGracePeriodSeconds = 30 // k8s默认30s
+        if ("${ctx.IS_DISABLE_K8S_HEALTH_CHECK}" == "false") {
+            terminationGracePeriodSeconds = 5 // 开启健康探测情况减少pod优雅关闭时间 加速部署 探测到新pod启动成功快速销毁旧pod
+        }
+
         // 灰度发布  金丝雀发布  A/B测试
         def canaryFlag = "canary"
         if ("${ctx.IS_CANARY_DEPLOY}" == 'true') {
@@ -154,6 +160,7 @@ class Kubernetes implements Serializable {
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g;s#{DEFAULT_CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
                 " s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g;s#{MAX_CPU_SIZE}#${map.docker_limit_cpu}#g;s#{MAX_MEMORY_SIZE}#${map.docker_memory}#g;s#{JAVA_OPTS_XMX}#${map.docker_java_opts}#g; " +
                 " s#{K8S_IMAGE_PULL_SECRETS}#${map.k8s_image_pull_secrets}#g;s#{CUSTOM_HEALTH_CHECK_PATH}#${ctx.CUSTOM_HEALTH_CHECK_PATH}#g;s#{K8S_NAMESPACE}#${k8sNameSpace}#g; " +
+                " s#{K8S_GRACE_PERIOD_SECONDS}#${terminationGracePeriodSeconds}#g; " +
                 " ' ${ctx.WORKSPACE}/ci/_k8s/${k8sYamlFile} > ${k8sYamlFile} "
 
         def pythonYamlParams = ""

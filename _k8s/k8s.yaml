@@ -86,7 +86,7 @@ spec:
             timeoutSeconds: 2
             successThreshold: 1      # 连续探测1次成功表示成功
             failureThreshold: 3
-      terminationGracePeriodSeconds: 5  # 优雅终止宽限期 默认30秒 缩短 Pod 终止等待时
+      terminationGracePeriodSeconds: {K8S_GRACE_PERIOD_SECONDS}  # 优雅终止宽限期 默认30秒 减少时间可缩短Pod销毁等待时 根据是否有readinessProbe就健康绪探测变化
       restartPolicy: Always         # Pod的重启策略 Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Never表示不再重启该Pod
       # 新特性topologySpreadConstraints分布约束代替affinity亲和度 实现均匀部署pod到不同的node 拓扑分布约束 在K8s v1.18版本进入beta阶段默认启用 参考文档： https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/topology-spread-constraints/
       topologySpreadConstraints:    # 配置一个拓扑分布约束
