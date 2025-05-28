@@ -31,9 +31,6 @@ spec:
         - name: {APP_COMMON_NAME}
           image: {IMAGE_URL}:{IMAGE_TAG}
           imagePullPolicy: Always  # 获取镜像的策略 Always表示总是下载最新镜像 IfNotPresent表示优先使用本地镜像，否则下载镜像，Never表示仅使用本地镜像
-          securityContext: # 容器安全级别配置增强
-            #readOnlyRootFilesystem: true      # 将容器根文件系统设为只读 防止恶意写入关键目录
-            allowPrivilegeEscalation: false   # 禁止进程通过 sudo 等方式提高权限 防止病毒控制
           resources: # 对Pod的资源限制机制 合理设置CPU 内存 防止CPU打满 内存溢出 导致整个服务器宕机
             requests: # 资源请求 调度器根据值选择满足资源的节点
               cpu: 300m  # cpu请求 容器启动的初始可用数量
@@ -99,6 +96,9 @@ spec:
             timeoutSeconds: 2
             successThreshold: 1       # 连续探测1次成功表示成功
             failureThreshold: 3
+          #securityContext: # 容器安全级别配置增强
+            #readOnlyRootFilesystem: true      # 将容器根文件系统设为只读 防止恶意写入关键目录 可能导致容器无法启动
+            #allowPrivilegeEscalation: false   # 禁止进程通过 sudo 等方式提高权限 防止病毒控制 可能影响业务
       terminationGracePeriodSeconds: {K8S_GRACE_PERIOD_SECONDS}  # 优雅终止宽限期 默认30秒 减少时间可缩短Pod销毁等待时 根据是否有健康绪探测变化值大小
       restartPolicy: Always         # Pod的重启策略 Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Never表示不再重启该Pod
       # 新特性topologySpreadConstraints分布约束代替affinity亲和度 实现均匀部署pod到不同的node 拓扑分布约束 在K8s v1.18版本进入beta阶段默认启用 参考文档： https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/topology-spread-constraints/
