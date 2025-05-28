@@ -26,10 +26,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                 sh("""
                    git config --global user.email "406798106@qq.com"
                    git config --global user.name ${GIT_USERNAME}
-                   git config --global credential.helper store
-                   git fetch --tags --force ${userPassWordUrl} || true
-                   git pull ${userPassWordUrl} || true
-                   git stash || true            
+                   git config --global credential.helper store         
                    """)
             }
 
