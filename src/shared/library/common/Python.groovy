@@ -19,7 +19,8 @@ class Python implements Serializable {
         ctx.sh " rm -rf *.tar.gz "
         ctx.sh " mv requirement.txt requirements.txt || true"
         ctx.sh " tar --warning=no-file-changed -pzcvf ${pythonPackageName} " +
-                " --exclude '*.md' --exclude '*.pyc' --exclude .git --exclude ci --exclude ci@tmp --exclude '*.log' --exclude '*.docx' --exclude '*.xlsx' --exclude '*.jar' --exclude '*.java' " +
+                " --exclude '*.md' --exclude '*.pyc' --exclude .git --exclude ci --exclude ci@tmp --exclude '*.log' " +
+                " --exclude '*.docx' --exclude '*.xlsx' --exclude '*.jar' --exclude '*.java' --exclude '*.tt*'  " +
                 " * >/dev/null 2>&1 "
         ctx.buildPackageSize = Utils.getFileSize(ctx, pythonPackageName)
     }
