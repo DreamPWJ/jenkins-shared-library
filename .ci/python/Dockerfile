@@ -50,7 +50,7 @@ RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
 
 # Docker 19.03后版本可启用 BuildKit 方式指定缓存目录 --mount=type=cache,target=$PIP_CACHE_DIR
 ARG IS_NEED_INSTALL="true"
-RUN --mount=type=cache,target=$PIP_CACHE_DIR pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN --mount=type=cache,target=$PIP_CACHE_DIR pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 
 # 暴露端口
