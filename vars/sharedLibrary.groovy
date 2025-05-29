@@ -905,6 +905,7 @@ def getInitParams(map) {
     mavenDockerName = "maven"
     if ("${IS_SPRING_NATIVE}" == "true") {
         mavenDockerName = "csanchez/maven"
+        JDK_PUBLISHER = "graalvm-community"
     }
 
     // 未来可独立拆分成不同参数传入 更易于理解和维护
