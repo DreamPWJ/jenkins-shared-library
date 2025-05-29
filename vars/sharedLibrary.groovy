@@ -1325,12 +1325,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
             def springNativeBuildParams = ""
             if ("${IS_SPRING_NATIVE}" == "true") { // 构建原生镜像包
                 springNativeBuildParams = " -Pnative "
-                // 可以使用mvnd守护进程加速构建
-                if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') {
-                    sh "${mavenCommandType} clean package -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
-                } else { // 多模块情况
-                    sh "${mavenCommandType} clean package -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am  -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
-                }
+                Maven.springNative(this, map, mavenCommandType, isMavenTest, springNativeBuildParams)
             } else if ("${map.maven_settings_xml_id}".trim() == "") { // 是否自定义maven仓库
                 // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
                 if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') { // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
