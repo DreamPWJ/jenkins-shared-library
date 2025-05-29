@@ -930,8 +930,8 @@ def getInitParams(map) {
     // Maven Docker构建镜像名称
     mavenDockerName = "maven"
     if ("${IS_SPRING_NATIVE}" == "true") {
-        mavenDockerName = "csanchez/maven"
-        JDK_PUBLISHER = "graalvm-community"
+        mavenDockerName = "csanchez/maven"  // 支持graalvm的maven版本
+        JDK_PUBLISHER = "graalvm-community" // 支持graalvm的jdk版本
     }
 
     // 健康检测url地址
