@@ -22,7 +22,8 @@ class Maven implements Serializable {
      */
     static def springNative(ctx, map, mavenCommandType, isMavenTest) {
         // Spring Boot 3 以后的 AOT 引擎可自动生成大部分反射和资源加载配置  初始化生成反射配置  检查日志中的缺失类，手动添加到 reflect-config.json
-        def springNativeBuildParams = " -Pnative native:compile " // spring-boot:build-image
+        // -Pnative：激活 Maven Profile，启用 GraalVM 原生镜像插件  native:compile：调用 native-maven-plugin 编译为本地可执行文件  生成的可执行文件路径：target/{项目名称}
+        def springNativeBuildParams = " -Pnative native:compile " // 构建Docker镜像使用 spring-boot:build-image
         // 可以使用mvnd守护进程加速构建
         if ("${ctx.IS_MAVEN_SINGLE_MODULE}" == 'true') {
             ctx.sh "${mavenCommandType} ${springNativeBuildParams} -T 2C -Dspring-boot.build-image.cache=true ${isMavenTest} "
