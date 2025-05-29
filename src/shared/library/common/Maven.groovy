@@ -25,9 +25,9 @@ class Maven implements Serializable {
         def springNativeBuildParams = " -Pnative native:compile " // spring-boot:build-image
         // 可以使用mvnd守护进程加速构建
         if ("${ctx.IS_MAVEN_SINGLE_MODULE}" == 'true') {
-            ctx.sh "${mavenCommandType} -T 2C -Dspring-boot.build-image.cache=true ${isMavenTest} ${springNativeBuildParams} "
+            ctx.sh "${mavenCommandType} ${springNativeBuildParams} -T 2C -Dspring-boot.build-image.cache=true ${isMavenTest} "
         } else { // 多模块情况
-            ctx.sh "${mavenCommandType} -T 2C -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am -Dspring-boot.build-image.cache=true ${isMavenTest} ${springNativeBuildParams} "
+            ctx.sh "${mavenCommandType} ${springNativeBuildParams} -T 2C -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am -Dspring-boot.build-image.cache=true ${isMavenTest} "
         }
     }
 
