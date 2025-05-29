@@ -20,29 +20,30 @@ class Maven implements Serializable {
     /**
      * GraalVM原生镜像构建
      */
-    static def springNative(ctx, map, mavenCommandType, isMavenTest, springNativeBuildParams) {
+    static def springNative(ctx, map, mavenCommandType, isMavenTest) {
         // Spring Boot 3 以后的 AOT 引擎可自动生成大部分反射和资源加载配置  初始化生成反射配置  检查日志中的缺失类，手动添加到 reflect-config.json
         // 仅生成反射配置（不编译镜像） 生成反射配置+构建原生镜像命令 mvn -Pnative spring-boot:build-image
         ctx.sh "${mavenCommandType} spring-boot:process-aot"
+        def springNativeBuildParams = " -Pnative spring-boot:build-image "
         // 可以使用mvnd守护进程加速构建
         if ("${ctx.IS_MAVEN_SINGLE_MODULE}" == 'true') {
-            ctx.sh "${mavenCommandType} clean package -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
+            ctx.sh "${mavenCommandType} clean package -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams} "
         } else { // 多模块情况
-            ctx.sh "${mavenCommandType} clean package -T 2C -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am  -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
+            ctx.sh "${mavenCommandType} clean package -T 2C -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am  -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams} "
         }
     }
 
     /**
      * Maven基于自定义setting文件方式打包
      */
-    static def packageBySettingFile(ctx, map, mavenCommandType, isMavenTest, springNativeBuildParams) {
+    static def packageBySettingFile(ctx, map, mavenCommandType, isMavenTest) {
         // 自定义私有库settings.xml方式 使用Secret file凭据存储
         ctx.withCredentials([ctx.file(credentialsId: "${map.maven_settings_xml_id}", variable: 'MAVEN_SETTINGS')]) {
             def data = ctx.readFile(file: "${ctx.MAVEN_SETTINGS}")
             def fileName = "settings.xml"
             // 使用 Groovy 代码写入文件
             ctx.writeFile file: fileName, text: data
-            ctx.sh "${mavenCommandType} clean install -T 2C -s $fileName -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am -Dmaven.compile.fork=true  ${isMavenTest} ${springNativeBuildParams}"
+            ctx.sh "${mavenCommandType} clean install -T 2C -s $fileName -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am -Dmaven.compile.fork=true  ${isMavenTest} "
         }
 
     }

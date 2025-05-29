@@ -1321,25 +1321,22 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
         def isMavenTest = "${IS_RUN_MAVEN_TEST}" == "true" ? "" : "-Dmaven.test.skip=true"  // 是否Maven单元测试
         retry(2) {
             // 对于Spring Boot 3.x及Spring Native与GaalVM集成的项目，通过以下命令来构建原生镜像  特性：性能明显提升 使用资源明显减少
-            // sh " ${mavenCommandType} clean package -Pnative -Dmaven.compile.fork=true -Dmaven.test.skip=true "
-            def springNativeBuildParams = ""
             if ("${IS_SPRING_NATIVE}" == "true") { // 构建原生镜像包
-                springNativeBuildParams = " -Pnative "
-                Maven.springNative(this, map, mavenCommandType, isMavenTest, springNativeBuildParams)
+                Maven.springNative(this, map, mavenCommandType, isMavenTest)
             } else if ("${map.maven_settings_xml_id}".trim() == "") { // 是否自定义maven仓库
                 // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
                 if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') { // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
                     MAVEN_ONE_LEVEL = ""
                     // 在pom.xml文件目录下执行 规范是pom.xml在代码根目录
                     // def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
-                    sh "${mavenCommandType} clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
+                    sh "${mavenCommandType} clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} "
                 } else {  // 多模块情况
                     // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
-                    sh "${mavenCommandType} clean install -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
+                    sh "${mavenCommandType} clean install -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.compile.fork=true ${isMavenTest} "
                 }
             } else {
                 // 基于自定义setting.xml文件方式打包 如私有包等
-                Maven.packageBySettingFile(this, map, mavenCommandType, isMavenTest, springNativeBuildParams)
+                Maven.packageBySettingFile(this, map, mavenCommandType, isMavenTest)
             }
 
             // 获取pom文件信息
