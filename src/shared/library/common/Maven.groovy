@@ -30,7 +30,9 @@ class Maven implements Serializable {
             ctx.sh "${mavenCommandType} clean package -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams} "
         } else { // 多模块情况
             // 仅生成反射配置（不编译镜像）
-            ctx.sh "${mavenCommandType} -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am spring-boot:process-aot"
+            ctx.dir("${ctx.env.WORKSPACE}/${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME}") {
+                ctx.sh "${mavenCommandType} spring-boot:process-aot"
+            }
             ctx.sh "${mavenCommandType} clean package -T 2C -pl ${ctx.MAVEN_ONE_LEVEL}${ctx.PROJECT_NAME} -am -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams} "
         }
     }
