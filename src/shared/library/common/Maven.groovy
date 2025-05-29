@@ -18,6 +18,14 @@ class Maven implements Serializable {
     }
 
     /**
+     * GraalVM原生镜像构建
+     */
+    static def springNative(ctx) {
+        // 初始化生成反射配置  检查日志中的缺失类，手动添加到 reflect-config.json
+        ctx.sh "mvn spring-boot:build-image -Dspring-boot.build-image.publish=false"
+    }
+
+    /**
      * Maven基于自定义setting文件方式打包
      */
     static def packageBySettingFile(ctx, map, mavenCommandType, isMavenTest, springNativeBuildParams) {
