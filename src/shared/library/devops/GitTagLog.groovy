@@ -19,7 +19,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
             }
             // 获取配置的repoUrl代码仓库协议 设置访问协议
             def repoUrlProtocol = repoUrl.toString().split("://")[0]
-            def userPassWordUrl = repoUrlProtocol + "://${GIT_USERNAME.replace("@", "%40")}:${ENCODED_GIT_PASSWORD.replace("@", "%40")}" +
+            def userPassWordUrl = repoUrlProtocol + "://${GIT_USERNAME}:${ENCODED_GIT_PASSWORD.replace("@", "%40")}" +
                     "@${repoUrl.toString().replace("http://", "").replace("https://", "")} "
 
             ctx.retry(2) {
@@ -64,7 +64,6 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                 writeFile file: "${changeLogFileName}", text: "## ${tagVersion}\n`${Utils.formatDate()}`<br><br>\n${gitChangeLog}\n${changeLogFile}"
                 try {
                     sh("""
-                          git pull
                           git add ${changeLogFileName}
                           git commit ${changeLogFileName}  -m "${GlobalVars.gitCommitChangeLogDocs}: 发布 v${tagVersion}" 
                           git push -u origin ${ctx.BRANCH_NAME} ${userPassWordUrl}
