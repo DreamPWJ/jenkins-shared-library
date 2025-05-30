@@ -65,7 +65,8 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                 try {
                     sh("""
                           git add ${changeLogFileName}
-                          git commit ${changeLogFileName}  -m "${GlobalVars.gitCommitChangeLogDocs}: 发布 v${tagVersion}" 
+                          git commit ${changeLogFileName}  -m "${GlobalVars.gitCommitChangeLogDocs}: 发布 v${tagVersion}"
+                          git pull || true
                           git push ${userPassWordUrl} ${ctx.BRANCH_NAME}
                            """)
                 } catch (e) {
