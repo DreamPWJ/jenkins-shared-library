@@ -71,3 +71,4 @@ docker exec proxy-nginx nginx -s reload || true
 # GNU nano编辑器CTRL+O 再 CTRL+X 保存退出
 
 # certbot certonly --authenticator=dns-aliyun --dns-aliyun-credentials='/my/credentials.ini' --email 406798106@qq.com  -d "panweiji.com"
+# certbot certificates

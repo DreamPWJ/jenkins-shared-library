@@ -901,12 +901,6 @@ def getInitParams(map) {
         MONOREPO_PROJECT_NAMES = GlobalVars.defaultValue
     }
 
-    // Maven Docker构建镜像名称
-    mavenDockerName = "maven"
-    if ("${IS_SPRING_NATIVE}" == "true") {
-        mavenDockerName = "csanchez/maven"
-    }
-
     // 未来可独立拆分成不同参数传入 更易于理解和维护
     SHELL_PARAMS_ARRAY = SHELL_PARAMS.split("\\s+")  // 正则表达式\s表示匹配任何空白字符，+表示匹配一次或多次
     SHELL_PROJECT_NAME = SHELL_PARAMS_ARRAY[0] // 项目名称
@@ -931,6 +925,13 @@ def getInitParams(map) {
     } catch (e) {
         println("获取通讯录失败")
         println(e.getMessage())
+    }
+
+    // Maven Docker构建镜像名称
+    mavenDockerName = "maven"
+    if ("${IS_SPRING_NATIVE}" == "true") {
+        mavenDockerName = "csanchez/maven"  // 支持graalvm的maven版本
+        JDK_PUBLISHER = "graalvm-community" // 支持graalvm的jdk版本
     }
 
     // 健康检测url地址
@@ -1321,30 +1322,22 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
         def isMavenTest = "${IS_RUN_MAVEN_TEST}" == "true" ? "" : "-Dmaven.test.skip=true"  // 是否Maven单元测试
         retry(2) {
             // 对于Spring Boot 3.x及Spring Native与GaalVM集成的项目，通过以下命令来构建原生镜像  特性：性能明显提升 使用资源明显减少
-            // sh " ${mavenCommandType} clean package -Pnative -Dmaven.compile.fork=true -Dmaven.test.skip=true "
-            def springNativeBuildParams = ""
             if ("${IS_SPRING_NATIVE}" == "true") { // 构建原生镜像包
-                springNativeBuildParams = " -Pnative "
-                // 可以使用mvnd守护进程加速构建
-                if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') {
-                    sh "${mavenCommandType} clean package -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
-                } else { // 多模块情况
-                    sh "${mavenCommandType} clean package -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am  -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
-                }
+                Maven.springNative(this, map, mavenCommandType, isMavenTest)
             } else if ("${map.maven_settings_xml_id}".trim() == "") { // 是否自定义maven仓库
                 // 更快的构建工具mvnd 多个的守护进程来服务构建请求来达到并行构建的效果  源码: https://github.com/apache/maven-mvnd
                 if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') { // 如果是整体单模块项目 不区分多模块也不需要指定项目模块名称
                     MAVEN_ONE_LEVEL = ""
                     // 在pom.xml文件目录下执行 规范是pom.xml在代码根目录
                     // def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
-                    sh "${mavenCommandType} clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
+                    sh "${mavenCommandType} clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} "
                 } else {  // 多模块情况
                     // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
-                    sh "${mavenCommandType} clean install -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.compile.fork=true ${isMavenTest} ${springNativeBuildParams}"
+                    sh "${mavenCommandType} clean install -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.compile.fork=true ${isMavenTest} "
                 }
             } else {
                 // 基于自定义setting.xml文件方式打包 如私有包等
-                Maven.packageBySettingFile(this, map, mavenCommandType, isMavenTest, springNativeBuildParams)
+                Maven.packageBySettingFile(this, map, mavenCommandType, isMavenTest)
             }
 
             // 获取pom文件信息
@@ -2071,7 +2064,7 @@ def alwaysPost() {
  */
 def gitTagLog() {
     // 文件夹的所有者和现在的用户不一致导致 git命令异常
-    sh "git config --global --add safe.directory ${env.WORKSPACE} || true"
+    // sh "git config --global --add safe.directory ${env.WORKSPACE} || true"
 
     // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行一次jenkins任务才能生效
     if (!params.IS_GIT_TAG && params.IS_GIT_TAG != false) {

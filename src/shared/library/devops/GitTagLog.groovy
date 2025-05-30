@@ -54,18 +54,19 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
                 }
 
                 //if (!changeLogFile.contains(gitChangeLog)) {  // 重复变更日志和无新增和修复记录 补丁小版本记录 不自动生成发布日志(存在新版本未被记录的情况) 频繁发布情况可以考虑按天打tag和记录 防止tag数量杂乱
-                // 设置git远程tag
+                // 推送git远程tag
                 sh("""
                           git tag -a ${tagVersion} -m '${gitChangeLog}'
                           git push ${userPassWordUrl} ${tagVersion}
+                          git checkout ${ctx.BRANCH_NAME}
                            """)
+                // 生成变更日志文件
                 writeFile file: "${changeLogFileName}", text: "## ${tagVersion}\n`${Utils.formatDate()}`<br><br>\n${gitChangeLog}\n${changeLogFile}"
                 try {
                     sh("""
-                          git checkout ${ctx.BRANCH_NAME}
                           git add ${changeLogFileName}
                           git commit ${changeLogFileName}  -m "${GlobalVars.gitCommitChangeLogDocs}: 发布 v${tagVersion}" 
-                          git push ${userPassWordUrl}
+                          git push ${userPassWordUrl} ${ctx.BRANCH_NAME}
                            """)
                 } catch (e) {
                     println "推送${changeLogFileName}变更日志异常"
