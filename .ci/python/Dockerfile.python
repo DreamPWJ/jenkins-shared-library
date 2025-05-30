@@ -28,7 +28,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 设置环境变量
 ENV DEBIAN_FRONTEND=noninteractive \
-    PIP_CACHE_DIR=/app/cache/pip  \
+    PIP_CACHE_DIR=/root/.cache/pip  \
     PYTHONUNBUFFERED=1
 
 # 更新包列表并安装基本工具
