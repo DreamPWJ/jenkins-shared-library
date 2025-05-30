@@ -28,7 +28,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 设置环境变量
 ENV DEBIAN_FRONTEND=noninteractive \
-    PIP_CACHE_DIR=/app/cache/pip  \
+    PIP_CACHE_DIR=/root/.cache/pip  \
     PYTHONUNBUFFERED=1
 
 # 动态安装依赖环境包 安装特定项目依赖环境  --no-install-recommends不安装那些被推荐但非必需的依赖包
@@ -42,7 +42,6 @@ RUN if [ -n "$CUSTOM_INSTALL_PACKAGES" ]; then \
 COPY python.tar.gz .
 
 # 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包
-# Docker 19.03后版本可启用 BuildKit 方式指定缓存目录 --mount=type=cache,target=/var/cache/pip
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  #&& mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
