@@ -2064,7 +2064,7 @@ def alwaysPost() {
  */
 def gitTagLog() {
     // 文件夹的所有者和现在的用户不一致导致 git命令异常
-    sh "git config --global --add safe.directory ${env.WORKSPACE} || true"
+    // sh "git config --global --add safe.directory ${env.WORKSPACE} || true"
 
     // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行一次jenkins任务才能生效
     if (!params.IS_GIT_TAG && params.IS_GIT_TAG != false) {
