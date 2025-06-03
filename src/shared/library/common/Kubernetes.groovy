@@ -152,7 +152,7 @@ class Kubernetes implements Serializable {
         } else {
             // 全量部署同时删除上次canary灰度部署服务
             def deploymentName = appName + "-" + canaryFlag + "-deployment"
-            ctx.sh "kubectl delete deployment ${deploymentName} || true"
+            ctx.sh "kubectl delete deployment ${deploymentName} --ignore-not-found || true"
         }
 
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
@@ -280,6 +280,12 @@ class Kubernetes implements Serializable {
         // 部署七层负载和灰度发布配置
         ctx.sh "kubectl apply -f ${yamlName}"
         //ctx.sh "kubectl get ing"
+
+        // 基于 kubectl patch 动态更新方案（无需重建）
+        // 新增 host 规则
+        // kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "add", "path": "/spec/rules/-", "value": {"host": "new.host.com", "http": {"paths": [{"path": "/", "pathType": "Prefix", "backend": {"service": {"name": "my-service", "port": {"number": 80}}}}]}}}]'
+        // 删除 host 规则（需要知道索引位置）
+        // kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "remove", "path": "/spec/rules/1"}]'
     }
 
     /**
