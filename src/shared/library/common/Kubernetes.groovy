@@ -84,7 +84,7 @@ class Kubernetes implements Serializable {
                 def k8sStartTime = new Date()
                 // K8S部署验证是否成功
                 verifyDeployment(ctx)
-                // 计算应用启动时间
+                // 计算应用部署启动时间
                 ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date())
             }
         }
@@ -280,12 +280,6 @@ class Kubernetes implements Serializable {
         // 部署七层负载和灰度发布配置
         ctx.sh "kubectl apply -f ${yamlName}"
         //ctx.sh "kubectl get ing"
-
-        // 基于 kubectl patch 动态更新方案（无需重建）
-        // 新增 host 规则
-        // kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "add", "path": "/spec/rules/-", "value": {"host": "new.host.com", "http": {"paths": [{"path": "/", "pathType": "Prefix", "backend": {"service": {"name": "my-service", "port": {"number": 80}}}}]}}}]'
-        // 删除 host 规则（需要知道索引位置）
-        // kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "remove", "path": "/spec/rules/1"}]'
     }
 
     /**
@@ -299,6 +293,12 @@ class Kubernetes implements Serializable {
         // 灰度发布初始化流量权重 当时灰度部署完成后的新版流量权重 如20%访问流量到新版本
         // 新版发布后启动等待时间, 每隔多长时间更改流量规则, 单位秒  逐渐提高新版流量权重实现灰度发布
         // 新版发布全部完成老版本下线等待时间, 隔多长时间下线旧应用, 单位秒  流量全部切到新版本后下线旧应用等待保证稳定性
+
+        // 基于 kubectl patch 动态更新方案（无需重建）
+        // 新增 host 规则
+        // kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "add", "path": "/spec/rules/-", "value": {"host": "new.host.com", "http": {"paths": [{"path": "/", "pathType": "Prefix", "backend": {"service": {"name": "my-service", "port": {"number": 80}}}}]}}}]'
+        // 删除 host 规则（需要知道索引位置）
+        // kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "remove", "path": "/spec/rules/1"}]'
 
         ctx.sh "kubectl apply -f ingress.yaml"
         ctx.sh "kubectl get ingress || true"
@@ -427,7 +427,7 @@ class Kubernetes implements Serializable {
      * K8s健康探测
      */
     static def healthDetection(ctx) {
-        // Pod通过两类探针来检查容器的健康状态。分别是ReadinessProbe（就绪探测） 和 LivenessProbe（存活探测）
+        // Pod通过三类探针来检查容器的健康状态。分别是StartupProbe（启动探针） ReadinessProbe（就绪探测） 和 LivenessProbe（存活探测）
         ctx.sh "kubectl get pod -l app=***  -o jsonpath=\"{.items[0].metadata.name} "  // kubectl获取新pod名称
         // yaml内容中包含初始化时间和启动完成时间  shell中自动解析所有内容, 建议yq进行实际的YAML解析
         ctx.sh "kubectl get pods podName*** -o yaml"
