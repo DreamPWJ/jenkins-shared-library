@@ -295,10 +295,15 @@ class Kubernetes implements Serializable {
         // 新版发布全部完成老版本下线等待时间, 隔多长时间下线旧应用, 单位秒  流量全部切到新版本后下线旧应用等待保证稳定性
 
         // 基于 kubectl patch 动态更新方案（无需重建）
-        // 新增 host 规则
-        // kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "add", "path": "/spec/rules/-", "value": {"host": "new.host.com", "http": {"paths": [{"path": "/", "pathType": "Prefix", "backend": {"service": {"name": "my-service", "port": {"number": 80}}}}]}}}]'
-        // 删除 host 规则（需要知道索引位置）
-        // kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "remove", "path": "/spec/rules/1"}]'
+        // 新增 host 规则 /spec/rules/- yaml路径数组最后一个新增
+        // kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "add", "path": "/spec/rules/-", "value": {"host": "new.host.com", "http": {"paths": [{"path": "/v2", "pathType": "Prefix", "backend": {"service": {"name": "my-service", "port": {"number": 80}}}}]}}}]'
+
+        // 查看yaml数组
+        // kubectl get ingress my-ingress -n ${k8sNameSpace} -o jsonpath='{.spec.rules}'
+
+        // 删除 host 规则/spec/rules/- yaml路径数组最后一个删除
+        // kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "remove", "path": "/spec/rules/-"}]'
+
 
         ctx.sh "kubectl apply -f ingress.yaml"
         ctx.sh "kubectl get ingress || true"
