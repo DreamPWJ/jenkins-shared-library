@@ -2110,9 +2110,6 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             MACHINE_TAG = "" // 不是多节点部署不添加机器标识
         }
         def rollbackTag = ""
-        if (params.DEPLOY_MODE == GlobalVars.rollback) {
-            rollbackTag = "**回滚版本号: 上一个版本**" // 回滚版本添加标识
-        }
         if (params.GIT_TAG != GlobalVars.noGit) {
             rollbackTag = "**Git Tag构建版本: ${params.GIT_TAG}**" // Git Tag版本添加标识
         }
