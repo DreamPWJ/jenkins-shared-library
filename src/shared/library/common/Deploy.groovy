@@ -110,6 +110,9 @@ class Deploy implements Serializable {
         def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}" // docker容器名称
         def deploymentName = "${ctx.FULL_PROJECT_NAME}" + "-deployment"  // kubernetes deployment名称
 
+        if (GlobalVars.rollback == ctx.params.DEPLOY_MODE) {
+            type = "回滚"
+        }
         if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
             type = "启动"
         }
@@ -132,7 +135,10 @@ class Deploy implements Serializable {
                 // KUBECONFIG变量为k8s中kubectl命令的yaml配置授权访问文件内容 数据保存为Jenkins的“Secret file”类型的凭据，用credentials方法从凭据中获取
                 ctx.withCredentials([ctx.file(credentialsId: "${k8s_credentials_id}", variable: 'KUBECONFIG')]) {
                     // ctx.sh "kubectl version"
-                    ctx.println("K8S服务方式控制服务 启动、停止、重启等")
+                    ctx.println("K8S服务方式控制服务 回滚、启动、停止、重启、销毁等")
+                    if (GlobalVars.rollback == ctx.params.DEPLOY_MODE) {
+                        rollbackService(ctx, map)
+                    }
                     if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
                         startService(ctx, map)
                     }
@@ -149,8 +155,11 @@ class Deploy implements Serializable {
             }
         } else {
             // Docker服务方式
-            ctx.println("Docker服务方式控制服务 启动、停止、重启等")
+            ctx.println("Docker服务方式控制服务 回滚、启动、停止、重启、销毁等")
             def command = ""
+            if (GlobalVars.rollback == ctx.params.DEPLOY_MODE) {
+                // command = "docker start " + dockerContainerName
+            }
             if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
                 command = "docker start " + dockerContainerName
             }
@@ -163,6 +172,7 @@ class Deploy implements Serializable {
             if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
                 command = "docker restart " + dockerContainerName
             }
+
             // 执行控制命令
             ctx.println "${ctx.remote.host}"
             ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} ' " + command + " ' "
@@ -197,6 +207,24 @@ class Deploy implements Serializable {
         // if ("${ctx.params.IS_DING_NOTICE}" == 'true')  // 是否钉钉通知
         DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "执行" + type + "服务命令 [${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}](${ctx.env.JOB_URL})  👩‍💻 ", typeText + "\n  ##### 执行" + type + "控制命令完成 ✅  " +
                 "\n  ###### 执行人: ${ctx.BUILD_USER} \n ###### 完成时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
+    }
+
+    /**
+     * 回滚服务 快速回滚
+     */
+    static def rollbackService(ctx, map) {
+        if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
+            // K8s服务方式
+            def deploymentName = "${ctx.FULL_PROJECT_NAME}" + "-deployment"
+            // 回滚到最近的上一个版本
+           ctx.sh " kubectl rollout undo deployment/" + deploymentName
+            // 回滚到指定历史版本
+            // kubectl rollout undo deployment/<deployment-name> --to-revision=<revision-number>
+        } else {
+            // Docker服务方式
+            def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
+            // ctx.sh " docker start  " + dockerContainerName
+        }
     }
 
     /**
@@ -238,11 +266,6 @@ class Deploy implements Serializable {
             def deploymentName = "${ctx.FULL_PROJECT_NAME}" + "-deployment"
             // 重启deployment命令 会逐一滚动重启 重启过程中保证服务可用性
             ctx.sh " kubectl rollout restart deployment " + deploymentName
-
-            // 扩缩容方式重启 会导致服务不可用 同时停止服务和启动服务
-//         ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=0 "
-//         ctx.sleep 2
-//         ctx.sh " kubectl scale deployment " + deploymentName + " --replicas=" + "${ctx.K8S_POD_REPLICAS}"
 
         } else {
             // Docker服务方式

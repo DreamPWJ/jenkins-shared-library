@@ -44,7 +44,7 @@ def call(String type = 'web-java', Map map) {
             parameters {
                 choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback, GlobalVars.start, GlobalVars.stop, GlobalVars.destroy, GlobalVars.restart],
                         description: '选择部署方式  1. ' + GlobalVars.release + '发布 2. ' + GlobalVars.rollback +
-                                '回滚(基于Jenkins归档方式回滚选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚请选择默认的' + GlobalVars.release + ') ' +
+                                '回滚(基于K8S/Docker方式快速回滚上一个版本选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚请选择默认的' + GlobalVars.release + ') ' +
                                 ' 3. ' + GlobalVars.start + '启动服务 4. ' + GlobalVars.stop + '停止服务 5. ' + GlobalVars.destroy + '销毁删除服务 6. ' + GlobalVars.restart + '滚动重启服务')
                 choice(name: 'MONOREPO_PROJECT_NAME', choices: "${MONOREPO_PROJECT_NAMES}",
                         description: "选择MonoRepo单体式统一仓库项目名称, ${GlobalVars.defaultValue}选项是MultiRepo多体式独立仓库或未配置, 大统一单体式仓库流水线可减少构建时间和磁盘空间")
@@ -57,8 +57,6 @@ def call(String type = 'web-java', Map map) {
                 string(name: 'VERSION_NUM', defaultValue: "", description: '选填 自定义语义化版本号x.y.z 如1.0.0 (默认不填写  自动生成的版本号并且语义化自增 生产环境设置有效) 🖊 ')
                 text(name: 'VERSION_DESCRIPTION', defaultValue: "${Constants.DEFAULT_VERSION_COPYWRITING}",
                         description: "填写服务版本描述文案 (不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊 ")
-                string(name: 'ROLLBACK_BUILD_ID', defaultValue: '0', description: "DEPLOY_MODE基于" + GlobalVars.rollback + "部署方式, 输入对应保留的回滚构建记录ID, " +
-                        "默认0是回滚到上一次连续构建, 当前归档模式的回滚仅适用于在master节点构建的任务")
                 booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行Docker/K8S集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
                 booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', defaultValue: false, description: "是否执行静态代码质量分析检测 生成质量报告, 交付可读、易维护和安全的高质量代码 🔦")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
@@ -637,11 +635,12 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                stage('Docker/K8s启停重服务') {
+                stage('K8S/Docker回滚 启动 停止 重启等服务') {
                     when {
                         beforeAgent true
                         expression {
-                            return ("${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}" || "${GlobalVars.destroy}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}")
+                            return ("${GlobalVars.rollback}" == "${params.DEPLOY_MODE}" || "${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}"
+                                    || "${GlobalVars.destroy}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}")
                         }
                     }
                     steps {
@@ -694,16 +693,6 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                stage('回滚版本') {
-                    when {
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.rollback
-                    }
-                    steps {
-                        script {
-                            rollbackVersion(map)
-                        }
-                    }
-                }
             }
 
             // post包含整个pipeline或者stage阶段完成情况
@@ -1693,12 +1682,9 @@ def blueGreenDeploy(map) {
             println ip
             remote.host = ip
             blueServerIp = ip
-            if (params.DEPLOY_MODE == GlobalVars.rollback) {
-                uploadRemote("${archivePath}", map)
-            } else {
-                uploadRemote(Utils.getShEchoResult(this, "pwd"), map)
-            }
-            runProject(map)
+
+            uploadRemote(Utils.getShEchoResult(this, "pwd"), map)  // 上传代码到远程服务器
+            runProject(map)  // 运行部署
             if (params.IS_HEALTH_CHECK == true) {
                 MACHINE_TAG = "蓝机"
                 healthCheck(map)
@@ -1772,17 +1758,15 @@ def scrollToDeploy(map) {
 
             machineNum++
             MACHINE_TAG = "${machineNum}号机" // 动态计算是几号机
-            if (params.DEPLOY_MODE == GlobalVars.rollback) {
-                uploadRemote("${archivePath}", map)
-            } else {
-                // 如果配置多节点动态替换不同的配置文件重新执行maven构建打包或者直接替换部署服务器文件
-                if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-                    docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-                        mavenBuildProject(map) // 需要mvn jdk构建环境
-                    }
+
+            // 如果配置多节点动态替换不同的配置文件重新执行maven构建打包或者直接替换部署服务器文件
+            if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+                docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+                    mavenBuildProject(map) // 需要mvn jdk构建环境
                 }
-                uploadRemote(Utils.getShEchoResult(this, "pwd"), map)
             }
+            uploadRemote(Utils.getShEchoResult(this, "pwd"), map)
+            
             runProject(map)
             if (params.IS_HEALTH_CHECK == true) {
                 healthCheck(map)
@@ -1917,26 +1901,6 @@ def beforeRunProject(map) {
  */
 def initDocker() {
     Docker.initDocker(this)
-}
-
-/**
- * 回滚版本
- */
-def rollbackVersion(map) {
-    if ("${ROLLBACK_BUILD_ID}" == '0') { // 默认回滚到上一个版本
-        ROLLBACK_BUILD_ID = "${Integer.parseInt(env.BUILD_ID) - 2}"
-    }
-    //input message: "是否确认回滚到构建ID为${ROLLBACK_BUILD_ID}的版本", ok: "确认"
-    //该/var/jenkins_home/**路径只适合在master节点执行的项目 不适合slave节点的项目
-    archivePath = "/var/jenkins_home/jobs/${env.JOB_NAME}/builds/${ROLLBACK_BUILD_ID}/archive/"
-    uploadRemote("${archivePath}", map)
-    runProject(map)
-    if (params.IS_HEALTH_CHECK == true) {
-        healthCheck(map)
-    }
-    if ("${IS_ROLL_DEPLOY}" == 'true') {
-        scrollToDeploy(map)
-    }
 }
 
 /**
@@ -2147,7 +2111,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
         }
         def rollbackTag = ""
         if (params.DEPLOY_MODE == GlobalVars.rollback) {
-            rollbackTag = "**回滚版本号: ${ROLLBACK_BUILD_ID}**" // 回滚版本添加标识
+            rollbackTag = "**回滚版本号: 上一个版本**" // 回滚版本添加标识
         }
         if (params.GIT_TAG != GlobalVars.noGit) {
             rollbackTag = "**Git Tag构建版本: ${params.GIT_TAG}**" // Git Tag版本添加标识
