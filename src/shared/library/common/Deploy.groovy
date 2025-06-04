@@ -222,8 +222,8 @@ class Deploy implements Serializable {
             // kubectl rollout undo deployment/<deployment-name> --to-revision=<revision-number>
         } else {
             // Docker服务方式
-            def dockerContainerName = "${ctx.FULL_PROJECT_NAME}-${ctx.SHELL_ENV_MODE}"
-            // ctx.sh " docker start  " + dockerContainerName
+            // 服务启动失败回滚到上一个版本  保证服务高可用性
+            Docker.rollbackServer(ctx, map, "${ctx.dockerImageName}", "${ctx.dockerContainerName}")
         }
     }
 
