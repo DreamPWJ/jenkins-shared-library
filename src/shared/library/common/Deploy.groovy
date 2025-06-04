@@ -158,7 +158,7 @@ class Deploy implements Serializable {
             ctx.println("Docker服务方式控制服务 回滚、启动、停止、重启、销毁等")
             def command = ""
             if (GlobalVars.rollback == ctx.params.DEPLOY_MODE) {
-                // command = "docker start " + dockerContainerName
+                rollbackService(ctx, map)
             }
             if (GlobalVars.start == ctx.params.DEPLOY_MODE) {
                 command = "docker start " + dockerContainerName
