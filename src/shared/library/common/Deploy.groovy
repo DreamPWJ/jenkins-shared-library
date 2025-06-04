@@ -179,12 +179,7 @@ class Deploy implements Serializable {
             // 循环串行执行多机分布式部署
             if (!ctx.remote_worker_ips.isEmpty()) {
                 if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
-                    ctx.timeout(time: 5, unit: 'MINUTES') {
-                        def healthCheckMsg = ctx.sh(
-                                script: "ssh  ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} ' cd /${ctx.DEPLOY_FOLDER}/ && ./health-check.sh -a ${ctx.PROJECT_TYPE} -b http://${ctx.remote.host}:${ctx.SHELL_HOST_PORT} '",
-                                returnStdout: true).trim()
-                        ctx.println "${healthCheckMsg}"
-                    }
+                    healthCheck(ctx)
                 }
                 ctx.remote_worker_ips.each { ip ->
                     ctx.println ip
@@ -192,12 +187,7 @@ class Deploy implements Serializable {
                     if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
                         // ctx.sleep 30  // 重启多个服务 防止服务不可用等待顺序重启
                         // 健康检测  判断服务是否启动成功
-                        ctx.timeout(time: 5, unit: 'MINUTES') {  // health-check.sh有检测超时时间 timeout为防止shell脚本超时失效兼容处理
-                            def healthCheckMsg = ctx.sh(
-                                    script: "ssh  ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ip} ' cd /${ctx.DEPLOY_FOLDER}/ && ./health-check.sh -a ${ctx.PROJECT_TYPE} -b http://${ip}:${ctx.SHELL_HOST_PORT} '",
-                                    returnStdout: true).trim()
-                            ctx.println "${healthCheckMsg}"
-                        }
+                        healthCheck(ctx)
                     }
                 }
             }
@@ -217,13 +207,25 @@ class Deploy implements Serializable {
             // K8s服务方式
             def deploymentName = "${ctx.FULL_PROJECT_NAME}" + "-deployment"
             // 回滚到最近的上一个版本
-           ctx.sh " kubectl rollout undo deployment/" + deploymentName
+            ctx.sh " kubectl rollout undo deployment/" + deploymentName
             // 回滚到指定历史版本
             // kubectl rollout undo deployment/<deployment-name> --to-revision=<revision-number>
         } else {
             // Docker服务方式
             // 服务启动失败回滚到上一个版本  保证服务高可用性
             Docker.rollbackServer(ctx, map, "${ctx.dockerImageName}", "${ctx.dockerContainerName}")
+            // 循环串行执行多机分布式部署
+            if (!ctx.remote_worker_ips.isEmpty()) {
+                healthCheck(ctx)
+                ctx.remote_worker_ips.each { ip ->
+                    ctx.println ip
+                    ctx.remote.host = ip
+                    // 服务启动失败回滚到上一个版本  保证服务高可用性
+                    Docker.rollbackServer(ctx, map, "${ctx.dockerImageName}", "${ctx.dockerContainerName}")
+                    // 健康检测  判断服务是否启动成功
+                    healthCheck(ctx)
+                }
+            }
         }
     }
 
@@ -289,5 +291,16 @@ class Deploy implements Serializable {
         }
     }
 
+    /**
+     * 健康探测
+     */
+    private static void healthCheck(ctx) {
+        ctx.timeout(time: 5, unit: 'MINUTES') {
+            def healthCheckMsg = ctx.sh(
+                    script: "ssh  ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} ' cd /${ctx.DEPLOY_FOLDER}/ && ./health-check.sh -a ${ctx.PROJECT_TYPE} -b http://${ctx.remote.host}:${ctx.SHELL_HOST_PORT} '",
+                    returnStdout: true).trim()
+            ctx.println "${healthCheckMsg}"
+        }
+    }
 
 }
