@@ -397,30 +397,13 @@ class Kubernetes implements Serializable {
     }
 
     /**
-     * 镜像方式部署
-     */
-    static def deployByImage(ctx, imageName, deploymentName, port) {
-        ctx.println("开始部署Kubernetes云原生应用")
-        // 创建示例部署并在端口 上公开它
-        ctx.sh "kubectl delete deployment ${deploymentName}"
-        ctx.sh "kubectl delete service ${deploymentName}"
-        ctx.sh "kubectl create deployment balanced  ${deploymentName} --image=${imageName}"
-        ctx.sh "kubectl expose deployment balanced  ${deploymentName} --type=NodePort --port=${port} "
-        // 获取服务
-        ctx.sh "kubectl get services ${deploymentName} && kubectl get pod" // STATUS 为 Running
-        // 启动服务
-        ctx.sh "minikube service ${deploymentName}"
-        // ctx.sh "kubectl port-forward service/${deploymentName} 8080:8080" // 使用 kubectl 转发端口  kubectl port-forward 不会返回
-    }
-
-    /**
      * 基于K8s内置的回滚功能
      */
     static def rollback(ctx) {
         // 回滚上一个版本
-        ctx.sh " kubectl rollout undo deployment/deployment-name  -n ${k8sNameSpace} "
+        ctx.sh " kubectl rollout undo deployment/deployment-name -n ${k8sNameSpace} "
         // 回滚到指定版本
-        ctx.sh " kubectl rollout undo deployment/deployment-name --revision=2 -n ${k8sNameSpace} "
+        ctx.sh " kubectl rollout undo deployment/deployment-name -n ${k8sNameSpace} --revision=2 "
     }
 
     /**
@@ -428,11 +411,6 @@ class Kubernetes implements Serializable {
      */
     static def healthDetection(ctx) {
         // Pod通过三类探针来检查容器的健康状态。分别是StartupProbe（启动探针） ReadinessProbe（就绪探测） 和 LivenessProbe（存活探测）
-        ctx.sh "kubectl get pod -l app=***  -o jsonpath=\"{.items[0].metadata.name} "  // kubectl获取新pod名称
-        // yaml内容中包含初始化时间和启动完成时间  shell中自动解析所有内容, 建议yq进行实际的YAML解析
-        ctx.sh "kubectl get pods podName*** -o yaml"
-        ctx.sh "kubectl -n ${k8sNameSpace} get pods podName*** -o yaml | yq e '.items[].status.conditions[] | select('.type' == \"PodScheduled\" or '.type' == \"Ready\") | '.lastTransitionTime'' - | xargs -n 2 bash -c 'echo \$(( \$(date -d \"\$0\" \"+%s\") - \$(date -d \"\$1\" \"+%s\") ))' "
-        ctx.sh "kubectl get pods podName**** -o custom-columns=NAME:.metadata.name,FINISHED:.metadata.creationTimestamp "
     }
 
     /**
@@ -443,10 +421,6 @@ class Kubernetes implements Serializable {
         // kubelet容器自动GC垃圾回收 如 image-gc-high-threshold 参数 参考文档: https://kubernetes-docsy-staging.netlify.app/zh/docs/concepts/cluster-administration/kubelet-garbage-collection/
         // 默认Kubelet会在节点驱逐信号触发和Image对应的Filesystem空间不足的情况下删除冗余的镜像
         // node节点 cat /etc/kubernetes/kubelet 镜像占用磁盘空间的比例超过高水位（可以通过参数ImageGCHighThresholdPercent 进行配置），kubelet 就会清理不用的镜像
-        // ctx.sh "whoami && docker version &&  docker rmi \$(docker image ls -f dangling=true -q) --no-prune || true"
-        // 在机器上设置定时任务 保留多少天  如 docker image prune -a --force --filter "until=720h"
-        // 因占用资源被K8S驱逐的pod   删除所有状态为Evicted的Pod
-        ctx.sh "kubectl get pods --namespace default | grep Evicted | awk '{print \$1}' | xargs kubectl delete pod -n default\n"
     }
 
 }
