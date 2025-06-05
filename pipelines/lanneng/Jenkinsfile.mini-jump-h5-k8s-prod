@@ -59,7 +59,7 @@ map.put('k8s_credentials_ids', '74a3d376-cb4c-4a20-9bf7-7300a5eaa84d')
 map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
 // 项目标签或项目简称
-map.put('project_tag', '小程序跳转H5')
+map.put('project_tag', '小程序H5')
 
 // 是否是生产环境
 map.put('is_prod', true)
@@ -70,13 +70,13 @@ map.put('is_grace_shutdown', false)
 // 是否进行服务启动健康探测 K8S集群类型设置false使用自带健康探测
 map.put('is_health_check', false)
 // 是否Pipeline内脚本钉钉通知  总开关
-map.put('is_ding_notice', false)
+map.put('is_ding_notice', true)
 // 是否进行部署前通知
 map.put('is_before_deploy_notice', false)
 // 是否只通知发布变更记录
 map.put('is_only_notice_change_log', false)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', false)
+map.put('is_git_tag', true)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
@@ -134,6 +134,23 @@ JSON_PARAMS
     "IS_K8S_DEPLOY" : true,
     "K8S_POD_REPLICAS" : "2",
     "APPLICATION_DOMAIN" : "https://qr.pengbocloud.com"
+}
+
+pengbo-park-h5-k8s-prod
+澎泊车SaaS 2.0 停车场用户H5平台 Web前端-k8s集群 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/mini-monorepo.git" ,
+    "BRANCH_NAME" : "develop" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "pengbo-mini" ,
+    "SHELL_PARAMS" : "pengbo-mini h5 9019 80 prod" ,
+    "NODE_VERSION": "20" ,
+    "NPM_RUN_PARAMS" : "build:h5",
+    "IS_MONO_REPO" : true,
+    "IS_K8S_DEPLOY" : true,
+    "K8S_POD_REPLICAS" : "2",
+    "APPLICATION_DOMAIN" : "https://qr.pengbocloud.com",
 }
 
 */
