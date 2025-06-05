@@ -294,9 +294,21 @@ class Kubernetes implements Serializable {
         // 新版发布后启动等待时间, 每隔多长时间更改流量规则, 单位秒  逐渐提高新版流量权重实现灰度发布
         // 新版发布全部完成老版本下线等待时间, 隔多长时间下线旧应用, 单位秒  流量全部切到新版本后下线旧应用等待保证稳定性
 
+
+        // 定义 ingress yaml数据
+        def ingressJson = [
+                "host": "${ctx.APPLICATION_DOMAIN}",
+                "http": ["paths": [["path": "/v2", "pathType": "Prefix",
+                                    "backend": ["service": ["name": "${ctx.FULL_PROJECT_NAME}-service", "port": ["number": ctx.SHELL_HOST_PORT]]]]],
+                ],
+        ]
+
+        // 根据service名称找到ingress的名称
+        def ingressName = ctx.sh("kubectl get ingress -n ${k8sNameSpace} -o jsonpath='{.items[?(@.spec.rules[0].host==\"${ctx.APPLICATION_DOMAIN}\")].metadata.name}'").trim()
+
         // 基于 kubectl patch 动态更新方案（无需重建）
         // 新增 host 规则 /spec/rules/- yaml路径数组最后一个新增
-        // kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "add", "path": "/spec/rules/-", "value": {"host": "new.host.com", "http": {"paths": [{"path": "/v2", "pathType": "Prefix", "backend": {"service": {"name": "my-service", "port": {"number": 80}}}}]}}}]'
+        ctx.sh " kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "add", "path": "/spec/rules/-", "value": "${ingressJson}"}]' "
 
         // 查看yaml数组
         // kubectl get ingress my-ingress -n ${k8sNameSpace} -o jsonpath='{.spec.rules}'

@@ -209,7 +209,7 @@ JSON_PARAMS
     "PROJECT_NAME" : "pengbo-mini" ,
     "SHELL_PARAMS" : "pengbo-mini h5 9018 80 test" ,
     "NODE_VERSION": "20" ,
-    "NPM_RUN_PARAMS" : "build:h5",
+    "NPM_RUN_PARAMS" : "build:h5-test",
     "IS_MONO_REPO" : true,
 }
 

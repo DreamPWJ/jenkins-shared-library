@@ -25,7 +25,7 @@ map.put('proxy_jump_port', ' ')
 
 // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
 map.put('default_git_branch', 'feature/saas-v2.0')
-map.put('default_frontend_git_branch', 'v2')
+map.put('default_frontend_git_branch', ' ')
 
 // 保持构建的最大个数
 map.put('build_num_keep', 3)
@@ -241,6 +241,23 @@ JSON_PARAMS
     "IS_K8S_DEPLOY" : true,
     "K8S_POD_REPLICAS" : "1",
     "APPLICATION_DOMAIN" : "https://merchant.pengbocloud.com",
+}
+
+pengbo-park-h5-k8s-prod
+澎泊车SaaS 2.0 停车场用户H5平台 Web前端-k8s集群 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/mini-monorepo.git" ,
+    "BRANCH_NAME" : "develop" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "pengbo-mini" ,
+    "SHELL_PARAMS" : "pengbo-mini h5 9019 80 prod" ,
+    "NODE_VERSION": "20" ,
+    "NPM_RUN_PARAMS" : "build:h5",
+    "IS_MONO_REPO" : true,
+    "IS_K8S_DEPLOY" : true,
+    "K8S_POD_REPLICAS" : "2",
+    "APPLICATION_DOMAIN" : "https://qr.pengbocloud.com",
 }
 
 */
