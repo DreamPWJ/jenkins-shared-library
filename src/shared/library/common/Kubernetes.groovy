@@ -301,8 +301,8 @@ class Kubernetes implements Serializable {
         // 查看yaml数组
         // kubectl get ingress my-ingress -n ${k8sNameSpace} -o jsonpath='{.spec.rules}'
 
-        // 删除 host 规则/spec/rules/- yaml路径数组最后一个删除
-        // kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "remove", "path": "/spec/rules/-"}]'
+        // 删除 host 规则 /spec/rules/index yaml路径数组index下标 查看API版本 kubectl get ingress my-ingress -n default -o jsonpath='{.apiVersion}'
+        // kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "remove", "path": "/spec/rules/1"}]' -v9
 
 
         ctx.sh "kubectl apply -f ingress.yaml"
