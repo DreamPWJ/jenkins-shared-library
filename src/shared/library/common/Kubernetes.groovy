@@ -294,7 +294,6 @@ class Kubernetes implements Serializable {
         // 新版发布后启动等待时间, 每隔多长时间更改流量规则, 单位秒  逐渐提高新版流量权重实现灰度发布
         // 新版发布全部完成老版本下线等待时间, 隔多长时间下线旧应用, 单位秒  流量全部切到新版本后下线旧应用等待保证稳定性
 
-
         // 定义 ingress yaml数据
         def ingressJson = [
                 "host": "${ctx.APPLICATION_DOMAIN}",
