@@ -521,7 +521,7 @@ def call(String type = 'web-java', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (IS_ROLL_DEPLOY == true && IS_CANARY_DEPLOY == false) // 是否进行滚动部署
+                            return (IS_ROLL_DEPLOY == true) // 是否进行滚动部署
                         }
                     }
                     steps {
@@ -1759,15 +1759,21 @@ def scrollToDeploy(map) {
             machineNum++
             MACHINE_TAG = "${machineNum}号机" // 动态计算是几号机
 
+            if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
+                if (machineNum >= 2) { // Docker灰度发布发布的思路:  滚动部署情况 只部署第一个节点
+                    return
+                }
+            }
+
             // 如果配置多节点动态替换不同的配置文件重新执行maven构建打包或者直接替换部署服务器文件
             if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
                 docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
                     mavenBuildProject(map) // 需要mvn jdk构建环境
                 }
             }
-            uploadRemote(Utils.getShEchoResult(this, "pwd"), map)
-            
-            runProject(map)
+
+            uploadRemote(Utils.getShEchoResult(this, "pwd"), map) // 上传部署到远程服务器
+            runProject(map) //  运行部署项目
             if (params.IS_HEALTH_CHECK == true) {
                 healthCheck(map)
             }
