@@ -1176,7 +1176,6 @@ def sourceCodeDeploy() {
             sh " rm -f ${sourceCodeDeployName}.tar.gz &&  tar --warning=no-file-changed -zcvf  ${sourceCodeDeployName}.tar.gz --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
             Tools.printColor(this, "源码压缩打包成功 ✅")
         }
-        // return // 后续代码不执行
     }
 }
 
@@ -1761,7 +1760,7 @@ def scrollToDeploy(map) {
 
             if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
                 if (machineNum >= 2) { // Docker灰度发布发布的思路:  滚动部署情况 只部署第一个节点
-                    return
+                    return  // 返回后续代码不再执行
                 }
             }
 
