@@ -57,7 +57,7 @@ def call(String type = 'web-java', Map map) {
                 string(name: 'VERSION_NUM', defaultValue: "", description: '选填 自定义语义化版本号x.y.z 如1.0.0 (默认不填写  自动生成的版本号并且语义化自增 生产环境设置有效) 🖊 ')
                 text(name: 'VERSION_DESCRIPTION', defaultValue: "${Constants.DEFAULT_VERSION_COPYWRITING}",
                         description: "填写服务版本描述文案 (不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊 ")
-                booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行Docker/K8S集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
+                booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行K8s/Docker集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
                 booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', defaultValue: false, description: "是否执行静态代码质量分析检测 生成质量报告, 交付可读、易维护和安全的高质量代码 🔦")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
                         description: '是否执行服务启动健康检测  K8S使用默认的健康探测 🌡️')
@@ -521,7 +521,7 @@ def call(String type = 'web-java', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (IS_ROLL_DEPLOY == true && IS_CANARY_DEPLOY == false) // 是否进行滚动部署
+                            return (IS_ROLL_DEPLOY == true) // 是否进行滚动部署
                         }
                     }
                     steps {
@@ -1176,7 +1176,6 @@ def sourceCodeDeploy() {
             sh " rm -f ${sourceCodeDeployName}.tar.gz &&  tar --warning=no-file-changed -zcvf  ${sourceCodeDeployName}.tar.gz --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
             Tools.printColor(this, "源码压缩打包成功 ✅")
         }
-        // return // 后续代码不执行
     }
 }
 
@@ -1756,6 +1755,12 @@ def scrollToDeploy(map) {
             println ip
             remote.host = ip
 
+            if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
+                if (machineNum >= 2) { // Docker灰度发布发布的思路:  滚动部署情况 只部署第一个节点
+                    return  // 返回后续代码不再执行
+                }
+            }
+
             machineNum++
             MACHINE_TAG = "${machineNum}号机" // 动态计算是几号机
 
@@ -1765,9 +1770,9 @@ def scrollToDeploy(map) {
                     mavenBuildProject(map) // 需要mvn jdk构建环境
                 }
             }
-            uploadRemote(Utils.getShEchoResult(this, "pwd"), map)
-            
-            runProject(map)
+
+            uploadRemote(Utils.getShEchoResult(this, "pwd"), map) // 上传部署到远程服务器
+            runProject(map) //  运行部署项目
             if (params.IS_HEALTH_CHECK == true) {
                 healthCheck(map)
             }

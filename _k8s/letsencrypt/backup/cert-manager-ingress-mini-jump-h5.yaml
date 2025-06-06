@@ -61,6 +61,9 @@ spec:
     - hosts:
         - test-qr.pengbocloud.com
       secretName: test-qr.pengbocloud.com-tls
+    - hosts:
+        - mini-h5.pengbocloud.com
+      secretName: mini-h5.pengbocloud.com-tls
 
   rules:
     #自定义域名
@@ -99,4 +102,16 @@ spec:
                 #服务端口
                 port:
                   number: 9106
+            pathType: Prefix
+    - host: mini-h5.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: pengbo-mini-h5-service
+                #服务端口
+                port:
+                  number: 9019
             pathType: Prefix
