@@ -1755,14 +1755,14 @@ def scrollToDeploy(map) {
             println ip
             remote.host = ip
 
-            machineNum++
-            MACHINE_TAG = "${machineNum}号机" // 动态计算是几号机
-
             if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
                 if (machineNum >= 2) { // Docker灰度发布发布的思路:  滚动部署情况 只部署第一个节点
                     return  // 返回后续代码不再执行
                 }
             }
+
+            machineNum++
+            MACHINE_TAG = "${machineNum}号机" // 动态计算是几号机
 
             // 如果配置多节点动态替换不同的配置文件重新执行maven构建打包或者直接替换部署服务器文件
             if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {

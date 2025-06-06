@@ -649,16 +649,6 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
-    def machineNum = 1
-    // 循环3次
-    for (int i = 0; i < 3; i++) {
-        if (machineNum >= 2) {
-            println("不再执行")
-            return
-        }
-        machineNum++
-        println(machineNum)
-    }
 /*    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
         // 压缩源码文件 加速传输
         Python.codePackage(this)
