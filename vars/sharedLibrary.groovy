@@ -1092,6 +1092,7 @@ def getUserInfo() {
             }
         }
     }
+    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: "${BUILD_USER}同学 正在为您加速部署${SHELL_ENV_MODE}环境 ...")
 }
 
 /**
@@ -1744,6 +1745,15 @@ def blueGreenDeploy(map) {
  * 滚动部署
  */
 def scrollToDeploy(map) {
+
+    if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
+        println "Docker灰度发布:  滚动部署情况 只部署第一个节点 单机部署阶段已部署"
+        return  // 返回后续代码不再执行
+        /* if (machineNum >= 2) { // 金丝雀分批部署控制阀门
+            return
+        } */
+    }
+
     // 主从架构与双主架构等  负载均衡和滚动更新worker应用服务
     if ("${IS_SAME_SERVER}" == 'false') {   // 不同服务器滚动部署
         def machineNum = 1
@@ -1754,13 +1764,6 @@ def scrollToDeploy(map) {
         remote_worker_ips.each { ip ->
             println ip
             remote.host = ip
-
-            if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
-                if (machineNum >= 2) { // Docker灰度发布发布的思路:  滚动部署情况 只部署第一个节点
-                    return  // 返回后续代码不再执行
-                }
-            }
-
             machineNum++
             MACHINE_TAG = "${machineNum}号机" // 动态计算是几号机
 
@@ -2012,17 +2015,24 @@ def alwaysPost() {
         def noticeHealthCheckUrl = "${APPLICATION_DOMAIN == "" ? healthCheckUrl : healthCheckDomainUrl}"
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             currentBuild.description = "${IS_GEN_QR_CODE == 'true' ? "<img src=${qrCodeOssUrl} width=250 height=250 > <br/> " : ""}" +
-                    "<a href='${noticeHealthCheckUrl}'> 👉URL访问地址</a> " +
-                    "<br/> 项目: ${PROJECT_NAME}" +
-                    "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
+                    "项目: ${PROJECT_NAME}" +
                     "<br/> 大小: ${buildPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-            currentBuild.description = "<a href='${noticeHealthCheckUrl}'> 👉API访问地址</a> " +
+            currentBuild.description =
                     "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉直接下载构建${javaPackageType}包</a>" : ""}" +
-                    "<br/> 项目: ${PROJECT_NAME}" +
-                    "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
+                    "项目: ${PROJECT_NAME}" +
                     "<br/> 环境: ${releaseEnvironment}   大小: ${buildPackageSize} <br/> 分支: ${BRANCH_NAME}  <br/> 发布人: ${BUILD_USER}"
         }
+        // 构建徽章展示关键信息
+        if ("${IS_PROD}" == 'true') {
+            addBadge(id: "version-badge", text: "${tagVersion}")
+        } else {
+            if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
+                addBadge(id: "env-badge", text: "${releaseEnvironment}")
+            }
+        }
+        addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: "${noticeHealthCheckUrl}", target: '_blank')
+        removeBadges(id: "launch-badge")
     } catch (error) {
         println error.getMessage()
     }

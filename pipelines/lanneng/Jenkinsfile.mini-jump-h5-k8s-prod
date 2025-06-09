@@ -59,7 +59,7 @@ map.put('k8s_credentials_ids', '74a3d376-cb4c-4a20-9bf7-7300a5eaa84d')
 map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
 // 项目标签或项目简称
-map.put('project_tag', '小程序H5')
+map.put('project_tag', '小程序与H5跨端')
 
 // 是否是生产环境
 map.put('is_prod', true)

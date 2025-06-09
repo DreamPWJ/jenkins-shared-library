@@ -380,7 +380,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
      * 根据Dockerfile构建镜像
      */
     static def buildDockerImage(ctx, map, dockerFilePath, imageName, imageTag, buildParams, isReBuild = false) {
-        ctx.println("根据自定义Dockerfile构建增强环境的镜像")
+        ctx.println("根据自定义增强构建环境的Dockerfile镜像: " + dockerFilePath)
         // 构建镜像 判断镜像是否存在
         def imagesExistCommand = ""
         if (!isReBuild) { // 是否重新构建镜像
