@@ -1440,7 +1440,7 @@ def uploadOss(map) {
  * 上传部署文件到远程云端
  */
 def uploadRemote(filePath, map) {
-    retry(2) {   // 重试几次 可能网络等问题导致上传失败
+    retry(3) {   // 重试几次 可能网络等问题导致上传失败
         // 应用包部署目录
         projectDeployFolder = "/${DEPLOY_FOLDER}/${FULL_PROJECT_NAME}/"
         // ssh免密登录检测和设置
