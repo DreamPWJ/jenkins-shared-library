@@ -201,6 +201,7 @@ def call(String type = 'experiment', Map map) {
             // post包含整个pipeline或者stage阶段完成情况
             post() {
                 always {
+                    graphView()  // 启用图形视图
                     script {
                         echo '总是运行，无论成功、失败还是其他状态'
                     }
