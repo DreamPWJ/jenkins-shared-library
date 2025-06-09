@@ -2025,7 +2025,7 @@ def alwaysPost() {
         }
         // 构建徽章展示关键信息
         if ("${IS_PROD}" == 'true') {
-            addBadge(id: "version-badge", text: "v${tagVersion}")
+            addBadge(id: "version-badge", text: "${tagVersion}")
         } else {
             if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
                 addBadge(id: "env-badge", text: "${releaseEnvironment}")
