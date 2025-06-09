@@ -158,6 +158,8 @@ def call(String type = 'experiment', Map map) {
                 ansiColor('xterm')
                 //当agent为Docker或Dockerfile时, 指定在同一个jenkins节点上,每个stage都分别运行在一个新容器中,而不是同一个容器
                 //newContainerPerStage()
+                // 允许更复杂的流程图结构（如深层嵌套）
+                graphView(maxDepth: 5)
             }
 
             stages {
@@ -650,7 +652,7 @@ def pullProjectCode() {
 def futureLab(map) {
     addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
     sleep 5
-    addBadge(id: "version-badge", text: "")
+    addBadge(id: "version-badge", text: "2.3.6")
     addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
     removeBadges(id: "launch-badge")
 /*    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
