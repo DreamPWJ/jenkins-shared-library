@@ -2015,13 +2015,12 @@ def alwaysPost() {
         def noticeHealthCheckUrl = "${APPLICATION_DOMAIN == "" ? healthCheckUrl : healthCheckDomainUrl}"
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             currentBuild.description = "${IS_GEN_QR_CODE == 'true' ? "<img src=${qrCodeOssUrl} width=250 height=250 > <br/> " : ""}" +
-                    "<a href='${noticeHealthCheckUrl}'> 👉URL访问地址</a> " +
-                    "<br/> 项目: ${PROJECT_NAME}" +
+                    "项目: ${PROJECT_NAME}" +
                     "<br/> 大小: ${buildPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-            currentBuild.description = "<a href='${noticeHealthCheckUrl}'> 👉API访问地址</a> " +
+            currentBuild.description =
                     "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉直接下载构建${javaPackageType}包</a>" : ""}" +
-                    "<br/> 项目: ${PROJECT_NAME}" +
+                    "项目: ${PROJECT_NAME}" +
                     "<br/> 环境: ${releaseEnvironment}   大小: ${buildPackageSize} <br/> 分支: ${BRANCH_NAME}  <br/> 发布人: ${BUILD_USER}"
         }
         // 构建徽章展示关键信息
