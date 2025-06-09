@@ -158,6 +158,10 @@ def call(String type = 'experiment', Map map) {
                 ansiColor('xterm')
                 //当agent为Docker或Dockerfile时, 指定在同一个jenkins节点上,每个stage都分别运行在一个新容器中,而不是同一个容器
                 //newContainerPerStage()
+                graphView(
+                        maxDepth: 5,               // 显示多少层嵌套
+                        position: 'left'            // 超宽屏左侧布局
+                )
             }
 
             stages {
