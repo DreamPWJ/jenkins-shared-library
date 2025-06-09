@@ -2026,10 +2026,10 @@ def alwaysPost() {
         }
         // 构建徽章展示关键信息
         if ("${IS_PROD}" == 'true') {
-            addBadge(id: "version-badge", text: "版本: ${tagVersion}")
+            addBadge(id: "version-badge", text: "v${tagVersion}")
         } else {
             if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-                addBadge(id: "env-badge", text: "环境: ${releaseEnvironment}")
+                addBadge(id: "env-badge", text: "${releaseEnvironment}")
             }
         }
         addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: "${noticeHealthCheckUrl}", target: '_blank')
