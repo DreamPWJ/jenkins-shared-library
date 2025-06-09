@@ -201,7 +201,6 @@ def call(String type = 'experiment', Map map) {
             // post包含整个pipeline或者stage阶段完成情况
             post() {
                 always {
-                    graphView()  // 启用图形视图
                     script {
                         echo '总是运行，无论成功、失败还是其他状态'
                     }
@@ -649,11 +648,13 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
-    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
+
+/*    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
     sleep 5
     addBadge(id: "version-badge", text: "2.3.6")
     addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
-    removeBadges(id: "launch-badge")
+    removeBadges(id: "launch-badge")*/
+
 /*    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
         // 压缩源码文件 加速传输
         Python.codePackage(this)
