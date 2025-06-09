@@ -648,9 +648,10 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
-    addInfoBadge(icon: 'symbol-rocket plugin-ionicons-api', text: '加速部署sit环境 ...')
+    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
     sleep 5
-    addBadge(id: "version-badge",text: "2.3.6")
+    addBadge(id: "version-badge", text: "2.3.6")
+    removeBadges(id: "launch-badge")
 /*    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
         // 压缩源码文件 加速传输
         Python.codePackage(this)
