@@ -1092,6 +1092,7 @@ def getUserInfo() {
             }
         }
     }
+    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: "${BUILD_USER}同学 正在为您加速部署${SHELL_ENV_MODE}环境 ...")
 }
 
 /**
@@ -2016,22 +2017,22 @@ def alwaysPost() {
             currentBuild.description = "${IS_GEN_QR_CODE == 'true' ? "<img src=${qrCodeOssUrl} width=250 height=250 > <br/> " : ""}" +
                     "<a href='${noticeHealthCheckUrl}'> 👉URL访问地址</a> " +
                     "<br/> 项目: ${PROJECT_NAME}" +
-                    "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
                     "<br/> 大小: ${buildPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
             currentBuild.description = "<a href='${noticeHealthCheckUrl}'> 👉API访问地址</a> " +
                     "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉直接下载构建${javaPackageType}包</a>" : ""}" +
                     "<br/> 项目: ${PROJECT_NAME}" +
-                    "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
                     "<br/> 环境: ${releaseEnvironment}   大小: ${buildPackageSize} <br/> 分支: ${BRANCH_NAME}  <br/> 发布人: ${BUILD_USER}"
         }
         // 构建徽章展示关键信息
         if ("${IS_PROD}" == 'true') {
             addBadge(id: "version-badge", text: "${tagVersion}")
         } else {
-            addBadge(id: "env-badge", text: "${releaseEnvironment}环境")
+            if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
+                addBadge(id: "env-badge", text: "${releaseEnvironment}环境")
+            }
         }
-        addInfoBadge(id: "url-badge", text: '访问地址', link: "${noticeHealthCheckUrl}", target: '_blank')
+        addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: "${noticeHealthCheckUrl}", target: '_blank')
         removeBadges(id: "launch-badge")
     } catch (error) {
         println error.getMessage()
