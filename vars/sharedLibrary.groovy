@@ -2025,6 +2025,14 @@ def alwaysPost() {
                     "${IS_PROD == 'true' ? "<br/> 版本: ${tagVersion}" : ""} " +
                     "<br/> 环境: ${releaseEnvironment}   大小: ${buildPackageSize} <br/> 分支: ${BRANCH_NAME}  <br/> 发布人: ${BUILD_USER}"
         }
+        // 构建徽章展示关键信息
+        if ("${IS_PROD}" == 'true') {
+            addBadge(id: "version-badge", text: "${tagVersion}")
+        } else {
+            addBadge(id: "env-badge", text: "${releaseEnvironment}环境")
+        }
+        addInfoBadge(id: "url-badge", text: '访问地址', link: "${noticeHealthCheckUrl}", target: '_blank')
+        removeBadges(id: "launch-badge")
     } catch (error) {
         println error.getMessage()
     }
