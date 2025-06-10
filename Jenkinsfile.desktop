@@ -6,7 +6,6 @@
  * @description 核心Pipeline代码 针对桌面端项目CI/CD的脚本
  * 注意 本文件在Git位置和名称不能随便改动 配置在jenkins里
  */
-// Pipeline需要安装的插件
 
 // 根据不同环境项目配置不同参数
 def map = [:]

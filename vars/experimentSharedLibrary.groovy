@@ -654,7 +654,7 @@ def futureLab(map) {
     HttpUtil.post(this, "https://saasadmin.pengbocloud.com",  '{"name":"new_item"}')
 
 
-/*    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
+/*  addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
     sleep 5
     addBadge(id: "version-badge", text: "2.3.6")
     addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')

@@ -5,7 +5,7 @@ package shared.library.common
  * @date 2025/6/10 08:22
  * @email 406798106@qq.com
  * @description http请求工具类
- * 基于Groovy原生HTTP库 零依赖，完全编程控制
+ * 基于Groovy语言原生HTTP库 零依赖，完全编程控制
  */
 class HttpUtil implements Serializable {
 

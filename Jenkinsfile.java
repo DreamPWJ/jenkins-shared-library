@@ -6,11 +6,6 @@
  * @description 核心Pipeline代码 针对Web前端项目和JAVA等后端项目CI/CD的脚本
  * 注意 本文件在Git位置和名称不能随便改动 配置在jenkins里
  */
-// Pipeline可能需要安装的插件
-// 共享库请先去配置Jenkins系统配置 -> Global Untrusted Pipeline Libraries 注意名称和版本分支分开填写 最终组合如@Library('jenkins-shared-library@master')
-// Pipeline Maven Integration , NodeJS , Pipeline Utility Steps , DingTalk , Docker , Docker Pipeline , Maven Integration, Kubernetes , Pipeline Graph View
-// Configuration as Code, build user vars, Git Parameter, AnsiColor, Generic Webhook Trigger, Gitlab, HTTP Request, Badge ,
-// Dark Theme, ThinBackup, Role-based Authorization Strategy, HTML Publisher
 
 // 根据不同环境项目配置不同参数
 def map = [:]
