@@ -22,7 +22,7 @@ class DingTalk implements Serializable {
      */
     static def noticeMarkdown(ctx, accessTokens, title, content, mobile = "") {
         // 支持多钉钉群同时通知
-        accessTokens.split(",").each { accessToken ->
+        accessTokens.trim().split(",").each { accessToken ->
             def url = "${DING_TALK_URL}${accessToken}"
             if (mobile != "") {
                 content = content + "@" + mobile
@@ -41,7 +41,7 @@ class DingTalk implements Serializable {
                     ]
             ]
             def data = HttpUtil.post(ctx, url, JsonOutput.toJson(json))
-            // ctx.println("钉钉通知结果: ${data}")
+            ctx.println("钉钉通知结果: ${data}")
         }
     }
 
