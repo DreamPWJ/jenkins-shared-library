@@ -647,6 +647,7 @@ def pullProjectCode() {
 /**
  * 实验开发调试
  */
+@NonCPS
 def futureLab(map) {
 
     // Groovy HTTP 原生调用
