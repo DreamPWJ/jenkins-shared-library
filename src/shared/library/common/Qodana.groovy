@@ -111,7 +111,7 @@ class Qodana implements Serializable {
 
         // 钉钉通知质量报告 形成信息闭环
         // if ("${ctx.IS_CODE_QUALITY_ANALYSIS}" == 'true')  // 是否钉钉通知
-        DingTalk.notice(ctx, "${map.ding_talk_credentials_id}", "![screenshot](https://blog.jetbrains.com/wp-content/uploads/2022/06/DSGN-13163-Static-analysis-with-Qodana-banners_featured.png) "
+        DingTalk.noticeMarkDown(ctx, map.ding_talk_credentials_ids, "![screenshot](https://blog.jetbrains.com/wp-content/uploads/2022/06/DSGN-13163-Static-analysis-with-Qodana-banners_featured.png) "
                 + " 静态代码分析质量报告 ${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}  📑",
                 "\n\n #### 代码质量分析结果: [查看报表](${ctx.env.JOB_URL}${reportName}) 📈"
                         + "\n 持续交付可读、易维护和安全的高质量代码 ✨ "

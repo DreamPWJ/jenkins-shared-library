@@ -20,7 +20,7 @@ class DingTalk implements Serializable {
      * 直接使用http交互更灵活 不再基于插件实现
      * 文档: https://open.dingtalk.com/document/robots/custom-robot-access
      */
-    static def noticeMarkdown(ctx, credentialsIds, title, content, mobile = "") {
+    static def noticeMarkDown(ctx, credentialsIds, title, content, mobile = "") {
         // 支持多钉钉群同时通知
         credentialsIds.each { item ->
             def url = "${DING_TALK_URL}${item.token}"
@@ -49,6 +49,39 @@ class DingTalk implements Serializable {
         }
     }
 
+    /**
+     * ActionCard整体跳转样式类型通知
+     */
+    static def noticeActionCard(ctx, credentialsIds, title, content, mobile = "") {
+        // 支持多钉钉群同时通知
+        credentialsIds.each { item ->
+            def url = "${DING_TALK_URL}${item.token}"
+            def keyword = item.keyword
+            if (keyword == null || keyword == "") {
+                keyword = DING_TALK_KEY_WORD
+            }
+            if (mobile != "") { // @通知 内容里必须包含通知的手机号
+                content = content + "@" + mobile
+            }
+            def json = [
+                    "msgtype"     : "action_card",
+                    "markdown"    : [
+                            "title": "${title}-${keyword}",
+                            "text" : "${content}"
+                    ],
+                    "single_title": "查看详情",
+                    "single_url"  : "https://open.dingtalk.com",
+                    "at"          : [
+                            "atMobiles": [
+                                    "${mobile}"
+                            ],
+                            "isAtAll"  : false
+                    ]
+            ]
+            def data = HttpUtil.post(ctx, url, JsonOutput.toJson(json))
+            // ctx.println("钉钉通知结果: ${data}")
+        }
+    }
 
     /**
      * 通知  插件方式 不再推进继续使用

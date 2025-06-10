@@ -205,7 +205,7 @@ def call(String type = 'web-java', Map map) {
                     }
                     steps {
                         script {
-                            manualApproval()
+                            manualApproval(map)
                         }
                     }
                 }
@@ -495,7 +495,7 @@ def call(String type = 'web-java', Map map) {
                     }
                     steps {
                         script {
-                            integrationTesting()
+                            integrationTesting(map)
                         }
                     }
                 }
@@ -1488,7 +1488,7 @@ def uploadRemote(filePath, map) {
  * 人工卡点审批
  * 每一个人都有点击执行流水线权限  但是不一定有发布上线的权限 为了保证项目稳定安全等需要人工审批
  */
-def manualApproval() {
+def manualApproval(map) {
     // 针对生产环境部署前做人工发布审批
     // if ("${IS_PROD}" == 'true') {
     // 选择具有审核权限的人员 可以配置一个或多个 也可以相互审批
@@ -1500,7 +1500,7 @@ def manualApproval() {
         // 如果是有审核权限人员发布的跳过本次审核
     } else {
         // 同时钉钉通知到审核人 点击链接自动进入要审核流水线  如果Jenkins提供Open API审核可直接在钉钉内完成点击审批
-        DingTalk.notice(this, "${DING_TALK_CREDENTIALS_ID}", "发布流水线申请人工审批通知 ✍🏻 ",
+        DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids, "发布流水线申请人工审批通知 ✍🏻 ",
                 "#### ${BUILD_USER}申请发布${PROJECT_NAME}服务 !" +
                         " \n ### [请您点击链接去审批](${env.JOB_URL}) 👈🏻 " +
                         " \n ##### Git代码  [变更日志](${REPO_URL.replace('.git', '')}/-/commits/${BRANCH_NAME}/)  " +
@@ -1525,7 +1525,7 @@ def manualApproval() {
             error("人工审批失败, 您没有审批的权限, 请重新运行流水线发起审批 ❌")
         } else {
             // 审核人同意后通知发布人 消息自动及时高效传递
-            DingTalk.notice(this, "${DING_TALK_CREDENTIALS_ID}", "您发布流水线已被${approvalCcurrentUser}审批同意 ✅",
+            DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids, "您发布流水线已被${approvalCcurrentUser}审批同意 ✅",
                     "#### 前往流水线 [查看](${env.JOB_URL})  !" +
                             " \n ###### 审批时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
                     "${BUILD_USER_MOBILE}")
@@ -1634,7 +1634,7 @@ def healthCheck(map, params = '') { // 可选参数
 /**
  * 集成测试
  */
-def integrationTesting() {
+def integrationTesting(map) {
     // 可先动态传入数据库名称部署集成测试应用 启动测试完成销毁 再重新部署业务应用
     try {
         // 创建JMeter性能压测报告
@@ -1653,7 +1653,7 @@ def integrationTesting() {
         def failedNum = "${json.message.failedNum}"
         def projectId = "${AUTO_TEST_PARAM}".trim().split("&")[2].split("=")[0].replaceAll("env_", "")
         def testCollectionId = "${AUTO_TEST_PARAM}".trim().split("&")[0].replaceAll("id=", "")
-        DingTalk.notice(this, "${DING_TALK_CREDENTIALS_ID}", "自动化API集成测试报告 🙋",
+        DingTalk.noticeMarkdown(this, map.ding_talk_credentials_ids, "自动化API集成测试报告 🙋",
                 "#### ${json.message.msg} \n #### 测试报告: [查看结果](${testUrl.replace("mode=json", "mode=html")}) 🚨" +
                         "\n ##### 测试总耗时:  ${json.runTime} \n ##### 测试用例不完善也可导致不通过 👉[去完善](${yapiUrl}/project/${projectId}/interface/col/${testCollectionId})  ",
                 "${failedNum}" == "0" ? "" : "${BUILD_USER_MOBILE}")
@@ -2292,7 +2292,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                     } catch (e) {
                     }
 
-                    DingTalk.noticeMarkdown(this, map.ding_talk_credentials_ids,
+                    DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
                             "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
                             "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉\n" +
                                     "#### 项目: ${PROJECT_NAME}\n" +
