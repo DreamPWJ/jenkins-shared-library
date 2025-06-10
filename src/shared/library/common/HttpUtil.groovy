@@ -18,14 +18,14 @@ class HttpUtil implements Serializable {
         def responseCode = get.getResponseCode()
         if (responseCode == 200) {
             def content = get.getInputStream().getText()
-            echo "GET获取数据: ${content}"
+            ctx.println("GET获取数据: ${content}")
         }
     }
 
     /**
      *  POST请求
      */
-    static def post(ctx, requestUrl,  jsonBody) {
+    static def post(ctx, requestUrl, jsonBody) {
         // POST请求（带JSON体）
         def post = new URL(requestUrl).openConnection()
         post.setRequestMethod("POST")
@@ -35,7 +35,7 @@ class HttpUtil implements Serializable {
         def postCode = post.getResponseCode()
         if (postCode == 200) {
             def content = post.getInputStream().getText()
-            echo "POST获取数据: ${content}"
+            ctx.println("POST获取数据: ${content}")
         }
     }
 
