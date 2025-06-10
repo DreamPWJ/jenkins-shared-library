@@ -2209,7 +2209,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                     "- Nginx Web服务启动${msg}",
                                     "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
                                     "- Node版本: ${NODE_VERSION}   包大小: ${buildPackageSize}",
-                                    "###### 访问URL: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl})",
+                                    "- 访问URL: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl})",
                                     "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
                                     "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
                                     "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
@@ -2225,14 +2225,14 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                 } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
                     def javaInfo = ""
                     if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-                        javaInfo = "构建版本: JDK${JDK_VERSION}   包大小: ${buildPackageSize} \n"
+                        javaInfo = "- 构建版本: JDK${JDK_VERSION}   包大小: ${buildPackageSize} \n"
                         if ("${javaOssUrl}".trim() != '') {
                             javaInfo = javaInfo + "[直接下载构建${javaPackageType}包](${javaOssUrl})  👈 \\n"
                         }
                     }
                     def pythonInfo = ""
                     if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-                        pythonInfo = "运行版本: Python${CUSTOM_PYTHON_VERSION}   包大小: ${buildPackageSize} \n"
+                        pythonInfo = "- 运行版本: Python${CUSTOM_PYTHON_VERSION}   包大小: ${buildPackageSize} \n"
                     }
 
                     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
@@ -2245,9 +2245,9 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                     "##### 详细信息 \n" +
                                     "- 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString} \n" +
                                     "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment} \n" +
-                                    "- ${javaInfo}" +
-                                    "- ${pythonInfo}" +
-                                    "###### API地址: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl}) \n" +
+                                    "${javaInfo}" +
+                                    "${pythonInfo}" +
+                                    "- API地址: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl}) \n" +
                                     "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL}) \n" +
                                     "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS} \n" +
                                     "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
