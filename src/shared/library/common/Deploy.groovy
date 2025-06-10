@@ -197,7 +197,7 @@ class Deploy implements Serializable {
         // if ("${ctx.params.IS_DING_NOTICE}" == 'true')  // 是否钉钉通知
         DingTalk.noticeMarkDown(ctx, map.ding_talk_credentials_ids, "执行服务控制命令",
                 "### 执行【" + type + "】服务命令 [${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}](${ctx.env.JOB_URL})  👩‍💻 \n" +
-                        typeText + "\n  ##### 执行[" + type + "]控制命令完成 ✅  " +
+                        typeText + "\n  ##### 执行" + type + "控制命令完成 ✅  " +
                         "\n  ###### 执行人: ${ctx.BUILD_USER} \n ###### 完成时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
     }
 
