@@ -648,10 +648,12 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
+    // 钉钉 HTTP 原生调用
+    DingTalk.noticeMarkdown(this, "${env.DING_TALK_CREDENTIALS_ID}", "新增钉钉HTTP原生调用 面向未来重构基建", "### 测试通知", "18863302302")
 
     // Groovy HTTP 原生调用
-    HttpUtil.get(this, "https://saasadmin.pengbocloud.com")
-    HttpUtil.post(this, "https://saasadmin.pengbocloud.com",  '{"name":"new_item"}')
+/*    HttpUtil.get(this, "https://saasadmin.pengbocloud.com")
+    HttpUtil.post(this, "https://saasadmin.pengbocloud.com",  '{"name":"new_item"}')*/
 
 
 /*  addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
@@ -720,6 +722,6 @@ def futureLab(map) {
     println("结果: ${maxVersion}")
     */
 
-    }
+}
 
 

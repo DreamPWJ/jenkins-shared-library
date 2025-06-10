@@ -1,5 +1,7 @@
 package shared.library.common
 
+import shared.library.common.*
+
 /**
  * @author 潘维吉
  * @date 2021/1/26 13:22
@@ -7,6 +9,31 @@ package shared.library.common
  * @description 钉钉通知
  */
 class DingTalk implements Serializable {
+
+    /**
+     * Markdown类型通知
+     * 不基于插件实现 直接使用http交互更灵活
+     * 文档: https://open.dingtalk.com/document/robots/custom-robot-access
+     */
+    static def noticeMarkdown(ctx, credentialsId, title, content, mobile = "") {
+        def url = "https://oapi.dingtalk.com/robot/send?access_token=${credentialsId}"
+        def json = []
+        json << [
+                "msgtype" : "markdown",
+                "markdown": [
+                        "title": "${title}",
+                        "text" : "${content}"
+                ],
+                "at": [
+                        "atMobiles": [
+                                "${mobile}"
+                        ],
+                        "isAtAll": false
+                ]
+        ]
+        def data = HttpUtil.post(ctx, url, json)
+        ctx.println("钉钉通知结果: ${data}")
+    }
 
     /**
      * 通知
