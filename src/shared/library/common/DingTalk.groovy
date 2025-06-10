@@ -31,6 +31,7 @@ class DingTalk implements Serializable {
                         "isAtAll": false
                 ]
         ]
+        ctx.println("json结果: ${json.toString()}")
         def data = HttpUtil.post(ctx, url, json.toString())
         ctx.println("钉钉通知结果: ${data}")
     }

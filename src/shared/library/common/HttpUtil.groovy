@@ -32,8 +32,8 @@ class HttpUtil implements Serializable {
         post.setDoOutput(true)
         post.setRequestProperty("Content-Type", "application/json")
         post.getOutputStream().write(jsonBody.getBytes("UTF-8"))
-        def postCode = post.getResponseCode()
-        if (postCode == 200) {
+        def responseCode = post.getResponseCode()
+        if (responseCode == 200) {
             def content = post.getInputStream().getText()
             ctx.println("POST获取数据: ${content}")
         }
