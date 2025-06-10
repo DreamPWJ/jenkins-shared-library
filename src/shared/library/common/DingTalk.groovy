@@ -25,7 +25,7 @@ class DingTalk implements Serializable {
                 "msgtype" : "markdown",
                 "markdown": [
                         "title": "${title}-${DING_TALK_KEY_WORD}",
-                        "text" : "${content}@${mobile}"
+                        "text" : "${content}"
                 ],
                 "at": [
                         "atMobiles": [
