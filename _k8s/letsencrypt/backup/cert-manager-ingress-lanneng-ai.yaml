@@ -32,12 +32,6 @@ metadata:
     # add an annotation indicating the issuer to use
     cert-manager.io/cluster-issuer: letsencrypt-prod-lanneng-ai
     acme.cert-manager.io/http01-edit-in-place: "true"
-    # 负载均衡算法 如ip_hash
-    nginx.ingress.kubernetes.io/upstream-hash-by: "$host"
-    # Session保持配置
-    nginx.ingress.kubernetes.io/affinity: "cookie"
-    nginx.ingress.kubernetes.io/affinity-mode: "persistent"
-    nginx.ingress.kubernetes.io/session-cookie-name: "route"
     # 后端大文件上传大小
     nginx.ingress.kubernetes.io/client-body-buffer-size: 1024m
     nginx.ingress.kubernetes.io/proxy-max-temp-file-size: 2048m
