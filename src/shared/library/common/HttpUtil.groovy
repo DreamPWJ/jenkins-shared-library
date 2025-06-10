@@ -18,7 +18,8 @@ class HttpUtil implements Serializable {
         def responseCode = get.getResponseCode()
         if (responseCode == 200) {
             def content = get.getInputStream().getText()
-            ctx.println("GET获取数据: ${content}")
+            //ctx.println("GET获取数据: ${content}")
+            return content
         }
     }
 
@@ -35,7 +36,8 @@ class HttpUtil implements Serializable {
         def responseCode = post.getResponseCode()
         if (responseCode == 200) {
             def content = post.getInputStream().getText()
-            ctx.println("POST获取数据: ${content}")
+            // ctx.println("POST获取数据: ${content}")
+            return content
         }
     }
 
