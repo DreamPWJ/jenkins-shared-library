@@ -2225,31 +2225,31 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                 } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
                     def javaInfo = ""
                     if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-                        javaInfo = "构建版本: JDK${JDK_VERSION}   包大小: ${buildPackageSize}"
+                        javaInfo = "构建版本: JDK${JDK_VERSION}   包大小: ${buildPackageSize} \n"
                         if ("${javaOssUrl}".trim() != '') {
-                            javaInfo = javaInfo + "\n [直接下载构建${javaPackageType}包](${javaOssUrl})  👈"
+                            javaInfo = javaInfo + "[直接下载构建${javaPackageType}包](${javaOssUrl})  👈 \\n"
                         }
                     }
                     def pythonInfo = ""
                     if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-                        pythonInfo = "运行版本: Python${CUSTOM_PYTHON_VERSION}   包大小: ${buildPackageSize}"
+                        pythonInfo = "运行版本: Python${CUSTOM_PYTHON_VERSION}   包大小: ${buildPackageSize} \n"
                     }
 
                     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
                             "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
-                            "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL})" +
-                                    "#### CI/CD部署完成 启动运行${msg}" +
-                                    "##### ${deployType}" +
-                                    "##### ${k8sPodContent}" +
-                                    "###### ${rollbackTag}" +
-                                    "##### 详细信息" +
-                                    "- 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}" +
-                                    "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}" +
+                            "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL}) \n" +
+                                    "#### CI/CD部署完成 启动运行${msg} \n" +
+                                    "##### ${deployType} \n" +
+                                    "##### ${k8sPodContent} \n" +
+                                    "###### ${rollbackTag} \n" +
+                                    "##### 详细信息 \n" +
+                                    "- 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString} \n" +
+                                    "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment} \n" +
                                     "- ${javaInfo}" +
                                     "- ${pythonInfo}" +
-                                    "###### API地址: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl})" +
-                                    "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})" +
-                                    "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}" +
+                                    "###### API地址: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl}) \n" +
+                                    "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL}) \n" +
+                                    "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS} \n" +
                                     "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
                             isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone))
                 }
