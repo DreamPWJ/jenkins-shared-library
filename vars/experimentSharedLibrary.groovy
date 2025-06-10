@@ -649,16 +649,35 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
-    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
+    // Groovy HTTP 原生调用
+    // GET请求示例
+    def get = new URL("https://saasadmin.pengbocloud.com").openConnection()
+    get.setRequestProperty("Accept", "application/json")
+    def responseCode = get.getResponseCode()
+    if (responseCode == 200) {
+        def content = get.getInputStream().getText()
+        echo "GET获取数据: ${content}"
+    }
+
+    // POST请求（带JSON体）
+    def post = new URL("https://saasadmin.pengbocloud.com").openConnection()
+    post.setRequestMethod("POST")
+    post.setDoOutput(true)
+    post.setRequestProperty("Content-Type", "application/json")
+    post.getOutputStream().write('{"name":"new_item"}'.getBytes("UTF-8"))
+    def postCode = post.getResponseCode()
+    if (postCode == 200) {
+        def content = get.getInputStream().getText()
+        echo "POST获取数据: ${content}"
+    }
+
+/*    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
     sleep 5
     addBadge(id: "version-badge", text: "2.3.6")
     addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
-    removeBadges(id: "launch-badge")
+    removeBadges(id: "launch-badge")*/
 
-/*    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
-        // 压缩源码文件 加速传输
-        Python.codePackage(this)
-    }
+/*
     def pythonVersion = "3.10"
     def installPackages = "" // 动态安装依赖包
     def dockerImageName = "panweiji/python"
@@ -718,6 +737,6 @@ def futureLab(map) {
     println("结果: ${maxVersion}")
     */
 
-}
+    }
 
 
