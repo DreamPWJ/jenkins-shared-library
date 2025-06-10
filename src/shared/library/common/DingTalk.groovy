@@ -22,8 +22,7 @@ class DingTalk implements Serializable {
      */
     static def noticeMarkdown(ctx, credentialsIds, title, content, mobile = "") {
         // 支持多钉钉群同时通知
-        def array = credentialsIds as ArrayList
-        array.each { item ->
+        credentialsIds.each { item ->
             def url = "${DING_TALK_URL}${item.token}"
             def keyword = item.keyword
             if (keyword == null || keyword == "") {
