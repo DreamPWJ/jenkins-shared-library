@@ -52,7 +52,7 @@ class DingTalk implements Serializable {
     /**
      * ActionCard独立跳转样式类型通知
      */
-    static def noticeActionCard(ctx, credentialsIds, title, content, mobile = "") {
+    static def noticeActionCard(ctx, credentialsIds, title, content, btnTitle, btnUrl, mobile = "") {
         // 支持多钉钉群同时通知
         credentialsIds.each { item ->
             def url = "${DING_TALK_URL}${item.token}"
@@ -71,8 +71,8 @@ class DingTalk implements Serializable {
                             "btnOrientation": "0",
                             "btns"          : [
                                     [
-                                            "title"    : "内容不错",
-                                            "actionURL": "https://www.dingtalk.com/"
+                                            "title"    : btnTitle,
+                                            "actionURL": btnUrl
                                     ],
                             ]
                     ],
@@ -84,7 +84,7 @@ class DingTalk implements Serializable {
                     ]
             ]
             def data = HttpUtil.post(ctx, url, JsonOutput.toJson(json))
-            ctx.println("钉钉通知结果: ${data}")
+            // ctx.println("钉钉通知结果: ${data}")
         }
     }
 
