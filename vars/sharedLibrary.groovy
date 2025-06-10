@@ -2147,7 +2147,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
                 deployType = "部署方式: K8S集群金丝雀发布"
             } else {
-                k8sPodContent = "K8S集群部署Pod节点数: **${K8S_POD_REPLICAS}**个"
+                k8sPodContent = "- K8S集群部署Pod节点数: *${K8S_POD_REPLICAS}*个 \n"
                 if ("${IS_K8S_AUTO_SCALING}" == "true") {
                     deployType = deployType + "+自动弹性扩缩容"
                 }
@@ -2202,13 +2202,13 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                     "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL})",
                                     "${monorepoProjectName}",
                                     "##### ${deployType}",
-                                    "##### ${k8sPodContent}",
                                     "###### ${rollbackTag}",
                                     "##### 详细信息",
                                     "- 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}}",
                                     "- Nginx Web服务启动${msg}",
                                     "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
                                     "- Node版本: ${NODE_VERSION}   包大小: ${buildPackageSize}",
+                                    "${k8sPodContent}",
                                     "- 访问URL: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl})",
                                     "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
                                     "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
@@ -2240,13 +2240,13 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL}) \n" +
                                     "#### CI/CD部署完成 启动运行${msg} \n" +
                                     "##### ${deployType} \n" +
-                                    "##### ${k8sPodContent} \n" +
                                     "###### ${rollbackTag} \n" +
                                     "##### 详细信息 \n" +
                                     "- 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString} \n" +
                                     "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment} \n" +
                                     "${javaInfo}" +
                                     "${pythonInfo}" +
+                                    "${k8sPodContent}" +
                                     "- API地址: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl}) \n" +
                                     "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL}) \n" +
                                     "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS} \n" +
