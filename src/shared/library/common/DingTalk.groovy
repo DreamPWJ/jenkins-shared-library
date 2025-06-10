@@ -1,5 +1,6 @@
 package shared.library.common
 
+import groovy.text.SimpleTemplateEngine
 import shared.library.common.*
 import groovy.json.JsonOutput
 
@@ -19,23 +20,29 @@ class DingTalk implements Serializable {
      * 不基于插件实现 直接使用http交互更灵活
      * 文档: https://open.dingtalk.com/document/robots/custom-robot-access
      */
-    static def noticeMarkdown(ctx, credentialsId, title, content, mobile = "") {
-        def url = "${DING_TALK_URL}${credentialsId}"
-        def json = [
-                "msgtype" : "markdown",
-                "markdown": [
-                        "title": "${title}-${DING_TALK_KEY_WORD}",
-                        "text" : "${content}"
-                ],
-                "at"      : [
-                        "atMobiles": [
-                                "${mobile}"
-                        ],
-                        "isAtAll"  : false
-                ]
-        ]
-        def data = HttpUtil.post(ctx, url, JsonOutput.toJson(json))
-        ctx.println("钉钉通知结果: ${data}")
+    static def noticeMarkdown(ctx, accessTokens, title, content, mobile = "") {
+        // 支持多钉钉群同时通知
+        accessTokens.split(",").each { accessToken ->
+            def url = "${DING_TALK_URL}${accessToken}"
+            if (mobile != "") {
+                content = content + "@" + mobile
+            }
+            def json = [
+                    "msgtype" : "markdown",
+                    "markdown": [
+                            "title": "${title}-${DING_TALK_KEY_WORD}",
+                            "text" : "${content}"
+                    ],
+                    "at"      : [
+                            "atMobiles": [
+                                    "${mobile}"
+                            ],
+                            "isAtAll"  : false
+                    ]
+            ]
+            def data = HttpUtil.post(ctx, url, JsonOutput.toJson(json))
+            // ctx.println("钉钉通知结果: ${data}")
+        }
     }
 
     /**

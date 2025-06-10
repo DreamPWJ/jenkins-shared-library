@@ -649,7 +649,7 @@ def pullProjectCode() {
  */
 def futureLab(map) {
     // 钉钉 HTTP 原生调用
-    DingTalk.noticeMarkdown(this, "383391980b120c38f0f9a4a398349739fa67a623f9cfa834df9c5374e81b2081", "新增钉钉HTTP原生调用 面向未来重构基建", "### 新增钉钉HTTP原生调用 面向未来重构基建", "18863302302")
+    DingTalk.noticeMarkdown(this, "${map.ding_talk_access_tokens}", "新增钉钉HTTP原生调用 面向未来重构基建", "### 新增钉钉HTTP原生调用 面向未来重构基建", "18863302302")
 
     // Groovy HTTP 原生调用
 /*    HttpUtil.get(this, "https://saasadmin.pengbocloud.com")
