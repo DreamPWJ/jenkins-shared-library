@@ -27,8 +27,6 @@ metadata:
   name: lannengtech-k8s-ingress-lanneng-open-park-third-party
   namespace: default
   annotations:
-    # 指定使用nginx做代理
-    #kubernetes.io/ingress.class: lanneng-park  # 已弃用 使用 spec.ingressClassName代替
     # add an annotation indicating the issuer to use
     cert-manager.io/cluster-issuer: letsencrypt-prod-lanneng-open-park-third-party
     acme.cert-manager.io/http01-edit-in-place: "true"
