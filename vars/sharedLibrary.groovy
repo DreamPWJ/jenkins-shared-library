@@ -2291,21 +2291,31 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                         }
                     } catch (e) {
                     }
-                    dingtalk(
-                            robot: "${DING_TALK_CREDENTIALS_ID}",
-                            type: 'MARKDOWN',
-                            title: "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
-                            text: [
-                                    "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉",
-                                    "#### 项目: ${PROJECT_NAME}",
-                                    "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}**",
-                                    "${gitChangeLog}",
-                                    ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看",
-                                    "###### 发布人: ${BUILD_USER}",
-                                    "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                            ],
-                            at: []
-                    )
+                    DingTalk.noticeMarkdown(this, "383391980b120c38f0f9a4a398349739fa67a623f9cfa834df9c5374e81b2081",
+                            "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
+                            "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉" +
+                                    "#### 项目: ${PROJECT_NAME}" +
+                                    "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}**" +
+                                    "${gitChangeLog}" +
+                                    ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看" +
+                                    "###### 发布人: ${BUILD_USER}" +
+                                    "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
+                            "")
+                    /*         dingtalk(
+                                     robot: "${DING_TALK_CREDENTIALS_ID}",
+                                     type: 'MARKDOWN',
+                                     title: "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
+                                     text: [
+                                             "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉",
+                                             "#### 项目: ${PROJECT_NAME}",
+                                             "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}**",
+                                             "${gitChangeLog}",
+                                             ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看",
+                                             "###### 发布人: ${BUILD_USER}",
+                                             "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
+                                     ],
+                                     at: []
+                             )*/
                 }
             }
         } catch (e) {
