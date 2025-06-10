@@ -1,6 +1,5 @@
 package shared.library.common
 
-import groovy.text.SimpleTemplateEngine
 import shared.library.common.*
 import groovy.json.JsonOutput
 
@@ -9,6 +8,7 @@ import groovy.json.JsonOutput
  * @date 2021/1/26 13:22
  * @email 406798106@qq.com
  * @description 钉钉通知
+ * 每个机器人每分钟最多发送20条消息到群里，如果超过20条，会限流10分钟
  */
 class DingTalk implements Serializable {
 
@@ -17,7 +17,7 @@ class DingTalk implements Serializable {
 
     /**
      * Markdown类型通知
-     * 不基于插件实现 直接使用http交互更灵活
+     * 直接使用http交互更灵活 不再基于插件实现
      * 文档: https://open.dingtalk.com/document/robots/custom-robot-access
      */
     static def noticeMarkdown(ctx, credentialsIds, title, content, mobile = "") {
@@ -49,11 +49,13 @@ class DingTalk implements Serializable {
         }
     }
 
+
     /**
-     * 通知
+     * 通知  插件方式 不再推进继续使用
      * 文档: https://open.dingtalk.com/document/robots/custom-robot-access
      * 插件: https://jenkinsci.github.io/dingtalk-plugin/
      */
+    @Deprecated
     static def notice(ctx, credentialsId, title, content, mobile = "") {
         ctx.dingtalk(
                 robot: "${credentialsId}",
@@ -71,6 +73,7 @@ class DingTalk implements Serializable {
     /**
      * 通知 图片类型
      */
+    @Deprecated
     static def noticeImage(ctx, credentialsId, imageUrl, title, content, mobile = "") {
         ctx.dingtalk(
                 robot: "${credentialsId}",
@@ -96,6 +99,7 @@ class DingTalk implements Serializable {
     /**
      * 通知 Link连接类型
      */
+    @Deprecated
     static def noticeLink(ctx, credentialsId, url, title, content, mobile = "") {
         ctx.dingtalk(
                 robot: "${credentialsId}",
