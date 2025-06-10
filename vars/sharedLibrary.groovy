@@ -2020,8 +2020,8 @@ def alwaysPost() {
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
             currentBuild.description =
                     "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉直接下载构建${javaPackageType}包</a>" : ""}" +
-                    "项目: ${PROJECT_NAME}" +
-                    "<br/> 环境: ${releaseEnvironment}   大小: ${buildPackageSize} <br/> 分支: ${BRANCH_NAME}  <br/> 发布人: ${BUILD_USER}"
+                            "项目: ${PROJECT_NAME}" +
+                            "<br/> 环境: ${releaseEnvironment}   大小: ${buildPackageSize} <br/> 分支: ${BRANCH_NAME}  <br/> 发布人: ${BUILD_USER}"
         }
         // 构建徽章展示关键信息
         if ("${IS_PROD}" == 'true') {
@@ -2302,21 +2302,6 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                     "###### 发布人: ${BUILD_USER}\n" +
                                     "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
                             "")
-                    /*         dingtalk(
-                                     robot: "${DING_TALK_CREDENTIALS_ID}",
-                                     type: 'MARKDOWN',
-                                     title: "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
-                                     text: [
-                                             "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉",
-                                             "#### 项目: ${PROJECT_NAME}",
-                                             "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}**",
-                                             "${gitChangeLog}",
-                                             ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看",
-                                             "###### 发布人: ${BUILD_USER}",
-                                             "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                                     ],
-                                     at: []
-                             )*/
                 }
             }
         } catch (e) {
