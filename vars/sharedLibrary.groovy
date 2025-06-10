@@ -2147,7 +2147,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
                 deployType = "部署方式: K8S集群金丝雀发布"
             } else {
-                k8sPodContent = "- K8S集群部署Pod节点数: *${K8S_POD_REPLICAS}*个 \n"
+                k8sPodContent = "- K8S集群部署Pod节点数: *${K8S_POD_REPLICAS}* 个 \n"
                 if ("${IS_K8S_AUTO_SCALING}" == "true") {
                     deployType = deployType + "+自动弹性扩缩容"
                 }
@@ -2200,12 +2200,12 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             text: [
                                     "${screenshot}",
                                     "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL})",
+                                    "##### Nginx Web服务启动${msg}",
                                     "${monorepoProjectName}",
                                     "##### ${deployType}",
                                     "###### ${rollbackTag}",
                                     "##### 详细信息",
-                                    "- 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}}",
-                                    "- Nginx Web服务启动${msg}",
+                                    "- 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
                                     "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
                                     "- Node版本: ${NODE_VERSION}   包大小: ${buildPackageSize}",
                                     "${k8sPodContent}",
