@@ -21,22 +21,21 @@ class DingTalk implements Serializable {
      */
     static def noticeMarkdown(ctx, credentialsId, title, content, mobile = "") {
         def url = "${DING_TALK_URL}${credentialsId}"
-        def json =  [
+        def json = [
                 "msgtype" : "markdown",
                 "markdown": [
                         "title": "${title}-${DING_TALK_KEY_WORD}",
                         "text" : "${content}"
                 ],
-                "at": [
+                "at"      : [
                         "atMobiles": [
                                 "${mobile}"
                         ],
-                        "isAtAll": false
+                        "isAtAll"  : false
                 ]
         ]
-        ctx.println("json结果: "+ JsonOutput.toJson(json))
         def data = HttpUtil.post(ctx, url, JsonOutput.toJson(json))
-        ctx.println("钉钉通知结果: ${data}")
+        // ctx.println("钉钉通知结果: ${data}")
     }
 
     /**
