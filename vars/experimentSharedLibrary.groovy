@@ -648,15 +648,23 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
-/*
+
     def array = map.ding_talk_credentials_ids
     array.each { item ->
         println "keyword: ${item.keyword}"
         println "token: ${item.token}"
     }
     // 钉钉 HTTP 原生调用
-     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids, "新增钉钉HTTP原生调用 面向未来重构基建", "#### 新增通知HTTP原生调用 面向未来重构基建", "18863302302")
-*/
+     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids, "新增钉钉HTTP原生调用 面向未来重构基建", "<div style=\"background:rgba(255,255,255,0.2); \n" +
+             "            backdrop-filter:blur(5px);\n" +
+             "            border:1px solid rgba(255,255,255,0.3);\n" +
+             "            border-radius:12px;\n" +
+             "            padding:12px;\">\n" +
+             "**<font color=\"#0066FF\">审批通知</font>**  \n" +
+             "申请人：李工  \n" +
+             "金额：¥8,000.00\n" +
+             "</div>", "")
+
 
     // Groovy HTTP 原生调用
 /*    HttpUtil.get(this, "https://saasadmin.pengbocloud.com")
