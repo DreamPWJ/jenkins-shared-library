@@ -21,13 +21,7 @@ class DingTalk implements Serializable {
                 "msgtype" : "markdown",
                 "markdown": [
                         "title": "${title}",
-                        "text" : "${content}@${mobile}"
-                ],
-                "at": [
-                        "atMobiles": [
-                                "${mobile}"
-                        ],
-                        "isAtAll": false
+                        "text" : "${content}"
                 ]
         ]
         ctx.println("json结果: ${json}")
