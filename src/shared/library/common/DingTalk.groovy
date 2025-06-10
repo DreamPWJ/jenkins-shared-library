@@ -17,8 +17,7 @@ class DingTalk implements Serializable {
      */
     static def noticeMarkdown(ctx, credentialsId, title, content, mobile = "") {
         def url = "https://oapi.dingtalk.com/robot/send?access_token=${credentialsId}"
-        def json = []
-        json << [
+        def json =  [
                 "msgtype" : "markdown",
                 "markdown": [
                         "title": "${title}",
@@ -31,8 +30,8 @@ class DingTalk implements Serializable {
                         "isAtAll": false
                 ]
         ]
-        ctx.println("json结果: ${json.toString()}")
-        def data = HttpUtil.post(ctx, url, json.toString())
+        ctx.println("json结果: ${json}")
+        def data = HttpUtil.post(ctx, url, "${json}")
         ctx.println("钉钉通知结果: ${data}")
     }
 
