@@ -5,7 +5,9 @@ package shared.library.common
  * @date 2021/1/26 13:22
  * @email 406798106@qq.com
  * @description http请求工具类
+ * 基于jenkins插件 HTTP Request(已停止维护)
  */
+@Deprecated
 class HttpRequest implements Serializable {
 
     /**
@@ -23,9 +25,9 @@ class HttpRequest implements Serializable {
         return response.content
     }
 
-/**
- *  Post请求
- */
+    /**
+     *  Post请求
+     */
     static def post(ctx, requestUrl, requestBody) {
         //def json = JsonOutput.toJson(["name": "", "age": ""])
         def response = ctx.httpRequest authentication: '',

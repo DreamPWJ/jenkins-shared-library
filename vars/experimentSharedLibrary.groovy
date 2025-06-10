@@ -647,30 +647,12 @@ def pullProjectCode() {
 /**
  * 实验开发调试
  */
-@NonCPS
 def futureLab(map) {
 
     // Groovy HTTP 原生调用
-    // GET请求示例
-    def get = new URL("https://saasadmin.pengbocloud.com").openConnection()
-    get.setRequestProperty("Accept", "application/json")
-    def responseCode = get.getResponseCode()
-    if (responseCode == 200) {
-        def content = get.getInputStream().getText()
-        echo "GET获取数据: ${content}"
-    }
+    HttpUtil.get(this, "https://saasadmin.pengbocloud.com")
+    HttpUtil.post(this, "https://saasadmin.pengbocloud.com",  '{"name":"new_item"}')
 
-    // POST请求（带JSON体）
-    def post = new URL("https://saasadmin.pengbocloud.com").openConnection()
-    post.setRequestMethod("POST")
-    post.setDoOutput(true)
-    post.setRequestProperty("Content-Type", "application/json")
-    post.getOutputStream().write('{"name":"new_item"}'.getBytes("UTF-8"))
-    def postCode = post.getResponseCode()
-    if (postCode == 200) {
-        def content = get.getInputStream().getText()
-        echo "POST获取数据: ${content}"
-    }
 
 /*    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
     sleep 5
