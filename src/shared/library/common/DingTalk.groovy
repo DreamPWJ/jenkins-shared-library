@@ -1,6 +1,7 @@
 package shared.library.common
 
 import shared.library.common.*
+import groovy.json.JsonOutput
 
 /**
  * @author 潘维吉
@@ -21,11 +22,17 @@ class DingTalk implements Serializable {
                 "msgtype" : "markdown",
                 "markdown": [
                         "title": "${title}",
-                        "text" : "${content}"
+                        "text" : "${content}@${mobile}"
+                ],
+                "at": [
+                        "atMobiles": [
+                                "${mobile}"
+                        ],
+                        "isAtAll": false
                 ]
         ]
-        ctx.println("json结果: ${json}")
-        def data = HttpUtil.post(ctx, url, "${json}")
+        ctx.println("json结果: "+ JsonOutput.toJson(json))
+        def data = HttpUtil.post(ctx, url, JsonOutput.toJson(json))
         ctx.println("钉钉通知结果: ${data}")
     }
 
