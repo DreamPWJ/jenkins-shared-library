@@ -79,7 +79,7 @@ class DingTalk implements Serializable {
                     ]
             ]
             def data = HttpUtil.post(ctx, url, JsonOutput.toJson(json))
-            // ctx.println("钉钉通知结果: ${data}")
+            ctx.println("钉钉通知结果: ${data}")
         }
     }
 
