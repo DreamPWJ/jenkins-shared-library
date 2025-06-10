@@ -2238,7 +2238,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
                             "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
                             "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL}) \n" +
-                                    "#### CI/CD部署完成 启动运行${msg} \n" +
+                                    "#### CI/CD部署启动${msg} \n" +
                                     "##### ${deployType} \n" +
                                     "###### ${rollbackTag} \n" +
                                     "##### 详细信息 \n" +
