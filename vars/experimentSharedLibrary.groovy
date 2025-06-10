@@ -648,15 +648,30 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
-    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
-    sleep 5
-    addBadge(id: "version-badge", text: "v2.3.6")
-    addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
-    removeBadges(id: "launch-badge")
-/*    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
-        // 压缩源码文件 加速传输
-        Python.codePackage(this)
+
+/*
+    def array = map.ding_talk_credentials_ids
+    array.each { item ->
+        println "keyword: ${item.keyword}"
+        println "token: ${item.token}"
     }
+    // 钉钉 HTTP 原生调用
+     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids, "新增钉钉HTTP原生调用 面向未来重构基建", "#### 新增通知HTTP原生调用 面向未来重构基建", "18863302302")
+*/
+
+
+    // Groovy HTTP 原生调用
+/*    HttpUtil.get(this, "https://saasadmin.pengbocloud.com")
+    HttpUtil.post(this, "https://saasadmin.pengbocloud.com",  '{"name":"new_item"}')*/
+
+
+/*  addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
+    sleep 5
+    addBadge(id: "version-badge", text: "2.3.6")
+    addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
+    removeBadges(id: "launch-badge")*/
+
+/*
     def pythonVersion = "3.10"
     def installPackages = "" // 动态安装依赖包
     def dockerImageName = "panweiji/python"

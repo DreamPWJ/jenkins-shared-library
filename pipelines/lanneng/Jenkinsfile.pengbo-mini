@@ -6,7 +6,6 @@
  * @description 核心Pipeline代码 针对小程序项目CI/CD的脚本
  * 注意 本文件在Git位置和名称不能随便改动 配置在jenkins里
  */
-// Pipeline需要安装的插件
 
 // 根据不同环境项目配置不同参数
 def map = [:]
@@ -37,6 +36,7 @@ map.put('nodejs', 'Node20')
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
 map.put('git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
 map.put('ding_talk_credentials_id', 'd33ae0ba-e531-41c8-8983-d9734e53a25a')
+map.put('ding_talk_credentials_ids', [["keyword":"蓝能科技","token":"383391980b120c38f0f9a4a398349739fa67a623f9cfa834df9c5374e81b2081"]]) // 支持多个群通知
 // OSS对象存储访问凭据配置 Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
 map.put('oss_credentials_id', 'f4eb7b7d-b7b2-41f1-9314-ae8a7d9346db')
 

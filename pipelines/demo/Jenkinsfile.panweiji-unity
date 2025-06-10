@@ -6,7 +6,6 @@
  * @description 核心Pipeline代码 针对Unity项目CI/CD的脚本
  * 注意 本文件在Git位置和名称不能随便改动 配置在jenkins里
  */
-// Pipeline需要安装的插件
 
 // 根据不同环境项目配置不同参数
 def map = [:]
@@ -42,6 +41,7 @@ map.put('jdk', '8')
 map.put('ci_git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
 map.put('git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
 map.put('ding_talk_credentials_id', '0d24aab8-f1ec-44eb-8e4f-71de9ecd25d5') // 支持多个群通知 逗号,分割 不要空格
+map.put('ding_talk_credentials_ids', [["keyword":"蓝能科技","token":"383391980b120c38f0f9a4a398349739fa67a623f9cfa834df9c5374e81b2081"]]) // 支持多个群通知
 // OSS对象存储访问凭据配置 Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
 map.put('oss_credentials_id', ' ')
 // 直连方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接

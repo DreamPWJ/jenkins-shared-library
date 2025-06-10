@@ -94,6 +94,7 @@ map.put('jdk', '17')
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
 map.put('git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
 map.put('ding_talk_credentials_id', 'd33ae0ba-e531-41c8-8983-d9734e53a25a')
+map.put('ding_talk_credentials_ids', [["keyword":"蓝能科技","token":"383391980b120c38f0f9a4a398349739fa67a623f9cfa834df9c5374e81b2081"]]) // 支持多个群通知
 // OSS对象存储访问凭据配置 Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
 map.put('oss_credentials_id', ' ')
 // 直连方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接

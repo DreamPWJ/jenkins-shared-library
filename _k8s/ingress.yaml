@@ -34,7 +34,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
 
     # 负载均衡算法 如ip_hash
-    nginx.ingress.kubernetes.io/upstream-hash-by: "$host"
+    # nginx.ingress.kubernetes.io/upstream-hash-by: "$host"
     # Session保持配置
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/affinity-mode: "persistent"

@@ -6,11 +6,6 @@
  * @description 核心Pipeline代码 针对Web前端项目和JAVA等后端项目CI/CD的脚本
  * 注意 本文件在Git位置和名称不能随便改动 配置在jenkins里
  */
-// Pipeline可能需要安装的插件
-// 共享库请先去配置Jenkins系统配置 -> Global Untrusted Pipeline Libraries 注意名称和版本分支分开填写 最终组合如@Library('jenkins-shared-library@master')
-// Pipeline Maven Integration , NodeJS , Pipeline Utility Steps , DingTalk , Docker , Docker Pipeline , Maven Integration, Kubernetes ,
-// Configuration as Code, build user vars, Git Parameter, AnsiColor, Generic Webhook Trigger, Blue Ocean, Gitlab,  HTTP Request, Badge ,
-// Dark Theme, ThinBackup, Role-based Authorization Strategy, HTML Publisher, SSH Pipeline Steps, Extended Choice Parameter, Hidden Parameter, Rebuilder, Active Choices
 
 // 根据不同环境项目配置不同参数
 def map = [:]
@@ -99,6 +94,7 @@ map.put('jdk', '21')
 map.put('ci_git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
 map.put('git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')
 map.put('ding_talk_credentials_id', 'ba0ebec7-73ad-4a26-af8b-d15c470b1328')
+map.put('ding_talk_credentials_ids', [["keyword":"蓝能科技","token":"383391980b120c38f0f9a4a398349739fa67a623f9cfa834df9c5374e81b2081"]]) // 支持多个群通知
 // OSS对象存储访问凭据配置 Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
 map.put('oss_credentials_id', ' ')
 // 直连方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接

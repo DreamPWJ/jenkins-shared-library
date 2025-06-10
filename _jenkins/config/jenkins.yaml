@@ -63,6 +63,18 @@ credentials:
               password: "{AQAAABAAAAAQBGIdVh9bcYHAcfgL7q35+XVzGSBMU2LdMNdMd2k1DeM=}"
               scope: GLOBAL
               username: "root"
+          - file:
+              description: "直连方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接"
+              fileName: "hosts.txt"
+              id: "6a38291d-3484-4499-947f-0759d493e9cc"
+              scope: GLOBAL
+              secretBytes: "{x3LrH6Ak6M8HuQV28r4/6ym+gb3ElAbO3ocEoXTk0TD5i0WMsIW16uWrE3fvukxPZ5/B4PSq6jvthOQ/bZEiBQ==}"
+          - file:
+              description: "maven阿里云私有库settings.xml文件"
+              fileName: "settings-aliyun.xml"
+              id: "18535097-fd28-4a42-96ec-54f281c0ba50"
+              scope: GLOBAL
+              secretBytes: "{ROLqFzlon2kHoztQ0ZpcbWHhJr0scu4UNjM8U5X9IkBKt1r7Ff8+Qif66VQqV4yuGEvSSt8zJ+18Vw5bYAzEAswWHL3mkiWahdwr0K01/yxSqr2MXqQtF70B6W85Sxl4ZuE27xVJQ5ps4Pk5FF3z4FslNO8SF+cSyf5/57VIEgXFlHc3KtHHQjpS2KkmZIaPQAWcnNP0PuGM0qDIf6zr03a3+Ldp4gbZR89IvLbCDtd+Coen/Wgxz46rawguOP5ZPLZ3ulyMYcJ7WlN6u1X0Ta72MFIf7Fy1wD4xScNhKtdXHM68z4AI7RwnLgZZMtJu/6fYg9BCeYeG5Ibee/syik8nJj+MFDhMJyGCjj9HkhgVKuMcuIpvj0y3Edu7OvPZaXRRpLUDy8Y50ADlPQUkmfETHaushrV1kbM2XObpqb/CU+Aa8BnwiMFJRAylmsbWajRETINwqySBEXS+Q2YjVo6h8uujL2XkeD9b/RO8LfINrwkKTyOBMNDlst0VOkNZEKzUB5LoVtbp5t2YpIYE+paYrivaVk68RV3IisnPpxiiwcdsBP+yNXA7oTLOELs9hiGR3JKCR3qJAmcbt9Gne/+hSfMRMas/TQe58LEoEaZ1SKhjBV8Qdwmw5thDHrgufuo7XBNSoXs8JDXAhLFjcCuicKzFfGG/yGqYlYbPfV6cHLWdPmPnPFi2H6qk+qb43AxjWsONZBYlW3miCZK0whyAmjbc/7bzt6n9JsDCWbLB9mUIOXdNENZWBbLaH/LeUPEe85tQabCGyHFguQEUcne7D3Bleuc4vVeujbSx8Rj1X5xzSJ0uJ7wZ/DLhQZqVnQ+RuBUJ/HTIlX0imX1Rg4AaeAXYSI8YXxsmGGWVq7VODgzrW553rTXPDogfY5O7skatNsfLK59t7+Ms1v+kuDH+hK9/EHQe3cHCKYLdcGxwfMoATC8B68WI6meAbGBlgbEJnC+qOTQLrBfQNXQO0ZTY53KjucefYCKVlaHAsoxynIft654bgeqYzNQ6qJsQldKdXwaZWuaQSWjk43rU4SkHkxyxn6mfczfxBXiXOvn2TMGXfrsAzX4nHxQMeG3tSs5064SISZJO3Vt5TDOGCq7qdofSlK2CcdEVIS583imbbpx9XfinsujCiYo6e7CzbSe6KSF6Pphi8fU/OKnKuzgoN99i4YPk9qp1zXhnw+LjzeNuNhG+qklexsNsj6os2PqHwQbRUr88ZRNcng0uRjfbqromTgTxP76WT/olfNly4KIX0N0JcPLTXG0yse9/NcSf0Xywx/dxWUBVy+n/QJETvvpygw81Wcp/iki4582fruzk7jhBKhsXxTTmzt8QXwroUjeUDPA9Q4uS5ctP2cxO2qN8eDJDEUC7R8ZZUIzngSF6girasjQaEiLicQ+iQmooVMOlawC93JWiryJ6O+ymdj3KTtN2pxRTu8RbwR4IUg0LC9M1YLCqKzfv1jxqkwDnHd4kWhnBIw5rzqi5ojcihxM2xR8JATxVXraqSIXrd6oXcRkyx7RQndk7X14U9F6D6YpXMClkToFKvHovP8rLGQiFT3BJstc3PPkt5HIYETgoZJ/1boy+3qWw5PQuXF9KQT49WbxVuR9eO+zzmjWhxKZQsI7PuXl32KZpKaaQXDluygrqaHdSMSJXRv+6tB6xQbDxyQkzEbKfZ5nbC+Q7IdaJY5k0dLTcS2Kt+C4YfzZpkn8TN258pVpLM4s3le13gCiLAioBx28xRLSfgwiGffJkaftNaF2AW629yNWwJebOrF2vi8OYxFybddLM/a2h0mcQPZh6pZfamJBQmMlIvYnrYFwytRlAnacWmKYy5ptF/B0KUlPVeW0KOE7bTVNfIN073kzsKujubnZilSTZx9KzzIji9ebDwm3rwOpeZ9ZOLfhpGZTNPXIAvkpct4ytV1qF3h40QsOy2fmwrEqWNYKJhdEw/633VxhtaroPhfFWPcgVlZ4Ss2JC+Ec9dGJt4gMhOgMuYd0YsD2DPT6NbhBAFuBU6Omrn15NDoMVN22He8qQAnKaLzGPFYzLWcoK4S+tjUb7T4Np2yK4/Uh8jo4d6Vx8TdK54vj4JLPP1+rcnYdekMuMOcX7ZNtKXJGue92CGBoHMS8OQgB8cXKsKUBR6wyUfYWkB07l/k7ArrkeBCP+lFAHI/f+Shu7Nggn2zArsXCWqNg8byGvSCPfoq0quLgStPxSpPLZ9pQUU3p0VICEIHYyevTWEEzfIf3I4zU8E0Dvo1Wh/U4ClYclgj/DdoLa41p64LI+VOhZHSwaC1SY+zuN6R4upIzdwFDpLUFVeoDQoI2sTEkRp8E3hMF3wlwFZnQTq5Ns8xJX+//P0KXJmAYBVK7KmgTZpW8SjzS800uS99jsOru2erDVHBX0o6Hsbqc+DckVX6xDm3JJeerCDrZZoFwL6uFghpJ8ZJjwSwLQju9o2qNwaOwO5GWijD6MU40wSrywXVj69ir6Hrz/6VV14+OhyQ2y0Hsd1+AudUYWp5vGxYSLoc65IakGZlrM7UJxlthKQrimsRk+G+1S3+pFRIFMUPay7IdYBqEWcmRVjaG8oxeMW0jAeMH2rvNPeR+QlxA6K7h+L0iV0xqLiUODHVKDIhmVjmuTn0OnTaWA84fJWUkEwFVxPKMRzKFwwM3kJEZ0wd7VR5Nok28j6WVrEVEvFuGn9k0nU+uq4WNqGweYbzUBRqgqPP+SMb0zzDks/QfZ8ZRNc2W1ul00KZEO6xhGLaQYxM3+XWGppfdMHqXwr3btR9LkD92VwEih3CXd6LEFDksc8rRLfw8+aFAQnZ0NU0UdzigbfKGPdElHB3Y+P1iBbWBYj7SJGh9Io8IS8Wg9nOdOG2hMMQ8vqpJpRyWIEfz7X/tNlw6loTDjqJHGNvepp7gTUELgr/auxoG/onCMhsjHYFlcPMKptXz28fVDN9FkwS0xDcKbDHXU6lNVoYPnN943vBuZT5h9nOsfGf/15fCoX1NF2d69vTNsWEIUmRxAF8ELWQmNF7t1Re7ZrofcaNki2duNLI2PgC+3XuQWbzFbOvX+NMOvLjeY8ZLm1yoqrz9VMqPfvEaCe3SuDVeu34IkTm8A+fgpsH07+AdV6r+tzWEJWdAnrIDMcwOg6ZvM4gvLUXsCcKkWONxbfDnGiltlZIUTyqRv2Lp8tuEGUziPA/BB7ndPQf5LyofBa/ubNyYHQcPZba2k/L4oEDyG7kOtJsPIHBifdgraDrYi9EXVqBE0wP0+O9ZP178CZlXNVy2AVJN9SKw2zllouS00B+trIOOOatq8Cb70hA3o+tOJb1ZzItZxK0kGprtKonRTUFAwF+tOvv+873MYvJZTgygr0rubnzVVybUmBiQLf1PpnIZZi5dfAfk9hQw5XeIrz4YrDolk3At3bvgQNqXWwxQx8r7N2O0HgO9yz/tgg0lcxPycDg/aboyjrbPuNYah08RwbiRg0ruFgAFYA2slswjByzGzQM4hdltBsMBhhfSmgT/cjAd906eWcn8xjJ2DHe/N3DQCftfmYC+Y+SSpvv3wAcUwSPvqtQqTSCUMZo6T7ADnsgH5sJFXIG3imW6+2TyBvrzjfsMMMb62zW3vFLy+/Jmh3oPNoik+VkmAHMmJLuWCYKzBAv4XqwzGhPCgInACtj/haFNVgCsdM3GuWEh2s07fHT6dyGn+vaVzMarooZybCiUNRa+70uaLDFbvtugKqW1lrTdEfZk7av0ahQIGTLz5HBXdgtiAeME1KXTntywcsAJ0jUPB5N3qXi6CzA6+5cI8mh7/aiOSNI34IhMwjvajGIGwsZXzT6eU3geKDMC7i2ym7in3imainNj4UJ7WqEEEfEEzppsUh5c980Q/O5xfwQw7J5rTHRjOCepC6o4DbaxhYuGZ0rVjrG/54qWprv2edZvJo6axxROaIYDeUMU00htJx0z6CcMYX8D6bqmhXDkCNyNV4YM3B8mhcpKs+F7QGItitnP0qaxYu6UwyIka1u1eg/cEtn1iPXvmqS2mQMxR62mX/CNzvhdYGkRSzyr/vZdq1HfCJZuZZJupr8knmT2iRawrkzmFCRg4RkXzPchwxYhotY/sWOpfCJ4UyWogcCj2HOGv07jSVqSwLIY3HADcG5l+eb5B9SaVWIMZvgs11J2ChM5SU1RYDzTosesgwKVi7AyabWsEXGNHkA6H8tGz3+nh0KtPF+tEXdnceOYvb9x2tFSeADfsbhTw/yX+I2UhtfvWhHwWfSE1AYDtu/mjpSPKaF4QfpSSvxaoWkVUZh6TTA/bpgBtWDwqi3NQaDM25d3OYIpn+hSD1SBX8LOZX6TORgAQzdqpc3sBY2UNOUsJXbX8R+r8A3kPIuaBQQoa00TLKyFY1c/oZbcpXeQ7qsLUuyOOZEueDswuCSpYtgj63ma/T30ZW++wpWY81YZAoajbsUM1QaKv1usN6CH5BXieraHiJvRY80KqkzXQUx3Q+ucDiyzX0Jbtn74eQ1/Wrf/IcHPMSKcgvJkXBsBZngETdclixbEHU8KfzkC6JsO6l8l6qC/dSi1anBG1spcFrL8NrklLpmIT9SdA/HvYQe1vUNsdFVQpwN5TQiwMqwFkqbckLF3pM8rp9pY3+FzjVgBblZ19c86CKqOUgDF1FtKFh2nij19uZGw2mpEafj6iF+lzE+bKM087vI3mCIIMR2E/UqzsedJZbgyNGgUWRgpUM0pBdKh2mbD6u/1S6vOFsZUO4Pe7SouR1RK/qKQ6jPFkymtw8xRUbaoX8y0VF5OFq4ZIx4mdDChqN86BlP5qt0ATOmhwQCi1TLqrRuLRYILzj3czBEazPnaBiC22GZD7PlCUwKJXNqRE5nGGbOt7PTynVJW6JOpSmFcKAoegsdvIGoLJmu1/dCv4xxzvm/ieqyN+ehBS4DQnh4RRJPzQqPsbyEtVIH/C7RMBuyP+VRWn4j0+yCmy/+XYF7uZ+y03V63NwseajYll1T0qJcSrtVk22BFgGqNi9GRHoqV8GvQoQI1OjBhoZUdzAxStc7kPLnhqzsJXAN88Swn/QpJw8qqf5ssPbANT0wNAnDlRayhs3s514flCG0KmBTaHLLCack3F4yiNS8c6FTvYgpBhYrtmt2+TkOGKw+75J6UcCts5GDhBrkdWarHP4JiwheKWL3K24m30FXEKFEB7NtPScL22y5P4L8j4P+taTX6xeRDYOkkR1+hQz2wHmefSPpBfUT3QeGCKSjegLneROuUE0iBOxlDjk/Vm2UEzOVWzVThHMC2Ho41IZgqS5O+5nmnRIK4lF3yZRVQeMjjsu9lKPVlowG3qEMk1v/dTXJVESFsR/xmoX0+zJ46IjFPNy+p+KjLzMmhlvL/zSckietxRICBvf44x0gvR9OJISwN+H44ITRDV/nOgeh+rJLnlPIsDvnUvN/jxpXnf+qRSVn0HaVKOVzb4IZgTsBxHzgf/nhG0Rdkj3VQ5qRIYvVsEkWyCR27CRaaE+ODoL6gaCXYmo2bVcTC7ptQOZtSu9pCxE9I122svHDGro+AldQRXN79aFQdUWX1PRUCSzpuXZUEH/WGqGV28sNTpjd2cGcNFVankdnNBxfoDr34lkxgBjC87cc0kfqXgIl7P58v5M+6abvHjDLA3yjW9QFBU+kMtiH6s2jLokw==}"
 jenkins:
   authorizationStrategy:
     loggedInUsersCanDoAnything:
@@ -89,7 +101,6 @@ jenkins:
     rawHtml:
       disableSyntaxHighlighting: false
   mode: NORMAL
-  myViewsTabBar: "standard"
   nodeMonitors:
     - "architecture"
     - "clock"
@@ -165,18 +176,22 @@ jenkins:
             - "userCommunityProperty"
             - mailer:
                 emailAddress: "406798106@qq.com"
+            - myView:
+                viewsTabBar: "standard"
             - preferredProvider:
                 providerId: "default"
             - "consoleUrlProvider"
             - theme:
                 theme: "noOp"
             - "favorite"
+            - "viewsTabBar"
             - "experimentalFlags"
         - id: "liuxuewen"
           name: "刘学文"
           properties:
             - "apiToken"
-            - "myView"
+            - myView:
+                viewsTabBar: "standard"
             - "experimentalFlags"
             - theme:
                 theme: "noOp"
@@ -187,6 +202,7 @@ jenkins:
             - "favorite"
             - preferredProvider:
                 providerId: "default"
+            - "viewsTabBar"
         - id: "liuyuecheng"
           name: "刘月成"
           properties:
@@ -194,10 +210,13 @@ jenkins:
             - "userCommunityProperty"
             - mailer:
                 emailAddress: "406798106@qq.com"
+            - myView:
+                viewsTabBar: "standard"
             - preferredProvider:
                 providerId: "default"
             - "experimentalFlags"
             - "consoleUrlProvider"
+            - "viewsTabBar"
             - "favorite"
             - theme:
                 theme: "noOp"
@@ -209,11 +228,14 @@ jenkins:
             - "consoleUrlProvider"
             - mailer:
                 emailAddress: "1979229786@qq.com"
+            - myView:
+                viewsTabBar: "standard"
             - preferredProvider:
                 providerId: "default"
             - theme:
                 theme: "noOp"
             - "experimentalFlags"
+            - "viewsTabBar"
             - "favorite"
         - id: "renzhongbin"
           name: "任仲滨"
@@ -221,13 +243,15 @@ jenkins:
             - "apiToken"
             - "userCommunityProperty"
             - "consoleUrlProvider"
-            - "myView"
+            - myView:
+                viewsTabBar: "standard"
             - preferredProvider:
                 providerId: "default"
             - "timezone"
             - "experimentalFlags"
             - mailer:
                 emailAddress: "406798106@qq.com"
+            - "viewsTabBar"
             - "favorite"
             - theme:
                 theme: "noOp"
@@ -235,7 +259,8 @@ jenkins:
           name: "商天翔"
           properties:
             - "apiToken"
-            - "myView"
+            - myView:
+                viewsTabBar: "standard"
             - "experimentalFlags"
             - theme:
                 theme: "noOp"
@@ -246,11 +271,13 @@ jenkins:
             - "favorite"
             - preferredProvider:
                 providerId: "default"
+            - "viewsTabBar"
         - id: "zhangkai"
           name: "张凯"
           properties:
             - "apiToken"
-            - "myView"
+            - myView:
+                viewsTabBar: "standard"
             - "experimentalFlags"
             - theme:
                 theme: "noOp"
@@ -261,13 +288,15 @@ jenkins:
             - "favorite"
             - preferredProvider:
                 providerId: "default"
+            - "viewsTabBar"
         - id: "zhangyujian"
           name: "张余键"
           properties:
             - "apiToken"
             - "userCommunityProperty"
             - "consoleUrlProvider"
-            - "myView"
+            - myView:
+                viewsTabBar: "standard"
             - preferredProvider:
                 providerId: "default"
             - theme:
@@ -276,13 +305,15 @@ jenkins:
             - "experimentalFlags"
             - mailer:
                 emailAddress: "406798106@qq.com"
+            - "viewsTabBar"
             - "favorite"
         - id: "zhoufeng"
           name: "周峰"
           properties:
             - "apiToken"
             - "userCommunityProperty"
-            - "myView"
+            - myView:
+                viewsTabBar: "standard"
             - preferredProvider:
                 providerId: "default"
             - "timezone"
@@ -290,6 +321,7 @@ jenkins:
             - mailer:
                 emailAddress: "406798106@qq.com"
             - "consoleUrlProvider"
+            - "viewsTabBar"
             - "favorite"
             - theme:
                 theme: "noOp"
@@ -300,6 +332,8 @@ jenkins:
             - "userCommunityProperty"
             - mailer:
                 emailAddress: "406798106@qq.com"
+            - myView:
+                viewsTabBar: "standard"
             - preferredProvider:
                 providerId: "default"
             - "experimentalFlags"
@@ -307,6 +341,7 @@ jenkins:
             - theme:
                 theme: "noOp"
             - "favorite"
+            - "viewsTabBar"
   slaveAgentPort: 50000
   updateCenter:
     sites:
@@ -328,8 +363,11 @@ jenkins:
           - "htc-epark-h5-prod"
           - "htc-epark-server-prod"
           - "htc-open-epark-server-prod"
+          - "htc-park-card-web-prod"
           - "htc-park-coupon-h5-prod"
           - "htc-pay-server-prod"
+          - "htc-traffic-server-prod"
+          - "htc-traffic-server-web-prod"
           - "htc-video-server-prod"
         name: "1-htc-epark-prod"
     - list:
@@ -349,10 +387,8 @@ jenkins:
           - "jxyb-hci-induction-screen-server-prod"
           - "jxyb-hci-induction-screen-web-prod"
           - "jxyb-hci-open-epark-server-prod"
-          - "jxyb-hci-openpark-saas-app-prod"
           - "jxyb-hci-park-coupon-h5-prod"
           - "jxyb-hci-pay-server-prod"
-          - "jxyb-hci-pellet-charging-app-prod"
           - "jxyb-hci-rsu-controller-prod"
           - "jxyb-hci-video-server-prod"
         name: "2-jxyb-hci-epark-prod "
@@ -375,6 +411,7 @@ jenkins:
           - "htc-open-epark-server-k8s-prod"
           - "htc-park-coupon-h5-k8s-prod"
           - "htc-pay-server-k8s-prod"
+          - "htc-traffic-server-k8s-prod"
           - "htc-video-server-k8s-prod"
           - "usmpay-job-k8s-prod"
         name: "3-htc-epark-k8s-prod 💯"
@@ -404,17 +441,19 @@ jenkins:
           - "lastDuration"
           - "descriptionColumn"
           - "buildButton"
-        description: "澎泊云Saas 2.0生产环境"
+        description: "澎泊云Saas 2.0生产环境 🚀"
         jobNames:
+          - "mini-jump-h5-k8s-prod"
           - "pengbo-park-access-k8s-prod"
           - "pengbo-park-admin-client-k8s-prod"
           - "pengbo-park-admin-client-web-k8s-prod"
           - "pengbo-park-admin-k8s-prod"
           - "pengbo-park-admin-web-k8s-prod"
           - "pengbo-park-app-k8s-prod"
+          - "pengbo-park-h5-k8s-prod"
           - "pengbo-park-job-k8s-prod"
           - "pengbo-park-merchant-web-k8s-prod"
-        name: "4-pengbo-park-k8s-prod"
+        name: "4-pengbo-park-k8s-prod 🚀"
     - list:
         columns:
           - "status"
@@ -446,7 +485,6 @@ jenkins:
           - "floor-lock-app-k8s-prod"
           - "iot-car-lock-app-k8s-prod"
           - "jxyb-hci-floor-lock-app-prod"
-          - "mini-jump-h5-k8s-prod"
         name: "6-floor-lock-prod"
     - all:
         description: "蓝能科技CI/CD全自动构建部署流水线    All in One"
@@ -668,6 +706,8 @@ jenkins:
           - "environment-monitor-k8s-prod"
           - "lanneng-car-wash-server-k8s-prod"
           - "lanneng-car-wash-web-k8s-prod"
+          - "lanneng-park-led-sdk-k8s-prod"
+          - "lanneng-park-led-server-k8s-prod"
           - "lattice-screen-k8s-prod"
           - "object-detect-yolo-k8s-prod"
           - "park-saas-foreign-k8s-prod"
@@ -709,6 +749,7 @@ jenkins:
           - "status"
           - "weather"
           - "jobName"
+          - "gitBranchSpecifierColumn"
           - "lastSuccess"
           - "lastFailure"
           - "lastDuration"
@@ -723,6 +764,7 @@ jenkins:
           - "pengbo-park-admin-test"
           - "pengbo-park-admin-web-test"
           - "pengbo-park-app-test"
+          - "pengbo-park-h5-test"
           - "pengbo-park-job-test"
           - "pengbo-park-merchant-web-test"
         name: "pengbo-saas-v2-test"
@@ -738,6 +780,7 @@ jenkins:
           - "buildButton"
         description: "流水线测试视图"
         jobNames:
+          - "experiment-pipeline"
           - "pengbo-park-app-native-test"
           - "spring-ai-demo-test"
           - "spring-boot3-graalvm-demo"
@@ -786,8 +829,8 @@ globalCredentialsConfiguration:
     typeFilter: "none"
 appearance:
   pipelineGraphView:
-    showGraphOnBuildPage: false
-    showGraphOnJobPage: false
+    showGraphOnBuildPage: true
+    showGraphOnJobPage: true
   prism:
     theme: PRISM
   themeManager:
@@ -890,6 +933,7 @@ unclassified:
     endpoints:
       - bitbucketCloudEndpoint:
           enableCache: false
+          enableHookSignature: false
           manageHooks: false
           repositoriesCacheDuration: 0
           teamCacheDuration: 0
