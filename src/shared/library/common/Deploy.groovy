@@ -196,7 +196,7 @@ class Deploy implements Serializable {
         // 控制完成钉钉通知大家 重要操作默认执行钉钉通知
         // if ("${ctx.params.IS_DING_NOTICE}" == 'true')  // 是否钉钉通知
         DingTalk.noticeMarkDown(ctx, map.ding_talk_credentials_ids,
-                "执行【" + type + "】服务命令 [${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}](${ctx.env.JOB_URL})  👩‍💻 ",
+                "### 执行【" + type + "】服务命令 [${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}](${ctx.env.JOB_URL})  👩‍💻 \n",
                 typeText + "\n  ##### 执行[" + type + "]控制命令完成 ✅  " +
                         "\n  ###### 执行人: ${ctx.BUILD_USER} \n ###### 完成时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
     }

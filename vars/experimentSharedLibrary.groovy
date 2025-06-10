@@ -655,7 +655,7 @@ def futureLab(map) {
         println "token: ${item.token}"
     }
     // 钉钉 HTTP 原生调用
-     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids, "新增钉钉HTTP原生调用 面向未来重构基建", "### 新增通知HTTP原生调用 面向未来重构基建", "18863302302")
+     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids, "新增钉钉HTTP原生调用 面向未来重构基建", "#### 新增通知HTTP原生调用 面向未来重构基建", "18863302302")
 */
 
     // Groovy HTTP 原生调用
