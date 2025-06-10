@@ -13,24 +13,28 @@ import groovy.json.JsonOutput
 class DingTalk implements Serializable {
 
     static def DING_TALK_URL = "https://oapi.dingtalk.com/robot/send?access_token=" // 钉钉通知请求地址
-    static def DING_TALK_KEY_WORD = "蓝能科技"   // 钉钉通知关键字
+    static def DING_TALK_KEY_WORD = "潘维吉"   // 默认钉钉通知关键字
 
     /**
      * Markdown类型通知
      * 不基于插件实现 直接使用http交互更灵活
      * 文档: https://open.dingtalk.com/document/robots/custom-robot-access
      */
-    static def noticeMarkdown(ctx, accessTokens, title, content, mobile = "") {
+    static def noticeMarkdown(ctx, credentialsIds, title, content, mobile = "") {
         // 支持多钉钉群同时通知
-        accessTokens.trim().split(",").each { accessToken ->
-            def url = "${DING_TALK_URL}${accessToken}"
-            if (mobile != "") {
+        credentialsIds.each { item ->
+            def url = "${DING_TALK_URL}${item.token}"
+            def keyword = item.keyword
+            if (keyword == null || keyword == "") {
+                keyword = DING_TALK_KEY_WORD
+            }
+            if (mobile != "") { // @通知 内容里必须包含通知的手机号
                 content = content + "@" + mobile
             }
             def json = [
                     "msgtype" : "markdown",
                     "markdown": [
-                            "title": "${title}-${DING_TALK_KEY_WORD}",
+                            "title": "${title}-${keyword}",
                             "text" : "${content}"
                     ],
                     "at"      : [

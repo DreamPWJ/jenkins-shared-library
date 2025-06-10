@@ -2292,7 +2292,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                     } catch (e) {
                     }
 
-                    DingTalk.noticeMarkdown(this, "383391980b120c38f0f9a4a398349739fa67a623f9cfa834df9c5374e81b2081",
+                    DingTalk.noticeMarkdown(this, "${map.ding_talk_credentials_ids}",
                             "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
                             "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉\n" +
                                     "#### 项目: ${PROJECT_NAME}\n" +
