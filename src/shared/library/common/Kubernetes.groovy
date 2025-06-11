@@ -85,7 +85,7 @@ class Kubernetes implements Serializable {
                 // K8S部署验证是否成功
                 verifyDeployment(ctx)
                 // 计算应用部署启动时间
-                ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date())
+                ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date(), "${ctx.K8S_POD_REPLICAS}".toInteger())
             }
         }
     }
@@ -297,7 +297,7 @@ class Kubernetes implements Serializable {
         // 定义 ingress yaml数据
         def ingressJson = [
                 "host": "${ctx.APPLICATION_DOMAIN}",
-                "http": ["paths": [["path": "/v2", "pathType": "Prefix",
+                "http": ["paths": [["path"   : "/v2", "pathType": "Prefix",
                                     "backend": ["service": ["name": "${ctx.FULL_PROJECT_NAME}-service", "port": ["number": ctx.SHELL_HOST_PORT]]]]],
                 ],
         ]
@@ -307,7 +307,7 @@ class Kubernetes implements Serializable {
 
         // 基于 kubectl patch 动态更新方案（无需重建）
         // 新增 host 规则 /spec/rules/- yaml路径数组最后一个新增
-        ctx.sh " kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "add", "path": "/spec/rules/-", "value": "${ingressJson}"}]' "
+        ctx.sh " kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{" op ": " add ", " path ": " / spec / rules / -", " value ": " $ { ingressJson } "}]' "
 
         // 查看yaml数组
         // kubectl get ingress my-ingress -n ${k8sNameSpace} -o jsonpath='{.spec.rules}'

@@ -114,8 +114,8 @@ class Utils implements Serializable {
     /**
      * 获取时间差 并且格式化
      */
-    static def getTimeDiff(start, end) {
-        def totalSeconds = ((end.getTime() - start.getTime()) / 1000) as int
+    static def getTimeDiff(start, end, multiple = 1) {
+        def totalSeconds = ((end.getTime() - start.getTime()) / 1000 / multiple) as int
         if (totalSeconds == 0) {
             totalSeconds = (totalSeconds + 1) // 防止出现0s情况
         }
@@ -124,7 +124,7 @@ class Utils implements Serializable {
         if (totalSeconds < 60) {
             return totalSeconds + "s"
         } else {
-            return minutes + "min" + seconds + "s"
+            return minutes + "m" + seconds + "s"
         }
     }
 
