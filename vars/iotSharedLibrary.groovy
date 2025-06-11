@@ -905,7 +905,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
     if ("${params.IS_DING_NOTICE}" == 'true') { // 是否钉钉通知
         println("钉钉通知: " + params.NOTIFIER_PHONES)
         // 格式化持续时间
-        def durationTimeString = "${currentBuild.durationString.replace(' and counting', '').replace('sec', 's')}".replace(' ', '')
+        def durationTimeString = "${currentBuild.durationString.replace(' and counting', '').replace('min', 'm').replace('sec', 's')}".replace(' ', '')
         def notifierPhone = params.NOTIFIER_PHONES.split("-")[1].trim()
         if (notifierPhone == "oneself") { // 通知自己
             notifierPhone = "${BUILD_USER_MOBILE}"

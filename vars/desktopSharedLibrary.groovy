@@ -957,7 +957,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
         }
         // 支持多个钉钉群通知
         dingTalkIds.each { dingId ->
-            def durationTimeString = "${currentBuild.durationString.replace(' and counting', '').replace('sec', 's')}".replace(' ', '')
+            def durationTimeString = "${currentBuild.durationString.replace(' and counting', '').replace('min', 'm').replace('sec', 's')}".replace(' ', '')
             if (type == 0) { // 失败
                 dingtalk(
                         robot: "${dingId}",

@@ -933,7 +933,7 @@ def alwaysPost() {
 def dingNotice(int type, msg = '', atMobiles = '') {
     if ("${params.IS_DING_NOTICE}" == 'true') { // 是否钉钉通知
         println("钉钉通知: " + params.NOTIFIER_PHONES)
-        def durationTimeString = "${currentBuild.durationString.replace(' and counting', '').replace('sec', 's')}".replace(' ', '')
+        def durationTimeString = "${currentBuild.durationString.replace(' and counting', '').replace('min', 'm').replace('sec', 's')}".replace(' ', '')
         def codeUrl = "" // 二维码url
         def buildTypeMsg = ""  // 构建版本类型
         def buildNoticeMsg = "" // 构建版本类型提示信息
