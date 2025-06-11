@@ -854,6 +854,9 @@ security:
     approvedScriptHashes:
       - "SHA512:3f205299bef2fe3329258a42f2c60d332cc35ccb41a3ca0512d7869c6aff4561ff708c48123b4f7c3dec33ccca30d54fb8b9b51b5bc7070f96236d11a3f0bdcb"
     forceSandbox: false
+  updateSiteWarningsConfiguration:
+    ignoredWarnings:
+      - "SECURITY-3353"
 unclassified:
   ansiColorBuildWrapper:
     colorMaps:
@@ -929,14 +932,6 @@ unclassified:
         whiteB: "#D3D7CF"
         yellow: "#C4A000"
         yellowB: "#C4A000"
-  bitbucketEndpointConfiguration:
-    endpoints:
-      - bitbucketCloudEndpoint:
-          enableCache: false
-          enableHookSignature: false
-          manageHooks: false
-          repositoriesCacheDuration: 0
-          teamCacheDuration: 0
   buildDiscarders:
     configuredBuildDiscarders:
       - "jobBuildDiscarder"

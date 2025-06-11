@@ -1,5 +1,4 @@
 ansicolor:1.0.6
-ant:513.vde9e7b_a_0da_0f
 antisamy-markup-formatter:173.v680e3a_b_69ff3
 apache-httpcomponents-client-4-api:4.5.14-269.vfa_2321039a_83
 apache-httpcomponents-client-5-api:5.5-150.veb_76e719855b_
@@ -14,7 +13,6 @@ build-user-vars-plugin:195.v8c35f9d5c3dc
 caffeine-api:3.2.0-166.v72a_6d74b_870f
 checks-api:370.vb_61a_c57328f3
 cloud-stats:377.vd8a_6c953e98e
-cloudbees-bitbucket-branch-source:936.4.0
 cloudbees-folder:6.1023.v4fcb_72152519
 command-launcher:123.v37cfdc92ef67
 commons-compress-api:1.27.1-3
@@ -65,7 +63,6 @@ javax-activation-api:1.2.0-8
 javax-mail-api:1.6.2-11
 jaxb:2.3.9-133.vb_ec76a_73f706
 jdk-tool:83.v417146707a_3d
-jenkins-design-language:1.27.20
 jersey2-api:2.45-154.v4ded3dc34f81
 jjwt-api:0.11.5-120.v0268cf544b_89
 jnr-posix-api:3.1.20-138.vdb_9db_a_39182f
@@ -81,7 +78,6 @@ kubernetes-credentials:192.v4d5b_1c429d17
 ldap:780.vcb_33c9a_e4332
 localization-support:1.3
 localization-zh-cn:371.v23851f835d6b_
-lockable-resources:1349.v8b_ccb_c5487f7
 mailer:489.vd4b_25144138f
 matrix-auth:3.2.6
 matrix-project:849.v0cd64ed7e531
@@ -89,7 +85,6 @@ maven-plugin:3.26
 metrics:4.2.32-476.v5042e1c1edd7
 mina-sshd-api-common:2.15.0-161.vb_200831a_c15b_
 mina-sshd-api-core:2.15.0-161.vb_200831a_c15b_
-nodejs:1.6.4
 okhttp-api:4.11.0-189.v976fa_d3379d6
 oss-symbols-api:324.v432cce4172ca_
 pam-auth:1.12
@@ -117,7 +112,6 @@ resource-disposer:0.25
 role-strategy:777.v4fe2599cb_f48
 scm-api:704.v3ce5c542825a_
 script-security:1373.vb_b_4a_a_c26fa_00
-simple-theme-plugin:211.v5424a_5510e47
 snakeyaml-api:2.3-125.v4d77857a_b_402
 sse-gateway:1.28
 ssh-credentials:355.v9b_e5b_cde5003
@@ -141,4 +135,4 @@ workflow-scm-step:437.v05a_f66b_e5ef8
 workflow-step-api:700.v6e45cb_a_5a_a_21
 workflow-support:968.v8f17397e87b_8
 ws-cleanup:0.48
-Result: [Plugin:ansicolor, Plugin:ant, Plugin:antisamy-markup-formatter, Plugin:apache-httpcomponents-client-4-api, Plugin:apache-httpcomponents-client-5-api, Plugin:asm-api, Plugin:authentication-tokens, Plugin:badge, Plugin:bootstrap5-api, Plugin:bouncycastle-api, Plugin:branch-api, Plugin:build-timeout, Plugin:build-user-vars-plugin, Plugin:caffeine-api, Plugin:checks-api, Plugin:cloud-stats, Plugin:cloudbees-bitbucket-branch-source, Plugin:cloudbees-folder, Plugin:command-launcher, Plugin:commons-compress-api, Plugin:commons-lang3-api, Plugin:commons-text-api, Plugin:config-file-provider, Plugin:configuration-as-code, Plugin:credentials-binding, Plugin:credentials, Plugin:dark-theme, Plugin:data-tables-api, Plugin:dingding-notifications, Plugin:display-url-api, Plugin:docker-commons, Plugin:docker-java-api, Plugin:docker-plugin, Plugin:docker-workflow, Plugin:durable-task, Plugin:echarts-api, Plugin:eddsa-api, Plugin:email-ext, Plugin:emoji-symbols-api, Plugin:favorite, Plugin:font-awesome-api, Plugin:generic-webhook-trigger, Plugin:git-client, Plugin:git-parameter, Plugin:git-server, Plugin:git, Plugin:github-api, Plugin:github-branch-source, Plugin:github, Plugin:gitlab-api, Plugin:gitlab-oauth, Plugin:gitlab-plugin, Plugin:gradle, Plugin:gson-api, Plugin:h2-api, Plugin:handy-uri-templates-2-api, Plugin:htmlpublisher, Plugin:instance-identity, Plugin:ionicons-api, Plugin:jackson2-api, Plugin:jakarta-activation-api, Plugin:jakarta-mail-api, Plugin:javadoc, Plugin:javax-activation-api, Plugin:javax-mail-api, Plugin:jaxb, Plugin:jdk-tool, Plugin:jenkins-design-language, Plugin:jersey2-api, Plugin:jjwt-api, Plugin:jnr-posix-api, Plugin:joda-time-api, Plugin:jquery3-api, Plugin:jsch, Plugin:json-api, Plugin:json-path-api, Plugin:jsoup, Plugin:junit, Plugin:kubernetes-client-api, Plugin:kubernetes-credentials, Plugin:ldap, Plugin:localization-support, Plugin:localization-zh-cn, Plugin:lockable-resources, Plugin:mailer, Plugin:matrix-auth, Plugin:matrix-project, Plugin:maven-plugin, Plugin:metrics, Plugin:mina-sshd-api-common, Plugin:mina-sshd-api-core, Plugin:nodejs, Plugin:okhttp-api, Plugin:oss-symbols-api, Plugin:pam-auth, Plugin:pipeline-build-step, Plugin:pipeline-github-lib, Plugin:pipeline-graph-analysis, Plugin:pipeline-graph-view, Plugin:pipeline-groovy-lib, Plugin:pipeline-input-step, Plugin:pipeline-maven-api, Plugin:pipeline-maven, Plugin:pipeline-milestone-step, Plugin:pipeline-model-api, Plugin:pipeline-model-definition, Plugin:pipeline-model-extensions, Plugin:pipeline-rest-api, Plugin:pipeline-stage-step, Plugin:pipeline-stage-tags-metadata, Plugin:pipeline-utility-steps, Plugin:plain-credentials, Plugin:plugin-util-api, Plugin:prism-api, Plugin:pubsub-light, Plugin:resource-disposer, Plugin:role-strategy, Plugin:scm-api, Plugin:script-security, Plugin:simple-theme-plugin, Plugin:snakeyaml-api, Plugin:sse-gateway, Plugin:ssh-credentials, Plugin:ssh-slaves, Plugin:sshd, Plugin:structs, Plugin:theme-manager, Plugin:thinBackup, Plugin:timestamper, Plugin:token-macro, Plugin:trilead-api, Plugin:variant, Plugin:workflow-aggregator, Plugin:workflow-api, Plugin:workflow-basic-steps, Plugin:workflow-cps, Plugin:workflow-durable-task-step, Plugin:workflow-job, Plugin:workflow-multibranch, Plugin:workflow-scm-step, Plugin:workflow-step-api, Plugin:workflow-support, Plugin:ws-cleanup]
+Result: [Plugin:ansicolor, Plugin:antisamy-markup-formatter, Plugin:apache-httpcomponents-client-4-api, Plugin:apache-httpcomponents-client-5-api, Plugin:asm-api, Plugin:authentication-tokens, Plugin:badge, Plugin:bootstrap5-api, Plugin:bouncycastle-api, Plugin:branch-api, Plugin:build-timeout, Plugin:build-user-vars-plugin, Plugin:caffeine-api, Plugin:checks-api, Plugin:cloud-stats, Plugin:cloudbees-folder, Plugin:command-launcher, Plugin:commons-compress-api, Plugin:commons-lang3-api, Plugin:commons-text-api, Plugin:config-file-provider, Plugin:configuration-as-code, Plugin:credentials-binding, Plugin:credentials, Plugin:dark-theme, Plugin:data-tables-api, Plugin:dingding-notifications, Plugin:display-url-api, Plugin:docker-commons, Plugin:docker-java-api, Plugin:docker-plugin, Plugin:docker-workflow, Plugin:durable-task, Plugin:echarts-api, Plugin:eddsa-api, Plugin:email-ext, Plugin:emoji-symbols-api, Plugin:favorite, Plugin:font-awesome-api, Plugin:generic-webhook-trigger, Plugin:git-client, Plugin:git-parameter, Plugin:git-server, Plugin:git, Plugin:github-api, Plugin:github-branch-source, Plugin:github, Plugin:gitlab-api, Plugin:gitlab-oauth, Plugin:gitlab-plugin, Plugin:gradle, Plugin:gson-api, Plugin:h2-api, Plugin:handy-uri-templates-2-api, Plugin:htmlpublisher, Plugin:instance-identity, Plugin:ionicons-api, Plugin:jackson2-api, Plugin:jakarta-activation-api, Plugin:jakarta-mail-api, Plugin:javadoc, Plugin:javax-activation-api, Plugin:javax-mail-api, Plugin:jaxb, Plugin:jdk-tool, Plugin:jersey2-api, Plugin:jjwt-api, Plugin:jnr-posix-api, Plugin:joda-time-api, Plugin:jquery3-api, Plugin:jsch, Plugin:json-api, Plugin:json-path-api, Plugin:jsoup, Plugin:junit, Plugin:kubernetes-client-api, Plugin:kubernetes-credentials, Plugin:ldap, Plugin:localization-support, Plugin:localization-zh-cn, Plugin:mailer, Plugin:matrix-auth, Plugin:matrix-project, Plugin:maven-plugin, Plugin:metrics, Plugin:mina-sshd-api-common, Plugin:mina-sshd-api-core, Plugin:okhttp-api, Plugin:oss-symbols-api, Plugin:pam-auth, Plugin:pipeline-build-step, Plugin:pipeline-github-lib, Plugin:pipeline-graph-analysis, Plugin:pipeline-graph-view, Plugin:pipeline-groovy-lib, Plugin:pipeline-input-step, Plugin:pipeline-maven-api, Plugin:pipeline-maven, Plugin:pipeline-milestone-step, Plugin:pipeline-model-api, Plugin:pipeline-model-definition, Plugin:pipeline-model-extensions, Plugin:pipeline-rest-api, Plugin:pipeline-stage-step, Plugin:pipeline-stage-tags-metadata, Plugin:pipeline-utility-steps, Plugin:plain-credentials, Plugin:plugin-util-api, Plugin:prism-api, Plugin:pubsub-light, Plugin:resource-disposer, Plugin:role-strategy, Plugin:scm-api, Plugin:script-security, Plugin:snakeyaml-api, Plugin:sse-gateway, Plugin:ssh-credentials, Plugin:ssh-slaves, Plugin:sshd, Plugin:structs, Plugin:theme-manager, Plugin:thinBackup, Plugin:timestamper, Plugin:token-macro, Plugin:trilead-api, Plugin:variant, Plugin:workflow-aggregator, Plugin:workflow-api, Plugin:workflow-basic-steps, Plugin:workflow-cps, Plugin:workflow-durable-task-step, Plugin:workflow-job, Plugin:workflow-multibranch, Plugin:workflow-scm-step, Plugin:workflow-step-api, Plugin:workflow-support, Plugin:ws-cleanup]
