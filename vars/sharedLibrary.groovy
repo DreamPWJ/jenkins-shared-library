@@ -1082,7 +1082,7 @@ def getUserInfo() {
                 // BUILD_USER_EMAIL = env.BUILD_USER_EMAIL
                 // 获取钉钉插件手机号 注意需要系统设置里in-process script approval允许权限
                 def user = hudson.model.User.getById(env.BUILD_USER_ID, false).getProperty(io.jenkins.plugins.DingTalkUserProperty.class)
-                BUILD_USER_MOBILE = user.mobile
+                BUILD_USER_MOBILE = user.mobile  // 用记号用于群@提醒
                 if (user.mobile == null || "${user.mobile}".trim() == "") {
                     BUILD_USER_MOBILE = env.BUILD_USER // 未填写钉钉插件手机号则使用用户名代替显示
                 }
