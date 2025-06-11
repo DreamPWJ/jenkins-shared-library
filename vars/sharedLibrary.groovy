@@ -1082,7 +1082,7 @@ def getUserInfo() {
                 // BUILD_USER_EMAIL = env.BUILD_USER_EMAIL
                 // 获取钉钉插件手机号 注意需要系统设置里in-process script approval允许权限
                 def user = hudson.model.User.getById(env.BUILD_USER_ID, false).getProperty(io.jenkins.plugins.DingTalkUserProperty.class)
-                BUILD_USER_MOBILE = user.mobile
+                BUILD_USER_MOBILE = user.mobile  // 用记号用于群@提醒
                 if (user.mobile == null || "${user.mobile}".trim() == "") {
                     BUILD_USER_MOBILE = env.BUILD_USER // 未填写钉钉插件手机号则使用用户名代替显示
                 }
@@ -2016,12 +2016,12 @@ def alwaysPost() {
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             currentBuild.description = "${IS_GEN_QR_CODE == 'true' ? "<img src=${qrCodeOssUrl} width=250 height=250 > <br/> " : ""}" +
                     "项目: ${PROJECT_NAME}" +
-                    "<br/> 大小: ${buildPackageSize} <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 发布人: ${BUILD_USER}"
+                    " <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 大小: ${buildPackageSize} <br/> 发布人: ${BUILD_USER}"
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
             currentBuild.description =
                     "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉直接下载构建${javaPackageType}包</a>" : ""}" +
                             "项目: ${PROJECT_NAME}" +
-                            "<br/> 环境: ${releaseEnvironment}   大小: ${buildPackageSize} <br/> 分支: ${BRANCH_NAME}  <br/> 发布人: ${BUILD_USER}"
+                            "<br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment}   大小: ${buildPackageSize} <br/> 发布人: ${BUILD_USER}"
         }
         // 构建徽章展示关键信息
         if ("${IS_PROD}" == 'true') {
@@ -2116,7 +2116,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
     if ("${params.IS_DING_NOTICE}" == 'true') { // 是否钉钉通知
         println("钉钉通知: " + params.NOTIFIER_PHONES)
         // 格式化持续时间
-        def durationTimeString = "${currentBuild.durationString.replace(' and counting', '').replace('sec', 's')}".replace(' ', '')
+        def durationTimeString = "${currentBuild.durationString.replace(' and counting', '').replace('min', 'm').replace('sec', 's')}".replace(' ', '')
         def notifierPhone = params.NOTIFIER_PHONES.split("-")[1].trim()
         if (notifierPhone == "oneself") { // 通知自己
             notifierPhone = "${BUILD_USER_MOBILE}"
@@ -2130,7 +2130,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
         }
         def monorepoProjectName = ""
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd && "${IS_MONO_REPO}" == 'true') {
-            monorepoProjectName = "MonoRepo项目: ${PROJECT_NAME}"   // 单体仓库区分项目
+            monorepoProjectName = "MonoRepo项目: ${PROJECT_NAME} \n"   // 单体仓库区分项目
         }
         // Docker部署方式
         def deployType = ""
@@ -2147,7 +2147,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
                 deployType = "部署方式: K8S集群金丝雀发布"
             } else {
-                k8sPodContent = "K8S集群部署Pod节点数: **${K8S_POD_REPLICAS}**个"
+                k8sPodContent = "- K8S集群部署Pod节点数: *${K8S_POD_REPLICAS}* 个 \n"
                 if ("${IS_K8S_AUTO_SCALING}" == "true") {
                     deployType = deployType + "+自动弹性扩缩容"
                 }
@@ -2169,21 +2169,16 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
         try {
             if (type == 0) { // 失败
                 if (!isHealthCheckFail) {
-                    dingtalk(
-                            robot: "${DING_TALK_CREDENTIALS_ID}",
-                            type: 'MARKDOWN',
-                            title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}流水线失败通知",
-                            text: [
-                                    "### [${env.JOB_NAME}#${env.BUILD_NUMBER}](${env.BUILD_URL}) ${PROJECT_TAG}${envTypeMark}${projectTypeName}项目${msg}",
-                                    "#### 请及时处理 🏃",
-                                    "###### ** 流水线失败原因: [运行日志](${env.BUILD_URL}console) 👈 **",
-                                    "###### Jenkins地址  [查看](${env.JENKINS_URL})   源码地址  [查看](${REPO_URL})",
-                                    "###### 发布环境: ${releaseEnvironment}  持续时间: ${durationTimeString}",
-                                    "###### 发布人: ${BUILD_USER}",
-                                    "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                            ],
-                            at: ["${BUILD_USER_MOBILE}"]
-                    )
+                    DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
+                            "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}流水线失败通知",
+                            "### [${env.JOB_NAME}#${env.BUILD_NUMBER}](${env.BUILD_URL}) ${PROJECT_TAG}${envTypeMark}${projectTypeName}项目${msg} \n" +
+                                    "#### 请及时处理 🏃 \n" +
+                                    "###### ** 流水线失败原因: [运行日志](${env.BUILD_URL}console) 👈 ** \n" +
+                                    "###### 发布环境: ${releaseEnvironment}  持续时间: ${durationTimeString} \n" +
+                                    "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL}) \n" +
+                                    "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS} \n" +
+                                    "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
+                            "${BUILD_USER_MOBILE}")
                 }
             } else if (type == 1 && "${IS_ONLY_NOTICE_CHANGE_LOG}" == 'false') { // 部署完成
                 if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
@@ -2193,83 +2188,66 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                     if ("${qrCodeOssUrl}" == "") {
                         screenshot = ""
                     }
-                    dingtalk(
-                            robot: "${DING_TALK_CREDENTIALS_ID}",
-                            type: 'ACTION_CARD',
-                            title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
-                            text: [
-                                    "${screenshot}",
-                                    "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL})",
-                                    "##### 版本信息",
-                                    "- Nginx Web服务启动${msg}",
-                                    "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
-                                    "- Node版本: ${NODE_VERSION}   包大小: ${buildPackageSize}",
-                                    "${monorepoProjectName}",
-                                    "##### ${deployType}",
-                                    "##### ${k8sPodContent}",
-                                    "###### ${rollbackTag}",
-                                    "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
-                                    "###### 访问URL: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl})",
-                                    "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
-                                    "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
-                                    "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                            ],
-                            btns: [
-                                    [
-                                            title    : "直接访问URL地址",
-                                            actionUrl: "${noticeHealthCheckUrl}"
-                                    ]
-                            ],
-                            at: [isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone)]
-                    )
+
+                    DingTalk.noticeActionCard(this, map.ding_talk_credentials_ids,
+                            "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
+                            "${screenshot} \n" +
+                                    "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL}) \n" +
+                                    "##### Nginx Web服务启动${msg} \n" +
+                                    "${monorepoProjectName}" +
+                                    "##### ${deployType} \n" +
+                                    "###### ${rollbackTag} \n" +
+                                    "##### 详细信息 \n" +
+                                    "- 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString} \n" +
+                                    "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment} \n" +
+                                    "- Node版本: ${NODE_VERSION}   包大小: ${buildPackageSize} \n" +
+                                    "${k8sPodContent}" +
+                                    "- 访问URL: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl}) \n" +
+                                    "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL}) \n" +
+                                    "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS} \n" +
+                                    "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
+                            "访问Web服务",
+                            "${noticeHealthCheckUrl}",
+                            isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone))
                 } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
                     def javaInfo = ""
                     if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-                        javaInfo = "构建版本: JDK${JDK_VERSION}   包大小: ${buildPackageSize}"
+                        javaInfo = "- 构建版本: JDK${JDK_VERSION}   包大小: ${buildPackageSize} \n"
                         if ("${javaOssUrl}".trim() != '') {
-                            javaInfo = javaInfo + "\n [直接下载构建${javaPackageType}包](${javaOssUrl})  👈"
+                            javaInfo = javaInfo + "[直接下载构建${javaPackageType}包](${javaOssUrl})  👈 \\n"
                         }
                     }
                     def pythonInfo = ""
                     if ("${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-                        pythonInfo = "运行版本: Python${CUSTOM_PYTHON_VERSION}   包大小: ${buildPackageSize}"
+                        pythonInfo = "- 运行版本: Python${CUSTOM_PYTHON_VERSION}   包大小: ${buildPackageSize} \n"
                     }
-                    dingtalk(
-                            robot: "${DING_TALK_CREDENTIALS_ID}",
-                            type: 'MARKDOWN',
-                            title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
-                            text: [
-                                    "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL})",
-                                    "#### · CI构建CD部署完成 👌",
-                                    "#### · 服务端启动运行${msg}",
-                                    "##### ${deployType}",
-                                    "##### ${k8sPodContent}",
-                                    "###### ${rollbackTag}",
-                                    "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
-                                    "###### 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment}",
-                                    "###### ${javaInfo}",
-                                    "###### ${pythonInfo}",
-                                    "###### API地址: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl})",
-                                    "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
-                                    "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
-                                    "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                            ],
-                            at: [isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone)]
-                    )
+
+                    DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
+                            "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
+                            "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL}) \n" +
+                                    "#### CI/CD部署启动${msg} \n" +
+                                    "##### ${deployType} \n" +
+                                    "###### ${rollbackTag} \n" +
+                                    "##### 详细信息 \n" +
+                                    "- 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString} \n" +
+                                    "- 构建分支: ${BRANCH_NAME}   环境: ${releaseEnvironment} \n" +
+                                    "${javaInfo}" +
+                                    "${pythonInfo}" +
+                                    "${k8sPodContent}" +
+                                    "- API地址: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl}) \n" +
+                                    "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL}) \n" +
+                                    "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS} \n" +
+                                    "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
+                            isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone))
                 }
             } else if (type == 2 && "${IS_ONLY_NOTICE_CHANGE_LOG}" == 'false') { // 部署之前
-                dingtalk(
-                        robot: "${DING_TALK_CREDENTIALS_ID}",
-                        type: 'MARKDOWN',
-                        title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署前通知",
-                        text: [
-                                "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${envTypeMark}${projectTypeName}](${env.JOB_URL})",
-                                "#### ${PROJECT_TAG}服务部署启动中 🚀  请稍等...  ☕",
-                                "###### 发布人: ${BUILD_USER}",
-                                "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
-                        ],
-                        at: []
-                )
+                DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
+                        "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署前通知",
+                        "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${envTypeMark}${projectTypeName}](${env.JOB_URL}) \n" +
+                                "#### ${PROJECT_TAG}服务部署启动中 🚀  请稍等...  ☕ \n" +
+                                "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS} \n" +
+                                "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
+                        "")
             } else if (type == 3) { // 变更记录 有些场景精简提醒只推送发布日志消
                 def gitChangeLog = ""
                 if ("${Constants.DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESCRIPTION) {
@@ -2294,12 +2272,12 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
 
                     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
                             "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
-                            "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉\n" +
-                                    "#### 项目: ${PROJECT_NAME}\n" +
-                                    "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}**\n" +
-                                    "${gitChangeLog}\n" +
-                                    ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看\n" +
-                                    "###### 发布人: ${BUILD_USER}\n" +
+                            "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉 \n" +
+                                    "#### 项目: ${PROJECT_NAME} \n" +
+                                    "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}** \n" +
+                                    "${gitChangeLog} \n" +
+                                    ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看 \n" +
+                                    "###### 发布人: ${BUILD_USER} \n" +
                                     "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
                             "")
                 }

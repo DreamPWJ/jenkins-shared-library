@@ -454,22 +454,9 @@ jenkins:
           - "pengbo-park-job-k8s-prod"
           - "pengbo-park-merchant-web-k8s-prod"
         name: "4-pengbo-park-k8s-prod 🚀"
-    - list:
-        columns:
-          - "status"
-          - "weather"
-          - "jobName"
-          - "lastSuccess"
-          - "lastFailure"
-          - "lastDuration"
-          - "descriptionColumn"
-          - "buildButton"
-        description: "颗粒计费K8S集群"
-        jobNames:
-          - "pellet-charging-app-k8s-prod"
-          - "pellet-charging-job-k8s-prod"
-          - "pellet-charging-web-k8s-prod"
-        name: "5-pellet-charging-prod"
+    - all:
+        description: "蓝能科技CI/CD全自动构建部署流水线    All in One"
+        name: "all"
     - list:
         columns:
           - "status"
@@ -485,10 +472,7 @@ jenkins:
           - "floor-lock-app-k8s-prod"
           - "iot-car-lock-app-k8s-prod"
           - "jxyb-hci-floor-lock-app-prod"
-        name: "6-floor-lock-prod"
-    - all:
-        description: "蓝能科技CI/CD全自动构建部署流水线    All in One"
-        name: "all"
+        name: "floor-lock-prod"
     - list:
         columns:
           - "status"
@@ -729,6 +713,22 @@ jenkins:
           - "park-saas-app-test"
           - "park-saas-web-test"
         name: "park-saas-test"
+    - list:
+        columns:
+          - "status"
+          - "weather"
+          - "jobName"
+          - "lastSuccess"
+          - "lastFailure"
+          - "lastDuration"
+          - "descriptionColumn"
+          - "buildButton"
+        description: "颗粒计费K8S集群"
+        jobNames:
+          - "pellet-charging-app-k8s-prod"
+          - "pellet-charging-job-k8s-prod"
+          - "pellet-charging-web-k8s-prod"
+        name: "pellet-charging-prod"
     - list:
         columns:
           - "status"
@@ -1012,9 +1012,6 @@ unclassified:
     operations:
       - "abortOperation"
     overwriteable: false
-  httpRequestGlobalConfig:
-    formAuthentications:
-      - keyName: "sonar-admin-user"
   injectionConfig:
     allowUntrusted: false
     checkForBuildAgentErrors: false

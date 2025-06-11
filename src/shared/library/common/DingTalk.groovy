@@ -17,7 +17,7 @@ class DingTalk implements Serializable {
 
     /**
      * Markdown类型通知
-     * 直接使用http交互更灵活 不再基于插件实现
+     * 直接使用http交互更灵活 不再基于封装的插件实现
      * 文档: https://open.dingtalk.com/document/robots/custom-robot-access
      */
     static def noticeMarkDown(ctx, credentialsIds, title, content, mobile = "") {
@@ -50,9 +50,9 @@ class DingTalk implements Serializable {
     }
 
     /**
-     * ActionCard整体跳转样式类型通知
+     * ActionCard独立跳转样式类型通知
      */
-    static def noticeActionCard(ctx, credentialsIds, title, content, mobile = "") {
+    static def noticeActionCard(ctx, credentialsIds, title, content, btnTitle, btnUrl, mobile = "") {
         // 支持多钉钉群同时通知
         credentialsIds.each { item ->
             def url = "${DING_TALK_URL}${item.token}"
@@ -64,14 +64,19 @@ class DingTalk implements Serializable {
                 content = content + "@" + mobile
             }
             def json = [
-                    "msgtype"     : "action_card",
-                    "markdown"    : [
-                            "title": "${title}-${keyword}",
-                            "text" : "${content}"
+                    "msgtype"   : "actionCard",
+                    "actionCard": [
+                            "title"         : "${title}-${keyword}",
+                            "text"          : "${content}",
+                            "btnOrientation": "0",
+                            "btns"          : [
+                                    [
+                                            "title"    : btnTitle,
+                                            "actionURL": btnUrl
+                                    ],
+                            ]
                     ],
-                    "single_title": "查看详情",
-                    "single_url"  : "https://open.dingtalk.com",
-                    "at"          : [
+                    "at"        : [
                             "atMobiles": [
                                     "${mobile}"
                             ],

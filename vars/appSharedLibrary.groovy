@@ -1864,7 +1864,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
 
         // 支持多个钉钉群通知
         dingTalkIds.each { dingId ->
-            def durationTimeString = "${currentBuild.durationString.replace(' and counting', '').replace('sec', 's')}".replace(' ', '')
+            def durationTimeString = "${currentBuild.durationString.replace(' and counting', '').replace('min', 'm').replace('sec', 's')}".replace(' ', '')
             def notifierPhone = params.NOTIFIER_PHONES.split("-")[1].trim()
             if (notifierPhone == "oneself") { // 通知自己
                 notifierPhone = "${BUILD_USER_MOBILE}"

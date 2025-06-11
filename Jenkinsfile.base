@@ -8,9 +8,9 @@
  */
 // Pipeline可能需要安装的插件
 // 共享库请先去配置Jenkins系统配置 -> Global Untrusted Pipeline Libraries 注意名称和版本分支分开填写 最终组合如@Library('jenkins-shared-library@master')
-// Pipeline Utility Steps , Docker , Docker Pipeline , Pipeline Graph View ,
-// Configuration as Code, build user vars, Git Parameter, AnsiColor, Generic Webhook Trigger, Badge ,
-// Dark Theme, ThinBackup, Role-based Authorization Strategy, HTML Publisher
+// Pipeline Graph View , Pipeline Utility Steps , Docker , Docker Pipeline , Badge ,
+// Configuration as Code, build user vars, Git Parameter, AnsiColor, Generic Webhook Trigger,
+// Dark Theme, ThinBackup, Role-based Authorization Strategy, HTML Publisher, DingTalk
 
 // 根据不同环境项目配置不同参数
 def map = [:]
