@@ -2265,7 +2265,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
 
                     try {
                         if ("${tagVersion}") {
-                            titlePrefix = "${PROJECT_TAG} ${tagVersion}"
+                            titlePrefix = "${PROJECT_TAG} **${tagVersion}**"
                         }
                     } catch (e) {
                     }
@@ -2274,7 +2274,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
                             "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉 \n" +
                                     "#### 项目: ${PROJECT_NAME} \n" +
-                                    "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}** \n" +
+                                    "#### 环境: *${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}* \n" +
                                     "${gitChangeLog} \n" +
                                     ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看 \n" +
                                     "###### 发布人: ${BUILD_USER} \n" +
