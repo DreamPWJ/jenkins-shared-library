@@ -86,6 +86,7 @@ jenkins:
   disabledAdministrativeMonitors:
     - "jenkins.monitor.JavaVersionRecommendationAdminMonitor-17-2026-03-31-WARNING"
     - "jenkins.monitor.JavaVersionRecommendationAdminMonitor-11-2024-09-30-WARNING"
+    - "OldData"
     - "hudson.util.DoubleLaunchChecker"
     - "jenkins.security.ResourceDomainRecommendation"
     - "jenkins.monitor.JavaVersionRecommendationAdminMonitor-11-2024-09-30-DANGER"
