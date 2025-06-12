@@ -651,18 +651,13 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
+    JenkinsCI.getCurrentBuildParent(this)
+
     addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
     sleep 5
     addBadge(id: "version-badge", text: "2.35.16", color: 'green', cssClass: 'badge-text--background')
     addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
     removeBadges(id: "launch-badge")
-
-    // 获取当前项目的描述信息
-    def job = currentBuild.getRawBuild().getParent()
-    def description = job.description ?: "无描述信息"
-    // 打印job对象
-    echo "当前项目: " + JsonOutput.toJson(job)
-    echo "当前项目描述: ${description}"
 
     /*
     def array = map.ding_talk_credentials_ids
