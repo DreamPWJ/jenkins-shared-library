@@ -658,6 +658,7 @@ def futureLab(map) {
     // 获取当前项目的描述信息
     def job = currentBuild.getRawBuild().getParent()
     def description = job.description ?: "无描述信息"
+    echo "当前项目: ${job}"
     echo "当前项目描述: ${description}"
 
     /*
