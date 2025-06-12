@@ -33,8 +33,7 @@ class Kubernetes implements Serializable {
                 // kubectl命令Windows下配置到环境变量Path中 路径为kubectl.exe所在的文件夹目录 不包括exe文件
                 // 下载集群的配置文件，复制到本地计算机的 $HOME/.kube/config（kubectl的默认路径）
                 // 2. 若您之前配置过KUBECONFIG环境变量，kubectl会优先加载KUBECONFIG环境变量包括文件路径，而不是$HOME/.kube/config，使用时请注意
-                // ctx.println("k8s集群访问配置：${ctx.KUBECONFIG}")
-                // ctx.sh "kubectl version"
+                // ctx.println("k8s集群访问配置：${ctx.KUBECONFIG}")  ctx.sh "kubectl version"
 
                 ctx.println("开始部署Kubernetes云原生应用 🏗️ ")
 
@@ -48,7 +47,8 @@ class Kubernetes implements Serializable {
 
                 ctx.println("K8S集群执行部署命令完成 ✅")
 
-                afterDeployRun(ctx, map, deployNum) // 部署命令执行后的各种处理
+                // 部署命令执行后的各种处理
+                afterDeployRun(ctx, map, deployNum)
 
             }
         }
@@ -323,7 +323,7 @@ class Kubernetes implements Serializable {
             deployHPA(ctx, map, deployNum)
         }
 
-        if (!"${ctx.IS_CANARY_DEPLOY}" == 'true') {
+        if ("${ctx.IS_CANARY_DEPLOY}" != 'true') {
             // 全量部署同时删除上次canary灰度部署服务
             ctx.sh "kubectl delete deployment ${canaryDeploymentName} --ignore-not-found || true"
         }
