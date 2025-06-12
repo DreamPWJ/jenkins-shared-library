@@ -664,11 +664,11 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
-    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
+/*    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
     sleep 5
     addBadge(id: "version-badge", text: "2.100.10", color: 'green', cssClass: 'badge-text--background')
     addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
-    removeBadges(id: "launch-badge")
+    removeBadges(id: "launch-badge")*/
 
     // JenkinsCI.getCurrentBuildParent(this)
 
@@ -708,7 +708,7 @@ def futureLab(map) {
         // sh "helm version"
     }*/
 
-/*    def nodeVersion = "${"Node20".replace('Node', '')}"
+    def nodeVersion = "${"Node24".replace('Node', '')}"
     def dockerImageName = "panweiji/node-build"
     def dockerImageTag = "${nodeVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
@@ -717,8 +717,8 @@ def futureLab(map) {
         sh "npm -v"
         sh "yarn --version"
         sh "pnpm --version"
-        // sh "playwright --version"
-    }*/
+        sh "playwright --version"
+    }
 
 
 /*
