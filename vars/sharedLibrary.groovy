@@ -1117,7 +1117,7 @@ def pullProjectCode() {
         }
         // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
         // println "${git}"
-        sh "git --version"  // 使用git 2.0以上的高级版本  否则有兼容性问题
+        // sh "git --version"  // 使用git 2.0以上的高级版本  否则有兼容性问题
         // sh "which git"
         // https仓库下载报错处理 The certificate issuer's certificate has expired.  Check your system date and time.
         sh "git config --global http.sslVerify false || true"
@@ -1140,6 +1140,7 @@ def pullProjectCode() {
                   userRemoteConfigs                : [[credentialsId: "${GIT_CREDENTIALS_ID}", url: "${REPO_URL}"]]
         ])
     }
+
     // 是否存在CI代码
     dir("${env.WORKSPACE}/ci") {
         existCiCode()
@@ -1155,7 +1156,6 @@ def pullProjectCode() {
  */
 def pullCIRepo() {
     // 同步部署脚本和配置文件等
-    sh ' mkdir -p ci && chmod -R 777 ci'
     dir("${env.WORKSPACE}/ci") {
         def reg = ~/^\*\// // 正则匹配去掉*/字符
         // 根据jenkins配置的scm分支 获取相应分支下脚本和配置 支持多分支构建
@@ -1877,7 +1877,7 @@ def syncScript() {
  * 是否存在CI代码
  */
 def existCiCode() {
-    if (!fileExists(".ci/Dockerfile")) {
+    if (!fileExists(".ci")) {
         // println "为保证先后顺序拉取代码 可能导致第一次构建时候无法找到CI仓库代码 重新拉取代码"
         pullCIRepo()
     }
