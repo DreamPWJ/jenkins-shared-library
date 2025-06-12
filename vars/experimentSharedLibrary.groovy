@@ -708,7 +708,7 @@ def futureLab(map) {
         // sh "helm version"
     }*/
 
-    def nodeVersion = "${"Node24".replace('Node', '')}"
+/*    def nodeVersion = "${"Node24".replace('Node', '')}"
     def dockerImageName = "panweiji/node-build"
     def dockerImageTag = "${nodeVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
@@ -717,8 +717,8 @@ def futureLab(map) {
         sh "npm -v"
         sh "yarn --version"
         sh "pnpm --version"
-        sh "playwright --version"
-    }
+       // sh "playwright --version"
+    }*/
 
 
 /*
