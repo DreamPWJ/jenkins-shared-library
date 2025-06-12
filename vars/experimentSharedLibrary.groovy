@@ -168,9 +168,24 @@ def call(String type = 'experiment', Map map) {
                             initInfo()
                             getShellParams(map)
                             getUserInfo()
-                            // 按顺序执行代码
-                            pullProjectCode()
-                            pullCIRepo()
+                        }
+                    }
+                }
+
+                stage('获取代码') {
+                    when {
+                        beforeAgent true
+                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                    }
+                    steps {
+                        script {
+                            parallel( // 步骤内并发执行
+                                    'CI/CD代码': {
+                                        pullCIRepo()
+                                    },
+                                    '项目代码': {
+                                        pullProjectCode()
+                                    })
                         }
                     }
                 }
