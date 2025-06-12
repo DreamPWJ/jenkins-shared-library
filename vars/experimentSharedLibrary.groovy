@@ -1,4 +1,5 @@
 #!groovy
+import groovy.json.JsonOutput
 import shared.library.GlobalVars
 import shared.library.Utils
 import shared.library.common.*
@@ -658,7 +659,8 @@ def futureLab(map) {
     // 获取当前项目的描述信息
     def job = currentBuild.getRawBuild().getParent()
     def description = job.description ?: "无描述信息"
-    echo "当前项目: ${job}"
+    // 打印job对象
+    echo "当前项目: " + JsonOutput.toJson(job)
     echo "当前项目描述: ${description}"
 
     /*
