@@ -2027,7 +2027,7 @@ def alwaysPost() {
         if ("${IS_PROD}" == 'true') {
             addBadge(id: "version-badge", text: "${tagVersion}", color: 'green', cssClass: 'badge-text--background')
         } else {
-            addBadge(id: "env-badge", text: "${releaseEnvironment}".toUpperCase(), cssClass: 'badge-text--background')
+            addBadge(id: "env-badge", text: "${releaseEnvironment}".toUpperCase(), color: 'blue', cssClass: 'badge-text--background')
         }
         addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: "${noticeHealthCheckUrl}", target: '_blank')
         removeBadges(id: "launch-badge")
