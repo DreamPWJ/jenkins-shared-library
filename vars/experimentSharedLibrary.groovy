@@ -649,13 +649,13 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
-    JenkinsCI.getCurrentBuildParent(this)
-
     addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
     sleep 5
-    addBadge(id: "version-badge", text: "2.123.345", color: 'green', cssClass: 'badge-text--background')
+    addBadge(id: "version-badge", text: "2.100.10", color: 'green', cssClass: 'badge-text--background')
     addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
     removeBadges(id: "launch-badge")
+
+    // JenkinsCI.getCurrentBuildParent(this)
 
     /*
     def array = map.ding_talk_credentials_ids
