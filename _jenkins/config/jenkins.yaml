@@ -455,6 +455,29 @@ jenkins:
           - "pengbo-park-job-k8s-prod"
           - "pengbo-park-merchant-web-k8s-prod"
         name: "4-pengbo-park-k8s-prod 🚀"
+    - list:
+        columns:
+          - "status"
+          - "weather"
+          - "jobName"
+          - "lastSuccess"
+          - "lastFailure"
+          - "lastDuration"
+          - "descriptionColumn"
+          - "buildButton"
+        description: "蓝能洗车生产环境"
+        jobNames:
+          - "environment-monitor-k8s-prod"
+          - "lanneng-car-wash-server-k8s-prod"
+          - "lanneng-car-wash-web-k8s-prod"
+          - "lanneng-park-led-sdk-k8s-prod"
+          - "lanneng-park-led-server-k8s-prod"
+          - "lattice-screen-k8s-prod"
+          - "object-detect-yolo-k8s-prod"
+          - "park-saas-foreign-k8s-prod"
+          - "rsu-controller-admin-web-k8s-prod"
+          - "rsu-controller-k8s-prod"
+        name: "5-lanneng-python-k8s-prod 🐍"
     - all:
         description: "蓝能科技CI/CD全自动构建部署流水线    All in One"
         name: "all"
@@ -686,29 +709,6 @@ jenkins:
           - "lastDuration"
           - "descriptionColumn"
           - "buildButton"
-        description: "蓝能洗车生产环境"
-        jobNames:
-          - "environment-monitor-k8s-prod"
-          - "lanneng-car-wash-server-k8s-prod"
-          - "lanneng-car-wash-web-k8s-prod"
-          - "lanneng-park-led-sdk-k8s-prod"
-          - "lanneng-park-led-server-k8s-prod"
-          - "lattice-screen-k8s-prod"
-          - "object-detect-yolo-k8s-prod"
-          - "park-saas-foreign-k8s-prod"
-          - "rsu-controller-admin-web-k8s-prod"
-          - "rsu-controller-k8s-prod"
-        name: "lanneng-python-k8s-prod 🐍"
-    - list:
-        columns:
-          - "status"
-          - "weather"
-          - "jobName"
-          - "lastSuccess"
-          - "lastFailure"
-          - "lastDuration"
-          - "descriptionColumn"
-          - "buildButton"
         description: "停车Saas测试环境"
         jobNames:
           - "park-saas-app-test"
@@ -832,6 +832,8 @@ appearance:
   pipelineGraphView:
     showGraphOnBuildPage: true
     showGraphOnJobPage: true
+    showStageDurations: true
+    showStageNames: true
   prism:
     theme: PRISM
   themeManager:
@@ -1026,8 +1028,6 @@ unclassified:
     charset: "UTF-8"
     useSsl: false
     useTls: false
-  mavenModuleSet:
-    localRepository: "default"
   pollSCM:
     pollingThreadCount: 10
   scmGit:
@@ -1096,11 +1096,3 @@ tool:
   mavenGlobalConfig:
     globalSettingsProvider: "standard"
     settingsProvider: "standard"
-  pipelineMaven:
-    daoClass: "org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginNullDao"
-    globalTraceability: false
-    triggerDownstreamUponResultAborted: false
-    triggerDownstreamUponResultFailure: false
-    triggerDownstreamUponResultNotBuilt: false
-    triggerDownstreamUponResultSuccess: true
-    triggerDownstreamUponResultUnstable: false
