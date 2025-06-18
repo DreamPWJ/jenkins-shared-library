@@ -1641,9 +1641,9 @@ def integrationTesting(map) {
         // 创建冒烟测试报告
         Tests.createSmokeReport(this)
 
-        // 结合YApi或者Apifox接口管理做自动化API测试
-        // sh " npm install -g apifox-cli "
-        // sh " apifox run --access-token "
+        // 结合YApi或者ApiFox接口管理做自动化API测试
+        ApiFox.autoTest(this)
+
         def yapiUrl = "http://yapi.panweiji.com"
         def testUrl = "${yapiUrl}/api/open/run_auto_test?${AUTO_TEST_PARAM}"
         // 执行接口测试
