@@ -1,5 +1,7 @@
 package shared.library.common
 
+import groovy.json.JsonOutput
+
 /**
  * @author 潘维吉
  * @date 2021/8/10 13:22
@@ -23,6 +25,18 @@ class JenkinsCI implements Serializable {
             }
         }
         return changedFiles
+    }
+
+    /**
+     * 获取当前job信息
+     */
+    @NonCPS
+    static def getCurrentBuildParent(ctx) {
+        // 获取当前项目的描述信息
+        def job = ctx.currentBuild.getRawBuild().getParent()
+        def description = job.description ?: "无描述信息"
+        ctx.echo "当前项目描述: ${description}"
+        return job
     }
 
     /**

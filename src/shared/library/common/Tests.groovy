@@ -38,6 +38,13 @@ class Tests implements Serializable {
     }
 
     /**
+     * 安全测试报告
+     */
+    static def createSecurityReport(ctx) {
+
+    }
+
+    /**
      * PostMan自动化API测试
      */
     static def runPostman(ctx) {

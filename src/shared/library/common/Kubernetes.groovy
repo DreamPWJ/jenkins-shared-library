@@ -18,6 +18,7 @@ class Kubernetes implements Serializable {
     static def k8sYamlFile = "k8s.yaml" // k8s集群应用部署yaml定义文件
     static def pythonYamlFile = "k8s_yaml.py" // 使用Python动态处理Yaml文件
     static def k8sNameSpace = "default" // k8s默认命名空间
+    static def canaryDeploymentName = "" // 灰度发布部署名称
 
     /**
      * 声明式执行k8s集群部署
@@ -32,8 +33,7 @@ class Kubernetes implements Serializable {
                 // kubectl命令Windows下配置到环境变量Path中 路径为kubectl.exe所在的文件夹目录 不包括exe文件
                 // 下载集群的配置文件，复制到本地计算机的 $HOME/.kube/config（kubectl的默认路径）
                 // 2. 若您之前配置过KUBECONFIG环境变量，kubectl会优先加载KUBECONFIG环境变量包括文件路径，而不是$HOME/.kube/config，使用时请注意
-                // ctx.println("k8s集群访问配置：${ctx.KUBECONFIG}")
-                // ctx.sh "kubectl version"
+                // ctx.println("k8s集群访问配置：${ctx.KUBECONFIG}")  ctx.sh "kubectl version"
 
                 ctx.println("开始部署Kubernetes云原生应用 🏗️ ")
 
@@ -45,47 +45,11 @@ class Kubernetes implements Serializable {
                     kubectl apply -f ${k8sYamlFile}
                     """
 
-                // 查看个组件的状态  如 kubectl get svc
-                // kubectl get pod || true
-                ctx.sh """ 
-                    kubectl top pod || true
-                    kubectl top nodes || true
-                    """
+                ctx.println("K8S集群执行部署命令完成 ✅")
 
-                // 七层负载和灰度发布配置部署ingress
-                // ingressNginxDeploy(ctx, map)
+                // 部署命令执行后的各种处理
+                afterDeployRun(ctx, map, deployNum)
 
-                // 部署Pod弹性水平扩缩容 可基于QPS自动伸缩  只需要初始化一次 定时任务没做分布式处理情况不建议扩缩容
-                if ("${ctx.IS_CANARY_DEPLOY}" != 'true' && "${ctx.IS_K8S_AUTO_SCALING}" == 'true') {
-                    deployHPA(ctx, map, deployNum)
-                }
-
-                // 删除服务
-                // ctx.sh "kubectl delete -f ${k8sYamlFile}"
-                // kubectl 停止删除pod 默认等待30秒  删除deployment 命令kubectl delete deployment  删除所有 kubectl delete pods --all  --force
-                // kubectl delete pod podName
-                // 查看详细信息   kubectl describe pod podName
-
-                // 查看命名空间下pod在哪些node节点运行
-                // ctx.sh "kubectl get pod -n ${k8sNameSpace} -o wide"
-                // 查看pod节点当前的节点资源占用情况
-                // ctx.sh "kubectl top pod"
-                // 查看node节点当前的节点资源占用情况
-                // ctx.sh "kubectl top nodes"
-
-                // K8S健康检查 K8S默认有健康探测策略  k8s.yaml文件实现
-                // healthDetection(ctx)
-
-                // K8S运行容器方式使用Docker容器时 删除无效镜像 减少磁盘占用  K8S默认有容器清理策略 无需手动处理
-                // cleanDockerImages(ctx)
-
-                ctx.println("K8S集群执行部署完成 ✅")
-
-                def k8sStartTime = new Date()
-                // K8S部署验证是否成功
-                verifyDeployment(ctx)
-                // 计算应用部署启动时间
-                ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date(), "${ctx.K8S_POD_REPLICAS}".toInteger())
             }
         }
     }
@@ -140,6 +104,7 @@ class Kubernetes implements Serializable {
 
         // 灰度发布  金丝雀发布  A/B测试
         def canaryFlag = "canary"
+        canaryDeploymentName = appName + "-" + canaryFlag + "-deployment"
         if ("${ctx.IS_CANARY_DEPLOY}" == 'true') {
             // 只发布一个新的pod服务用于验证服务, 老服务不变, 验证完成后取消灰度发布, 重新发布全量服务
             appName += "-" + canaryFlag
@@ -149,10 +114,6 @@ class Kubernetes implements Serializable {
 /*          def oldDeploymentName = appName + "-deployment"
             def newK8sPodReplicas = Integer.parseInt(k8sPodReplicas) - 1
             ctx.sh "kubectl scale deployment ${oldDeploymentName} --replicas=${newK8sPodReplicas} || true"   */
-        } else {
-            // 全量部署同时删除上次canary灰度部署服务
-            def deploymentName = appName + "-" + canaryFlag + "-deployment"
-            ctx.sh "kubectl delete deployment ${deploymentName} --ignore-not-found || true"
         }
 
         ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
@@ -224,13 +185,18 @@ class Kubernetes implements Serializable {
 
             def yamlName = "hpa.yaml"
             // 如果cpu或内存达到限额百分之多少 进行自动扩容
-            def cpuHPA = Integer.parseInt("${map.docker_limit_cpu}".replace("m", "")) * 0.8 + "m"
+            def cpuHPAValue = 0.8 // CPU使用多少百分比扩缩容
+            def memoryHPAValue = 0.9 // 内存使用多少百分比扩缩容
+            def defaultHPANum = 1  // 默认扩容个数 加或乘 合理设置 防止资源不足
+
+            def cpuHPA = Integer.parseInt("${map.docker_limit_cpu}".replace("m", "")) * cpuHPAValue + "m"
             // 内存值不支持小数  转成成为M数据
             def memoryUnit = "${map.docker_memory}".contains("G") ? "G" : "M"
-            def memoryHPA = Math.floor(Integer.parseInt("${map.docker_memory}".replace(memoryUnit, "")) * 0.9 * 1024) + "M"
+            def memoryHPA = Math.floor(Integer.parseInt("${map.docker_memory}".replace(memoryUnit, "")) * memoryHPAValue * 1024) + "M"
             def k8sPodReplicas = "${ctx.K8S_POD_REPLICAS}"
             // 最大扩容数量设置为基础pod节点的倍数 默认为2倍或者+1 避免过多扩容节点导致资源耗尽
-            def maxK8sPodReplicas = Integer.parseInt(k8sPodReplicas) + 1 // * 2
+            def maxK8sPodReplicas = Integer.parseInt(k8sPodReplicas) + defaultHPANum // * 2
+
             // 不同配置环境的相同应用 或者 定时任务在应用代码内无分布式处理机制情况
             if ("${ctx.IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${ctx.SOURCE_TARGET_CONFIG_DIR}".trim() != "") {
                 if (deployNum != 0) { // 第二次以后环境部署
@@ -240,6 +206,7 @@ class Kubernetes implements Serializable {
                     maxK8sPodReplicas = 1
                 }
             }
+
             def k8sVersion = getK8sVersion(ctx)
             def hpaApiVersion = "v2" // 默认使用新的稳定版本
             if (Utils.compareVersions(k8sVersion, "1.23.0") == -1) { // k8s低版本 使用低版本api
@@ -331,12 +298,45 @@ class Kubernetes implements Serializable {
     }
 
     /**
-     * k8s方式实现蓝绿部署
+     * K8S方式实现蓝绿部署
      */
     static def blueGreenDeploy(ctx, map) {
         // 蓝绿发布是为新版本创建一个与老版本完全一致的生产环境，在不影响老版本的前提下，按照一定的规则把部分流量切换到新版本，
         // 当新版本试运行一段时间没有问题后，将用户的全量流量从老版本迁移至新版本。
         ctx.sh " "
+    }
+
+    /**
+     *  K8S部署后执行的脚本
+     */
+    static def afterDeployRun(ctx, map, deployNum) {
+
+        // 查看个组件的状态  如 kubectl get svc
+        // kubectl get pod || true
+        ctx.sh """ 
+                    kubectl top pod || true
+                    kubectl top nodes || true
+                    """
+
+        // 部署Pod弹性水平扩缩容 可基于QPS自动伸缩  只需要初始化一次 定时任务没做分布式处理情况不建议扩缩容
+        if ("${ctx.IS_CANARY_DEPLOY}" != 'true' && "${ctx.IS_K8S_AUTO_SCALING}" == 'true') {
+            deployHPA(ctx, map, deployNum)
+        }
+
+        if ("${ctx.IS_CANARY_DEPLOY}" != 'true') {
+            // 全量部署同时删除上次canary灰度部署服务
+            ctx.sh "kubectl delete deployment ${canaryDeploymentName} --ignore-not-found || true"
+        }
+
+        // 七层负载和灰度发布配置部署ingress
+        // ingressNginxDeploy(ctx, map)
+
+        def k8sStartTime = new Date()
+        // K8S部署验证是否成功
+        verifyDeployment(ctx)
+        // 计算应用部署启动时间
+        ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date(), "${ctx.K8S_POD_REPLICAS}".toInteger())
+
     }
 
     /**
@@ -348,7 +348,7 @@ class Kubernetes implements Serializable {
         def deploymentName = "${ctx.FULL_PROJECT_NAME}" // labels.app标签值
         def namespace = k8sNameSpace
         def k8sPodReplicas = Integer.parseInt(ctx.K8S_POD_REPLICAS) // 部署pod数
-        ctx.sleep 3 // 等待检测  需要等待容器镜像下载如Pending状态等  可以先判断容器下载完成后再执行下面的检测
+        ctx.sleep 2 // 等待检测  需要等待容器镜像下载如Pending状态等  可以先判断容器下载完成后再执行下面的检测
         // 等待所有Pod达到Ready状态
         ctx.timeout(time: 10, unit: 'MINUTES') { // 设置超时时间
             def podsAreReady = false

@@ -802,7 +802,7 @@ def otaUpgrade(map) {
  * 是否存在CI代码
  */
 def existCiCode() {
-    if (!fileExists(".ci/Dockerfile")) {
+    if (!fileExists(".ci")) {
         // println "为保证先后顺序拉取代码 可能导致第一次构建时候无法找到CI仓库代码 重新拉取代码"
         pullCIRepo()
     }

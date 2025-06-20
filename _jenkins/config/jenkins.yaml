@@ -86,6 +86,7 @@ jenkins:
   disabledAdministrativeMonitors:
     - "jenkins.monitor.JavaVersionRecommendationAdminMonitor-17-2026-03-31-WARNING"
     - "jenkins.monitor.JavaVersionRecommendationAdminMonitor-11-2024-09-30-WARNING"
+    - "OldData"
     - "hudson.util.DoubleLaunchChecker"
     - "jenkins.security.ResourceDomainRecommendation"
     - "jenkins.monitor.JavaVersionRecommendationAdminMonitor-11-2024-09-30-DANGER"
@@ -151,13 +152,13 @@ jenkins:
               locations:
                 - home: "/usr/bin/git"
                   key: "hudson.plugins.git.GitTool$DescriptorImpl@Default"
-        numExecutors: 2
+        numExecutors: 3
         remoteFS: "/my/jenkins"
         retentionStrategy: "always"
   numExecutors: 2
   primaryView:
     all:
-      description: "蓝能科技CI/CD全自动构建部署流水线    All in One"
+      description: "蓝能科技CI/CD全自动化构建部署流水线    All in One"
       name: "all"
   projectNamingStrategy: "standard"
   quietPeriod: 1
@@ -358,18 +359,19 @@ jenkins:
           - "lastDuration"
           - "descriptionColumn"
           - "buildButton"
-        description: "日照好停车生产服务器"
+        description: "澎泊云Saas 2.0生产环境 🚀"
         jobNames:
-          - "htc-epark-h5-prod"
-          - "htc-epark-server-prod"
-          - "htc-open-epark-server-prod"
-          - "htc-park-card-web-prod"
-          - "htc-park-coupon-h5-prod"
-          - "htc-pay-server-prod"
-          - "htc-traffic-server-prod"
-          - "htc-traffic-server-web-prod"
-          - "htc-video-server-prod"
-        name: "1-htc-epark-prod"
+          - "mini-jump-h5-k8s-prod"
+          - "pengbo-park-access-k8s-prod"
+          - "pengbo-park-admin-client-k8s-prod"
+          - "pengbo-park-admin-client-web-k8s-prod"
+          - "pengbo-park-admin-k8s-prod"
+          - "pengbo-park-admin-web-k8s-prod"
+          - "pengbo-park-app-k8s-prod"
+          - "pengbo-park-h5-k8s-prod"
+          - "pengbo-park-job-k8s-prod"
+          - "pengbo-park-merchant-web-k8s-prod"
+        name: "1-pengbo-park-k8s-prod 🚀"
     - list:
         columns:
           - "status"
@@ -380,18 +382,12 @@ jenkins:
           - "lastDuration"
           - "descriptionColumn"
           - "buildButton"
-        description: "莒县云泊科技停车超融合生产环境"
+        description: "停车场Saas平台生产环境"
         jobNames:
-          - "jxyb-hci-epark-h5-prod"
-          - "jxyb-hci-epark-server-prod"
-          - "jxyb-hci-induction-screen-server-prod"
-          - "jxyb-hci-induction-screen-web-prod"
-          - "jxyb-hci-open-epark-server-prod"
-          - "jxyb-hci-park-coupon-h5-prod"
-          - "jxyb-hci-pay-server-prod"
-          - "jxyb-hci-rsu-controller-prod"
-          - "jxyb-hci-video-server-prod"
-        name: "2-jxyb-hci-epark-prod "
+          - "openpark-saas-app-k8s-prod"
+          - "openpark-saas-job-k8s-prod"
+          - "openpark-saas-web-k8s-prod"
+        name: "2-openpark-saas-k8s-prod 🔥"
     - list:
         columns:
           - "status"
@@ -414,7 +410,7 @@ jenkins:
           - "htc-traffic-server-k8s-prod"
           - "htc-video-server-k8s-prod"
           - "usmpay-job-k8s-prod"
-        name: "3-htc-epark-k8s-prod 💯"
+        name: "3-htc-epark-k8s-prod "
     - list:
         columns:
           - "status"
@@ -425,12 +421,18 @@ jenkins:
           - "lastDuration"
           - "descriptionColumn"
           - "buildButton"
-        description: "停车场Saas平台生产环境"
+        description: "日照好停车生产服务器"
         jobNames:
-          - "openpark-saas-app-k8s-prod"
-          - "openpark-saas-job-k8s-prod"
-          - "openpark-saas-web-k8s-prod"
-        name: "3-openpark-saas-prod 🔥"
+          - "htc-epark-h5-prod"
+          - "htc-epark-server-prod"
+          - "htc-open-epark-server-prod"
+          - "htc-park-card-web-prod"
+          - "htc-park-coupon-h5-prod"
+          - "htc-pay-server-prod"
+          - "htc-traffic-server-prod"
+          - "htc-traffic-server-web-prod"
+          - "htc-video-server-prod"
+        name: "3-htc-epark-prod"
     - list:
         columns:
           - "status"
@@ -441,21 +443,98 @@ jenkins:
           - "lastDuration"
           - "descriptionColumn"
           - "buildButton"
-        description: "澎泊云Saas 2.0生产环境 🚀"
+        description: "莒县云泊科技停车超融合生产环境"
         jobNames:
-          - "mini-jump-h5-k8s-prod"
-          - "pengbo-park-access-k8s-prod"
-          - "pengbo-park-admin-client-k8s-prod"
-          - "pengbo-park-admin-client-web-k8s-prod"
-          - "pengbo-park-admin-k8s-prod"
-          - "pengbo-park-admin-web-k8s-prod"
-          - "pengbo-park-app-k8s-prod"
-          - "pengbo-park-h5-k8s-prod"
-          - "pengbo-park-job-k8s-prod"
-          - "pengbo-park-merchant-web-k8s-prod"
-        name: "4-pengbo-park-k8s-prod 🚀"
+          - "jxyb-hci-epark-h5-prod"
+          - "jxyb-hci-epark-server-prod"
+          - "jxyb-hci-induction-screen-server-prod"
+          - "jxyb-hci-induction-screen-web-prod"
+          - "jxyb-hci-open-epark-server-prod"
+          - "jxyb-hci-park-coupon-h5-prod"
+          - "jxyb-hci-pay-server-prod"
+          - "jxyb-hci-rsu-controller-prod"
+          - "jxyb-hci-video-server-prod"
+        name: "4-jxyb-hci-epark-prod "
+    - list:
+        columns:
+          - "status"
+          - "weather"
+          - "jobName"
+          - "lastSuccess"
+          - "lastFailure"
+          - "lastDuration"
+          - "descriptionColumn"
+          - "buildButton"
+        description: "蓝能洗车生产环境"
+        jobNames:
+          - "environment-monitor-k8s-prod"
+          - "lanneng-car-wash-server-k8s-prod"
+          - "lanneng-car-wash-web-k8s-prod"
+          - "lanneng-park-led-sdk-k8s-prod"
+          - "lanneng-park-led-server-k8s-prod"
+          - "lattice-screen-k8s-prod"
+          - "object-detect-yolo-k8s-prod"
+          - "park-saas-foreign-k8s-prod"
+          - "rsu-controller-admin-web-k8s-prod"
+          - "rsu-controller-k8s-prod"
+        name: "6-lanneng-python-k8s-prod 🐍"
+    - list:
+        columns:
+          - "status"
+          - "weather"
+          - "jobName"
+          - "lastSuccess"
+          - "lastFailure"
+          - "lastDuration"
+          - "descriptionColumn"
+          - "buildButton"
+          - "favoriteColumn"
+        description: "AI人工智能项目"
+        jobNames:
+          - "city-watch-park-ai-prod"
+          - "city-watch-park-ai-server-prod"
+          - "lanneng-park-ai-k8s-prod"
+          - "lanneng-park-ai-server-k8s-prod"
+        name: "7-lanneng-ai-k8s-prod"
+    - list:
+        columns:
+          - "status"
+          - "weather"
+          - "jobName"
+          - "lastSuccess"
+          - "lastFailure"
+          - "lastDuration"
+          - "descriptionColumn"
+          - "buildButton"
+        description: "日照市城管局智慧停车平台生产环境"
+        jobNames:
+          - "city-watch-admin-prod"
+          - "city-watch-admin-web-prod"
+          - "city-watch-app-prod"
+          - "city-watch-h5-prod"
+          - "city-watch-oauth2-prod"
+          - "city-watch-vision-web-prod"
+        name: "8-rizhao-city-park-prod"
+    - list:
+        columns:
+          - "status"
+          - "weather"
+          - "jobName"
+          - "lastSuccess"
+          - "lastFailure"
+          - "lastDuration"
+          - "descriptionColumn"
+          - "buildButton"
+        description: "蓝能科技官网与产品官网"
+        jobNames:
+          - "lanneng-bus-k8s-prod"
+          - "lanneng-landing-page-admin-k8s-prod"
+          - "lanneng-landing-page-admin-web-k8s-prod"
+          - "lanneng-landing-page-k8s-prod"
+          - "pdf-js-k8s-prod"
+        name: "9-landing-page-k8s-prod"
     - all:
-        description: "蓝能科技CI/CD全自动构建部署流水线    All in One"
+        description: "蓝能科技CI/CD全自动化构建部署流水线    All in One"
         name: "all"
     - list:
         columns:
@@ -574,42 +653,6 @@ jenkins:
           - "lastDuration"
           - "descriptionColumn"
           - "buildButton"
-        description: "蓝能科技官网与产品官网"
-        jobNames:
-          - "lanneng-bus-k8s-prod"
-          - "lanneng-landing-page-admin-k8s-prod"
-          - "lanneng-landing-page-admin-web-k8s-prod"
-          - "lanneng-landing-page-k8s-prod"
-          - "pdf-js-k8s-prod"
-        name: "landing-page"
-    - list:
-        columns:
-          - "status"
-          - "weather"
-          - "jobName"
-          - "lastSuccess"
-          - "lastFailure"
-          - "lastDuration"
-          - "descriptionColumn"
-          - "buildButton"
-          - "favoriteColumn"
-        description: "AI人工智能项目"
-        jobNames:
-          - "city-watch-park-ai-prod"
-          - "city-watch-park-ai-server-prod"
-          - "lanneng-park-ai-k8s-prod"
-          - "lanneng-park-ai-server-k8s-prod"
-        name: "lanneng-ai"
-    - list:
-        columns:
-          - "status"
-          - "weather"
-          - "jobName"
-          - "lastSuccess"
-          - "lastFailure"
-          - "lastDuration"
-          - "descriptionColumn"
-          - "buildButton"
         description: "蓝能科技APP流水线"
         jobNames:
           - "induction-screen-android-app"
@@ -685,29 +728,6 @@ jenkins:
           - "lastDuration"
           - "descriptionColumn"
           - "buildButton"
-        description: "蓝能洗车生产环境"
-        jobNames:
-          - "environment-monitor-k8s-prod"
-          - "lanneng-car-wash-server-k8s-prod"
-          - "lanneng-car-wash-web-k8s-prod"
-          - "lanneng-park-led-sdk-k8s-prod"
-          - "lanneng-park-led-server-k8s-prod"
-          - "lattice-screen-k8s-prod"
-          - "object-detect-yolo-k8s-prod"
-          - "park-saas-foreign-k8s-prod"
-          - "rsu-controller-admin-web-k8s-prod"
-          - "rsu-controller-k8s-prod"
-        name: "lanneng-python-k8s-prod 🐍"
-    - list:
-        columns:
-          - "status"
-          - "weather"
-          - "jobName"
-          - "lastSuccess"
-          - "lastFailure"
-          - "lastDuration"
-          - "descriptionColumn"
-          - "buildButton"
         description: "停车Saas测试环境"
         jobNames:
           - "park-saas-app-test"
@@ -767,7 +787,7 @@ jenkins:
           - "pengbo-park-h5-test"
           - "pengbo-park-job-test"
           - "pengbo-park-merchant-web-test"
-        name: "pengbo-saas-v2-test"
+        name: "pengbo-saas-v2-test 🌱"
     - list:
         columns:
           - "status"
@@ -786,26 +806,8 @@ jenkins:
           - "spring-boot3-graalvm-demo"
           - "spring-boot3-graalvm-k8s-demo"
           - "spring-boot3-jdk21-test"
+          - "Test"
         name: "pipeline-test"
-    - list:
-        columns:
-          - "status"
-          - "weather"
-          - "jobName"
-          - "lastSuccess"
-          - "lastFailure"
-          - "lastDuration"
-          - "descriptionColumn"
-          - "buildButton"
-        description: "日照市城管局智慧停车平台生产环境"
-        jobNames:
-          - "city-watch-admin-prod"
-          - "city-watch-admin-web-prod"
-          - "city-watch-app-prod"
-          - "city-watch-h5-prod"
-          - "city-watch-oauth2-prod"
-          - "city-watch-vision-web-prod"
-        name: "rizhao-city-park-prod"
     - list:
         columns:
           - "status"
@@ -831,6 +833,8 @@ appearance:
   pipelineGraphView:
     showGraphOnBuildPage: true
     showGraphOnJobPage: true
+    showStageDurations: true
+    showStageNames: true
   prism:
     theme: PRISM
   themeManager:
@@ -854,6 +858,9 @@ security:
     approvedScriptHashes:
       - "SHA512:3f205299bef2fe3329258a42f2c60d332cc35ccb41a3ca0512d7869c6aff4561ff708c48123b4f7c3dec33ccca30d54fb8b9b51b5bc7070f96236d11a3f0bdcb"
     forceSandbox: false
+  updateSiteWarningsConfiguration:
+    ignoredWarnings:
+      - "SECURITY-3353"
 unclassified:
   ansiColorBuildWrapper:
     colorMaps:
@@ -929,14 +936,6 @@ unclassified:
         whiteB: "#D3D7CF"
         yellow: "#C4A000"
         yellowB: "#C4A000"
-  bitbucketEndpointConfiguration:
-    endpoints:
-      - bitbucketCloudEndpoint:
-          enableCache: false
-          enableHookSignature: false
-          manageHooks: false
-          repositoriesCacheDuration: 0
-          teamCacheDuration: 0
   buildDiscarders:
     configuredBuildDiscarders:
       - "jobBuildDiscarder"
@@ -962,11 +961,6 @@ unclassified:
     precedenceBulk: false
     throttlingEnabled: false
     watchingEnabled: false
-  enrichedSummaryConfig:
-    enrichedSummaryEnabled: false
-    httpClientDelayBetweenRetriesInSeconds: 1
-    httpClientMaxRetries: 3
-    httpClientTimeoutInSeconds: 1
   fingerprints:
     fingerprintCleanupDisabled: false
     storage: "file"
@@ -1012,15 +1006,6 @@ unclassified:
     operations:
       - "abortOperation"
     overwriteable: false
-  injectionConfig:
-    allowUntrusted: false
-    checkForBuildAgentErrors: false
-    enabled: false
-    enforceUrl: false
-    gradleCaptureTaskInputFiles: true
-    injectCcudExtension: false
-    injectMavenExtension: false
-    mavenCaptureGoalInputFiles: true
   junitTestResultStorage:
     storage: "file"
   location:
@@ -1030,8 +1015,6 @@ unclassified:
     charset: "UTF-8"
     useSsl: false
     useTls: false
-  mavenModuleSet:
-    localRepository: "default"
   pollSCM:
     pollingThreadCount: 10
   scmGit:
@@ -1100,11 +1083,3 @@ tool:
   mavenGlobalConfig:
     globalSettingsProvider: "standard"
     settingsProvider: "standard"
-  pipelineMaven:
-    daoClass: "org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginNullDao"
-    globalTraceability: false
-    triggerDownstreamUponResultAborted: false
-    triggerDownstreamUponResultFailure: false
-    triggerDownstreamUponResultNotBuilt: false
-    triggerDownstreamUponResultSuccess: true
-    triggerDownstreamUponResultUnstable: false

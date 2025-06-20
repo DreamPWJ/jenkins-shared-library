@@ -62,6 +62,9 @@ spec:
     - hosts:
         - mini-h5.pengbocloud.com
       secretName: mini-h5.pengbocloud.com-tls
+    - hosts:
+        - lan-mei.pengbocloud.com
+      secretName: lan-mei.pengbocloud.com-tls
 
   rules:
     #自定义域名
@@ -112,4 +115,16 @@ spec:
                 #服务端口
                 port:
                   number: 9019
+            pathType: Prefix
+    - host: lan-mei.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: mini-jump-h5-service
+                #服务端口
+                port:
+                  number: 9106
             pathType: Prefix

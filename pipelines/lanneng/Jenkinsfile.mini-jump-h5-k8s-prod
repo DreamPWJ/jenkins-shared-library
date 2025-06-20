@@ -138,7 +138,7 @@ JSON_PARAMS
 }
 
 pengbo-park-h5-k8s-prod
-澎泊车SaaS 2.0 停车场用户H5平台 Web前端-k8s集群 ❤️
+澎泊车SaaS 2.0 停车用户H5平台 Web前端-k8s集群 ❤️
 JSON_PARAMS
 {
     "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/mini-monorepo.git" ,

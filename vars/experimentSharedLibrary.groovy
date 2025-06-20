@@ -168,9 +168,24 @@ def call(String type = 'experiment', Map map) {
                             initInfo()
                             getShellParams(map)
                             getUserInfo()
-                            // 按顺序执行代码
-                            pullProjectCode()
-                            pullCIRepo()
+                        }
+                    }
+                }
+
+                stage('获取代码') {
+                    when {
+                        beforeAgent true
+                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                    }
+                    steps {
+                        script {
+                            parallel( // 步骤内并发执行
+                                    'CI/CD代码': {
+                                        pullCIRepo()
+                                    },
+                                    '项目代码': {
+                                        pullProjectCode()
+                                    })
                         }
                     }
                 }
@@ -649,6 +664,14 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
+/*    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
+    sleep 5
+    addBadge(id: "version-badge", text: "2.100.10", color: 'green', cssClass: 'badge-text--background')
+    addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
+    removeBadges(id: "launch-badge")*/
+
+    // JenkinsCI.getCurrentBuildParent(this)
+
     /*
     def array = map.ding_talk_credentials_ids
     array.each { item ->
@@ -665,12 +688,6 @@ def futureLab(map) {
 /*    HttpUtil.get(this, "https://saasadmin.pengbocloud.com")
     HttpUtil.post(this, "https://saasadmin.pengbocloud.com",  '{"name":"new_item"}')*/
 
-
-/*  addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
-    sleep 5
-    addBadge(id: "version-badge", text: "2.3.6")
-    addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
-    removeBadges(id: "launch-badge")*/
 
 /*
     def pythonVersion = "3.10"
@@ -691,7 +708,7 @@ def futureLab(map) {
         // sh "helm version"
     }*/
 
-/*    def nodeVersion = "${"Node20".replace('Node', '')}"
+/*    def nodeVersion = "${"Node24".replace('Node', '')}"
     def dockerImageName = "panweiji/node-build"
     def dockerImageTag = "${nodeVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
@@ -700,7 +717,7 @@ def futureLab(map) {
         sh "npm -v"
         sh "yarn --version"
         sh "pnpm --version"
-        // sh "playwright --version"
+     // sh "playwright --version || true"
     }*/
 
 

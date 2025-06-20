@@ -191,7 +191,6 @@ def call(String type = 'web-java', Map map) {
                                      '项目代码': {
                                          pullProjectCode()
                                      }) */
-                            // codeQualityAnalysis()
                         }
                     }
                 }
@@ -1118,7 +1117,7 @@ def pullProjectCode() {
         }
         // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
         // println "${git}"
-        sh "git --version"  // 使用git 2.0以上的高级版本  否则有兼容性问题
+        // sh "git --version"  // 使用git 2.0以上的高级版本  否则有兼容性问题
         // sh "which git"
         // https仓库下载报错处理 The certificate issuer's certificate has expired.  Check your system date and time.
         sh "git config --global http.sslVerify false || true"
@@ -1141,6 +1140,7 @@ def pullProjectCode() {
                   userRemoteConfigs                : [[credentialsId: "${GIT_CREDENTIALS_ID}", url: "${REPO_URL}"]]
         ])
     }
+
     // 是否存在CI代码
     dir("${env.WORKSPACE}/ci") {
         existCiCode()
@@ -1156,7 +1156,6 @@ def pullProjectCode() {
  */
 def pullCIRepo() {
     // 同步部署脚本和配置文件等
-    sh ' mkdir -p ci && chmod -R 777 ci'
     dir("${env.WORKSPACE}/ci") {
         def reg = ~/^\*\// // 正则匹配去掉*/字符
         // 根据jenkins配置的scm分支 获取相应分支下脚本和配置 支持多分支构建
@@ -1642,9 +1641,9 @@ def integrationTesting(map) {
         // 创建冒烟测试报告
         Tests.createSmokeReport(this)
 
-        // 结合YApi或者Apifox接口管理做自动化API测试
-        // sh " npm install -g apifox-cli "
-        // sh " apifox run --access-token "
+        // 结合YApi或者ApiFox接口管理做自动化API测试
+        ApiFox.autoTest(this)
+
         def yapiUrl = "http://yapi.panweiji.com"
         def testUrl = "${yapiUrl}/api/open/run_auto_test?${AUTO_TEST_PARAM}"
         // 执行接口测试
@@ -1878,7 +1877,7 @@ def syncScript() {
  * 是否存在CI代码
  */
 def existCiCode() {
-    if (!fileExists(".ci/Dockerfile")) {
+    if (!fileExists(".ci")) {
         // println "为保证先后顺序拉取代码 可能导致第一次构建时候无法找到CI仓库代码 重新拉取代码"
         pullCIRepo()
     }
@@ -2025,11 +2024,9 @@ def alwaysPost() {
         }
         // 构建徽章展示关键信息
         if ("${IS_PROD}" == 'true') {
-            addBadge(id: "version-badge", text: "${tagVersion}")
+            addBadge(id: "version-badge", text: "${tagVersion}", color: 'green', cssClass: 'badge-text--background')
         } else {
-            if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-                addBadge(id: "env-badge", text: "${releaseEnvironment}")
-            }
+            addBadge(id: "env-badge", text: "${releaseEnvironment}".toUpperCase(), color: 'blue', cssClass: 'badge-text--background')
         }
         addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: "${noticeHealthCheckUrl}", target: '_blank')
         removeBadges(id: "launch-badge")
@@ -2274,7 +2271,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
                             "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉 \n" +
                                     "#### 项目: ${PROJECT_NAME} \n" +
-                                    "#### 环境: **${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}** \n" +
+                                    "#### 环境: *${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}* \n" +
                                     "${gitChangeLog} \n" +
                                     ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看 \n" +
                                     "###### 发布人: ${BUILD_USER} \n" +
