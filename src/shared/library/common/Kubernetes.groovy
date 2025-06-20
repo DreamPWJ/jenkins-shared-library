@@ -221,10 +221,8 @@ class Kubernetes implements Serializable {
             ctx.sh " cat ${yamlName} "
 
             ctx.println("K8S集群执行部署Pod自动水平扩缩容 💕")
-            // 部署Pod水平扩缩容  如果已存在不重新创建 部署前删除旧HPA更新到最新yaml配置 可使用 kubectl patch命令热更新
-            ctx.sh "kubectl get hpa ${ctx.FULL_PROJECT_NAME}-hpa -n ${k8sNameSpace} || kubectl apply -f ${yamlName}"
-            // 后续更新资源
-            // ctx.sh "kubectl get hpa ${ctx.FULL_PROJECT_NAME}-hpa -n ${k8sNameSpace} && kubectl patch -f ${yamlName}"
+            // 部署Pod水平扩缩容  apply默认资源不存在则创建，存在则更新
+            ctx.sh "kubectl apply -f ${yamlName} || true"
 
         }
     }
