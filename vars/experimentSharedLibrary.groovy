@@ -664,24 +664,26 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
-/*    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: '潘维吉同学 正在为您加速部署sit环境 ...')
+   addInfoBadge(text: '流水线执行成功 ✅')
     sleep 5
-    addBadge(id: "version-badge", text: "2.100.10", color: 'green', cssClass: 'badge-text--background')
-    addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
-    removeBadges(id: "launch-badge")*/
+    addInfoBadge(text: '流水线执行失败 ❌')
+    sleep 5
+    /*   addBadge(id: "version-badge", text: "2.100.10", color: 'green', cssClass: 'badge-text--background')
+      addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
+      removeBadges(id: "launch-badge")
 
-    // JenkinsCI.getCurrentBuildParent(this)
+      // JenkinsCI.getCurrentBuildParent(this)
 
-    /*
-    def array = map.ding_talk_credentials_ids
-    array.each { item ->
-        println "keyword: ${item.keyword}"
-        println "token: ${item.token}"
-    }
+      /*
+      def array = map.ding_talk_credentials_ids
+      array.each { item ->
+          println "keyword: ${item.keyword}"
+          println "token: ${item.token}"
+      }
 
-    // 钉钉 HTTP 原生调用
-     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids, "面向未来重构CI/CD基建", "#### 面向未来重构CI/CD基建 功能 性能 易用性全面提升", "18863302302")
-    */
+      // 钉钉 HTTP 原生调用
+       DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids, "面向未来重构CI/CD基建", "#### 面向未来重构CI/CD基建 功能 性能 易用性全面提升", "18863302302")
+      */
 
 
     // Groovy HTTP 原生调用
