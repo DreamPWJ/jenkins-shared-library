@@ -663,11 +663,10 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
-
-   addInfoBadge(text: '流水线执行成功 ✅')
+  /*  addInfoBadge(text: '流水线执行成功 ✅')
     sleep 5
     addInfoBadge(text: '流水线执行失败 ❌')
-    sleep 5
+    sleep 5*/
     /*   addBadge(id: "version-badge", text: "2.100.10", color: 'green', cssClass: 'badge-text--background')
       addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
       removeBadges(id: "launch-badge")
