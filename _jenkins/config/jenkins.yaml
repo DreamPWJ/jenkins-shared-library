@@ -158,7 +158,7 @@ jenkins:
   numExecutors: 2
   primaryView:
     all:
-      description: "蓝能科技CI/CD全自动构建部署流水线    All in One"
+      description: "蓝能科技CI/CD全自动化构建部署流水线    All in One"
       name: "all"
   projectNamingStrategy: "standard"
   quietPeriod: 1
@@ -534,7 +534,7 @@ jenkins:
           - "pdf-js-k8s-prod"
         name: "9-landing-page-k8s-prod"
     - all:
-        description: "蓝能科技CI/CD全自动构建部署流水线    All in One"
+        description: "蓝能科技CI/CD全自动化构建部署流水线    All in One"
         name: "all"
     - list:
         columns:
@@ -806,6 +806,7 @@ jenkins:
           - "spring-boot3-graalvm-demo"
           - "spring-boot3-graalvm-k8s-demo"
           - "spring-boot3-jdk21-test"
+          - "Test"
         name: "pipeline-test"
     - list:
         columns:
@@ -960,11 +961,6 @@ unclassified:
     precedenceBulk: false
     throttlingEnabled: false
     watchingEnabled: false
-  enrichedSummaryConfig:
-    enrichedSummaryEnabled: false
-    httpClientDelayBetweenRetriesInSeconds: 1
-    httpClientMaxRetries: 3
-    httpClientTimeoutInSeconds: 1
   fingerprints:
     fingerprintCleanupDisabled: false
     storage: "file"
@@ -1010,15 +1006,6 @@ unclassified:
     operations:
       - "abortOperation"
     overwriteable: false
-  injectionConfig:
-    allowUntrusted: false
-    checkForBuildAgentErrors: false
-    enabled: false
-    enforceUrl: false
-    gradleCaptureTaskInputFiles: true
-    injectCcudExtension: false
-    injectMavenExtension: false
-    mavenCaptureGoalInputFiles: true
   junitTestResultStorage:
     storage: "file"
   location:
