@@ -11,7 +11,7 @@
 def map = [:]
 
 // 远程服务器地址 k8s集群方式可填空或填公网代理负载IP
-map.put('remote_ip', '120.92.140.41')
+map.put('remote_ip', '120.92.149.246')
 // 工作服务器地址 同时支持N个服务器自动化分布式部署
 map.put('remote_worker_ips', [])
 // 远程服务器用户名
@@ -54,12 +54,12 @@ map.put('docker_repo_namespace', 'lanneng')
 
 // K8S集群相关参数
 // K8S集群部署集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
-map.put('k8s_credentials_ids', '74a3d376-cb4c-4a20-9bf7-7300a5eaa84d')
+map.put('k8s_credentials_ids', 'a1d2642d-296f-47a2-8d1a-087b46e3255e')
 // K8S集群私有镜像仓库拉取密钥 在集群内使用kubectl create secret命令生成
 map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
 // 项目标签或项目简称
-map.put('project_tag', '服务健康探测中心')
+map.put('project_tag', 'OAuth2授权中心')
 
 // 是否是生产环境
 map.put('is_prod', true)
@@ -81,7 +81,7 @@ map.put('is_git_tag', true)
 map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称  预配置在jenkins节点管理内
-map.put('jenkins_node', 'node-3')
+map.put('jenkins_node', 'node-2')
 map.put('jenkins_node_frontend', 'node-3')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.9
@@ -118,25 +118,25 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/lanneng/Jenkinsfile.services-health-check-prod
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/lanneng/Jenkinsfile.services-oauth2-k8s-prod
 
 /*
 
-services-health-check-k8s-prod
-所有服务健康探测中心-k8s集群
+oauth2-service-k8s-prod
+OAuth2授权中心-k8s集群
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
    "BRANCH_NAME" : "feature/infra" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "services-health-check" ,
-   "SHELL_PARAMS" : "services-health check 8197 8080 prod",
+   "PROJECT_NAME" : "oauth2-service" ,
+   "SHELL_PARAMS" : "oauth2-service app 6868 6868 prod",
    "IS_MAVEN_SINGLE_MODULE" : true,
    "IS_SPRING_NATIVE" : true,
    "IS_K8S_DEPLOY" : true,
    "K8S_POD_REPLICAS" : "1",
-   "CUSTOM_HEALTH_CHECK_PATH" : "/healthy-check",
-   "GIT_PROJECT_FOLDER_NAME" : "single-module-projects/services-health-check",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/health-check",
+   "GIT_PROJECT_FOLDER_NAME" : "single-module-projects/oauth2-service",
 }
 
 
