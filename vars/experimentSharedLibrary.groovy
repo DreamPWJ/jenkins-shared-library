@@ -664,7 +664,7 @@ def pullProjectCode() {
  */
 def futureLab(map) {
     // 构建开始后立即重定向
-    def redirectUrl = "${env.BUILD_URL}/${env.BUILD_NUMBER}"
+    def redirectUrl = "${env.BUILD_URL}"
     println(redirectUrl)
     echo "<script>location.href='${redirectUrl}';</script>"
 
