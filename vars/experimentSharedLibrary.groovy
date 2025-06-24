@@ -666,7 +666,7 @@ def futureLab(map) {
     // 构建开始后立即重定向
     def redirectUrl = "${env.BUILD_URL}"
     println(redirectUrl)
-    echo "<script>location.href='${redirectUrl}';</script>"
+    echo "<script>window.location.href='${redirectUrl}';</script>"
 
     def badge = addInfoBadge(icon: "", text: '流水线执行成功 ✅')
     sleep 5
