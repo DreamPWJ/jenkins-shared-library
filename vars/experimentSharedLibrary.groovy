@@ -663,6 +663,11 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
+    // 构建开始后立即重定向
+    def redirectUrl = "${env.BUILD_URL}/${env.BUILD_NUMBER}"
+    println(redirectUrl)
+    echo "<script>location.href='${redirectUrl}';</script>"
+
     def badge = addInfoBadge(icon: "", text: '流水线执行成功 ✅')
     sleep 5
     def badge2 = addInfoBadge(icon: "", text: '流水线执行失败 ❌')
