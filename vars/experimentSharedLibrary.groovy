@@ -666,6 +666,7 @@ def futureLab(map) {
     // 构建开始后立即重定向
     def redirectUrl = "${env.BUILD_URL}"
     println(redirectUrl)
+    System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'unsafe-inline';")
     echo "<script>window.location.href='${redirectUrl}';</script>"
 
     def badge = addInfoBadge(icon: "", text: '流水线执行成功 ✅')
