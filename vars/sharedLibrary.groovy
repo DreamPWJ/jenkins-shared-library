@@ -1181,6 +1181,17 @@ def sourceCodeDeploy() {
 }
 
 /**
+ * 直接构建包部署方式  如无源码的情况
+ * 无需打包 只需要包上传到服务器上执行自定义命令启动
+ */
+def packageDeploy() {
+    if ("${IS_PACKAGE_DEPLOY}" == 'true') {
+        // file(name: 'packageFile', description: '请上传部署包文件')  // 文件已经被上传到工作区 名为packageFile
+        Tools.printColor(this, "构建包上传成功 ✅")
+    }
+}
+
+/**
  * 代码质量分析
  */
 def codeQualityAnalysis() {
