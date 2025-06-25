@@ -664,17 +664,6 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
-    // 获取上传文件的绝对路径
-    def configPath = params.DEPLOY_PACKAGE
-    // 打印路径验证
-    echo "配置文件路径: ${configPath}"
-    // 检查文件是否存在
-    if (fileExists(configPath)) {
-        echo "文件上传成功"
-    } else {
-        error "文件未找到!"
-    }
-
 
     // 构建开始后立即重定向
     def redirectUrl = "${env.BUILD_URL}"
