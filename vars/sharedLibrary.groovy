@@ -1186,7 +1186,7 @@ def sourceCodeDeploy() {
  */
 def packageDeploy() {
     if ("${IS_PACKAGE_DEPLOY}" == 'true') {
-        // 参数化上传或者从http地址下载部署包
+        // 参数化上传或者Git仓库下载或从http地址下载部署包
         Tools.printColor(this, "构建包上传成功 ✅")
     }
 }
