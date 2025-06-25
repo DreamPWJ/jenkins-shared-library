@@ -81,7 +81,7 @@ map.put('is_git_tag', false)
 map.put('is_need_sass', false)
 
 // jenkins分布式构建节点label名称
-map.put('jenkins_node', 'macos-test')
+map.put('jenkins_node', 'master')
 map.put('jenkins_node_frontend', 'master')
 
 // 构建环境变量
