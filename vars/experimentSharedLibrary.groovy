@@ -664,6 +664,8 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
+    // 打印路径验证
+    echo "部署文件: ${params.DEPLOY_PACKAGE}"
 
     // 构建开始后立即重定向
     def redirectUrl = "${env.BUILD_URL}"
