@@ -664,20 +664,20 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
-    input message: '请上传部署包',
+/*    input message: '请上传部署包',
             parameters: [
                     uploadableFile(name: 'DEPLOY_PACKAGE', description: '请选择要上传的部署包')
             ]
     // 获取上传文件的路径
     def filePath = params.DEPLOY_PACKAGE
     // 此时文件已经在工作空间中，路径为filePath
-    echo "Uploaded file path: ${filePath}"
+    echo "Uploaded file path: ${filePath}"*/
 
     // 构建开始后立即重定向
-    def redirectUrl = "${env.BUILD_URL}"
+/*    def redirectUrl = "${env.BUILD_URL}"
     println(redirectUrl)
     System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'unsafe-inline';")
-    echo "<script>window.location.href='${redirectUrl}';</script>"
+    echo "<script>window.location.href='${redirectUrl}';</script>"*/
 
     def badge = addInfoBadge(icon: "", text: '流水线执行成功 ✅')
     sleep 5
