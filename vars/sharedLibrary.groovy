@@ -1186,7 +1186,7 @@ def sourceCodeDeploy() {
  */
 def packageDeploy() {
     if ("${IS_PACKAGE_DEPLOY}" == 'true') {
-        // file(name: 'DEPLOY_PACKAGE', description: '请上传部署包文件', accept: '*.jar, *.war, *.zip')  // 文件上传到工作区 在${WORKSPACE}/<参数名>.<随机后缀>
+        // file(name: 'DEPLOY_PACKAGE', description: '请上传部署包文件')  // 文件上传到工作区 在${WORKSPACE}/<参数名>.<随机后缀>
         Tools.printColor(this, "构建包上传成功 ✅")
     }
 }
