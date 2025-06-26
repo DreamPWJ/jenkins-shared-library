@@ -38,8 +38,8 @@ def call(String type = 'experiment', Map map) {
     if (type == "experiment") { // 针对标准项目
         pipeline {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
-            agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}" }
-            //agent { label "${map.jenkins_node}" }
+            // agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}" }
+            agent any
 
             parameters {
                 choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback, GlobalVars.start, GlobalVars.stop, GlobalVars.destroy, GlobalVars.restart],
@@ -664,6 +664,7 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
+    println "文件路径: ${params.DEPLOY_PACKAGE}"
 
     // 构建开始后立即重定向
 /*    def redirectUrl = "${env.BUILD_URL}"
