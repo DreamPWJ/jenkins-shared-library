@@ -19,10 +19,10 @@ spec:
     metadata:
       labels:
         app: {APP_COMMON_NAME}
-      annotations:
-        prometheus.io/scrape: "true"                # 让prometheus自动发现
-        prometheus.io/path: /actuator/prometheus    # /metric路径是集成内提供的 Prometheus 监控接口 或利用 exporter 服务来为 Prometheus 提供指标数据
-        prometheus.io/port: "{CONTAINER_PORT}"      # /metric接口的端口
+#      annotations:
+#        prometheus.io/scrape: "true"                # 让prometheus自动发现
+#        prometheus.io/path: /actuator/prometheus    # /metric路径是集成内提供的 Prometheus 监控接口 或利用 exporter 服务来为 Prometheus 提供指标数据
+#        prometheus.io/port: "{CONTAINER_PORT}"      # /metric接口的端口
 
     spec:
       #privileged: true  # 允许特权模式的Pod
@@ -146,10 +146,10 @@ metadata:
   namespace: {K8S_NAMESPACE}
   labels:
     app: {APP_COMMON_NAME}-service
-  annotations:
-    prometheus.io/scrape: "true"                # 让prometheus自动发现
-    prometheus.io/path: /actuator/prometheus    # /metric路径是集成内提供的 Prometheus 监控接口 或利用 exporter 服务来为 Prometheus 提供指标数据
-    prometheus.io/port: "{CONTAINER_PORT}"      # /metric接口的端口
+#  annotations:
+#    prometheus.io/scrape: "true"                # 让prometheus自动发现
+#    prometheus.io/path: /actuator/prometheus    # /metric路径是集成内提供的 Prometheus 监控接口 或利用 exporter 服务来为 Prometheus 提供指标数据
+#    prometheus.io/port: "{CONTAINER_PORT}"      # /metric接口的端口
 
 spec:
   type: LoadBalancer                   # 规格类型ClusterIP、NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡
