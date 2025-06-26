@@ -611,7 +611,7 @@ def call(String type = 'web-java', Map map) {
                     steps {
                         script {
                             if ("${params.IS_DING_NOTICE}" == 'true' && params.IS_HEALTH_CHECK == false) {
-                                dingNotice(map, 1, "**成功 ✅**") // ✅
+                                dingNotice(map, 1, "**成功 ✅**")
                             }
                         }
                     }
@@ -705,6 +705,7 @@ def call(String type = 'web-java', Map map) {
                 success {
                     script {
                         echo '当前成功时运行'
+                        currentBuild.result = 'SUCCESS'  // 显式设置构建结果
                         deletePackagedOutput()
                         //deployMultiEnv()
                     }
@@ -1176,6 +1177,17 @@ def sourceCodeDeploy() {
             sh " rm -f ${sourceCodeDeployName}.tar.gz &&  tar --warning=no-file-changed -zcvf  ${sourceCodeDeployName}.tar.gz --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
             Tools.printColor(this, "源码压缩打包成功 ✅")
         }
+    }
+}
+
+/**
+ * 直接构建包部署方式  如无源码的情况
+ * 无需打包 只需要包上传到服务器上执行自定义命令启动
+ */
+def packageDeploy() {
+    if ("${IS_PACKAGE_DEPLOY}" == 'true') {
+        // 参数化上传或者Git仓库下载或从http地址下载部署包
+        Tools.printColor(this, "构建包上传成功 ✅")
     }
 }
 

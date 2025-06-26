@@ -220,18 +220,10 @@ class Kubernetes implements Serializable {
                     " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
             ctx.sh " cat ${yamlName} "
 
-            // 部署Pod水平扩缩容  如果已存在不重新创建
             ctx.println("K8S集群执行部署Pod自动水平扩缩容 💕")
-            // 部署前删除旧HPA更新到最新yaml配置
-            // ctx.sh "kubectl delete hpa ${ctx.FULL_PROJECT_NAME}-hpa -n ${k8sNameSpace} || true "
-            ctx.sh "kubectl get hpa ${ctx.FULL_PROJECT_NAME}-hpa -n ${k8sNameSpace} || kubectl apply -f ${yamlName}"
+            // 部署Pod水平扩缩容  apply默认资源不存在则创建，存在则更新
+            ctx.sh "kubectl apply -f ${yamlName} || true"
 
-            // 若安装正确，可用执行以下命令查询自定义指标 查看到 Custom Metrics API 返回配置的 QPS 相关指标 可能需要等待几分钟才能查询到
-            // ctx.sh " kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 || true "
-            // kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/${k8sNameSpace}/pods/*/http_server_requests_qps"
-
-            // 并发测试ab（apache benchmark） CentOS环境 sudo yum -y install httpd-tools    Ubuntu环境 sudo apt-get update && sudo apt-get -y install apache2-utils
-            // ab -c 100 -n 10000 -r http://120.92.49.178:8080/  // 并发数-c  总请求数-n  是否允许请求错误-r  总的请求数(n) = 次数 * 一次并发数(c)
         }
     }
 

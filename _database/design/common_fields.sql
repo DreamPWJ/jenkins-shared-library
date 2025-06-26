@@ -23,6 +23,7 @@ create table base_common_fields
     create_time datetime   default CURRENT_TIMESTAMP null comment '创建时间'
 )
     comment '通用表设计字段表';
+
 #  创建索引
 /*
 create index table_name_column_name_index
