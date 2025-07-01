@@ -1189,6 +1189,7 @@ def sourceCodeDeploy() {
 def packageDeploy() {
     // 参数化上传或者Git仓库下载或从http地址下载包
     try { // 是否存在声明
+        println("上传文件名: ${DEPLOY_PACKAGE_FILENAME}")
         unstash 'DEPLOY_PACKAGE' // 获取文件
         // sh 'cat DEPLOY_PACKAGE'
         // 文件恢复原始文件名称  原始文件名称是 定义变量名称+ _FILENAME固定后缀组合
