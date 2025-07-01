@@ -1102,6 +1102,9 @@ def getUserInfo() {
  * 获取项目代码
  */
 def pullProjectCode() {
+    // 源码直接部署方式
+    sourceCodeDeploy()
+
     // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行jenkins任务才能生效
     if (!params.GIT_TAG) {
         params.GIT_TAG = GlobalVars.noGit
@@ -1150,8 +1153,6 @@ def pullProjectCode() {
         existCiCode()
     }
 
-    // 源码直接部署方式
-    sourceCodeDeploy()
     // 直接构建包部署方式
     packageDeploy()
 }
@@ -1172,20 +1173,6 @@ def pullCIRepo() {
 }
 
 /**
- * 源码直接部署方式
- * 无需打包 只需要压缩上传到服务器上执行自定义命令启动
- */
-def sourceCodeDeploy() {
-    if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {
-        dir("${env.WORKSPACE}/") { // 源码在特定目录下
-            sh " rm -f ${sourceCodeDeployName}.tar.gz && " +
-                    " tar --warning=no-file-changed -zcvf  ${sourceCodeDeployName}.tar.gz --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
-            Tools.printColor(this, "源码压缩打包成功 ✅")
-        }
-    }
-}
-
-/**
  * 直接构建包部署方式  如无源码的情况
  * 无需打包 只需要包上传到服务器上执行自定义命令启动
  */
@@ -1201,11 +1188,25 @@ def packageDeploy() {
         buildPackageSize = Utils.getFileSize(this, "${DEPLOY_PACKAGE_FILENAME}")
         IS_PACKAGE_DEPLOY = true
         // 统一部署文件名称 SSH传输包到部署服务器
-
+        return  // 终止后续阶段执行 比如拉取代码
     } catch (error) {
         // 如果是必须上传文件的job任务 构建后报错提醒 或者构建先input提醒
     }
     // 如果直接包部署方式 后面流程不需要打包 也不再依赖Git仓库
+}
+
+/**
+ * 源码直接部署方式
+ * 无需打包 只需要压缩上传到服务器上执行自定义命令启动
+ */
+def sourceCodeDeploy() {
+    if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {
+        dir("${env.WORKSPACE}/") { // 源码在特定目录下
+            sh " rm -f ${sourceCodeDeployName}.tar.gz && " +
+                    " tar --warning=no-file-changed -zcvf  ${sourceCodeDeployName}.tar.gz --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
+            Tools.printColor(this, "源码压缩打包成功 ✅")
+        }
+    }
 }
 
 /**
