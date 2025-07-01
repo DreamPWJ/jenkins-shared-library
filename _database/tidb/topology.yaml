@@ -1,7 +1,7 @@
 global:
   user: "root"
   ssh_port: 22
-  deploy_dir: "/tidb-deploy" # 部署目录 注意会产生大量的log日志防止磁盘满 rm -f /tidb-deploy/tidb-4000/log/*
+  deploy_dir: "/tidb-deploy" # 部署目录 注意会产生大量的log日志防止磁盘满 rm -f /tidb-deploy/tidb-4000/log/* && rm -f /tidb-deploy/tikv-20160/log/*
   data_dir: "/tidb-data"  #  基于Raft协议同步复制  所有节点数据保持一致
 
 # 配置文档: https://docs.pingcap.com/zh/tidb/dev/tidb-configuration-file

@@ -39,7 +39,7 @@ def call(String type = 'experiment', Map map) {
         pipeline {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
             agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}" }
-            //agent { label "${map.jenkins_node}" }
+            // agent any
 
             parameters {
                 choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback, GlobalVars.start, GlobalVars.stop, GlobalVars.destroy, GlobalVars.restart],
@@ -67,7 +67,8 @@ def call(String type = 'experiment', Map map) {
                         description: '是否在生产环境中自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录 📄')
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 将构建成功失败等状态信息同步到群内所有人 📢 ")
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
-                file(name: 'DEPLOY_PACKAGE', description: '请上传部署包文件')
+                // file(name: 'DEPLOY_PACKAGE', description: '请上传部署包文件')
+                stashedFile 'DEPLOY_PACKAGE'
                 //booleanParam(name: 'IS_DEPLOY_MULTI_ENV', defaultValue: false, description: '是否同时部署当前job项目多环境 如dev test等')
             }
 
@@ -665,7 +666,24 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
-    // 构建开始后立即重定向
+/*
+    timeout(time: 1, unit: 'MINUTES') {
+        input message: '请上传部署包并确认',
+                submitter: 'admin'
+    }
+*/
+    try { // 是否存在声明
+        // 原始文件名称是 定义变量名称+ _FILENAME后缀组合
+        println("上传文件名: ${DEPLOY_PACKAGE_FILENAME}")
+        unstash 'DEPLOY_PACKAGE' // 获取文件
+        // sh 'cat DEPLOY_PACKAGE'
+        // 部署文件恢复原始文件名称
+        sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME'
+    } catch (error) {
+    }
+
+
+// 构建开始后立即重定向
 /*    def redirectUrl = "${env.BUILD_URL}"
     println(redirectUrl)
     System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'unsafe-inline';")
@@ -677,25 +695,25 @@ def futureLab(map) {
     sleep 5
     removeBadges(id: badge.getId())
     removeBadges(id: badge2.getId())
-    /*   addBadge(id: "version-badge", text: "2.100.10", color: 'green', cssClass: 'badge-text--background')
-      addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
-      removeBadges(id: "launch-badge")
+/*   addBadge(id: "version-badge", text: "2.100.10", color: 'green', cssClass: 'badge-text--background')
+  addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
+  removeBadges(id: "launch-badge")
 
-      // JenkinsCI.getCurrentBuildParent(this)
+  // JenkinsCI.getCurrentBuildParent(this)
 
-      /*
-      def array = map.ding_talk_credentials_ids
-      array.each { item ->
-          println "keyword: ${item.keyword}"
-          println "token: ${item.token}"
-      }
+  /*
+  def array = map.ding_talk_credentials_ids
+  array.each { item ->
+      println "keyword: ${item.keyword}"
+      println "token: ${item.token}"
+  }
 
-      // 钉钉 HTTP 原生调用
-       DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids, "面向未来重构CI/CD基建", "#### 面向未来重构CI/CD基建 功能 性能 易用性全面提升", "18863302302")
-      */
+  // 钉钉 HTTP 原生调用
+   DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids, "面向未来重构CI/CD基建", "#### 面向未来重构CI/CD基建 功能 性能 易用性全面提升", "18863302302")
+  */
 
 
-    // Groovy HTTP 原生调用
+// Groovy HTTP 原生调用
 /*    HttpUtil.get(this, "https://saasadmin.pengbocloud.com")
     HttpUtil.post(this, "https://saasadmin.pengbocloud.com",  '{"name":"new_item"}')*/
 
