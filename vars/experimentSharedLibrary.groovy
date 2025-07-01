@@ -673,13 +673,13 @@ def futureLab(map) {
     }
 */
     try { // 是否存在声明
-        println("${DEPLOY_PACKAGE_FILENAME}") // 原始文件名称是 定义变量名称+ _FILENAME后缀组合
-    } catch (error) {
+        // 原始文件名称是 定义变量名称+ _FILENAME后缀组合
         println("上传文件名: ${DEPLOY_PACKAGE_FILENAME}")
         unstash 'DEPLOY_PACKAGE' // 获取文件
         // sh 'cat DEPLOY_PACKAGE'
         // 部署文件恢复原始文件名称
         sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME && ls'
+    } catch (error) {
     }
 
 
@@ -689,12 +689,12 @@ def futureLab(map) {
     System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'unsafe-inline';")
     echo "<script>window.location.href='${redirectUrl}';</script>"*/
 
-def badge = addInfoBadge(icon: "", text: '流水线执行成功 ✅')
-sleep 5
-def badge2 = addInfoBadge(icon: "", text: '流水线执行失败 ❌')
-sleep 5
-removeBadges(id: badge.getId())
-removeBadges(id: badge2.getId())
+    def badge = addInfoBadge(icon: "", text: '流水线执行成功 ✅')
+    sleep 5
+    def badge2 = addInfoBadge(icon: "", text: '流水线执行失败 ❌')
+    sleep 5
+    removeBadges(id: badge.getId())
+    removeBadges(id: badge2.getId())
 /*   addBadge(id: "version-badge", text: "2.100.10", color: 'green', cssClass: 'badge-text--background')
   addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
   removeBadges(id: "launch-badge")
