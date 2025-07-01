@@ -314,7 +314,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return (IS_SOURCE_CODE_DEPLOY == false && IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
+                        expression { return (IS_SOURCE_CODE_DEPLOY == false && IS_PACKAGE_DEPLOY == false && IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
                     }
                     /*      agent {
                               dockerfile {
@@ -820,6 +820,8 @@ def getInitParams(map) {
     IS_INTEGRATION_TESTING = jsonParams.IS_INTEGRATION_TESTING ? jsonParams.IS_INTEGRATION_TESTING : false
     // 是否直接源码部署 无需打包 自定义命令启动
     IS_SOURCE_CODE_DEPLOY = jsonParams.IS_SOURCE_CODE_DEPLOY ? jsonParams.IS_SOURCE_CODE_DEPLOY : false
+    // 是否直接构建包部署方式  如无源码的情况
+    IS_PACKAGE_DEPLOY = jsonParams.IS_PACKAGE_DEPLOY ? jsonParams.IS_PACKAGE_DEPLOY : false
 
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
@@ -1200,7 +1202,7 @@ def packageDeploy() {
         // SSH传输包到部署服务器
 
     } catch (error) {
-        // 如果是必须上传文件的job 构建后报错提醒 或者构建先input提醒
+        // 如果是必须上传文件的job任务 构建后报错提醒 或者构建先input提醒
     }
     // 如果直接包部署方式 后面流程不需要打包 也不再依赖Git仓库
 }
@@ -1478,6 +1480,8 @@ def uploadRemote(filePath, map) {
         // 基于scp或rsync同步文件到远程服务器
         if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行自定义命令启动
             sh " scp ${proxyJumpSCPText} ${sourceCodeDeployName}.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
+        } else if (IS_PACKAGE_DEPLOY == true) {
+            println("直接构建包部署方式  如无源码的情况")
         } else if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
             if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
                 dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
