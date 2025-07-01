@@ -673,7 +673,7 @@ def futureLab(map) {
     }
 */
     try { // 是否存在声明
-        println("${DEPLOY_PACKAGE_FILENAME}")
+        println("${DEPLOY_PACKAGE_FILENAME}") // 原始文件名称是 定义变量名称+ _FILENAME后缀组合
     } catch (error) {
         println("上传文件名: ${DEPLOY_PACKAGE_FILENAME}")
         unstash 'DEPLOY_PACKAGE' // 获取文件
