@@ -1104,6 +1104,9 @@ def getUserInfo() {
 def pullProjectCode() {
     // 直接构建包部署方式
     packageDeploy()
+    if (IS_PACKAGE_DEPLOY == true) {
+        return  // 终止后续阶段执行 比如拉取项目代码 因为直接是包部署方式 不需要源码
+    }
 
     // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行jenkins任务才能生效
     if (!params.GIT_TAG) {
@@ -1188,7 +1191,7 @@ def packageDeploy() {
         buildPackageSize = Utils.getFileSize(this, "${DEPLOY_PACKAGE_FILENAME}")
         IS_PACKAGE_DEPLOY = true
         // 统一部署文件名称 SSH传输包到部署服务器
-        return  // 终止后续阶段执行 比如拉取项目代码 因为直接是包部署方式 不需要源码
+
     } catch (error) {
         // 如果是必须上传文件的job任务 构建后报错提醒 或者构建先input提醒
     }
@@ -1479,13 +1482,14 @@ def uploadRemote(filePath, map) {
             syncScript()
         }
         println("上传部署文件到部署服务器中... 🚀 ")
+
         // 基于scp或rsync同步文件到远程服务器
-        if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行自定义命令启动
-            sh " scp ${proxyJumpSCPText} ${sourceCodeDeployName}.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
-        } else if (IS_PACKAGE_DEPLOY == true) {
-            sh " scp ${proxyJumpSCPText} ${DEPLOY_PACKAGE_FILENAME} ${remote.user}@${remote.host}:${projectDeployFolder} "
-        } else if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
-            if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
+        if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
+            if (IS_PACKAGE_DEPLOY == true) { // 直接构建包部署方式  如无源码的情况
+                sh " scp ${proxyJumpSCPText} ${DEPLOY_PACKAGE_FILENAME} ${remote.user}@${remote.host}:${projectDeployFolder} "
+            } else if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行自定义命令启动
+                sh " scp ${proxyJumpSCPText} ${sourceCodeDeployName}.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
+            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
                 dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
                     sh " scp ${proxyJumpSCPText} ${npmPackageLocation} " +
                             "${remote.user}@${remote.host}:${projectDeployFolder}"
