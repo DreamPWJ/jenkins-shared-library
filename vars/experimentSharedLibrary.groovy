@@ -672,7 +672,9 @@ def futureLab(map) {
                 submitter: 'admin'
     }
 */
-    if (binding.getVariable('DEPLOY_PACKAGE_FILENAME')) { // 是否存在声明
+    try { // 是否存在声明
+        println("${DEPLOY_PACKAGE_FILENAME}")
+    } catch (error) {
         println("上传文件名: ${DEPLOY_PACKAGE_FILENAME}")
         unstash 'DEPLOY_PACKAGE' // 获取文件
         // sh 'cat DEPLOY_PACKAGE'
@@ -680,37 +682,38 @@ def futureLab(map) {
         sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME && ls'
     }
 
-    // 构建开始后立即重定向
+
+// 构建开始后立即重定向
 /*    def redirectUrl = "${env.BUILD_URL}"
     println(redirectUrl)
     System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'unsafe-inline';")
     echo "<script>window.location.href='${redirectUrl}';</script>"*/
 
-    def badge = addInfoBadge(icon: "", text: '流水线执行成功 ✅')
-    sleep 5
-    def badge2 = addInfoBadge(icon: "", text: '流水线执行失败 ❌')
-    sleep 5
-    removeBadges(id: badge.getId())
-    removeBadges(id: badge2.getId())
-    /*   addBadge(id: "version-badge", text: "2.100.10", color: 'green', cssClass: 'badge-text--background')
-      addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
-      removeBadges(id: "launch-badge")
+def badge = addInfoBadge(icon: "", text: '流水线执行成功 ✅')
+sleep 5
+def badge2 = addInfoBadge(icon: "", text: '流水线执行失败 ❌')
+sleep 5
+removeBadges(id: badge.getId())
+removeBadges(id: badge2.getId())
+/*   addBadge(id: "version-badge", text: "2.100.10", color: 'green', cssClass: 'badge-text--background')
+  addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
+  removeBadges(id: "launch-badge")
 
-      // JenkinsCI.getCurrentBuildParent(this)
+  // JenkinsCI.getCurrentBuildParent(this)
 
-      /*
-      def array = map.ding_talk_credentials_ids
-      array.each { item ->
-          println "keyword: ${item.keyword}"
-          println "token: ${item.token}"
-      }
+  /*
+  def array = map.ding_talk_credentials_ids
+  array.each { item ->
+      println "keyword: ${item.keyword}"
+      println "token: ${item.token}"
+  }
 
-      // 钉钉 HTTP 原生调用
-       DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids, "面向未来重构CI/CD基建", "#### 面向未来重构CI/CD基建 功能 性能 易用性全面提升", "18863302302")
-      */
+  // 钉钉 HTTP 原生调用
+   DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids, "面向未来重构CI/CD基建", "#### 面向未来重构CI/CD基建 功能 性能 易用性全面提升", "18863302302")
+  */
 
 
-    // Groovy HTTP 原生调用
+// Groovy HTTP 原生调用
 /*    HttpUtil.get(this, "https://saasadmin.pengbocloud.com")
     HttpUtil.post(this, "https://saasadmin.pengbocloud.com",  '{"name":"new_item"}')*/
 
