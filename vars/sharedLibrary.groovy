@@ -1482,13 +1482,14 @@ def uploadRemote(filePath, map) {
             syncScript()
         }
         println("上传部署文件到部署服务器中... 🚀 ")
+
         // 基于scp或rsync同步文件到远程服务器
-        if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行自定义命令启动
-            sh " scp ${proxyJumpSCPText} ${sourceCodeDeployName}.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
-        } else if (IS_PACKAGE_DEPLOY == true) {
-            sh " scp ${proxyJumpSCPText} ${DEPLOY_PACKAGE_FILENAME} ${remote.user}@${remote.host}:${projectDeployFolder} "
-        } else if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
-            if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
+        if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
+            if (IS_PACKAGE_DEPLOY == true) { // 直接构建包部署方式  如无源码的情况
+                sh " scp ${proxyJumpSCPText} ${DEPLOY_PACKAGE_FILENAME} ${remote.user}@${remote.host}:${projectDeployFolder} "
+            } else if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行自定义命令启动
+                sh " scp ${proxyJumpSCPText} ${sourceCodeDeployName}.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
+            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
                 dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
                     sh " scp ${proxyJumpSCPText} ${npmPackageLocation} " +
                             "${remote.user}@${remote.host}:${projectDeployFolder}"
