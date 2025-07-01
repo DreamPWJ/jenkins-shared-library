@@ -673,8 +673,7 @@ def futureLab(map) {
     }
 */
     unstash 'DEPLOY_PACKAGE'
-    sh 'cat DEPLOY_PACKAGE'
-    println "文件路径: ${params.DEPLOY_PACKAGE}"
+    sh 'cat DEPLOY_PACKAGE && ls'
 
     // 构建开始后立即重定向
 /*    def redirectUrl = "${env.BUILD_URL}"
