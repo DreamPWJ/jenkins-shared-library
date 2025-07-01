@@ -34,9 +34,9 @@ map.put('build_num_keep', 3)
 // JVM内存设置
 map.put('docker_java_opts', '-Xmx900m')
 // 容器最大cpu限制 m是千分之一 100m是0.1个CPU
-map.put('docker_limit_cpu', '900m')
+map.put('docker_limit_cpu', '800m')
 // 容器最大内存限制 不支持小数点形式设置
-map.put('docker_memory', '1200M')
+map.put('docker_memory', '1000M')
 // docker日志限制
 map.put('docker_log_opts', 'max-size=150m') // --log-opt max-size=50m --log-opt max-file=3
 // docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
@@ -135,7 +135,7 @@ JSON_PARAMS
     "NPM_RUN_PARAMS" : "build",
     "CUSTOM_DOCKERFILE_NAME" : "Dockerfile.ssr",
     "IS_K8S_DEPLOY" : true,
-    "K8S_POD_REPLICAS" : "3",
+    "K8S_POD_REPLICAS" : "2",
     "APPLICATION_DOMAIN" : "https://lannengtech.com",
 }
 
@@ -153,7 +153,7 @@ JSON_PARAMS
     "NPM_RUN_PARAMS" : "build:prod",
     "CUSTOM_NGINX_CONFIG" : "config/default-k8s.conf",
     "IS_K8S_DEPLOY" : true,
-    "K8S_POD_REPLICAS" : "2",
+    "K8S_POD_REPLICAS" : "1",
     "APPLICATION_DOMAIN" : "https://website-admin.lannengtech.com",
 }
 

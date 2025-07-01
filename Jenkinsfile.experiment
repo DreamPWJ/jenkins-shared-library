@@ -132,30 +132,5 @@ JSON_PARAMS:
    "SHELL_PARAMS" : "iot-car-lock-app test 8185 8178 sit"
 }
 
-{
-   "REPO_URL" : "https://github.com/DreamPWJ/health.git" ,
-   "BRANCH_NAME" : "prod" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "health-app" ,
-   "SHELL_PARAMS" : "health app 8080 8080 prod" ,
-}
-
-可选参数如下
-{
-  "NPM_RUN_PARAMS" : "build"
-  "IS_ROLL_DEPLOY" : true
-  "IS_BLUE_GREEN_DEPLOY" : true
-  "IS_STATIC_RESOURCE" : true
-  "IS_MONO_REPO" : true
-  "IS_BEFORE_DEPLOY_NOTICE" : true
-}
 */
 
-/*
-Pipeline五大特性
-代码: Pipeline以代码的形式实现，通常被检入源代码控制，使团队能够编辑、审查和迭代其CI/CD流程。
-可持续性: Jenkins重启或者中断后都不会影响Pipeline Job。
-停顿: Pipeline可以选择停止并等待任工输入或批准，然后再继续Pipeline运行。
-多功能: Pipeline支持现实世界的复杂CI/CD要求，包括fork/join子进程，循环和并行执行工作的能力
-可扩展: Pipeline插件支持其DSL的自定义扩展以及与其他插件集成的多个选项。
-*/

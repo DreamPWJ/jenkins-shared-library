@@ -314,7 +314,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return (IS_SOURCE_CODE_DEPLOY == false && IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
+                        expression { return (IS_SOURCE_CODE_DEPLOY == false && IS_PACKAGE_DEPLOY == false && IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
                     }
                     /*      agent {
                               dockerfile {
@@ -820,6 +820,8 @@ def getInitParams(map) {
     IS_INTEGRATION_TESTING = jsonParams.IS_INTEGRATION_TESTING ? jsonParams.IS_INTEGRATION_TESTING : false
     // 是否直接源码部署 无需打包 自定义命令启动
     IS_SOURCE_CODE_DEPLOY = jsonParams.IS_SOURCE_CODE_DEPLOY ? jsonParams.IS_SOURCE_CODE_DEPLOY : false
+    // 是否直接构建包部署方式  如无源码的情况
+    IS_PACKAGE_DEPLOY = jsonParams.IS_PACKAGE_DEPLOY ? jsonParams.IS_PACKAGE_DEPLOY : false
 
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
@@ -1100,6 +1102,9 @@ def getUserInfo() {
  * 获取项目代码
  */
 def pullProjectCode() {
+    // 直接构建包部署方式
+    packageDeploy()
+
     // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行jenkins任务才能生效
     if (!params.GIT_TAG) {
         params.GIT_TAG = GlobalVars.noGit
@@ -1150,8 +1155,6 @@ def pullProjectCode() {
 
     // 源码直接部署方式
     sourceCodeDeploy()
-    // 直接构建包部署方式
-    packageDeploy()
 }
 
 /**
@@ -1170,6 +1173,29 @@ def pullCIRepo() {
 }
 
 /**
+ * 直接构建包部署方式  如无源码的情况
+ * 无需打包 只需要包上传到服务器上执行自定义命令启动
+ */
+def packageDeploy() {
+    // 参数化上传或者Git仓库下载或从http地址下载包
+    try { // 是否存在声明
+        println("上传文件中: ${DEPLOY_PACKAGE_FILENAME}")
+        unstash 'DEPLOY_PACKAGE' // 获取文件 上传到具体job根目录下和源码同级结构
+        // sh 'cat DEPLOY_PACKAGE'
+        // 文件恢复原始文件名称  原始文件名称是 定义变量名称+ _FILENAME 固定后缀组合
+        sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME'
+        Tools.printColor(this, "${DEPLOY_PACKAGE_FILENAME} 文件上传成功 ✅")
+        buildPackageSize = Utils.getFileSize(this, "${DEPLOY_PACKAGE_FILENAME}")
+        IS_PACKAGE_DEPLOY = true
+        // 统一部署文件名称 SSH传输包到部署服务器
+        return  // 终止后续阶段执行 比如拉取项目代码 因为直接是包部署方式 不需要源码
+    } catch (error) {
+        // 如果是必须上传文件的job任务 构建后报错提醒 或者构建先input提醒
+    }
+    // 如果直接包部署方式 后面流程不需要打包 也不再依赖Git仓库
+}
+
+/**
  * 源码直接部署方式
  * 无需打包 只需要压缩上传到服务器上执行自定义命令启动
  */
@@ -1181,28 +1207,6 @@ def sourceCodeDeploy() {
             Tools.printColor(this, "源码压缩打包成功 ✅")
         }
     }
-}
-
-/**
- * 直接构建包部署方式  如无源码的情况
- * 无需打包 只需要包上传到服务器上执行自定义命令启动
- */
-def packageDeploy() {
-    // 参数化上传或者Git仓库下载或从http地址下载包
-    try { // 是否存在声明
-        println("上传文件名: ${DEPLOY_PACKAGE_FILENAME}")
-        unstash 'DEPLOY_PACKAGE' // 获取文件 上传到具体job根目录下和源码同级结构
-        // sh 'cat DEPLOY_PACKAGE'
-        // 文件恢复原始文件名称  原始文件名称是 定义变量名称+ _FILENAME 固定后缀组合
-        sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME'
-        Tools.printColor(this, "${DEPLOY_PACKAGE_FILENAME} 文件上传成功 ✅")
-        IS_PACKAGE_DEPLOY = true
-        // SSH传输包到部署服务器
-
-    } catch (error) {
-        // 如果是必须上传文件的job 构建后报错提醒 或者构建先input提醒
-    }
-    // 如果直接包部署方式 后面流程不需要打包 也不再依赖Git仓库
 }
 
 /**
@@ -1478,6 +1482,8 @@ def uploadRemote(filePath, map) {
         // 基于scp或rsync同步文件到远程服务器
         if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行自定义命令启动
             sh " scp ${proxyJumpSCPText} ${sourceCodeDeployName}.tar.gz ${remote.user}@${remote.host}:${projectDeployFolder} "
+        } else if (IS_PACKAGE_DEPLOY == true) {
+            sh " scp ${proxyJumpSCPText} ${DEPLOY_PACKAGE_FILENAME} ${remote.user}@${remote.host}:${projectDeployFolder} "
         } else if ("${IS_PUSH_DOCKER_REPO}" != 'true') { // 远程镜像库方式不需要再上传构建产物 直接远程仓库docker pull拉取镜像
             if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
                 dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
