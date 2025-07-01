@@ -672,10 +672,11 @@ def futureLab(map) {
                 submitter: 'admin'
     }
 */
-    unstash 'DEPLOY_PACKAGE'
-    sh 'cat DEPLOY_PACKAGE && ls'
+    unstash 'DEPLOY_PACKAGE' // 获取文件
+    // sh 'cat DEPLOY_PACKAGE'
     // 部署文件恢复原始文件名称
-    sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME'
+    sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME && ls'
+    println("上传文件名: ${DEPLOY_PACKAGE_FILENAME}")
 
     // 构建开始后立即重定向
 /*    def redirectUrl = "${env.BUILD_URL}"
