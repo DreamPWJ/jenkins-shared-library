@@ -672,7 +672,7 @@ def futureLab(map) {
                 submitter: 'admin'
     }
 */
-    if (this.binding.variables.containsKey('DEPLOY_PACKAGE_FILENAME')) {
+    if (binding.getVariable('DEPLOY_PACKAGE_FILENAME')) { // 是否存在声明
         println("上传文件名: ${DEPLOY_PACKAGE_FILENAME}")
         unstash 'DEPLOY_PACKAGE' // 获取文件
         // sh 'cat DEPLOY_PACKAGE'
