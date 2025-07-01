@@ -119,7 +119,7 @@ class Docker implements Serializable {
             }
 
             if ("${ctx.IS_PACKAGE_DEPLOY}" == 'true') {  // 直接构建包部署方式  如无源码的情况
-                println("判断文件类型进行特殊化处理: ${ctx.DEPLOY_PACKAGE_FILENAME}")
+                ctx.println("判断文件类型进行特殊化处理: ${ctx.DEPLOY_PACKAGE_FILENAME}")
             } else if ("${ctx.IS_SOURCE_CODE_DEPLOY}" == 'true') {  // 源码直接部署 无需打包 只需要压缩上传到服务器上执行自定义命令启动
                 def codeDockerFileName = "Dockerfile.code"
                 def jdkPublisher = "${ctx.JDK_PUBLISHER}"
