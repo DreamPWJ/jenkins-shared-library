@@ -673,9 +673,10 @@ def futureLab(map) {
     }
 */
     withFileParameter('THEFILE') {
-        sh 'cat $THEFILE'
+        // sh 'cat $THEFILE'
+        println "文件路径: ${THEFILE}"
     }
-    println "文件路径: ${params.DEPLOY_PACKAGE}"
+   //  println "文件路径: ${params.DEPLOY_PACKAGE}"
 
     // 构建开始后立即重定向
 /*    def redirectUrl = "${env.BUILD_URL}"
