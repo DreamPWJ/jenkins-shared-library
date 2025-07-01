@@ -1177,7 +1177,7 @@ def sourceCodeDeploy() {
     if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {
         dir("${env.WORKSPACE}/") { // 源码在特定目录下
             sh " rm -f ${sourceCodeDeployName}.tar.gz && " +
-           " tar --warning=no-file-changed -zcvf  ${sourceCodeDeployName}.tar.gz --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
+                    " tar --warning=no-file-changed -zcvf  ${sourceCodeDeployName}.tar.gz --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
             Tools.printColor(this, "源码压缩打包成功 ✅")
         }
     }
@@ -1196,6 +1196,9 @@ def packageDeploy() {
         // 文件恢复原始文件名称  原始文件名称是 定义变量名称+ _FILENAME 固定后缀组合
         sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME'
         Tools.printColor(this, "${DEPLOY_PACKAGE_FILENAME} 文件上传成功 ✅")
+        IS_PACKAGE_DEPLOY = true
+        // SSH传输包到部署服务器
+
     } catch (error) {
         // 如果是必须上传文件的job 构建后报错提醒 或者构建先input提醒
     }
