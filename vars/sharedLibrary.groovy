@@ -1188,7 +1188,7 @@ def packageDeploy() {
         buildPackageSize = Utils.getFileSize(this, "${DEPLOY_PACKAGE_FILENAME}")
         IS_PACKAGE_DEPLOY = true
         // 统一部署文件名称 SSH传输包到部署服务器
-        return  // 终止后续阶段执行 比如拉取代码
+        return  // 终止后续阶段执行 比如拉取项目代码 因为直接是包部署方式 不需要源码
     } catch (error) {
         // 如果是必须上传文件的job任务 构建后报错提醒 或者构建先input提醒
     }
