@@ -672,7 +672,7 @@ def futureLab(map) {
                 submitter: 'admin'
     }
 */
-    if ("${DEPLOY_PACKAGE_FILENAME}") {
+    if (DEPLOY_PACKAGE_FILENAME) {
         println("上传文件名: ${DEPLOY_PACKAGE_FILENAME}")
         unstash 'DEPLOY_PACKAGE' // 获取文件
         // sh 'cat DEPLOY_PACKAGE'
