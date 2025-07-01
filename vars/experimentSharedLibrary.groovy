@@ -674,6 +674,8 @@ def futureLab(map) {
 */
     unstash 'DEPLOY_PACKAGE'
     sh 'cat DEPLOY_PACKAGE && ls'
+    // 部署文件恢复原始文件名称
+    sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME'
 
     // 构建开始后立即重定向
 /*    def redirectUrl = "${env.BUILD_URL}"
