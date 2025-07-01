@@ -674,11 +674,11 @@ def futureLab(map) {
 */
     try { // 是否存在声明
         // 原始文件名称是 定义变量名称+ _FILENAME后缀组合
-        println("上传文件名: ${DEPLOY_PACKAGE_FILENAME}")
         unstash 'DEPLOY_PACKAGE' // 获取文件
         // sh 'cat DEPLOY_PACKAGE'
         // 部署文件恢复原始文件名称
-        sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME && ls'
+        sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME'
+        println("上传文件名: ${DEPLOY_PACKAGE_FILENAME}")
     } catch (error) {
     }
 
