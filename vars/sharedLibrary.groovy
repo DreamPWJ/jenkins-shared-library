@@ -1102,8 +1102,8 @@ def getUserInfo() {
  * 获取项目代码
  */
 def pullProjectCode() {
-    // 源码直接部署方式
-    sourceCodeDeploy()
+    // 直接构建包部署方式
+    packageDeploy()
 
     // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行jenkins任务才能生效
     if (!params.GIT_TAG) {
@@ -1153,8 +1153,8 @@ def pullProjectCode() {
         existCiCode()
     }
 
-    // 直接构建包部署方式
-    packageDeploy()
+    // 源码直接部署方式
+    sourceCodeDeploy()
 }
 
 /**
