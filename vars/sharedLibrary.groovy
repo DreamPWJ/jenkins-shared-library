@@ -1198,6 +1198,7 @@ def packageDeploy() {
         // 文件恢复原始文件名称  原始文件名称是 定义变量名称+ _FILENAME 固定后缀组合
         sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME'
         Tools.printColor(this, "${DEPLOY_PACKAGE_FILENAME} 文件上传成功 ✅")
+        buildPackageSize = Utils.getFileSize(this, ${DEPLOY_PACKAGE_FILENAME})
         IS_PACKAGE_DEPLOY = true
         // 统一部署文件名称 SSH传输包到部署服务器
 
