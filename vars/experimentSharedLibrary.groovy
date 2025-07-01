@@ -68,7 +68,7 @@ def call(String type = 'experiment', Map map) {
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 将构建成功失败等状态信息同步到群内所有人 📢 ")
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
                 // file(name: 'DEPLOY_PACKAGE', description: '请上传部署包文件')
-                stashedFile  'DEPLOY_PACKAGE'
+                stashedFile 'DEPLOY_PACKAGE'
                 //booleanParam(name: 'IS_DEPLOY_MULTI_ENV', defaultValue: false, description: '是否同时部署当前job项目多环境 如dev test等')
             }
 
@@ -672,11 +672,13 @@ def futureLab(map) {
                 submitter: 'admin'
     }
 */
-    println("上传文件名: ${DEPLOY_PACKAGE_FILENAME}")
-    unstash 'DEPLOY_PACKAGE' // 获取文件
-    // sh 'cat DEPLOY_PACKAGE'
-    // 部署文件恢复原始文件名称
-    sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME && ls'
+    if ("${DEPLOY_PACKAGE_FILENAME}") {
+        println("上传文件名: ${DEPLOY_PACKAGE_FILENAME}")
+        unstash 'DEPLOY_PACKAGE' // 获取文件
+        // sh 'cat DEPLOY_PACKAGE'
+        // 部署文件恢复原始文件名称
+        sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME && ls'
+    }
 
     // 构建开始后立即重定向
 /*    def redirectUrl = "${env.BUILD_URL}"
