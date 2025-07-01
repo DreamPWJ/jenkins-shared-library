@@ -1190,11 +1190,11 @@ def packageDeploy() {
     // 参数化上传或者Git仓库下载或从http地址下载包
     try { // 是否存在声明
         println("上传文件名: ${DEPLOY_PACKAGE_FILENAME}")
-        unstash 'DEPLOY_PACKAGE' // 获取文件
+        unstash 'DEPLOY_PACKAGE' // 获取文件 上传到具体job根目录下和源码同级结构
         // sh 'cat DEPLOY_PACKAGE'
-        // 文件恢复原始文件名称  原始文件名称是 定义变量名称+ _FILENAME固定后缀组合
+        // 文件恢复原始文件名称  原始文件名称是 定义变量名称+ _FILENAME 固定后缀组合
         sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME'
-        Tools.printColor(this, "${DEPLOY_PACKAGE_FILENAME}文件上传成功 ✅")
+        Tools.printColor(this, "${DEPLOY_PACKAGE_FILENAME} 文件上传成功 ✅")
     } catch (error) {
     }
 }
