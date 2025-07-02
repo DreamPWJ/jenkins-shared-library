@@ -1680,8 +1680,8 @@ def integrationTesting(map) {
         // 结合YApi或者ApiFox接口管理做自动化API测试
         ApiFox.autoTest(this)
 
-        def yapiUrl = "http://yapi.panweiji.com"
-        def testUrl = "${yapiUrl}/api/open/run_auto_test?${AUTO_TEST_PARAM}"
+        def apiFoxUrl = "http://apiFox.panweiji.com"
+        def testUrl = "${apiFoxUrl}/api/open/run_auto_test?${AUTO_TEST_PARAM}"
         // 执行接口测试
         def content = HttpRequest.get(this, "${testUrl}")
         def json = readJSON text: "${content}"
@@ -1690,7 +1690,7 @@ def integrationTesting(map) {
         def testCollectionId = "${AUTO_TEST_PARAM}".trim().split("&")[0].replaceAll("id=", "")
         DingTalk.noticeMarkdown(this, map.ding_talk_credentials_ids, "自动化API集成测试报告", "### 自动化API集成测试报告 🙋 " +
                 "\n #### ${json.message.msg} \n #### 测试报告: [查看结果](${testUrl.replace("mode=json", "mode=html")}) 🚨" +
-                "\n ##### 测试总耗时:  ${json.runTime} \n ##### 测试用例不完善也可导致不通过 👉[去完善](${yapiUrl}/project/${projectId}/interface/col/${testCollectionId})  ",
+                "\n ##### 测试总耗时:  ${json.runTime} \n ##### 测试用例不完善也可导致不通过 👉[去完善](${apiFoxUrl}/project/${projectId}/interface/col/${testCollectionId})  ",
                 "${failedNum}" == "0" ? "" : "${BUILD_USER_MOBILE}")
     } catch (e) {
         println "自动化集成测试失败 ❌"
