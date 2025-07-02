@@ -665,11 +665,19 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
+// 生成跳转 URL（示例）
+    def targetUrl = "${env.BUILD_URL}console"
 
-    currentBuild.rawBuild.project.getLastBuild().save()
-    redirectUrl = "${env.BUILD_URL}console"
-    echo "Redirecting to: ${redirectUrl}"
-
+    // 在构建描述中添加跳转链接
+    currentBuild.description = """
+                    <script>
+                        setTimeout(() => {
+                            window.location.href = "${targetUrl}";
+                        }, 1000);
+                    </script>
+                    <h3>构建成功！1秒后跳转到部署报告页...</h3>
+                    <a href="${targetUrl}">若未自动跳转，请点击此处</a>
+                """
 /*
     timeout(time: 1, unit: 'MINUTES') {
         input message: '请上传部署包并确认',
@@ -693,13 +701,13 @@ def futureLab(map) {
     System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'unsafe-inline';")
     echo "<script>window.location.href='${redirectUrl}';</script>"*/
 
-/*    def badge = addInfoBadge(icon: "", text: '流水线执行成功 ✅')
+    def badge = addInfoBadge(icon: "", text: '流水线执行成功 ✅')
     sleep 5
     def badge2 = addInfoBadge(icon: "", text: '流水线执行失败 ❌')
     sleep 5
     removeBadges(id: badge.getId())
     removeBadges(id: badge2.getId())
-    */
+
 /*   addBadge(id: "version-badge", text: "2.100.10", color: 'green', cssClass: 'badge-text--background')
   addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
   removeBadges(id: "launch-badge")
