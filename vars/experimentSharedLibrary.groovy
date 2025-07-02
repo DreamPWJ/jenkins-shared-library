@@ -665,25 +665,16 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
-// 生成跳转 URL（示例）
+    // 生成跳转 URL
     def targetUrl = "${env.BUILD_URL}console"
 
-    // 在构建描述中添加跳转链接
-    currentBuild.description = """
-                    <script>
-                        setTimeout(() => {
-                            window.location.href = "${targetUrl}";
-                        }, 1000);
-                    </script>
-                    <h3>构建成功！1秒后跳转到部署报告页...</h3>
-                    <a href="${targetUrl}">若未自动跳转，请点击此处</a>
-                """
 /*
     timeout(time: 1, unit: 'MINUTES') {
         input message: '请上传部署包并确认',
                 submitter: 'admin'
     }
 */
+
     try { // 是否存在声明
         // 原始文件名称是 定义变量名称+ _FILENAME后缀组合
         println("上传文件名: ${DEPLOY_PACKAGE_FILENAME}")
@@ -702,9 +693,9 @@ def futureLab(map) {
     echo "<script>window.location.href='${redirectUrl}';</script>"*/
 
     def badge = addInfoBadge(icon: "", text: '流水线执行成功 ✅')
-    sleep 5
+    sleep 3
     def badge2 = addInfoBadge(icon: "", text: '流水线执行失败 ❌')
-    sleep 5
+    sleep 3
     removeBadges(id: badge.getId())
     removeBadges(id: badge2.getId())
 
