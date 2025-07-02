@@ -68,7 +68,7 @@ def call(String type = 'experiment', Map map) {
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 将构建成功失败等状态信息同步到群内所有人 📢 ")
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
                 // file(name: 'DEPLOY_PACKAGE', description: '请上传部署包文件')
-                stashedFile(name: 'DEPLOY_PACKAGE', description: '请选择上传部署包文件 不依赖源码情况下支持直接上传成品包部署方式 如 *.jar、*.war、*.tar.gz等 🚀 ')
+                stashedFile(name: 'DEPLOY_PACKAGE', description: '请选择上传部署包文件 不依赖源码情况下 支持直接上传成品包部署方式 (如 *.jar、*.war、*.tar.gz等格式) 🚀 ')
                 //booleanParam(name: 'IS_DEPLOY_MULTI_ENV', defaultValue: false, description: '是否同时部署当前job项目多环境 如dev test等')
             }
 
