@@ -675,7 +675,7 @@ def futureLab(map) {
             sleep(5)
         }
     } catch (e) {
-        Tools.printColor(ctx, "K8S集群中Pod服务部署启动失败  ❌", "red")
+        Tools.printColor(this, "K8S集群中Pod服务部署启动失败  ❌", "red")
         // error("K8S集群健康探测失败, 终止当前Pipeline流水线运行 ❌")
     }
 
