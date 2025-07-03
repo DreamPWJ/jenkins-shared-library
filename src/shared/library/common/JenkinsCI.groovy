@@ -77,6 +77,27 @@ class JenkinsCI implements Serializable {
     }
 
     /**
+     * 获取所有job信息 并更新等
+     */
+    static def getAllJobs(ctx) {
+        Jenkins.instance.items.each { job ->
+            // println("${job.name}:${job.url}")
+            /*  job.builds.each { build ->
+                      println("${build.number}:${build.url}")
+           }  */
+            try {
+                // 重载配置（清除缓存，重新解析共享库）
+                job.doReload()
+                println "[SUCCESS] Reloaded job: ${job.fullName}"
+            } catch (Exception e) {
+                println "[ERROR] Failed to reload ${job.fullName}: ${e.message}"
+            }
+        }
+        Jenkins.instance.save()
+
+    }
+
+    /**
      * 获取所有已安装插件信息
      * 存储到 plugins.txt 用于自动化初始化安装大量插件
      */
@@ -107,4 +128,5 @@ class JenkinsCI implements Serializable {
             false
         }
     }
+
 }
