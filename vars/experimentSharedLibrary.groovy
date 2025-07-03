@@ -671,14 +671,15 @@ def futureLab(map) {
     println("远程节点IP数量乘数: ${array.size * 3}")
 */
 
-/*    try {
-        timeout(time: 3, unit: 'SECONDS') {
+    try {
+        def timeOutValue = 3
+        timeout(time: timeOutValue, unit: 'SECONDS') {
             sleep(5)
         }
     } catch (e) {
         Tools.printColor(this, "K8S集群中Pod服务部署启动失败  ❌", "red")
         // error("K8S集群健康探测失败, 终止当前Pipeline流水线运行 ❌")
-    }*/
+    }
 
     // 生成跳转 URL
     def targetUrl = "${env.BUILD_URL}console"
