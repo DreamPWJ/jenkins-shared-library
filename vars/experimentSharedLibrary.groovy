@@ -668,12 +668,15 @@ def futureLab(map) {
     def array = map.remote_worker_ips
     println("远程节点IP: ${array}")
     println("远程节点IP数量: ${array.size}")
-    println("远程节点IP数量乘数: ${array.size*3}")
+    println("远程节点IP数量乘数: ${array.size * 3}")
 
-    timeout(time: 3, unit: 'SECONDS'){
-        sleep(5)
+    try {
+        timeout(time: 3, unit: 'SECONDS') {
+            sleep(5)
+        }
+    } catch (e) {
+        error("K8S健康探测失败, 终止当前Pipeline运行 ❌")
     }
-
     // 生成跳转 URL
     def targetUrl = "${env.BUILD_URL}console"
 
