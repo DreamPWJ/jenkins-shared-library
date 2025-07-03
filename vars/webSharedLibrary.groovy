@@ -1049,7 +1049,7 @@ def healthCheck(map, params = '') { // 可选参数
         }
         IS_ARCHIVE = false // 不归档
         currentBuild.result = 'FAILURE' // 失败  不稳定UNSTABLE 取消ABORTED
-        error("健康检测失败, 终止当前Pipeline运行 ❌")
+        error("应用服务健康检测失败, 终止当前Pipeline运行 ❌")
         return
     }
 }

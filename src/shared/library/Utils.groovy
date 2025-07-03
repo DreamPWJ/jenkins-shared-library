@@ -39,7 +39,7 @@ class Utils implements Serializable {
     /**
      * 格式化时间
      */
-    static def formatDate(String format = 'yyyy-MM-dd HH:mm') {
+    static def formatDate(String format = 'yyyy-MM-dd HH:mm:ss') {
         return new Date().format(format)
     }
 

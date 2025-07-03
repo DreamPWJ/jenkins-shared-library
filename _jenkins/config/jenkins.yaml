@@ -123,6 +123,7 @@ jenkins:
             javaPath: "/usr/lib/jvm/jdk-21.0.5/bin/java"
             port: 18025
             sshHostKeyVerificationStrategy: "nonVerifyingKeyVerificationStrategy"
+        mode: EXCLUSIVE
         name: "node-2"
         nodeDescription: "node 2号节点"
         nodeProperties:
@@ -144,7 +145,6 @@ jenkins:
             maxNumRetries: 30
             port: 3900
             sshHostKeyVerificationStrategy: "nonVerifyingKeyVerificationStrategy"
-        mode: EXCLUSIVE
         name: "node-3"
         nodeDescription: "node 3"
         nodeProperties:
@@ -668,21 +668,6 @@ jenkins:
           - "lastDuration"
           - "descriptionColumn"
           - "buildButton"
-        description: "ERP系统"
-        jobNames:
-          - "lanneng-erp-app-prod"
-          - "lanneng-erp-web-prod"
-        name: "lanneng-erp"
-    - list:
-        columns:
-          - "status"
-          - "weather"
-          - "jobName"
-          - "lastSuccess"
-          - "lastFailure"
-          - "lastDuration"
-          - "descriptionColumn"
-          - "buildButton"
         description: "跃动时刻K8S生产环境"
         jobNames:
           - "lanneng-fitness-admin-web-k8s-prod"
@@ -801,12 +786,12 @@ jenkins:
         description: "流水线测试视图"
         jobNames:
           - "experiment-pipeline"
-          - "pengbo-park-app-native-test"
           - "spring-ai-demo-test"
           - "spring-boot3-graalvm-demo"
           - "spring-boot3-graalvm-k8s-demo"
           - "spring-boot3-jdk21-test"
           - "Test"
+          - "Test/pengbo-park-app-native-test"
         name: "pipeline-test"
     - list:
         columns:
@@ -822,6 +807,7 @@ jenkins:
           - "buildButton"
         description: "服务健康探测"
         jobNames:
+          - "oauth2-service-k8s-prod"
           - "services-health-check-k8s-prod"
         name: "services-health-check"
   viewsTabBar: "standard"

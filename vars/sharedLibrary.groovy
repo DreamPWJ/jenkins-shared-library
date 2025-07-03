@@ -65,7 +65,7 @@ def call(String type = 'web-java', Map map) {
                         description: '是否在生产环境中自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录 📄')
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 将构建成功失败等状态信息同步到群内所有人 📢 ")
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
-                stashedFile 'DEPLOY_PACKAGE'
+                stashedFile(name: 'DEPLOY_PACKAGE', description: "请选择上传部署包文件 不依赖源码情况下 支持直接上传成品包部署方式 (如 *.jar、*.war、*.tar.gz 等格式) 🚀 ")
                 //booleanParam(name: 'IS_DEPLOY_MULTI_ENV', defaultValue: false, description: '是否同时部署当前job项目多环境 如dev test等')
             }
 
@@ -1627,7 +1627,9 @@ def healthCheck(map, params = '') { // 可选参数
         healthCheckParams = " -a ${PROJECT_TYPE} -b ${healthCheckUrl}"
     }
     def healthCheckStart = new Date()
-    timeout(time: 10, unit: 'MINUTES') {  // health-check.sh有检测超时时间 timeout为防止shell脚本超时失效兼容处理
+
+    def timeout = 5 // 单节点部署启动最大超时时间
+    timeout(time: timeout, unit: 'MINUTES') {  // health-check.sh有检测超时时间 timeout为防止shell脚本超时失效兼容处理
         healthCheckMsg = sh(
                 script: "ssh  ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/ && ./health-check.sh ${healthCheckParams} '",
                 returnStdout: true).trim()
@@ -1661,7 +1663,7 @@ def healthCheck(map, params = '') { // 可选参数
 
         IS_ARCHIVE = false // 不归档
         currentBuild.result = 'FAILURE' // 失败  不稳定UNSTABLE 取消ABORTED
-        error("健康检测失败, 终止当前Pipeline运行 ❌")
+        error("应用服务健康检测失败, 终止当前Pipeline运行 ❌")
         return
     }
 }
@@ -1680,8 +1682,8 @@ def integrationTesting(map) {
         // 结合YApi或者ApiFox接口管理做自动化API测试
         ApiFox.autoTest(this)
 
-        def yapiUrl = "http://yapi.panweiji.com"
-        def testUrl = "${yapiUrl}/api/open/run_auto_test?${AUTO_TEST_PARAM}"
+        def apiFoxUrl = "http://apiFox.panweiji.com"
+        def testUrl = "${apiFoxUrl}/api/open/run_auto_test?${AUTO_TEST_PARAM}"
         // 执行接口测试
         def content = HttpRequest.get(this, "${testUrl}")
         def json = readJSON text: "${content}"
@@ -1690,7 +1692,7 @@ def integrationTesting(map) {
         def testCollectionId = "${AUTO_TEST_PARAM}".trim().split("&")[0].replaceAll("id=", "")
         DingTalk.noticeMarkdown(this, map.ding_talk_credentials_ids, "自动化API集成测试报告", "### 自动化API集成测试报告 🙋 " +
                 "\n #### ${json.message.msg} \n #### 测试报告: [查看结果](${testUrl.replace("mode=json", "mode=html")}) 🚨" +
-                "\n ##### 测试总耗时:  ${json.runTime} \n ##### 测试用例不完善也可导致不通过 👉[去完善](${yapiUrl}/project/${projectId}/interface/col/${testCollectionId})  ",
+                "\n ##### 测试总耗时:  ${json.runTime} \n ##### 测试用例不完善也可导致不通过 👉[去完善](${apiFoxUrl}/project/${projectId}/interface/col/${testCollectionId})  ",
                 "${failedNum}" == "0" ? "" : "${BUILD_USER_MOBILE}")
     } catch (e) {
         println "自动化集成测试失败 ❌"

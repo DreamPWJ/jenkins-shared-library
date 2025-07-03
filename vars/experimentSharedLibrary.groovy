@@ -68,7 +68,7 @@ def call(String type = 'experiment', Map map) {
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 将构建成功失败等状态信息同步到群内所有人 📢 ")
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
                 // file(name: 'DEPLOY_PACKAGE', description: '请上传部署包文件')
-                stashedFile 'DEPLOY_PACKAGE'
+                stashedFile(name: 'DEPLOY_PACKAGE', description: "请选择上传部署包文件 不依赖源码情况下 支持直接上传成品包部署方式 (如 *.jar、*.war、*.tar.gz 等格式) 🚀 ")
                 //booleanParam(name: 'IS_DEPLOY_MULTI_ENV', defaultValue: false, description: '是否同时部署当前job项目多环境 如dev test等')
             }
 
@@ -665,6 +665,23 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
+/*    def array = map.remote_worker_ips
+    println("远程节点IP: ${array}")
+    println("远程节点IP数量: ${array.size}")
+    println("远程节点IP数量乘数: ${array.size * 3}")
+*/
+
+/*    try {
+        timeout(time: 3, unit: 'SECONDS') {
+            sleep(5)
+        }
+    } catch (e) {
+        Tools.printColor(this, "K8S集群中Pod服务部署启动失败  ❌", "red")
+        // error("K8S集群健康探测失败, 终止当前Pipeline流水线运行 ❌")
+    }*/
+
+    // 生成跳转 URL
+    def targetUrl = "${env.BUILD_URL}console"
 
 /*
     timeout(time: 1, unit: 'MINUTES') {
@@ -672,6 +689,7 @@ def futureLab(map) {
                 submitter: 'admin'
     }
 */
+
     try { // 是否存在声明
         // 原始文件名称是 定义变量名称+ _FILENAME后缀组合
         println("上传文件名: ${DEPLOY_PACKAGE_FILENAME}")
@@ -690,11 +708,12 @@ def futureLab(map) {
     echo "<script>window.location.href='${redirectUrl}';</script>"*/
 
     def badge = addInfoBadge(icon: "", text: '流水线执行成功 ✅')
-    sleep 5
+    sleep 3
     def badge2 = addInfoBadge(icon: "", text: '流水线执行失败 ❌')
-    sleep 5
+    sleep 3
     removeBadges(id: badge.getId())
     removeBadges(id: badge2.getId())
+
 /*   addBadge(id: "version-badge", text: "2.100.10", color: 'green', cssClass: 'badge-text--background')
   addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
   removeBadges(id: "launch-badge")
