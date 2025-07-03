@@ -342,7 +342,8 @@ class Kubernetes implements Serializable {
         def k8sPodReplicas = Integer.parseInt(ctx.K8S_POD_REPLICAS) // 部署pod数
         ctx.sleep 2 // 等待检测  需要等待容器镜像下载如Pending状态等  可以先判断容器下载完成后再执行下面的检测
         // 等待所有Pod达到Ready状态
-        ctx.timeout(time: 10, unit: 'MINUTES') { // 设置超时时间
+        def timeout = k8sPodReplicas * 2  // 超时时间 根据pod数据动态调整 乘数就是单个pod的预计最大部署启动时间
+        ctx.timeout(time: timeout, unit: 'MINUTES') { // 设置超时时间
             def podsAreReady = false
             int readyCount = 0
             int totalPods = 0
