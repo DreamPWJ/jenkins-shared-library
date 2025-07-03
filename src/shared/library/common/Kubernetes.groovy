@@ -218,7 +218,7 @@ class Kubernetes implements Serializable {
                     " s#{MAX_CPU_SIZE}#${cpuHPA}#g;s#{MAX_MEMORY_SIZE}#${memoryHPA}#g;s#{K8S_NAMESPACE}#${k8sNameSpace}#g; " +
                     " s#{HPA_API_VERSION}#${hpaApiVersion}#g; " +
                     " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
-            ctx.sh " cat ${yamlName} "
+            // ctx.sh " cat ${yamlName} "
 
             ctx.println("K8S集群执行部署Pod自动水平扩缩容 💕")
             // 部署Pod水平扩缩容  apply默认资源不存在则创建，存在则更新

@@ -665,6 +665,15 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
+    def array = map.remote_worker_ips
+    println("远程节点IP: ${array}")
+    println("远程节点IP数量: ${array.size}")
+    println("远程节点IP数量乘数: ${array.size*3}")
+
+    timeout(time: 3, unit: 'SECONDS'){
+        sleep(5)
+    }
+
     // 生成跳转 URL
     def targetUrl = "${env.BUILD_URL}console"
 
