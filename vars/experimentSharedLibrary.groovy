@@ -665,7 +665,7 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
-    def array = map.remote_worker_ips
+/*    def array = map.remote_worker_ips
     println("远程节点IP: ${array}")
     println("远程节点IP数量: ${array.size}")
     println("远程节点IP数量乘数: ${array.size * 3}")
@@ -675,8 +675,8 @@ def futureLab(map) {
             sleep(5)
         }
     } catch (e) {
-        error("K8S健康探测失败, 终止当前Pipeline运行 ❌")
-    }
+        error("K8S集群健康探测失败, 终止当前Pipeline流水线运行 ❌")
+    }*/
     // 生成跳转 URL
     def targetUrl = "${env.BUILD_URL}console"
 

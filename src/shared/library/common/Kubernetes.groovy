@@ -335,61 +335,66 @@ class Kubernetes implements Serializable {
      * K8S验证部署是否成功
      */
     static def verifyDeployment(ctx) {
-        // 前提开启 readinessProbe和livenessProbe 健康探测
-        ctx.println("K8S集群所有Pod节点健康探测中, 请耐心等待... 🚀")
-        def deploymentName = "${ctx.FULL_PROJECT_NAME}" // labels.app标签值
-        def namespace = k8sNameSpace
-        def k8sPodReplicas = Integer.parseInt(ctx.K8S_POD_REPLICAS) // 部署pod数
-        ctx.sleep 2 // 等待检测  需要等待容器镜像下载如Pending状态等  可以先判断容器下载完成后再执行下面的检测
-        // 等待所有Pod达到Ready状态
-        def timeout = k8sPodReplicas * 2  // 超时时间 根据pod数据动态调整 乘数就是单个pod的预计最大部署启动时间
-        ctx.timeout(time: timeout, unit: 'MINUTES') { // 设置超时时间
-            def podsAreReady = false
-            int readyCount = 0
-            int totalPods = 0
-            def podStatusPhase = ""
-            def whileCount = 0  // 循环次数
-            while (!podsAreReady) {
-                whileCount++
-                def output = ctx.sh(script: "kubectl get pods -n $namespace -l app=$deploymentName -o json", returnStdout: true)
-                def podStatus = ctx.readJSON text: output
+        try {
+            // 前提开启 readinessProbe和livenessProbe 健康探测
+            ctx.println("K8S集群所有Pod节点健康探测中, 请耐心等待... 🚀")
+            def deploymentName = "${ctx.FULL_PROJECT_NAME}" // labels.app标签值
+            def namespace = k8sNameSpace
+            def k8sPodReplicas = Integer.parseInt(ctx.K8S_POD_REPLICAS) // 部署pod数
+            ctx.sleep 2 // 等待检测  需要等待容器镜像下载如Pending状态等  可以先判断容器下载完成后再执行下面的检测
+            // 等待所有Pod达到Ready状态
+            def timeout = k8sPodReplicas * 2  // 超时时间 根据pod数据动态调整 乘数就是单个pod的预计最大部署启动时间
+            ctx.timeout(time: timeout, unit: 'MINUTES') { // 设置超时时间
+                def podsAreReady = false
+                int readyCount = 0
+                int totalPods = 0
+                def podStatusPhase = ""
+                def whileCount = 0  // 循环次数
+                while (!podsAreReady) {
+                    whileCount++
+                    def output = ctx.sh(script: "kubectl get pods -n $namespace -l app=$deploymentName -o json", returnStdout: true)
+                    def podStatus = ctx.readJSON text: output
 
-                readyCount = podStatus.items.findAll { it.status.containerStatuses.every { it.ready == true } }.size()
-                totalPods = podStatus.items.size()
-                podStatusPhase = podStatus.items.status.phase // Running状态容器正式启动运行
+                    readyCount = podStatus.items.findAll { it.status.containerStatuses.every { it.ready == true } }.size()
+                    totalPods = podStatus.items.size()
+                    podStatusPhase = podStatus.items.status.phase // Running状态容器正式启动运行
 
-                if (readyCount == totalPods) {
-                    podsAreReady = true
-                } else {
-                    // yaml内容中包含初始化时间和启动完成时间 shell中自动解析所有内容，建议yq进行实际的YAML解析
-                    ctx.echo "Waiting for all pods to be ready. Currently Ready: $readyCount / Total: $totalPods ,  podStatusPhase: $podStatusPhase"
-                    if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
-                        def sleepTime = k8sPodReplicas * 3 - whileCount
-                        ctx.sleep sleepTime < 3 ? 3 : sleepTime // 每隔多少秒检查一次
-                    }
-                    if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-                        def sleepTime = k8sPodReplicas * 2 - whileCount
-                        ctx.sleep sleepTime < 2 ? 2 : sleepTime // 每隔多少秒检查一次
+                    if (readyCount == totalPods) {
+                        podsAreReady = true
+                    } else {
+                        // yaml内容中包含初始化时间和启动完成时间 shell中自动解析所有内容，建议yq进行实际的YAML解析
+                        ctx.echo "Waiting for all pods to be ready. Currently Ready: $readyCount / Total: $totalPods ,  podStatusPhase: $podStatusPhase"
+                        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
+                            def sleepTime = k8sPodReplicas * 3 - whileCount
+                            ctx.sleep sleepTime < 3 ? 3 : sleepTime // 每隔多少秒检查一次
+                        }
+                        if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
+                            def sleepTime = k8sPodReplicas * 2 - whileCount
+                            ctx.sleep sleepTime < 2 ? 2 : sleepTime // 每隔多少秒检查一次
+                        }
                     }
                 }
-            }
 
-            // 除了Running之外的状态  都不能算部署成功 Pod处于Pending状态也会通过上面的Ready状态检测代码 其实部署是失败的
-            // 如 Pending 由于资源不足或其他限制  Terminating 器可能还在停止中或资源清理阶段  ContainerCreating 容器尚未创建完成
-            // Failed 如果Pod中的所有容器都因失败而退出，并且不会再重启，则Pod会进入Failed状态  CrashLoopBackOff 时，这意味着 Pod 中的主容器（或其中一个容器）反复启动并快速退出
-            if (podsAreReady == true) { //  健康探测成功
-                ctx.echo "Currently Ready: $readyCount / Total: $totalPods ,  podStatusPhase: $podStatusPhase"
-                if (podStatusPhase.contains("Pending") || podStatusPhase.contains("Terminating")
-                        || podStatusPhase.contains("ContainerCreating") || podStatusPhase.contains("CrashLoopBackOff")) {
+                // 除了Running之外的状态  都不能算部署成功 Pod处于Pending状态也会通过上面的Ready状态检测代码 其实部署是失败的
+                // 如 Pending 由于资源不足或其他限制  Terminating 器可能还在停止中或资源清理阶段  ContainerCreating 容器尚未创建完成
+                // Failed 如果Pod中的所有容器都因失败而退出，并且不会再重启，则Pod会进入Failed状态  CrashLoopBackOff 时，这意味着 Pod 中的主容器（或其中一个容器）反复启动并快速退出
+                if (podsAreReady == true) { //  健康探测成功
+                    ctx.echo "Currently Ready: $readyCount / Total: $totalPods ,  podStatusPhase: $podStatusPhase"
+                    if (podStatusPhase.contains("Pending") || podStatusPhase.contains("Terminating")
+                            || podStatusPhase.contains("ContainerCreating") || podStatusPhase.contains("CrashLoopBackOff")) {
+                        Tools.printColor(ctx, "K8S集群中Pod服务部署启动失败  ❌", "red")
+                        ctx.error("K8S集群中Pod服务部署启动失败 终止流水线运行 ❌")
+                    } else {
+                        Tools.printColor(ctx, "K8S集群中所有Pod服务已处于启动状态 ✅")
+                    }
+                } else { //  健康探测失败
                     Tools.printColor(ctx, "K8S集群中Pod服务部署启动失败  ❌", "red")
                     ctx.error("K8S集群中Pod服务部署启动失败 终止流水线运行 ❌")
-                } else {
-                    Tools.printColor(ctx, "K8S集群中所有Pod服务已处于启动状态 ✅")
                 }
-            } else { //  健康探测失败
-                Tools.printColor(ctx, "K8S集群中Pod服务部署启动失败  ❌", "red")
-                ctx.error("K8S集群中Pod服务部署启动失败 终止流水线运行 ❌")
             }
+        } catch (e) {
+            Tools.printColor(ctx, "K8S集群中Pod服务部署启动失败  ❌", "red")
+            ctx.error("K8S集群健康探测失败, 终止当前Pipeline流水线运行 ❌")
         }
     }
 
