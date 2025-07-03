@@ -1628,8 +1628,8 @@ def healthCheck(map, params = '') { // 可选参数
     }
     def healthCheckStart = new Date()
 
-    def timeout = 5 // 单节点部署启动最大超时时间
-    timeout(time: timeout, unit: 'MINUTES') {  // health-check.sh有检测超时时间 timeout为防止shell脚本超时失效兼容处理
+    // 单节点部署启动最大超时时间
+    timeout(time: 5, unit: 'MINUTES') {  // health-check.sh有检测超时时间 timeout为防止shell脚本超时失效兼容处理
         healthCheckMsg = sh(
                 script: "ssh  ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/ && ./health-check.sh ${healthCheckParams} '",
                 returnStdout: true).trim()
