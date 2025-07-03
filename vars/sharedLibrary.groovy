@@ -1782,8 +1782,7 @@ def blueGreenDeploy(map) {
  * 滚动部署
  */
 def scrollToDeploy(map) {
-
-    if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
+    if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀和灰度部署方式
         println "Docker灰度发布:  滚动部署情况 只部署第一个节点 单机部署阶段已部署"
         return  // 返回后续代码不再执行
         /* if (machineNum >= 2) { // 金丝雀分批部署控制阀门
@@ -2077,6 +2076,9 @@ def alwaysPost() {
  * 生成版本tag和变更日志
  */
 def gitTagLog() {
+    if (IS_PACKAGE_DEPLOY == true) {
+        return  // 终止后续阶段执行  因为直接是包部署方式 无源码仓库
+    }
     // 文件夹的所有者和现在的用户不一致导致 git命令异常
     // sh "git config --global --add safe.directory ${env.WORKSPACE} || true"
 
