@@ -183,7 +183,8 @@ class Deploy implements Serializable {
                 }
                 ctx.remote_worker_ips.each { ip ->
                     ctx.println ip
-                    ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ip} ' " + command + " ' "
+                    ctx.remote.host = ip
+                    ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} ' " + command + " ' "
                     if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
                         // ctx.sleep 30  // 重启多个服务 防止服务不可用等待顺序重启
                         // 健康检测  判断服务是否启动成功
