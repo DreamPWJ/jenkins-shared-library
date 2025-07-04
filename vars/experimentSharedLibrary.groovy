@@ -186,7 +186,9 @@ def call(String type = 'experiment', Map map) {
                                         pullCIRepo()
                                     },
                                     '项目代码': {
-                                        pullProjectCode()
+                                        retry(3) {
+                                            pullProjectCode()
+                                        }
                                     })
                         }
                     }
