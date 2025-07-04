@@ -774,7 +774,7 @@ def futureLab(map) {
     }*/
 
 
-    def mvndVersion = "1.0.2"
+/*    def mvndVersion = "1.0.2"
     def jdkVersion = "21"
     def dockerImageName = "panweiji/mvnd-jdk"
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
@@ -790,7 +790,7 @@ def futureLab(map) {
         //sh "mvn clean install  -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvnd  install"
         //sh "mvn  install"
-    }
+    }*/
 
 
 /*
