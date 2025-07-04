@@ -178,20 +178,20 @@ def call(String type = 'web-java', Map map) {
                     }
                     steps {
                         script {
-                            // 按顺序执行代码
                             // 重试几次
-                            retry(3) {
+                     /*       retry(3) {
                                 pullProjectCode()
                                 pullCIRepo()
-                            }
-
-                            /*  parallel( // 步骤内并发执行
+                            }*/
+                            parallel( // 步骤内并发执行
                                      'CI/CD代码': {
                                          pullCIRepo()
                                      },
                                      '项目代码': {
-                                         pullProjectCode()
-                                     }) */
+                                         retry(3) {
+                                             pullProjectCode()
+                                         }
+                           })
                         }
                     }
                 }

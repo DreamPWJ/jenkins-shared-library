@@ -186,7 +186,9 @@ def call(String type = 'experiment', Map map) {
                                         pullCIRepo()
                                     },
                                     '项目代码': {
-                                        pullProjectCode()
+                                        retry(3) {
+                                            pullProjectCode()
+                                        }
                                     })
                         }
                     }
@@ -710,12 +712,12 @@ def futureLab(map) {
     System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'unsafe-inline';")
     echo "<script>window.location.href='${redirectUrl}';</script>"*/
 
-    def badge = addInfoBadge(icon: "", text: '流水线执行成功 ✅')
+/*    def badge = addInfoBadge(icon: "", text: '流水线执行成功 ✅')
     sleep 3
     def badge2 = addInfoBadge(icon: "", text: '流水线执行失败 ❌')
     sleep 3
     removeBadges(id: badge.getId())
-    removeBadges(id: badge2.getId())
+    removeBadges(id: badge2.getId())*/
 
 /*   addBadge(id: "version-badge", text: "2.100.10", color: 'green', cssClass: 'badge-text--background')
   addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: 'https://yuanbao.tencent.com/', target: '_blank')
@@ -772,8 +774,7 @@ def futureLab(map) {
     }*/
 
 
-/*
-    def mvndVersion = "1.0.2"
+/*    def mvndVersion = "1.0.2"
     def jdkVersion = "21"
     def dockerImageName = "panweiji/mvnd-jdk"
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
@@ -785,12 +786,13 @@ def futureLab(map) {
         sh "mvn --version"
         sh "java --version"
 
-        //sh "mvnd clean install -T2 -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
+        sh "mvnd clean install -T 4C -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvn clean install  -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvnd  install"
         //sh "mvn  install"
-    }
-*/
+    }*/
+
+
 /*
     def k8sPodReplicas = Integer.parseInt("3")
     println("等于 " + k8sPodReplicas * 3 - 1)*/
