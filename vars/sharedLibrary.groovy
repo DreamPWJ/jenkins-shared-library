@@ -185,7 +185,9 @@ def call(String type = 'web-java', Map map) {
                                    }*/
                             parallel( // 步骤内并发执行
                                     'CI/CD代码': {
-                                        pullCIRepo()
+                                        retry(3) {
+                                            pullCIRepo()
+                                        }
                                     },
                                     '项目代码': {
                                         retry(3) {
@@ -1095,7 +1097,7 @@ def getUserInfo() {
             }
         }
     }
-    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: "${BUILD_USER}同学 正在为您加速部署${SHELL_ENV_MODE}环境 ...")
+    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: "${BUILD_USER}同学 正在为你加速构建部署${SHELL_ENV_MODE}环境 ...")
 }
 
 /**
