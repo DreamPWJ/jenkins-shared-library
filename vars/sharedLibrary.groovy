@@ -99,6 +99,29 @@ def call(String type = 'web-java', Map map) {
                 // pollSCM('H/1 * * * *')
             }
 
+            options {
+                //失败重试次数
+                retry(0)
+                //超时时间 job会自动被终止
+                timeout(time: 120, unit: 'MINUTES')
+                //保持构建的最大个数
+                buildDiscarder(logRotator(numToKeepStr: "${map.build_num_keep}", artifactNumToKeepStr: "${map.build_num_keep}"))
+                //控制台输出增加时间戳
+                timestamps()
+                //不允许同一个job同时执行流水线,可被用来防止同时访问共享资源等
+                disableConcurrentBuilds()
+                //如果某个stage为unstable状态，则忽略后面的任务，直接退出
+                skipStagesAfterUnstable()
+                //安静的时期 设置管道的静默时间段（以秒为单位），以覆盖全局默认值
+                quietPeriod(1)
+                //删除隐式checkout scm语句
+                skipDefaultCheckout()
+                //日志颜色
+                ansiColor('xterm')
+                //当agent为Docker或Dockerfile时, 指定在同一个jenkins节点上,每个stage都分别运行在一个新容器中,而不是同一个容器
+                //newContainerPerStage()
+            }
+
             environment {
                 // 系统环境变量
                 JAVA_TOOL_OPTIONS = "-Dfile.encoding=UTF-8" // 在全局系统设置或构建环境中设置 为了确保正确解析编码和颜色
@@ -136,29 +159,6 @@ def call(String type = 'web-java', Map map) {
                 IS_ONLY_NOTICE_CHANGE_LOG = "${map.is_only_notice_change_log}" // 是否只通知发布变更记录
             }
 
-            options {
-                //失败重试次数
-                retry(0)
-                //超时时间 job会自动被终止
-                timeout(time: 120, unit: 'MINUTES')
-                //保持构建的最大个数
-                buildDiscarder(logRotator(numToKeepStr: "${map.build_num_keep}", artifactNumToKeepStr: "${map.build_num_keep}"))
-                //控制台输出增加时间戳
-                timestamps()
-                //不允许同一个job同时执行流水线,可被用来防止同时访问共享资源等
-                disableConcurrentBuilds()
-                //如果某个stage为unstable状态，则忽略后面的任务，直接退出
-                skipStagesAfterUnstable()
-                //安静的时期 设置管道的静默时间段（以秒为单位），以覆盖全局默认值
-                quietPeriod(1)
-                //删除隐式checkout scm语句
-                skipDefaultCheckout()
-                //日志颜色
-                ansiColor('xterm')
-                //当agent为Docker或Dockerfile时, 指定在同一个jenkins节点上,每个stage都分别运行在一个新容器中,而不是同一个容器
-                //newContainerPerStage()
-            }
-
             stages {
                 stage('初始化') {
                     steps {
@@ -179,19 +179,21 @@ def call(String type = 'web-java', Map map) {
                     steps {
                         script {
                             // 重试几次
-                     /*       retry(3) {
-                                pullProjectCode()
-                                pullCIRepo()
-                            }*/
+                            /*       retry(3) {
+                                       pullProjectCode()
+                                       pullCIRepo()
+                                   }*/
                             parallel( // 步骤内并发执行
-                                     'CI/CD代码': {
-                                         pullCIRepo()
-                                     },
-                                     '项目代码': {
-                                         retry(3) {
-                                             pullProjectCode()
-                                         }
-                           })
+                                    'CI/CD代码': {
+                                        retry(3) {
+                                            pullCIRepo()
+                                        }
+                                    },
+                                    '项目代码': {
+                                        retry(3) {
+                                            pullProjectCode()
+                                        }
+                                    })
                         }
                     }
                 }
@@ -1095,7 +1097,7 @@ def getUserInfo() {
             }
         }
     }
-    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: "${BUILD_USER}同学 正在为您加速部署${SHELL_ENV_MODE}环境 ...")
+    addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: "${BUILD_USER}同学 正在为你加速构建部署${SHELL_ENV_MODE}环境 ...")
 }
 
 /**
