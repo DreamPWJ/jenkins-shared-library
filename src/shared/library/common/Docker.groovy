@@ -121,10 +121,11 @@ class Docker implements Serializable {
             if (ctx.IS_PACKAGE_DEPLOY == true) {  // 直接构建包部署方式  如无源码的情况
                 def deployPackageFile = "${ctx.DEPLOY_PACKAGE_FILENAME}"
                 ctx.println("直接构建包部署方式 判断包文件类型进行特殊化处理: ${deployPackageFile}")
+                // 部署包存放到根目录中
                 if (deployPackageFile.endsWith(".jar") || deployPackageFile.endsWith(".war")) {
                     ctx.mavenPackageLocationDir = ""
                 } else if (deployPackageFile.endsWith(".tar.gz")) {
-
+                    ctx.monoRepoProjectDir = ""
                 }
             }
 
