@@ -278,6 +278,8 @@ class Constants {
  *  获取初始化参数方法
  */
 def getInitParams(map) {
+    // 禁用Computer类的详细日志
+    System.setProperty("hudson.model.Computer.skipLogConfig", "true")
     // JSON_PARAMS为单独项目的初始化参数  JSON_PARAMS为key值  value为json结构  请选择jenkins动态参数中的 "文本参数" 配置  具体参数定义如下
     def jsonParams = readJSON text: "${JSON_PARAMS}"
     // println "${jsonParams}"
@@ -461,6 +463,9 @@ def getInitParams(map) {
     healthCheckTimeDiff = "未知"
     // Qodana代码质量准备不同语言的镜像名称
     qodanaImagesName = ""
+
+    // 恢复默认日志配置
+    System.clearProperty("hudson.model.Computer.skipLogConfig")
 }
 
 /**
