@@ -183,7 +183,9 @@ def call(String type = 'experiment', Map map) {
                         script {
                             parallel( // 步骤内并发执行
                                     'CI/CD代码': {
-                                        pullCIRepo()
+                                        retry(3) {
+                                            pullCIRepo()
+                                        }
                                     },
                                     '项目代码': {
                                         retry(3) {
