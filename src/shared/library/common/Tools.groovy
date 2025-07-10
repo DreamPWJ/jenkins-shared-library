@@ -12,8 +12,8 @@ class Tools implements Serializable {
      * 格式化颜色输出
      */
     static def printColor(ctx, value, color = "green") {
-        def colors = ['red'  : "\033[40;31m ${value} \033[0m",
-                      'blue' : "\033[47;34m ${value} \033[0m",
+        def colors = ['red'  : "\033[31m ${value} \033[0m",
+                      'blue' : "\033[34m ${value} \033[0m",
                       'green': "\033[32m ${value} \033[0m"]
         ctx.ansiColor('xterm') {
             ctx.println(colors[color])
