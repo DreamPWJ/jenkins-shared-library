@@ -790,7 +790,7 @@ def futureLab(map) {
         sh "mvn --version"
         sh "java --version"
 
-        sh "mvnd clean install -T 4C -Dmvnd.threads=8 -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
+        sh "mvnd clean install -T 8C -Dmvnd.threads=8 -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvn clean install  -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvnd  install"
         //sh "mvn  install"
