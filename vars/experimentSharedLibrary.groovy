@@ -671,6 +671,9 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
+
+    Tools.printColor(this, "Maven打包成功 ✅")
+    
 /*    def array = map.remote_worker_ips
     println("远程节点IP: ${array}")
     println("远程节点IP数量: ${array.size}")
