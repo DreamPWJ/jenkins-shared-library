@@ -672,7 +672,9 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
-    Tools.printColor(this, "Maven打包成功 ✅")
+    input message: 'Deploy to production?', ok: 'Yes, deploy'
+
+   //  Tools.printColor(this, "Maven打包成功 ✅")
     
 /*    def array = map.remote_worker_ips
     println("远程节点IP: ${array}")
