@@ -339,7 +339,7 @@ def call(String type = 'web', Map map) {
                     }
                 }
 
-                stage('上传云端') {
+                stage('上传代码包') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
