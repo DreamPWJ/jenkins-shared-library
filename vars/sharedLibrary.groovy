@@ -666,7 +666,7 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                stage('Prometheus运维') {
+                stage('智能运维') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
@@ -680,7 +680,7 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                stage('归档') {
+                stage('成品归档') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {

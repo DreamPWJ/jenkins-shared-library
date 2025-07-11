@@ -358,7 +358,7 @@ def call(String type = 'desktop', Map map) {
                     }
                 }
 
-                stage('归档') {
+                stage('成品归档') {
                     when {
                         expression {
                             return ("${IS_ARCHIVE}" == 'true' && "${map.jenkins_node}" == "master") // 是否归档

@@ -448,7 +448,7 @@ def call(String type = 'web', Map map) {
                     }
                 }
 
-                stage('归档') {
+                stage('成品归档') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
