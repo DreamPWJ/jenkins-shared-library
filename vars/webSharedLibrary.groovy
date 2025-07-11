@@ -59,7 +59,7 @@ def call(String type = 'web', Map map) {
                         "默认0是回滚到上一次连续构建, 当前归档模式的回滚仅适用于在master节点构建的任务")
                 booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行K8s/Docker集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
-                        description: '是否执行服务启动健康检测  K8S使用默认的健康探测')
+                        description: '是否执行服务启动健康探测  K8S使用默认的健康探测')
                 booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}",
                         description: '是否在生产环境中自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录')
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 📢 ")
@@ -367,7 +367,7 @@ def call(String type = 'web', Map map) {
                     }
                 }
 
-                stage('健康检测') {
+                stage('健康探测') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
@@ -665,7 +665,7 @@ def getInitParams(map) {
         println(e.getMessage())
     }
 
-    // 健康检测url地址
+    // 健康探测url地址
     healthCheckUrl = ""
     healthCheckDomainUrl = ""
     // 使用域名或机器IP地址
@@ -679,7 +679,7 @@ def getInitParams(map) {
     tagVersion = ""
     // 扫描二维码地址
     qrCodeOssUrl = ""
-    // 是否健康检测失败状态
+    // 是否健康探测失败状态
     isHealthCheckFail = false
     // 计算应用启动时间
     healthCheckTimeDiff = "未知"
@@ -1012,7 +1012,7 @@ def runProject(map) {
 }
 
 /**
- * 健康检测
+ * 健康探测
  */
 def healthCheck(map, params = '') { // 可选参数
     if (params?.trim()) { // 为null或空判断
@@ -1036,7 +1036,7 @@ def healthCheck(map, params = '') { // 可选参数
     } else if ("${healthCheckMsg}".contains("失败")) { // shell返回echo信息包含值
         isHealthCheckFail = true
         Tools.printColor(this, "${healthCheckMsg} ❌", "red")
-        println("👉 健康检测失败原因分析: 查看应用服务启动日志是否失败")
+        println("👉 健康探测失败原因分析: 查看应用服务启动日志是否失败")
         // 钉钉失败通知
         dingNotice(map, 1, "**失败或超时❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
         // 打印应用服务启动失败日志 方便快速排查错误
@@ -1049,7 +1049,7 @@ def healthCheck(map, params = '') { // 可选参数
         }
         IS_ARCHIVE = false // 不归档
         currentBuild.result = 'FAILURE' // 失败  不稳定UNSTABLE 取消ABORTED
-        error("应用服务健康检测失败, 终止当前Pipeline运行 ❌")
+        error("应用服务健康探测失败, 终止当前Pipeline运行 ❌")
         return
     }
 }

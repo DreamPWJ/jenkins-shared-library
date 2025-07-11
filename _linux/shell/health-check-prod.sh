@@ -35,7 +35,7 @@ for i in $(seq 1 60); do
 done
 
 # crontab -e
-# 定时健康检测 which crontab   */1 * * * *
+# 定时健康探测 which crontab   */1 * * * *
 #0 */1 * * *  /bin/bash /my/health-check-prod.sh  用户APP服务端  https://app-api.panweiji.com
 #0 */1 * * *  /bin/bash /my/health-check-prod.sh  管理APP服务端  https://mapp-api.panweiji.com
 #0 */1 * * *  /bin/bash /my/health-check-prod.sh  平台服务端  https://admin-api.panweiji.com
