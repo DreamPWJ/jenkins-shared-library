@@ -1,6 +1,6 @@
 #! /bin/bash
 # Author: 潘维吉
-# Description: 健康检测应用服务是否启动成功  k8s集群有自己的健康探测机制 无需执行脚本
+# Description: 健康探测应用服务是否启动成功  k8s集群有自己的健康探测机制 无需执行脚本
 
 # 使用getopts的方式进行shell参数传递
 while getopts ":a:b:" opt; do

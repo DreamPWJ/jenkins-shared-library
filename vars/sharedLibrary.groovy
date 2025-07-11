@@ -60,7 +60,7 @@ def call(String type = 'web-java', Map map) {
                 booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行K8s/Docker集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
                 booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', defaultValue: false, description: "是否执行静态代码质量分析检测 生成质量报告, 交付可读、易维护和安全的高质量代码 🔦")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
-                        description: '是否执行服务启动健康检测  K8S使用默认的健康探测 🌡️')
+                        description: '是否执行服务启动健康探测  K8S使用默认的健康探测 🌡️')
                 booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}",
                         description: '是否在生产环境中自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录 📄')
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 将构建成功失败等状态信息同步到群内所有人 📢 ")
@@ -436,7 +436,7 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                stage('上传云端') {
+                stage('上传代码包') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
@@ -464,7 +464,7 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                stage('健康检测') {
+                stage('健康探测') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
@@ -637,7 +637,7 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                stage('K8s/Docker回滚 启动 停止 重启') {
+                stage('K8s/Docker回滚 启动 停止 重启等') {
                     when {
                         beforeAgent true
                         expression {
@@ -666,7 +666,7 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                stage('Prometheus运维') {
+                stage('智能运维') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
@@ -680,7 +680,7 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                stage('归档') {
+                stage('成品归档') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
@@ -928,7 +928,7 @@ def getInitParams(map) {
         JDK_PUBLISHER = "graalvm-community" // 支持graalvm的jdk版本
     }
 
-    // 健康检测url地址
+    // 健康探测url地址
     healthCheckUrl = ""
     healthCheckDomainUrl = ""
     // 使用域名或机器IP地址
@@ -950,7 +950,7 @@ def getInitParams(map) {
     buildPackageSize = ""
     // Maven打包后产物的位置
     mavenPackageLocation = ""
-    // 是否健康检测失败状态
+    // 是否健康探测失败状态
     isHealthCheckFail = false
     // 计算应用启动时间
     healthCheckTimeDiff = "未知"
@@ -1613,7 +1613,7 @@ def runProject(map) {
 }
 
 /**
- * 健康检测
+ * 健康探测
  */
 def healthCheck(map, params = '') { // 可选参数
     Tools.printColor(this, "开始应用服务健康探测, 请耐心等待... 🚀 ")
@@ -1644,7 +1644,7 @@ def healthCheck(map, params = '') { // 可选参数
     } else if ("${healthCheckMsg}".contains("失败")) { // shell返回echo信息包含值
         isHealthCheckFail = true
         Tools.printColor(this, "${healthCheckMsg} ❌", "red")
-        println("👉 健康检测失败原因分析: 查看应用服务启动日志是否失败")
+        println("👉 健康探测失败原因分析: 查看应用服务启动日志是否失败")
         // 钉钉失败通知
         dingNotice(map, 1, "**失败或超时或已回滚❌** [点击我验证](${healthCheckUrl}) 👈 ", "${BUILD_USER_MOBILE}")
 
@@ -1665,7 +1665,7 @@ def healthCheck(map, params = '') { // 可选参数
 
         IS_ARCHIVE = false // 不归档
         currentBuild.result = 'FAILURE' // 失败  不稳定UNSTABLE 取消ABORTED
-        error("应用服务健康检测失败, 终止当前Pipeline运行 ❌")
+        error("应用服务健康探测失败, 终止当前Pipeline运行 ❌")
         return
     }
 }
@@ -1761,7 +1761,7 @@ def blueGreenDeploy(map) {
                 } catch (error) {
                     // 注意：这地方是使用的旧镜像部署，会导致一个问题，如果旧镜像本身就有问题，会导致部署失败，因为永远无法使用新镜像
                     println error.getMessage()
-                    println("从服务器健康检测失败异常捕获, 因为可能是旧镜像导致, 继续部署主服务器 ❌")
+                    println("从服务器健康探测失败异常捕获, 因为可能是旧镜像导致, 继续部署主服务器 ❌")
                 }
             }
             // 再部署真正提供服务的绿服务器

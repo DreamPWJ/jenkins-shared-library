@@ -187,7 +187,7 @@ class Deploy implements Serializable {
                     ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} ' " + command + " ' "
                     if (GlobalVars.restart == ctx.params.DEPLOY_MODE) {
                         // ctx.sleep 30  // 重启多个服务 防止服务不可用等待顺序重启
-                        // 健康检测  判断服务是否启动成功
+                        // 健康探测  判断服务是否启动成功
                         healthCheck(ctx)
                     }
                 }
@@ -225,7 +225,7 @@ class Deploy implements Serializable {
                     ctx.remote.host = ip
                     // 服务启动失败回滚到上一个版本  保证服务高可用性
                     Docker.rollbackServer(ctx, map, "${ctx.dockerImageName}", "${ctx.dockerContainerName}")
-                    // 健康检测  判断服务是否启动成功
+                    // 健康探测  判断服务是否启动成功
                     healthCheck(ctx)
                 }
             }
