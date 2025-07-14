@@ -77,6 +77,21 @@ class JenkinsCI implements Serializable {
     }
 
     /**
+     * 获取所有分布式node节点信息
+     */
+    static def getAllNodes(ctx) {
+        def nodesArray = []
+        // 获取所有节点
+        def nodes = Jenkins.instance.nodes
+        // 遍历节点并输出名称
+        for (node in nodes) {
+            nodesArray.add("${node.nodeName}")
+            ctx.println( "Node Name: ${node.nodeName}")
+        }
+        return nodesArray
+    }
+
+    /**
      * 获取所有job信息 并更新等
      */
     static def getAllJobs(ctx) {
