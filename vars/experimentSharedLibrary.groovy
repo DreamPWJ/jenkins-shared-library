@@ -11,7 +11,7 @@ import shared.library.devops.GitTagLog
  * 实验性CI/CD流水线 用于高效研发测试流水线新功能等
  */
 def call(String type = 'experiment', Map map) {
-    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: 前端${map.jenkins_node_frontend} , 后端${map.jenkins_node} "
+    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: ${params.SELECT_BUILD_NODE} "
     // 应用共享方法定义
     changeLog = new ChangeLog()
     gitTagLog = new GitTagLog()
