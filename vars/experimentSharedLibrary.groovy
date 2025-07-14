@@ -181,6 +181,7 @@ def call(String type = 'experiment', Map map) {
                     }
                     steps {
                         script {
+                            failFast true  // 其他阶段失败 中止parallel块同级正在进行的并行阶段
                             parallel( // 步骤内并发执行
                                     'CI/CD代码': {
                                         retry(3) {
