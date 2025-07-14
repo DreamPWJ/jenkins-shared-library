@@ -11,7 +11,7 @@ import shared.library.devops.GitTagLog
  * 实验性CI/CD流水线 用于高效研发测试流水线新功能等
  */
 def call(String type = 'experiment', Map map) {
-    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: ${params.SELECT_BUILD_NODE} "
+    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: ${params.SELECT_BUILD_NODE}"
     // 应用共享方法定义
     changeLog = new ChangeLog()
     gitTagLog = new GitTagLog()
@@ -369,6 +369,7 @@ def getInitParams(map) {
     CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.10.0"
     // 自定义Python启动文件名称 默认app.py文件
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
+
 
     // 获取分布式构建节点 可动态构建在不同机器上
     def allNodes = JenkinsCI.getAllNodes(this)

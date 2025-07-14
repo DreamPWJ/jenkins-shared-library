@@ -11,7 +11,7 @@ import shared.library.devops.GitTagLog
  * 针对大前端Web和服务端Java、Python、C++、Go等多语言项目
  */
 def call(String type = 'web-java', Map map) {
-    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: 前端${map.jenkins_node_frontend} , 后端${map.jenkins_node} "
+    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: ${params.SELECT_BUILD_NODE} "
     // 应用共享方法定义
     changeLog = new ChangeLog()
     gitTagLog = new GitTagLog()
@@ -38,7 +38,8 @@ def call(String type = 'web-java', Map map) {
     if (type == "web-java") { // 针对标准项目
         pipeline {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
-            agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}" }
+            agent { label "${params.SELECT_BUILD_NODE}" }
+            //agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}" }
             //agent { label "${map.jenkins_node}" }
 
             parameters {
@@ -57,6 +58,7 @@ def call(String type = 'web-java', Map map) {
                 string(name: 'VERSION_NUM', defaultValue: "", description: '选填 自定义语义化版本号x.y.z 如1.0.0 (默认不填写  自动生成的版本号并且语义化自增 生产环境设置有效) 🖊 ')
                 text(name: 'VERSION_DESCRIPTION', defaultValue: "${Constants.DEFAULT_VERSION_COPYWRITING}",
                         description: "填写服务版本描述文案 (不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊 ")
+                choice(name: 'SELECT_BUILD_NODE', choices: ALL_ONLINE_NODES, description: "选择分布式构建node节点 可动态调度构建在不同机器上实现高效协作 💻 ")
                 booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行K8s/Docker集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
                 booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', defaultValue: false, description: "是否执行静态代码质量分析检测 生成质量报告, 交付可读、易维护和安全的高质量代码 🔦")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
@@ -339,7 +341,8 @@ def call(String type = 'web-java', Map map) {
                                       mavenBuildProject(map)
                                   }
                               } else*/
-                            if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") { // mvnd支持条件
+                            if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
+                                // mvnd支持条件
                                 def mvndVersion = "1.0.2"
                                 def jdkVersion = "${JDK_VERSION}"
                                 def dockerImageName = "panweiji/mvnd-jdk"
@@ -855,6 +858,13 @@ def getInitParams(map) {
     CUSTOM_STARTUP_COMMAND = jsonParams.CUSTOM_STARTUP_COMMAND ? jsonParams.CUSTOM_STARTUP_COMMAND.trim() : ""
     // 自定义服务部署安装包 多个空格分隔
     CUSTOM_INSTALL_PACKAGES = jsonParams.CUSTOM_INSTALL_PACKAGES ? jsonParams.CUSTOM_INSTALL_PACKAGES.trim() : ""
+
+
+    // 获取分布式构建节点 可动态构建在不同机器上
+    def allNodes = JenkinsCI.getAllNodes(this)
+    def configNodeName = "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
+    int targetIndex = allNodes.findIndexOf { it == configNodeName }
+    ALL_ONLINE_NODES = [allNodes[targetIndex]] + allNodes.minus(configNodeName).sort()
 
     // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值
     if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
