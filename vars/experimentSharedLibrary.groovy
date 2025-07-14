@@ -181,18 +181,18 @@ def call(String type = 'experiment', Map map) {
                     }
                     steps {
                         script {
-                            failFast true  // 其他阶段失败 中止parallel块同级正在进行的并行阶段
                             parallel( // 步骤内并发执行
-                                    'CI/CD代码': {
-                                        retry(3) {
-                                            pullCIRepo()
-                                        }
-                                    },
-                                    '项目代码': {
-                                        retry(3) {
-                                            pullProjectCode()
-                                        }
-                                    })
+                                    failFast true,   // 表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
+                                            'CI/CD代码': {
+                                                retry(3) {
+                                                    pullCIRepo()
+                                                }
+                                            },
+                                            '项目代码': {
+                                                retry(3) {
+                                                    pullProjectCode()
+                                                }
+                                            })
                         }
                     }
                 }
