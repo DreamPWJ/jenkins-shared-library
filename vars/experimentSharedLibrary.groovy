@@ -38,7 +38,7 @@ def call(String type = 'experiment', Map map) {
     if (type == "experiment") { // 针对标准项目
         pipeline {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
-            agent { label "${ALL_NODE_LIST}" }
+            agent { label "${params.SELECT_BUILD_NODE}" }
             // agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}" }
             // agent any
 
@@ -70,7 +70,7 @@ def call(String type = 'experiment', Map map) {
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
                 // file(name: 'DEPLOY_PACKAGE', description: '请上传部署包文件')
                 stashedFile(name: 'DEPLOY_PACKAGE', description: "请选择上传部署包文件 不依赖源码情况下 支持直接上传成品包部署方式 (如 *.jar、*.war、*.tar.gz 等格式) 🚀 ")
-                choice(name: 'ALL_NODE_LIST', choices: ALL_ONLINE_NODES,  description: "选择分布式构建node节点 可动态调度构建在不同机器上实现高效协作 💻 ")
+                choice(name: 'SELECT_BUILD_NODE', choices: ALL_ONLINE_NODES,  description: "选择分布式构建node节点 可动态调度构建在不同机器上实现高效协作 💻 ")
                 //booleanParam(name: 'IS_DEPLOY_MULTI_ENV', defaultValue: false, description: '是否同时部署当前job项目多环境 如dev test等')
             }
 
