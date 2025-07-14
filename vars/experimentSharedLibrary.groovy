@@ -373,7 +373,7 @@ def getInitParams(map) {
 
     // 获取分布式构建节点 可动态构建在不同机器上
     def allNodes = JenkinsCI.getAllNodes(this)
-    def configNodeName = "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
+    def configNodeName = "test"
     int targetIndex = allNodes.findIndexOf { it == configNodeName }
     ALL_ONLINE_NODES = [allNodes[targetIndex]] + allNodes.minus(configNodeName).sort()
 
