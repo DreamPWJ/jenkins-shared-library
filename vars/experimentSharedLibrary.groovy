@@ -69,7 +69,7 @@ def call(String type = 'experiment', Map map) {
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
                 // file(name: 'DEPLOY_PACKAGE', description: '请上传部署包文件')
                 stashedFile(name: 'DEPLOY_PACKAGE', description: "请选择上传部署包文件 不依赖源码情况下 支持直接上传成品包部署方式 (如 *.jar、*.war、*.tar.gz 等格式) 🚀 ")
-                choice(name: 'ALL_NODE_LIST', choices: "${ALL_ONLINE_NODES}", description: "选择分布式构建节点 可动态构建在不同机器上")
+                choice(name: 'ALL_NODE_LIST', choices: ALL_ONLINE_NODES, description: "选择分布式构建node节点 可动态调度构建在不同机器上实现高效构建 💻 ")
                 //booleanParam(name: 'IS_DEPLOY_MULTI_ENV', defaultValue: false, description: '是否同时部署当前job项目多环境 如dev test等')
             }
 
@@ -372,7 +372,7 @@ def getInitParams(map) {
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
 
     // 获取分布式构建节点 可动态构建在不同机器上
-    ALL_ONLINE_NODES = JenkinsCI.getAllNodes(this) as ArrayList
+    ALL_ONLINE_NODES = JenkinsCI.getAllNodes(this)
 
     // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值
     if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
