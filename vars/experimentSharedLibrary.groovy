@@ -11,7 +11,7 @@ import shared.library.devops.GitTagLog
  * 实验性CI/CD流水线 用于高效研发测试流水线新功能等
  */
 def call(String type = 'experiment', Map map) {
-    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: 前端${map.jenkins_node_frontend} , 后端${map.jenkins_node} "
+    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: ${params.SELECT_BUILD_NODE}"
     // 应用共享方法定义
     changeLog = new ChangeLog()
     gitTagLog = new GitTagLog()
@@ -38,7 +38,8 @@ def call(String type = 'experiment', Map map) {
     if (type == "experiment") { // 针对标准项目
         pipeline {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
-            agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}" }
+            agent { label "${params.SELECT_BUILD_NODE}" }
+            // agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}" }
             // agent any
 
             parameters {
@@ -49,16 +50,15 @@ def call(String type = 'experiment', Map map) {
                 choice(name: 'MONOREPO_PROJECT_NAME', choices: "${MONOREPO_PROJECT_NAMES}",
                         description: "选择MonoRepo单体式统一仓库项目名称, ${GlobalVars.defaultValue}选项是MultiRepo多体式独立仓库或未配置, 大统一单体式仓库流水线可减少构建时间和磁盘空间")
                 gitParameter(name: 'GIT_BRANCH', type: 'PT_BRANCH', defaultValue: "${BRANCH_NAME}", selectedValue: "DEFAULT",
-                        useRepository: "${REPO_URL}", sortMode: 'ASCENDING', branchFilter: 'origin/(.*)',
+                        useRepository: "${REPO_URL}", sortMode: 'ASCENDING', branchFilter: 'origin/(.*)', quickFilterEnabled: false,
                         description: "选择要构建的Git分支 默认: " + "${BRANCH_NAME} (可自定义配置具体任务的默认常用分支, 实现一键或全自动构建)")
                 gitParameter(name: 'GIT_TAG', type: 'PT_TAG', defaultValue: GlobalVars.noGit, selectedValue: GlobalVars.noGit,
-                        useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*',
+                        useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*', quickFilterEnabled: false,
                         description: "DEPLOY_MODE基于" + GlobalVars.release + "部署方式, 可选择指定Git Tag版本标签构建, 默认不选择是获取指定分支下的最新代码, 选择后按tag代码而非分支代码构建⚠️, 同时可作为一键回滚版本使用 🔙 ")
+                choice(name: 'SELECT_BUILD_NODE', choices: ALL_ONLINE_NODES, description: "选择分布式构建node节点 可动态调度构建在不同机器上实现高效协作 💻 ")
                 string(name: 'VERSION_NUM', defaultValue: "", description: '选填 自定义语义化版本号x.y.z 如1.0.0 (默认不填写  自动生成的版本号并且语义化自增 生产环境设置有效) 🖊 ')
                 text(name: 'VERSION_DESCRIPTION', defaultValue: "${Constants.DEFAULT_VERSION_COPYWRITING}",
                         description: "填写服务版本描述文案 (不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊 ")
-                string(name: 'ROLLBACK_BUILD_ID', defaultValue: '0', description: "DEPLOY_MODE基于" + GlobalVars.rollback + "部署方式, 输入对应保留的回滚构建记录ID, " +
-                        "默认0是回滚到上一次连续构建, 当前归档模式的回滚仅适用于在master节点构建的任务")
                 booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行K8s/Docker集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
                 booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', defaultValue: false, description: "是否执行静态代码质量分析检测 生成质量报告， 交付可读、易维护和安全的高质量代码 🔦")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
@@ -179,19 +179,21 @@ def call(String type = 'experiment', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                    steps {
-                        script {
-                            parallel( // 步骤内并发执行
-                                    'CI/CD代码': {
-                                        retry(3) {
-                                            pullCIRepo()
-                                        }
-                                    },
-                                    '项目代码': {
-                                        retry(3) {
-                                            pullProjectCode()
-                                        }
-                                    })
+                    failFast true         //表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
+                    parallel {  // 并发构建步骤
+                        stage('CI/CD代码') {
+                            steps {
+                                retry(3) {
+                                    pullCIRepo()
+                                }
+                            }
+                        }
+                        stage('项目代码') {
+                            steps {
+                                retry(3) {
+                                    pullProjectCode()
+                                }
+                            }
                         }
                     }
                 }
@@ -367,6 +369,13 @@ def getInitParams(map) {
     CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.10.0"
     // 自定义Python启动文件名称 默认app.py文件
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
+
+
+    // 获取分布式构建节点 可动态构建在不同机器上
+    def allNodes = JenkinsCI.getAllNodes(this)
+    def configNodeName = "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
+    int targetIndex = allNodes.findIndexOf { it == configNodeName }
+    ALL_ONLINE_NODES = targetIndex == -1 ? allNodes : [allNodes[targetIndex]] + allNodes.minus(configNodeName).sort()
 
     // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值
     if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
@@ -672,8 +681,10 @@ def pullProjectCode() {
  */
 def futureLab(map) {
 
-    Tools.printColor(this, "Maven打包成功 ✅")
-    
+    // input message: 'Deploy to production?', ok: 'Yes, deploy'
+
+    //  Tools.printColor(this, "Maven打包成功 ✅")
+
 /*    def array = map.remote_worker_ips
     println("远程节点IP: ${array}")
     println("远程节点IP数量: ${array.size}")

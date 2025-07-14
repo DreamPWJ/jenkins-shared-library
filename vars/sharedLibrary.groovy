@@ -11,7 +11,7 @@ import shared.library.devops.GitTagLog
  * 针对大前端Web和服务端Java、Python、C++、Go等多语言项目
  */
 def call(String type = 'web-java', Map map) {
-    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: 前端${map.jenkins_node_frontend} , 后端${map.jenkins_node} "
+    echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: ${params.SELECT_BUILD_NODE} "
     // 应用共享方法定义
     changeLog = new ChangeLog()
     gitTagLog = new GitTagLog()
@@ -38,7 +38,8 @@ def call(String type = 'web-java', Map map) {
     if (type == "web-java") { // 针对标准项目
         pipeline {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
-            agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}" }
+            agent { label "${params.SELECT_BUILD_NODE}" }
+            //agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}" }
             //agent { label "${map.jenkins_node}" }
 
             parameters {
@@ -49,11 +50,12 @@ def call(String type = 'web-java', Map map) {
                 choice(name: 'MONOREPO_PROJECT_NAME', choices: "${MONOREPO_PROJECT_NAMES}",
                         description: "选择MonoRepo单体式统一仓库项目名称, ${GlobalVars.defaultValue}选项是MultiRepo多体式独立仓库或未配置, 大统一单体式仓库流水线可减少构建时间和磁盘空间")
                 gitParameter(name: 'GIT_BRANCH', type: 'PT_BRANCH', defaultValue: "${BRANCH_NAME}", selectedValue: "DEFAULT",
-                        useRepository: "${REPO_URL}", sortMode: 'ASCENDING', branchFilter: 'origin/(.*)',
+                        useRepository: "${REPO_URL}", sortMode: 'ASCENDING', branchFilter: 'origin/(.*)', quickFilterEnabled: false,
                         description: "选择要构建的Git分支 默认: " + "${BRANCH_NAME} (可自定义配置具体任务的默认常用分支, 实现一键或全自动构建)")
                 gitParameter(name: 'GIT_TAG', type: 'PT_TAG', defaultValue: GlobalVars.noGit, selectedValue: GlobalVars.noGit,
-                        useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*',
+                        useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*', quickFilterEnabled: false,
                         description: "DEPLOY_MODE基于" + GlobalVars.release + "部署方式, 可选择指定Git Tag版本标签构建, 默认不选择是获取指定分支下的最新代码, 选择后按tag代码而非分支代码构建⚠️, 同时可作为一键回滚版本使用 🔙 ")
+                choice(name: 'SELECT_BUILD_NODE', choices: ALL_ONLINE_NODES, description: "选择分布式构建node节点 可动态调度构建在不同机器上实现高效协作 💻 ")
                 string(name: 'VERSION_NUM', defaultValue: "", description: '选填 自定义语义化版本号x.y.z 如1.0.0 (默认不填写  自动生成的版本号并且语义化自增 生产环境设置有效) 🖊 ')
                 text(name: 'VERSION_DESCRIPTION', defaultValue: "${Constants.DEFAULT_VERSION_COPYWRITING}",
                         description: "填写服务版本描述文案 (不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊 ")
@@ -95,8 +97,8 @@ def call(String type = 'web-java', Map map) {
                                 '_(release)' + "${((PROJECT_TYPE.toInteger() == GlobalVars.frontEnd && IS_MONO_REPO == true) || (PROJECT_TYPE.toInteger() == GlobalVars.backEnd && IS_MAVEN_SINGLE_MODULE == false)) ? '\\(' + "${PROJECT_NAME}" + '\\)' : ''}" + '.*' +
                                 '$'
                 )
-                // 每分钟判断一次代码是否存在变化 有变化就执行
-                // pollSCM('H/1 * * * *')
+                // pollSCM('H/1 * * * *') // 每分钟判断一次代码是否存在变化 有变化就执行
+                // cron('H * * * *')      // 每隔1小时执行一次
             }
 
             options {
@@ -157,6 +159,7 @@ def call(String type = 'web-java', Map map) {
                 IS_GEN_QR_CODE = false // 生成二维码 方便手机端扫描
                 IS_ARCHIVE = false // 是否归档  多个job会占用磁盘空间
                 IS_ONLY_NOTICE_CHANGE_LOG = "${map.is_only_notice_change_log}" // 是否只通知发布变更记录
+                // KUBECONFIG = credentials('kubernetes-cluster') // k8s集群凭证
             }
 
             stages {
@@ -176,24 +179,21 @@ def call(String type = 'web-java', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                    steps {
-                        script {
-                            // 重试几次
-                            /*       retry(3) {
-                                       pullProjectCode()
-                                       pullCIRepo()
-                                   }*/
-                            parallel( // 步骤内并发执行
-                                    'CI/CD代码': {
-                                        retry(3) {
-                                            pullCIRepo()
-                                        }
-                                    },
-                                    '项目代码': {
-                                        retry(3) {
-                                            pullProjectCode()
-                                        }
-                                    })
+                    failFast true         //表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
+                    parallel {  // 并发构建步骤
+                        stage('CI/CD代码') {
+                            steps {
+                                retry(3) {
+                                    pullCIRepo()
+                                }
+                            }
+                        }
+                        stage('项目代码') {
+                            steps {
+                                retry(3) {
+                                    pullProjectCode()
+                                }
+                            }
                         }
                     }
                 }
@@ -212,15 +212,15 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                /*   stage('扫描代码') {
-                       //failFast true  // 其他阶段失败 中止parallel块同级正在进行的并行阶段
-                       parallel { */// 阶段并发执行
                 stage('代码质量') {
                     when {
                         beforeAgent true
                         // 生产环境不进行代码分析 缩减构建时间
+                        //anyOf {
                         // branch 'develop'
                         // branch 'feature*'
+                        // changelog '.*^\\[test\\] .+$' } // 匹配提交的 changeLog 决定是否执行
+                        //}
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             // 是否进行代码质量分析  && fileExists("sonar-project.properties") == true 代码根目录配置sonar-project.properties文件才进行代码质量分析
@@ -859,6 +859,13 @@ def getInitParams(map) {
     // 自定义服务部署安装包 多个空格分隔
     CUSTOM_INSTALL_PACKAGES = jsonParams.CUSTOM_INSTALL_PACKAGES ? jsonParams.CUSTOM_INSTALL_PACKAGES.trim() : ""
 
+
+    // 获取分布式构建节点 可动态构建在不同机器上
+    def allNodes = JenkinsCI.getAllNodes(this)
+    def configNodeName = "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
+    int targetIndex = allNodes.findIndexOf { it == configNodeName }
+    ALL_ONLINE_NODES = targetIndex == -1 ? allNodes : [allNodes[targetIndex]] + allNodes.minus(configNodeName).sort()
+
     // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值
     if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
         IS_CANARY_DEPLOY = false
@@ -1458,7 +1465,7 @@ def uploadOss(map) {
                 // 源文件地址
                 def sourceFile = "${env.WORKSPACE}/${mavenPackageLocation}"
                 // 目标文件
-                def targetFile = "java/${env.JOB_NAME}/${PROJECT_NAME}-${SHELL_ENV_MODE}-${env.BUILD_NUMBER}.${javaPackageType}"
+                def targetFile = "backend/${env.JOB_NAME}/${PROJECT_NAME}-${SHELL_ENV_MODE}-${env.BUILD_NUMBER}.${javaPackageType}"
                 javaOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
                 println "${javaOssUrl}"
                 Tools.printColor(this, "上传部署文件到OSS成功 ✅")
@@ -2054,12 +2061,12 @@ def alwaysPost() {
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             currentBuild.description = "${IS_GEN_QR_CODE == 'true' ? "<img src=${qrCodeOssUrl} width=250 height=250 > <br/> " : ""}" +
                     "项目: ${PROJECT_NAME}" +
-                    " <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 大小: ${buildPackageSize} <br/> 发布人: ${BUILD_USER}"
+                    " <br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment} <br/> 包大小: ${buildPackageSize} <br/> 发布人: ${BUILD_USER}"
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
             currentBuild.description =
                     "${javaOssUrl.trim() != '' ? "<br/><a href='${javaOssUrl}'> 👉直接下载构建${javaPackageType}包</a>" : ""}" +
                             "项目: ${PROJECT_NAME}" +
-                            "<br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment}   大小: ${buildPackageSize} <br/> 发布人: ${BUILD_USER}"
+                            "<br/> 分支: ${BRANCH_NAME} <br/> 环境: ${releaseEnvironment}  包大小: ${buildPackageSize} <br/> 发布人: ${BUILD_USER}"
         }
         // 构建徽章展示关键信息
         if ("${IS_PROD}" == 'true') {

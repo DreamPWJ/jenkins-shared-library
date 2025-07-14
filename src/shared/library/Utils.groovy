@@ -31,7 +31,7 @@ class Utils implements Serializable {
         }
         return ctx.sh(
                 script: getShEchoResultCmd,
-                returnStdout: true,
+                returnStdout: true, // returnStdout：将命令的执行结果赋值给变  returnStatus：将命令的执行状态码赋值给变量
                 encoding: 'UTF-8'
         ).trim()
     }
