@@ -372,7 +372,7 @@ def getInitParams(map) {
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
 
     // 获取分布式构建节点 可动态构建在不同机器上
-    ALL_ONLINE_NODES = JenkinsCI.getAllNodes(this)
+    ALL_ONLINE_NODES = JenkinsCI.getAllNodes(this) as List
 
     // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值
     if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
