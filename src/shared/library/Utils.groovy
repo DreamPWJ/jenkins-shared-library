@@ -14,7 +14,7 @@ import java.util.regex.Pattern
  * @author 潘维吉
  * @date 2020/10/9 9:20
  * @email 406798106@qq.com
- * @description 工具类*  实现序列化是为了pipeline被jenkins停止重启后能正确恢复
+ * @description 工具类  实现序列化是为了pipeline被jenkins停止重启后能正确恢复
  * 使用引入 import shared.library.Utils
  */
 class Utils implements Serializable {
