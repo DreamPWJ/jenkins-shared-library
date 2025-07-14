@@ -680,6 +680,7 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
+    println("构建机器名称: ${NODE_NAME}")
 
     // input message: 'Deploy to production?', ok: 'Yes, deploy'
 

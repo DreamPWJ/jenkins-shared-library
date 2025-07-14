@@ -1355,7 +1355,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
                             "###### 访问URL: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl})",
                             "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
-                            "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
+                            "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_NAME}",
                             "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
                     ],
                     btns: [

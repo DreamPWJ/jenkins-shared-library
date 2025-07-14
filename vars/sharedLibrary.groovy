@@ -2222,7 +2222,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                     "###### ** 流水线失败原因: [运行日志](${env.BUILD_URL}console) 👈 ** \n" +
                                     "###### 发布环境: ${releaseEnvironment}  持续时间: ${durationTimeString} \n" +
                                     "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL}) \n" +
-                                    "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS} \n" +
+                                    "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_NAME} \n" +
                                     "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
                             "${BUILD_USER_MOBILE}")
                 }
@@ -2250,7 +2250,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                     "${k8sPodContent}" +
                                     "- 访问URL: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl}) \n" +
                                     "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL}) \n" +
-                                    "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS} \n" +
+                                    "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_NAME} \n" +
                                     "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
                             "访问Web服务",
                             "${noticeHealthCheckUrl}",
@@ -2282,7 +2282,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                                     "${k8sPodContent}" +
                                     "- API地址: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl}) \n" +
                                     "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL}) \n" +
-                                    "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS} \n" +
+                                    "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_NAME} \n" +
                                     "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
                             isHealthCheckFail == true ? atMobiles : (notifierPhone == '110' ? '' : notifierPhone))
                 }
@@ -2291,7 +2291,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                         "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署前通知",
                         "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${envTypeMark}${projectTypeName}](${env.JOB_URL}) \n" +
                                 "#### ${PROJECT_TAG}服务部署启动中 🚀  请稍等...  ☕ \n" +
-                                "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS} \n" +
+                                "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_NAME} \n" +
                                 "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
                         "")
             } else if (type == 3) { // 变更记录 有些场景精简提醒只推送发布日志消

@@ -966,7 +966,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
                             "- 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
                             "##### ${buildNoticeMsg}",
                             "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
-                            "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
+                            "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_NAME}",
                     ],
                     btnLayout: 'V',
                     btns: [
