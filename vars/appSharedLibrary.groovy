@@ -29,7 +29,7 @@ def call(String type = 'android-ios', Map map) {
 
             parameters {
                 gitParameter(name: 'GIT_BRANCH', type: 'PT_BRANCH', defaultValue: "${DEFAULT_GIT_BRANCH}", selectedValue: "DEFAULT",
-                        useRepository: "${REPO_URL}", sortMode: 'ASCENDING', branchFilter: 'origin/(.*)',
+                        useRepository: "${REPO_URL}", sortMode: 'ASCENDING', branchFilter: 'origin/(.*)', quickFilterEnabled: false,
                         description: "选择要构建的Git分支 默认: " + "${DEFAULT_GIT_BRANCH} (可自定义配置具体任务的默认常用分支, 实现一键或全自动构建)")
                 choice(name: 'CROSS_PLATFORM_SYSTEM_TYPES', choices: "${GlobalVars.defaultValue}\n${Constants.ANDROID}\n${Constants.IOS}",
                         description: "自定义跨平台(如Flutter、React Native、Unity等)构建打包的目标系统(非跨平台的原生应用不需要选择此选项默认即可) , 跨平台项目${GlobalVars.defaultValue}选项默认是同时打包Android和iOS两个平台, 也可单独选择指定平台打包")
@@ -57,7 +57,7 @@ def call(String type = 'android-ios', Map map) {
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 📢 ")
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
                 gitParameter(name: 'GIT_TAG', type: 'PT_TAG', defaultValue: GlobalVars.noGit, selectedValue: GlobalVars.noGit,
-                        useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*',
+                        useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*', quickFilterEnabled: false,
                         description: "可选择指定Git Tag版本标签构建, 默认不选择是获取指定分支下的最新代码, 选择后按tag代码而非分支代码构建⚠️, 同时可作为一键回滚版本使用 🔙 ")
                 string(name: 'APP_VERSION_NUM', defaultValue: "", description: '选填 设置App的语义化版本号 如1.0.0 (默认不填写 自动获取应用代码内的版本号) 🖊 ')
                 text(name: 'APP_VERSION_DESCRIPTION', defaultValue: "${Constants.APP_DEFAULT_VERSION_COPYWRITING}",

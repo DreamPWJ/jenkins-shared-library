@@ -31,10 +31,10 @@ def call(String type = 'wx-mini', Map map) {
                         description: "发布构建类型  1. ${Constants.DEVELOP_TYPE}开发版生成预览码  2. ${Constants.TRIAL_TYPE}体验版上传公众平台并自动设置为体验版 " +
                                 " 3. ${Constants.RELEASE_TYPE}正式版(自动提审、打tag版本和生成变更记录等, 确保线上无正在待审核的版本)")
                 gitParameter(name: 'GIT_BRANCH', type: 'PT_BRANCH', defaultValue: "${DEFAULT_GIT_BRANCH}", selectedValue: "DEFAULT",
-                        useRepository: "${REPO_URL}", sortMode: 'ASCENDING', branchFilter: 'origin/(.*)',
+                        useRepository: "${REPO_URL}", sortMode: 'ASCENDING', branchFilter: 'origin/(.*)', quickFilterEnabled: false,
                         description: '选择要构建的Git分支 默认: ' + "${DEFAULT_GIT_BRANCH} (可自定义配置具体任务的默认常用分支, 实现一键或全自动构建)")
                 gitParameter(name: 'GIT_TAG', type: 'PT_TAG', defaultValue: GlobalVars.noGit, selectedValue: GlobalVars.noGit,
-                        useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*',
+                        useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*', quickFilterEnabled: false,
                         description: "可选择指定Git Tag版本标签构建, 默认不选择是获取指定分支下的最新代码, 选择后按tag代码而非分支代码构建⚠️, 同时可作为一键回滚版本使用 🔙 ")
                 string(name: 'VERSION_NUM', defaultValue: "", description: '选填 设置小程序的语义化版本号 如1.0.0 (默认不填写 自动获取之前设置的版本号并自增) 🖊')
                 text(name: 'VERSION_DESC', defaultValue: "${Constants.MINI_DEFAULT_VERSION_COPYWRITING}",

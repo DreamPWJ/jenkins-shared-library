@@ -35,10 +35,10 @@ def call(String type = 'iot', Map map) {
                 string(name: 'VERSION_NUM', defaultValue: "", description: '选填 设置IoT物联网固件的语义化版本号 如1.0.0 (默认不填写 自动获取之前设置的版本号并自增) 🖊')
                 booleanParam(name: 'IS_OTA_UPGRADE', defaultValue: "${map.is_ota_upgrade}", description: "是否开启OTA空中升级功能  🌎 ")
                 gitParameter(name: 'GIT_BRANCH', type: 'PT_BRANCH', defaultValue: "${BRANCH_NAME}", selectedValue: "DEFAULT",
-                        useRepository: "${REPO_URL}", sortMode: 'ASCENDING', branchFilter: 'origin/(.*)',
+                        useRepository: "${REPO_URL}", sortMode: 'ASCENDING', branchFilter: 'origin/(.*)', quickFilterEnabled: false,
                         description: "选择要构建的Git分支 默认: " + "${BRANCH_NAME} (可自定义配置具体任务的默认常用分支, 实现一键或全自动构建)")
                 gitParameter(name: 'GIT_TAG', type: 'PT_TAG', defaultValue: GlobalVars.noGit, selectedValue: GlobalVars.noGit,
-                        useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*',
+                        useRepository: "${REPO_URL}", sortMode: 'DESCENDING_SMART', tagFilter: '*', quickFilterEnabled: false,
                         description: "DEPLOY_MODE基于" + GlobalVars.release + "部署方式, 可选择指定Git Tag版本标签构建, 默认不选择是获取指定分支下的最新代码, 选择后按tag代码而非分支代码构建⚠️, 同时可作为一键回滚版本使用 🔙 ")
                 text(name: 'VERSION_DESC', defaultValue: "${Constants.IOT_DEFAULT_VERSION_COPYWRITING}",
                         description: '填写IoT物联网版本描述文案(文案会显示在钉钉通知、Git Tag、CHANGELOG.md等, ' +
