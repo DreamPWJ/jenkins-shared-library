@@ -95,8 +95,8 @@ def call(String type = 'web-java', Map map) {
                                 '_(release)' + "${((PROJECT_TYPE.toInteger() == GlobalVars.frontEnd && IS_MONO_REPO == true) || (PROJECT_TYPE.toInteger() == GlobalVars.backEnd && IS_MAVEN_SINGLE_MODULE == false)) ? '\\(' + "${PROJECT_NAME}" + '\\)' : ''}" + '.*' +
                                 '$'
                 )
-                // 每分钟判断一次代码是否存在变化 有变化就执行
-                // pollSCM('H/1 * * * *')
+                // pollSCM('H/1 * * * *') // 每分钟判断一次代码是否存在变化 有变化就执行
+                // cron('H * * * *')      // 每隔1小时执行一次
             }
 
             options {
@@ -157,6 +157,7 @@ def call(String type = 'web-java', Map map) {
                 IS_GEN_QR_CODE = false // 生成二维码 方便手机端扫描
                 IS_ARCHIVE = false // 是否归档  多个job会占用磁盘空间
                 IS_ONLY_NOTICE_CHANGE_LOG = "${map.is_only_notice_change_log}" // 是否只通知发布变更记录
+                // KUBECONFIG = credentials('kubernetes-cluster') // k8s集群凭证
             }
 
             stages {
@@ -176,24 +177,21 @@ def call(String type = 'web-java', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                    steps {
-                        script {
-                            // 重试几次
-                            /*       retry(3) {
-                                       pullProjectCode()
-                                       pullCIRepo()
-                                   }*/
-                            parallel( // 步骤内并发执行
-                                    'CI/CD代码': {
-                                        retry(3) {
-                                            pullCIRepo()
-                                        }
-                                    },
-                                    '项目代码': {
-                                        retry(3) {
-                                            pullProjectCode()
-                                        }
-                                    })
+                    failFast true         //表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
+                    parallel {  // 并发构建步骤
+                        stage('CI/CD代码') {
+                            steps {
+                                retry(3) {
+                                    pullCIRepo()
+                                }
+                            }
+                        }
+                        stage('项目代码') {
+                            steps {
+                                retry(3) {
+                                    pullProjectCode()
+                                }
+                            }
                         }
                     }
                 }
@@ -212,15 +210,15 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                /*   stage('扫描代码') {
-                       //failFast true  // 其他阶段失败 中止parallel块同级正在进行的并行阶段
-                       parallel { */// 阶段并发执行
                 stage('代码质量') {
                     when {
                         beforeAgent true
                         // 生产环境不进行代码分析 缩减构建时间
+                        //anyOf {
                         // branch 'develop'
                         // branch 'feature*'
+                        // changelog '.*^\\[test\\] .+$' } // 匹配提交的 changeLog 决定是否执行
+                        //}
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             // 是否进行代码质量分析  && fileExists("sonar-project.properties") == true 代码根目录配置sonar-project.properties文件才进行代码质量分析
