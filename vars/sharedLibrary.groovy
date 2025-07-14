@@ -339,8 +339,7 @@ def call(String type = 'web-java', Map map) {
                                       mavenBuildProject(map)
                                   }
                               } else*/
-                            if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
-                                // mvnd支持条件
+                            if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") { // mvnd支持条件
                                 def mvndVersion = "1.0.2"
                                 def jdkVersion = "${JDK_VERSION}"
                                 def dockerImageName = "panweiji/mvnd-jdk"
@@ -1456,7 +1455,7 @@ def uploadOss(map) {
                 // 源文件地址
                 def sourceFile = "${env.WORKSPACE}/${mavenPackageLocation}"
                 // 目标文件
-                def targetFile = "java/${env.JOB_NAME}/${PROJECT_NAME}-${SHELL_ENV_MODE}-${env.BUILD_NUMBER}.${javaPackageType}"
+                def targetFile = "backend/${env.JOB_NAME}/${PROJECT_NAME}-${SHELL_ENV_MODE}-${env.BUILD_NUMBER}.${javaPackageType}"
                 javaOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
                 println "${javaOssUrl}"
                 Tools.printColor(this, "上传部署文件到OSS成功 ✅")
