@@ -375,10 +375,7 @@ def getInitParams(map) {
     def allNodes = ["master"]
     def configNodeName = "test"
     int targetIndex = allNodes.findIndexOf { it == configNodeName }
-    if (targetIndex == -1) {
-        ALL_ONLINE_NODES = allNodes
-    }
-    ALL_ONLINE_NODES = [allNodes[targetIndex]] + allNodes.minus(configNodeName).sort()
+    ALL_ONLINE_NODES = targetIndex == -1 ? allNodes : [allNodes[targetIndex]] + allNodes.minus(configNodeName).sort()
 
     // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值
     if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
