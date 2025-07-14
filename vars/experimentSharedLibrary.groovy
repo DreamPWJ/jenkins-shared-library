@@ -182,17 +182,16 @@ def call(String type = 'experiment', Map map) {
                     steps {
                         script {
                             parallel( // 步骤内并发执行
-                                    failFast true,   // 表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
-                                            'CI/CD代码': {
-                                                retry(3) {
-                                                    pullCIRepo()
-                                                }
-                                            },
-                                            '项目代码': {
-                                                retry(3) {
-                                                    pullProjectCode()
-                                                }
-                                            })
+                                    'CI/CD代码': {
+                                        retry(3) {
+                                            pullCIRepo()
+                                        }
+                                    },
+                                    '项目代码': {
+                                        retry(3) {
+                                            pullProjectCode()
+                                        }
+                                    })
                         }
                     }
                 }
