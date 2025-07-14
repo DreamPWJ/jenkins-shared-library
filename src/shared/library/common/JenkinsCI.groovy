@@ -85,7 +85,7 @@ class JenkinsCI implements Serializable {
         def nodes = Jenkins.instance.nodes
         // 遍历节点并输出名称
         for (node in nodes) {
-            nodesArray.add(node.nodeNam)
+            nodesArray.add(node.nodeName)
             // ctx.println( "Node Name: ${node.nodeName}")
         }
         return nodesArray
