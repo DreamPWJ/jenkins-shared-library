@@ -44,7 +44,7 @@ def call(String type = 'web', Map map) {
             parameters {
                 choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback, GlobalVars.start, GlobalVars.stop, GlobalVars.destroy, GlobalVars.restart],
                         description: '选择部署方式  1. ' + GlobalVars.release + '发布 2. ' + GlobalVars.rollback +
-                                '回滚(基于K8s/Docker方式快速回滚上一个版本选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚请选择默认的' + GlobalVars.release + ') ' +
+                                '回滚(基于K8s/Docker方式快速回滚上一个版本选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚更早历史版本用默认的' + GlobalVars.release + ') ' +
                                 ' 3. ' + GlobalVars.start + '启动服务 4. ' + GlobalVars.stop + '停止服务 5. ' + GlobalVars.destroy + '销毁删除服务 6. ' + GlobalVars.restart + '滚动重启服务')
                 choice(name: 'MONOREPO_PROJECT_NAME', choices: "${MONOREPO_PROJECT_NAMES}",
                         description: "选择MonoRepo单体式统一仓库项目名称, ${GlobalVars.defaultValue}选项是MultiRepo多体式独立仓库或未配置, 大统一单体式仓库流水线可减少构建时间和磁盘空间")
@@ -1220,7 +1220,7 @@ def genQRCode(map) {
  */
 def alwaysPost() {
     // sh 'pwd'
-    // cleanWs()  // 清空工作空间
+    // deleteDir()  // 清空工作空间
     try {
         def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
         def noticeHealthCheckUrl = "${APPLICATION_DOMAIN == "" ? healthCheckUrl : healthCheckDomainUrl}"
@@ -1355,7 +1355,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             "###### 启动用时: ${healthCheckTimeDiff}   持续时间: ${durationTimeString}",
                             "###### 访问URL: [${noticeHealthCheckUrl}](${noticeHealthCheckUrl})",
                             "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL})",
-                            "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_LABELS}",
+                            "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_NAME}",
                             "###### 发布时间: ${Utils.formatDate()} (${Utils.getWeek(this)})"
                     ],
                     btns: [
