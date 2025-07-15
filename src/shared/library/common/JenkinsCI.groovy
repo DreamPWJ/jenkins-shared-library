@@ -89,8 +89,6 @@ class JenkinsCI implements Serializable {
             if (computer.online) { // 是否在线
                 nodesArray.add(node.nodeName) // 匹配的是label标签 而非名称
             }
-            def labels = node.assignedLabels*.toString().join(', ') ?: '无标签'
-            ctx.println( "Labels Name: ${labels}")
             // ctx.println( "Node Name: ${node.nodeName}")
         }
         return nodesArray
