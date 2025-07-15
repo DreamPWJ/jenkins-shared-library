@@ -681,6 +681,7 @@ def pullProjectCode() {
  */
 def futureLab(map) {
     println("构建机器名称: ${NODE_NAME}")
+    deleteDir()  // 清空工作空间
 
     // input message: 'Deploy to production?', ok: 'Yes, deploy'
 

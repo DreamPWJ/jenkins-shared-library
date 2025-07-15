@@ -2053,7 +2053,7 @@ def productsWarehouse(map) {
  */
 def alwaysPost() {
     // sh 'pwd'
-    // cleanWs()  // 清空工作空间
+    // deleteDir()  // 清空工作空间
     // Jenkins全局安全配置->标记格式器内设置Safe HTML支持html文本
     try {
         def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
