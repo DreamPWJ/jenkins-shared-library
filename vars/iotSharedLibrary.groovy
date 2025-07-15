@@ -29,7 +29,7 @@ def call(String type = 'iot', Map map) {
             parameters {
                 choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback],
                         description: '选择部署方式  1. ' + GlobalVars.release + '发布 2. ' + GlobalVars.rollback +
-                                '回滚(基于Jenkins归档方式回滚选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚请选择默认的' + GlobalVars.release + ')')
+                                '回滚(基于Jenkins归档方式回滚选择' + GlobalVars.rollback + ', 基于Git Tag方式回滚更早历史版本用默认的' + GlobalVars.release + ')')
                 /*              choice(name: 'MONOREPO_PROJECT_NAME', choices: "${MONOREPO_PROJECT_NAMES}",
                                       description: "选择MonoRepo单体式统一仓库项目名称, ${GlobalVars.defaultValue}选项是MultiRepo多体式独立仓库或未配置, 大统一单体式仓库流水线可减少构建时间和磁盘空间") */
                 string(name: 'VERSION_NUM', defaultValue: "", description: '选填 设置IoT物联网固件的语义化版本号 如1.0.0 (默认不填写 自动获取之前设置的版本号并自增) 🖊')
