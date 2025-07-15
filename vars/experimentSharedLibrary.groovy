@@ -58,7 +58,7 @@ def call(String type = 'experiment', Map map) {
                 choice(name: 'SELECT_BUILD_NODE', choices: ALL_ONLINE_NODES, description: "选择分布式构建node节点 可动态调度构建在不同机器上 实现大规模流水线高效协作运行 💻 ")
                 string(name: 'VERSION_NUM', defaultValue: "", description: "选填 自定义语义化版本号x.y.z 如1.0.0 (默认不填写  自动生成的版本号并且语义化自增 生产环境设置有效) 🖊 ")
                 text(name: 'VERSION_DESCRIPTION', defaultValue: "${Constants.DEFAULT_VERSION_COPYWRITING}",
-                        description: "填写服务版本描述文案 (不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊 ")
+                        description: "请填写版本变更日志 (不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊 ")
                 booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行K8s/Docker集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
                 booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', defaultValue: false, description: "是否执行静态代码质量分析检测并生成质量报告， 交付可读、易维护和安全的高质量代码 🔦 ")
                 booleanParam(name: 'IS_WORKSPACE_CLEAN', defaultValue: false, description: "是否全部清空CI/CD工作空间 删除代码构建产物与缓存等 全新构建流水线工作环境 🛀 ")
