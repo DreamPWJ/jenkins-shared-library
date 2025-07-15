@@ -60,7 +60,8 @@ def call(String type = 'experiment', Map map) {
                 text(name: 'VERSION_DESCRIPTION', defaultValue: "${Constants.DEFAULT_VERSION_COPYWRITING}",
                         description: "填写服务版本描述文案 (不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊 ")
                 booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行K8s/Docker集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
-                booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', defaultValue: false, description: "是否执行静态代码质量分析检测 生成质量报告， 交付可读、易维护和安全的高质量代码 🔦")
+                booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', defaultValue: false, description: "是否执行静态代码质量分析检测 生成质量报告， 交付可读、易维护和安全的高质量代码 🔦 ")
+                booleanParam(name: 'IS_WORKSPACE_CLEAN', defaultValue: false, description: "是否全部清空CI/CD工作空间 删除代码构建产物与缓存等 全新构建流水线工作环境 🛀 ")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
                         description: '是否执行服务启动健康探测  K8S使用默认的健康探测 🌡️')
                 booleanParam(name: 'IS_GIT_TAG', defaultValue: "${map.is_git_tag}",
@@ -681,7 +682,11 @@ def pullProjectCode() {
  */
 def futureLab(map) {
     println("构建机器名称: ${NODE_NAME}")
-    deleteDir()  // 清空工作空间
+
+    if(IS_WORKSPACE_CLEAN){
+        deleteDir()  // 清空工作空间
+    }
+
 
     // input message: 'Deploy to production?', ok: 'Yes, deploy'
 
