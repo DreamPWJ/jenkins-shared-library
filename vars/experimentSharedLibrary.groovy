@@ -382,15 +382,6 @@ def getInitParams(map) {
         IS_CANARY_DEPLOY = false
     }
 
-    // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
-    try {
-        if (params.IS_WORKSPACE_CLEAN == true) {
-            deleteDir()  // 清空当前工作空间
-        }
-    } catch (error) {
-        println("清空工作空间失败: " + error)
-    }
-
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
         BRANCH_NAME = "${map.default_git_branch}"
@@ -536,6 +527,16 @@ def initInfo() {
         proxyJumpSSHText = " -J ${proxy_jump_user_name}@${proxy_jump_ip}:${proxy_jump_port} "
         proxyJumpSCPText = " -o 'ProxyJump ${proxy_jump_user_name}@${proxy_jump_ip}:${proxy_jump_port}' "
     }
+
+    // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
+    try {
+        if (params.IS_WORKSPACE_CLEAN == true) {
+            deleteDir()  // 清空当前工作空间
+        }
+    } catch (error) {
+        println("清空工作空间失败: " + error)
+    }
+
 }
 
 /**

@@ -872,15 +872,6 @@ def getInitParams(map) {
     int targetIndex = allNodes.findIndexOf { it == configNodeName }
     ALL_ONLINE_NODES = targetIndex == -1 ? allNodes : [allNodes[targetIndex]] + allNodes.minus(configNodeName).sort()
 
-    // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
-    try {
-        if (params.IS_WORKSPACE_CLEAN == true) {
-            deleteDir()  // 清空当前工作空间
-        }
-    } catch (error) {
-        println("清空工作空间失败: "+ error)
-    }
-
     // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值
     if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
         IS_CANARY_DEPLOY = false
@@ -1033,6 +1024,16 @@ def initInfo() {
         proxyJumpSSHText = " -J ${proxy_jump_user_name}@${proxy_jump_ip}:${proxy_jump_port} "
         proxyJumpSCPText = " -o 'ProxyJump ${proxy_jump_user_name}@${proxy_jump_ip}:${proxy_jump_port}' "
     }
+
+    // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
+    try {
+        if (params.IS_WORKSPACE_CLEAN == true) {
+            deleteDir()  // 清空当前工作空间
+        }
+    } catch (error) {
+        println("清空工作空间失败: "+ error)
+    }
+
 }
 
 /**
