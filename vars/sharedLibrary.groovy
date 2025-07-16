@@ -337,6 +337,11 @@ def call(String type = 'web-java', Map map) {
                           }*/
                     steps {
                         script {
+                            // Gradle构建方式
+                      /*      if (IS_GRADLE_BUILD == true) {
+                                gradleBuildProject(map)
+                            }*/
+
                             /* if ("${IS_PROD}" == 'true') {
                                   docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
                                       mavenBuildProject(map)
@@ -872,7 +877,8 @@ def getInitParams(map) {
         if (params.IS_WORKSPACE_CLEAN == true) {
             deleteDir()  // 清空当前工作空间
         }
-    } catch (error) {}
+    } catch (error) {
+    }
 
     // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值
     if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
@@ -1408,6 +1414,13 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
         // 上传部署文件到OSS
         uploadOss(map)
     }
+}
+
+/**
+ * Gradle编译构建
+ */
+def gradleBuildProject(map) {
+    println("执行Gradle构建 🏗️  ")
 }
 
 /**

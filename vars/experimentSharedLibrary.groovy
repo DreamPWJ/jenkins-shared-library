@@ -824,7 +824,7 @@ def futureLab(map) {
     def jdkVersion = "21"
     docker.image("gradle:$gradleVersion-jdk$jdkVersion").inside("-v /var/cache/gradle-cache:/gradle-cache") {
         dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
-            sh "gradle --info"
+            // sh "gradle --info"
             // sh "gradle build"
             Gradle.build(this)
             // spring boot构建jar包 在 build/libs 下面
