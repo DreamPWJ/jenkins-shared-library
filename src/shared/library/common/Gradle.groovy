@@ -16,7 +16,7 @@ class Gradle implements Serializable {
     static def build(ctx, tasks = "clean build") {
         if (ctx.isUnix()) { // Linux和MacOS使用./gradlew  Windows系统 直接gradlew
            // 在 build.gradle 的 repositories 块中添加镜像源 加速下载
-            ctx.sh """
+/*           ctx.sh """
             cat >> build.gradle <<EOF    
             allprojects {   
                 repositories {  
@@ -27,10 +27,10 @@ class Gradle implements Serializable {
                 }  
             }  
             EOF
-            """
+            """*/
 
             ctx.sh "chmod +x gradlew && " +
-                    " gradle $tasks -Dorg.gradle.parallel=true --no-daemon"
+                    " ./gradlew $tasks -Dorg.gradle.parallel=true "
         } else {
             ctx.bat "gradlew $tasks"
         }
