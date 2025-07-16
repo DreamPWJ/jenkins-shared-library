@@ -341,7 +341,9 @@ def call(String type = 'web-java', Map map) {
                             if (IS_GRADLE_BUILD == true) {
                                 def gradleVersion = "8" // Gradle版本 要动态配置
                                 def jdkVersion = "${JDK_VERSION}"
-                                docker.image("gradle:$gradleVersion-jdk$jdkVersion").inside("-v /var/cache/gradle-cache:/gradle-cache -v /var/cache/maven/.m2:/root/.m2") {
+                                def dockerImageName = "gradle"
+                                def dockerImageTag = "$gradleVersion-jdk$jdkVersion"
+                                docker.image("${dockerImageName}:${dockerImageTag}").inside("-v $HOME/.gradle:/root/.gradle -v $HOME/.gradle:/home/gradle/.gradle") {
                                     gradleBuildProject(map)
                                 }
                             } else {
@@ -1431,7 +1433,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
 def gradleBuildProject(map) {
     println("执行Gradle构建 🏗️  ")
     dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
-        Gradle.build(this, "bootJar")
+        Gradle.build(this, "bootJar") // 打包命令
         buildPackageLocationDir = "build/libs"  // Gradle构建产物目录
         dir(buildPackageLocationDir) {
             sh "rm -f *-plain.jar && ls"  // 删除无效的jar包

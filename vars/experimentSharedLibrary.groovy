@@ -830,11 +830,13 @@ def futureLab(map) {
         //sh "mvn  install"
     }*/
 
-    def gradleVersion = "8"
-    def jdkVersion = "21"
-    docker.image("gradle:$gradleVersion-jdk$jdkVersion").inside("-v /var/cache/gradle-cache:/gradle-cache -v /var/cache/maven/.m2:/root/.m2") {
+    def gradleVersion = "8" // Gradle版本 要动态配置
+    def jdkVersion = "${JDK_VERSION}"
+    def dockerImageName = "gradle"
+    def dockerImageTag = "$gradleVersion-jdk$jdkVersion"
+    docker.image("${dockerImageName}:${dockerImageTag}").inside(" -v $HOME/.gradle:/root/.gradle -v $HOME/.gradle:/home/gradle/.gradle ") {
         dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
-            Gradle.build(this, "bootJar")
+            Gradle.build(this, "bootJar")  // 打包命令
             // Spring Boot构建jar包 在 build/libs 下面
             def buildLibPath = "build/libs"
             dir(buildLibPath) {
