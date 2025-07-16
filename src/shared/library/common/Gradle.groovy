@@ -29,8 +29,8 @@ class Gradle implements Serializable {
             EOF
             """*/
 
-            ctx.sh "chmod +x gradlew && " +
-                    " gradle $tasks -Dorg.gradle.parallel=true "
+            //ctx.sh "chmod +x gradlew && "
+            ctx.sh " gradle $tasks -Dorg.gradle.parallel=true "
         } else {
             ctx.bat "gradlew $tasks"
         }
