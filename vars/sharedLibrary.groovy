@@ -878,6 +878,7 @@ def getInitParams(map) {
             deleteDir()  // 清空当前工作空间
         }
     } catch (error) {
+        println("清空工作空间失败: "+ error)
     }
 
     // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值

@@ -388,6 +388,7 @@ def getInitParams(map) {
             deleteDir()  // 清空当前工作空间
         }
     } catch (error) {
+        println("清空工作空间失败: " + error)
     }
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
