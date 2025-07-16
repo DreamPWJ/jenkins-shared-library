@@ -382,6 +382,14 @@ def getInitParams(map) {
         IS_CANARY_DEPLOY = false
     }
 
+    // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
+    try {
+        if (params.IS_WORKSPACE_CLEAN == true) {
+            deleteDir()  // 清空当前工作空间
+        }
+    } catch (error) {
+    }
+
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
         BRANCH_NAME = "${map.default_git_branch}"
@@ -681,15 +689,6 @@ def pullProjectCode() {
  */
 def futureLab(map) {
     println("构建机器名称: ${NODE_NAME}")
-
-    // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
-    try {
-        if (params.IS_WORKSPACE_CLEAN == true) {
-            deleteDir()  // 清空当前工作空间
-        }
-    } catch (error) {
-    }
-
 
     // input message: 'Deploy to production?', ok: 'Yes, deploy'
 
