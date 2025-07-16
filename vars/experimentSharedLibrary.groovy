@@ -539,9 +539,9 @@ def initInfo() {
         if (params.IS_WORKSPACE_CLEAN == true) {
             def jenkinsHome = env.JENKINS_HOME
             def jobHome = jenkinsHome + "/workspace/" + env.JOB_NAME
+            sh "rm -rf ${jobHome}@*" // 清除缓存临时空间
             dir(jobHome) {
                 deleteDir()  // 清空当前工作空间
-                sh "rm -rf ${jobHome}@*" // 清除缓存零食空间
             }
         }
     } catch (error) {
