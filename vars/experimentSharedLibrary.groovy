@@ -206,7 +206,7 @@ def call(String type = 'experiment', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return true
+                            return false
                         }
                     }
 /*                    agent {
