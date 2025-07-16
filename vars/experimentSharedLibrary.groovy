@@ -537,7 +537,8 @@ def initInfo() {
     // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
     try {
         if (params.IS_WORKSPACE_CLEAN == true) {
-            def jenkinsHome = env.JENKINS_HOME
+            def jenkinsHome = Jenkins.instance.rootDir.absolutePath
+            println("jenkinsHome: " + jenkinsHome)
             def jobHome = jenkinsHome + "/workspace/" + env.JOB_NAME
             sh "rm -rf ${jobHome}@*" // 清除缓存临时空间
             dir(jobHome) {
