@@ -15,22 +15,10 @@ class Gradle implements Serializable {
      */
     static def build(ctx, tasks = "clean build") {
         if (ctx.isUnix()) { // Linux和MacOS使用./gradlew  Windows系统 直接gradlew
-            // 在 build.gradle 的 repositories 块中添加镜像源 加速下载
-/*           ctx.sh """
-            cat >> build.gradle <<EOF    
-            allprojects {   
-                repositories {  
-                    maven { url 'https://maven.aliyun.com/repository/public' }  
-                    maven { url 'https://maven.aliyun.com/repository/central' }  
-                    maven { url 'https://maven.aliyun.com/repository/google' }  
-                    mavenCentral()  
-                }  
-            }  
-            EOF
-            """*/
-
-            //ctx.sh "chmod +x gradlew && "
-            ctx.sh " gradle $tasks -Dorg.gradle.parallel=true "
+            ctx.sh " gradle $tasks " +
+                    " -Dorg.gradle.parallel=true -Dorg.gradle.caching=true " +
+                    " -Dorg.gradle.internal.http.socketTimeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000 " +
+                    " --no-daemon "
         } else {
             ctx.bat "gradlew $tasks"
         }

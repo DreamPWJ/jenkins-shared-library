@@ -822,12 +822,12 @@ def futureLab(map) {
 
     def gradleVersion = "8"
     def jdkVersion = "21"
-    docker.image("gradle:$gradleVersion-jdk$jdkVersion").inside("-v /var/cache/gradle-cache:/gradle-cache") {
+    docker.image("gradle:$gradleVersion-jdk$jdkVersion").inside("-v /var/cache/gradle-cache:/gradle-cache -v /var/cache/maven/.m2:/root/.m2") {
         dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
             // sh "gradle --info"
             // sh "gradle build"
             Gradle.build(this)
-            // spring boot构建jar包 在 build/libs 下面
+            // Spring Boot构建jar包 在 build/libs 下面
             def buildLibPath = "build/libs"
             dir(buildLibPath) {
                 sh "rm -f *-plain.jar && ls"
