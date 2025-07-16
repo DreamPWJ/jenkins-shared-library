@@ -341,7 +341,9 @@ def call(String type = 'web-java', Map map) {
                             if (IS_GRADLE_BUILD == true) {
                                 def gradleVersion = "8" // Gradle版本 要动态配置
                                 def jdkVersion = "${JDK_VERSION}"
-                                docker.image("gradle:$gradleVersion-jdk$jdkVersion").inside("-v /var/cache/gradle-cache:/gradle-cache -v /var/cache/maven/.m2:/root/.m2") {
+                                def dockerImageName = "gradle"
+                                def dockerImageTag = "$gradleVersion-jdk$jdkVersion"
+                                docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/gradle-cache:/gradle-cache") {
                                     gradleBuildProject(map)
                                 }
                             } else {
