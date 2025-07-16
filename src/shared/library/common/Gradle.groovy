@@ -13,9 +13,9 @@ class Gradle implements Serializable {
     /**
      * 构建
      */
-    static def build(ctx, tasks = "build") {
+    static def build(ctx, tasks = "clean build") {
         if (ctx.isUnix()) { // Linux和MacOS使用./gradlew  Windows系统 直接gradlew
-            ctx.sh "gradle $tasks"
+            ctx.sh "./gradlew $tasks"
         } else {
             ctx.bat "gradlew $tasks"
         }
