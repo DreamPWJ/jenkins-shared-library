@@ -426,7 +426,7 @@ def getInitParams(map) {
     }
 
     // 未来可独立拆分成不同参数传入 更易于理解和维护
-    env.SHELL_PARAMS_ARRAY = SHELL_PARAMS.split("\\s+")  // 正则表达式\s表示匹配任何空白字符，+表示匹配一次或多次
+    SHELL_PARAMS_ARRAY = SHELL_PARAMS.split("\\s+")  // 正则表达式\s表示匹配任何空白字符，+表示匹配一次或多次
     env.SHELL_PROJECT_NAME = SHELL_PARAMS_ARRAY[0] // 项目名称
     env.SHELL_PROJECT_TYPE = SHELL_PARAMS_ARRAY[1] // 项目类型
     env.SHELL_HOST_PORT = SHELL_PARAMS_ARRAY[2] // 宿主机对外访问接口
