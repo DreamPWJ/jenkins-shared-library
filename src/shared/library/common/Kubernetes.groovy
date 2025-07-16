@@ -115,9 +115,14 @@ class Kubernetes implements Serializable {
             def newK8sPodReplicas = Integer.parseInt(k8sPodReplicas) - 1
             ctx.sh "kubectl scale deployment ${oldDeploymentName} --replicas=${newK8sPodReplicas} || true"   */
         }
+        // 如果使用容器镜像仓库和k8s是一个云厂商 镜像仓库地址使用内网地址 加速下载和流量节省
+        def dockerRepoRegistry = "${ctx.DOCKER_REPO_REGISTRY}"
+        if ("${ctx.DOCKER_REPO_REGISTRY}".endsWithAny("aliyun.com", "ksyun.com")) {
+            dockerRepoRegistry = "${ctx.DOCKER_REPO_REGISTRY}".replace("hub-", "hub-vpc-")  // 转换成给我地址
+        }
 
         // 基于统一k8s yaml核心配置模版动态替换参数 实现不同类型应用部署
-        ctx.sh "sed -e 's#{IMAGE_URL}#${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
+        ctx.sh "sed -e 's#{IMAGE_URL}#${dockerRepoRegistry}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
                 " s#{APP_NAME}#${appName}#g;s#{APP_COMMON_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{SPRING_PROFILE}#${ctx.SHELL_ENV_MODE}#g; " +
                 " s#{HOST_PORT}#${hostPort}#g;s#{CONTAINER_PORT}#${containerPort}#g;s#{DEFAULT_CONTAINER_PORT}#${ctx.SHELL_EXPOSE_PORT}#g; " +
                 " s#{K8S_POD_REPLICAS}#${k8sPodReplicas}#g;s#{MAX_CPU_SIZE}#${map.docker_limit_cpu}#g;s#{MAX_MEMORY_SIZE}#${map.docker_memory}#g;s#{JAVA_OPTS_XMX}#${map.docker_java_opts}#g; " +
