@@ -819,10 +819,18 @@ def futureLab(map) {
         //sh "mvn  install"
     }*/
 
-
-    docker.image("gradle:8-jdk21").inside("-v /var/cache/gradle-cache:/gradle-cache") {
+    def gradleVersion = "8"
+    def jdkVersion = "21"
+    docker.image("gradle:$gradleVersion-jdk$jdkVersion").inside("-v /var/cache/gradle-cache:/gradle-cache") {
         sh "gradle --info"
         // sh "gradle build"
+        Gradle.build(this)
+        // spring boot构建jar包 在 build/libs 下面
+        def buildLibPath = "build/libs"
+        dir("${env.WORKSPACE}/${buildLibPath}"){
+            sh "rm -f *-plain.jar && ls"
+        }
+
     }
 
 /*

@@ -6,9 +6,20 @@ import shared.library.Utils
  * @author 潘维吉
  * @date 2021/12/17 13:22
  * @email 406798106@qq.com
- * @description Gradle相关
+ * @description Gradle构建相关
  */
 class Gradle implements Serializable {
+
+    /**
+     * 构建
+     */
+    static def build(ctx, tasks = "clean build") {
+        if (ctx.isUnix()) { // Linux和MacOS使用./gradlew  Windows系统 直接gradlew
+            ctx.sh "gradle $tasks"
+        } else {
+            ctx.bat "gradlew $tasks"
+        }
+    }
 
     /**
      *  初始化环境变量
@@ -50,13 +61,5 @@ class Gradle implements Serializable {
                  """
         }
     }
-
-    /**
-     * 构建
-     */
-    static def build(ctx, tasks = "clean build") {
-        ctx.sh "./gradlew ${tasks}" // Linux和MacOS使用./gradlew  Windows系统 直接gradlew
-    }
-
 
 }
