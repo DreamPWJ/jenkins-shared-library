@@ -115,10 +115,11 @@ class Kubernetes implements Serializable {
             def newK8sPodReplicas = Integer.parseInt(k8sPodReplicas) - 1
             ctx.sh "kubectl scale deployment ${oldDeploymentName} --replicas=${newK8sPodReplicas} || true"   */
         }
-        // 如果使用容器镜像仓库和k8s是一个云厂商 镜像仓库地址使用内网地址 加速下载和流量节省
+
+        // 如果使用容器镜像仓库和k8s是一个云厂商 镜像仓库地址建议使用内网地址 下载加速和节省流量
         def dockerRepoRegistry = "${ctx.DOCKER_REPO_REGISTRY}"
         if ("${ctx.DOCKER_REPO_REGISTRY}".endsWithAny("aliyun.com", "ksyun.com")) {
-            dockerRepoRegistry = "${ctx.DOCKER_REPO_REGISTRY}".replace("hub-", "hub-vpc-")  // 转换成给我地址
+            dockerRepoRegistry = "${ctx.DOCKER_REPO_REGISTRY}".replace("hub-", "hub-vpc-")  // 转换成内网仓库地址
         }
 
         // 基于统一k8s yaml核心配置模版动态替换参数 实现不同类型应用部署
