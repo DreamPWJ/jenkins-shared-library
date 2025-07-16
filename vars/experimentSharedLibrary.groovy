@@ -179,7 +179,7 @@ def call(String type = 'experiment', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return false
+                            return true
                         }
                     }
                     failFast true         //表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
@@ -206,7 +206,7 @@ def call(String type = 'experiment', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return false
+                            return true
                         }
                     }
 /*                    agent {
