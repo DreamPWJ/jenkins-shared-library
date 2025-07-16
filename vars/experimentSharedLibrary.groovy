@@ -820,6 +820,11 @@ def futureLab(map) {
     }*/
 
 
+    docker.image("gradle:8-jdk21").inside("-v /var/cache/gradle-cache:/gradle-cache") {
+        sh "gradle --info"
+        // sh "gradle build"
+    }
+
 /*
     def k8sPodReplicas = Integer.parseInt("3")
     println("等于 " + k8sPodReplicas * 3 - 1)*/
