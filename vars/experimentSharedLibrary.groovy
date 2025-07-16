@@ -537,10 +537,7 @@ def initInfo() {
     // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
     try {
         if (params.IS_WORKSPACE_CLEAN == true) {
-            // 获取当前节点用户目录
-            def jenkinsHome = sh(script: 'echo $JENKINS_HOME', returnStdout: true).trim()
-            println("jenkinsHome: " + jenkinsHome)
-            def jobHome = jenkinsHome + "/workspace/" + env.JOB_NAME
+            def jobHome = env.WORKSPACE.split("@")[0] // 根据@符号分隔去前面的路径
             sh "rm -rf ${jobHome}@*" // 清除缓存临时空间
             dir(jobHome) {
                 deleteDir()  // 清空当前工作空间
