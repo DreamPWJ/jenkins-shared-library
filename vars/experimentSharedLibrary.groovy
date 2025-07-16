@@ -826,7 +826,7 @@ def futureLab(map) {
         dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
             // sh "gradle --info"
             // sh "gradle build"
-            Gradle.build(this)
+            Gradle.build(this, "bootJar")
             // Spring Boot构建jar包 在 build/libs 下面
             def buildLibPath = "build/libs"
             dir(buildLibPath) {
