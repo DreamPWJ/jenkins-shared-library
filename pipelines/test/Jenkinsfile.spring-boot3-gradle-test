@@ -59,7 +59,7 @@ map.put('k8s_credentials_ids', ' ')
 map.put('k8s_image_pull_secrets', ' ')
 
 // 项目标签或项目简称
-map.put('project_tag', 'Spring Boot3与AI大模型')
+map.put('project_tag', 'Spring Boot3与Gradle构建')
 
 // 是否是生产环境
 map.put('is_prod', false)
@@ -109,7 +109,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', 'single-module-projects')
+map.put('maven_one_level', ' ')
 // Maven自定义settings.xml文件Secret file凭据  如设置私有库或镜像源情况
 map.put('maven_settings_xml_id', ' ')
 
@@ -118,21 +118,22 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/test/Jenkinsfile.spring-boot3-ai-test
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/test/Jenkinsfile.spring-boot3-gradle-test
 
 /*
 
-spring-ai-demo-test
-Spring Boot3与AI大模型服务端
+spring-gradle-demo-test
+Spring Boot3与Gradle构建服务
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
    "BRANCH_NAME" : "feature/infra" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "spring-ai-demo" ,
-   "SHELL_PARAMS" : "spring-ai demo 8123 8080 dev",
+   "PROJECT_NAME" : "gradle-demo" ,
+   "SHELL_PARAMS" : "gradle demo 8124 8080 dev",
    "IS_MAVEN_SINGLE_MODULE" : true,
-   "GIT_PROJECT_FOLDER_NAME" : "single-module-projects/project-demos/spring-ai-demo",
+   "IS_GRADLE_BUILD" : true,
+   "GIT_PROJECT_FOLDER_NAME" : "single-module-projects/project-demos/gradle-demo",
 }
 
 

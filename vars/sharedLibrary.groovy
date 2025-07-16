@@ -40,7 +40,7 @@ def call(String type = 'web-java', Map map) {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
             agent { label "${params.SELECT_BUILD_NODE}" }
             //agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}" }
-            //agent { label "${map.jenkins_node}" }
+            //agent any
 
             parameters {
                 choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback, GlobalVars.start, GlobalVars.stop, GlobalVars.destroy, GlobalVars.restart],
@@ -337,24 +337,33 @@ def call(String type = 'web-java', Map map) {
                           }*/
                     steps {
                         script {
-                            /* if ("${IS_PROD}" == 'true') {
-                                  docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-                                      mavenBuildProject(map)
-                                  }
-                              } else*/
-                            if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
-                                // mvnd支持条件
-                                def mvndVersion = "1.0.2"
+                            // Gradle构建方式
+                            if (IS_GRADLE_BUILD == true) {
+                                def gradleVersion = "8" // Gradle版本 要动态配置
                                 def jdkVersion = "${JDK_VERSION}"
-                                def dockerImageName = "panweiji/mvnd-jdk"
-                                def dockerImageTag = "${mvndVersion}-${jdkVersion}"
-                                Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk", dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}")
-                                docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-                                    mavenBuildProject(map, 0, "mvnd")
+                                docker.image("gradle:$gradleVersion-jdk$jdkVersion").inside("-v /var/cache/gradle-cache:/gradle-cache -v /var/cache/maven/.m2:/root/.m2") {
+                                    gradleBuildProject(map)
                                 }
                             } else {
-                                docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-                                    mavenBuildProject(map)
+                                /* if ("${IS_PROD}" == 'true') {
+                                      docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+                                          mavenBuildProject(map)
+                                      }
+                                  } else*/
+                                if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
+                                    // mvnd支持条件
+                                    def mvndVersion = "1.0.2"  // Mvnd版本 要动态配置
+                                    def jdkVersion = "${JDK_VERSION}"
+                                    def dockerImageName = "panweiji/mvnd-jdk"
+                                    def dockerImageTag = "${mvndVersion}-${jdkVersion}"
+                                    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk", dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}")
+                                    docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+                                        mavenBuildProject(map, 0, "mvnd")
+                                    }
+                                } else {
+                                    docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+                                        mavenBuildProject(map)
+                                    }
                                 }
                             }
                         }
@@ -825,6 +834,8 @@ def getInitParams(map) {
     IS_SOURCE_CODE_DEPLOY = jsonParams.IS_SOURCE_CODE_DEPLOY ? jsonParams.IS_SOURCE_CODE_DEPLOY : false
     // 是否直接构建包部署方式  如无源码的情况
     IS_PACKAGE_DEPLOY = jsonParams.IS_PACKAGE_DEPLOY ? jsonParams.IS_PACKAGE_DEPLOY : false
+    // 是否Gradle构建方式
+    IS_GRADLE_BUILD = jsonParams.IS_GRADLE_BUILD ? jsonParams.IS_GRADLE_BUILD : false
 
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
@@ -866,13 +877,6 @@ def getInitParams(map) {
     def configNodeName = "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
     int targetIndex = allNodes.findIndexOf { it == configNodeName }
     ALL_ONLINE_NODES = targetIndex == -1 ? allNodes : [allNodes[targetIndex]] + allNodes.minus(configNodeName).sort()
-
-    // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
-    try {
-        if (params.IS_WORKSPACE_CLEAN == true) {
-            deleteDir()  // 清空当前工作空间
-        }
-    } catch (error) {}
 
     // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值
     if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
@@ -963,8 +967,8 @@ def getInitParams(map) {
     javaPackageType = ""
     // 构建包大小
     buildPackageSize = ""
-    // Maven打包后产物的位置
-    mavenPackageLocation = ""
+    // 构建打包后产物的位置
+    buildPackageLocation = ""
     // 是否健康探测失败状态
     isHealthCheckFail = false
     // 计算应用启动时间
@@ -1026,6 +1030,17 @@ def initInfo() {
         proxyJumpSSHText = " -J ${proxy_jump_user_name}@${proxy_jump_ip}:${proxy_jump_port} "
         proxyJumpSCPText = " -o 'ProxyJump ${proxy_jump_user_name}@${proxy_jump_ip}:${proxy_jump_port}' "
     }
+
+    // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
+    try {
+        if (params.IS_WORKSPACE_CLEAN == true) {
+            def jobHome = env.WORKSPACE.split("@")[0] // 根据@符号分隔去前面的路径
+            sh " rm -rf ${jobHome}*"
+        }
+    } catch (error) {
+        println("清空工作空间失败: " + error)
+    }
+
 }
 
 /**
@@ -1392,21 +1407,40 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
         }
         // Maven打包产出物位置
         if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') {
-            mavenPackageLocationDir = "target"
+            buildPackageLocationDir = "target"
         } else {
-            mavenPackageLocationDir = ("${MAVEN_ONE_LEVEL}" == "" ? "${PROJECT_NAME}" : "${MAVEN_ONE_LEVEL}${PROJECT_NAME}") + "/target"
+            buildPackageLocationDir = ("${MAVEN_ONE_LEVEL}" == "" ? "${PROJECT_NAME}" : "${MAVEN_ONE_LEVEL}${PROJECT_NAME}") + "/target"
         }
-        mavenPackageLocation = "${mavenPackageLocationDir}" + "/*.${javaPackageType}"
+        buildPackageLocation = "${buildPackageLocationDir}" + "/*.${javaPackageType}"
         if ("${IS_SPRING_NATIVE}" == "true") {
             // 名称为pom.xml下build内的imageName标签名称
-            mavenPackageLocation = "${mavenPackageLocationDir}" + "/spring-native-graalvm"
+            buildPackageLocation = "${buildPackageLocationDir}" + "/spring-native-graalvm"
         }
-        println(mavenPackageLocation)
-        buildPackageSize = Utils.getFileSize(this, mavenPackageLocation)
+        println(buildPackageLocation)
+        buildPackageSize = Utils.getFileSize(this, buildPackageLocation)
         println(buildPackageSize)
         Tools.printColor(this, "Maven打包成功 ✅")
         // 上传部署文件到OSS
         uploadOss(map)
+    }
+}
+
+/**
+ * Gradle编译构建
+ */
+def gradleBuildProject(map) {
+    println("执行Gradle构建 🏗️  ")
+    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
+        Gradle.build(this, "bootJar")
+        buildPackageLocationDir = "build/libs"  // Gradle构建产物目录
+        dir(buildPackageLocationDir) {
+            sh "rm -f *-plain.jar && ls"  // 删除无效的jar包
+        }
+        buildPackageLocation = "${buildPackageLocationDir}" + "/*.jar"
+        println(buildPackageLocation)
+        buildPackageSize = Utils.getFileSize(this, buildPackageLocation)
+        println(buildPackageSize)
+        Tools.printColor(this, "Gradle打包成功 ✅")
     }
 }
 
@@ -1471,7 +1505,7 @@ def uploadOss(map) {
             if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
                 // 源文件地址
-                def sourceFile = "${env.WORKSPACE}/${mavenPackageLocation}"
+                def sourceFile = "${env.WORKSPACE}/${buildPackageLocation}"
                 // 目标文件
                 def targetFile = "backend/${env.JOB_NAME}/${PROJECT_NAME}-${SHELL_ENV_MODE}-${env.BUILD_NUMBER}.${javaPackageType}"
                 javaOssUrl = AliYunOSS.upload(this, map, sourceFile, targetFile)
@@ -1516,7 +1550,7 @@ def uploadRemote(filePath, map) {
                 sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd ${projectDeployFolder} && rm -f *.${javaPackageType}' "
                 dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
                     // 上传构建包到远程服务器
-                    sh " scp ${proxyJumpSCPText} ${mavenPackageLocation} ${remote.user}@${remote.host}:${projectDeployFolder} "
+                    sh " scp ${proxyJumpSCPText} ${buildPackageLocation} ${remote.user}@${remote.host}:${projectDeployFolder} "
                 }
             } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
                 // Go语言打包产物 上传包到远程服务器
@@ -1972,7 +2006,7 @@ def archive() {
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             archiveArtifacts artifacts: "${npmPackageLocation}", onlyIfSuccessful: true
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-            archiveArtifacts artifacts: "${mavenPackageLocation}", onlyIfSuccessful: true
+            archiveArtifacts artifacts: "${buildPackageLocation}", onlyIfSuccessful: true
         }
     } catch (error) {
         println "归档文件异常"
@@ -1989,7 +2023,7 @@ def deletePackagedOutput() {
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             sh " rm -f ${npmPackageLocation} "
         } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-            sh " rm -f ${mavenPackageLocation} "
+            sh " rm -f ${buildPackageLocation} "
         }
         //}
     } catch (error) {

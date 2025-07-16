@@ -6,9 +6,23 @@ import shared.library.Utils
  * @author 潘维吉
  * @date 2021/12/17 13:22
  * @email 406798106@qq.com
- * @description Gradle相关
+ * @description Gradle构建相关
  */
 class Gradle implements Serializable {
+
+    /**
+     * 构建
+     */
+    static def build(ctx, tasks = "clean build") {
+        if (ctx.isUnix()) { // Linux和MacOS使用./gradlew  Windows系统 直接gradlew
+            ctx.sh " gradle $tasks -x test -x jar " +
+                    " -Dorg.gradle.daemon.idletimeout=0 -Dorg.gradle.parallel=true -Dorg.gradle.caching=true " +
+                    " -Dorg.gradle.internal.http.socketTimeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000 " +
+                    " --no-daemon "
+        } else {
+            ctx.bat "gradlew $tasks"
+        }
+    }
 
     /**
      *  初始化环境变量
@@ -50,13 +64,5 @@ class Gradle implements Serializable {
                  """
         }
     }
-
-    /**
-     * 构建
-     */
-    static def build(ctx, tasks = "clean build") {
-        ctx.sh "./gradlew ${tasks}" // Linux和MacOS使用./gradlew  Windows系统 直接gradlew
-    }
-
 
 }

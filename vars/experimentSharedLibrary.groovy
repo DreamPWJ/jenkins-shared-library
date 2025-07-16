@@ -13,8 +13,8 @@ import shared.library.devops.GitTagLog
 def call(String type = 'experiment', Map map) {
     echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: ${params.SELECT_BUILD_NODE}"
     // 应用共享方法定义
-    changeLog = new ChangeLog()
-    gitTagLog = new GitTagLog()
+    env.changeLog = new ChangeLog()
+    env.gitTagLog = new GitTagLog()
 
     remote = [:]
     try {
@@ -24,13 +24,13 @@ def call(String type = 'experiment', Map map) {
         remote.host = "${map.remote_ip}" // 部署应用程序服务器IP  不传字符参数 使用默认值
     }
     remote.user = "${map.remote_user_name}"
-    remote_worker_ips = readJSON text: "${map.remote_worker_ips}"  // 分布式部署工作服务器地址 同时支持N个服务器
+    env.remote_worker_ips = readJSON text: "${map.remote_worker_ips}"  // 分布式部署工作服务器地址 同时支持N个服务器
     // 代理机或跳板机外网ip用于透传部署到内网目标机器
-    proxy_jump_ip = "${map.proxy_jump_ip}"
+    env.proxy_jump_ip = "${map.proxy_jump_ip}"
     // 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
-    proxy_jump_user_name = "${map.proxy_jump_user_name}"
+    env.proxy_jump_user_name = "${map.proxy_jump_user_name}"
     // 自定义跳板机ssh和scp访问端口 默认22
-    proxy_jump_port = "${map.proxy_jump_port}"
+    env.proxy_jump_port = "${map.proxy_jump_port}"
 
     // 初始化参数
     getInitParams(map)
@@ -68,7 +68,6 @@ def call(String type = 'experiment', Map map) {
                         description: '是否在生产环境中自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录 📄')
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 将构建成功失败等状态信息同步到群内所有人 📢 ")
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
-                // file(name: 'DEPLOY_PACKAGE', description: '请上传部署包文件')
                 stashedFile(name: 'DEPLOY_PACKAGE', description: "请选择上传部署包文件 不依赖源码情况下 支持直接上传成品包部署方式 (如 *.jar、*.war、*.tar.gz 等格式) 🚀 ")
                 //booleanParam(name: 'IS_DEPLOY_MULTI_ENV', defaultValue: false, description: '是否同时部署当前job项目多环境 如dev test等')
             }
@@ -179,6 +178,9 @@ def call(String type = 'experiment', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            return true
+                        }
                     }
                     failFast true         //表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
                     parallel {  // 并发构建步骤
@@ -203,6 +205,9 @@ def call(String type = 'experiment', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            return true
+                        }
                     }
 /*                    agent {
                         dockerfile {
@@ -282,94 +287,94 @@ class Constants {
 /**
  *  获取初始化参数方法
  */
-def getInitParams(map) {
+ def getInitParams(map) {
 
     // JSON_PARAMS为单独项目的初始化参数  JSON_PARAMS为key值  value为json结构  请选择jenkins动态参数中的 "文本参数" 配置  具体参数定义如下
     def jsonParams = readJSON text: "${JSON_PARAMS}"
     // println "${jsonParams}"
-    REPO_URL = jsonParams.REPO_URL ? jsonParams.REPO_URL.trim() : "" // Git源码地址 需要包含.git后缀
-    BRANCH_NAME = jsonParams.BRANCH_NAME ? jsonParams.BRANCH_NAME.trim() : GlobalVars.defaultBranch  // Git默认分支
-    PROJECT_TYPE = jsonParams.PROJECT_TYPE ? jsonParams.PROJECT_TYPE.trim() : ""  // 项目类型 1 前端项目 2 后端项目
+    env.REPO_URL = jsonParams.REPO_URL ? jsonParams.REPO_URL.trim() : "" // Git源码地址 需要包含.git后缀
+    env.BRANCH_NAME = jsonParams.BRANCH_NAME ? jsonParams.BRANCH_NAME.trim() : GlobalVars.defaultBranch  // Git默认分支
+    env.PROJECT_TYPE = jsonParams.PROJECT_TYPE ? jsonParams.PROJECT_TYPE.trim() : ""  // 项目类型 1 前端项目 2 后端项目
     // 计算机语言类型 1. Java  2. Go  3. Python  5. C++  6. JavaScript
-    COMPUTER_LANGUAGE = jsonParams.COMPUTER_LANGUAGE ? jsonParams.COMPUTER_LANGUAGE.trim() : "1"
+    env.COMPUTER_LANGUAGE = jsonParams.COMPUTER_LANGUAGE ? jsonParams.COMPUTER_LANGUAGE.trim() : "1"
     // 项目名 获取部署资源位置和指定构建模块名等
-    PROJECT_NAME = jsonParams.PROJECT_NAME ? jsonParams.PROJECT_NAME.trim() : ""
-    SHELL_PARAMS = jsonParams.SHELL_PARAMS ? jsonParams.SHELL_PARAMS.trim() : "" // shell传入前端或后端参数
+    env.PROJECT_NAME = jsonParams.PROJECT_NAME ? jsonParams.PROJECT_NAME.trim() : ""
+    env.SHELL_PARAMS = jsonParams.SHELL_PARAMS ? jsonParams.SHELL_PARAMS.trim() : "" // shell传入前端或后端参数
     // 分布式部署独立扩展服务器 基于通用配置的基础上 再扩展的服务器IP集合 逗号分割
-    EXPAND_SERVER_IPS = jsonParams.EXPAND_SERVER_IPS ? jsonParams.EXPAND_SERVER_IPS.trim() : ""
+    env.EXPAND_SERVER_IPS = jsonParams.EXPAND_SERVER_IPS ? jsonParams.EXPAND_SERVER_IPS.trim() : ""
 
-    JDK_VERSION = jsonParams.JDK_VERSION ? jsonParams.JDK_VERSION.trim() : "${map.jdk}" // 自定义JDK版本
-    JDK_PUBLISHER = jsonParams.JDK_PUBLISHER ? jsonParams.JDK_PUBLISHER.trim() : "${map.jdk_publisher}" // JDK版本发行商
-    NODE_VERSION = jsonParams.NODE_VERSION ? jsonParams.NODE_VERSION.trim() : "${map.nodejs}" // 自定义Node版本
-    TOMCAT_VERSION = jsonParams.TOMCAT_VERSION ? jsonParams.TOMCAT_VERSION.trim() : "7.0" // 自定义Tomcat版本
+    env.JDK_VERSION = jsonParams.JDK_VERSION ? jsonParams.JDK_VERSION.trim() : "${map.jdk}" // 自定义JDK版本
+    env.JDK_PUBLISHER = jsonParams.JDK_PUBLISHER ? jsonParams.JDK_PUBLISHER.trim() : "${map.jdk_publisher}" // JDK版本发行商
+    env.NODE_VERSION = jsonParams.NODE_VERSION ? jsonParams.NODE_VERSION.trim() : "${map.nodejs}" // 自定义Node版本
+    env.TOMCAT_VERSION = jsonParams.TOMCAT_VERSION ? jsonParams.TOMCAT_VERSION.trim() : "7.0" // 自定义Tomcat版本
     // npm包管理工具类型 如:  npm、yarn、pnpm
-    NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
-    NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [build]的前端项目参数
+    env.NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
+    env.NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [build]的前端项目参数
 
-    IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
+    env.IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
     // 是否Maven单模块代码
-    IS_MAVEN_SINGLE_MODULE = jsonParams.IS_MAVEN_SINGLE_MODULE ? jsonParams.IS_MAVEN_SINGLE_MODULE : false
+    env.IS_MAVEN_SINGLE_MODULE = jsonParams.IS_MAVEN_SINGLE_MODULE ? jsonParams.IS_MAVEN_SINGLE_MODULE : false
     // 是否执行Maven单元测试
-    IS_RUN_MAVEN_TEST = jsonParams.IS_RUN_MAVEN_TEST ? jsonParams.IS_RUN_MAVEN_TEST : false
+    env.IS_RUN_MAVEN_TEST = jsonParams.IS_RUN_MAVEN_TEST ? jsonParams.IS_RUN_MAVEN_TEST : false
     // 是否使用Docker容器环境方式构建打包 false使用宿主机环境
-    IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true
+    env.IS_DOCKER_BUILD = jsonParams.IS_DOCKER_BUILD == "false" ? false : true
     // 是否开启Docker多架构CPU构建支持
-    IS_DOCKER_BUILD_MULTI_PLATFORM = jsonParams.IS_DOCKER_BUILD_MULTI_PLATFORM ? jsonParams.IS_DOCKER_BUILD_MULTI_PLATFORM : false
-    IS_BLUE_GREEN_DEPLOY = jsonParams.IS_BLUE_GREEN_DEPLOY ? jsonParams.IS_BLUE_GREEN_DEPLOY : false // 是否蓝绿部署
-    IS_ROLL_DEPLOY = jsonParams.IS_ROLL_DEPLOY ? jsonParams.IS_ROLL_DEPLOY : false // 是否滚动部署
+    env.IS_DOCKER_BUILD_MULTI_PLATFORM = jsonParams.IS_DOCKER_BUILD_MULTI_PLATFORM ? jsonParams.IS_DOCKER_BUILD_MULTI_PLATFORM : false
+    env.IS_BLUE_GREEN_DEPLOY = jsonParams.IS_BLUE_GREEN_DEPLOY ? jsonParams.IS_BLUE_GREEN_DEPLOY : false // 是否蓝绿部署
+    env.IS_ROLL_DEPLOY = jsonParams.IS_ROLL_DEPLOY ? jsonParams.IS_ROLL_DEPLOY : false // 是否滚动部署
     // 是否灰度发布  金丝雀发布  A/B测试
-    IS_CANARY_DEPLOY = jsonParams.IS_CANARY_DEPLOY ? jsonParams.IS_CANARY_DEPLOY : params.IS_CANARY_DEPLOY
-    IS_K8S_DEPLOY = jsonParams.IS_K8S_DEPLOY ? jsonParams.IS_K8S_DEPLOY : false // 是否K8S集群部署
-    IS_SERVERLESS_DEPLOY = jsonParams.IS_SERVERLESS_DEPLOY ? jsonParams.IS_SERVERLESS_DEPLOY : false
+    env.IS_CANARY_DEPLOY = jsonParams.IS_CANARY_DEPLOY ? jsonParams.IS_CANARY_DEPLOY : params.IS_CANARY_DEPLOY
+    env.IS_K8S_DEPLOY = jsonParams.IS_K8S_DEPLOY ? jsonParams.IS_K8S_DEPLOY : false // 是否K8S集群部署
+    env.IS_SERVERLESS_DEPLOY = jsonParams.IS_SERVERLESS_DEPLOY ? jsonParams.IS_SERVERLESS_DEPLOY : false
     // 是否Serverless发布
-    IS_STATIC_RESOURCE = jsonParams.IS_STATIC_RESOURCE ? jsonParams.IS_STATIC_RESOURCE : false // 是否静态web资源
-    IS_UPLOAD_OSS = jsonParams.IS_UPLOAD_OSS ? jsonParams.IS_UPLOAD_OSS : false // 是否构建产物上传到OSS
+    env.IS_STATIC_RESOURCE = jsonParams.IS_STATIC_RESOURCE ? jsonParams.IS_STATIC_RESOURCE : false // 是否静态web资源
+    env.IS_UPLOAD_OSS = jsonParams.IS_UPLOAD_OSS ? jsonParams.IS_UPLOAD_OSS : false // 是否构建产物上传到OSS
     // K8s集群业务应用是否使用Session 做亲和度关联
-    IS_USE_SESSION = jsonParams.IS_USE_SESSION ? jsonParams.IS_USE_SESSION : false
+    env.IS_USE_SESSION = jsonParams.IS_USE_SESSION ? jsonParams.IS_USE_SESSION : false
     // 是否是NextJs服务端React框架
-    IS_NEXT_JS = jsonParams.IS_NEXT_JS ? jsonParams.IS_NEXT_JS : false
+    env.IS_NEXT_JS = jsonParams.IS_NEXT_JS ? jsonParams.IS_NEXT_JS : false
     // 服务器部署时不同机器的代码配置是否不相同
-    IS_DIFF_CONF_IN_DIFF_MACHINES = jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES ? jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES : false
+    env.IS_DIFF_CONF_IN_DIFF_MACHINES = jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES ? jsonParams.IS_DIFF_CONF_IN_DIFF_MACHINES : false
     // 是否开启K8S自动水平弹性扩缩容
-    IS_K8S_AUTO_SCALING = jsonParams.IS_K8S_AUTO_SCALING ? jsonParams.IS_K8S_AUTO_SCALING : false
+    env.IS_K8S_AUTO_SCALING = jsonParams.IS_K8S_AUTO_SCALING ? jsonParams.IS_K8S_AUTO_SCALING : false
     // 是否禁用K8S健康探测
-    IS_DISABLE_K8S_HEALTH_CHECK = jsonParams.IS_DISABLE_K8S_HEALTH_CHECK ? jsonParams.IS_DISABLE_K8S_HEALTH_CHECK : false
+    env.IS_DISABLE_K8S_HEALTH_CHECK = jsonParams.IS_DISABLE_K8S_HEALTH_CHECK ? jsonParams.IS_DISABLE_K8S_HEALTH_CHECK : false
     // 是否开启Spring Native原生镜像 显著提升性能同时降低资源使用
-    IS_SPRING_NATIVE = jsonParams.IS_SPRING_NATIVE ? jsonParams.IS_SPRING_NATIVE : false
+    env.IS_SPRING_NATIVE = jsonParams.IS_SPRING_NATIVE ? jsonParams.IS_SPRING_NATIVE : false
     // 是否进行代码质量分析的开关
-    IS_CODE_QUALITY_ANALYSIS = jsonParams.IS_CODE_QUALITY_ANALYSIS ? jsonParams.IS_CODE_QUALITY_ANALYSIS : params.IS_CODE_QUALITY_ANALYSIS
+    env.IS_CODE_QUALITY_ANALYSIS = jsonParams.IS_CODE_QUALITY_ANALYSIS ? jsonParams.IS_CODE_QUALITY_ANALYSIS : params.IS_CODE_QUALITY_ANALYSIS
     // 是否进集成测试
-    IS_INTEGRATION_TESTING = jsonParams.IS_INTEGRATION_TESTING ? jsonParams.IS_INTEGRATION_TESTING : false
+    env.IS_INTEGRATION_TESTING = jsonParams.IS_INTEGRATION_TESTING ? jsonParams.IS_INTEGRATION_TESTING : false
 
     // 设置monorepo单体仓库主包文件夹名
-    MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
-    AUTO_TEST_PARAM = jsonParams.AUTO_TEST_PARAM ? jsonParams.AUTO_TEST_PARAM.trim() : ""  // 自动化集成测试参数
+    env.MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
+    env.AUTO_TEST_PARAM = jsonParams.AUTO_TEST_PARAM ? jsonParams.AUTO_TEST_PARAM.trim() : ""  // 自动化集成测试参数
     // Java框架类型 1. Spring Boot  2. Spring MVC
-    JAVA_FRAMEWORK_TYPE = jsonParams.JAVA_FRAMEWORK_TYPE ? jsonParams.JAVA_FRAMEWORK_TYPE.trim() : "1"
+    env.JAVA_FRAMEWORK_TYPE = jsonParams.JAVA_FRAMEWORK_TYPE ? jsonParams.JAVA_FRAMEWORK_TYPE.trim() : "1"
     // 自定义Docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
-    DOCKER_VOLUME_MOUNT = jsonParams.DOCKER_VOLUME_MOUNT ? jsonParams.DOCKER_VOLUME_MOUNT.trim() : "${map.docker_volume_mount}".trim()
+    env.DOCKER_VOLUME_MOUNT = jsonParams.DOCKER_VOLUME_MOUNT ? jsonParams.DOCKER_VOLUME_MOUNT.trim() : "${map.docker_volume_mount}".trim()
     // 自定义特殊化的Nginx配置文件在项目源码中的路径  用于替换CI仓库的config默认标准配置文件
-    CUSTOM_NGINX_CONFIG = jsonParams.CUSTOM_NGINX_CONFIG ? jsonParams.CUSTOM_NGINX_CONFIG.trim() : ""
+    env.CUSTOM_NGINX_CONFIG = jsonParams.CUSTOM_NGINX_CONFIG ? jsonParams.CUSTOM_NGINX_CONFIG.trim() : ""
     // 不同部署节点动态批量替换多个环境配置文件 源文件目录 目标文件目录 逗号,分割  如 resources/config,resources
-    SOURCE_TARGET_CONFIG_DIR = jsonParams.SOURCE_TARGET_CONFIG_DIR ? jsonParams.SOURCE_TARGET_CONFIG_DIR.trim() : ""
+    env.SOURCE_TARGET_CONFIG_DIR = jsonParams.SOURCE_TARGET_CONFIG_DIR ? jsonParams.SOURCE_TARGET_CONFIG_DIR.trim() : ""
     // 不同项目通过文件目录区分放在相同的仓库中 设置Git代码项目文件夹名称 用于找到相关应用源码
-    GIT_PROJECT_FOLDER_NAME = jsonParams.GIT_PROJECT_FOLDER_NAME ? jsonParams.GIT_PROJECT_FOLDER_NAME.trim() : ""
+    env.GIT_PROJECT_FOLDER_NAME = jsonParams.GIT_PROJECT_FOLDER_NAME ? jsonParams.GIT_PROJECT_FOLDER_NAME.trim() : ""
     // K8S集群 Pod初始化副本数量  高并发建议分布式2n+1节点容灾性
-    K8S_POD_REPLICAS = jsonParams.K8S_POD_REPLICAS ? jsonParams.K8S_POD_REPLICAS.trim() : 2
+    env.K8S_POD_REPLICAS = jsonParams.K8S_POD_REPLICAS ? jsonParams.K8S_POD_REPLICAS.trim() : 2
     // 应用服务访问完整域名或代理服务器IP 带https或http前缀 用于反馈显示等
-    APPLICATION_DOMAIN = jsonParams.APPLICATION_DOMAIN ? jsonParams.APPLICATION_DOMAIN.trim() : ""
+    env.APPLICATION_DOMAIN = jsonParams.APPLICATION_DOMAIN ? jsonParams.APPLICATION_DOMAIN.trim() : ""
     // NFS网络文件服务地址
-    NFS_SERVER = jsonParams.NFS_SERVER ? jsonParams.NFS_SERVER.trim() : ""
+    env.NFS_SERVER = jsonParams.NFS_SERVER ? jsonParams.NFS_SERVER.trim() : ""
     // 挂载宿主机路径与NFS服务器文件路径映射关系 NFS宿主机文件路径 NFS服务器文件路径 映射关系:冒号分割 多个逗号,分割
-    NFS_MOUNT_PATHS = jsonParams.NFS_MOUNT_PATHS ? jsonParams.NFS_MOUNT_PATHS.trim() : ""
+    env.NFS_MOUNT_PATHS = jsonParams.NFS_MOUNT_PATHS ? jsonParams.NFS_MOUNT_PATHS.trim() : ""
     // 自定义健康探测HTTP路径Path  默认根目录 /
-    CUSTOM_HEALTH_CHECK_PATH = jsonParams.CUSTOM_HEALTH_CHECK_PATH ? jsonParams.CUSTOM_HEALTH_CHECK_PATH.trim() : "/"
+    env.CUSTOM_HEALTH_CHECK_PATH = jsonParams.CUSTOM_HEALTH_CHECK_PATH ? jsonParams.CUSTOM_HEALTH_CHECK_PATH.trim() : "/"
     // 自定义部署Dockerfile名称 如 Dockerfile.xxx
-    CUSTOM_DOCKERFILE_NAME = jsonParams.CUSTOM_DOCKERFILE_NAME ? jsonParams.CUSTOM_DOCKERFILE_NAME.trim() : ""
+    env.CUSTOM_DOCKERFILE_NAME = jsonParams.CUSTOM_DOCKERFILE_NAME ? jsonParams.CUSTOM_DOCKERFILE_NAME.trim() : ""
     // 自定义Python版本
-    CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.10.0"
+    env.CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.10.0"
     // 自定义Python启动文件名称 默认app.py文件
-    CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
+    env.CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
 
 
     // 获取分布式构建节点 可动态构建在不同机器上
@@ -422,21 +427,21 @@ def getInitParams(map) {
 
     // 未来可独立拆分成不同参数传入 更易于理解和维护
     SHELL_PARAMS_ARRAY = SHELL_PARAMS.split("\\s+")  // 正则表达式\s表示匹配任何空白字符，+表示匹配一次或多次
-    SHELL_PROJECT_NAME = SHELL_PARAMS_ARRAY[0] // 项目名称
-    SHELL_PROJECT_TYPE = SHELL_PARAMS_ARRAY[1] // 项目类型
-    SHELL_HOST_PORT = SHELL_PARAMS_ARRAY[2] // 宿主机对外访问接口
-    SHELL_EXPOSE_PORT = SHELL_PARAMS_ARRAY[3] // 容器内暴露端口
-    SHELL_ENV_MODE = SHELL_PARAMS_ARRAY[4] // 环境模式 如 dev sit test prod等
+    env.SHELL_PROJECT_NAME = SHELL_PARAMS_ARRAY[0] // 项目名称
+    env.SHELL_PROJECT_TYPE = SHELL_PARAMS_ARRAY[1] // 项目类型
+    env.SHELL_HOST_PORT = SHELL_PARAMS_ARRAY[2] // 宿主机对外访问接口
+    env.SHELL_EXPOSE_PORT = SHELL_PARAMS_ARRAY[3] // 容器内暴露端口
+    env.SHELL_ENV_MODE = SHELL_PARAMS_ARRAY[4] // 环境模式 如 dev sit test prod等
 
     // 项目全名 防止项目名称重复
-    FULL_PROJECT_NAME = "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}"
+    env.FULL_PROJECT_NAME = "${SHELL_PROJECT_NAME}-${SHELL_PROJECT_TYPE}"
     // Docker镜像名称
-    dockerImageName = "${SHELL_PROJECT_NAME}/${SHELL_PROJECT_TYPE}-${SHELL_ENV_MODE}"
+    env.dockerImageName = "${SHELL_PROJECT_NAME}/${SHELL_PROJECT_TYPE}-${SHELL_ENV_MODE}"
     // Docker容器名称
-    dockerContainerName = "${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}"
+    env.dockerContainerName = "${FULL_PROJECT_NAME}-${SHELL_ENV_MODE}"
 
     // 获取通讯录
-    contactPeoples = ""
+    env.contactPeoples = ""
     try {
         def data = libraryResource('contacts.yaml')
         Map contacts = readYaml text: data
@@ -447,8 +452,8 @@ def getInitParams(map) {
     }
 
     // 健康探测url地址
-    healthCheckUrl = ""
-    healthCheckDomainUrl = ""
+    env.healthCheckUrl = ""
+    env.healthCheckDomainUrl = ""
     // 使用域名或机器IP地址
     if ("${APPLICATION_DOMAIN}".trim() == "") {
         healthCheckUrl = "http://${remote.host}:${SHELL_HOST_PORT}"
@@ -457,23 +462,23 @@ def getInitParams(map) {
     }
 
     // Git Tag版本变量定义
-    tagVersion = ""
+    env.tagVersion = ""
     // 扫描二维码地址
-    qrCodeOssUrl = ""
+    env.qrCodeOssUrl = ""
     // Java构建包OSS地址Url
-    javaOssUrl = ""
+    env.javaOssUrl = ""
     // Java打包类型 jar、war
-    javaPackageType = ""
+    env.javaPackageType = ""
     // 构建包大小
-    buildPackageSize = ""
-    // Maven打包后产物的位置
-    mavenPackageLocation = ""
+    env.buildPackageSize = ""
+    // 构建打包后产物的位置
+    env.buildPackageLocation = ""
     // 是否健康探测失败状态
-    isHealthCheckFail = false
+    env.isHealthCheckFail = false
     // 计算应用启动时间
-    healthCheckTimeDiff = "未知"
+    env.healthCheckTimeDiff = "未知"
     // Qodana代码质量准备不同语言的镜像名称
-    qodanaImagesName = ""
+    env.qodanaImagesName = ""
 
 }
 
@@ -528,6 +533,17 @@ def initInfo() {
         proxyJumpSSHText = " -J ${proxy_jump_user_name}@${proxy_jump_ip}:${proxy_jump_port} "
         proxyJumpSCPText = " -o 'ProxyJump ${proxy_jump_user_name}@${proxy_jump_ip}:${proxy_jump_port}' "
     }
+
+    // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
+    try {
+        if (params.IS_WORKSPACE_CLEAN == true) {
+            def jobHome = env.WORKSPACE.split("@")[0] // 根据@符号分隔去前面的路径
+            sh " rm -rf ${jobHome}*"
+        }
+    } catch (error) {
+        println("清空工作空间失败: " + error)
+    }
+
 }
 
 /**
@@ -632,6 +648,7 @@ def pullCIRepo() {
  * 获取项目代码
  */
 def pullProjectCode() {
+
     // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行jenkins任务才能生效
     if (!params.GIT_TAG) {
         params.GIT_TAG = GlobalVars.noGit
@@ -682,14 +699,7 @@ def pullProjectCode() {
  */
 def futureLab(map) {
     println("构建机器名称: ${NODE_NAME}")
-
-    // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
-    try {
-        if (params.IS_WORKSPACE_CLEAN == true) {
-            deleteDir()  // 清空当前工作空间
-        }
-    } catch (error) {}
-
+    println("仓库地址: ${REPO_URL}")
 
     // input message: 'Deploy to production?', ok: 'Yes, deploy'
 
@@ -820,6 +830,18 @@ def futureLab(map) {
         //sh "mvn  install"
     }*/
 
+    def gradleVersion = "8"
+    def jdkVersion = "21"
+    docker.image("gradle:$gradleVersion-jdk$jdkVersion").inside("-v /var/cache/gradle-cache:/gradle-cache -v /var/cache/maven/.m2:/root/.m2") {
+        dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
+            Gradle.build(this, "bootJar")
+            // Spring Boot构建jar包 在 build/libs 下面
+            def buildLibPath = "build/libs"
+            dir(buildLibPath) {
+                sh "rm -f *-plain.jar && ls"
+            }
+        }
+    }
 
 /*
     def k8sPodReplicas = Integer.parseInt("3")
