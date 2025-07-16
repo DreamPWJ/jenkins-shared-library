@@ -13,8 +13,8 @@ import shared.library.devops.GitTagLog
 def call(String type = 'experiment', Map map) {
     echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: ${params.SELECT_BUILD_NODE}"
     // 应用共享方法定义
-    changeLog = new ChangeLog()
-    gitTagLog = new GitTagLog()
+    env.changeLog = new ChangeLog()
+    env.gitTagLog = new GitTagLog()
 
     remote = [:]
     try {
