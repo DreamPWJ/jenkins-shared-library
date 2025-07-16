@@ -538,7 +538,7 @@ def initInfo() {
     try {
         if (params.IS_WORKSPACE_CLEAN == true) {
             // 获取当前节点用户目录
-            def jenkinsHome = sh(script: 'echo $HOME', returnStdout: true).trim()
+            def jenkinsHome = sh(script: 'echo $JENKINS_HOME', returnStdout: true).trim()
             println("jenkinsHome: " + jenkinsHome)
             def jobHome = jenkinsHome + "/workspace/" + env.JOB_NAME
             sh "rm -rf ${jobHome}@*" // 清除缓存临时空间
