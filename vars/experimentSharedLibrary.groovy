@@ -287,7 +287,7 @@ class Constants {
 /**
  *  获取初始化参数方法
  */
- getInitParams(map) {
+ def getInitParams(map) {
 
     // JSON_PARAMS为单独项目的初始化参数  JSON_PARAMS为key值  value为json结构  请选择jenkins动态参数中的 "文本参数" 配置  具体参数定义如下
     def jsonParams = readJSON text: "${JSON_PARAMS}"
