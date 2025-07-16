@@ -1028,10 +1028,13 @@ def initInfo() {
     // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
     try {
         if (params.IS_WORKSPACE_CLEAN == true) {
-            deleteDir()  // 清空当前工作空间
+            def jobHome = env.WORKSPACE.split("@")[0] // 根据@符号分隔去前面的路径
+            dir(jobHome) {
+                deleteDir()  // 清空当前工作空间
+            }
         }
     } catch (error) {
-        println("清空工作空间失败: "+ error)
+        println("清空工作空间失败: " + error)
     }
 
 }

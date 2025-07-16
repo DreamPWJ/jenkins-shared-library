@@ -541,7 +541,6 @@ def initInfo() {
             dir(jobHome) {
                 deleteDir()  // 清空当前工作空间
             }
-            // sh "rm -rf ${jobHome}@*" // 清除缓存临时空间
         }
     } catch (error) {
         println("清空工作空间失败: " + error)
