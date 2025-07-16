@@ -30,7 +30,7 @@ class Gradle implements Serializable {
             """
 
             ctx.sh "chmod +x gradlew && " +
-                    " ./gradlew $tasks -Dorg.gradle.parallel=true"
+                    " gradle $tasks -Dorg.gradle.parallel=true --no-daemon"
         } else {
             ctx.bat "gradlew $tasks"
         }
