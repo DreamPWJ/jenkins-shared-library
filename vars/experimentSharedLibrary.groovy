@@ -534,17 +534,6 @@ def initInfo() {
         proxyJumpSCPText = " -o 'ProxyJump ${proxy_jump_user_name}@${proxy_jump_ip}:${proxy_jump_port}' "
     }
 
-    // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
-    try {
-        if (params.IS_WORKSPACE_CLEAN == true) {
-            sh "pwd"
-            println(env.WORKSPACE)
-            cleanWs()  // 清空当前工作空间
-        }
-    } catch (error) {
-        println("清空工作空间失败: " + error)
-    }
-
 }
 
 /**
@@ -649,6 +638,18 @@ def pullCIRepo() {
  * 获取项目代码
  */
 def pullProjectCode() {
+
+    // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
+    try {
+        if (params.IS_WORKSPACE_CLEAN == true) {
+            sh "pwd"
+            println(env.WORKSPACE)
+            cleanWs()  // 清空当前工作空间
+        }
+    } catch (error) {
+        println("清空工作空间失败: " + error)
+    }
+
     // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行jenkins任务才能生效
     if (!params.GIT_TAG) {
         params.GIT_TAG = GlobalVars.noGit
