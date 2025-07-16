@@ -1028,7 +1028,7 @@ def initInfo() {
     // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
     try {
         if (params.IS_WORKSPACE_CLEAN == true) {
-            deleteDir()  // 清空当前工作空间
+            cleanWs()  // 清空当前工作空间
         }
     } catch (error) {
         println("清空工作空间失败: "+ error)
@@ -2076,7 +2076,7 @@ def productsWarehouse(map) {
  */
 def alwaysPost() {
     // sh 'pwd'
-    // deleteDir()  // 清空工作空间
+    // cleanWs()  // 清空工作空间
     // Jenkins全局安全配置->标记格式器内设置Safe HTML支持html文本
     try {
         def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"

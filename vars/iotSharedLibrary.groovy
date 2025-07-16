@@ -850,7 +850,7 @@ def deletePackagedOutput() {
  */
 def alwaysPost() {
     // sh 'pwd'
-    // deleteDir()  // 清空工作空间
+    // cleanWs()  // 清空工作空间
     // Jenkins全局安全配置->标记格式器内设置Safe HTML支持html文本
     try {
         def releaseEnvironment = "${ENV_TYPE}"

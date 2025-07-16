@@ -1220,7 +1220,7 @@ def genQRCode(map) {
  */
 def alwaysPost() {
     // sh 'pwd'
-    // deleteDir()  // 清空工作空间
+    // cleanWs()  // 清空工作空间
     try {
         def releaseEnvironment = "${NPM_RUN_PARAMS != "" ? NPM_RUN_PARAMS : SHELL_ENV_MODE}"
         def noticeHealthCheckUrl = "${APPLICATION_DOMAIN == "" ? healthCheckUrl : healthCheckDomainUrl}"
