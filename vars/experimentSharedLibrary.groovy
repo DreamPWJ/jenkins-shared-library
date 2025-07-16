@@ -16,7 +16,7 @@ def call(String type = 'experiment', Map map) {
     env.changeLog = new ChangeLog()
     env.gitTagLog = new GitTagLog()
 
-    env.remote = [:]
+    remote = [:]
     try {
         remote.host = "${REMOTE_IP}" // 部署应用程序服务器IP 动态字符参数 可配置在独立的job中
     } catch (exception) {
