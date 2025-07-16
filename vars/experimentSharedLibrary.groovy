@@ -538,6 +538,7 @@ def initInfo() {
     try {
         if (params.IS_WORKSPACE_CLEAN == true) {
             sh "pwd"
+            println(env.WORKSPACE)
             cleanWs()  // 清空当前工作空间
         }
     } catch (error) {
