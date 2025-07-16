@@ -343,7 +343,7 @@ def call(String type = 'web-java', Map map) {
                                 def jdkVersion = "${JDK_VERSION}"
                                 def dockerImageName = "gradle"
                                 def dockerImageTag = "$gradleVersion-jdk$jdkVersion"
-                                docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/gradle:/root/.gradle -v /var/cache/gradle:/home/gradle -v /var/cache/maven/.m2:/root/.m2") {
+                                docker.image("${dockerImageName}:${dockerImageTag}").inside("-v $HOME/.gradle:/root/.gradle -v $HOME/.gradle:/home/gradle/.gradle") {
                                     gradleBuildProject(map)
                                 }
                             } else {
