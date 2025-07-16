@@ -16,7 +16,7 @@ class Gradle implements Serializable {
     static def build(ctx, tasks = "clean build") {
         if (ctx.isUnix()) { // Linux和MacOS使用./gradlew  Windows系统 直接gradlew
             ctx.sh " gradle $tasks --no-daemon -x test -x jar " +
-                    " -Dorg.gradle.daemon.idletimeout=1000 -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.daemon=false " +
+                    " -Dorg.gradle.daemon.idletimeout=1000 -Dorg.gradle.parallel=true -Dorg.gradle.caching=false -Dorg.gradle.daemon=false " +
                     " -Dorg.gradle.internal.http.socketTimeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000  " +
                     " --info --stacktrace "
         } else {
