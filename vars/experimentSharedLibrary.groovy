@@ -538,10 +538,10 @@ def initInfo() {
     try {
         if (params.IS_WORKSPACE_CLEAN == true) {
             def jobHome = env.WORKSPACE.split("@")[0] // 根据@符号分隔去前面的路径
-            sh "rm -rf ${jobHome}@*" // 清除缓存临时空间
             dir(jobHome) {
                 deleteDir()  // 清空当前工作空间
             }
+            // sh "rm -rf ${jobHome}@*" // 清除缓存临时空间
         }
     } catch (error) {
         println("清空工作空间失败: " + error)
