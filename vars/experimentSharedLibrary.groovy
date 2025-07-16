@@ -232,6 +232,7 @@ def call(String type = 'experiment', Map map) {
                 always {
                     script {
                         echo '总是运行，无论成功、失败还是其他状态'
+                        cleanWs deleteDirs: true, patterns: [[pattern: '@**', type: 'INCLUDE']]
                     }
                 }
                 success {
