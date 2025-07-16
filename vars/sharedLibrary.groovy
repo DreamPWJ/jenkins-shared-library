@@ -339,7 +339,7 @@ def call(String type = 'web-java', Map map) {
                         script {
                             // Gradle构建方式
                             if (IS_GRADLE_BUILD == true) {
-                                def gradleVersion = "8"
+                                def gradleVersion = "8" // Gradle版本 要动态配置
                                 def jdkVersion = "${JDK_VERSION}"
                                 docker.image("gradle:$gradleVersion-jdk$jdkVersion").inside("-v /var/cache/gradle-cache:/gradle-cache -v /var/cache/maven/.m2:/root/.m2") {
                                     gradleBuildProject(map)
@@ -352,7 +352,7 @@ def call(String type = 'web-java', Map map) {
                                   } else*/
                                 if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
                                     // mvnd支持条件
-                                    def mvndVersion = "1.0.2"
+                                    def mvndVersion = "1.0.2"  // Mvnd版本 要动态配置
                                     def jdkVersion = "${JDK_VERSION}"
                                     def dockerImageName = "panweiji/mvnd-jdk"
                                     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
@@ -1432,9 +1432,9 @@ def gradleBuildProject(map) {
     println("执行Gradle构建 🏗️  ")
     dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
         Gradle.build(this, "bootJar")
-        buildPackageLocationDir = "build/libs"  // Gradle构建产物 在 build/libs 下面
+        buildPackageLocationDir = "build/libs"  // Gradle构建产物目录
         dir(buildPackageLocationDir) {
-            sh "rm -f *-plain.jar && ls"
+            sh "rm -f *-plain.jar && ls"  // 删除无效的jar包
         }
         buildPackageLocation = "${buildPackageLocationDir}" + "/*.jar"
         println(buildPackageLocation)
