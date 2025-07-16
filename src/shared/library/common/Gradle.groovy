@@ -18,7 +18,7 @@ class Gradle implements Serializable {
             ctx.sh " gradle $tasks --no-daemon -x test -x jar " +
                     " -Dorg.gradle.daemon.idletimeout=1000 -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.daemon=false " +
                     " -Dorg.gradle.internal.http.socketTimeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000  " +
-                    "  "
+                    " --info --stacktrace "
         } else {
             ctx.bat "gradlew $tasks"
         }
