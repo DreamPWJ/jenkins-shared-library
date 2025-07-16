@@ -178,6 +178,9 @@ def call(String type = 'experiment', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            return false
+                        }
                     }
                     failFast true         //表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
                     parallel {  // 并发构建步骤
@@ -202,6 +205,9 @@ def call(String type = 'experiment', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            return false
+                        }
                     }
 /*                    agent {
                         dockerfile {
@@ -531,7 +537,7 @@ def initInfo() {
     // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
     try {
         if (params.IS_WORKSPACE_CLEAN == true) {
-            cleanWs()  // 清空当前工作空间
+            deleteDir()  // 清空当前工作空间
         }
     } catch (error) {
         println("清空工作空间失败: " + error)
