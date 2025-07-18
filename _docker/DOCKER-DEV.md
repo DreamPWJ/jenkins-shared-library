@@ -88,14 +88,6 @@ docker run -d --restart always -p 3100:8080 --cpus=2 -m 4096m --add-host=host.do
  -v /my/open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main
 
 docker exec -it ollama  ollama run deepseek-r1:7b
-
-#### 基于Docker安装部署ZenTao禅道项目管理软件
-#### 从Docker Hub里拉取ZenTao禅道镜像最新版来部署
-docker pull idoop/zentao:latest
-
-#### 启动运行容器 禅道初始化账号admin,密码123456 MySQL root账号密码是123456 BIND_ADDRESS如果设置值为false, Mysql服务器将不会绑定地址 /opt/zbox/bin/mysql -h127.0.0.1 -uroot -p123456进入数据库
-sudo docker run -d --restart=always -p 8080:80 -p 3308:3306 --cpus=2 -m 2048m --name zentao-server \
--e BIND_ADDRESS="false" -v /my/zentao:/opt/zbox  idoop/zentao:latest
  
 #### 安装 sonar代码质量检测服务 默认用户名密码都是admin  如果docker启动报错宿主机执行 sysctl -w vm.max_map_count=262144 
 sudo docker pull sonarqube:community  
