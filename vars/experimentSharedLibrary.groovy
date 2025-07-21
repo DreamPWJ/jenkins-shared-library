@@ -830,7 +830,7 @@ def futureLab(map) {
         //sh "mvn  install"
     }*/
 
-    def gradleVersion = "8" // Gradle版本 要动态配置
+/*    def gradleVersion = "8" // Gradle版本 要动态配置
     def jdkVersion = "${JDK_VERSION}"
     def dockerImageName = "gradle"
     def dockerImageTag = "$gradleVersion-jdk$jdkVersion"
@@ -843,7 +843,7 @@ def futureLab(map) {
                 sh "rm -f *-plain.jar && ls"
             }
         }
-    }
+    }*/
 
 /*
     def k8sPodReplicas = Integer.parseInt("3")
