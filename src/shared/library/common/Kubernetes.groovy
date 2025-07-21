@@ -311,7 +311,7 @@ class Kubernetes implements Serializable {
     static def afterDeployRun(ctx, map, deployNum) {
 
         // 查看个组件的状态  如 kubectl get svc
-        // kubectl top pod || true
+        // kubectl top pods || true
         ctx.sh """ 
                     kubectl top nodes || true
                     """

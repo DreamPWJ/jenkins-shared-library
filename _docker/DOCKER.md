@@ -48,7 +48,7 @@ docker volume create mqtt-emqx && docker inspect mqtt-emqx
 
 docker run -d --restart=always  -p 18083:18083 -p 1883:1883 -p 8083:8083 -p 8084:8084 -p 8883:8883  \
 -e TZ="Asia/Shanghai" \
--v /my/emqx/data:/opt/emqx/data -v /my/emqx/etc:/opt/emqx/etc -v /my/emqx/log:/opt/emqx/log \
+-v /my/emqx/data:/opt/emqx/data -v /my/emqx/etc:/opt/emqx/etc -v /my/emqx/log:/opt/emqx/log  -v /etc/letsencrypt:/etc/letsencrypt  \
 --cpus=2 -m 4096m  --log-opt max-size=200m --log-opt max-file=1  \
 --privileged --name emqx  emqx/emqx:latest
 
