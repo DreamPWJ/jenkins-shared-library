@@ -80,7 +80,7 @@ class JenkinsCI implements Serializable {
      * 获取所有分布式node节点信息
      */
     static def getAllNodes(ctx) {
-        def nodesArray = ["master"] // 添加 Master 节点
+        def nodesArray = ["master"] // 添加 Master 节点标签
         // 获取所有节点
         def allNodes = Jenkins.instance.nodes
         // 遍历节点并输出名称

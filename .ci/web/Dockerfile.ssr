@@ -18,6 +18,11 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # cd到app文件夹下
 WORKDIR /app
 
+# 设置容器内存上限 用于垃圾回收机制（必须！否则Node无法感知容器限制） # 单位MB
+#ENV NODE_MEMORY_LIMIT=4096
+# Node参数化定制  低延迟应用（实时服务）
+#ENV NODE_OPTIONS="--max-old-space-size=4096 --expose-gc --incremental-marking"
+
 # 将根目录下的源码文件都copy到docker容器文件系统的app文件夹下
 COPY . .
 #COPY myapp.tar.gz /app/
