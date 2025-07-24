@@ -28,6 +28,21 @@ class JenkinsCI implements Serializable {
     }
 
     /**
+     * 获取当前job是否有代码变更记录并提醒
+     */
+    static def getNoChangeLogAndTip(ctx) {
+        // 过滤特殊前缀git提交记录并返回数据
+        def gitLogs = ctx.currentBuild.changeSets.findAll { changeSet ->
+            return changeSet.commitMessages.findAll { commitMessage ->
+                return !commitMessage.startsWith(GlobalVars.gitCommitChangeLogDocs)
+            }
+        }
+        if (gitLogs.isEmpty()) {
+            ctx.addBadge(id: "no-change-log-badge", text: "无代码变更", color: 'yellow', cssClass: 'badge-text--background')
+        }
+    }
+
+    /**
      * 获取当前job信息
      */
     @NonCPS
