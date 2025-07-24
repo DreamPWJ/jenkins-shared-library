@@ -1,5 +1,8 @@
 package shared.library.common
 
+import shared.library.GlobalVars
+import shared.library.Utils
+import shared.library.common.*
 import groovy.json.JsonOutput
 
 /**
@@ -48,8 +51,8 @@ class JenkinsCI implements Serializable {
                 changeLogSet.items.each { commit ->
                     // 过滤条件：排除特殊开头的提交
                     ctx.println("${commit.msg}")
-                    ctx.println(ctx.GlobalVars.gitCommitChangeLogDocs)
-                    if (!commit.msg.startsWith(ctx.GlobalVars.gitCommitChangeLogDocs)) {
+                    ctx.println(GlobalVars.gitCommitChangeLogDocs)
+                    if (!commit.msg.startsWith(GlobalVars.gitCommitChangeLogDocs)) {
                         filteredChanges.add([
                                 msg: commit.msg,
                         ])
