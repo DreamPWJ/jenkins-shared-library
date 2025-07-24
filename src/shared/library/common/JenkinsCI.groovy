@@ -38,7 +38,7 @@ class JenkinsCI implements Serializable {
             }
         }
         if (gitLogs.isEmpty()) {
-            ctx.addBadge(id: "no-change-log-badge", text: "无代码变更", color: 'yellow', cssClass: 'badge-text--background')
+            ctx.addBadge(id: "no-change-log-badge", text: "无代码变更!", color: 'yellow', cssClass: 'badge-text--background')
         }
     }
 
