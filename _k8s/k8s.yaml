@@ -63,7 +63,7 @@ spec:
           lifecycle:
             preStop:
               exec:
-                command: ["sleep", "5"]  # 等待 kube-proxy 完成规则同步再开始停止容器内进程 仅保留必要的最小等待时间
+                command: ["sleep", "3"]  # 等待 kube-proxy 完成规则同步再开始停止容器内进程 仅保留必要的最小等待时间
           # startupProbe（启动探针）检测容器是否完成启动 在 startupProbe 成功之前，其他探针（readinessProbe 和 livenessProbe）不会启动
           startupProbe:
             httpGet:

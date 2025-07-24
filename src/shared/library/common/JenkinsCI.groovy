@@ -1,5 +1,8 @@
 package shared.library.common
 
+import shared.library.GlobalVars
+import shared.library.Utils
+import shared.library.common.*
 import groovy.json.JsonOutput
 
 /**
@@ -25,6 +28,42 @@ class JenkinsCI implements Serializable {
             }
         }
         return changedFiles
+    }
+
+    /**
+     * 当前job是否有代码变更记录并提醒
+     */
+    static def getNoChangeLogAndTip(ctx) {
+        try {
+            def lastBuild = ctx.currentBuild.previousBuild
+            if (lastBuild != null) {
+                // 判断上次是否成功
+                if (!lastBuild.result == 'SUCCESS') {
+                    return // 如果上次构建不成功 之前变更记录获取不到 不再处理
+                }
+            }
+            // 获取所有变更记录
+            def changeLogSets = ctx.currentBuild.changeSets // 始终在checkout后使用 确保在检出步骤之后访问变更集
+            def filteredChanges = []
+
+            // 遍历每个变更集（多仓库支持）  过滤特殊前缀git提交记录并返回数据
+            changeLogSets.each { changeLogSet ->
+                changeLogSet.items.each { commit ->
+                    // 过滤条件：排除特殊开头的提交
+                    if (!commit.msg.startsWith(GlobalVars.gitCommitChangeLogDocs)) {
+                        filteredChanges.add([
+                                msg: commit.msg,
+                        ])
+                    }
+                }
+            }
+
+            if (filteredChanges.isEmpty()) {
+                ctx.addBadge(id: "no-change-log-badge", text: "无代码变更", color: 'yellow', cssClass: 'badge-text--background')
+            }
+        } catch (e) {
+            ctx.println("获取变更记录失败：${e.message}")
+        }
     }
 
     /**
@@ -80,7 +119,7 @@ class JenkinsCI implements Serializable {
      * 获取所有分布式node节点信息
      */
     static def getAllNodes(ctx) {
-        def nodesArray = ["master"] // 添加 Master 节点
+        def nodesArray = ["master"] // 添加 Master 节点标签
         // 获取所有节点
         def allNodes = Jenkins.instance.nodes
         // 遍历节点并输出名称

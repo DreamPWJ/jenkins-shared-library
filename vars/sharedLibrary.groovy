@@ -1129,6 +1129,8 @@ def getUserInfo() {
             }
         }
     }
+
+    // 构建过程中徽章展示信息
     addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: "${BUILD_USER}同学 正在为你加速构建部署${SHELL_ENV_MODE}环境 ...")
 }
 
@@ -1189,6 +1191,9 @@ def pullProjectCode() {
     dir("${env.WORKSPACE}/ci") {
         existCiCode()
     }
+
+    // 当前job是否有代码变更记录并提醒
+    JenkinsCI.getNoChangeLogAndTip(this)
 
     // 源码直接部署方式
     sourceCodeDeploy()

@@ -701,6 +701,9 @@ def futureLab(map) {
     println("构建机器名称: ${NODE_NAME}")
     println("仓库地址: ${REPO_URL}")
 
+    // 当前job是否有代码变更记录并提醒
+    JenkinsCI.getNoChangeLogAndTip(this)
+
     // input message: 'Deploy to production?', ok: 'Yes, deploy'
 
     //  Tools.printColor(this, "Maven打包成功 ✅")
@@ -830,7 +833,7 @@ def futureLab(map) {
         //sh "mvn  install"
     }*/
 
-    def gradleVersion = "8" // Gradle版本 要动态配置
+/*    def gradleVersion = "8" // Gradle版本 要动态配置
     def jdkVersion = "${JDK_VERSION}"
     def dockerImageName = "gradle"
     def dockerImageTag = "$gradleVersion-jdk$jdkVersion"
@@ -843,7 +846,7 @@ def futureLab(map) {
                 sh "rm -f *-plain.jar && ls"
             }
         }
-    }
+    }*/
 
 /*
     def k8sPodReplicas = Integer.parseInt("3")
