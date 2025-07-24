@@ -287,7 +287,7 @@ class Constants {
 /**
  *  获取初始化参数方法
  */
- def getInitParams(map) {
+def getInitParams(map) {
 
     // JSON_PARAMS为单独项目的初始化参数  JSON_PARAMS为key值  value为json结构  请选择jenkins动态参数中的 "文本参数" 配置  具体参数定义如下
     def jsonParams = readJSON text: "${JSON_PARAMS}"
@@ -702,7 +702,7 @@ def futureLab(map) {
     println("仓库地址: ${REPO_URL}")
 
     if (currentBuild.changeSets.isEmpty()) {
-        addBadge(id: "no-change-log-badge", text: "无变更记录 ⚠️")
+        addBadge(id: "no-change-log-badge", text: "无变更记录 ⚠️", cssClass: 'badge-text--background')
         sleep 3
     }
 
