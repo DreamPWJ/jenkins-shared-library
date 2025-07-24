@@ -31,7 +31,6 @@ class JenkinsCI implements Serializable {
      * 当前job是否有代码变更记录并提醒
      */
     static def getNoChangeLogAndTip(ctx) {
-
         // 获取所有变更记录
         def changeLogSets = currentBuild.changeSets
         def filteredChanges = []
@@ -42,10 +41,7 @@ class JenkinsCI implements Serializable {
                 // 过滤条件：排除开头的提交
                 if (!commit.msg.startsWith(GlobalVars.gitCommitChangeLogDocs)) {
                     filteredChanges.add([
-                            commitId: commit.commitId,
-                            author: commit.author.toString(),
                             msg: commit.msg,
-                            date: new Date(commit.timestamp).format('yyyy-MM-dd HH:mm')
                     ])
                 }
             }
