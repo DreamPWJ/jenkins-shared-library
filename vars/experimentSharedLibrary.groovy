@@ -702,7 +702,7 @@ def futureLab(map) {
     println("仓库地址: ${REPO_URL}")
 
     if (currentBuild.changeSets.isEmpty()) {
-        addInfoBadge(icon: "", text: '无变更记录 ⚠️', color: 'gray')
+        addBadge(id: "no-change-log-badge", text: "无变更记录 ⚠", color: 'gray', cssClass: 'badge-text--background')
         sleep 3
     }
 
