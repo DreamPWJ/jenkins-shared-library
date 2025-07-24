@@ -65,7 +65,8 @@ class Git implements Serializable {
                 def isExistsFile = changedFiles.findAll { a ->
                     changedFiles.any {
                         (a.contains(fileName) || a.contains(lockFileName)
-                                || a.contains("yarn.lock") || a.contains("pnpm-lock.yaml") || a.contains("Podfile") || a.contains("requirement.txt") || a.contains("requirements.txt"))
+                                || a.contains("yarn.lock") || a.contains("pnpm-lock.yaml") || a.contains("Podfile")
+                                || a.contains("requirement.txt") || a.contains("requirements.txt"))
                     }
                 }
                 if (isExistsFile) {
@@ -151,7 +152,8 @@ class Git implements Serializable {
             def lsb = jenkins.getLastSuccessfulBuild()  // 上次成功的构建
             def lsbTime = lsb.getTime().format("yyyy-MM-dd HH:mm:ss")
             // ctx.println("上次成功构建时间: " + lsbTime)
-            gitLogs = Utils.getShEchoResult(ctx, "git log --pretty=format:\"- %s @%an ;\" -n ${maxRecordsNum}  --since='${lsbTime}' --no-merges  | grep -v '^${GlobalVars.gitCommitChangeLogDocs}' ")
+            gitLogs = Utils.getShEchoResult(ctx, "git log --pretty=format:\"- %s @%an ;\" -n ${maxRecordsNum}  " +
+                    " --since='${lsbTime}' --no-merges  | grep -v '^${GlobalVars.gitCommitChangeLogDocs}' ")
             // 针对变更记录数组遍历可进行特殊化处理
            /* def gitLogsArr = gitLogs.split('\n')
             for (gitLog in gitLogsArr) */
