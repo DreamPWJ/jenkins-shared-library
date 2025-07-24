@@ -153,7 +153,8 @@ class Git implements Serializable {
             // ctx.println("上次成功构建时间: " + lsbTime)
             gitLogs = Utils.getShEchoResult(ctx, "git log --pretty=format:\"- %s @%an ;\" -n ${maxRecordsNum}  --since='${lsbTime}' --no-merges  | grep -v '^${GlobalVars.gitCommitChangeLogDocs}' ")
             // 针对变更记录数组遍历可进行特殊化处理
-
+           /* def gitLogsArr = gitLogs.split('\n')
+            for (gitLog in gitLogsArr) */
             return gitLogs
         } catch (error) {
             ctx.println "获取GIT某个时间段的提交记录失败"
