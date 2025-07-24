@@ -31,24 +31,35 @@ class JenkinsCI implements Serializable {
      * 当前job是否有代码变更记录并提醒
      */
     static def getNoChangeLogAndTip(ctx) {
-        // 获取所有变更记录
-        def changeLogSets = ctx.currentBuild.changeSets
-        def filteredChanges = []
-
-        // 遍历每个变更集（多仓库支持）  过滤特殊前缀git提交记录并返回数据
-        changeLogSets.each { changeLogSet ->
-            changeLogSet.items.each { commit ->
-                // 过滤条件：排除开头的提交
-                if (!commit.msg.startsWith(GlobalVars.gitCommitChangeLogDocs)) {
-                    filteredChanges.add([
-                            msg: commit.msg,
-                    ])
+        try {
+            def lastBuild = ctx.currentBuild.previousBuild
+            if (lastBuild != null) {
+                // 判断上次是否成功
+                if (!lastBuild.result == 'SUCCESS') {
+                    return // 如果上次构建不成功 之前变更记录获取不到 不再处理
                 }
             }
-        }
+            // 获取所有变更记录
+            def changeLogSets = ctx.currentBuild.changeSets
+            def filteredChanges = []
 
-        if (filteredChanges.isEmpty()) {
-            ctx.addBadge(id: "no-change-log-badge", text: "无代码变更", color: 'yellow', cssClass: 'badge-text--background')
+            // 遍历每个变更集（多仓库支持）  过滤特殊前缀git提交记录并返回数据
+            changeLogSets.each { changeLogSet ->
+                changeLogSet.items.each { commit ->
+                    // 过滤条件：排除特殊开头的提交
+                    if (!commit.msg.startsWith(GlobalVars.gitCommitChangeLogDocs)) {
+                        filteredChanges.add([
+                                msg: commit.msg,
+                        ])
+                    }
+                }
+            }
+
+            if (filteredChanges.isEmpty()) {
+                ctx.addBadge(id: "no-change-log-badge", text: "无代码变更", color: 'yellow', cssClass: 'badge-text--background')
+            }
+        } catch (e) {
+            ctx.println("获取变更记录失败：${e.message}")
         }
     }
 
