@@ -1129,7 +1129,18 @@ def getUserInfo() {
             }
         }
     }
+
+    // 构建过程中徽章展示信息
     addInfoBadge(id: "launch-badge", icon: 'symbol-rocket plugin-ionicons-api', text: "${BUILD_USER}同学 正在为你加速构建部署${SHELL_ENV_MODE}环境 ...")
+    // 过滤特殊前缀git提交记录并返回数据
+    def gitLogs = currentBuild.changeSets.findAll { changeSet ->
+        return changeSet.commitMessages.findAll { commitMessage ->
+            return !commitMessage.startsWith(GlobalVars.gitCommitChangeLogDocs)
+        }
+    }
+    if (gitLogs.isEmpty()) {
+        addBadge(id: "no-change-log-badge", text: "无代码变更", color: 'yellow', cssClass: 'badge-text--background')
+    }
 }
 
 /**

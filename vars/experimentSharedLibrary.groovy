@@ -701,15 +701,14 @@ def futureLab(map) {
     println("构建机器名称: ${NODE_NAME}")
     println("仓库地址: ${REPO_URL}")
 
-    // 过滤特殊前缀git提交数据并返回
+    // 过滤特殊前缀git提交记录并返回数据
     def gitLogs = currentBuild.changeSets.findAll { changeSet ->
         return changeSet.commitMessages.findAll { commitMessage ->
             return !commitMessage.startsWith(GlobalVars.gitCommitChangeLogDocs)
         }
     }
-
     if (gitLogs.isEmpty()) {
-        addBadge(id: "no-change-log-badge", text: "无变更记录", color: 'yellow', cssClass: 'badge-text--background')
+        addBadge(id: "no-change-log-badge", text: "无代码变更", color: 'yellow', cssClass: 'badge-text--background')
         sleep 3
     }
 
