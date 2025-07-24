@@ -32,7 +32,7 @@ class JenkinsCI implements Serializable {
      */
     static def getNoChangeLogAndTip(ctx) {
         // 获取所有变更记录
-        def changeLogSets = currentBuild.changeSets
+        def changeLogSets = ctx.currentBuild.changeSets
         def filteredChanges = []
 
         // 遍历每个变更集（多仓库支持）  过滤特殊前缀git提交记录并返回数据
