@@ -28,7 +28,7 @@ class JenkinsCI implements Serializable {
     }
 
     /**
-     * 获取当前job是否有代码变更记录并提醒
+     * 当前job是否有代码变更记录并提醒
      */
     static def getNoChangeLogAndTip(ctx) {
         // 过滤特殊前缀git提交记录并返回数据
