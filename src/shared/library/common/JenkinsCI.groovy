@@ -31,14 +31,27 @@ class JenkinsCI implements Serializable {
      * 当前job是否有代码变更记录并提醒
      */
     static def getNoChangeLogAndTip(ctx) {
-        // 过滤特殊前缀git提交记录并返回数据
-        def gitLogs = ctx.currentBuild.changeSets
-/*                .findAll { changeSet ->
-            return changeSet.commitMessages.findAll { commitMessage ->
-                return !commitMessage.startsWith(GlobalVars.gitCommitChangeLogDocs)
+
+        // 获取所有变更记录
+        def changeLogSets = currentBuild.changeSets
+        def filteredChanges = []
+
+        // 遍历每个变更集（多仓库支持）  过滤特殊前缀git提交记录并返回数据
+        changeLogSets.each { changeLogSet ->
+            changeLogSet.items.each { commit ->
+                // 过滤条件：排除开头的提交
+                if (!commit.msg.startsWith(GlobalVars.gitCommitChangeLogDocs)) {
+                    filteredChanges.add([
+                            commitId: commit.commitId,
+                            author: commit.author.toString(),
+                            msg: commit.msg,
+                            date: new Date(commit.timestamp).format('yyyy-MM-dd HH:mm')
+                    ])
+                }
             }
-        }*/
-        if (gitLogs.isEmpty()) {
+        }
+
+        if (filteredChanges.isEmpty()) {
             ctx.addBadge(id: "no-change-log-badge", text: "无代码变更", color: 'yellow', cssClass: 'badge-text--background')
         }
     }
