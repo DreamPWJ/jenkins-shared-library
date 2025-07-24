@@ -43,7 +43,7 @@ class JenkinsCI implements Serializable {
                 }
             }
             // 获取所有变更记录
-            def changeLogSets = ctx.currentBuild.changeSets
+            def changeLogSets = ctx.currentBuild.changeSets // 始终在checkout后使用 确保在检出步骤之后访问变更集
             def filteredChanges = []
 
             // 遍历每个变更集（多仓库支持）  过滤特殊前缀git提交记录并返回数据
