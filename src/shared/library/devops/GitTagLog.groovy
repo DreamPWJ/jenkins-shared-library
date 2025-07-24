@@ -24,7 +24,7 @@ def genTagAndLog(ctx, tagVersion, gitChangeLog, repoUrl, gitCredentialsId) {
 
             ctx.retry(2) {
                 sh("""
-                   git config --global user.email "406798106@qq.com"
+                   git config --global user.email "${GlobalVars.gitEmail}"
                    git config --global user.name ${GIT_USERNAME}       
                    """)
             }
