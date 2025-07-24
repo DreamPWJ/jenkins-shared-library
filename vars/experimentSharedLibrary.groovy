@@ -702,7 +702,8 @@ def futureLab(map) {
     println("仓库地址: ${REPO_URL}")
 
     if (currentBuild.changeSets.isEmpty()) {
-        addInfoBadge(icon: "", text: '无变更记录 ❌', color: 'gray')
+        addInfoBadge(icon: "", text: '无变更记录 ❌', color: 'yellow')
+        sleep 3
     }
 
     // input message: 'Deploy to production?', ok: 'Yes, deploy'
