@@ -701,6 +701,10 @@ def futureLab(map) {
     println("构建机器名称: ${NODE_NAME}")
     println("仓库地址: ${REPO_URL}")
 
+    if (currentBuild.changeSets.isEmpty()) {
+        addInfoBadge(icon: "", text: '无变更记录 ❌', color: 'gray')
+    }
+
     // input message: 'Deploy to production?', ok: 'Yes, deploy'
 
     //  Tools.printColor(this, "Maven打包成功 ✅")
