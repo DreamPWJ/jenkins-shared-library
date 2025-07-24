@@ -47,12 +47,17 @@ class JenkinsCI implements Serializable {
             changeLogSets.each { changeLogSet ->
                 changeLogSet.items.each { commit ->
                     // 过滤条件：排除特殊开头的提交
+                    ctx.println("${commit}")
+                    ctx.println("${commit.msg}")
+                    ctx.println(GlobalVars.gitCommitChangeLogDocs)
                     if (!commit.msg.startsWith(GlobalVars.gitCommitChangeLogDocs)) {
                         filteredChanges.add([
                                 msg: commit.msg,
                         ])
                     }
                 }
+                ctx.println(filteredChanges)
+                ctx.println(filteredChanges.isEmpty())
             }
 
             if (filteredChanges.isEmpty()) {
