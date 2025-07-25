@@ -153,7 +153,7 @@ class Git implements Serializable {
             def lsbTime = lsb.getTime().format("yyyy-MM-dd HH:mm:ss")
             // ctx.println("上次成功构建时间: " + lsbTime)
             gitLogs = Utils.getShEchoResult(ctx, "git log --pretty=format:\"- %s @%an ;\" -n ${maxRecordsNum}  " +
-                    " --since='${lsbTime}' --no-merges  | grep -v '^${GlobalVars.gitCommitChangeLogDocs}' ")
+                    " --since='${lsbTime}' --no-merges  | grep -v '${GlobalVars.gitCommitChangeLogDocs}' ")
             // 针对变更记录数组遍历可进行特殊化处理
            /* def gitLogsArr = gitLogs.split('\n')
             for (gitLog in gitLogsArr) */
