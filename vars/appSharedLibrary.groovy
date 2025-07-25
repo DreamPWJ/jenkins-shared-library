@@ -554,7 +554,7 @@ class Constants {
  */
 def getInitParams(map) {
     // JSON_PARAMS为单独项目的初始化参数  JSON_PARAMS为key值  value为json结构  请选择jenkins动态参数中的 "文本参数" 配置  具体参数定义如下
-    def jsonParams = readJSON text: "${JSON_PARAMS}"
+    jsonParams = readJSON text: "${JSON_PARAMS}"
     // 项目类型 1.Android 2.iOS 3.Flutter 4.React Native 5.Unity
     PROJECT_TYPE = jsonParams.PROJECT_TYPE ? jsonParams.PROJECT_TYPE.trim() : ""
     REPO_URL = jsonParams.REPO_URL ? jsonParams.REPO_URL.trim() : "" // Git源码地址
