@@ -43,10 +43,8 @@ class JenkinsCI implements Serializable {
                 }
             }
             // 判断是否是默认分支 如果切换分支currentBuild.changeSets也会无记录 因为不知道上次代码的基线
-            ctx.println("当前分支: ${ctx.jsonParams.BRANCH_NAME.trim()}")
-            ctx.println("当前分支: ${ctx.params.GIT_BRANCH}")
-            if (ctx.BRANCH_NAME != ctx.params.GIT_BRANCH) {
-                ctx.println("当前分支不是默认分支: ${ctx.params.GIT_BRANCH}")
+            if (ctx.jsonParams.BRANCH_NAME.trim() != ctx.params.GIT_BRANCH) {
+                ctx.println("当前分支${ctx.params.GIT_BRANCH}不是默认分支: ${ctx.params.GIT_BRANCH}")
                 return
             }
             // 获取所有变更记录
