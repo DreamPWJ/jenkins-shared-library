@@ -73,7 +73,7 @@ class Qodana implements Serializable {
                         "@${ctx.REPO_URL.toString().replace("http://", "").replace("https://", "")} "
                 // 先从远程下载最新代码  防止推送的时候冲突
                 ctx.sh("""
-                   git config --global user.email "406798106@qq.com"
+                   git config --global user.email "${GlobalVars.gitEmail}"
                    git config --global user.name ${ctx.GIT_USERNAME}
                    """)
                 // 创建新分支

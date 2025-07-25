@@ -138,4 +138,9 @@ class GlobalVars implements Serializable {
     static String gitCommitDocs = "docs"  // 文档标识
     static String gitCommitChangeLogDocs = "docs(changelog)"  // 版本文档标识
 
+    /**
+     * Git信息
+     */
+    static String gitEmail = "406798106@qq.com"  // Git管理员提交邮箱
+
 }

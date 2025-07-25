@@ -28,7 +28,7 @@ class Git implements Serializable {
                         "@${ctx.REPO_URL.toString().replace("http://", "").replace("https://", "")} "
                 // 先从远程下载最新代码  防止推送的时候冲突
                 ctx.sh("""
-                   git config --global user.email "406798106@qq.com"
+                   git config --global user.email "${GlobalVars.gitEmail}"
                    git config --global user.name ${ctx.GIT_USERNAME}
                    git pull ${userPassWordUrl}
                    """)
@@ -65,7 +65,8 @@ class Git implements Serializable {
                 def isExistsFile = changedFiles.findAll { a ->
                     changedFiles.any {
                         (a.contains(fileName) || a.contains(lockFileName)
-                                || a.contains("yarn.lock") || a.contains("pnpm-lock.yaml") || a.contains("Podfile") || a.contains("requirement.txt") || a.contains("requirements.txt"))
+                                || a.contains("yarn.lock") || a.contains("pnpm-lock.yaml") || a.contains("Podfile")
+                                || a.contains("requirement.txt") || a.contains("requirements.txt"))
                     }
                 }
                 if (isExistsFile) {
@@ -151,9 +152,11 @@ class Git implements Serializable {
             def lsb = jenkins.getLastSuccessfulBuild()  // 上次成功的构建
             def lsbTime = lsb.getTime().format("yyyy-MM-dd HH:mm:ss")
             // ctx.println("上次成功构建时间: " + lsbTime)
-            gitLogs = Utils.getShEchoResult(ctx, "git log --pretty=format:\"- %s @%an ;\" -n ${maxRecordsNum}  --since='${lsbTime}' --no-merges  | grep -v '^${GlobalVars.gitCommitChangeLogDocs}' ")
+            gitLogs = Utils.getShEchoResult(ctx, "git log --pretty=format:\"- %s @%an ;\" -n ${maxRecordsNum}  " +
+                    " --since='${lsbTime}' --no-merges  | grep -v '${GlobalVars.gitCommitChangeLogDocs}' ")
             // 针对变更记录数组遍历可进行特殊化处理
-
+           /* def gitLogsArr = gitLogs.split('\n')
+            for (gitLog in gitLogsArr) */
             return gitLogs
         } catch (error) {
             ctx.println "获取GIT某个时间段的提交记录失败"
