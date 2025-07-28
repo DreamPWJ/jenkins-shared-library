@@ -159,6 +159,7 @@ class Git implements Serializable {
             def gitLogsArr = gitLogs.split(';')
             def newGitLogs = ""
             for (gitLog in gitLogsArr) {
+                ctx.println "获取GIT提交记录: ${gitLog}"
                 if (!gitLog.contains(GlobalVars.gitCommitChangeLogDocs)) {
                     newGitLogs += newGitLogs + "\n"
                 }
