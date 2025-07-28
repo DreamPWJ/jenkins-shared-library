@@ -151,9 +151,9 @@ class Git implements Serializable {
             def jenkins = Jenkins.instance.getItem(ctx.env.JOB_NAME)
             def lsb = jenkins.getLastSuccessfulBuild()  // 上次成功的构建
             def lsbTime = lsb.getTime().format("yyyy-MM-dd HH:mm:ss")
-            ctx.println("上次成功构建时间: " + lsbTime)
+            // ctx.println("上次成功构建时间: " + lsbTime)
             gitLogs = Utils.getShEchoResult(ctx, "git log --pretty=format:\"- %s @%an ;\" -n ${maxRecordsNum}  " +
-                    " --since='${lsbTime}' --no-merges | grep \"${GlobalVars.gitCommitChangeLogDocs}\" || true ")
+                    " --since='2025-07-20 12:47:02' --no-merges | grep \"${GlobalVars.gitCommitChangeLogDocs}\" || true ")
 
             // 针对变更记录数组遍历可进行特殊化处理
 /*            def gitLogsArr = gitLogs.split("\\;") as ArrayList
