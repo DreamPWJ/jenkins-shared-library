@@ -701,12 +701,14 @@ def futureLab(map) {
     println("构建机器名称: ${NODE_NAME}")
     println("仓库地址: ${REPO_URL}")
 
+    JenkinsCI.getGitLogByTime( this)
+
     // 当前job是否有代码变更记录并提醒
     JenkinsCI.getNoChangeLogAndTip(this)
 
     // input message: 'Deploy to production?', ok: 'Yes, deploy'
 
-    //  Tools.printColor(this, "Maven打包成功 ✅")
+    // Tools.printColor(this, "Maven打包成功 ✅")
 
 /*    def array = map.remote_worker_ips
     println("远程节点IP: ${array}")
