@@ -151,7 +151,7 @@ class Git implements Serializable {
             def jenkins = Jenkins.instance.getItem(ctx.env.JOB_NAME)
             def lsb = jenkins.getLastSuccessfulBuild()  // 上次成功的构建
             def lsbTime = lsb.getTime().format("yyyy-MM-dd HH:mm:ss")
-            // ctx.println("上次成功构建时间: " + lsbTime)
+            ctx.println("上次成功构建时间: " + lsbTime)
             gitLogs = Utils.getShEchoResult(ctx, "git log --pretty=format:\"- %s @%an ;\" -n ${maxRecordsNum}  " +
                     " --since='2025-07-20 11:52:24' --no-merges ")
             //  | grep ${GlobalVars.gitCommitChangeLogDocs} || true
