@@ -1,6 +1,7 @@
 #!/bin/bash
 # Author: 潘维吉
 # Description:  脚本来监控CPU、内存和磁盘的使用率，并在使用率超过预设阈值时发送告警
+# 使用Ansible中心化统一批量管理多机器脚本
 
 # 项目服务器名称
 PROJECT_SERVER_NAME="服务器"
@@ -107,6 +108,7 @@ if [ ${DISK_USAGE} -gt ${DISK_USAGE_THRESHOLD} ]; then
              --header 'Content-Type: application/json' \
              --data-raw "$DATA"
         # TODO 记录已发送的记录 防止重复发送  并自动执行脚本清理磁盘空间
+        # ./my/clean_disk.sh
         # STATUS_FILE="/tmp/monitor_status"
         # echo "disk_status=0" >> $STATUS_FILE
 fi
