@@ -287,7 +287,7 @@ class Constants {
 /**
  *  获取初始化参数方法
  */
- def getInitParams(map) {
+def getInitParams(map) {
 
     // JSON_PARAMS为单独项目的初始化参数  JSON_PARAMS为key值  value为json结构  请选择jenkins动态参数中的 "文本参数" 配置  具体参数定义如下
     jsonParams = readJSON text: "${JSON_PARAMS}"
@@ -701,7 +701,8 @@ def futureLab(map) {
     println("构建机器名称: ${NODE_NAME}")
     println("仓库地址: ${REPO_URL}")
 
-    Git.getGitLogByTime( this)
+    def logs = Git.getGitLogByTime(this)
+    println("Git日志: ${logs}")
 
     // 当前job是否有代码变更记录并提醒
     JenkinsCI.getNoChangeLogAndTip(this)
