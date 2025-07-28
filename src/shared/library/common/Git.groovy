@@ -157,6 +157,7 @@ class Git implements Serializable {
             //  | grep ${GlobalVars.gitCommitChangeLogDocs} || true
             // 针对变更记录数组遍历可进行特殊化处理
            def gitLogsArr = gitLogs.split('\\;')
+            ctx.println "gitLogsArr获取GIT提交记录: ${gitLogsArr}"
             def newGitLogs = ""
             for (gitLog in gitLogsArr) {
                 ctx.println "item获取GIT提交记录: ${gitLog}"
