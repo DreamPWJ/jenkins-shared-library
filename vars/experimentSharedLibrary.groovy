@@ -701,7 +701,7 @@ def futureLab(map) {
     println("构建机器名称: ${NODE_NAME}")
     println("仓库地址: ${REPO_URL}")
 
-    JenkinsCI.getGitLogByTime( this)
+    Git.getGitLogByTime( this)
 
     // 当前job是否有代码变更记录并提醒
     JenkinsCI.getNoChangeLogAndTip(this)
