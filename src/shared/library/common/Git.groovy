@@ -155,8 +155,10 @@ class Git implements Serializable {
             gitLogs = Utils.getShEchoResult(ctx, "git log --pretty=format:\"- %s @%an ;\" -n ${maxRecordsNum}  " +
                     " --since='${lsbTime}' --no-merges ") //  | grep ${GlobalVars.gitCommitChangeLogDocs} || true
             // 针对变更记录数组遍历可进行特殊化处理
-           /* def gitLogsArr = gitLogs.split('\n')
-            for (gitLog in gitLogsArr) */
+            def gitLogsArr = gitLogs.split('\n')
+            for (gitLog in gitLogsArr) {
+                ctx.println "${gitLog}"
+            }
             return gitLogs
         } catch (error) {
             ctx.println "获取GIT某个时间段的提交记录失败"
