@@ -106,7 +106,7 @@ if [ ${DISK_USAGE} -gt ${DISK_USAGE_THRESHOLD} ]; then
              --url $DING_TALK_WEBHOOK \
              --header 'Content-Type: application/json' \
              --data-raw "$DATA"
-        # TODO 记录已发送的记录 防止重复发送
+        # TODO 记录已发送的记录 防止重复发送  并自动执行脚本清理磁盘空间
         # STATUS_FILE="/tmp/monitor_status"
         # echo "disk_status=0" >> $STATUS_FILE
 fi
