@@ -156,7 +156,8 @@ class Git implements Serializable {
                     " --since='2025-07-20 11:52:24' --no-merges ")
             //  | grep ${GlobalVars.gitCommitChangeLogDocs} || true
             // 针对变更记录数组遍历可进行特殊化处理
-            def gitLogsArr = gitLogs.split('\\;')
+            def gitLogsArr = gitLogs.split('\\;') as ArrayList
+            ctx.println("gitLogsArr获取GIT提交记录: ${gitLogsArr}")
             def newGitLogs = ""
             for (gitLog in gitLogsArr) {
                 ctx.println("item获取GIT提交记录: ${gitLog}")
