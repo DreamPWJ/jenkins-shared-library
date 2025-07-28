@@ -25,6 +25,9 @@ ansible GROUP_NAME -m copy -a " src=/my/panweiji/test.zip dest=/my/panweiji/ "
 ansible GROUP_NAME -m command -a " unzip -o -d /my/panweiji/test /my/panweiji/test.zip "
 # ansible GROUP_NAME -m command -a " /usr/sbin/reboot "
 
+# 执行脚本命令
+ansible GROUP_NAME -m shell -a " /my/backup.sh "
+
 # 把脚本下发到所有的服务器，然后再运行脚本。相当于copy+shell+delete
 chmod a+x /usr/local/src/script
 ansible GROUP_NAME -m script -a "/usr/local/src/script"
