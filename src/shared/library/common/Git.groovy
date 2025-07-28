@@ -153,18 +153,18 @@ class Git implements Serializable {
             def lsbTime = lsb.getTime().format("yyyy-MM-dd HH:mm:ss")
             // ctx.println("上次成功构建时间: " + lsbTime)
             gitLogs = Utils.getShEchoResult(ctx, "git log --pretty=format:\"- %s @%an ;\" -n ${maxRecordsNum}  " +
-                    " --since='${lsbTime}' --no-merges ")
+                    " --since='2025-07-20 11:52:24' --no-merges ")
             //  | grep ${GlobalVars.gitCommitChangeLogDocs} || true
             // 针对变更记录数组遍历可进行特殊化处理
-/*            def gitLogsArr = gitLogs.split(';')
+           def gitLogsArr = gitLogs.split('\\;')
             def newGitLogs = ""
             for (gitLog in gitLogsArr) {
-                ctx.println "获取GIT提交记录: ${gitLog}"
+                ctx.println "item获取GIT提交记录: ${gitLog}"
                 if (!gitLog.contains(GlobalVars.gitCommitChangeLogDocs)) {
                     newGitLogs += newGitLogs + "\n"
                 }
             }
-            ctx.println "获取GIT提交记录: ${newGitLogs}"*/
+            ctx.println "获取GIT提交记录: ${newGitLogs}"
             return gitLogs
         } catch (error) {
             ctx.println "获取GIT某个时间段的提交记录失败"
