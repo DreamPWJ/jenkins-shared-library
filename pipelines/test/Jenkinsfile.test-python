@@ -44,19 +44,19 @@ map.put('docker_volume_mount', '')
 // Dockerfile多阶段构建 镜像名称
 map.put('docker_multistage_build_images', ' ')
 // 是否上传镜像到docker容器仓库
-map.put('is_push_docker_repo', false)
+map.put('is_push_docker_repo', true)
 // docker容器镜像仓库账号信任id
-map.put('docker_repo_credentials_id', '5553c9ed-5416-4bbf-b7fc-9d53ed856177')
+map.put('docker_repo_credentials_id', '73f6b3b0-4580-4acf-b04a-63892fcf9ba8')
 // docker镜像仓库注册地址
-map.put('docker_repo_registry', 'registry.cn-qingdao.aliyuncs.com')
+map.put('docker_repo_registry', 'hub-cn-shanghai-2.kce.ksyun.com')
 // docker仓库命名空间名称
-map.put('docker_repo_namespace', 'lexiang')
+map.put('docker_repo_namespace', 'lanneng')
 
 // K8S集群相关参数
 // K8S集群部署集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
-map.put('k8s_credentials_ids', ' ')
+map.put('k8s_credentials_ids', '74a3d376-cb4c-4a20-9bf7-7300a5eaa84d')
 // K8S集群私有镜像仓库拉取密钥 在集群内使用kubectl create secret命令生成
-map.put('k8s_image_pull_secrets', ' ')
+map.put('k8s_image_pull_secrets', 'lannengkeji2022')
 
 // 项目标签或项目简称
 map.put('project_tag', 'Python工程')
@@ -128,7 +128,7 @@ test-python
 JSON_PARAMS
 {
     "REPO_URL" : "https://git.pengbocloud.com/pan.weiji/python-flask-demo.git" ,
-    "BRANCH_NAME" : "masteer" ,
+    "BRANCH_NAME" : "master" ,
     "PROJECT_TYPE" : "2" ,
     "COMPUTER_LANGUAGE" : "3" ,
     "PROJECT_NAME" : "python-flask-demo" ,
