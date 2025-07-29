@@ -169,10 +169,10 @@ function get_disk_space() {
     if (( $(echo "$TOTAL_FREE < $MIN_FREE_SPACE" | bc -l) )); then
         echo "🚨 Warning: Free space is below $MIN_FREE_SPACE GB!"
         echo -e "\033[31m当前系统磁盘空间不足, 可能导致Docker镜像构建失败 🚨  \033[0m"
+
         echo "======== 开始自动清理Docker日志 ========"
         docker builder prune --force || true #  移除 Docker 构建缓存  CI/CD服务器或服务端构建镜像显著有效
-        sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
-        #rm -rf /my/**/log* && rm -f /my/**/*.log || true
+        sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log" || true
         # 删除所有 .log 文件
         find /my -type f -name "*.log" -exec rm -f {} + || true
         # 删除所有 log* 的目录
@@ -183,6 +183,7 @@ function get_disk_space() {
         rm -f /var/lib/docker/overlay2/*/diff/etc/nginx/on || true
         # 隐藏占用情况 查找进程没有关闭导致内核无法回收占用空间的隐藏要删除的文件
         lsof -w | grep 'deleted' | awk '{print $2}' | xargs kill -9  || true
+
         AFTER_TOTAL_FREE=$(df -h  / | awk '/\// {print $4}' | sed 's/G//')
         echo "After clean free space is $AFTER_TOTAL_FREE GB! "
     fi
