@@ -14,7 +14,7 @@ class Docker implements Serializable {
 
     // 镜像标签  也可自定义版本标签用于无需重复构建相同的镜像, 做到复用镜像CD持续部署到多环境中
     // k8s集群中 在生产环境中部署容器时，你应该避免使用 :latest 标签，因为这使得正在运行的镜像的版本难以追踪，并且难以正确地回滚
-    static def imageTag = "latest" // Utils.getVersionNum(ctx)
+    static def imageTag = "latest"
     static def imageNodeTag = "-node-" // 相同应用不同容器镜像标签
 
     /**
@@ -78,7 +78,7 @@ class Docker implements Serializable {
 
         // k8s用版本号方式给tag打标签
         if ("${ctx.IS_K8S_DEPLOY}" == 'true') {
-            imageTag = Utils.getVersionNum(ctx)
+            imageTag = Utils.getVersionNumTag(ctx)
         }
         def localImageTag = imageTag
         // 自动替换相同应用不同分布式部署节点的环境文件

@@ -238,6 +238,16 @@ class Utils implements Serializable {
         if (versionNum == '') {
             versionNum = ctx.env.BUILD_NUMBER
         }
+        return  "v" + "${versionNum}"
+    }
+
+    /**
+     * 获取唯一镜像Tag版本号方法
+     */
+    static def getVersionNumTag(ctx, String versionNum = '') {
+        if (versionNum == '') {
+            versionNum = ctx.env.BUILD_NUMBER
+        }
         return new Date().format('yyyy-MM-dd') + "-v" + "${versionNum}"
     }
 
