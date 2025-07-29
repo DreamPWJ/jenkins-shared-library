@@ -108,6 +108,11 @@ if [ ${DISK_USAGE} -gt ${DISK_USAGE_THRESHOLD} ]; then
              --header 'Content-Type: application/json' \
              --data-raw "$DATA"
         # TODO 记录已发送的记录 防止重复发送  并自动执行脚本清理磁盘空间
+        sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log" || true
+        find /my -type f -name "*.log" -exec rm -f {} + || true
+        find /my -type d -name "log*" -exec rm -rf {} + || true
+        docker builder prune --force  || true
+        rm -f /var/lib/docker/overlay2/*/diff/etc/nginx/on || true
         # ./my/clean_disk.sh
         # STATUS_FILE="/tmp/monitor_status"
         # echo "disk_status=0" >> $STATUS_FILE

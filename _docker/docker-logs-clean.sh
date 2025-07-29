@@ -10,7 +10,7 @@ echo "======== 开始自动清理Docker日志 ========"
 TOTAL_FREE=$(df -h  / | awk '/\// {print $4}' | sed 's/G//')
 echo " Free space is $TOTAL_FREE GB! "
 
-sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log"
+sudo sh -c "truncate -s 0 /var/lib/docker/containers/*/*-json.log" || true
 rm -rf /my/**/log* && rm -f /my/**/*.log || true
 # 删除所有 .log 文件
 find /my -type f -name "*.log" -exec rm -f {} + || true
