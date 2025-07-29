@@ -64,7 +64,7 @@ class Kubernetes implements Serializable {
         def hostPort = "${ctx.SHELL_HOST_PORT}" // 宿主机端口
         def containerPort = "${ctx.SHELL_EXPOSE_PORT}" // 容器内端口
 
-        def imageTag = Docker.imageTag
+        def imageTag = Utils.getVersionNumTag(ctx) // Docker.imageTag变量在jenkins重启后会丢失数据
         def k8sPodReplicas = "${ctx.K8S_POD_REPLICAS}"
 
 /*        def k8sVersion = getK8sVersion(ctx)
