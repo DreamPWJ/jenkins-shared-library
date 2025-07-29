@@ -1169,7 +1169,7 @@ def pullProjectCode() {
         sh "git config --global http.sslVerify false || true"
         // 在node节点工具位置选项配置 which git的路径 才能拉取代码!!!
         // 对于大体积仓库或网络不好情况 自定义代码下载超时时间
-        checkout([$class           : 'GitSCM',
+        checkout([$class           : 'GitSCM', // 其它代码版本工具 MercurialSCM、SubversionSCM
                   branches         : [[name: "*/${BRANCH_NAME}"]],
                   extensions       : [[$class: 'CloneOption', timeout: 30]],
                   gitTool          : 'Default',
@@ -1842,7 +1842,7 @@ def blueGreenDeploy(map) {
  */
 def scrollToDeploy(map) {
     if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀和灰度部署方式
-        println "Docker灰度发布:  滚动部署情况 只部署第一个节点 单机部署阶段已部署"
+        println "Docker灰度发布:  滚动部署情况 只部署第一个节点 单机部署阶段已部署 退出滚动部署步骤"
         return  // 返回后续代码不再执行
         /* if (machineNum >= 2) { // 金丝雀分批部署控制阀门
             return
@@ -2240,7 +2240,6 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             deployType = "部署方式: K8S集群滚动发布"
             if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
                 deployType = "部署方式: K8S集群金丝雀发布"
-                addBadge(id: "canary-deploy-badge", text: "金丝雀", color: 'blue', cssClass: 'badge-text--background')
             } else {
                 k8sPodContent = "- K8S集群部署Pod节点数: *${K8S_POD_REPLICAS}* 个 \n"
                 if ("${IS_K8S_AUTO_SCALING}" == "true") {
@@ -2248,6 +2247,10 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                 }
             }
         }
+        if (IS_CANARY_DEPLOY == true) { // 金丝雀部署方式
+            addBadge(id: "canary-deploy-badge", text: "金丝雀", color: 'blue', cssClass: 'badge-text--background')
+        }
+
         def projectTypeName = ""
         if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
             projectTypeName = "前端"
