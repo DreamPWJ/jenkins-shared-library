@@ -65,7 +65,7 @@ class JenkinsCI implements Serializable {
             }
 
             if (filteredChanges.isEmpty()) {
-                ctx.addBadge(id: "no-change-log-badge", text: "无代码变更", color: 'yellow', cssClass: 'badge-text--background')
+                ctx.addBadge(id: "no-change-log-badge", text: "无代码", color: 'yellow', cssClass: 'badge-text--background')
             }
         } catch (e) {
             ctx.println("获取变更记录失败：${e.message}")
