@@ -2240,6 +2240,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             deployType = "部署方式: K8S集群滚动发布"
             if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀部署方式
                 deployType = "部署方式: K8S集群金丝雀发布"
+                addBadge(id: "canary-deploy-badge", text: "金丝雀", color: 'blue', cssClass: 'badge-text--background')
             } else {
                 k8sPodContent = "- K8S集群部署Pod节点数: *${K8S_POD_REPLICAS}* 个 \n"
                 if ("${IS_K8S_AUTO_SCALING}" == "true") {
