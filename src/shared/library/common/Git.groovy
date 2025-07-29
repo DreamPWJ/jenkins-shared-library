@@ -40,8 +40,8 @@ class Git implements Serializable {
                    """)
             }
         } catch (error) {
-            ctx.println "Git提交文件到远程失败 ❌ "
-            ctx.println error.getMessage()
+            ctx.println("Git提交文件到远程失败 ❌ ")
+            ctx.println(error.getMessage())
         }
     }
 
@@ -55,10 +55,10 @@ class Git implements Serializable {
             if (changedFiles.isEmpty()) { // 无变更文件 可判断是否初始化过依赖 防止重复安装浪费资源和时间
                 // 是否存在node_modules文件夹
                 if (ctx.fileExists("node_modules")) {
-                    // ctx.println "node_modules文件夹存在"
+                    // ctx.println("node_modules文件夹存在")
                     return false
                 } else {
-                    ctx.println "node_modules文件夹不存在"
+                    ctx.println("node_modules文件夹不存在")
                     return true
                 }
             } else {
@@ -70,13 +70,13 @@ class Git implements Serializable {
                     }
                 }
                 if (isExistsFile) {
-                    ctx.println "依赖包配置管理文件在Git代码中上发生了变化"
+                    ctx.println("依赖包配置管理文件在Git代码中上发生了变化")
                 }
                 return isExistsFile
             }
         } catch (error) {
-            ctx.println "获取Git变更记录中是否存在指定的文件失败"
-            ctx.println error.getMessage()
+            ctx.println("获取Git变更记录中是否存在指定的文件失败")
+            ctx.println(error.getMessage())
         }
         return true
     }
@@ -153,14 +153,22 @@ class Git implements Serializable {
             def lsbTime = lsb.getTime().format("yyyy-MM-dd HH:mm:ss")
             // ctx.println("上次成功构建时间: " + lsbTime)
             gitLogs = Utils.getShEchoResult(ctx, "git log --pretty=format:\"- %s @%an ;\" -n ${maxRecordsNum}  " +
-                    " --since='${lsbTime}' --no-merges  | grep -v '${GlobalVars.gitCommitChangeLogDocs}' ")
+                    " --since='${lsbTime}' --no-merges | grep -v \"${GlobalVars.gitCommitChangeLogDocs}\" || true ")
+
             // 针对变更记录数组遍历可进行特殊化处理
-           /* def gitLogsArr = gitLogs.split('\n')
-            for (gitLog in gitLogsArr) */
+/*            def gitLogsArr = gitLogs.split("\\;") as ArrayList
+            def newGitLogs = ""
+            for (gitLog in gitLogsArr) {
+                if (!gitLog.contains(GlobalVars.gitCommitChangeLogDocs)) {
+                    newGitLogs += newGitLogs + "\n"
+                }
+            }
+            ctx.println("获取GIT提交记录: ${newGitLogs}")*/
+
             return gitLogs
         } catch (error) {
-            ctx.println "获取GIT某个时间段的提交记录失败"
-            ctx.println error.getMessage()
+            ctx.println("获取GIT某个时间段的提交记录失败")
+            ctx.println(error.getMessage())
         }
         return gitLogs
     }

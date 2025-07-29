@@ -47,6 +47,7 @@ class JenkinsCI implements Serializable {
                 ctx.println("当前分支: ${ctx.params.GIT_BRANCH} 不是默认分支: ${ctx.jsonParams.BRANCH_NAME.trim()}")
                 return
             }
+
             // 获取所有变更记录
             def changeLogSets = ctx.currentBuild.changeSets // 始终在checkout后使用 确保在检出步骤之后访问变更集
             def filteredChanges = []
@@ -64,7 +65,7 @@ class JenkinsCI implements Serializable {
             }
 
             if (filteredChanges.isEmpty()) {
-                ctx.addBadge(id: "no-change-log-badge", text: "无代码变更", color: 'yellow', cssClass: 'badge-text--background')
+                ctx.addBadge(id: "no-change-log-badge", text: "无代码", color: 'yellow', cssClass: 'badge-text--background')
             }
         } catch (e) {
             ctx.println("获取变更记录失败：${e.message}")
