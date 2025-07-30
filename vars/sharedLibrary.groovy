@@ -1112,6 +1112,7 @@ def getUserInfo() {
         BUILD_USER = "$git_user_name"
         BUILD_USER_MOBILE = "18863302302"
         // BUILD_USER_EMAIL = "$git_user_email"
+        addBadge(id: "auto-trigger-badge", text: "自动触发", color: 'blue', cssClass: 'badge-text--background')
     } else {
         wrap([$class: 'BuildUser']) {
             try {
