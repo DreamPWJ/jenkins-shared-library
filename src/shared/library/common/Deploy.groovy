@@ -202,7 +202,7 @@ class Deploy implements Serializable {
                             "\n  ###### 执行人: ${ctx.BUILD_USER} \n ###### 完成时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
         }
         // 构建描述徽章信息
-        ctx.addBadge(id: "control-service-badge", text: "${type}", color: 'yellow', cssClass: 'badge-text--background')
+        ctx.addBadge(id: "control-service-badge", text: "${type}", color: 'purple', cssClass: 'badge-text--background')
     }
 
     /**

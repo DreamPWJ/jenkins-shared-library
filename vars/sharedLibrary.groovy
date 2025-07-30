@@ -1112,7 +1112,7 @@ def getUserInfo() {
         BUILD_USER = "$git_user_name"
         BUILD_USER_MOBILE = "18863302302"
         // BUILD_USER_EMAIL = "$git_user_email"
-        addBadge(id: "auto-trigger-badge", text: "自动触发", color: 'blue', cssClass: 'badge-text--background')
+        addBadge(id: "auto-trigger-badge", text: "自动触发", color: 'purple', cssClass: 'badge-text--background')
     } else {
         wrap([$class: 'BuildUser']) {
             try {
@@ -2246,7 +2246,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             }
         }
         if (IS_CANARY_DEPLOY == true) { // 金丝雀部署方式
-            addBadge(id: "canary-deploy-badge", text: "金丝雀", color: 'blue', cssClass: 'badge-text--background')
+            addBadge(id: "canary-deploy-badge", text: "金丝雀", color: 'purple', cssClass: 'badge-text--background')
         }
 
         def projectTypeName = ""
