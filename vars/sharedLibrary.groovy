@@ -68,7 +68,7 @@ def call(String type = 'web-java', Map map) {
                         description: '是否在生产环境中自动给Git仓库设置Tag版本和生成CHANGELOG.md变更记录 📄')
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 将构建成功失败等状态信息同步到群内所有人 📢 ")
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
-                stashedFile(name: 'DEPLOY_PACKAGE', description: "请选择上传部署包文件 不依赖源码情况下 支持直接上传成品包部署方式 (如 *.jar、*.war、*.tar.gz 等格式) 🚀 ")
+                stashedFile(name: 'DEPLOY_PACKAGE', description: "请选择上传部署包文件、配置文件等 可不依赖源码情况下支持直接上传成品包部署方式和动态配置替换等 (如 *.jar、*.yaml、*.tar.gz 等格式) 🚀 ")
                 //booleanParam(name: 'IS_DEPLOY_MULTI_ENV', defaultValue: false, description: '是否同时部署当前job项目多环境 如dev test等')
             }
 
@@ -1112,6 +1112,7 @@ def getUserInfo() {
         BUILD_USER = "$git_user_name"
         BUILD_USER_MOBILE = "18863302302"
         // BUILD_USER_EMAIL = "$git_user_email"
+        addBadge(id: "auto-trigger-badge", text: "自动触发", color: 'purple', cssClass: 'badge-text--background')
     } else {
         wrap([$class: 'BuildUser']) {
             try {
@@ -1161,12 +1162,13 @@ def pullProjectCode() {
         if (!"${REPO_URL}".contains(".git")) {
             REPO_URL = "${REPO_URL}.git"
         }
-        // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
-        // println "${git}"
-        // sh "git --version"  // 使用git 2.0以上的高级版本  否则有兼容性问题
+        // sh "git --version"  // 建议使用git 2.0以上的高级版本  否则可能有兼容性问题
         // sh "which git"
         // https仓库下载报错处理 The certificate issuer's certificate has expired.  Check your system date and time.
         sh "git config --global http.sslVerify false || true"
+        // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
+        // println "${git}"
+
         // 在node节点工具位置选项配置 which git的路径 才能拉取代码!!!
         // 对于大体积仓库或网络不好情况 自定义代码下载超时时间
         checkout([$class           : 'GitSCM', // 其它代码版本工具 MercurialSCM、SubversionSCM
@@ -1349,7 +1351,6 @@ def nodeBuildProject(map) {
         sh "rm -rf ${NPM_PACKAGE_FOLDER} && mv build ${NPM_PACKAGE_FOLDER}"
     }*/
         buildPackageSize = Utils.getFolderSize(this, npmPackageLocationDir)
-        println(buildPackageSize)
         Tools.printColor(this, "Web打包成功 ✅")
         // 压缩文件夹 易于加速传输
         if ("${IS_MONO_REPO}" == 'true') {
@@ -1425,7 +1426,6 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
         }
         println(buildPackageLocation)
         buildPackageSize = Utils.getFileSize(this, buildPackageLocation)
-        println(buildPackageSize)
         Tools.printColor(this, "Maven打包成功 ✅")
         // 上传部署文件到OSS
         uploadOss(map)
@@ -1446,17 +1446,8 @@ def gradleBuildProject(map) {
         buildPackageLocation = "${buildPackageLocationDir}" + "/*.jar"
         println(buildPackageLocation)
         buildPackageSize = Utils.getFileSize(this, buildPackageLocation)
-        println(buildPackageSize)
         Tools.printColor(this, "Gradle打包成功 ✅")
     }
-}
-
-/**
- * Go编译构建
- */
-def goBuildProject() {
-    Go.build(this)
-    Tools.printColor(this, "Go语言构建成功 ✅")
 }
 
 /**
@@ -1468,6 +1459,14 @@ def pythonBuildProject() {
         Python.codePackage(this)
     }
     Tools.printColor(this, "Python语言构建成功 ✅")
+}
+
+/**
+ * Go编译构建
+ */
+def goBuildProject() {
+    Go.build(this)
+    Tools.printColor(this, "Go语言构建成功 ✅")
 }
 
 /**
@@ -1686,8 +1685,8 @@ def healthCheck(map, params = '') { // 可选参数
     }
     def healthCheckStart = new Date()
 
-    // 单节点部署启动最大超时时间
-    timeout(time: 5, unit: 'MINUTES') {  // health-check.sh有检测超时时间 timeout为防止shell脚本超时失效兼容处理
+    // 单节点部署启动最大超时时间 可根据项目大小动态配置健康探测时长
+    timeout(time: 8, unit: 'MINUTES') {  // health-check.sh有检测超时时间 timeout为防止shell脚本超时失效兼容处理
         healthCheckMsg = sh(
                 script: "ssh  ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/ && ./health-check.sh ${healthCheckParams} '",
                 returnStdout: true).trim()
@@ -2248,7 +2247,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             }
         }
         if (IS_CANARY_DEPLOY == true) { // 金丝雀部署方式
-            addBadge(id: "canary-deploy-badge", text: "金丝雀", color: 'blue', cssClass: 'badge-text--background')
+            addBadge(id: "canary-deploy-badge", text: "金丝雀", color: 'purple', cssClass: 'badge-text--background')
         }
 
         def projectTypeName = ""

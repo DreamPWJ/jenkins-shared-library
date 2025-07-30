@@ -7,7 +7,7 @@ echo -e "\033[32m执行Docker部署Python语言脚本  👇 \033[0m"
 # 可采用$0,$1,$2..等方式获取脚本命令行传入的参数  执行脚本
 
 echo "使用getopts的方式进行shell参数传递"
-while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:y:z:" opt; do
+while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:" opt; do
   case $opt in
   a)
     echo "project_name_prefix=$OPTARG"
@@ -152,6 +152,10 @@ echo "构建暴露端口: ${build_expose_ports}"
 echo "运行动态参数: ${docker_memory}  ${docker_log_opts} ${dynamic_run_args}"
 echo "远程调试参数: ${remote_debugging_param}"
 
+# 远程镜像仓库上传镜像方式
+if [[ ${is_push_docker_repo} == true ]]; then
+    docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
+fi
 # 根据镜像名称查询镜像ID 用于删除无效的镜像
 docker_image_ids=$(docker images -q --filter reference=${docker_image_name})
 
@@ -159,8 +163,8 @@ docker_image_ids=$(docker images -q --filter reference=${docker_image_name})
 cd /${deploy_folder} && ./docker-common.sh get_cpu_rate && cd /${deploy_file}
 # 获取系统磁盘资源 如果硬盘资源不足 停止容器构建或自动清理空间
 cd /${deploy_folder} && ./docker-common.sh get_disk_space && cd /${deploy_file}
-# 重命名上一个版本镜像tag 用于回滚版本控制策略
-cd /${deploy_folder} && ./docker-common.sh set_docker_rollback_tag ${docker_image_name} && cd /${deploy_file}
+# 重命名上一个版本镜像tag 用于纯Docker方式回滚版本控制策略
+cd /${deploy_folder} && ./docker-common.sh set_docker_rollback_tag ${docker_image_name} ${is_push_docker_repo} && cd /${deploy_file}
 
 set -x # 开启shell命令打印模式
 
@@ -180,7 +184,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     --build-arg CUSTOM_INSTALL_PACKAGES="" \
     -f /${deploy_folder}/python/Dockerfile . --no-cache
 else
-  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
+  echo "执行远程镜像仓库方式 无需在部署机器执行镜像构建"
 fi
 
 # 根据镜像创建时间判断镜像是否构建成功
@@ -220,7 +224,7 @@ docker run -d --restart=on-failure:16 -p ${host_port}:${expose_port} --privilege
   -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1   ${dynamic_run_args} \
   -e "REMOTE_DEBUGGING_PARAM=${remote_debugging_param}" -e HOST_NAME=$(hostname) \
   -e "DOCKER_SERVICE_PORT=${build_expose_ports}" \
-  -v /${deploy_folder}/${project_name}/logs:/logs -v /${deploy_folder}/${project_name}/app:/app \
+  -v /${deploy_folder}/${project_name}/logs:/logs \
   --name ${docker_container_name} ${docker_image_name}
 
 set +x # 关闭shell命令打印模式

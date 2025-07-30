@@ -8,7 +8,7 @@ echo -e "\033[32m执行Docker部署Web脚本  👇 \033[0m"
 #project_name_prefix=$1
 
 echo "使用getopts的方式进行shell参数传递"
-while getopts ":a:b:c:d:e:f:g:h:i:k:" opt; do
+while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:" opt; do
   case $opt in
   a)
     echo "project_name_prefix=$OPTARG"
@@ -98,6 +98,10 @@ dynamic_run_args=""
 # 进入部署文件所在目录并解压部署资源
 # tar -xzvf ${npm_package_folder}.tar.gz  && rm -f ${npm_package_folder}.tar.gz
 
+# 远程镜像仓库上传镜像方式
+if [[ ${is_push_docker_repo} == true ]]; then
+    docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
+fi
 # 根据镜像名称查询镜像ID 用于删除无效的镜像
 docker_image_ids=$(docker images -q --filter reference=${docker_image_name})
 
@@ -105,8 +109,8 @@ docker_image_ids=$(docker images -q --filter reference=${docker_image_name})
 cd /${deploy_folder} && ./docker-common.sh get_cpu_rate && cd /${deploy_file}
 # 获取系统磁盘资源 如果硬盘资源不足 停止容器构建或自动清理空间
 cd /${deploy_folder} && ./docker-common.sh get_disk_space && cd /${deploy_file}
-# 重命名上一个版本镜像tag 用于回滚版本控制策略
-cd /${deploy_folder} && ./docker-common.sh set_docker_rollback_tag ${docker_image_name} && cd /${deploy_file}
+# 重命名上一个版本镜像tag 用于纯Docker方式回滚版本控制策略
+cd /${deploy_folder} && ./docker-common.sh set_docker_rollback_tag ${docker_image_name} ${is_push_docker_repo} && cd /${deploy_file}
 
 set -x # 开启shell命令打印模式
 
@@ -122,7 +126,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     --build-arg PROJECT_NAME=${project_name} --build-arg WEB_STRIP_COMPONENTS=${web_strip_components} \
     -f /${deploy_folder}/web/Dockerfile .
 else
-  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
+    echo "执行远程镜像仓库方式 无需在部署机器执行镜像构建"
 fi
 
 # 根据镜像创建时间判断镜像是否构建成功

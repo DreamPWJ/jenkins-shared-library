@@ -195,13 +195,14 @@ class Deploy implements Serializable {
         }
 
         // 控制完成钉钉通知大家 重要操作默认执行钉钉通知
-        // if ("${ctx.params.IS_DING_NOTICE}" == 'true')  // 是否钉钉通知
-        DingTalk.noticeMarkDown(ctx, map.ding_talk_credentials_ids, "执行" + type + "服务控制命令",
-                "### 执行【" + type + "】服务控制命令 [${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}](${ctx.env.JOB_URL})  👩‍💻 \n" +
-                        typeText + "\n  ##### 执行" + type + "控制命令完成 ✅  " +
-                        "\n  ###### 执行人: ${ctx.BUILD_USER} \n ###### 完成时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
+        if (ctx.params.IS_DING_NOTICE == true) {  // 是否钉钉通知
+            DingTalk.noticeMarkDown(ctx, map.ding_talk_credentials_ids, "执行" + type + "服务控制命令",
+                    "### 执行【" + type + "】服务控制命令 [${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}](${ctx.env.JOB_URL})  👩‍💻 \n" +
+                            typeText + "\n  ##### 执行" + type + "控制命令完成 ✅  " +
+                            "\n  ###### 执行人: ${ctx.BUILD_USER} \n ###### 完成时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
+        }
         // 构建描述徽章信息
-        ctx.addBadge(id: "control-service-badge", text: "${type}", color: 'yellow', cssClass: 'badge-text--background')
+        ctx.addBadge(id: "control-service-badge", text: "${type}", color: 'purple', cssClass: 'badge-text--background')
     }
 
     /**
@@ -300,7 +301,7 @@ class Deploy implements Serializable {
      * 健康探测
      */
     private static void healthCheck(ctx) {
-        ctx.timeout(time: 5, unit: 'MINUTES') {
+        ctx.timeout(time: 8, unit: 'MINUTES') {
             def healthCheckMsg = ctx.sh(
                     script: "ssh  ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} ' cd /${ctx.DEPLOY_FOLDER}/ && ./health-check.sh -a ${ctx.PROJECT_TYPE} -b http://${ctx.remote.host}:${ctx.SHELL_HOST_PORT} '",
                     returnStdout: true).trim()

@@ -261,12 +261,24 @@ class Docker implements Serializable {
      *  拉取远程仓库Docker镜像
      */
     static def pull(ctx, imageName) {
-        def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${imageTag}"
+        def imageRepoFullName = "${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${imageName}"
+        def imageRepoFullNameTag = "${imageRepoFullName}:${imageTag}"
+        // Docker方式回滚 拉取镜像之前设置回滚策略 不适合K8S方式
+        if (ctx.IS_K8S_DEPLOY == false) {
+            ctx.println("重命名上一个版本远程镜像tag 用于纯Docker方式回滚版本控制策略")
+            ctx.sh """  
+                     ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} \
+                    'docker rmi ${imageRepoFullName}:previous || true && \
+                     docker tag ${imageRepoFullName}:latest ${imageRepoFullName}:previous || true'
+                """
+        }
+
         ctx.withCredentials([ctx.usernamePassword(credentialsId: "${ctx.DOCKER_REPO_CREDENTIALS_ID}", usernameVariable: 'DOCKER_HUB_USER_NAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+            // 拉取新镜像
             ctx.sh """     
                        ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} \
                       'docker login ${ctx.DOCKER_REPO_REGISTRY} --username=${ctx.DOCKER_HUB_USER_NAME} --password=${ctx.DOCKER_HUB_PASSWORD} && \
-                       docker pull ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}'
+                       docker pull ${imageRepoFullNameTag}'
                     """
             ctx.println("拉取远程仓库Docker镜像完成 ✅")
         }
@@ -317,6 +329,10 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
     static def rollbackServer(ctx, map, imageName, containerName) {
         try {
             ctx.println("执行Docker镜像容器回滚版本")
+            if (map.is_push_docker_repo == true) { // 推送镜像到远程仓库方式
+                // 添加镜像仓库连接和仓库名称前缀
+                imageName = "${map.docker_repo_registry}/${map.docker_repo_namespace}/${imageName}"
+            }
             // 重命名上一个版本镜像tag 回滚版本控制策略
             // ctx.sh " docker rmi ${imageName}:previous || true "
             // ctx.sh " docker tag ${imageName}:latest ${imageName}:previous || true "
@@ -380,7 +396,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
                         " -e \"PROJECT_NAME=${ctx.PROJECT_NAME}\" -e PYTHON_START_FILE=\"${ctx.CUSTOM_PYTHON_START_FILE}\" " +
                         " -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1 " +
                         " -e HOST_NAME=\$(hostname) " +
-                        " ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/app:/app " +
+                        " ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs " +
                         " --name ${containerName} ${imageName}:${dockerRollBackTag} ' "
             }
         }
