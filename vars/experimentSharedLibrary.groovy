@@ -669,7 +669,7 @@ def pullProjectCode() {
         sh "git --version"  // 建议使用git 2.0以上的高级版本  否则可能有兼容性问题
         // sh "which git"
         // https仓库下载报错处理 The certificate issuer's certificate has expired.  Check your system date and time.
-        // sh "git config --global http.sslVerify false || true"
+        sh "git config --global http.sslVerify false || true"
         // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
         // println "${git}"
 
