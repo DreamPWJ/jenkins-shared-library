@@ -98,6 +98,10 @@ dynamic_run_args=""
 # 进入部署文件所在目录并解压部署资源
 # tar -xzvf ${npm_package_folder}.tar.gz  && rm -f ${npm_package_folder}.tar.gz
 
+# 远程镜像仓库上传镜像方式
+if [[ ${is_push_docker_repo} == true ]]; then
+    docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
+fi
 # 根据镜像名称查询镜像ID 用于删除无效的镜像
 docker_image_ids=$(docker images -q --filter reference=${docker_image_name})
 
@@ -122,7 +126,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     --build-arg PROJECT_NAME=${project_name} --build-arg WEB_STRIP_COMPONENTS=${web_strip_components} \
     -f /${deploy_folder}/web/Dockerfile .
 else
-  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
+    echo "执行远程镜像仓库方式 无需部署机器构建镜像"
 fi
 
 # 根据镜像创建时间判断镜像是否构建成功

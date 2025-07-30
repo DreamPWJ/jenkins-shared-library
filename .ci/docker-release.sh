@@ -200,6 +200,10 @@ echo "构建暴露端口: ${build_expose_ports}"
 echo "运行动态参数: ${docker_java_opts} ${docker_memory} ${docker_log_opts} ${dynamic_run_args}"
 echo "远程调试参数: ${remote_debugging_param}"
 
+# 远程镜像仓库上传镜像方式
+if [[ ${is_push_docker_repo} == true ]]; then
+    docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
+fi
 # 根据镜像名称查询镜像ID 用于删除无效的镜像
 docker_image_ids=$(docker images -q --filter reference=${docker_image_name})
 
@@ -241,7 +245,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     --build-arg TOMCAT_VERSION=${tomcat_version} --build-arg JAVA_OPTS="-Xms128m ${docker_java_opts}" \
     -f /${deploy_folder}/${docker_file_name} . --no-cache
 else
-  docker_image_name=${docker_repo_registry_and_namespace}/${project_name_prefix}/${project_type}-${env_mode}
+    echo "执行远程镜像仓库方式 无需部署机器构建镜像"
 fi
 
 # 根据镜像创建时间判断镜像是否构建成功
