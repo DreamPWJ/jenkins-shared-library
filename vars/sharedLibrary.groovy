@@ -1349,7 +1349,6 @@ def nodeBuildProject(map) {
         sh "rm -rf ${NPM_PACKAGE_FOLDER} && mv build ${NPM_PACKAGE_FOLDER}"
     }*/
         buildPackageSize = Utils.getFolderSize(this, npmPackageLocationDir)
-        println(buildPackageSize)
         Tools.printColor(this, "Web打包成功 ✅")
         // 压缩文件夹 易于加速传输
         if ("${IS_MONO_REPO}" == 'true') {
@@ -1425,7 +1424,6 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
         }
         println(buildPackageLocation)
         buildPackageSize = Utils.getFileSize(this, buildPackageLocation)
-        println(buildPackageSize)
         Tools.printColor(this, "Maven打包成功 ✅")
         // 上传部署文件到OSS
         uploadOss(map)
@@ -1446,17 +1444,8 @@ def gradleBuildProject(map) {
         buildPackageLocation = "${buildPackageLocationDir}" + "/*.jar"
         println(buildPackageLocation)
         buildPackageSize = Utils.getFileSize(this, buildPackageLocation)
-        println(buildPackageSize)
         Tools.printColor(this, "Gradle打包成功 ✅")
     }
-}
-
-/**
- * Go编译构建
- */
-def goBuildProject() {
-    Go.build(this)
-    Tools.printColor(this, "Go语言构建成功 ✅")
 }
 
 /**
@@ -1468,6 +1457,14 @@ def pythonBuildProject() {
         Python.codePackage(this)
     }
     Tools.printColor(this, "Python语言构建成功 ✅")
+}
+
+/**
+ * Go编译构建
+ */
+def goBuildProject() {
+    Go.build(this)
+    Tools.printColor(this, "Go语言构建成功 ✅")
 }
 
 /**
@@ -1686,8 +1683,8 @@ def healthCheck(map, params = '') { // 可选参数
     }
     def healthCheckStart = new Date()
 
-    // 单节点部署启动最大超时时间
-    timeout(time: 5, unit: 'MINUTES') {  // health-check.sh有检测超时时间 timeout为防止shell脚本超时失效兼容处理
+    // 单节点部署启动最大超时时间 可根据项目大小动态配置健康探测时长
+    timeout(time: 8, unit: 'MINUTES') {  // health-check.sh有检测超时时间 timeout为防止shell脚本超时失效兼容处理
         healthCheckMsg = sh(
                 script: "ssh  ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/ && ./health-check.sh ${healthCheckParams} '",
                 returnStdout: true).trim()

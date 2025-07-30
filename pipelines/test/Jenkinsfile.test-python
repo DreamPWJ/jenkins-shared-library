@@ -133,6 +133,7 @@ JSON_PARAMS
     "COMPUTER_LANGUAGE" : "3" ,
     "PROJECT_NAME" : "python-flask-demo" ,
     "SHELL_PARAMS" : "python-flask demo 8079 5000 sit",
+    "CUSTOM_PYTHON_START_FILE" : "app.py",
 }
 
 */

@@ -300,7 +300,7 @@ class Deploy implements Serializable {
      * 健康探测
      */
     private static void healthCheck(ctx) {
-        ctx.timeout(time: 5, unit: 'MINUTES') {
+        ctx.timeout(time: 8, unit: 'MINUTES') {
             def healthCheckMsg = ctx.sh(
                     script: "ssh  ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} ' cd /${ctx.DEPLOY_FOLDER}/ && ./health-check.sh -a ${ctx.PROJECT_TYPE} -b http://${ctx.remote.host}:${ctx.SHELL_HOST_PORT} '",
                     returnStdout: true).trim()
