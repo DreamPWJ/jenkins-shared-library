@@ -8,7 +8,7 @@ echo -e "\033[32m执行Docker部署Web脚本  👇 \033[0m"
 #project_name_prefix=$1
 
 echo "使用getopts的方式进行shell参数传递"
-while getopts ":a:b:c:d:e:f:g:h:i:k:" opt; do
+while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:" opt; do
   case $opt in
   a)
     echo "project_name_prefix=$OPTARG"

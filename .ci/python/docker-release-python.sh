@@ -7,7 +7,7 @@ echo -e "\033[32m执行Docker部署Python语言脚本  👇 \033[0m"
 # 可采用$0,$1,$2..等方式获取脚本命令行传入的参数  执行脚本
 
 echo "使用getopts的方式进行shell参数传递"
-while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:y:z:" opt; do
+while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:" opt; do
   case $opt in
   a)
     echo "project_name_prefix=$OPTARG"
@@ -180,6 +180,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     --build-arg DEPLOY_FOLDER=${deploy_folder} \
     --build-arg EXPOSE_PORT="${build_expose_ports}" \
     --build-arg PYTHON_VERSION="${python_version}" \
+    --build-arg PYTHON_START_FILE="${python_start_file}" \
     --build-arg CUSTOM_INSTALL_PACKAGES="" \
     -f /${deploy_folder}/python/Dockerfile . --no-cache
 else
