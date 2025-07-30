@@ -396,7 +396,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
                         " -e \"PROJECT_NAME=${ctx.PROJECT_NAME}\" -e PYTHON_START_FILE=\"${ctx.CUSTOM_PYTHON_START_FILE}\" " +
                         " -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1 " +
                         " -e HOST_NAME=\$(hostname) " +
-                        " ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/app:/app " +
+                        " ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs " +
                         " --name ${containerName} ${imageName}:${dockerRollBackTag} ' "
             }
         }
