@@ -672,7 +672,6 @@ def pullProjectCode() {
         // sh "git config --global http.sslVerify false || true"
         // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
         // println "${git}"
-        sh "ping github.com"
 
         // 在node节点工具位置选项配置 which git的路径 才能拉取代码!!!
         // 对于大体积仓库或网络不好情况 自定义代码下载超时时间
