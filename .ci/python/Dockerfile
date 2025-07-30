@@ -45,6 +45,7 @@ COPY python.tar.gz .
 RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
  #&& mv requirement.txt requirements.txt || true \
  && rm -f *.tar.gz \
+ && chmod +x /app/app.py \
  && ls -l
 
 # Docker 19.03后版本可启用 BuildKit 方式指定缓存目录 --mount=type=cache,target=$PIP_CACHE_DIR
