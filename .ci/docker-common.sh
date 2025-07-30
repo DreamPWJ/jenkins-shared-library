@@ -28,11 +28,14 @@ function is_enable_buildkit() {
 
 # 重命名上一个版本镜像tag 用于回滚版本控制策略
 function set_docker_rollback_tag() {
-  if [ "$(docker images  | grep $1)" ]; then
-    echo "重命名上一个版本镜像tag 用于回滚版本控制策略"
-    docker rmi $1:previous || true
-    docker tag $1:latest $1:previous || true
-  fi
+    if [[  $2 == false ]]; then
+      if [ "$(docker images  | grep $1)" ]; then
+        echo "重命名上一个版本镜像tag 用于回滚版本控制策略"
+        docker rmi $1:previous || true
+        # 对于远程镜像仓库应在pull新镜像之前重命名tag , 对于部署机器构建镜像在构建新镜像之前重命名tag
+        docker tag $1:latest $1:previous || true
+      fi
+   fi
 }
 
 # 部署前操作检查容器是否存在 停止容器
@@ -147,7 +150,6 @@ function get_cpu_rate() {
 function get_disk_space() {
     # 设置所需的最小可用空间（单位GB）
     MIN_FREE_SPACE=10      # 小于多少空间开始清理
-
     # 获取总的可用空间（单位GB） 获取根目录  df -h  / 命令
     TOTAL_FREE=$(df -h  / | awk '/\// {print $4}' | sed 's/G//')
 
