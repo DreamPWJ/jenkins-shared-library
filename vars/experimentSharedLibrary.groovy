@@ -666,12 +666,13 @@ def pullProjectCode() {
         if (!"${REPO_URL}".contains(".git")) {
             REPO_URL = "${REPO_URL}.git"
         }
-        // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
-        // println "${git}"
         sh "git --version"  // 使用git 2.0以上的高级版本  否则有兼容性问题
         // sh "which git"
         // https仓库下载报错处理 The certificate issuer's certificate has expired.  Check your system date and time.
         sh "git config --global http.sslVerify false || true"
+        // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
+        // println "${git}"
+
         // 在node节点工具位置选项配置 which git的路径 才能拉取代码!!!
         // 对于大体积仓库或网络不好情况 自定义代码下载超时时间
         checkout([$class           : 'GitSCM',
