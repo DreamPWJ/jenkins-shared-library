@@ -56,4 +56,4 @@ RUN --mount=type=cache,target=$PIP_CACHE_DIR pip install -r requirements.txt -i 
 EXPOSE $EXPOSE_PORT
 
 # 动态设置启动文件启动项目  CMD中的"$MY_VAR"变量设置成 docker run -e MY_VAR=value 运行变量 否则无法获取
-CMD python /app/app.py
+CMD python /app/$PYTHON_START_FILE
