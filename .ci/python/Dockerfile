@@ -49,7 +49,7 @@ RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
 
 # Docker 19.03后版本可启用 BuildKit 方式指定缓存目录 --mount=type=cache,target=$PIP_CACHE_DIR
 ARG IS_NEED_INSTALL="true"
-#RUN --mount=type=cache,target=$PIP_CACHE_DIR pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+RUN --mount=type=cache,target=$PIP_CACHE_DIR pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 
 
 # 暴露端口
