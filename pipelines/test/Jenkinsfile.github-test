@@ -114,7 +114,7 @@ map.put('maven_one_level', ' ')
 map.put('maven_settings_xml_id', ' ')
 
 // 调用核心通用Pipeline
-experimentSharedLibrary(map)
+sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -126,7 +126,7 @@ github-test
 Github工程代码测试
 JSON_PARAMS
 {
-   "REPO_URL" : "https://github.com/DreamPWJ/antd-antv.git" , // https://github.com/DreamPWJ/astro-site.git
+   "REPO_URL" : "https://github.com/DreamPWJ/trading-charts.git" , // https://github.com/DreamPWJ/astro-site.git
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "1" ,
    "PROJECT_NAME" : "github-test" ,
