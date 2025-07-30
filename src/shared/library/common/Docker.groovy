@@ -261,8 +261,8 @@ class Docker implements Serializable {
      *  拉取远程仓库Docker镜像
      */
     static def pull(ctx, imageName) {
-        def imageFullName = "${ctx.DOCKER_REPO_NAMESPACE}/${imageName}:${imageTag}"
-        def imageRepoFullName = "${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}"
+        def imageRepoFullName = "${ctx.DOCKER_REPO_REGISTRY}/${ctx.DOCKER_REPO_NAMESPACE}/${imageName}"
+        def imageRepoFullNameTag = "${imageRepoFullName}:${imageTag}"
         // Docker方式回滚 拉取镜像之前设置回滚策略 不适合K8S方式
         if (ctx.IS_K8S_DEPLOY == false) {
             ctx.println("重命名上一个版本远程镜像tag 用于回滚版本控制策略")
@@ -278,7 +278,7 @@ class Docker implements Serializable {
             ctx.sh """     
                        ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} \
                       'docker login ${ctx.DOCKER_REPO_REGISTRY} --username=${ctx.DOCKER_HUB_USER_NAME} --password=${ctx.DOCKER_HUB_PASSWORD} && \
-                       docker pull ${imageRepoFullName}'
+                       docker pull ${imageRepoFullNameTag}'
                     """
             ctx.println("拉取远程仓库Docker镜像完成 ✅")
         }
