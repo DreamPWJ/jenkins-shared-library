@@ -126,7 +126,7 @@ github-test
 Github工程代码测试
 JSON_PARAMS
 {
-   "REPO_URL" : "https://github.com/DreamPWJ/antd-antv.git" ,
+   "REPO_URL" : "https://github.com/DreamPWJ/antd-antv.git" , // https://github.com/DreamPWJ/astro-site.git
    "BRANCH_NAME" : "main" ,
    "PROJECT_TYPE" : "1" ,
    "PROJECT_NAME" : "github-test" ,
