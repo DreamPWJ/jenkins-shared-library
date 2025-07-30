@@ -701,14 +701,6 @@ def futureLab(map) {
     println("构建机器名称: ${NODE_NAME}")
     println("仓库地址: ${REPO_URL}")
 
-    if (map.is_push_docker_repo == true) {
-        // 添加仓库连接和仓库名称前缀
-        imageName = "${map.docker_repo_registry}/${map.docker_repo_namespace}/"
-        println("仓库地址1: ${imageName}")
-    } else {
-        imageName = "${map.docker_repo_registry}/${map.docker_repo_namespace}/"
-        println("仓库地址2: ${imageName}")
-    }
 /*
     def logs = Git.getGitLogByTime(this)
     println("Git日志: ${logs}")

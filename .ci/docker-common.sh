@@ -30,7 +30,7 @@ function is_enable_buildkit() {
 function set_docker_rollback_tag() {
     if [[  $2 == false ]]; then
       if [ "$(docker images  | grep $1)" ]; then
-        echo "重命名上一个版本镜像tag 用于回滚版本控制策略"
+        echo "重命名上一个版本本地镜像tag 用于回滚版本控制策略"
         docker rmi $1:previous || true
         # 对于远程镜像仓库应在pull新镜像之前重命名tag , 对于部署机器构建镜像在构建新镜像之前重命名tag
         docker tag $1:latest $1:previous || true
