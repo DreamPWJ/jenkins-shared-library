@@ -1162,7 +1162,7 @@ def pullProjectCode() {
         if (!"${REPO_URL}".contains(".git")) {
             REPO_URL = "${REPO_URL}.git"
         }
-        // sh "git --version"  // 使用git 2.0以上的高级版本  否则有兼容性问题
+        // sh "git --version"  // 建议使用git 2.0以上的高级版本  否则可能有兼容性问题
         // sh "which git"
         // https仓库下载报错处理 The certificate issuer's certificate has expired.  Check your system date and time.
         sh "git config --global http.sslVerify false || true"
