@@ -2271,7 +2271,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}流水线失败通知",
                             "### [${env.JOB_NAME}#${env.BUILD_NUMBER}](${env.BUILD_URL}) ${PROJECT_TAG}${envTypeMark}${projectTypeName}项目${msg} \n" +
                                     "#### 请及时处理 🏃 \n" +
-                                    "###### ** 流水线失败原因: [运行日志](${env.BUILD_URL}console) 👈 ** \n" +
+                                    "##### <font color=red > 流水线失败原因:</font> [运行日志](${env.BUILD_URL}console) 👈  \n" +
                                     "###### 发布环境: ${releaseEnvironment}  持续时间: ${durationTimeString} \n" +
                                     "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL}) \n" +
                                     "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_NAME} \n" +
