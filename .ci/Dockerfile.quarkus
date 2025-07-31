@@ -45,8 +45,8 @@ ARG PACKAGE_FILE=quarkus-app
 COPY ${PACKAGE_FILE}.tar.gz .
 
 # 解压文件到当前文件夹下并删除压缩文件
-RUN pwd \
- && tar -pxzvf  ${PACKAGE_FILE}.tar.gz  \
+RUN yum install -y tar \
+ && tar -pxzvf  ${PACKAGE_FILE}.tar.gz >/dev/null 2>&1 \
  && rm -f ${PACKAGE_FILE}.tar.gz \
  && ls -l
 
