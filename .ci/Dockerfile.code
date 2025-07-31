@@ -47,8 +47,8 @@ ADD ${SOURCE_CODE_FILE}.tar.gz .
 # && rm -f ${SOURCE_CODE_FILE}.tar.gz \
 # && ls -l
 # 移动文件并去掉顶层目录
-RUN mv /app/${SOURCE_CODE_FILE}/* /app/  \
- && rm -rf /app/${SOURCE_CODE_FILE} \
+RUN mv ${SOURCE_CODE_FILE}/* /app/  \
+ && rm -rf ${SOURCE_CODE_FILE} \
  && ls -l
 
 # 对外暴露端口 k8s在yaml设置端口

@@ -28,8 +28,9 @@ COPY  nginx.conf   /etc/nginx/
 # 删除之前的部署文件
 #RUN rm -rf /usr/share/nginx/html/*
 
-# 拷贝部署文件到nginx
+# 复制代码到容器 ADD 会自动解压，COPY 不会解压
 COPY  ${NPM_PACKAGE_FOLDER}.tar.gz /usr/share/nginx/html/
+
 # 解压文件到当前文件夹下并删除压缩文件
 RUN cd /usr/share/nginx/html/ \
  && tar -xzvf ${NPM_PACKAGE_FOLDER}.tar.gz --strip-components ${WEB_STRIP_COMPONENTS} >/dev/null 2>&1 \
