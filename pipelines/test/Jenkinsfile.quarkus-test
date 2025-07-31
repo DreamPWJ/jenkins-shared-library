@@ -131,7 +131,7 @@ JSON_PARAMS
    "PROJECT_TYPE" : "2" ,
    "JAVA_FRAMEWORK_TYPE" : "3",
    "PROJECT_NAME" : "quarkus-demo" ,
-   "SHELL_PARAMS" : "quarkus demo 8125 8080 dev",
+   "SHELL_PARAMS" : "quarkus demo 8125 8080 prod",
    "IS_MAVEN_SINGLE_MODULE" : true,
    "GIT_PROJECT_FOLDER_NAME" : "single-module-projects/project-demos/quarkus-demo",
 }

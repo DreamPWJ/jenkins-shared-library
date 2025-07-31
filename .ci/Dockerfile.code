@@ -39,12 +39,11 @@ ARG SOURCE_CODE_FILE=source-code
 # 动态下载安装相关依赖 下行注释的KEY值动态替换
 #DOCKER-FILE-RUN-COMMAND
 
-# 将部署文件复制到docker内根目录
+# 复制代码到容器 ADD 会自动解压，COPY 不会解压
 COPY ${SOURCE_CODE_FILE}.tar.gz .
 
 # 解压文件到当前文件夹下并删除压缩文件
-RUN pwd \
- && tar -xzvf ${SOURCE_CODE_FILE}.tar.gz --strip-components 2  >/dev/null 2>&1  \
+RUN tar -xzvf ${SOURCE_CODE_FILE}.tar.gz --strip-components 2  >/dev/null 2>&1  \
  && rm -f ${SOURCE_CODE_FILE}.tar.gz \
  && ls -l
  
