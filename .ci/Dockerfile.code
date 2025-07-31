@@ -47,7 +47,7 @@ ADD ${SOURCE_CODE_FILE}.tar.gz .
 # && rm -f ${SOURCE_CODE_FILE}.tar.gz \
 # && ls -l
 # 移动文件并去掉顶层目录
-RUN mv ${SOURCE_CODE_FILE}/* /app/  \
+RUN pwd && ls -l && mv ${SOURCE_CODE_FILE}/* /app/  \
  && rm -rf ${SOURCE_CODE_FILE} \
  && ls -l
 
