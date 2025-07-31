@@ -43,7 +43,7 @@ ARG PACKAGE_FILE=quarkus-app
 
 # 将部署文件复制到docker内目录 注意tar.gz不能使用中划线命名
 #COPY  /app/target/quarkus-app /app
-COPY ${PACKAGE_FILE}.tar.gz /app
+COPY ${PACKAGE_FILE}.tar.gz .
 
 # 解压文件到当前文件夹下并删除压缩文件
 RUN tar -pxzvf  ${PACKAGE_FILE}.tar.gz >/dev/null 2>&1 \
