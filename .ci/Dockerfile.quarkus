@@ -39,7 +39,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 #DOCKER-FILE-RUN-COMMAND
 
 # 打包文件名称
-ARG PACKAGE_FILE=quarkus-app
+ENV PACKAGE_FILE=quarkus-app
 
 # 复制代码到容器 ADD 会自动解压，COPY 不会解压
 ADD ${PACKAGE_FILE}.tar.gz .
@@ -59,5 +59,5 @@ HEALTHCHECK --start-period=10s --interval=30s --timeout=30s --retries=3 \
 
 # 运行jar包命令 远程调式  启动命令: java -jar app.jar  在k8s动态设置启动参数
 # JVM模式启动命令
-ENTRYPOINT "java" "-jar" $JAVA_OPTS $REMOTE_DEBUGGING_PARAM "-Djava.security.egd=file:/dev/./urandom" "/app/quarkus-app/quarkus-run.jar"
+ENTRYPOINT "java" "-jar" $JAVA_OPTS $REMOTE_DEBUGGING_PARAM "-Djava.security.egd=file:/dev/./urandom" "/app/$PACKAGE_FILE/quarkus-run.jar"
 # ENTRYPOINT ["./quarkus-app"] # 原生镜像模式启动命令
