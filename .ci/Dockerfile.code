@@ -46,7 +46,7 @@ ADD ${SOURCE_CODE_FILE}.tar.gz .
 #RUN tar -xzvf ${SOURCE_CODE_FILE}.tar.gz --strip-components 2  >/dev/null 2>&1  \
 #&& rm -f ${SOURCE_CODE_FILE}.tar.gz \
 #&& ls -l
-# 移动文件并去掉顶层目录
+# 移动解压文件并去掉上一层目录
 RUN set -eux; \
   dir_path=$(find . -mindepth 1 -maxdepth 1 -type d -print -quit); \
   mv ${dir_path}/* /app/; \
