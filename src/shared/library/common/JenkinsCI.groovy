@@ -79,9 +79,19 @@ class JenkinsCI implements Serializable {
     static def getCurrentBuildParent(ctx) {
         // 获取当前项目的描述信息
         def job = ctx.currentBuild.getRawBuild().getParent()
-        def description = job.description ?: "无描述信息"
-        ctx.echo "当前项目描述: ${description}"
         return job
+    }
+
+    /**
+     * 获取当前job信息描述
+     */
+    @NonCPS
+    static def getCurrentBuildDescription(ctx) {
+        // 获取当前项目的描述信息
+        def job = ctx.currentBuild.getRawBuild().getParent()
+        def description = job.description ?: "无项目描述信息"
+        // ctx.echo "当前项目描述: ${description}"
+        return description
     }
 
     /**

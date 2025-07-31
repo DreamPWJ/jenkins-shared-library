@@ -2355,7 +2355,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                     gitChangeLog = "${params.VERSION_DESCRIPTION}"
                 }
                 if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
-                    def titlePrefix = "${PROJECT_TAG} BUILD#${env.BUILD_NUMBER}"
+                    def titlePrefix = "${PROJECT_TAG} BUILD#<font color=green>${env.BUILD_NUMBER}</font>"
                     // 如果gitChangeLog为空 赋值提醒文案
                     if ("${gitChangeLog}" == '') {
                         gitChangeLog = "无版本变更记录 🈳"
@@ -2363,7 +2363,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
 
                     try {
                         if ("${tagVersion}") {
-                            titlePrefix = "${PROJECT_TAG} ${tagVersion}"
+                            titlePrefix = "${PROJECT_TAG} <font color=green>${tagVersion}</font>"
                         }
                     } catch (e) {
                     }
@@ -2373,6 +2373,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉 \n" +
                                     "#### 项目: ${PROJECT_NAME} \n" +
                                     "#### 环境: *${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}* \n" +
+                                    "##### 描述: ${JenkinsCI.getCurrentBuildDescription(this)} \n" +
                                     "${gitChangeLog} \n" +
                                     ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看 \n" +
                                     "###### 发布人: ${BUILD_USER} \n" +
