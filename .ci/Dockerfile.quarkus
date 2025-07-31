@@ -46,7 +46,7 @@ COPY ${PACKAGE_FILE}.tar.gz .
 
 # 解压文件到当前文件夹下并删除压缩文件
 RUN pwd \
- && tar -pxzvf  ${PACKAGE_FILE}.tar.gz >/dev/null 2>&1 \
+ && tar -pxzvf  ${PACKAGE_FILE}.tar.gz  \
  && rm -f ${PACKAGE_FILE}.tar.gz \
  && ls -l
 
@@ -60,4 +60,4 @@ HEALTHCHECK --start-period=10s --interval=30s --timeout=30s --retries=3 \
 # 运行jar包命令 远程调式  启动命令: java -jar app.jar  在k8s动态设置启动参数
 # JVM模式启动命令
 ENTRYPOINT ["java", "-jar", "$JAVA_OPTS $REMOTE_DEBUGGING_PARAM", "-Djava.security.egd=file:/dev/./urandom", "quarkus-run.jar"]
-# ENTRYPOINT ["./${PACKAGE_FILE}"] # 原生镜像模式启动命令
+# ENTRYPOINT ["./${quarkus-app}"] # 原生镜像模式启动命令
