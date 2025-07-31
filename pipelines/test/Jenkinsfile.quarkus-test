@@ -129,6 +129,7 @@ JSON_PARAMS
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
    "BRANCH_NAME" : "feature/infra" ,
    "PROJECT_TYPE" : "2" ,
+   "JAVA_FRAMEWORK_TYPE" : "3",
    "PROJECT_NAME" : "quarkus-demo" ,
    "SHELL_PARAMS" : "quarkus demo 8125 8080 dev",
    "IS_MAVEN_SINGLE_MODULE" : true,

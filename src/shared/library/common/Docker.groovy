@@ -202,6 +202,10 @@ class Docker implements Serializable {
                         dockerFileName = "Dockerfile.mvc"
                         // 拉取基础镜像避免重复下载
                         dockerImagesName = "${ctx.TOMCAT_VERSION}-jre8"
+                    } else if ("${ctx.JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.Quarkus) {
+                        dockerFileName = "Dockerfile.quarkus"
+                        // 拉取基础镜像避免重复下载
+                        dockerImagesName = "${jdkPublisher}:${ctx.JDK_VERSION}"
                     }
 
                     ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "

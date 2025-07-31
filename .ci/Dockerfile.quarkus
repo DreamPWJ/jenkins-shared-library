@@ -38,8 +38,14 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # 动态下载安装相关依赖 下行注释的KEY值动态替换
 #DOCKER-FILE-RUN-COMMAND
 
-# 将部署文件复制到docker内根目录
-COPY  /app/target/quarkus-app /app
+# 将部署文件复制到docker内目录 注意tar.gz不能使用中划线命名
+#COPY  /app/target/quarkus-app /app
+COPY quarkus-app.tar.gz /app
+
+# 解压文件到当前文件夹下并删除压缩文件
+RUN tar -pxzvf  quarkus-app.tar.gz >/dev/null 2>&1 \
+ && rm -f *.tar.gz \
+ && ls -l
 
 # 对外暴露端口 k8s在yaml设置端口
 EXPOSE  $EXPOSE_PORT

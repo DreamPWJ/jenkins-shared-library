@@ -166,10 +166,10 @@ JSON_PARAMS
    "REPO_URL" : "https://git.pengbocloud.com/pan.weiji/spring-mvc-demo.git" ,
    "BRANCH_NAME" : "master" ,
    "PROJECT_TYPE" : "2" ,
+   "JAVA_FRAMEWORK_TYPE" : "2",
    "PROJECT_NAME" : "spring-mvc-demo" ,
    "SHELL_PARAMS" : "spring-mvc demo 8096 8080 sit",
    "IS_MAVEN_SINGLE_MODULE" : true,
-   "JAVA_FRAMEWORK_TYPE" : "2",
    "DOCKER_VOLUME_MOUNT" : "/my/tomcat/server.xml:/usr/local/tomcat/conf/server.xml"
 }
 

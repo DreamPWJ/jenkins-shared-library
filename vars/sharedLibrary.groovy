@@ -842,7 +842,7 @@ def getInitParams(map) {
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
     AUTO_TEST_PARAM = jsonParams.AUTO_TEST_PARAM ? jsonParams.AUTO_TEST_PARAM.trim() : ""  // 自动化集成测试参数
-    // Java框架类型 1. Spring Boot  2. Spring MVC
+    // Java框架类型 1. Spring Boot  2. Spring MVC 3. Quarkus
     JAVA_FRAMEWORK_TYPE = jsonParams.JAVA_FRAMEWORK_TYPE ? jsonParams.JAVA_FRAMEWORK_TYPE.trim() : "1"
     // 自定义Docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
     DOCKER_VOLUME_MOUNT = jsonParams.DOCKER_VOLUME_MOUNT ? jsonParams.DOCKER_VOLUME_MOUNT.trim() : "${map.docker_volume_mount}".trim()
@@ -1392,7 +1392,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
                     MAVEN_ONE_LEVEL = ""
                     // 在pom.xml文件目录下执行 规范是pom.xml在代码根目录
                     // def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
-                    sh "${mavenCommandType} clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} -Dmaven.repo.remote=https://maven.aliyun.com/repository/public"
+                    sh "${mavenCommandType} clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} "
                 } else {  // 多模块情况
                     // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
                     sh "${mavenCommandType} clean install -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.compile.fork=true ${isMavenTest} "
@@ -1405,6 +1405,8 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
             // 获取pom文件信息
             // Maven.getPomInfo(this)
         }
+
+        def mavenTarget = "target" // Maven打包目录
         if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
             javaPackageType = "jar"
             // Spring Native默认Linux无后缀 原生直接执行的文件 也无需JVM环境
@@ -1413,16 +1415,22 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
             }
         } else if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringMVC) {
             javaPackageType = "war"
+        } else if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.Quarkus) {
+            // 核心包在 target/quarkus-app/ 下面  启动命令 java -jar target/quarkus-app/quarkus-run.jar
+            javaPackageType = "tar.gz"
+            def quarkusAppName = "quarkus-app"
+            sh "tar -zcvf ${quarkusAppName}.${javaPackageType} ${mavenTarget}/${quarkusAppName} >/dev/null 2>&1 "
         }
+
         // Maven打包产出物位置
         if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') {
-            buildPackageLocationDir = "target"
+            buildPackageLocationDir = "${mavenTarget}"
         } else {
-            buildPackageLocationDir = ("${MAVEN_ONE_LEVEL}" == "" ? "${PROJECT_NAME}" : "${MAVEN_ONE_LEVEL}${PROJECT_NAME}") + "/target"
+            buildPackageLocationDir = ("${MAVEN_ONE_LEVEL}" == "" ? "${PROJECT_NAME}" : "${MAVEN_ONE_LEVEL}${PROJECT_NAME}") + "/${mavenTarget}"
         }
         buildPackageLocation = "${buildPackageLocationDir}" + "/*.${javaPackageType}"
         if ("${IS_SPRING_NATIVE}" == "true") {
-            // 名称为pom.xml下build内的imageName标签名称
+            // 名称为pom.xml下build内的imageName标签名称 统一名称或动态定义配置
             buildPackageLocation = "${buildPackageLocationDir}" + "/spring-native-graalvm"
         }
         println(buildPackageLocation)
