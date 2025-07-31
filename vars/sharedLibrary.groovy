@@ -400,10 +400,10 @@ def call(String type = 'web-java', Map map) {
                             /*   if (IS_DOCKER_BUILD == true) {
                                    // Python需要交叉编译 不同系统部署使用不同系统环境打包 如Windows使用 cdrx/pyinstaller-windows
                                    docker.image("cdrx/pyinstaller-linux:python3").inside {
-                                       pythonBuildProject()
+                                       pythonBuildProject(map)
                                    }
                                } else {*/
-                            pythonBuildProject()
+                            pythonBuildProject(map)
                             //  }
                         }
                     }
@@ -836,7 +836,7 @@ def getInitParams(map) {
     IS_SOURCE_CODE_DEPLOY = jsonParams.IS_SOURCE_CODE_DEPLOY ? jsonParams.IS_SOURCE_CODE_DEPLOY : false
     // 是否直接构建包部署方式  如无源码的情况
     IS_PACKAGE_DEPLOY = jsonParams.IS_PACKAGE_DEPLOY ? jsonParams.IS_PACKAGE_DEPLOY : false
-    // 是否Gradle构建方式
+    // 是否使用Gradle构建方式
     IS_GRADLE_BUILD = jsonParams.IS_GRADLE_BUILD ? jsonParams.IS_GRADLE_BUILD : false
 
     // 设置monorepo单体仓库主包文件夹名
@@ -1036,7 +1036,7 @@ def initInfo() {
     // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
     try {
         if (params.IS_WORKSPACE_CLEAN == true) {
-            println("删除代码构建产物与缓存等 用于全新构建流水线工作环境" )
+            println("删除代码构建产物与缓存等 用于全新构建流水线工作环境")
             def jobHome = env.WORKSPACE.split("@")[0] // 根据@符号分隔去前面的路径
             sh " rm -rf ${jobHome}*"
         }
@@ -1392,7 +1392,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
                     MAVEN_ONE_LEVEL = ""
                     // 在pom.xml文件目录下执行 规范是pom.xml在代码根目录
                     // def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
-                    sh "${mavenCommandType} clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} "
+                    sh "${mavenCommandType} clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} -Dmaven.repo.remote=https://maven.aliyun.com/repository/public"
                 } else {  // 多模块情况
                     // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
                     sh "${mavenCommandType} clean install -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.compile.fork=true ${isMavenTest} "
@@ -1454,7 +1454,7 @@ def gradleBuildProject(map) {
 /**
  * Python编译构建
  */
-def pythonBuildProject() {
+def pythonBuildProject(map) {
     dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
         // 压缩源码文件 加速传输
         Python.codePackage(this)
