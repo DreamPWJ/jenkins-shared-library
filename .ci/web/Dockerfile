@@ -2,7 +2,7 @@
 # Version 1.0.0
 # Description: 自定义构建Nginx Web项目镜像
 
-# Nginx基础镜像 or stable-alpine-slim
+# Nginx基础镜像
 FROM nginx:stable
 
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
