@@ -108,6 +108,7 @@ class GlobalVars implements Serializable {
     static int SpringBoot = 1 // Spring Boot框架
     static int SpringMVC = 2 // Spring MVC框架
     static int Quarkus = 3 // Quarkus原生框架
+    static int SpringNative = 4 // Spring Native原生框架
 
     /**
      * CI代码库 jenkins-shared-library仓库 自动同步部署脚本和配置等

@@ -228,6 +228,9 @@ if [[ ${is_push_docker_repo} == false ]]; then
      docker_file_name="Dockerfile.mvc" # Spring MVC框架 war包
      docker_pull_image_name=tomcat:${tomcat_version}-jre8
   fi
+  if [[ ${java_framework_type} == 3 ]]; then
+     docker_file_name="Dockerfile.quarkus" # Quarkus原生框架
+  fi
   if [[ ${is_spring_native} == true ]]; then
      docker_file_name="Dockerfile.native" # Spring Native原生镜像直接执行文件
   fi

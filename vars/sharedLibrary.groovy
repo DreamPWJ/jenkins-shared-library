@@ -400,10 +400,10 @@ def call(String type = 'web-java', Map map) {
                             /*   if (IS_DOCKER_BUILD == true) {
                                    // Python需要交叉编译 不同系统部署使用不同系统环境打包 如Windows使用 cdrx/pyinstaller-windows
                                    docker.image("cdrx/pyinstaller-linux:python3").inside {
-                                       pythonBuildProject()
+                                       pythonBuildProject(map)
                                    }
                                } else {*/
-                            pythonBuildProject()
+                            pythonBuildProject(map)
                             //  }
                         }
                     }
@@ -836,13 +836,13 @@ def getInitParams(map) {
     IS_SOURCE_CODE_DEPLOY = jsonParams.IS_SOURCE_CODE_DEPLOY ? jsonParams.IS_SOURCE_CODE_DEPLOY : false
     // 是否直接构建包部署方式  如无源码的情况
     IS_PACKAGE_DEPLOY = jsonParams.IS_PACKAGE_DEPLOY ? jsonParams.IS_PACKAGE_DEPLOY : false
-    // 是否Gradle构建方式
+    // 是否使用Gradle构建方式
     IS_GRADLE_BUILD = jsonParams.IS_GRADLE_BUILD ? jsonParams.IS_GRADLE_BUILD : false
 
     // 设置monorepo单体仓库主包文件夹名
     MONO_REPO_MAIN_PACKAGE = jsonParams.MONO_REPO_MAIN_PACKAGE ? jsonParams.MONO_REPO_MAIN_PACKAGE.trim() : "projects"
     AUTO_TEST_PARAM = jsonParams.AUTO_TEST_PARAM ? jsonParams.AUTO_TEST_PARAM.trim() : ""  // 自动化集成测试参数
-    // Java框架类型 1. Spring Boot  2. Spring MVC
+    // Java框架类型 1. Spring Boot  2. Spring MVC 3. Quarkus
     JAVA_FRAMEWORK_TYPE = jsonParams.JAVA_FRAMEWORK_TYPE ? jsonParams.JAVA_FRAMEWORK_TYPE.trim() : "1"
     // 自定义Docker挂载映射 docker run -v 参数(格式 宿主机挂载路径:容器内目标路径)  多个用逗号,分割
     DOCKER_VOLUME_MOUNT = jsonParams.DOCKER_VOLUME_MOUNT ? jsonParams.DOCKER_VOLUME_MOUNT.trim() : "${map.docker_volume_mount}".trim()
@@ -1036,6 +1036,7 @@ def initInfo() {
     // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
     try {
         if (params.IS_WORKSPACE_CLEAN == true) {
+            println("删除代码构建产物与缓存等 用于全新构建流水线工作环境")
             def jobHome = env.WORKSPACE.split("@")[0] // 根据@符号分隔去前面的路径
             sh " rm -rf ${jobHome}*"
         }
@@ -1404,6 +1405,8 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
             // 获取pom文件信息
             // Maven.getPomInfo(this)
         }
+
+        def mavenTarget = "target" // Maven打包目录
         if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot) {
             javaPackageType = "jar"
             // Spring Native默认Linux无后缀 原生直接执行的文件 也无需JVM环境
@@ -1412,16 +1415,22 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
             }
         } else if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringMVC) {
             javaPackageType = "war"
+        } else if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.Quarkus) {
+            // 核心包在 target/quarkus-app/ 下面  启动命令 java -jar target/quarkus-app/quarkus-run.jar
+            javaPackageType = "tar.gz"
+            def quarkusAppName = "quarkus-app"
+            sh "cd ${mavenTarget}/ && tar -zcvf ${quarkusAppName}.${javaPackageType} ${quarkusAppName} >/dev/null 2>&1 "
         }
+
         // Maven打包产出物位置
         if ("${IS_MAVEN_SINGLE_MODULE}" == 'true') {
-            buildPackageLocationDir = "target"
+            buildPackageLocationDir = "${mavenTarget}"
         } else {
-            buildPackageLocationDir = ("${MAVEN_ONE_LEVEL}" == "" ? "${PROJECT_NAME}" : "${MAVEN_ONE_LEVEL}${PROJECT_NAME}") + "/target"
+            buildPackageLocationDir = ("${MAVEN_ONE_LEVEL}" == "" ? "${PROJECT_NAME}" : "${MAVEN_ONE_LEVEL}${PROJECT_NAME}") + "/${mavenTarget}"
         }
         buildPackageLocation = "${buildPackageLocationDir}" + "/*.${javaPackageType}"
         if ("${IS_SPRING_NATIVE}" == "true") {
-            // 名称为pom.xml下build内的imageName标签名称
+            // 名称为pom.xml下build内的imageName标签名称 统一名称或动态定义配置
             buildPackageLocation = "${buildPackageLocationDir}" + "/spring-native-graalvm"
         }
         println(buildPackageLocation)
@@ -1453,7 +1462,7 @@ def gradleBuildProject(map) {
 /**
  * Python编译构建
  */
-def pythonBuildProject() {
+def pythonBuildProject(map) {
     dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
         // 压缩源码文件 加速传输
         Python.codePackage(this)
@@ -2270,7 +2279,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}流水线失败通知",
                             "### [${env.JOB_NAME}#${env.BUILD_NUMBER}](${env.BUILD_URL}) ${PROJECT_TAG}${envTypeMark}${projectTypeName}项目${msg} \n" +
                                     "#### 请及时处理 🏃 \n" +
-                                    "###### ** 流水线失败原因: [运行日志](${env.BUILD_URL}console) 👈 ** \n" +
+                                    "##### <font color=red> 流水线失败原因:</font> [运行日志](${env.BUILD_URL}console) 👈  \n" +
                                     "###### 发布环境: ${releaseEnvironment}  持续时间: ${durationTimeString} \n" +
                                     "###### Jenkins  [运行日志](${env.BUILD_URL}console)   Git源码  [查看](${REPO_URL}) \n" +
                                     "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_NAME} \n" +
@@ -2354,7 +2363,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                     gitChangeLog = "${params.VERSION_DESCRIPTION}"
                 }
                 if ("${gitChangeLog}" != GlobalVars.noChangeLog) {
-                    def titlePrefix = "${PROJECT_TAG} BUILD#${env.BUILD_NUMBER}"
+                    def titlePrefix = "${PROJECT_TAG} BUILD#<font color=green>${env.BUILD_NUMBER}</font>"
                     // 如果gitChangeLog为空 赋值提醒文案
                     if ("${gitChangeLog}" == '') {
                         gitChangeLog = "无版本变更记录 🈳"
@@ -2372,6 +2381,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                             "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉 \n" +
                                     "#### 项目: ${PROJECT_NAME} \n" +
                                     "#### 环境: *${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}* \n" +
+                                    "##### 描述: ${JenkinsCI.getCurrentBuildDescription(this)} \n" +
                                     "${gitChangeLog} \n" +
                                     ">  👉  前往 [变更日志](${REPO_URL.replace('.git', '')}/blob/${BRANCH_NAME}/CHANGELOG.md) 查看 \n" +
                                     "###### 发布人: ${BUILD_USER} \n" +

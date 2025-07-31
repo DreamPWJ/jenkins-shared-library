@@ -38,7 +38,7 @@ RUN if [ -n "$CUSTOM_INSTALL_PACKAGES" ]; then \
     && apt-get install -y --no-install-recommends $CUSTOM_INSTALL_PACKAGES ; \
     fi
 
-# 复制代码到容器 ADD 会自动解压，COPY 不会解压  注意tar.gz不能使用中划线命名
+# 复制代码到容器 ADD 会自动解压，COPY 不会解压
 COPY python.tar.gz .
 
 # 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包

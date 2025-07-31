@@ -59,10 +59,10 @@ map.put('k8s_credentials_ids', ' ')
 map.put('k8s_image_pull_secrets', ' ')
 
 // 项目标签或项目简称
-map.put('project_tag', 'Github')
+map.put('project_tag', 'Quarkus原生框架')
 
 // 是否是生产环境
-map.put('is_prod', true)
+map.put('is_prod', false)
 // 是否在同一台服务器蓝绿部署或滚动部署 非k8s集群方式设置
 map.put('is_same_server', false)
 // 是否进行优雅停机
@@ -76,7 +76,7 @@ map.put('is_before_deploy_notice', false)
 // 是否只通知发布变更记录
 map.put('is_only_notice_change_log', false)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', true)
+map.put('is_git_tag', false)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
@@ -85,14 +85,14 @@ map.put('jenkins_node', 'node-3')
 map.put('jenkins_node_frontend', 'node-3')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.9
-map.put('nodejs', 'Node24')
+map.put('nodejs', 'Node20')
 map.put('maven', 'Maven3.9')
 map.put('jdk_publisher', 'amazoncorretto')
 map.put('jdk', '21')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
-map.put('git_credentials_id', '95034cc2-61c8-4acb-83c8-e7bbd841a142')
+map.put('git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
 map.put('ding_talk_credentials_id', 'd33ae0ba-e531-41c8-8983-d9734e53a25a')
 map.put('ding_talk_credentials_ids', [["keyword":"蓝能科技","token":"383391980b120c38f0f9a4a398349739fa67a623f9cfa834df9c5374e81b2081"]]) // 支持多个群通知
 // OSS对象存储访问凭据配置 Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
@@ -109,7 +109,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', ' ')
+map.put('maven_one_level', 'single-module-projects')
 // Maven自定义settings.xml文件Secret file凭据  如设置私有库或镜像源情况
 map.put('maven_settings_xml_id', ' ')
 
@@ -118,20 +118,22 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/test/Jenkinsfile.github-test
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/test/Jenkinsfile.quarkus-test
 
 /*
 
-github-test
-Github工程代码测试
+quarkus-test
+Quarkus原生框架测试
 JSON_PARAMS
 {
-   "REPO_URL" : "https://github.com/DreamPWJ/trading-charts.git" , // https://github.com/DreamPWJ/astro-site.git
-   "BRANCH_NAME" : "main" ,
-   "PROJECT_TYPE" : "1" ,
-   "PROJECT_NAME" : "github-test" ,
-   "SHELL_PARAMS" : "github-test code 9021 80 prod" ,
-   "NPM_RUN_PARAMS" : "build",
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+   "BRANCH_NAME" : "feature/infra" ,
+   "PROJECT_TYPE" : "2" ,
+   "JAVA_FRAMEWORK_TYPE" : "3",
+   "PROJECT_NAME" : "quarkus-demo" ,
+   "SHELL_PARAMS" : "quarkus demo 8125 8080 prod",
+   "IS_MAVEN_SINGLE_MODULE" : true,
+   "GIT_PROJECT_FOLDER_NAME" : "single-module-projects/project-demos/quarkus-demo",
 }
 
 

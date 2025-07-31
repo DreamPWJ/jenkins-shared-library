@@ -52,7 +52,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 # 下载项目依赖包
 #COPY requirements.txt requirements.txt
 
-# 复制代码到容器 ADD 会自动解压，COPY 不会解压  注意tar.gz不能使用中划线命名
+# 复制代码到容器 ADD 会自动解压，COPY 不会解压
 #COPY . .
 COPY python.tar.gz .
 

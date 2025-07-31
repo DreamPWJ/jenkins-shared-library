@@ -537,6 +537,7 @@ def initInfo() {
     // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
     try {
         if (params.IS_WORKSPACE_CLEAN == true) {
+            println("删除代码构建产物与缓存等 用于全新构建流水线工作环境" )
             def jobHome = env.WORKSPACE.split("@")[0] // 根据@符号分隔去前面的路径
             sh " rm -rf ${jobHome}*"
         }
@@ -669,7 +670,7 @@ def pullProjectCode() {
         sh "git --version"  // 建议使用git 2.0以上的高级版本  否则可能有兼容性问题
         // sh "which git"
         // https仓库下载报错处理 The certificate issuer's certificate has expired.  Check your system date and time.
-        // sh "git config --global http.sslVerify false || true"
+        sh "git config --global http.sslVerify false || true"
         // def git = git url: "${REPO_URL}", branch: "${BRANCH_NAME}", credentialsId: "${GIT_CREDENTIALS_ID}"
         // println "${git}"
 

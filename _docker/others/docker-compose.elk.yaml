@@ -4,7 +4,7 @@
 # Logstash: 用于收集日志，SpringBoot应用整合了Logstash以后会把日志发送给Logstash,Logstash再把日志转发给Elasticsearch；
 # Kibana: 通过Web端的可视化界面来查看日志
 
-# 启动命令 cd /my && docker-compose  -f docker-compose.elk.yaml up -d
+# 启动命令 cd /my && docker compose  -f docker-compose.elk.yaml up -d
 # 销毁命令 cd /tmp && docker compose down --rmi all
 
 version: '3.7'
