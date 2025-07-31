@@ -41,13 +41,14 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # 打包文件名称
 ARG PACKAGE_FILE=quarkus-app
 
-# 将部署文件复制到docker内目录
-COPY ${PACKAGE_FILE}.tar.gz .
+# 复制代码到容器 ADD 会自动解压，COPY 不会解压
+ADD ${PACKAGE_FILE}.tar.gz .
 
 # 解压文件到当前文件夹下并删除压缩文件
-RUN  tar -pxzvf  ${PACKAGE_FILE}.tar.gz >/dev/null 2>&1 \
- && rm -f ${PACKAGE_FILE}.tar.gz \
- && ls -l
+#RUN  tar -pxzvf  ${PACKAGE_FILE}.tar.gz >/dev/null 2>&1 \
+# && rm -f ${PACKAGE_FILE}.tar.gz \
+# && ls -l
+RUN ls -l
 
 # 对外暴露端口 k8s在yaml设置端口
 EXPOSE  $EXPOSE_PORT
