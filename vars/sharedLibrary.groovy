@@ -1249,8 +1249,10 @@ def packageDeploy() {
 def sourceCodeDeploy() {
     if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {
         dir("${env.WORKSPACE}/") { // 源码在特定目录下
-            sh " rm -f ${sourceCodeDeployName}.tar.gz && " +
-                    " tar --warning=no-file-changed -zcvf  ${sourceCodeDeployName}.tar.gz --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
+            def tarFile="${sourceCodeDeployName}.tar.gz"
+            sh " rm -f ${tarFile} && " +
+                    " tar --warning=no-file-changed -zcvf  ${tarFile} --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
+            buildPackageSize = Utils.getFileSize(this, "${tarFile}")
             Tools.printColor(this, "源码压缩打包成功 ✅")
         }
     }
