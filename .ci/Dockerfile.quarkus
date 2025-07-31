@@ -39,15 +39,14 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 #DOCKER-FILE-RUN-COMMAND
 
 # 打包文件名称
-ARG PACKAGE_FILE=quarkus-app
+ENV PACKAGE_FILE=quarkus-app
 
-# 将部署文件复制到docker内目录 注意tar.gz不能使用中划线命名
-#COPY  /app/target/quarkus-app /app
+# 将部署文件复制到docker内目录
 COPY ${PACKAGE_FILE}.tar.gz .
 
 # 解压文件到当前文件夹下并删除压缩文件
 RUN tar -pxzvf  ${PACKAGE_FILE}.tar.gz >/dev/null 2>&1 \
- && rm -f *.tar.gz \
+ && rm -f ${PACKAGE_FILE}.tar.gz \
  && ls -l
 
 # 对外暴露端口 k8s在yaml设置端口
@@ -59,5 +58,5 @@ HEALTHCHECK --start-period=10s --interval=30s --timeout=30s --retries=3 \
 
 # 运行jar包命令 远程调式  启动命令: java -jar app.jar  在k8s动态设置启动参数
 # JVM模式启动命令
-ENTRYPOINT "java" "-jar" $JAVA_OPTS $REMOTE_DEBUGGING_PARAM  "-Djava.security.egd=file:/dev/./urandom" "/app/quarkus-run.jar"
+ENTRYPOINT ["java", "-jar", "$JAVA_OPTS $REMOTE_DEBUGGING_PARAM", "-Djava.security.egd=file:/dev/./urandom", "quarkus-run.jar"]
 # ENTRYPOINT ["./${PACKAGE_FILE}"] # 原生镜像模式启动命令
