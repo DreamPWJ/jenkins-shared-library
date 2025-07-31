@@ -39,13 +39,14 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 #DOCKER-FILE-RUN-COMMAND
 
 # 打包文件名称
-ENV PACKAGE_FILE=quarkus-app
+ARG PACKAGE_FILE=quarkus-app
 
 # 将部署文件复制到docker内目录
 COPY ${PACKAGE_FILE}.tar.gz .
 
 # 解压文件到当前文件夹下并删除压缩文件
-RUN tar -pxzvf  ${PACKAGE_FILE}.tar.gz >/dev/null 2>&1 \
+RUN pwd \
+ && tar -pxzvf  ${PACKAGE_FILE}.tar.gz >/dev/null 2>&1 \
  && rm -f ${PACKAGE_FILE}.tar.gz \
  && ls -l
 
