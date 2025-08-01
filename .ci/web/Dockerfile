@@ -4,8 +4,8 @@
 
 # Nginx基础镜像
 # 推荐标签 alpine 纯静态资源、轻量级生产部署最佳 无需动态模块或复杂配置
-FROM docker.1ms.run/library/nginx:alpine
-#FROM nginx:stable
+#FROM docker.1ms.run/library/nginx:alpine
+FROM nginx:stable
 
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
 #LABEL author="潘维吉"
