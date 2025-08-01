@@ -149,7 +149,7 @@ class Docker implements Serializable {
                     webDockerFileName = "${ctx.CUSTOM_DOCKERFILE_NAME}"
                     // 如Node构建环境 SSR方式等
                     // 拉取基础镜像避免重复下载
-                    def dockerImagesName = "node:lts"
+                    def dockerImagesName = "node:bullseye-slim"
                     ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} && pwd && \
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
