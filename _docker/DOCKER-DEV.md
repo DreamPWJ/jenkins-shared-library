@@ -6,6 +6,7 @@ sudo cat <<EOF >/etc/docker/daemon.json
 "registry-mirrors": [
   "https://docker.lanneng.tech",
   "https://em1sutsj.mirror.aliyuncs.com",
+  "https://registry.docker-cn.com",
   "https://hub-mirror.c.163.com"
 ],
 "dns": ["8.8.8.8", "114.114.114.114"],
@@ -17,7 +18,7 @@ sudo cat <<EOF >/etc/docker/daemon.json
 }
 EOF
 sudo systemctl reload docker # reload 不会重启 Docker 服务，但会使新的配置生效
-sudo systemctl daemon-reload && sudo systemctl restart docker  # 导致当前运行的容器短暂中断 reload命令无效执行
+sudo systemctl daemon-reload && sudo systemctl restart docker  # 导致当前运行的容器短暂中断 reload命令无效再执行
 sudo journalctl -u docker.service  # 排查启动失败的原因
 
 #### 还原Docker容器的启动run命令完整参数
