@@ -56,18 +56,12 @@ ENV PATH="/opt/venv/bin:$PATH"
 #COPY . .
 ADD python.tar.gz .
 
-# 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包
-#RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
-# # && mv requirement.txt requirements.txt || true \
-# && rm -f *.tar.gz \
-# && ls -l
-
 # Docker 19.03后版本可启用 BuildKit 方式指定缓存目录 --mount=type=cache,target=$PIP_CACHE_DIR
 ARG IS_NEED_INSTALL="true"
 RUN ls -l  && --mount=type=cache,target=$PIP_CACHE_DIR pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 
 # 暴露端口
-EXPOSE 5000
+EXPOSE $EXPOSE_PORT
 
 # 启动项目时动态设置python主文件  CMD中的"$MY_VAR"变量设置成 docker run -e MY_VAR=value 运行变量 否则无法获取
 CMD ["sh", "-c", "python $PYTHON_START_FILE"]
