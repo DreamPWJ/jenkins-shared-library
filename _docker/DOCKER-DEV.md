@@ -5,8 +5,10 @@ sudo cat <<EOF >/etc/docker/daemon.json
 {
 "registry-mirrors": [
   "https://docker.lanneng.tech",
-  "https://em1sutsj.mirror.aliyuncs.com"
+  "https://em1sutsj.mirror.aliyuncs.com",
+  "https://hub-mirror.c.163.com"
 ],
+"dns": ["8.8.8.8", "114.114.114.114"],
 "log-driver":"json-file",
 "log-opts": {
 "max-size": "100m",
