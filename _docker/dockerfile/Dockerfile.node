@@ -8,6 +8,9 @@
 # 指定我们的基础镜像是node 如果指定的镜像不存在默认会自动从Docker Hub上下载
 FROM node:24
 
+# Docker 将此路径用作所有后续命令的默认位置
+WORKDIR /app
+
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
 #LABEL author="潘维吉"
 
@@ -18,10 +21,8 @@ USER root
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# 将根目录下的源码文件都copy到docker容器文件系统的app文件夹下
-ADD . /app/
-# cd到app文件夹下
-WORKDIR /app
+# 将根目录下的源码文件都复制到到docker容器文件系统的工作目录文件夹下
+ADD . .
 
 # 安装项目依赖包  RUN和CMD都是执行命令，他们的差异在于RUN中定义的命令会在执行docker build命令创建镜像时执行，而CMD中定义的命令会在执行docker run命令运行镜像时执行
 RUN npm install --only=production && npm rebuild node-sass --force

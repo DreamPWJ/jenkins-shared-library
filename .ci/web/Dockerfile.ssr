@@ -9,15 +9,15 @@ ARG EXPOSE_PORT
 # 推荐标签: bullseye-slim 稳定的底层依赖，兼容性优于 Alpine 适用需平衡兼容性与体积的 SSR 应用
 FROM node:lts AS runtime
 
+# Docker 将此路径用作所有后续命令的默认位置
+WORKDIR /app
+
 # 指定切换用户
 USER root
 
 # 设置时区
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-# cd到app文件夹下
-WORKDIR /app
 
 # 设置容器内存上限 用于垃圾回收机制（必须！否则Node无法感知容器限制） # 单位MB
 #ENV NODE_MEMORY_LIMIT=4096
