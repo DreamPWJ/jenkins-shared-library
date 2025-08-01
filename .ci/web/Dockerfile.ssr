@@ -5,8 +5,12 @@
 # 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
 ARG EXPOSE_PORT
 
-# 依赖基础镜像  默认值变量方式 ${NODE_VERSON:18}
-FROM node:lts AS runtime
+# 依赖基础镜像  默认值变量方式 ${NODE_VERSON:24}
+# 推荐标签: bullseye-slim 稳定的底层依赖，兼容性优于 alpine 适用需平衡兼容性与体积的 SSR 应用
+FROM node:bullseye-slim AS runtime
+
+# Docker 将此路径用作所有后续命令的默认位置
+WORKDIR /app
 
 # 指定切换用户
 USER root
@@ -14,9 +18,6 @@ USER root
 # 设置时区
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-# cd到app文件夹下
-WORKDIR /app
 
 # 设置容器内存上限 用于垃圾回收机制（必须！否则Node无法感知容器限制） # 单位MB
 #ENV NODE_MEMORY_LIMIT=4096
@@ -34,10 +35,10 @@ COPY . .
 # 配置环境变量
 ENV HOST 0.0.0.0
 ENV PORT $EXPOSE_PORT
+
 # 容器对外暴露的端口号
 EXPOSE $EXPOSE_PORT
 
 # 启动运行 需要node_modules目录文件才能运行
 CMD node ./dist/server/entry.mjs
-
 #CMD ["npm", "start"]

@@ -39,13 +39,7 @@ RUN if [ -n "$CUSTOM_INSTALL_PACKAGES" ]; then \
     fi
 
 # 复制代码到容器 ADD 会自动解压，COPY 不会解压
-COPY python.tar.gz .
-
-# 解压文件到当前文件夹下并删除压缩文件  下载项目依赖包
-RUN tar -pxzvf python.tar.gz >/dev/null 2>&1 \
- #&& mv requirement.txt requirements.txt || true \
- && rm -f *.tar.gz \
- && ls -l
+ADD python.tar.gz .
 
 # Docker 19.03后版本可启用 BuildKit 方式指定缓存目录 --mount=type=cache,target=$PIP_CACHE_DIR
 ARG IS_NEED_INSTALL="true"

@@ -26,7 +26,6 @@ RUN apk add --update --no-cache python3 gcc musl-dev python3-dev \
 RUN pip install ruamel.yaml
 
 
-
 # 自定义构建镜像
 # DOCKER_BUILDKIT=1 docker build -t panweiji/k8s:latest  -f /my/Dockerfile.k8s . --no-cache
 # 上传镜像 先 docker login 登录

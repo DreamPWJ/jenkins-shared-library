@@ -2,8 +2,9 @@
 # Version 1.0.0
 # Description: 自定义构建Nginx Web项目镜像
 
-# Nginx基础镜像 or stable-alpine-slim
-FROM nginx:stable
+# Nginx基础镜像
+# 推荐标签: alpine 纯静态资源、轻量级生产部署最佳 无需动态模块或复杂配置
+FROM nginx:stable-alpine
 
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
 #LABEL author="潘维吉"
@@ -28,8 +29,9 @@ COPY  nginx.conf   /etc/nginx/
 # 删除之前的部署文件
 #RUN rm -rf /usr/share/nginx/html/*
 
-# 拷贝部署文件到nginx
+# 复制代码到容器 ADD 会自动解压，COPY 不会解压
 COPY  ${NPM_PACKAGE_FOLDER}.tar.gz /usr/share/nginx/html/
+
 # 解压文件到当前文件夹下并删除压缩文件
 RUN cd /usr/share/nginx/html/ \
  && tar -xzvf ${NPM_PACKAGE_FOLDER}.tar.gz --strip-components ${WEB_STRIP_COMPONENTS} >/dev/null 2>&1 \

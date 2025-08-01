@@ -1,12 +1,12 @@
 #### 基于Docker安装部署nginx
-docker pull nginx
+docker pull nginx:stable
 
 #### 启动运行nginx容器  创建目录 mkdir -p /my/nginx/config && mkdir -p /my/nginx/ssl
 sudo docker run -d --restart=always -p 80:80 -p 443:443 --name proxy-nginx  -v /etc/localtime:/etc/localtime:ro \
 -v /my/nginx/config/nginx.conf:/etc/nginx/nginx.conf:ro  -v /my/nginx/config/default.conf:/etc/nginx/conf.d/default.conf:ro \
 -v /my/nginx/ssl:/etc/nginx/ssl -v /my/nginx/html:/usr/share/nginx/html  -v /etc/letsencrypt:/etc/letsencrypt   \
 --log-opt max-size=200m --log-opt max-file=1   \
--v /my/nginx/logs:/var/log/nginx  nginx
+-v /my/nginx/logs:/var/log/nginx  nginx:stable
 
 #### 从Docker Hub里拉取redis镜像来部署 密码强度要求：8位及以上，包含大小写，字母，特殊符号
 docker pull redis:latest

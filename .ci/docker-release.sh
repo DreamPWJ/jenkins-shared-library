@@ -308,6 +308,7 @@ if [[ ${is_push_docker_repo} == true ]]; then
   cd /${deploy_folder} && ./docker-common.sh remove_docker_dangling_images
 fi
 
+
 # 并发构建镜像删除none的镜像可能导致错误
 #docker_none_images=$(docker images | grep "none" | awk '{print $3}')
 #if [[ ${docker_none_images} ]]; then

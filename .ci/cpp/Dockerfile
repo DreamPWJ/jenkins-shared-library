@@ -8,7 +8,7 @@ ARG PROJECT_NAME
 ARG EXPOSE_PORT
 
 # 依赖基础镜像
-FROM ubuntu:bionic
+FROM ubuntu:jammy
 FROM gcc:latest
 
 # 指定切换用户
