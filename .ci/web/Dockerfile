@@ -3,6 +3,7 @@
 # Description: 自定义构建Nginx Web项目镜像
 
 # Nginx基础镜像
+# 推荐标签alpine 纯静态资源、轻量级生产部署最佳 无需动态模块或复杂配置
 FROM nginx:stable
 
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看

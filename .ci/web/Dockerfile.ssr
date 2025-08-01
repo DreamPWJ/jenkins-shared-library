@@ -5,7 +5,8 @@
 # 构建镜像docker build --build-arg PROJECT_NAME=app 或 docker-compose.yaml args参数传入
 ARG EXPOSE_PORT
 
-# 依赖基础镜像  默认值变量方式 ${NODE_VERSON:18}
+# 依赖基础镜像  默认值变量方式 ${NODE_VERSON:22}
+# 推荐标签bullseye-slim 稳定的底层依赖，兼容性优于 Alpine 适用需平衡兼容性与体积的 SSR 应用
 FROM node:lts AS runtime
 
 # 指定切换用户
@@ -34,10 +35,10 @@ COPY . .
 # 配置环境变量
 ENV HOST 0.0.0.0
 ENV PORT $EXPOSE_PORT
+
 # 容器对外暴露的端口号
 EXPOSE $EXPOSE_PORT
 
 # 启动运行 需要node_modules目录文件才能运行
 CMD node ./dist/server/entry.mjs
-
 #CMD ["npm", "start"]
