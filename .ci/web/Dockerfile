@@ -3,7 +3,7 @@
 # Description: 自定义构建Nginx Web项目镜像
 
 # Nginx基础镜像
-# 推荐标签 alpine 纯静态资源、轻量级生产部署最佳 无需动态模块或复杂配置
+# 推荐标签: alpine 纯静态资源、轻量级生产部署最佳 无需动态模块或复杂配置
 #FROM docker.1ms.run/library/nginx:alpine
 FROM nginx:stable
 
