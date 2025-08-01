@@ -163,7 +163,7 @@ class Docker implements Serializable {
                     if ("${ctx.GIT_PROJECT_FOLDER_NAME}" != "") { // Git目录区分项目
                         webProjectDir = "${ctx.GIT_PROJECT_FOLDER_NAME}"
                     }
-                    def dockerImagesName = "nginx:stable"
+                    def dockerImagesName = "nginx:stable-alpine"
                     // 拉取基础镜像避免重复下载
                     ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
                     ctx.sh """  cp -p ${ctx.env.WORKSPACE}/ci/.ci/web/default.conf ${ctx.env.WORKSPACE}/${webProjectDir} &&
