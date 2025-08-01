@@ -6,7 +6,7 @@
 ARG EXPOSE_PORT
 
 # 依赖基础镜像  默认值变量方式 ${NODE_VERSON:22}
-# 推荐标签: bullseye-slim 稳定的底层依赖，兼容性优于 Alpine 适用需平衡兼容性与体积的 SSR 应用
+# 推荐标签: bullseye-slim 稳定的底层依赖，兼容性优于 alpine 适用需平衡兼容性与体积的 SSR 应用
 FROM node:bullseye-slim AS runtime
 
 # Docker 将此路径用作所有后续命令的默认位置
