@@ -6,8 +6,7 @@ sudo cat <<EOF >/etc/docker/daemon.json
 "registry-mirrors": [
   "https://docker.lanneng.tech",
   "https://em1sutsj.mirror.aliyuncs.com",
-  "https://registry.docker-cn.com",
-  "https://hub-mirror.c.163.com"
+  "https://docker.1ms.run"
 ],
 "dns": ["8.8.8.8", "114.114.114.114"],
 "log-driver":"json-file",

@@ -48,7 +48,8 @@ sudo cat <<EOF >/etc/docker/daemon.json
 {
 "registry-mirrors": [
   "https://docker.lanneng.tech",
-  "https://em1sutsj.mirror.aliyuncs.com"
+  "https://em1sutsj.mirror.aliyuncs.com",
+  "https://docker.1ms.run"
 ],
 "log-driver":"json-file",
 "log-opts": {
