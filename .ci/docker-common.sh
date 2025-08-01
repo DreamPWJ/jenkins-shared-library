@@ -75,8 +75,7 @@ function is_success_images() {
 {
 "registry-mirrors": [
   "https://docker.lanneng.tech",
-  "https://em1sutsj.mirror.aliyuncs.com",
-  "https://docker.1ms.run"
+  "https://em1sutsj.mirror.aliyuncs.com"
 ],
 "log-driver":"json-file",
 "log-opts": {

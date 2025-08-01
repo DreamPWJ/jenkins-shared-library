@@ -319,7 +319,7 @@ class Docker implements Serializable {
         ctx.println("Docker镜像源设置 加速构建速度")
         // 阿里云镜像加速仅对阿里云产品有效
         ctx.sh """     
-export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirror.aliyuncs.com,https://docker.1ms.run'
+export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirror.aliyuncs.com'
              """
 
         // 让容器配置服务生效 reload 不会重启 Docker 服务，但会使新的配置生效
