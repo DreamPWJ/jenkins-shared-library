@@ -18,13 +18,13 @@ Y | y)
   echo -e "\033[32m中间件服务安装开始  \033[0m"
 
   echo "基于Docker安装部署Nginx"
-  docker pull nginx
+  docker pull nginx:stable
   # 放开端口范围  -p 7000-8000:7000-8000  -p 8080:443
   sudo docker run -d --restart=always -p 80:80 -p 443:443 -p 4000:4000 --name proxy-nginx -v /etc/localtime:/etc/localtime:ro \
     -v /my/nginx/config/nginx.conf:/etc/nginx/nginx.conf:ro -v /my/nginx/config/default.conf:/etc/nginx/conf.d/default.conf:ro \
     -v /my/nginx/ssl:/etc/nginx/ssl -v /my/nginx/html:/usr/share/nginx/html -v /etc/letsencrypt:/etc/letsencrypt \
     --log-opt max-size=200m --log-opt max-file=1   \
-    -v /my/nginx/logs:/var/log/nginx nginx
+    -v /my/nginx/logs:/var/log/nginx nginx:stable
 
   echo "安装Let's Encrypt客户端Certbot"
   sudo apt-get install -y certbot || true
