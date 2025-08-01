@@ -7,7 +7,7 @@
 ARG NODE_VERSION
 
 # 基础镜像
-FROM node:${NODE_VERSION:-24}
+FROM node:${NODE_VERSION:-24}-bullseye-slim
 
 # 设置镜像元数据，利用 docker inspect [镜像名称|镜像ID],即可查看
 #LABEL author="潘维吉"

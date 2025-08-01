@@ -6,7 +6,7 @@
 # ARG EXPOSE_PORT
 
 # 指定我们的基础镜像是node 如果指定的镜像不存在默认会自动从Docker Hub上下载
-FROM node:24
+FROM node:24-bullseye-slim
 
 # Docker 将此路径用作所有后续命令的默认位置
 WORKDIR /app
