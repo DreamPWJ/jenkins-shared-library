@@ -11,7 +11,7 @@ ARG PYTHON_START_FILE
 
 # 依赖基础镜像
 #FROM python:${PYTHON_VERSION}-slim
-FROM ubuntu:latest
+FROM ubuntu:jammy
 
 # 设置工作目录
 WORKDIR /app
