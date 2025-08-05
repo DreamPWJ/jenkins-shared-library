@@ -168,7 +168,7 @@ spec:
     - name: {APP_COMMON_NAME}-quic
       port: {HOST_PORT}
       targetPort: {CONTAINER_PORT}
-      protocol: UDP
+      protocol: UDP                    # UDP通讯协议 支持HTTP/3 + QUIC
 
 #  Session保持  Ingress的解决方案:  https://www.modb.pro/db/210201
 #  sessionAffinity: ClientIP            # 集群Session共享设置为 "ClientIP" 注意只适用NodePort类型 （默认值是 "None"值 Service向后台Pod转发规则是轮询），来基于客户端的IP地址选择固定会话Pod关联
