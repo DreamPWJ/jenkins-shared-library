@@ -297,9 +297,10 @@ def getInitParams(map) {
     env.PROJECT_TYPE = jsonParams.PROJECT_TYPE ? jsonParams.PROJECT_TYPE.trim() : ""  // 项目类型 1 前端项目 2 后端项目
     // 计算机语言类型 1. Java  2. Go  3. Python  5. C++  6. JavaScript
     env.COMPUTER_LANGUAGE = jsonParams.COMPUTER_LANGUAGE ? jsonParams.COMPUTER_LANGUAGE.trim() : "1"
-    // 项目名 获取部署资源位置和指定构建模块名等
+    // 项目名 代码位置或构建模块名等
     env.PROJECT_NAME = jsonParams.PROJECT_NAME ? jsonParams.PROJECT_NAME.trim() : ""
-    env.SHELL_PARAMS = jsonParams.SHELL_PARAMS ? jsonParams.SHELL_PARAMS.trim() : "" // shell传入前端或后端参数
+    // shell传入前端或后端组合参数 包括名称、类型、多端口、环境等
+    env.SHELL_PARAMS = jsonParams.SHELL_PARAMS ? jsonParams.SHELL_PARAMS.trim() : ""
     // 分布式部署独立扩展服务器 基于通用配置的基础上 再扩展的服务器IP集合 逗号分割
     env.EXPAND_SERVER_IPS = jsonParams.EXPAND_SERVER_IPS ? jsonParams.EXPAND_SERVER_IPS.trim() : ""
 

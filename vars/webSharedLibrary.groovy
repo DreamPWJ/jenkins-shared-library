@@ -541,9 +541,10 @@ def getInitParams(map) {
     WEB_PROJECT_TYPE = jsonParams.WEB_PROJECT_TYPE ? jsonParams.WEB_PROJECT_TYPE.trim() : "1"
     // 计算机语言类型 1. Java  2. Go  3. Python  5. C++  6. JavaScript
     COMPUTER_LANGUAGE = jsonParams.COMPUTER_LANGUAGE ? jsonParams.COMPUTER_LANGUAGE.trim() : "1"
-    // 项目名 获取部署资源位置和指定构建模块名等
+    // 项目名 代码位置或构建模块名等
     PROJECT_NAME = jsonParams.PROJECT_NAME ? jsonParams.PROJECT_NAME.trim() : ""
-    SHELL_PARAMS = jsonParams.SHELL_PARAMS ? jsonParams.SHELL_PARAMS.trim() : "" // shell传入前端或后端参数
+    // shell传入前端或后端组合参数 包括名称、类型、多端口、环境等
+    SHELL_PARAMS = jsonParams.SHELL_PARAMS ? jsonParams.SHELL_PARAMS.trim() : ""
 
     // npm包管理工具类型 如:  npm、yarn、pnpm
     NODE_VERSION = jsonParams.NODE_VERSION ? jsonParams.NODE_VERSION.trim() : "${map.nodejs}" // nodejs版本
