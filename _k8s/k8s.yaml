@@ -160,7 +160,7 @@ spec:
       port: {HOST_PORT}                # 指定Service接收请求的端口
       targetPort: {CONTAINER_PORT}     # 请求转发的端口 容器内部端口
       #nodePort: {HOST_PORT}           # NodePort类型端口区间 30000–32767 不指定端口，系统将分配一个随机端口
-      protocol: TCP                    # 定义通信协议
+      protocol: TCP                    # 定义通信协议 可定义UDP支持QUIC协议
 
 #  Session保持  Ingress的解决方案:  https://www.modb.pro/db/210201
 #  sessionAffinity: ClientIP            # 集群Session共享设置为 "ClientIP" 注意只适用NodePort类型 （默认值是 "None"值 Service向后台Pod转发规则是轮询），来基于客户端的IP地址选择固定会话Pod关联
