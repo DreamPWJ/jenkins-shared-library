@@ -247,7 +247,7 @@ def call(String type = 'quality', Map map) {
                     }
                     steps {
                         script {
-
+                            echo '单元测试'
                         }
                     }
                 }
