@@ -119,10 +119,11 @@ sharedLibrary(map)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// jenkins流水线配置
+// Jenkins流水线参数化配置
 // https://github.com/DreamPWJ/jenkins-shared-library.git  Jenkinsfile
 
 /*
+
 JSON_PARAMS:
 {
     "REPO_URL" : "https://github.com/DreamPWJ/health.git" ,
