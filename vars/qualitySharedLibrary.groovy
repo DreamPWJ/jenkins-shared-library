@@ -362,12 +362,12 @@ def call(String type = 'quality', Map map) {
                     when {
                         beforeAgent true
                         // 生产环境不进行集成测试 缩减构建时间
-                        not {
+                /*        not {
                             anyOf {
                                 branch 'master'
                                 branch 'prod'
                             }
-                        }
+                        }*/
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             // 是否进行集成测试  是否存在postman_collection.json文件才进行API集成测试  fileExists("_test/postman/postman_collection.json") == true
