@@ -246,7 +246,7 @@ def call(String type = 'quality', Map map) {
                     }
                 }
 
-                stage('多方面并行测试') {
+                stage('多方向并行测试') {
                     when {
                         beforeAgent true
                         // 生产环境不进行集成测试 缩减构建时间
@@ -325,23 +325,23 @@ def call(String type = 'quality', Map map) {
                         agent any
                         axes {
                             axis {
-                                name 'OS'
-                                values 'linux', 'windows', 'mac'
+                                name 'PLATFORM'
+                                values 'Linux', 'Windows', 'Mac'
                             }
                             axis {
                                 name 'BROWSER'
-                                values 'chrome', 'firefox', 'safari', 'edge'
+                                values 'Chrome', 'Firefox', 'Safari', 'Edge'
                             }
                         }
                         stages {
                             stage("Build") {
                                 steps {
-                                    echo "Do Build for ${OS} - ${BROWSER}"
+                                    echo "Do Build for ${PLATFORM} - ${BROWSER}"
                                 }
                             }
                             stage("Test") {
                                 steps {
-                                    echo "Do Test for ${OS} - ${BROWSER}"
+                                    echo "Do Test for ${PLATFORM} - ${BROWSER}"
                                 }
                             }
                         }
