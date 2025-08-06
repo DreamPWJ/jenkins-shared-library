@@ -35,7 +35,7 @@ def call(String type = 'quality', Map map) {
     // 初始化参数
     getInitParams(map)
 
-    if (type == "web-java") { // 针对标准项目
+    if (type == "quality") { // 针对标准项目
         pipeline {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
             agent { label "${params.SELECT_BUILD_NODE}" }
