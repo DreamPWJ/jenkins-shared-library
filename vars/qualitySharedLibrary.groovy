@@ -281,6 +281,12 @@ def call(String type = 'quality', Map map) {
                             }
                         }
                         stage('安全测试') {
+                            when {
+                                beforeAgent true
+                                expression {
+                                    return false
+                                }
+                            }
                             steps {
                                 echo "安全测试"
                                 sleep 3
