@@ -42,7 +42,7 @@ EXPOSE  80 443
 
 # 健康检查 HTTP响应200为健康 如果服务不可用或未响应，Docker可以标记容器为不健康，并根据配置采取行动，如自动重启容器
 HEALTHCHECK --start-period=1s --interval=30s --timeout=30s --retries=3 \
-    CMD curl --fail --max-time 5 http://localhost:80 || exit 1
+    CMD curl --fail --max-time 30 http://localhost:80 || exit 1
 
 # 启动nginx
 CMD ["nginx", "-g", "daemon off;"]

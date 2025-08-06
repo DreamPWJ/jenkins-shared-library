@@ -44,8 +44,8 @@ COPY  *.jar  /server.jar
 EXPOSE  $EXPOSE_PORT
 
 # 健康检查 HTTP响应200为健康 如果服务不可用或未响应，Docker可以标记容器为不健康，并根据配置采取行动，如自动重启容器
-HEALTHCHECK --start-period=10s --interval=30s --timeout=30s --retries=3 \
-    CMD curl --fail --max-time 5 http://localhost:$DOCKER_SERVICE_PORT || exit 1
+HEALTHCHECK --start-period=30s --interval=30s --timeout=60s --retries=3 \
+    CMD curl --fail --max-time 30 http://localhost:$DOCKER_SERVICE_PORT || exit 1
 
 # 运行jar包命令 远程调式  启动命令: java -jar app.jar  在k8s动态设置启动参数
 ENTRYPOINT "java" "-jar" $JAVA_OPTS $REMOTE_DEBUGGING_PARAM  "-Djava.security.egd=file:/dev/./urandom" "/server.jar"
