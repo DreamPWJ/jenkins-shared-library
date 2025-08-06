@@ -362,17 +362,17 @@ def call(String type = 'quality', Map map) {
                     when {
                         beforeAgent true
                         // 生产环境不进行集成测试 缩减构建时间
-                /*        not {
-                            anyOf {
-                                branch 'master'
-                                branch 'prod'
-                            }
-                        }*/
+                        /*        not {
+                                    anyOf {
+                                        branch 'master'
+                                        branch 'prod'
+                                    }
+                                }*/
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             // 是否进行集成测试  是否存在postman_collection.json文件才进行API集成测试  fileExists("_test/postman/postman_collection.json") == true
-                         /*   return ("${IS_INTEGRATION_TESTING}" == 'true' && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd
-                                    && "${AUTO_TEST_PARAM}" != "")*/
+                            /*   return ("${IS_INTEGRATION_TESTING}" == 'true' && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd
+                                       && "${AUTO_TEST_PARAM}" != "")*/
                             return true
                         }
                     }
@@ -382,26 +382,31 @@ def call(String type = 'quality', Map map) {
                             steps {
                                 echo "集成测试"
                                 // integrationTesting(map)
+                                sleep 3
                             }
                         }
                         stage('性能测试') {
                             steps {
                                 echo "性能测试"
+                                sleep 5
                             }
                         }
                         stage('安全测试') {
                             steps {
                                 echo "安全测试"
+                                sleep 3
                             }
                         }
                         stage('UI测试') {
                             steps {
                                 echo "UI测试"
+                                sleep 6
                             }
                         }
                         stage('冒烟测试') {
                             steps {
                                 echo "冒烟测试"
+                                sleep 3
                             }
                         }
                     }
