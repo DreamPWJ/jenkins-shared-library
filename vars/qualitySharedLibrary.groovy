@@ -325,23 +325,23 @@ def call(String type = 'quality', Map map) {
                         agent any
                         axes {
                             axis {
-                                name 'PLATFORM'
+                                name 'OS'
                                 values 'linux', 'windows', 'mac'
                             }
                             axis {
                                 name 'BROWSER'
-                                values  'chrome','firefox', 'safari', 'edge'
+                                values 'chrome', 'firefox', 'safari', 'edge'
                             }
                         }
                         stages {
-                            stage("${PLATFORM}-${BROWSER}-build") {
+                            stage("${OS}-${BROWSER}-build") {
                                 steps {
-                                    echo "Do Build for ${PLATFORM} - ${BROWSER}"
+                                    echo "Do Build for ${OS} - ${BROWSER}"
                                 }
                             }
-                            stage("${PLATFORM}-${BROWSER}-test") {
+                            stage("${OS}-${BROWSER}-test") {
                                 steps {
-                                    echo "Do Test for ${PLATFORM} - ${BROWSER}"
+                                    echo "Do Test for ${OS} - ${BROWSER}"
                                 }
                             }
                         }
