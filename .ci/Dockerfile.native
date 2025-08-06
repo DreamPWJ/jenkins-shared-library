@@ -46,9 +46,9 @@ RUN chmod +x /app/spring-native-graalvm
 # 对外暴露端口
 EXPOSE  $EXPOSE_PORT
 
-# 健康检查 HTTP响应200为健康 如果服务不可用或未响应，Docker可以标记容器为不健康，并根据配置采取行动，如自动重启容器
+# 健康检查 HTTP响应200为健康 如果服务不可用或未响应，Docker可以标记容器为不健康，并根据配置采取行动，如自动重启容器 和--restart=on-failure联动
 HEALTHCHECK --start-period=1s --interval=30s --timeout=30s --retries=3 \
-    CMD curl --fail --max-time 30 http://localhost:$DOCKER_SERVICE_PORT || exit 1
+    CMD curl --fail  http://localhost:$DOCKER_SERVICE_PORT || exit 1
 
 # Spring Native自定义启动命令 Linux操作系统上原生机器码级别的二进制可执行文件，无需JVM环境
 ENTRYPOINT ["/app/spring-native-graalvm"]

@@ -43,8 +43,8 @@ COPY  *.jar  /server.jar
 # 对外暴露端口 k8s在yaml设置端口
 EXPOSE  $EXPOSE_PORT
 
-# 健康检查 HTTP响应200为健康 如果服务不可用或未响应，Docker可以标记容器为不健康，并根据配置采取行动，如自动重启容器
-HEALTHCHECK --start-period=30s --interval=30s --timeout=60s --retries=3 \
+# 健康检查 HTTP响应200为健康 如果服务不可用或未响应，Docker可以标记容器为不健康，并根据配置采取行动，如自动重启容器 和--restart=on-failure联动
+HEALTHCHECK --start-period=10s --interval=30s --timeout=30s --retries=3 \
     CMD curl --fail  http://localhost:$DOCKER_SERVICE_PORT || exit 1
 
 # 运行jar包命令 远程调式  启动命令: java -jar app.jar  在k8s动态设置启动参数
