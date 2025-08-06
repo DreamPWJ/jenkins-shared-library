@@ -246,16 +246,16 @@ def call(String type = 'quality', Map map) {
                     }
                 }
 
-                stage('全面测试') {
+                stage('多方面并行测试') {
                     when {
                         beforeAgent true
                         // 生产环境不进行集成测试 缩减构建时间
-                        /*        not {
-                                    anyOf {
-                                        branch 'master'
-                                        branch 'prod'
-                                    }
-                                }*/
+                        not {
+                            anyOf {
+                                branch 'master'
+                                branch 'prod'
+                            }
+                        }
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             // 是否进行集成测试  是否存在postman_collection.json文件才进行API集成测试  fileExists("_test/postman/postman_collection.json") == true
@@ -306,6 +306,48 @@ def call(String type = 'quality', Map map) {
                     }
                 }
 
+                stage('跨平台矩阵测试') {
+                    when {
+                        beforeAgent true
+                        // 生产环境不进行集成测试 缩减构建时间
+                        not {
+                            anyOf {
+                                branch 'master'
+                                branch 'prod'
+                            }
+                        }
+                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            return true
+                        }
+                    }
+                    matrix {
+                        agent any
+                        axes {
+                            axis {
+                                name 'PLATFORM'
+                                values 'linux', 'windows', 'mac'
+                            }
+                            axis {
+                                name 'BROWSER'
+                                values 'firefox', 'chrome', 'safari', 'edge'
+                            }
+                        }
+                        stages {
+                            stage('Build') {
+                                steps {
+                                    echo "Do Build for ${PLATFORM} - ${BROWSER}"
+                                }
+                            }
+                            stage('Test') {
+                                steps {
+                                    echo "Do Test for ${PLATFORM} - ${BROWSER}"
+                                }
+                            }
+                        }
+                    }
+                }
+
                 stage('质量报告') {
                     when {
                         beforeAgent true
@@ -330,11 +372,6 @@ def call(String type = 'quality', Map map) {
                     steps {
                         script {
                             // echo "Docker环境内Node构建方式"
-                            /*   if ("${IS_PROD}" == 'true') {
-                                   docker.image("panweiji/node:${NODE_VERSION.replace('Node', '')}").inside("") {
-                                       nodeBuildProject(map)
-                                   }
-                               } else {*/ // 验证新特性
                             def nodeVersion = "${NODE_VERSION.replace('Node', '')}"
                             def dockerImageName = "panweiji/node-build"
                             def dockerImageTag = "${nodeVersion}"
@@ -342,7 +379,6 @@ def call(String type = 'quality', Map map) {
                             docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
                                 nodeBuildProject(map)
                             }
-                            // }
                         }
                     }
                 }
@@ -369,11 +405,6 @@ def call(String type = 'quality', Map map) {
                                     gradleBuildProject(map)
                                 }
                             } else {
-                                /* if ("${IS_PROD}" == 'true') {
-                                      docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-                                          mavenBuildProject(map)
-                                      }
-                                  } else*/
                                 if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
                                     // mvnd支持条件
                                     def mvndVersion = "1.0.2"  // Mvnd版本 要动态配置
