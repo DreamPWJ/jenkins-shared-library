@@ -330,16 +330,16 @@ def call(String type = 'quality', Map map) {
                             }
                             axis {
                                 name 'BROWSER'
-                                values 'firefox', 'chrome', 'safari', 'edge'
+                                values  'chrome','firefox', 'safari', 'edge'
                             }
                         }
                         stages {
-                            stage('Build') {
+                            stage("${PLATFORM}-${BROWSER}-build") {
                                 steps {
                                     echo "Do Build for ${PLATFORM} - ${BROWSER}"
                                 }
                             }
-                            stage('Test') {
+                            stage("${PLATFORM}-${BROWSER}-test") {
                                 steps {
                                     echo "Do Test for ${PLATFORM} - ${BROWSER}"
                                 }
