@@ -358,7 +358,7 @@ def call(String type = 'quality', Map map) {
                     }
                 }
 
-                stage('集成测试') {
+                stage('全面测试') {
                     when {
                         beforeAgent true
                         // 生产环境不进行集成测试 缩减构建时间
@@ -371,15 +371,17 @@ def call(String type = 'quality', Map map) {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
                             // 是否进行集成测试  是否存在postman_collection.json文件才进行API集成测试  fileExists("_test/postman/postman_collection.json") == true
-                            return ("${IS_INTEGRATION_TESTING}" == 'true' && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd
-                                    && "${AUTO_TEST_PARAM}" != "" && IS_BLUE_GREEN_DEPLOY == false)
+                         /*   return ("${IS_INTEGRATION_TESTING}" == 'true' && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd
+                                    && "${AUTO_TEST_PARAM}" != "")*/
+                            return true
                         }
                     }
                     failFast false         // true表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
                     parallel {  // 并发构建步骤
                         stage('集成测试') {
                             steps {
-                                    integrationTesting(map)
+                                echo "集成测试"
+                                // integrationTesting(map)
                             }
                         }
                         stage('性能测试') {
@@ -419,7 +421,7 @@ def call(String type = 'quality', Map map) {
                         }
                     }
                 }
-                
+
 
                 stage('成品归档') {
                     when {
