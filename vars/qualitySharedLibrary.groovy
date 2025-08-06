@@ -59,8 +59,8 @@ def call(String type = 'quality', Map map) {
                 string(name: 'VERSION_NUM', defaultValue: "", description: "选填 自定义语义化版本号x.y.z 如1.0.0 (默认不填写  自动生成的版本号并且语义化自增 生产环境设置有效) 🖊 ")
                 text(name: 'VERSION_DESCRIPTION', defaultValue: "${Constants.DEFAULT_VERSION_COPYWRITING}",
                         description: "请填写版本变更日志 (不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊 ")
+                booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', defaultValue: true, description: "是否执行静态代码质量分析扫描检测并生成质量报告, 交付可读、易维护和安全的高质量代码 🔦 ")
                 booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行K8s/Docker集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
-                booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', defaultValue: false, description: "是否执行静态代码质量分析扫描检测并生成质量报告, 交付可读、易维护和安全的高质量代码 🔦 ")
                 booleanParam(name: 'IS_WORKSPACE_CLEAN', defaultValue: false, description: "是否全部清空CI/CD工作空间 删除代码构建产物与缓存等 全新构建流水线工作环境 🛀 ")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
                         description: '是否执行服务启动健康探测  K8S使用默认的健康探测 🌡️')
@@ -98,7 +98,6 @@ def call(String type = 'quality', Map map) {
                                 '$'
                 )
                 // pollSCM('H/1 * * * *') // 每分钟判断一次代码是否存在变化 有变化就执行
-                // cron('H * * * *')      // 每隔1小时执行一次
                 cron('H 2 * * *')         // 每天几点执行
             }
 
@@ -352,7 +351,11 @@ def call(String type = 'quality', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return (IS_SOURCE_CODE_DEPLOY == false && IS_PACKAGE_DEPLOY == false && IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
+                        expression {
+                            return (IS_SOURCE_CODE_DEPLOY == false && IS_PACKAGE_DEPLOY == false
+                                    && IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd
+                                    && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java && false)
+                        }
                     }
                     steps {
                         script {
@@ -395,7 +398,7 @@ def call(String type = 'quality', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (IS_K8S_DEPLOY == false)  // k8s集群部署 镜像方式无需上传到服务器
+                            return (IS_K8S_DEPLOY == false && false)  // k8s集群部署 镜像方式无需上传到服务器
                         }
                     }
                     steps {
@@ -409,7 +412,8 @@ def call(String type = 'quality', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (IS_BLUE_GREEN_DEPLOY == false && IS_K8S_DEPLOY == false)  // 非蓝绿和k8s集群部署 都有单独步骤
+                            return (IS_BLUE_GREEN_DEPLOY == false && IS_K8S_DEPLOY == false && false)
+                            // 非蓝绿和k8s集群部署 都有单独步骤
                         }
                     }
                     steps {
@@ -423,7 +427,7 @@ def call(String type = 'quality', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (params.IS_HEALTH_CHECK == true && IS_BLUE_GREEN_DEPLOY == false)
+                            return (params.IS_HEALTH_CHECK == true && IS_BLUE_GREEN_DEPLOY == false && false)
                         }
                     }
                     steps {

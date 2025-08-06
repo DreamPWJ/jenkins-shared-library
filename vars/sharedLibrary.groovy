@@ -99,7 +99,6 @@ def call(String type = 'web-java', Map map) {
                                 '$'
                 )
                 // pollSCM('H/1 * * * *') // 每分钟判断一次代码是否存在变化 有变化就执行
-                // cron('H * * * *')      // 每隔1小时执行一次
                 // cron('H 2 * * *')      // 每天几点执行
             }
 
@@ -318,7 +317,9 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return (IS_SOURCE_CODE_DEPLOY == false && IS_PACKAGE_DEPLOY == false && IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
+                        expression { return (IS_SOURCE_CODE_DEPLOY == false && IS_PACKAGE_DEPLOY == false
+                                && IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd
+                                && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
                     }
                     /*      agent {
                               dockerfile {
