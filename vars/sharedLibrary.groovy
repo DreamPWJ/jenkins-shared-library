@@ -100,7 +100,7 @@ def call(String type = 'web-java', Map map) {
                 )
                 // pollSCM('H/1 * * * *') // 每分钟判断一次代码是否存在变化 有变化就执行
                 // cron('H * * * *')      // 每隔1小时执行一次
-                // cron('0 2 * * *')      // 每天几点执行
+                // cron('H 2 * * *')      // 每天几点执行
             }
 
             options {
