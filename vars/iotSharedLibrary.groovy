@@ -376,7 +376,7 @@ def call(String type = 'iot', Map map) {
             }
         }
 
-    } else if (type == "iot-2") {  // 注意！！！ 差异性较大的Pipeline建议区分groovy文件维护
+    } else if (type == "iot-2") {  // 同类型流水线不同阶段判断执行  但差异性较大的Pipeline建议区分groovy文件维护
 
     }
 

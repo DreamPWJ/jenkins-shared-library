@@ -521,7 +521,7 @@ def call(String type = 'web', Map map) {
             }
         }
 
-    } else if (type == "web-2") {  // 注意！！！ 差异性较大的Pipeline建议区分groovy文件维护
+    } else if (type == "web-2") {  // 同类型流水线不同阶段判断执行  但差异性较大的Pipeline建议区分groovy文件维护
 
     }
 }
