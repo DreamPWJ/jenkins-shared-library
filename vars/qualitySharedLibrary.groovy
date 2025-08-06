@@ -334,12 +334,12 @@ def call(String type = 'quality', Map map) {
                             }
                         }
                         stages {
-                            stage("${OS}Build") {
+                            stage("Build") {
                                 steps {
                                     echo "Do Build for ${OS} - ${BROWSER}"
                                 }
                             }
-                            stage("${BROWSER}Test") {
+                            stage("Test") {
                                 steps {
                                     echo "Do Test for ${OS} - ${BROWSER}"
                                 }
