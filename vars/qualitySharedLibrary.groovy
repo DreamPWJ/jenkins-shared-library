@@ -238,6 +238,20 @@ def call(String type = 'quality', Map map) {
                     }
                 }
 
+                stage('单元测试') {
+                    when {
+                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            return true
+                        }
+                    }
+                    steps {
+                        script {
+
+                        }
+                    }
+                }
+
                 stage('JavaScript构建') {
                     when {
                         beforeAgent true
@@ -303,39 +317,6 @@ def call(String type = 'quality', Map map) {
                                     }
                                 }
                             }
-                        }
-                    }
-                }
-
-                stage('Python构建') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) }
-                    }
-                    steps {
-                        script {
-                            /*   if (IS_DOCKER_BUILD == true) {
-                                   // Python需要交叉编译 不同系统部署使用不同系统环境打包 如Windows使用 cdrx/pyinstaller-windows
-                                   docker.image("cdrx/pyinstaller-linux:python3").inside {
-                                       pythonBuildProject(map)
-                                   }
-                               } else {*/
-                            pythonBuildProject(map)
-                            //  }
-                        }
-                    }
-                }
-
-                stage('制作镜像') {
-                    when {
-                        beforeAgent true
-                        expression { return ("${IS_PUSH_DOCKER_REPO}" == 'true') }
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                    }
-                    steps {
-                        script {
-                            buildImage(map)
                         }
                     }
                 }
@@ -748,10 +729,7 @@ def initInfo() {
     if (!isUnix()) {
         error("当前脚本针对Unix(如Linux或MacOS)系统 脚本执行失败 ❌")
     }
-    //echo sh(returnStdout: true, script: 'env')
-    //sh 'printenv'
-    //println "${env.PATH}"
-    //println currentBuild
+
     try {
         echo "$git_event_name"  // 如 push
         IS_AUTO_TRIGGER = true
@@ -1210,41 +1188,6 @@ def gradleBuildProject(map) {
     }
 }
 
-/**
- * Python编译构建
- */
-def pythonBuildProject(map) {
-    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
-        // 压缩源码文件 加速传输
-        Python.codePackage(this)
-    }
-    Tools.printColor(this, "Python语言构建成功 ✅")
-}
-
-
-/**
- * 制作镜像
- * 可通过ssh在不同机器上构建镜像
- */
-def buildImage(map) {
-    // Docker多阶段镜像构建处理
-    Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
-    // 构建并上传Docker镜像仓库  只构建一次
-    retry(2) { // 重试几次 可能网络等问题导致构建失败
-        Docker.build(this, "${dockerImageName}")
-    }
-    // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
-    if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-        def deployNum = 2  // 暂时区分两个不同环境文件 实际还存在每一个部署服务的环境配置文件都不一样
-        docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-            mavenBuildProject(map, deployNum) // 需要mvn jdk构建环境
-        }
-        // Docker多阶段镜像构建处理
-        Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
-        // 构建并上传Docker镜像仓库  多节点部署只构建一次
-        Docker.build(this, "${dockerImageName}", deployNum)
-    }
-}
 
 /**
  * 上传部署文件到OSS
