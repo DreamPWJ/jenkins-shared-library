@@ -181,7 +181,7 @@ def call(String type = 'web-java', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                    failFast true         //表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
+                    failFast true         // true表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
                     parallel {  // 并发构建步骤
                         stage('CI/CD代码') {
                             steps {

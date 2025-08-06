@@ -180,7 +180,7 @@ def call(String type = 'quality', Map map) {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                     }
-                    failFast true         //表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
+                    failFast true         // true表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
                     parallel {  // 并发构建步骤
                         stage('CI/CD代码') {
                             steps {
@@ -215,12 +215,6 @@ def call(String type = 'quality', Map map) {
                         }
                     }
                     agent {
-                        // label "node-3"  // 执行节点 分布式执行 可在不同服务上执行不同任务
-                        /*   docker {
-                               // sonarqube环境  构建完成自动删除容器
-                               image "sonarqube:community"
-                               reuseNode true // 使用根节点
-                           }*/
                         docker {
                             // js、jvm、php、jvm-android、go、python、php。 jvm-community是免费版
                             image "jetbrains/${qodanaImagesName}:latest" // 设置镜像类型和版本号 latest
@@ -381,14 +375,37 @@ def call(String type = 'quality', Map map) {
                                     && "${AUTO_TEST_PARAM}" != "" && IS_BLUE_GREEN_DEPLOY == false)
                         }
                     }
-                    steps {
-                        script {
-                            integrationTesting(map)
+                    failFast false         // true表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
+                    parallel {  // 并发构建步骤
+                        stage('集成测试') {
+                            steps {
+                                    integrationTesting(map)
+                            }
+                        }
+                        stage('性能测试') {
+                            steps {
+                                echo "性能测试"
+                            }
+                        }
+                        stage('安全测试') {
+                            steps {
+                                echo "安全测试"
+                            }
+                        }
+                        stage('UI测试') {
+                            steps {
+                                echo "UI测试"
+                            }
+                        }
+                        stage('冒烟测试') {
+                            steps {
+                                echo "冒烟测试"
+                            }
                         }
                     }
                 }
 
-                stage('钉钉通知') {
+                stage('质量报告') {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
@@ -402,33 +419,7 @@ def call(String type = 'quality', Map map) {
                         }
                     }
                 }
-
-                stage('发布日志') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                    }
-                    steps {
-                        script {
-                            // 钉钉通知变更记录
-                            dingNotice(map, 3)
-                        }
-                    }
-                }
-
-                stage('制品仓库') {
-                    when {
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return false  // 是否进行制品仓库
-                        }
-                    }
-                    steps {
-                        script {
-                            productsWarehouse(map)
-                        }
-                    }
-                }
+                
 
                 stage('成品归档') {
                     when {
@@ -1531,26 +1522,6 @@ def genQRCode(map) {
             println error.getMessage()
         }
     }
-}
-
-/**
- * 制品仓库版本管理 如Maven、Npm、Docker等以及通用仓库版本上传 支持大型项目复杂依赖关系
- */
-def productsWarehouse(map) {
-    //  1. Maven与Gradle仓库  2. Npm仓库  3. Docker镜像仓库  4. 通用OSS仓库
-
-    // Maven与Gradle制品仓库
-    // Maven.uploadWarehouse(this)
-
-    // Npm制品仓库
-    // Node.uploadWarehouse(this)
-
-    // Docker制品仓库
-    // Docker.push(this)
-
-    // 通用OSS制品仓库
-    // AliYunOSS.upload(this, map)
-
 }
 
 /**
