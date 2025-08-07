@@ -299,20 +299,22 @@ def call(String type = 'quality', Map map) {
                         }
                         stage('冒烟测试') {
                             steps {
-                                stage('冒烟测试-1') {
-                                    steps {
-                                        echo "冒烟测试-1"
-                                        sleep 1
+                                script {
+                                    stage('冒烟测试-1') {
+                                        steps {
+                                            echo "冒烟测试-1"
+                                            sleep 1
+                                        }
                                     }
-                                }
-                                stage('冒烟测试-2') {
-                                    steps {
-                                        // 只显示当前阶段stage失败  而整个流水线构建显示成功
-                                        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                                            script {
-                                                echo "冒烟测试-2"
-                                                sleep 3
-                                                error("测试冒烟测试报错中断 ❌")
+                                    stage('冒烟测试-2') {
+                                        steps {
+                                            // 只显示当前阶段stage失败  而整个流水线构建显示成功
+                                            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                                script {
+                                                    echo "冒烟测试-2"
+                                                    sleep 3
+                                                    error("测试冒烟测试报错中断 ❌")
+                                                }
                                             }
                                         }
                                     }
