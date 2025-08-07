@@ -21,18 +21,18 @@ class Qodana implements Serializable {
     static def analyse(ctx, map) {
         ctx.println("Qodana开始扫描分析代码质量 ... 🔍")
 
-        // 读取结果json文件
-        def metaInfoFile = ctx.readFile(file: "${qodanaReportDir}/metaInformation.json")
-        def metaInfo = ctx.readJSON text: "${metaInfoFile}"
-        def problemsNum = metaInfo.total
-        ctx.println("总共问题数: " + problemsNum)
-
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
         def qodanaYamlPath = "${ctx.env.WORKSPACE}/ci/_jenkins/qodana/" // Qodana YAML 配置文件路径
         def isCodeDiff = false // 是否增量代码检测
         def isFailThreshold = true // 是否设置质量阈值
         def isApplyFixes = false // 是否自动修复  社区版不支持高级功能
         def earliestCommit = null  // 变更记录
+
+        // 读取结果json文件
+        def metaInfoFile = ctx.readFile(file: "${qodanaReportDir}/metaInformation.json")
+        def metaInfo = ctx.readJSON text: "${metaInfoFile}"
+        def problemsNum = metaInfo.total
+        ctx.println("总共问题数: " + problemsNum)
 
         if (isCodeDiff) { // 是否增量代码检测
             // 获取jenkins变更记录 用于增量代码分析 从父提交到当前提交的代码变更
