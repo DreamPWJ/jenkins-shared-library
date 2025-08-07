@@ -236,7 +236,7 @@ def call(String type = 'experiment', Map map) {
                 success {
                     script {
                         echo '当前成功时运行'
-
+                        JenkinsCI.triggerUpstreamJob(this, "quality-pipeline")
                     }
                 }
                 failure {
@@ -700,8 +700,6 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
-
-    JenkinsCI.triggerUpstreamJob(this, "quality-pipeline")
 
     println("构建机器名称: ${NODE_NAME}")
     println("仓库地址: ${REPO_URL}")

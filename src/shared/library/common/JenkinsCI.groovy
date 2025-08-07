@@ -81,9 +81,9 @@ class JenkinsCI implements Serializable {
         // 当上一个job构建完成自动执行下游job  上下job动态参数传递
         def nextJob = ctx.build job: "${nextJobName}",
                 parameters: [
-                        ctx.booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', value: false)
+                        ctx.booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', value: ctx.params.IS_CODE_QUALITY_ANALYSIS)
                 ],
-                wait: true  // 是否等待子流水线完成后执行，默认为true, false异步并行触发
+                wait: false  // 是否等待子流水线完成，默认为true, false异步并行触发
         ctx.println nextJob.getResult()
     }
 
