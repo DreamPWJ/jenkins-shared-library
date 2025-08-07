@@ -543,7 +543,6 @@ def call(String type = 'quality', Map map) {
                         echo '当前成功时运行'
                         currentBuild.result = 'SUCCESS'  // 显式设置构建结果
                         deletePackagedOutput()
-                        //deployMultiEnv()
                     }
                 }
                 failure {

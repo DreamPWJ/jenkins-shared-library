@@ -719,7 +719,6 @@ def call(String type = 'web-java', Map map) {
                         echo '当前成功时运行'
                         currentBuild.result = 'SUCCESS'  // 显式设置构建结果
                         deletePackagedOutput()
-                        //deployMultiEnv()
                     }
                 }
                 failure {
@@ -2198,20 +2197,6 @@ def gitTagLog() {
         tagVersion = params.GIT_TAG
     }
     // 非生产环境下也需要回滚版本 所以需要打tag版本 如 1.0.0-beta 或者 0.x.y 等
-}
-
-/**
- * 同时构建部署多环境
- */
-def deployMultiEnv() {
-    currentBuild.result = "SUCCESS"
-    if (params.IS_DEPLOY_MULTI_ENV == true) {
-        // 注意流水线开启并发构建 会影响下一个嵌套任务运行
-        jobDevEnv = build job: "${PROJECT_NAME}-dev"
-        println jobDevEnv.getResult()
-        jobTestEnv = build job: "${PROJECT_NAME}-test"
-        println jobTestEnv.getResult()
-    }
 }
 
 /**

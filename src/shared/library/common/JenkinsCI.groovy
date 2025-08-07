@@ -73,6 +73,22 @@ class JenkinsCI implements Serializable {
     }
 
     /**
+     * 上下游job关联构建
+     */
+    static def triggerUpstreamJob(ctx) {
+        // 当上一个job构建完成自动执行下游job 动态传入参数
+        def nextJobName =  "quality-pipeline-job" // 下游job名称
+        def jobDevEnv = ctx.build job: "${nextJobName}",
+                parameters: [
+                string(name: 'DEPLOY_ENV', value: 'production'),
+                choice(name: 'BUILD_TYPE', choices: ['release', 'debug', 'testing'], description: '选择构建类型'),
+                booleanParam(name: 'DRY_RUN', value: true)
+        ],
+        wait: true  // 是否等待子流水线完成后执行，默认为true, false异步并行触发
+        ctx.println jobDevEnv.getResult()
+    }
+
+    /**
      * 获取当前job信息
      */
     @NonCPS
