@@ -28,12 +28,6 @@ class Qodana implements Serializable {
         def isApplyFixes = false // 是否自动修复  社区版不支持高级功能
         def earliestCommit = null  // 变更记录
 
-        // 读取结果json文件
-        def metaInfoFile = ctx.readFile(file: "${qodanaReportDir}/results/metaInformation.json")
-        def metaInfo = ctx.readJSON text: "${metaInfoFile}"
-        def problemsNum = metaInfo.total
-        ctx.println("总共问题数: " + problemsNum)
-
         if (isCodeDiff) { // 是否增量代码检测
             // 获取jenkins变更记录 用于增量代码分析 从父提交到当前提交的代码变更
             earliestCommit = ctx.sh(script: 'git rev-parse HEAD^', returnStdout: true).trim()
@@ -115,11 +109,18 @@ class Qodana implements Serializable {
         // 归档生成的报告文件
         // ctx.archiveArtifacts artifacts: "${qodanaReportDir}/**", allowEmptyArchive: true
 
+        // 读取结果json文件
+        def metaInfoFile = ctx.readFile(file: "${qodanaReportDir}/results/metaInformation.json")
+        def metaInfo = ctx.readJSON text: "${metaInfoFile}"
+        def problemsNum = metaInfo.total
+        ctx.println("总共质量问题数: " + problemsNum)
+
         // 钉钉通知质量报告 形成信息闭环
-        if (ctx.params.IS_DING_NOTICE == true) {  // 是否钉钉通知
+        if (ctx.params.IS_DING_NOTICE == true && problemsNum > 0) {  // 是否钉钉通知
             DingTalk.noticeMarkDown(ctx, map.ding_talk_credentials_ids, "静态代码分析质量报告", "![screenshot](https://blog.jetbrains.com/wp-content/uploads/2022/06/DSGN-13163-Static-analysis-with-Qodana-banners_featured.png) \n"
                     + "### 静态代码分析质量报告 ${ctx.env.JOB_NAME} ${ctx.PROJECT_TAG}  📑"
                     + "\n #### 代码质量分析结果: [查看报表](${ctx.env.JOB_URL}${reportName}) 📈"
+                    + "\n #### 扫描总共质量问题数: <font color=red>${problemsNum}</font> "
                     + "\n 持续交付可读、易维护和安全的高质量代码 ✨ "
                     + "\n ###### 执行人: ${ctx.BUILD_USER} \n ###### 完成时间: ${Utils.formatDate()} (${Utils.getWeek(ctx)})", "")
         }
