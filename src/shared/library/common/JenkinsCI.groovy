@@ -79,12 +79,12 @@ class JenkinsCI implements Serializable {
     @NonCPS
     static def triggerUpstreamJob(ctx, nextJobName) {
         // 当上一个job构建完成自动执行下游job  上下job动态参数传递
-        def jobDevEnv = ctx.build job: "${nextJobName}",
+        def nextJob = ctx.build job: "${nextJobName}",
                 parameters: [
-                        booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', value: false)
+                        ctx.booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', value: false)
                 ],
                 wait: true  // 是否等待子流水线完成后执行，默认为true, false异步并行触发
-        ctx.println jobDevEnv.getResult()
+        ctx.println nextJob.getResult()
     }
 
     /**
