@@ -29,7 +29,7 @@ class Qodana implements Serializable {
         def earliestCommit = null  // 变更记录
 
         // 读取结果json文件
-        def metaInfoFile = ctx.readFile(file: "${qodanaReportDir}/metaInformation.json")
+        def metaInfoFile = ctx.readFile(file: "${qodanaReportDir}/results/metaInformation.json")
         def metaInfo = ctx.readJSON text: "${metaInfoFile}"
         def problemsNum = metaInfo.total
         ctx.println("总共问题数: " + problemsNum)
