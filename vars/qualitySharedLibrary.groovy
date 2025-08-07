@@ -270,13 +270,13 @@ def call(String type = 'quality', Map map) {
                             steps {
                                 echo "集成测试"
                                 // integrationTesting(map)
-                                sleep 3
+                                sleep 2
                             }
                         }
                         stage('性能测试') {
                             steps {
                                 echo "性能测试"
-                                sleep 5
+                                sleep 4
                             }
                         }
                         stage('安全测试') {
@@ -288,7 +288,7 @@ def call(String type = 'quality', Map map) {
                             }
                             steps {
                                 echo "安全测试"
-                                sleep 3
+                                sleep 2
                             }
                         }
                         stage('UI测试') {
@@ -297,7 +297,7 @@ def call(String type = 'quality', Map map) {
                                 sleep 6
                             }
                         }
-                        stage('冒烟测试') {
+                        stage('') {
                             steps {
                                 script {
                                     stage('冒烟测试-1') {
@@ -309,7 +309,7 @@ def call(String type = 'quality', Map map) {
                                         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                                             script {
                                                 echo "冒烟测试-2"
-                                                sleep 3
+                                                sleep 1
                                                 error("测试冒烟测试报错中断 ❌")
                                             }
                                         }
