@@ -31,6 +31,9 @@ class Qodana implements Serializable {
         if (isCodeDiff) { // 是否增量代码检测
             // 获取jenkins变更记录 用于增量代码分析 从父提交到当前提交的代码变更
             earliestCommit = ctx.sh(script: 'git rev-parse HEAD^', returnStdout: true).trim()
+            if(earliestCommit == null || earliestCommit == ""){
+                return // 无代码变更 不再执行
+            }
         }
 
         // 如果需要连接Qodana Cloud服务需要访问token  非社区版都需要Qodana Cloud配合
