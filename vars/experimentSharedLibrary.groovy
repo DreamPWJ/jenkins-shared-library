@@ -235,7 +235,7 @@ def call(String type = 'experiment', Map map) {
                 success {
                     script {
                         echo '当前成功时运行'
-                        // JenkinsCI.triggerUpstreamJob(this, "quality-pipeline")
+                        JenkinsCI.triggerUpstreamJob(this, "quality-pipeline")
                     }
                 }
                 failure {

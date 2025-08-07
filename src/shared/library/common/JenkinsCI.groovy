@@ -83,7 +83,8 @@ class JenkinsCI implements Serializable {
             def isWait = false // 是否等待子流水线完成后 上游才算完成
             def nextJob = ctx.build job: "${nextJobName}",
                     parameters: [
-                            ctx.booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', value: ctx.params.IS_CODE_QUALITY_ANALYSIS)
+                            ctx.booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', value: ctx.params.IS_CODE_QUALITY_ANALYSIS),
+                            ctx.booleanParam(name: 'IS_DING_NOTICE', value: ctx.params.IS_DING_NOTICE),
                     ],
                     wait: isWait  // 是否等待子流水线完成，默认为true, 解耦false异步并行触发
             if (isWait) {
