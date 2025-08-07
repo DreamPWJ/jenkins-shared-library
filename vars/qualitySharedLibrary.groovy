@@ -299,9 +299,11 @@ def call(String type = 'quality', Map map) {
                         }
                         stage('冒烟测试') {
                             steps {
-                                echo "冒烟测试"
-                                sleep 3
-                                error("测试报错中断 ❌")
+                                script {
+                                    echo "冒烟测试"
+                                    sleep 3
+                                    error("测试报错中断 ❌")
+                                }
                             }
                         }
                     }
@@ -383,15 +385,19 @@ def call(String type = 'quality', Map map) {
                         stages {
                             stage("Build") {
                                 steps {
-                                    echo "Do Build for ${PLATFORM} - ${BROWSER}"
+                                    script {
+                                        echo "Do Build for ${PLATFORM} - ${BROWSER}"
+                                    }
                                 }
                             }
                             stage("Test") {
                                 steps {
-                                    def  matrixName="${PLATFORM}-${BROWSER}"
-                                    echo "Do Test for ${matrixName}"
-                                    if ("${matrixName}".toString() == "Linux-Edge") {
-                                        error("测试报错中断 ❌")
+                                    script {
+                                        def matrixName = "${PLATFORM}-${BROWSER}"
+                                        echo "Do Test for ${matrixName}"
+                                        if ("${matrixName}".toString() == "Linux-Edge") {
+                                            error("测试报错中断 ❌")
+                                        }
                                     }
                                 }
                             }
