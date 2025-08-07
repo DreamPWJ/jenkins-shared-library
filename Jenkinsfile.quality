@@ -131,7 +131,7 @@ JSON_PARAMS:
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "iot-car-lock-app" ,
    "SHELL_PARAMS" : "iot-car-lock-app test 8185 8178 sit",
-   "MAVEN_ONE_LEVEL" : "iot-car-lock",
+   "MAVEN_ONE_LEVEL" : "iot-car-lock"
 }
 
 */
