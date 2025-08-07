@@ -241,8 +241,10 @@ def call(String type = 'quality', Map map) {
                     }
                     steps {
                         script {
-                            echo '单元测试'
-                            Tests.createJUnitReport(this)
+                            script {
+                                echo '单元测试'
+                                Tests.createJUnitReport(this)
+                            }
                         }
                     }
                 }
@@ -269,16 +271,20 @@ def call(String type = 'quality', Map map) {
                     parallel {  // 并发构建步骤
                         stage('集成测试') {
                             steps {
-                                echo "集成测试"
-                                // integrationTesting(map)
-                                sleep 2
+                                script {
+                                    echo "集成测试"
+                                    // integrationTesting(map)
+                                    sleep 2
+                                }
                             }
                         }
                         stage('性能测试') {
                             steps {
-                                echo "性能测试"
-                                sleep 4
-                                Tests.createJMeterReport(this)
+                                script {
+                                    echo "性能测试"
+                                    sleep 4
+                                    Tests.createJMeterReport(this)
+                                }
                             }
                         }
                         stage('安全测试') {
@@ -289,15 +295,19 @@ def call(String type = 'quality', Map map) {
                                 }
                             }
                             steps {
-                                echo "安全测试"
-                                sleep 2
-                                Tests.createSecurityReport(this)
+                                script {
+                                    echo "安全测试"
+                                    sleep 2
+                                    Tests.createSecurityReport(this)
+                                }
                             }
                         }
                         stage('UI测试') {
                             steps {
-                                echo "UI测试"
-                                sleep 6
+                                script {
+                                    echo "UI测试"
+                                    sleep 6
+                                }
                             }
                         }
                         stage('冒烟') {
