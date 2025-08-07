@@ -48,7 +48,7 @@ class Qodana implements Serializable {
         }
         if ("${ctx.COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) { // 自定义yaml检测规则文件
             qodanaParams = qodanaParams + " --config " + qodanaYamlPath + "qodana.yaml"
-            def mavenOneLevel = "${map.maven_one_level}".trim() != "" ? "${map.maven_one_level}/" : "${map.maven_one_level}".trim()
+            def mavenOneLevel = "${ctx.MAVEN_ONE_LEVEL}".trim() != "" ? "${ctx.MAVEN_ONE_LEVEL}/" : "${ctx.MAVEN_ONE_LEVEL}".trim()
             // 实际要扫描的项目的路径
             qodanaParams = qodanaParams + " --project-dir ${ctx.env.WORKSPACE}/${mavenOneLevel}${ctx.PROJECT_NAME} "
         }

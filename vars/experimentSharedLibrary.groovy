@@ -139,7 +139,6 @@ def call(String type = 'experiment', Map map) {
                 DEPLOY_FOLDER = "${map.deploy_folder}" // 服务器上部署所在的文件夹名称
                 NPM_PACKAGE_FOLDER = "${map.npm_package_folder}" // Web项目NPM打包代码所在的文件夹名称
                 WEB_STRIP_COMPONENTS = "${map.web_strip_components}" // Web项目解压到指定目录层级
-                MAVEN_ONE_LEVEL = "${map.maven_one_level}" // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
                 DOCKER_JAVA_OPTS = "${map.docker_java_opts}" // JVM内存设置
                 DOCKER_MEMORY = "${map.docker_memory}" // 容器最大内存限制 不支持小数点形式设置
                 DOCKER_LOG_OPTS = "${map.docker_log_opts}" // docker日志限制
@@ -310,6 +309,8 @@ def getInitParams(map) {
     // npm包管理工具类型 如:  npm、yarn、pnpm
     env.NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
     env.NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [build]的前端项目参数
+    // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
+    env.MAVEN_ONE_LEVEL = jsonParams.MAVEN_ONE_LEVEL ? jsonParams.MAVEN_ONE_LEVEL.trim() : "${map.maven_one_level}"
 
     env.IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
     // 是否Maven单模块代码
