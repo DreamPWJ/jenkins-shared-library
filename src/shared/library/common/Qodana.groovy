@@ -109,6 +109,12 @@ class Qodana implements Serializable {
         // 归档生成的报告文件
         // ctx.archiveArtifacts artifacts: "${qodanaReportDir}/**", allowEmptyArchive: true
 
+        // 读取结果json文件
+        def metaInfoFile = ctx.readFile(file: "${qodanaReportDir}/metaInformation.json")
+        def metaInfo = ctx.readJSON text: "${metaInfoFile}"
+        def problemsNum = metaInfo.total
+        ctx.println("总共问题数: " + problemsNum)
+
         // 钉钉通知质量报告 形成信息闭环
         if (ctx.params.IS_DING_NOTICE == true) {  // 是否钉钉通知
             DingTalk.noticeMarkDown(ctx, map.ding_talk_credentials_ids, "静态代码分析质量报告", "![screenshot](https://blog.jetbrains.com/wp-content/uploads/2022/06/DSGN-13163-Static-analysis-with-Qodana-banners_featured.png) \n"
