@@ -242,6 +242,7 @@ def call(String type = 'quality', Map map) {
                     steps {
                         script {
                             echo '单元测试'
+                            Tests.createJUnitReport(this)
                         }
                     }
                 }
@@ -277,6 +278,7 @@ def call(String type = 'quality', Map map) {
                             steps {
                                 echo "性能测试"
                                 sleep 4
+                                Tests.createJMeterReport(this)
                             }
                         }
                         stage('安全测试') {
@@ -289,6 +291,7 @@ def call(String type = 'quality', Map map) {
                             steps {
                                 echo "安全测试"
                                 sleep 2
+                                Tests.createSecurityReport(this)
                             }
                         }
                         stage('UI测试') {
@@ -303,6 +306,7 @@ def call(String type = 'quality', Map map) {
                                     stage('冒烟测试-1') {
                                         echo "冒烟测试-1"
                                         sleep 1
+                                        Tests.createSmokeReport(this)
                                     }
                                     stage('冒烟测试-2') {
                                         // 只显示当前阶段stage失败  而整个流水线构建显示成功
@@ -357,7 +361,7 @@ def call(String type = 'quality', Map map) {
                                     script {
                                         stage("${PLATFORM}-${BROWSER}-Build") {
                                             def matrixName = "${PLATFORM}-${BROWSER}"
-                                            if("${matrixName}" != "Linux-Safari" && "${matrixName}" != "Mac-Edge" && "${matrixName}" != "Windows-Safari"){
+                                            if ("${matrixName}" != "Linux-Safari" && "${matrixName}" != "Mac-Edge" && "${matrixName}" != "Windows-Safari") {
                                                 echo "Do Build for ${matrixName}"
                                             }
                                         }

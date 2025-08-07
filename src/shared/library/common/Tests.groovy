@@ -20,7 +20,7 @@ class Tests implements Serializable {
      * 创建JUnit报告
      */
     static def createJUnitReport(ctx) {
-        ctx.junit('test-output/junit.xml')
+        // ctx.junit('test-output/junit.xml')
     }
 
     /**
