@@ -332,6 +332,46 @@ def call(String type = 'quality', Map map) {
                                 name 'BROWSER'
                                 values 'Chrome', 'Firefox', 'Safari', 'Edge'
                             }
+                    /*        axis {
+                                name 'ARCHITECTURE'
+                                values '32-bit', '64-bit'
+                            }*/
+                        }
+                        excludes {
+                            exclude {
+                                axis {
+                                    name 'PLATFORM'
+                                    values 'Windows'
+                                }
+                                axis {
+                                    name 'BROWSER'
+                                    values 'Safari'
+                                }
+                            }
+                            exclude {
+                                axis {
+                                    name 'PLATFORM'
+                                    values 'Mac'
+                                }
+                                axis {
+                                    name 'BROWSER'
+                                    values 'Edge'
+                                }
+                            }
+                            exclude {
+                                axis {
+                                    name 'PLATFORM'
+                                    values 'Linux'
+                                }
+                                axis {
+                                    name 'BROWSER'
+                                    values 'Safari'
+                                }
+                                axis {
+                                    name 'BROWSER'
+                                    values 'Edge'
+                                }
+                            }
                         }
                         stages {
                             stage("Build") {
