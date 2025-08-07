@@ -21,6 +21,12 @@ class Qodana implements Serializable {
     static def analyse(ctx, map) {
         ctx.println("Qodana开始扫描分析代码质量 ... 🔍")
 
+        // 读取结果json文件
+        def metaInfoFile = ctx.readFile(file: "${qodanaReportDir}/metaInformation.json")
+        def metaInfo = ctx.readJSON text: "${metaInfoFile}"
+        def problemsNum = metaInfo.total
+        ctx.println("总共问题数: " + problemsNum)
+
         def qodanaReportDir = "${ctx.env.WORKSPACE}/qodana-report"
         def qodanaYamlPath = "${ctx.env.WORKSPACE}/ci/_jenkins/qodana/" // Qodana YAML 配置文件路径
         def isCodeDiff = false // 是否增量代码检测
@@ -108,12 +114,6 @@ class Qodana implements Serializable {
 
         // 归档生成的报告文件
         // ctx.archiveArtifacts artifacts: "${qodanaReportDir}/**", allowEmptyArchive: true
-
-        // 读取结果json文件
-        def metaInfoFile = ctx.readFile(file: "${qodanaReportDir}/metaInformation.json")
-        def metaInfo = ctx.readJSON text: "${metaInfoFile}"
-        def problemsNum = metaInfo.total
-        ctx.println("总共问题数: " + problemsNum)
 
         // 钉钉通知质量报告 形成信息闭环
         if (ctx.params.IS_DING_NOTICE == true) {  // 是否钉钉通知
