@@ -249,7 +249,7 @@ def call(String type = 'quality', Map map) {
                     }
                 }
 
-                stage('并行多方向测试') {
+                stage('多类型测试-并行') {
                     when {
                         beforeAgent true
                         // 生产环境不进行集成测试 缩减构建时间
@@ -334,7 +334,7 @@ def call(String type = 'quality', Map map) {
                     }
                 }
 
-                stage('矩阵跨平台测试') {
+                stage('多平台测试-矩阵') {
                     when {
                         beforeAgent true
                         // 生产环境不进行集成测试 缩减构建时间
