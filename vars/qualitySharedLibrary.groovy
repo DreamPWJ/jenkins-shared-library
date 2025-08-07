@@ -294,115 +294,26 @@ def call(String type = 'quality', Map map) {
                         stage('UI测试') {
                             steps {
                                 echo "UI测试"
-                                sleep 6
+                                sleep 8
                             }
                         }
-                        stage('冒烟测试') {
-                            steps {
-                                // 只显示当前阶段stage失败  而整个流水线构建显示成功
-                                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                                    script {
-                                        echo "冒烟测试"
-                                        sleep 3
-                                        error("测试冒烟测试报错中断 ❌")
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                stage('跨平台矩阵测试') {
-                    when {
-                        beforeAgent true
-                        // 生产环境不进行集成测试 缩减构建时间
-                        not {
-                            anyOf {
-                                branch 'master'
-                                branch 'prod'
-                            }
-                        }
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return true
-                        }
-                    }
-                    matrix {
-                        agent any
-                        axes {
-                            axis {
-                                name 'PLATFORM'
-                                values 'Linux', 'Windows', 'Mac'
-                            }
-                            axis {
-                                name 'BROWSER'
-                                values 'Chrome', 'Firefox', 'Safari', 'Edge'
-                            }
-                            /*        axis {
-                                        name 'ARCHITECTURE'
-                                        values '32-bit', '64-bit'
-                                    }*/
-                        }
-                        /*  excludes {
-                              exclude {
-                                  axis {
-                                      name 'PLATFORM'
-                                      values 'Windows'
-                                  }
-                                  axis {
-                                      name 'BROWSER'
-                                      values 'Safari'
-                                  }
-                              }
-                              exclude {
-                                  axis {
-                                      name 'PLATFORM'
-                                      values 'Mac'
-                                  }
-                                  axis {
-                                      name 'BROWSER'
-                                      values 'Edge'
-                                  }
-                              }
-                              exclude {
-                                  axis {
-                                      name 'PLATFORM'
-                                      values 'Linux'
-                                  }
-                                  axis {
-                                      name 'BROWSER'
-                                      values 'Safari'
-                                  }
-                              }
-                              exclude {
-                                  axis {
-                                      name 'PLATFORM'
-                                      values 'Linux'
-                                  }
-                                  axis {
-                                      name 'BROWSER'
-                                      values 'Edge'
-                                  }
-                              }
-                          }*/
-                        stages {
-                            stage("Build") {
+                        steps {
+                            stage('非冒烟测试') {
                                 steps {
                                     script {
-                                        echo "Do Build for ${PLATFORM} - ${BROWSER}"
+                                        echo "非冒烟测试"
+                                        sleep 1
                                     }
                                 }
                             }
-                            stage("Test") {
+                            stage('冒烟测试') {
                                 steps {
                                     // 只显示当前阶段stage失败  而整个流水线构建显示成功
                                     catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                                         script {
-                                            def matrixName = "${PLATFORM}-${BROWSER}"
-                                            echo "Do Test for ${matrixName}"
-                                            if ("${matrixName}".toString() == "Linux-Edge") {
-                                                error("测试跨平台矩阵报错中断 ❌")
-                                            }
+                                            echo "冒烟测试"
+                                            sleep 3
+                                            error("测试冒烟测试报错中断 ❌")
                                         }
                                     }
                                 }
@@ -410,200 +321,302 @@ def call(String type = 'quality', Map map) {
                         }
                     }
                 }
-
-                stage('质量报告') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return true }
-                    }
-                    steps {
-                        script {
-                            if ("${params.IS_DING_NOTICE}" == 'true' && params.IS_HEALTH_CHECK == false) {
-                                dingNotice(map, 1, "**成功 ✅**")
-                            }
-                        }
-                    }
-                }
-
-                stage('JavaScript构建') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return (IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) }
-                    }
-                    steps {
-                        script {
-                            // echo "Docker环境内Node构建方式"
-                            def nodeVersion = "${NODE_VERSION.replace('Node', '')}"
-                            def dockerImageName = "panweiji/node-build"
-                            def dockerImageTag = "${nodeVersion}"
-                            Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
-                            docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
-                                nodeBuildProject(map)
-                            }
-                        }
-                    }
-                }
-
-                stage('Java构建') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return (IS_SOURCE_CODE_DEPLOY == false && IS_PACKAGE_DEPLOY == false
-                                    && IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd
-                                    && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java && false)
-                        }
-                    }
-                    steps {
-                        script {
-                            // Gradle构建方式
-                            if (IS_GRADLE_BUILD == true) {
-                                def gradleVersion = "8" // Gradle版本 要动态配置
-                                def jdkVersion = "${JDK_VERSION}"
-                                def dockerImageName = "gradle"
-                                def dockerImageTag = "$gradleVersion-jdk$jdkVersion"
-                                docker.image("${dockerImageName}:${dockerImageTag}").inside("-v $HOME/.gradle:/root/.gradle -v $HOME/.gradle:/home/gradle/.gradle") {
-                                    gradleBuildProject(map)
-                                }
-                            } else {
-                                if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
-                                    // mvnd支持条件
-                                    def mvndVersion = "1.0.2"  // Mvnd版本 要动态配置
-                                    def jdkVersion = "${JDK_VERSION}"
-                                    def dockerImageName = "panweiji/mvnd-jdk"
-                                    def dockerImageTag = "${mvndVersion}-${jdkVersion}"
-                                    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk", dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}")
-                                    docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-                                        mavenBuildProject(map, 0, "mvnd")
-                                    }
-                                } else {
-                                    docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-                                        mavenBuildProject(map)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                stage('上传代码包') {
-                    when {
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return (IS_K8S_DEPLOY == false && false)  // k8s集群部署 镜像方式无需上传到服务器
-                        }
-                    }
-                    steps {
-                        script {
-                            uploadRemote(Utils.getShEchoResult(this, "pwd"), map)
-                        }
-                    }
-                }
-
-                stage('单机部署') {
-                    when {
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return (IS_BLUE_GREEN_DEPLOY == false && IS_K8S_DEPLOY == false && false)
-                            // 非蓝绿和k8s集群部署 都有单独步骤
-                        }
-                    }
-                    steps {
-                        script {
-                            runProject(map)
-                        }
-                    }
-                }
-
-                stage('健康探测') {
-                    when {
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return (params.IS_HEALTH_CHECK == true && IS_BLUE_GREEN_DEPLOY == false && false)
-                        }
-                    }
-                    steps {
-                        script {
-                            healthCheck(map)
-                        }
-                    }
-                }
-
-
-                stage('成品归档') {
-                    when {
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return ("${IS_ARCHIVE}" == 'true') // 是否归档
-                        }
-                    }
-                    steps {
-                        script {
-                            // 归档
-                            archive()
-                        }
-                    }
-                }
-
             }
 
-            // post包含整个pipeline或者stage阶段完成情况
-            post() {
-                always {
-                    script {
-                        echo '总是运行，无论成功、失败还是其他状态'
-                        alwaysPost()
+            stage('跨平台矩阵测试') {
+                when {
+                    beforeAgent true
+                    // 生产环境不进行集成测试 缩减构建时间
+                    not {
+                        anyOf {
+                            branch 'master'
+                            branch 'prod'
+                        }
+                    }
+                    environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                    expression {
+                        return true
                     }
                 }
-                success {
-                    script {
-                        echo '当前成功时运行'
-                        currentBuild.result = 'SUCCESS'  // 显式设置构建结果
-                        deletePackagedOutput()
-                        //deployMultiEnv()
+                matrix {
+                    agent any
+                    axes {
+                        axis {
+                            name 'PLATFORM'
+                            values 'Linux', 'Windows', 'Mac'
+                        }
+                        axis {
+                            name 'BROWSER'
+                            values 'Chrome', 'Firefox', 'Safari', 'Edge'
+                        }
+                        /*        axis {
+                                    name 'ARCHITECTURE'
+                                    values '32-bit', '64-bit'
+                                }*/
+                    }
+                    /*  excludes {
+                          exclude {
+                              axis {
+                                  name 'PLATFORM'
+                                  values 'Windows'
+                              }
+                              axis {
+                                  name 'BROWSER'
+                                  values 'Safari'
+                              }
+                          }
+                          exclude {
+                              axis {
+                                  name 'PLATFORM'
+                                  values 'Mac'
+                              }
+                              axis {
+                                  name 'BROWSER'
+                                  values 'Edge'
+                              }
+                          }
+                          exclude {
+                              axis {
+                                  name 'PLATFORM'
+                                  values 'Linux'
+                              }
+                              axis {
+                                  name 'BROWSER'
+                                  values 'Safari'
+                              }
+                          }
+                          exclude {
+                              axis {
+                                  name 'PLATFORM'
+                                  values 'Linux'
+                              }
+                              axis {
+                                  name 'BROWSER'
+                                  values 'Edge'
+                              }
+                          }
+                      }*/
+                    stages {
+                        stage("Build") {
+                            steps {
+                                script {
+                                    echo "Do Build for ${PLATFORM} - ${BROWSER}"
+                                }
+                            }
+                        }
+                        stage("Test") {
+                            steps {
+                                // 只显示当前阶段stage失败  而整个流水线构建显示成功
+                                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                    script {
+                                        def matrixName = "${PLATFORM}-${BROWSER}"
+                                        echo "Do Test for ${matrixName}"
+                                        if ("${matrixName}".toString() == "Linux-Edge") {
+                                            error("测试跨平台矩阵报错中断 ❌")
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
-                failure {
+            }
+
+            stage('质量报告') {
+                when {
+                    beforeAgent true
+                    environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                    expression { return true }
+                }
+                steps {
                     script {
-                        echo '当前失败时才运行'
-                        dingNotice(map, 0, "CI/CD流水线失败 ❌")
-                        // AI人工智能分析错误日志帮助人类解释与理解 插件: Explain Error Plugin
-                        // explainError()
+                        if ("${params.IS_DING_NOTICE}" == 'true' && params.IS_HEALTH_CHECK == false) {
+                            dingNotice(map, 1, "**成功 ✅**")
+                        }
                     }
                 }
-                unstable {
+            }
+
+            stage('JavaScript构建') {
+                when {
+                    beforeAgent true
+                    environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                    expression { return (IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) }
+                }
+                steps {
                     script {
-                        echo '不稳定状态时运行'
+                        // echo "Docker环境内Node构建方式"
+                        def nodeVersion = "${NODE_VERSION.replace('Node', '')}"
+                        def dockerImageName = "panweiji/node-build"
+                        def dockerImageTag = "${nodeVersion}"
+                        Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
+                        docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
+                            nodeBuildProject(map)
+                        }
                     }
                 }
-                aborted {
-                    script {
-                        echo '被终止时运行'
+            }
+
+            stage('Java构建') {
+                when {
+                    beforeAgent true
+                    environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                    expression {
+                        return (IS_SOURCE_CODE_DEPLOY == false && IS_PACKAGE_DEPLOY == false
+                                && IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd
+                                && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java && false)
                     }
                 }
-                changed {
+                steps {
                     script {
-                        echo '当前完成状态与上一次完成状态不同执行'
+                        // Gradle构建方式
+                        if (IS_GRADLE_BUILD == true) {
+                            def gradleVersion = "8" // Gradle版本 要动态配置
+                            def jdkVersion = "${JDK_VERSION}"
+                            def dockerImageName = "gradle"
+                            def dockerImageTag = "$gradleVersion-jdk$jdkVersion"
+                            docker.image("${dockerImageName}:${dockerImageTag}").inside("-v $HOME/.gradle:/root/.gradle -v $HOME/.gradle:/home/gradle/.gradle") {
+                                gradleBuildProject(map)
+                            }
+                        } else {
+                            if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
+                                // mvnd支持条件
+                                def mvndVersion = "1.0.2"  // Mvnd版本 要动态配置
+                                def jdkVersion = "${JDK_VERSION}"
+                                def dockerImageName = "panweiji/mvnd-jdk"
+                                def dockerImageTag = "${mvndVersion}-${jdkVersion}"
+                                Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk", dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}")
+                                docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+                                    mavenBuildProject(map, 0, "mvnd")
+                                }
+                            } else {
+                                docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+                                    mavenBuildProject(map)
+                                }
+                            }
+                        }
                     }
                 }
-                fixed {
-                    script {
-                        echo '上次完成状态为失败或不稳定,当前完成状态为成功时执行'
+            }
+
+            stage('上传代码包') {
+                when {
+                    environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                    expression {
+                        return (IS_K8S_DEPLOY == false && false)  // k8s集群部署 镜像方式无需上传到服务器
                     }
                 }
-                regression {
+                steps {
                     script {
-                        echo '上次完成状态为成功,当前完成状态为失败、不稳定或中止时执行'
+                        uploadRemote(Utils.getShEchoResult(this, "pwd"), map)
                     }
+                }
+            }
+
+            stage('单机部署') {
+                when {
+                    environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                    expression {
+                        return (IS_BLUE_GREEN_DEPLOY == false && IS_K8S_DEPLOY == false && false)
+                        // 非蓝绿和k8s集群部署 都有单独步骤
+                    }
+                }
+                steps {
+                    script {
+                        runProject(map)
+                    }
+                }
+            }
+
+            stage('健康探测') {
+                when {
+                    environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                    expression {
+                        return (params.IS_HEALTH_CHECK == true && IS_BLUE_GREEN_DEPLOY == false && false)
+                    }
+                }
+                steps {
+                    script {
+                        healthCheck(map)
+                    }
+                }
+            }
+
+
+            stage('成品归档') {
+                when {
+                    environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                    expression {
+                        return ("${IS_ARCHIVE}" == 'true') // 是否归档
+                    }
+                }
+                steps {
+                    script {
+                        // 归档
+                        archive()
+                    }
+                }
+            }
+
+        }
+
+        // post包含整个pipeline或者stage阶段完成情况
+        post() {
+            always {
+                script {
+                    echo '总是运行，无论成功、失败还是其他状态'
+                    alwaysPost()
+                }
+            }
+            success {
+                script {
+                    echo '当前成功时运行'
+                    currentBuild.result = 'SUCCESS'  // 显式设置构建结果
+                    deletePackagedOutput()
+                    //deployMultiEnv()
+                }
+            }
+            failure {
+                script {
+                    echo '当前失败时才运行'
+                    dingNotice(map, 0, "CI/CD流水线失败 ❌")
+                    // AI人工智能分析错误日志帮助人类解释与理解 插件: Explain Error Plugin
+                    // explainError()
+                }
+            }
+            unstable {
+                script {
+                    echo '不稳定状态时运行'
+                }
+            }
+            aborted {
+                script {
+                    echo '被终止时运行'
+                }
+            }
+            changed {
+                script {
+                    echo '当前完成状态与上一次完成状态不同执行'
+                }
+            }
+            fixed {
+                script {
+                    echo '上次完成状态为失败或不稳定,当前完成状态为成功时执行'
+                }
+            }
+            regression {
+                script {
+                    echo '上次完成状态为成功,当前完成状态为失败、不稳定或中止时执行'
                 }
             }
         }
-
-    } else if (type == "quality-2") {  // 同类型流水线不同阶段判断执行  但差异性较大的Pipeline建议区分groovy文件维护
-
     }
+
+}
+
+else if (type == "quality-2") {  // 同类型流水线不同阶段判断执行  但差异性较大的Pipeline建议区分groovy文件维护
+
+}
 }
 
 /**
