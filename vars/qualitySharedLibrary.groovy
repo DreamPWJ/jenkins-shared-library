@@ -351,56 +351,24 @@ def call(String type = 'quality', Map map) {
                                         values '32-bit', '64-bit'
                                     }*/
                         }
-                        /*  excludes {
-                              exclude {
-                                  axis {
-                                      name 'PLATFORM'
-                                      values 'Windows'
-                                  }
-                                  axis {
-                                      name 'BROWSER'
-                                      values 'Safari'
-                                  }
-                              }
-                              exclude {
-                                  axis {
-                                      name 'PLATFORM'
-                                      values 'Mac'
-                                  }
-                                  axis {
-                                      name 'BROWSER'
-                                      values 'Edge'
-                                  }
-                              }
-                              exclude {
-                                  axis {
-                                      name 'PLATFORM'
-                                      values 'Linux'
-                                  }
-                                  axis {
-                                      name 'BROWSER'
-                                      values 'Safari'
-                                  }
-                              }
-                              exclude {
-                                  axis {
-                                      name 'PLATFORM'
-                                      values 'Linux'
-                                  }
-                                  axis {
-                                      name 'BROWSER'
-                                      values 'Edge'
-                                  }
-                              }
-                          }*/
                         stages {
                             stage("Matrix") {
                                 steps {
                                     script {
                                         stage("${PLATFORM}-${BROWSER}-Build") {
+                                            when {
+                                                expression {
+                                                    return ("${PLATFORM}-${BROWSER}" != "Linux-Safari" && "${PLATFORM}-${BROWSER}" != "Mac-Edge" && "${PLATFORM}-${BROWSER}" != "BROWSER-Safari")
+                                                }
+                                            }
                                             echo "Do Build for ${PLATFORM} - ${BROWSER}"
                                         }
                                         stage("${PLATFORM}-${BROWSER}-Test") {
+                                            when {
+                                                expression {
+                                                    return ("${PLATFORM}-${BROWSER}" != "Linux-Safari" && "${PLATFORM}-${BROWSER}" != "Mac-Edge" && "${PLATFORM}-${BROWSER}" != "Windows-Safari")
+                                                }
+                                            }
                                             // 只显示当前阶段stage失败  而整个流水线构建显示成功
                                             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                                                 def matrixName = "${PLATFORM}-${BROWSER}"
@@ -413,28 +381,6 @@ def call(String type = 'quality', Map map) {
                                     }
                                 }
                             }
-
-            /*                stage("Build") {
-                                steps {
-                                    script {
-                                        echo "Do Build for ${PLATFORM} - ${BROWSER}"
-                                    }
-                                }
-                            }
-                            stage("Test") {
-                                steps {
-                                    // 只显示当前阶段stage失败  而整个流水线构建显示成功
-                                    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                                        script {
-                                            def matrixName = "${PLATFORM}-${BROWSER}"
-                                            echo "Do Test for ${matrixName}"
-                                            if ("${matrixName}".toString() == "Linux-Edge") {
-                                                error("测试跨平台矩阵报错中断 ❌")
-                                            }
-                                        }
-                                    }
-                                }
-                            } */
                         }
                     }
                 }
