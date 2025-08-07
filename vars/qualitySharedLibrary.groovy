@@ -337,7 +337,7 @@ def call(String type = 'quality', Map map) {
                                 values '32-bit', '64-bit'
                             }*/
                         }
-                        excludes {
+                      /*  excludes {
                             exclude {
                                 axis {
                                     name 'PLATFORM'
@@ -378,7 +378,7 @@ def call(String type = 'quality', Map map) {
                                     values 'Edge'
                                 }
                             }
-                        }
+                        }*/
                         stages {
                             stage("Build") {
                                 steps {
