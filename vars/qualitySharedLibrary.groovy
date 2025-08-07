@@ -297,7 +297,7 @@ def call(String type = 'quality', Map map) {
                                 sleep 6
                             }
                         }
-                        stage('') {
+                        stage('冒烟测试') {
                             steps {
                                 script {
                                     stage('冒烟测试-1') {
@@ -394,7 +394,27 @@ def call(String type = 'quality', Map map) {
                               }
                           }*/
                         stages {
-                            stage("Build") {
+                            stage("Matrix") {
+                                steps {
+                                    script {
+                                        stage("Build") {
+                                            echo "Do Build for ${PLATFORM} - ${BROWSER}"
+                                        }
+                                        stage("Test") {
+                                            // 只显示当前阶段stage失败  而整个流水线构建显示成功
+                                            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                                def matrixName = "${PLATFORM}-${BROWSER}"
+                                                echo "Do Test for ${matrixName}"
+                                                if ("${matrixName}".toString() == "Linux-Edge") {
+                                                    error("测试跨平台矩阵报错中断 ❌")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+            /*                stage("Build") {
                                 steps {
                                     script {
                                         echo "Do Build for ${PLATFORM} - ${BROWSER}"
@@ -414,7 +434,7 @@ def call(String type = 'quality', Map map) {
                                         }
                                     }
                                 }
-                            }
+                            } */
                         }
                     }
                 }
