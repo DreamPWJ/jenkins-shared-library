@@ -357,6 +357,7 @@ def call(String type = 'quality', Map map) {
                                     script {
                                         stage("${PLATFORM}-${BROWSER}-Build") {
                                             when {
+                                                beforeAgent true
                                                 expression {
                                                     return ("${PLATFORM}-${BROWSER}" != "Linux-Safari" && "${PLATFORM}-${BROWSER}" != "Mac-Edge" && "${PLATFORM}-${BROWSER}" != "BROWSER-Safari")
                                                 }
@@ -365,6 +366,7 @@ def call(String type = 'quality', Map map) {
                                         }
                                         stage("${PLATFORM}-${BROWSER}-Test") {
                                             when {
+                                                beforeAgent true
                                                 expression {
                                                     return ("${PLATFORM}-${BROWSER}" != "Linux-Safari" && "${PLATFORM}-${BROWSER}" != "Mac-Edge" && "${PLATFORM}-${BROWSER}" != "Windows-Safari")
                                                 }
