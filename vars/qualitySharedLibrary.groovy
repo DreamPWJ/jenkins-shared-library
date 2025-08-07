@@ -367,6 +367,12 @@ def call(String type = 'quality', Map map) {
                                     name 'BROWSER'
                                     values 'Safari'
                                 }
+                            }
+                            exclude {
+                                axis {
+                                    name 'PLATFORM'
+                                    values 'Linux'
+                                }
                                 axis {
                                     name 'BROWSER'
                                     values 'Edge'
