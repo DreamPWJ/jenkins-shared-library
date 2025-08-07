@@ -76,9 +76,8 @@ class JenkinsCI implements Serializable {
      * 上下游job关联构建
      * 如 1. 微服务各模块之间的关联顺序构建 2. 顺序部署多个环境的job 3. 部署完成后执行各种测试和质量分析等
      */
-    static def triggerUpstreamJob(ctx) {
+    static def triggerUpstreamJob(ctx,nextJobName) {
         // 当上一个job构建完成自动执行下游job  上下job动态参数传递
-        def nextJobName =  "quality-pipeline-job" // 下游job名称
         def jobDevEnv = ctx.build job: "${nextJobName}",
                 parameters: [
                 string(name: 'DEPLOY_ENV', value: 'production'),

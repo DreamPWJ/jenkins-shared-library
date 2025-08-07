@@ -537,7 +537,7 @@ def initInfo() {
     // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
     try {
         if (params.IS_WORKSPACE_CLEAN == true) {
-            println("删除代码构建产物与缓存等 用于全新构建流水线工作环境" )
+            println("删除代码构建产物与缓存等 用于全新构建流水线工作环境")
             def jobHome = env.WORKSPACE.split("@")[0] // 根据@符号分隔去前面的路径
             sh " rm -rf ${jobHome}*"
         }
@@ -700,6 +700,9 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
+
+    JenkinsCI.triggerUpstreamJob(this, "quality-pipeline")
+
     println("构建机器名称: ${NODE_NAME}")
     println("仓库地址: ${REPO_URL}")
 
