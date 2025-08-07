@@ -397,10 +397,10 @@ def call(String type = 'quality', Map map) {
                             stage("Matrix") {
                                 steps {
                                     script {
-                                        stage("Build") {
+                                        stage("${PLATFORM}-${BROWSER}-Build") {
                                             echo "Do Build for ${PLATFORM} - ${BROWSER}"
                                         }
-                                        stage("Test") {
+                                        stage("${PLATFORM}-${BROWSER}-Test") {
                                             // 只显示当前阶段stage失败  而整个流水线构建显示成功
                                             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                                                 def matrixName = "${PLATFORM}-${BROWSER}"
