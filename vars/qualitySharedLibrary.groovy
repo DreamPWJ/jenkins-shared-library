@@ -386,10 +386,11 @@ def call(String type = 'quality', Map map) {
                               }
                           }*/
                         stages {
-                            stage("Build") {
-                                steps {
-                                    script {
+                            script {
+                                stage("Build-${env.PLATFORM}") {
+                                    steps {
                                         echo "Do Build for ${PLATFORM} - ${BROWSER}"
+
                                     }
                                 }
                             }
