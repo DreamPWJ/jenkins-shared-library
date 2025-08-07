@@ -388,8 +388,9 @@ def call(String type = 'quality', Map map) {
                             }
                             stage("Test") {
                                 steps {
-                                    echo "Do Test for ${PLATFORM} - ${BROWSER}"
-                                    if ("${PLATFORM}-${BROWSER}" == "Linux-Edge") {
+                                    def  matrixName="${PLATFORM}-${BROWSER}"
+                                    echo "Do Test for ${matrixName}"
+                                    if ("${matrixName}".toString() == "Linux-Edge") {
                                         error("测试报错中断 ❌")
                                     }
                                 }
