@@ -353,24 +353,19 @@ def call(String type = 'quality', Map map) {
                         }
                         stages {
                             stage("Matrix") {
+                                script {
+                                when {
+                                    beforeAgent true
+                                    expression {
+                                        return ("${PLATFORM}-${BROWSER}" != "Linux-Safari" && "${PLATFORM}-${BROWSER}" != "Mac-Edge" && "${PLATFORM}-${BROWSER}" != "Windows-Safari")
+                                    }
+                                }
                                 steps {
-                                    script {
+
                                         stage("${PLATFORM}-${BROWSER}-Build") {
-                                            when {
-                                                beforeAgent true
-                                                expression {
-                                                    return ("${PLATFORM}-${BROWSER}" != "Linux-Safari" && "${PLATFORM}-${BROWSER}" != "Mac-Edge" && "${PLATFORM}-${BROWSER}" != "BROWSER-Safari")
-                                                }
-                                            }
                                             echo "Do Build for ${PLATFORM} - ${BROWSER}"
                                         }
                                         stage("${PLATFORM}-${BROWSER}-Test") {
-                                            when {
-                                                beforeAgent true
-                                                expression {
-                                                    return ("${PLATFORM}-${BROWSER}" != "Linux-Safari" && "${PLATFORM}-${BROWSER}" != "Mac-Edge" && "${PLATFORM}-${BROWSER}" != "Windows-Safari")
-                                                }
-                                            }
                                             // 只显示当前阶段stage失败  而整个流水线构建显示成功
                                             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                                                 def matrixName = "${PLATFORM}-${BROWSER}"
