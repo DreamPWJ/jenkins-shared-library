@@ -299,10 +299,13 @@ def call(String type = 'quality', Map map) {
                         }
                         stage('冒烟测试') {
                             steps {
-                                script {
-                                    echo "冒烟测试"
-                                    sleep 3
-                                    error("测试报错中断 ❌")
+                                // 只显示当前阶段stage失败  而整个流水线构建显示成功
+                                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                    script {
+                                        echo "冒烟测试"
+                                        sleep 3
+                                        error("测试冒烟测试报错中断 ❌")
+                                    }
                                 }
                             }
                         }
@@ -398,7 +401,7 @@ def call(String type = 'quality', Map map) {
                                             def matrixName = "${PLATFORM}-${BROWSER}"
                                             echo "Do Test for ${matrixName}"
                                             if ("${matrixName}".toString() == "Linux-Edge") {
-                                                error("测试矩阵报错中断 ❌")
+                                                error("测试跨平台矩阵报错中断 ❌")
                                             }
                                         }
                                     }
