@@ -392,11 +392,14 @@ def call(String type = 'quality', Map map) {
                             }
                             stage("Test") {
                                 steps {
-                                    script {
-                                        def matrixName = "${PLATFORM}-${BROWSER}"
-                                        echo "Do Test for ${matrixName}"
-                                        if ("${matrixName}".toString() == "Linux-Edge") {
-                                            error("测试报错中断 ❌")
+                                    // 只显示当前阶段stage失败  而整个流水线构建显示成功
+                                    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                        script {
+                                            def matrixName = "${PLATFORM}-${BROWSER}"
+                                            echo "Do Test for ${matrixName}"
+                                            if ("${matrixName}".toString() == "Linux-Edge") {
+                                                error("测试矩阵报错中断 ❌")
+                                            }
                                         }
                                     }
                                 }
