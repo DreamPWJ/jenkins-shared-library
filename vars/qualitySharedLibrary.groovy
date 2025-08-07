@@ -353,17 +353,13 @@ def call(String type = 'quality', Map map) {
                         }
                         stages {
                             stage("Matrix") {
-                                script {
-                                when {
-                                    beforeAgent true
-                                    expression {
-                                        return ("${PLATFORM}-${BROWSER}" != "Linux-Safari" && "${PLATFORM}-${BROWSER}" != "Mac-Edge" && "${PLATFORM}-${BROWSER}" != "Windows-Safari")
-                                    }
-                                }
                                 steps {
-
+                                    script {
                                         stage("${PLATFORM}-${BROWSER}-Build") {
-                                            echo "Do Build for ${PLATFORM} - ${BROWSER}"
+                                            def matrixName = "${PLATFORM}-${BROWSER}"
+                                            if("${matrixName}" != "Linux-Safari" && "${matrixName}" != "Mac-Edge" && "${matrixName}" != "Windows-Safari"){
+                                                echo "Do Build for ${matrixName}"
+                                            }
                                         }
                                         stage("${PLATFORM}-${BROWSER}-Test") {
                                             // 只显示当前阶段stage失败  而整个流水线构建显示成功
