@@ -381,7 +381,7 @@ def call(String type = 'quality', Map map) {
                                                 def matrixName = "${PLATFORM}-${BROWSER}"
                                                 echo "Do Test for ${matrixName}"
                                                 if ("${matrixName}".toString() == "Windows-Chrome") {
-                                                    sleep 3
+                                                    sleep 6
                                                 }
                                                 if ("${matrixName}".toString() == "Linux-Edge") {
                                                     error("测试跨平台矩阵报错中断 ❌")
