@@ -85,7 +85,7 @@ class JenkinsCI implements Serializable {
                     parameters: [
                             ctx.booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', value: ctx.params.IS_CODE_QUALITY_ANALYSIS)
                     ],
-                    wait: isWait  // 是否等待子流水线完成，默认为true, false异步并行触发
+                    wait: isWait  // 是否等待子流水线完成，默认为true, 解耦false异步并行触发
             if (isWait) {
                 ctx.println nextJob.getResult() // 异步执行无法获取结果
             }
