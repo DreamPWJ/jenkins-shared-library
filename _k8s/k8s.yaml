@@ -45,8 +45,8 @@ spec:
           ports:
             - containerPort: {CONTAINER_PORT}
               protocol: TCP  # 容器级协议 HTTP/1.1 + HTTP/2
-            - containerPort: {CONTAINER_PORT}
-              protocol: UDP  # 容器级协议 HTTP/3 QUIC
+#            - containerPort: {CONTAINER_PORT}
+#              protocol: UDP  # 容器级协议 HTTP/3 QUIC
           env:
             - name: TZ
               value: Asia/Shanghai
