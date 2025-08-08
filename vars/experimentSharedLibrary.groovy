@@ -69,7 +69,6 @@ def call(String type = 'experiment', Map map) {
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 将构建成功失败等状态信息同步到群内所有人 📢 ")
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
                 stashedFile(name: 'DEPLOY_PACKAGE', description: "请选择上传部署包文件、配置文件等 可不依赖源码情况下支持直接上传成品包部署方式和动态配置替换等 (如 *.jar、*.yaml、*.tar.gz 等格式) 🚀 ")
-                //booleanParam(name: 'IS_DEPLOY_MULTI_ENV', defaultValue: false, description: '是否同时部署当前job项目多环境 如dev test等')
             }
 
             triggers {
@@ -140,7 +139,6 @@ def call(String type = 'experiment', Map map) {
                 DEPLOY_FOLDER = "${map.deploy_folder}" // 服务器上部署所在的文件夹名称
                 NPM_PACKAGE_FOLDER = "${map.npm_package_folder}" // Web项目NPM打包代码所在的文件夹名称
                 WEB_STRIP_COMPONENTS = "${map.web_strip_components}" // Web项目解压到指定目录层级
-                MAVEN_ONE_LEVEL = "${map.maven_one_level}" // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
                 DOCKER_JAVA_OPTS = "${map.docker_java_opts}" // JVM内存设置
                 DOCKER_MEMORY = "${map.docker_memory}" // 容器最大内存限制 不支持小数点形式设置
                 DOCKER_LOG_OPTS = "${map.docker_log_opts}" // docker日志限制
@@ -182,7 +180,7 @@ def call(String type = 'experiment', Map map) {
                             return true
                         }
                     }
-                    failFast true         //表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
+                    failFast true         // true表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
                     parallel {  // 并发构建步骤
                         stage('CI/CD代码') {
                             steps {
@@ -237,7 +235,7 @@ def call(String type = 'experiment', Map map) {
                 success {
                     script {
                         echo '当前成功时运行'
-
+                        JenkinsCI.triggerUpstreamJob(this, "quality-pipeline")
                     }
                 }
                 failure {
@@ -297,9 +295,10 @@ def getInitParams(map) {
     env.PROJECT_TYPE = jsonParams.PROJECT_TYPE ? jsonParams.PROJECT_TYPE.trim() : ""  // 项目类型 1 前端项目 2 后端项目
     // 计算机语言类型 1. Java  2. Go  3. Python  5. C++  6. JavaScript
     env.COMPUTER_LANGUAGE = jsonParams.COMPUTER_LANGUAGE ? jsonParams.COMPUTER_LANGUAGE.trim() : "1"
-    // 项目名 获取部署资源位置和指定构建模块名等
+    // 项目名 代码位置或构建模块名等
     env.PROJECT_NAME = jsonParams.PROJECT_NAME ? jsonParams.PROJECT_NAME.trim() : ""
-    env.SHELL_PARAMS = jsonParams.SHELL_PARAMS ? jsonParams.SHELL_PARAMS.trim() : "" // shell传入前端或后端参数
+    // shell传入前端或后端组合参数 包括名称、类型、多端口、环境等
+    env.SHELL_PARAMS = jsonParams.SHELL_PARAMS ? jsonParams.SHELL_PARAMS.trim() : ""
     // 分布式部署独立扩展服务器 基于通用配置的基础上 再扩展的服务器IP集合 逗号分割
     env.EXPAND_SERVER_IPS = jsonParams.EXPAND_SERVER_IPS ? jsonParams.EXPAND_SERVER_IPS.trim() : ""
 
@@ -310,6 +309,8 @@ def getInitParams(map) {
     // npm包管理工具类型 如:  npm、yarn、pnpm
     env.NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
     env.NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [build]的前端项目参数
+    // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
+    env.MAVEN_ONE_LEVEL = jsonParams.MAVEN_ONE_LEVEL ? jsonParams.MAVEN_ONE_LEVEL.trim() : "${map.maven_one_level}"
 
     env.IS_MONO_REPO = jsonParams.IS_MONO_REPO ? jsonParams.IS_MONO_REPO : false // 是否MonoRepo单体式仓库  单仓多包
     // 是否Maven单模块代码
@@ -537,7 +538,7 @@ def initInfo() {
     // 删除代码构建产物与缓存等 用于全新构建流水线工作环境
     try {
         if (params.IS_WORKSPACE_CLEAN == true) {
-            println("删除代码构建产物与缓存等 用于全新构建流水线工作环境" )
+            println("删除代码构建产物与缓存等 用于全新构建流水线工作环境")
             def jobHome = env.WORKSPACE.split("@")[0] // 根据@符号分隔去前面的路径
             sh " rm -rf ${jobHome}*"
         }
@@ -700,6 +701,7 @@ def pullProjectCode() {
  * 实验开发调试
  */
 def futureLab(map) {
+
     println("构建机器名称: ${NODE_NAME}")
     println("仓库地址: ${REPO_URL}")
 

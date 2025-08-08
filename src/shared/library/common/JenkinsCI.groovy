@@ -73,6 +73,29 @@ class JenkinsCI implements Serializable {
     }
 
     /**
+     * 上下游job关联构建
+     * 如 1. 微服务各模块之间的关联顺序构建 2. 顺序部署多个环境的job 3. 部署完成后执行各种测试和质量分析等
+     */
+    @NonCPS
+    static def triggerUpstreamJob(ctx, nextJobName) {
+        try {
+            // 当上一个job构建完成自动执行下游job  上下job动态参数传递
+            def isWait = false // 是否等待子流水线完成后 上游才算完成
+            def nextJob = ctx.build job: "${nextJobName}",
+                    parameters: [
+                            ctx.booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', value: ctx.params.IS_CODE_QUALITY_ANALYSIS),
+                            ctx.booleanParam(name: 'IS_DING_NOTICE', value: ctx.params.IS_DING_NOTICE),
+                    ],
+                    wait: isWait  // 是否等待子流水线完成，默认为true, 解耦false异步并行触发
+            if (isWait) {
+                ctx.println nextJob.getResult() // 异步执行无法获取结果
+            }
+        } catch (e) {
+            ctx.println("上下游job关联构建失败：${e.message}")
+        }
+    }
+
+    /**
      * 获取当前job信息
      */
     @NonCPS

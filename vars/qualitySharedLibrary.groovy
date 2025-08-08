@@ -8,9 +8,9 @@ import shared.library.devops.GitTagLog
 /**
  * @author 潘维吉
  * @description 通用核心共享Pipeline脚本库
- * 针对大前端Web和服务端Java、Python、C++、Go等多语言项目
+ * 针对质量、测试、安全、定时执行等独立的流水线
  */
-def call(String type = 'web-java', Map map) {
+def call(String type = 'quality', Map map) {
     echo "Pipeline共享库脚本类型: ${type}, Jenkins分布式节点名: ${params.SELECT_BUILD_NODE} "
     // 应用共享方法定义
     changeLog = new ChangeLog()
@@ -35,7 +35,7 @@ def call(String type = 'web-java', Map map) {
     // 初始化参数
     getInitParams(map)
 
-    if (type == "web-java") { // 针对标准项目
+    if (type == "quality") { // 针对标准项目
         pipeline {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
             agent { label "${params.SELECT_BUILD_NODE}" }
@@ -59,8 +59,8 @@ def call(String type = 'web-java', Map map) {
                 string(name: 'VERSION_NUM', defaultValue: "", description: "选填 自定义语义化版本号x.y.z 如1.0.0 (默认不填写  自动生成的版本号并且语义化自增 生产环境设置有效) 🖊 ")
                 text(name: 'VERSION_DESCRIPTION', defaultValue: "${Constants.DEFAULT_VERSION_COPYWRITING}",
                         description: "请填写版本变更日志 (不填写用默认文案在钉钉、Git Tag、CHANGELOG.md则使用Git提交记录作为发布日志) 🖊 ")
-                booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行K8s/Docker集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
                 booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', defaultValue: false, description: "是否执行静态代码质量分析扫描检测并生成质量报告, 交付可读、易维护和安全的高质量代码 🔦 ")
+                booleanParam(name: 'IS_CANARY_DEPLOY', defaultValue: false, description: "是否执行K8s/Docker集群灰度发布、金丝雀发布、A/B测试实现多版本共存机制 🐦")
                 booleanParam(name: 'IS_WORKSPACE_CLEAN', defaultValue: false, description: "是否全部清空CI/CD工作空间 删除代码构建产物与缓存等 全新构建流水线工作环境 🛀 ")
                 booleanParam(name: 'IS_HEALTH_CHECK', defaultValue: "${map.is_health_check}",
                         description: '是否执行服务启动健康探测  K8S使用默认的健康探测 🌡️')
@@ -69,7 +69,6 @@ def call(String type = 'web-java', Map map) {
                 booleanParam(name: 'IS_DING_NOTICE', defaultValue: "${map.is_ding_notice}", description: "是否开启钉钉群通知 将构建成功失败等状态信息同步到群内所有人 📢 ")
                 choice(name: 'NOTIFIER_PHONES', choices: "${contactPeoples}", description: '选择要通知的人 (钉钉群内@提醒发布结果) 📢 ')
                 stashedFile(name: 'DEPLOY_PACKAGE', description: "请选择上传部署包文件、配置文件等 可不依赖源码情况下支持直接上传成品包部署方式和动态配置替换等 (如 *.jar、*.yaml、*.tar.gz 等格式) 🚀 ")
-                //booleanParam(name: 'IS_DEPLOY_MULTI_ENV', defaultValue: false, description: '是否同时部署当前job项目多环境 如dev test等')
             }
 
             triggers {
@@ -99,7 +98,7 @@ def call(String type = 'web-java', Map map) {
                                 '$'
                 )
                 // pollSCM('H/1 * * * *') // 每分钟判断一次代码是否存在变化 有变化就执行
-                // cron('H 2 * * *')      // 每天几点执行
+                cron('H 2 * * *')         // 每天几点执行
             }
 
             options {
@@ -198,20 +197,6 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                stage('人工审批') {
-                    when {
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return false
-                        }
-                    }
-                    steps {
-                        script {
-                            manualApproval(map)
-                        }
-                    }
-                }
-
                 stage('代码质量') {
                     when {
                         beforeAgent true
@@ -228,12 +213,6 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                     agent {
-                        // label "node-3"  // 执行节点 分布式执行 可在不同服务上执行不同任务
-                        /*   docker {
-                               // sonarqube环境  构建完成自动删除容器
-                               image "sonarqube:community"
-                               reuseNode true // 使用根节点
-                           }*/
                         docker {
                             // js、jvm、php、jvm-android、go、python、php。 jvm-community是免费版
                             image "jetbrains/${qodanaImagesName}:latest" // 设置镜像类型和版本号 latest
@@ -252,38 +231,193 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
+                stage('单元测试') {
+                    when {
+                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            return true
+                        }
+                    }
+                    steps {
+                        script {
+                            script {
+                                echo '单元测试'
+                                Tests.createJUnitReport(this)
+                            }
+                        }
+                    }
+                }
+
+                stage('多类型测试-并行') {
+                    when {
+                        beforeAgent true
+                        // 生产环境不进行集成测试 缩减构建时间
+                        not {
+                            anyOf {
+                                branch 'master'
+                                branch 'prod'
+                            }
+                        }
+                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            // 是否进行集成测试  是否存在postman_collection.json文件才进行API集成测试  fileExists("_test/postman/postman_collection.json") == true
+                            /*   return ("${IS_INTEGRATION_TESTING}" == 'true' && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd
+                                       && "${AUTO_TEST_PARAM}" != "")*/
+                            return true
+                        }
+                    }
+                    failFast false         // true表示其中只要有一个分支构建执行失败，就直接推出不等待其他分支构建
+                    parallel {  // 并发构建步骤
+                        stage('集成测试') {
+                            steps {
+                                script {
+                                    echo "集成测试"
+                                    // integrationTesting(map)
+                                    sleep 2
+                                }
+                            }
+                        }
+                        stage('性能测试') {
+                            steps {
+                                script {
+                                    echo "性能测试"
+                                    sleep 4
+                                    Tests.createJMeterReport(this)
+                                }
+                            }
+                        }
+                        stage('安全测试') {
+                            when {
+                                beforeAgent true
+                                expression {
+                                    return false
+                                }
+                            }
+                            steps {
+                                script {
+                                    echo "安全测试"
+                                    sleep 2
+                                    Tests.createSecurityReport(this)
+                                }
+                            }
+                        }
+                        stage('UI测试') {
+                            steps {
+                                script {
+                                    echo "UI测试"
+                                    sleep 6
+                                }
+                            }
+                        }
+                        stage('冒烟') {
+                            steps {
+                                script {
+                                    stage('冒烟测试-1') {
+                                        echo "冒烟测试-1"
+                                        sleep 1
+                                        Tests.createSmokeReport(this)
+                                    }
+                                    stage('冒烟测试-2') {
+                                        // 只显示当前阶段stage失败  而整个流水线构建显示成功
+                                        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                            script {
+                                                echo "冒烟测试-2"
+                                                sleep 1
+                                                error("测试冒烟测试报错中断 ❌")
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                stage('多平台测试-矩阵') {
+                    when {
+                        beforeAgent true
+                        // 生产环境不进行集成测试 缩减构建时间
+                        not {
+                            anyOf {
+                                branch 'master'
+                                branch 'prod'
+                            }
+                        }
+                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression {
+                            return true
+                        }
+                    }
+                    matrix {
+                        agent any
+                        axes {
+                            axis {
+                                name 'PLATFORM'
+                                values 'Linux', 'Windows', 'Mac'
+                            }
+                            axis {
+                                name 'BROWSER'
+                                values 'Chrome', 'Firefox', 'Safari', 'Edge'
+                            }
+                            /*        axis {
+                                        name 'ARCHITECTURE'
+                                        values '32-bit', '64-bit'
+                                    }*/
+                        }
+                        stages {
+                            stage("Matrix") {
+                                steps {
+                                    script {
+                                        stage("${PLATFORM}-${BROWSER}-Build") {
+                                            def matrixName = "${PLATFORM}-${BROWSER}"
+                                            if ("${matrixName}" != "Linux-Safari" && "${matrixName}" != "Mac-Edge" && "${matrixName}" != "Windows-Safari") {
+                                                echo "Do Build for ${matrixName}"
+                                            }
+                                        }
+                                        stage("${PLATFORM}-${BROWSER}-Test") {
+                                            // 只显示当前阶段stage失败  而整个流水线构建显示成功
+                                            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                                def matrixName = "${PLATFORM}-${BROWSER}"
+                                                echo "Do Test for ${matrixName}"
+                                                if ("${matrixName}".toString() == "Windows-Chrome") {
+                                                    sleep 6
+                                                }
+                                                if ("${matrixName}".toString() == "Linux-Edge") {
+                                                    error("测试跨平台矩阵报错中断 ❌")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                stage('质量报告') {
+                    when {
+                        beforeAgent true
+                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
+                        expression { return true }
+                    }
+                    steps {
+                        script {
+                            if ("${params.IS_DING_NOTICE}" == 'true' && params.IS_HEALTH_CHECK == false) {
+                                dingNotice(map, 1, "**成功 ✅**")
+                            }
+                        }
+                    }
+                }
+
                 stage('JavaScript构建') {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression { return (IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) }
                     }
-/*                    agent {
-                        // label "linux"
-                        *//* dockerfile {
-                          filename 'Dockerfile.node-build' // 在WORKSPACE工作区代码目录
-                          dir "${env.WORKSPACE}/ci"
-                          // additionalBuildArgs  '--build-arg version=1.0.0'
-                          // args " -v /${env.WORKSPACE}:/tmp "
-                          reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
-                      }*//*
-                        docker {
-                            // Node环境  构建完成自动删除容器
-                            //image "node:${NODE_VERSION.replace('Node', '')}"
-                            // 使用自定义Dockerfile的node环境 加速monorepo依赖构建内置lerna等相关依赖
-                            image "panweiji/node:${NODE_VERSION.replace('Node', '')}" // 为了更通用应使用通用镜像  自定义镜像针对定制化需求
-                            // args " -v ${"${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}"}/node_modules:/node_modules "
-                            reuseNode true // 使用根节点
-                        }
-                    }*/
                     steps {
                         script {
                             // echo "Docker环境内Node构建方式"
-                            /*   if ("${IS_PROD}" == 'true') {
-                                   docker.image("panweiji/node:${NODE_VERSION.replace('Node', '')}").inside("") {
-                                       nodeBuildProject(map)
-                                   }
-                               } else {*/ // 验证新特性
                             def nodeVersion = "${NODE_VERSION.replace('Node', '')}"
                             def dockerImageName = "panweiji/node-build"
                             def dockerImageTag = "${nodeVersion}"
@@ -291,26 +425,9 @@ def call(String type = 'web-java', Map map) {
                             docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
                                 nodeBuildProject(map)
                             }
-                            // }
                         }
                     }
                 }
-/*                stage('JavaScript构建') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return (IS_DOCKER_BUILD == false && "${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) }
-                    }
-                    tools {
-                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中
-                        nodejs "${NODE_VERSION}"
-                    }
-                    steps {
-                        script {
-                            nodeBuildProject(map)
-                        }
-                    }
-                }*/
 
                 stage('Java构建') {
                     when {
@@ -319,25 +436,9 @@ def call(String type = 'web-java', Map map) {
                         expression {
                             return (IS_SOURCE_CODE_DEPLOY == false && IS_PACKAGE_DEPLOY == false
                                     && IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd
-                                    && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java)
+                                    && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java && false)
                         }
                     }
-                    /*      agent {
-                              dockerfile {
-                                  filename 'Dockerfile.mvnd-jdk' // 在WORKSPACE工作区代码目录
-                                  label "panweiji/mvnd-jdk-${JDK_PUBLISHER}-${JDK_VERSION}:latest"
-                                  dir "${env.WORKSPACE}/ci"
-                                  additionalBuildArgs "--build-arg MVND_VERSION=1.0.2 --build-arg JDK_PUBLISHER=${JDK_PUBLISHER} --build-arg JDK_VERSION=${JDK_VERSION}"
-                                  args " -v /var/cache/maven/.m2:/root/.m2  "
-                                  reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
-                              }
-                              docker {
-                                  // JDK MAVEN 环境  构建完成自动删除容器  graalvm使用csanchez/maven镜像  容器仓库：https://hub.docker.com/_/maven/
-                                  image "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
-                                  args " -v /var/cache/maven/.m2:/root/.m2 "
-                                  reuseNode true // 使用根节点
-                              }
-                          }*/
                     steps {
                         script {
                             // Gradle构建方式
@@ -369,88 +470,12 @@ def call(String type = 'web-java', Map map) {
                         }
                     }
                 }
-/*                stage('Java构建') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return (IS_DOCKER_BUILD == false && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) }
-                    }
-                    tools {
-                        // 工具名称必须在Jenkins 管理Jenkins → 全局工具配置中预配置 自动添加到PATH变量中  如果有node节点 工具位置也要配置HOME路径
-                        maven "${map.maven}"
-                        jdk "${JDK_VERSION}"  // JDK高版本构建环境可以打包低版本代码项目
-                    }
-                    steps {
-                        script {
-                            mavenBuildProject(map)
-                        }
-                    }
-                }*/
-
-                stage('Python构建') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) }
-                    }
-                    steps {
-                        script {
-                            /*   if (IS_DOCKER_BUILD == true) {
-                                   // Python需要交叉编译 不同系统部署使用不同系统环境打包 如Windows使用 cdrx/pyinstaller-windows
-                                   docker.image("cdrx/pyinstaller-linux:python3").inside {
-                                       pythonBuildProject(map)
-                                   }
-                               } else {*/
-                            pythonBuildProject(map)
-                            //  }
-                        }
-                    }
-                }
-
-                stage('Go构建') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) }
-                    }
-                    steps {
-                        script {
-                            goBuildProject()
-                        }
-                    }
-                }
-
-                stage('C++构建') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) }
-                    }
-                    steps {
-                        script {
-                            cppBuildProject()
-                        }
-                    }
-                }
-
-                stage('制作镜像') {
-                    when {
-                        beforeAgent true
-                        expression { return ("${IS_PUSH_DOCKER_REPO}" == 'true') }
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                    }
-                    steps {
-                        script {
-                            buildImage(map)
-                        }
-                    }
-                }
 
                 stage('上传代码包') {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (IS_K8S_DEPLOY == false)  // k8s集群部署 镜像方式无需上传到服务器
+                            return (IS_K8S_DEPLOY == false && false)  // k8s集群部署 镜像方式无需上传到服务器
                         }
                     }
                     steps {
@@ -464,7 +489,8 @@ def call(String type = 'web-java', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (IS_BLUE_GREEN_DEPLOY == false && IS_K8S_DEPLOY == false)  // 非蓝绿和k8s集群部署 都有单独步骤
+                            return (IS_BLUE_GREEN_DEPLOY == false && IS_K8S_DEPLOY == false && false)
+                            // 非蓝绿和k8s集群部署 都有单独步骤
                         }
                     }
                     steps {
@@ -478,7 +504,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (params.IS_HEALTH_CHECK == true && IS_BLUE_GREEN_DEPLOY == false)
+                            return (params.IS_HEALTH_CHECK == true && IS_BLUE_GREEN_DEPLOY == false && false)
                         }
                     }
                     steps {
@@ -488,207 +514,6 @@ def call(String type = 'web-java', Map map) {
                     }
                 }
 
-                stage('集成测试') {
-                    when {
-                        beforeAgent true
-                        // 生产环境不进行集成测试 缩减构建时间
-                        not {
-                            anyOf {
-                                branch 'master'
-                                branch 'prod'
-                            }
-                        }
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            // 是否进行集成测试  是否存在postman_collection.json文件才进行API集成测试  fileExists("_test/postman/postman_collection.json") == true
-                            return ("${IS_INTEGRATION_TESTING}" == 'true' && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd
-                                    && "${AUTO_TEST_PARAM}" != "" && IS_BLUE_GREEN_DEPLOY == false)
-                        }
-                    }
-                    steps {
-                        script {
-                            integrationTesting(map)
-                        }
-                    }
-                }
-
-                stage('蓝绿部署') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return (IS_BLUE_GREEN_DEPLOY == true)  // 是否进行蓝绿部署
-                        }
-                    }
-                    steps {
-                        script {
-                            // 蓝绿部署是实现零停机部署最经济的方式 只有单个服务长期占用资源
-                            blueGreenDeploy(map)
-                        }
-                    }
-                }
-
-                stage('滚动部署') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return (IS_ROLL_DEPLOY == true) // 是否进行滚动部署
-                        }
-                    }
-                    steps {
-                        script {
-                            // 滚动部署实现多台服务按顺序更新 分布式零停机
-                            scrollToDeploy(map)
-                        }
-                    }
-                }
-
-                stage('灰度发布') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return (IS_K8S_DEPLOY == true && IS_CANARY_DEPLOY == true) // 是否进行灰度发布
-                        }
-                    }
-                    agent {
-                        docker {
-                            //   构建完成自动删除容器
-                            image "panweiji/k8s:latest"
-                            // args " "
-                            reuseNode true // 使用根节点
-                        }
-                    }
-                    steps {
-                        script {
-                            // 灰度发布  金丝雀发布  A/B测试  基于Nginx Ingress 灰度发布  实现多版本共存 非强制更新提升用户体验
-                            grayscaleDeploy(map)
-                        }
-                    }
-                }
-
-                stage('Kubernetes云原生') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return (IS_K8S_DEPLOY == true && IS_CANARY_DEPLOY == false)  // 是否进行云原生K8S集群部署
-                        }
-                    }
-                    agent { // agent语法文档： https://www.jenkins.io/doc/book/pipeline/syntax/#agent
-                        /*   dockerfile {
-                              filename 'Dockerfile.k8s' // 在WORKSPACE工作区代码目录
-                              dir "${env.WORKSPACE}/ci"
-                              // additionalBuildArgs  '--build-arg version=1.0.0'
-                              // args " -v /${env.WORKSPACE}:/tmp "
-                              reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
-                          } */
-                        docker {
-                            //   构建完成自动删除容器
-                            image "panweiji/k8s:latest"
-                            // args " "
-                            reuseNode true // 使用根节点
-                        }
-                    }
-                    steps {
-                        script {
-                            // 云原生K8s部署大规模集群
-                            k8sDeploy(map)
-                        }
-                    }
-                }
-
-                stage('Serverless工作流') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return (IS_SERVERLESS_DEPLOY == true) // 是否进行Serverless发布
-                        }
-                    }
-                    steps {
-                        script {
-                            // Serverless发布方式免运维
-                            serverlessDeploy()
-                        }
-                    }
-                }
-
-                stage('钉钉通知') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return true }
-                    }
-                    steps {
-                        script {
-                            if ("${params.IS_DING_NOTICE}" == 'true' && params.IS_HEALTH_CHECK == false) {
-                                dingNotice(map, 1, "**成功 ✅**")
-                            }
-                        }
-                    }
-                }
-
-                stage('发布日志') {
-                    when {
-                        beforeAgent true
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                    }
-                    steps {
-                        script {
-                            // 自动打tag和生成CHANGELOG.md文件
-                            // docker.image("bitnami/git:latest").inside(" --entrypoint='' ") { // 因使用了Git高级特性 所以需确保最新版本
-                            gitTagLog()
-                            // }
-                            // 钉钉通知变更记录
-                            dingNotice(map, 3)
-                        }
-                    }
-                }
-
-                stage('K8s/Docker回滚 启动 停止 重启等') {
-                    when {
-                        beforeAgent true
-                        expression {
-                            return ("${GlobalVars.rollback}" == "${params.DEPLOY_MODE}" || "${GlobalVars.start}" == "${params.DEPLOY_MODE}" || "${GlobalVars.stop}" == "${params.DEPLOY_MODE}"
-                                    || "${GlobalVars.destroy}" == "${params.DEPLOY_MODE}" || "${GlobalVars.restart}" == "${params.DEPLOY_MODE}")
-                        }
-                    }
-                    steps {
-                        script {
-                            controlService(map)
-                        }
-                    }
-                }
-
-                stage('制品仓库') {
-                    when {
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return false  // 是否进行制品仓库
-                        }
-                    }
-                    steps {
-                        script {
-                            productsWarehouse(map)
-                        }
-                    }
-                }
-
-                stage('智能运维') {
-                    when {
-                        environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression {
-                            return false  // 是否进行部署监控
-                        }
-                    }
-                    steps {
-                        script {
-                            echo "随着应用服务部署 新一代Prometheus监控 全面检测应用健康情况"
-                        }
-                    }
-                }
 
                 stage('成品归档') {
                     when {
@@ -758,7 +583,7 @@ def call(String type = 'web-java', Map map) {
             }
         }
 
-    } else if (type == "web-java-2") {  // 同类型流水线不同阶段判断执行  但差异性较大的Pipeline建议区分groovy文件维护
+    } else if (type == "quality-2") {  // 同类型流水线不同阶段判断执行  但差异性较大的Pipeline建议区分groovy文件维护
 
     }
 }
@@ -991,10 +816,7 @@ def initInfo() {
     if (!isUnix()) {
         error("当前脚本针对Unix(如Linux或MacOS)系统 脚本执行失败 ❌")
     }
-    //echo sh(returnStdout: true, script: 'env')
-    //sh 'printenv'
-    //println "${env.PATH}"
-    //println currentBuild
+
     try {
         echo "$git_event_name"  // 如 push
         IS_AUTO_TRIGGER = true
@@ -1264,16 +1086,6 @@ def sourceCodeDeploy() {
 def codeQualityAnalysis() {
     // 创建项目
     SonarQube.createProject(this, "${FULL_PROJECT_NAME}")
-    // 扫描项目
-    // SonarQube.scan(this, "${FULL_PROJECT_NAME}")
-    // SonarQube.getStatus(this, "${PROJECT_NAME}")
-/*    def scannerHome = tool 'SonarQube' // 工具名称
-    withSonarQubeEnv('SonarQubeServer') { // 服务地址链接名称
-        // 如果配置了多个全局服务器连接，则可以指定其名称
-        sh "${scannerHome}/bin/sonar-scanner"
-        // sh "/usr/local/bin/sonar-scanner --version"
-    }*/
-    // 可自动提交自动修复PR代码或打通项目管理平台自动提交bug指派任务
 }
 
 /**
@@ -1463,56 +1275,6 @@ def gradleBuildProject(map) {
     }
 }
 
-/**
- * Python编译构建
- */
-def pythonBuildProject(map) {
-    dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") {
-        // 压缩源码文件 加速传输
-        Python.codePackage(this)
-    }
-    Tools.printColor(this, "Python语言构建成功 ✅")
-}
-
-/**
- * Go编译构建
- */
-def goBuildProject() {
-    Go.build(this)
-    Tools.printColor(this, "Go语言构建成功 ✅")
-}
-
-/**
- * C++编译构建
- */
-def cppBuildProject() {
-    Cpp.build(this)
-    Tools.printColor(this, "C++语言构建成功 ✅")
-}
-
-/**
- * 制作镜像
- * 可通过ssh在不同机器上构建镜像
- */
-def buildImage(map) {
-    // Docker多阶段镜像构建处理
-    Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
-    // 构建并上传Docker镜像仓库  只构建一次
-    retry(2) { // 重试几次 可能网络等问题导致构建失败
-        Docker.build(this, "${dockerImageName}")
-    }
-    // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
-    if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-        def deployNum = 2  // 暂时区分两个不同环境文件 实际还存在每一个部署服务的环境配置文件都不一样
-        docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-            mavenBuildProject(map, deployNum) // 需要mvn jdk构建环境
-        }
-        // Docker多阶段镜像构建处理
-        Docker.multiStageBuild(this, "${DOCKER_MULTISTAGE_BUILD_IMAGES}")
-        // 构建并上传Docker镜像仓库  多节点部署只构建一次
-        Docker.build(this, "${dockerImageName}", deployNum)
-    }
-}
 
 /**
  * 上传部署文件到OSS
@@ -1587,56 +1349,6 @@ def uploadRemote(filePath, map) {
         }
         Tools.printColor(this, "上传部署文件到部署服务器完成 ✅")
     }
-}
-
-/**
- * 人工卡点审批
- * 每一个人都有点击执行流水线权限  但是不一定有发布上线的权限 为了保证项目稳定安全等需要人工审批
- */
-def manualApproval(map) {
-    // 针对生产环境部署前做人工发布审批
-    // if ("${IS_PROD}" == 'true') {
-    // 选择具有审核权限的人员 可以配置一个或多个 也可以相互审批
-    def approvalPersons = ["admin", "潘维吉", "**科技"] // 多审批人数组 参数化配置 也可指定审批人
-    def approvalPersonMobiles = "18863302302" // 审核人的手机 多个逗号分隔 用于钉钉通知等
-
-    // 两种审批 1. 或签(一名审批人员同意或拒绝即可) 2. 会签(须所有审批人同意)
-    if ("${approvalPersons}".contains("${BUILD_USER}")) {
-        // 如果是有审核权限人员发布的跳过本次审核
-    } else {
-        // 同时钉钉通知到审核人 点击链接自动进入要审核流水线  如果Jenkins提供Open API审核可直接在钉钉内完成点击审批
-        DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids, "发布流水线申请人工审批通知", "### 发布流水线申请人工审批通知 ✍🏻 " +
-                " \n #### ${BUILD_USER}申请发布${PROJECT_NAME}服务 !" +
-                " \n ### [请您点击链接去审批](${env.JOB_URL}) 👈🏻 " +
-                " \n ##### Git代码  [变更日志](${REPO_URL.replace('.git', '')}/-/commits/${BRANCH_NAME}/)  " +
-                " \n ###### Jenkins  [运行日志](${env.BUILD_URL}console)  " +
-                " \n ###### 发布人: ${BUILD_USER}" +
-                " \n ###### 通知时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
-                "${approvalPersonMobiles}")
-        // 中断询问审批
-        input(
-                message: "请相关人员审批本次部署, 是否同意继续发布 ?",
-                ok: "同意"
-        )
-        def approvalCurrentUserId = ""
-        def approvalCcurrentUser = ""
-        wrap([$class: 'BuildUser']) {
-            approvalCurrentUser = env.BUILD_USER
-            approvalCurrentUserId = env.BUILD_USER_ID
-        }
-        println(approvalCurrentUserId)
-        println(approvalCcurrentUser)
-        if (!"${approvalPersons}".contains(approvalCcurrentUser) || !"${approvalPersons}".contains(approvalCurrentUserId)) {
-            error("人工审批失败, 您没有审批的权限, 请重新运行流水线发起审批 ❌")
-        } else {
-            // 审核人同意后通知发布人 消息自动及时高效传递
-            DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids, "发布流水线申请人工审批同意通知", "### 您发布流水线已被${approvalCcurrentUser}审批同意 ✅" +
-                    " \n #### 前往流水线 [查看](${env.JOB_URL})  !" +
-                    " \n ###### 审批时间: ${Utils.formatDate()} (${Utils.getWeek(this)})",
-                    "${BUILD_USER_MOBILE}")
-        }
-    }
-    // }
 }
 
 /**
@@ -1769,175 +1481,6 @@ def integrationTesting(map) {
         println "自动化集成测试失败 ❌"
         println e.getMessage()
     }
-}
-
-/**
- * 蓝绿部署
- */
-def blueGreenDeploy(map) {
-    // 蓝绿部署: 好处是只用一个主单点服务资源实现部署过程中不间断提供服务
-    // 1、先启动部署一个临时服务将流量切到蓝服务器上  2、再部署真正提供服务的绿服务器  3、部署完绿服务器,销毁蓝服务器,将流量切回到绿服务器
-    // 先判断是否在一台服务器部署
-    if ("${IS_SAME_SERVER}" == 'false') { // 不同服务器蓝绿部署
-        def mainServerIp = remote.host // 主服务器IP
-        def blueServerIp = ""  // 蓝服务器IP
-        // 先部署一个临时服务将流量切到蓝服务器上
-        if (remote_worker_ips.isEmpty()) {
-            error("多机蓝绿部署, 请先在相关的Jenkinsfile.x配置从服务器ip数组remote_worker_ips参数 ❌")
-        }
-        // 循环串行执行多机分布式部署
-        remote_worker_ips.each { ip ->
-            println ip
-            remote.host = ip
-            blueServerIp = ip
-
-            uploadRemote(Utils.getShEchoResult(this, "pwd"), map)  // 上传代码到远程服务器
-            runProject(map)  // 运行部署
-            if (params.IS_HEALTH_CHECK == true) {
-                MACHINE_TAG = "蓝机"
-                healthCheck(map)
-            }
-        }
-        // 再部署真正提供服务的绿服务器
-        remote.host = mainServerIp
-        runProject(map)
-        if (params.IS_HEALTH_CHECK == true) {
-            MACHINE_TAG = "绿机"
-            healthCheck(map)
-        }
-        // 部署完绿服务器,销毁蓝服务器,将流量切回到绿服务器
-        sh " ssh ${proxyJumpSSHText} ${remote.user}@${blueServerIp} ' docker stop ${dockerContainerName} --time=0 || true && docker rm ${dockerContainerName} || true ' "
-        // 自动配置nginx负载均衡
-        // Nginx.conf(this, "${mainServerIp}", "${SHELL_HOST_PORT}", "${blueServerIp}", "${SHELL_HOST_PORT}")
-    } else if ("${IS_SAME_SERVER}" == 'true') {  // 单机蓝绿部署 适用于服务器资源有限 又要实现零停机随时部署发布 蓝绿部署只保持一份节点服务
-        // 从服务宿主机Docker端口号  根据主服务器端口动态生成
-        def workHostPort = Integer.parseInt(SHELL_HOST_PORT) - 1000
-        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) { // 同一台服务器主从部署情况 情况只针对后端项目
-            def workShellParamsGetopts = "${SHELL_PARAMS_GETOPTS}".replace("-c ${SHELL_HOST_PORT}", "-c ${workHostPort}")
-            // 先部署一个临时服务将流量切到蓝服务器上
-            try {
-                dokcerReleaseWorkerMsg = Utils.getShEchoResult(this, " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} && ./${dockerReleaseWorkerShellName} '${workShellParamsGetopts}' ' ")
-            } catch (error) {
-                println error.getMessage()
-                currentBuild.result = 'FAILURE'
-                error("单机蓝绿部署从服务运行步骤出现异常 ❌")
-            }
-            if (params.IS_HEALTH_CHECK == true && !dokcerReleaseWorkerMsg.contains("跳过执行")) {
-                try {
-                    MACHINE_TAG = "蓝机"
-                    healthCheckUrl = "http://${remote.host}:${workHostPort}/"
-                    healthCheck(map, " -a ${PROJECT_TYPE} -b ${healthCheckUrl}")
-                } catch (error) {
-                    // 注意：这地方是使用的旧镜像部署，会导致一个问题，如果旧镜像本身就有问题，会导致部署失败，因为永远无法使用新镜像
-                    println error.getMessage()
-                    println("从服务器健康探测失败异常捕获, 因为可能是旧镜像导致, 继续部署主服务器 ❌")
-                }
-            }
-            // 再部署真正提供服务的绿服务器
-            runProject(map)
-            if (params.IS_HEALTH_CHECK == true) {
-                MACHINE_TAG = "绿机"
-                healthCheck(map)
-            }
-            sleep(time: 2, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
-            // 部署完绿服务器,销毁蓝服务器,将流量切回到绿服务器
-            def workDockerContainerName = "${FULL_PROJECT_NAME}-worker-${SHELL_ENV_MODE}"
-            sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} ' docker stop ${workDockerContainerName} --time=0 || true && docker rm ${workDockerContainerName} || true ' "
-            // 自动配置nginx负载均衡
-            // Nginx.conf(this, "${remote.host}", "${SHELL_HOST_PORT}", "${remote.host}", "${workHostPort}")
-        }
-    }
-}
-
-/**
- * 滚动部署
- */
-def scrollToDeploy(map) {
-    if ("${IS_CANARY_DEPLOY}" == "true") {  // 金丝雀和灰度部署方式
-        println "Docker灰度发布:  滚动部署情况 只部署第一个节点 单机部署阶段已部署 退出滚动部署步骤"
-        return  // 返回后续代码不再执行
-        /* if (machineNum >= 2) { // 金丝雀分批部署控制阀门
-            return
-        } */
-    }
-
-    // 主从架构与双主架构等  负载均衡和滚动更新worker应用服务
-    if ("${IS_SAME_SERVER}" == 'false') {   // 不同服务器滚动部署
-        def machineNum = 1
-        if (remote_worker_ips.isEmpty()) {
-            error("多机滚动部署, 请先在相关的Jenkinsfile.x文件配置其它服务器ip数组remote_worker_ips参数 ❌")
-        }
-        // 循环串行执行多机分布式部署
-        remote_worker_ips.each { ip ->
-            println ip
-            remote.host = ip
-            machineNum++
-            MACHINE_TAG = "${machineNum}号机" // 动态计算是几号机
-
-            // 如果配置多节点动态替换不同的配置文件重新执行maven构建打包或者直接替换部署服务器文件
-            if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-                docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-                    mavenBuildProject(map) // 需要mvn jdk构建环境
-                }
-            }
-
-            uploadRemote(Utils.getShEchoResult(this, "pwd"), map) // 上传部署到远程服务器
-            runProject(map) //  运行部署项目
-            if (params.IS_HEALTH_CHECK == true) {
-                healthCheck(map)
-            }
-        }
-    } else if ("${IS_SAME_SERVER}" == 'true') {  // 单机滚动部署 适用于服务器资源有限 又要实现零停机随时部署发布
-        // 从服务宿主机Docker端口号  根据主服务器端口动态生成
-        def workHostPort = Integer.parseInt(SHELL_HOST_PORT) - 1000
-        if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) { // 同一台服务器主从部署情况 情况只针对后端项目
-            def workShellParamsGetopts = "${SHELL_PARAMS_GETOPTS}".replace("-c ${SHELL_HOST_PORT}", "-c ${workHostPort}")
-            try {
-                sleep(time: 2, unit: "SECONDS") // 暂停pipeline一段时间，单位为秒
-                dokcerReleaseWorkerMsg = Utils.getShEchoResult(this, " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} && ./${dockerReleaseWorkerShellName} '${workShellParamsGetopts}' ' ")
-            } catch (error) {
-                println error.getMessage()
-                currentBuild.result = 'FAILURE'
-                error("单机滚动部署运行步骤出现异常 ❌")
-            }
-            if (params.IS_HEALTH_CHECK == true && !dokcerReleaseWorkerMsg.contains("跳过执行")) {
-                MACHINE_TAG = "2号机"
-                healthCheckUrl = "http://${remote.host}:${workHostPort}/"
-                healthCheck(map, " -a ${PROJECT_TYPE} -b ${healthCheckUrl}")
-            }
-        }
-    }
-}
-
-/**
- * 灰度发布  金丝雀发布  A/B测试
- * 基于Nginx Ingress 灰度发布  实现多版本并存 非强制用户更新提升用户体验
- */
-def grayscaleDeploy(map) {
-    // 灰度发布  金丝雀发布  A/B测试  Nginx-ingress 是使用 Nginx 作为反向代理和负载平衡器的 Kubernetes 的 Ingress 控制器
-    // Kubernetes.ingressDeploy(this, map)
-    Kubernetes.deploy(this, map)
-}
-
-/**
- * 云原生K8S部署大规模集群 弹性扩缩容
- */
-def k8sDeploy(map) {
-    // 执行k8s集群部署
-    Kubernetes.deploy(this, map)
-    // 自动替换相同应用不同分布式部署节点的环境文件  打包构建上传不同的镜像
-    if ("${IS_DIFF_CONF_IN_DIFF_MACHINES}" == 'true' && "${SOURCE_TARGET_CONFIG_DIR}".trim() != "" && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-        println("K8S集群部署相同应用不同环境的部署节点")
-        Kubernetes.deploy(this, map, 2)
-    }
-}
-
-/**
- *  Serverless工作流发布  无服务器架构免运维 只需要按照云函数的定义要求进行少量的声明或者配置
- *  可在两个不同物理可用区弹性部署  自动化的服务托管和弹性伸缩功能，使得系统可以根据实际需求动态调整资源和计费，有效降低了运维复杂度
- */
-def serverlessDeploy() {
-    // K8s中的Knative或者结合公有云方案 实现Serverless无服务
 }
 
 /**
@@ -2077,40 +1620,6 @@ def genQRCode(map) {
 }
 
 /**
- * 控制服务 启动 停止 重启等
- */
-def controlService(map) {
-    // 内部语法使用docker镜像
-    if ("${IS_K8S_DEPLOY}" == 'true') {
-        docker.image("panweiji/k8s:latest").inside {
-            Deploy.controlService(this, map)
-        }
-    } else {
-        Deploy.controlService(this, map)
-    }
-}
-
-/**
- * 制品仓库版本管理 如Maven、Npm、Docker等以及通用仓库版本上传 支持大型项目复杂依赖关系
- */
-def productsWarehouse(map) {
-    //  1. Maven与Gradle仓库  2. Npm仓库  3. Docker镜像仓库  4. 通用OSS仓库
-
-    // Maven与Gradle制品仓库
-    // Maven.uploadWarehouse(this)
-
-    // Npm制品仓库
-    // Node.uploadWarehouse(this)
-
-    // Docker制品仓库
-    // Docker.push(this)
-
-    // 通用OSS制品仓库
-    // AliYunOSS.upload(this, map)
-
-}
-
-/**
  * 总会执行统一处理方法
  */
 def alwaysPost() {
@@ -2142,64 +1651,6 @@ def alwaysPost() {
     } catch (error) {
         println error.getMessage()
     }
-}
-
-/**
- * 生成版本tag和变更日志
- */
-def gitTagLog() {
-    if (IS_PACKAGE_DEPLOY == true) {
-        return  // 终止后续阶段执行  因为直接是包部署方式 无源码仓库
-    }
-    // 文件夹的所有者和现在的用户不一致导致 git命令异常
-    // sh "git config --global --add safe.directory ${env.WORKSPACE} || true"
-
-    // 未获取到参数 兼容处理 因为参数配置从代码拉取 必须先执行一次jenkins任务才能生效
-    if (!params.IS_GIT_TAG && params.IS_GIT_TAG != false) {
-        params.IS_GIT_TAG = true
-    }
-    // 构建成功后生产环境并发布类型自动打tag和变更记录  指定tag方式不再重新打tag
-    if (params.IS_GIT_TAG == true && "${IS_PROD}" == 'true' && params.GIT_TAG == GlobalVars.noGit) {
-        // 获取变更记录
-        def gitChangeLog = ""
-        if ("${Constants.DEFAULT_VERSION_COPYWRITING}" == params.VERSION_DESCRIPTION) {
-            gitChangeLog = changeLog.genChangeLog(this, 100).replaceAll("\\;", "\n")
-        } else {
-            // 使用自定义文案
-            gitChangeLog = "${params.VERSION_DESCRIPTION}"
-        }
-        def latestTag = ""
-        try {
-            if ("${params.VERSION_NUM}".trim() != "") { // 自定义版本号
-                tagVersion = "${params.VERSION_NUM}".trim()
-                println "手填的自定义版本号为: ${tagVersion} "
-            } else {
-                // sh ' git fetch --tags ' // 拉取远程分支上所有的tags 需要设置用户名密码
-                // 获取本地当前分支最新tag名称 git describe --abbrev=0 --tags  获取远程仓库最新tag命令 git ls-remote   获取所有分支的最新tag名称命令 git describe --tags `git rev-list --tags --max-count=1`
-                // 不同分支下的独立打的tag可能导致tag版本错乱的情况  过滤掉非语义化版本的tag版本号
-                // latestTag = Utils.getShEchoResult(this, "git describe --abbrev=0 --tags")
-                latestTag = Git.getGitTagMaxVersion(this)
-
-                // 生成语义化版本号
-                tagVersion = Utils.genSemverVersion(this, latestTag, gitChangeLog.contains(GlobalVars.gitCommitFeature) ?
-                        GlobalVars.gitCommitFeature : GlobalVars.gitCommitFix)
-            }
-        } catch (error) {
-            println "生成tag语义化版本号失败"
-            println error.getMessage()
-            // tagVersion = Utils.formatDate("yyyy-MM-dd") // 获取版本号失败 使用时间格式作为tag
-            tagVersion = "1.0.${env.BUILD_NUMBER}" // 自动设置不重复tag版本 使用CI构建号作为tag
-        }
-
-        // 生成tag和变更日志
-        gitTagLog.genTagAndLog(this, tagVersion, gitChangeLog, "${REPO_URL}", "${GIT_CREDENTIALS_ID}")
-    }
-
-    // 指定tag时候设置版本信息
-    if (params.GIT_TAG != GlobalVars.noGit) {
-        tagVersion = params.GIT_TAG
-    }
-    // 非生产环境下也需要回滚版本 所以需要打tag版本 如 1.0.0-beta 或者 0.x.y 等
 }
 
 /**

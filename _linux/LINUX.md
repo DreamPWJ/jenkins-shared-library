@@ -3,6 +3,7 @@
 lsof -i:8080
 netstat -tunlp
 netstat -anp | grep 8080
+nc -vuz UDP地址 443
 
 #### 查看详细进程
 

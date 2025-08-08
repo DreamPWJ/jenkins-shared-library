@@ -405,7 +405,7 @@ def call(String type = 'desktop', Map map) {
                 }
             }
         }
-    } else if (type == "desktop-2") {  //  注意！！！ 差异性较大的Pipeline建议区分groovy文件维护
+    } else if (type == "desktop-2") {  //  同类型流水线不同阶段判断执行  但差异性较大的Pipeline建议区分groovy文件维护
 
     }
 }

@@ -376,7 +376,7 @@ def call(String type = 'iot', Map map) {
             }
         }
 
-    } else if (type == "iot-2") {  // 注意！！！ 差异性较大的Pipeline建议区分groovy文件维护
+    } else if (type == "iot-2") {  // 同类型流水线不同阶段判断执行  但差异性较大的Pipeline建议区分groovy文件维护
 
     }
 
@@ -402,7 +402,7 @@ def getInitParams(map) {
     PROJECT_TYPE = jsonParams.PROJECT_TYPE ? jsonParams.PROJECT_TYPE.trim() : "1"  // 项目类型 1. 嵌入式  2. VR AR XR  3. 元宇宙
     // 计算机语言类型 1. C++  2. C  3. Python 4. JavaScript 5. Rust
     COMPUTER_LANGUAGE = jsonParams.COMPUTER_LANGUAGE ? jsonParams.COMPUTER_LANGUAGE.trim() : "1"
-    // 项目名 获取部署资源位置和指定构建模块名等
+    // 项目名 代码位置或构建模块名等
     PROJECT_NAME = jsonParams.PROJECT_NAME ? jsonParams.PROJECT_NAME.trim() : ""
     PROJECT_CHINESE_NAME = jsonParams.PROJECT_CHINESE_NAME ? jsonParams.PROJECT_CHINESE_NAME.trim() : "" // 自定义项目中文名称
     // 环境类型变量设置
