@@ -165,7 +165,7 @@ spec:
       #nodePort: {HOST_PORT}           # NodePort类型端口区间 30000–32767 不指定端口，系统将分配一个随机端口
       protocol: TCP                    # 定义通信协议
 
-#    - name: {APP_COMMON_NAME}-quic
+#    - name: {APP_COMMON_NAME}-quic    # LoadBalancer不支持同时多个协议
 #      port: {HOST_PORT}
 #      targetPort: {CONTAINER_PORT}
 #      protocol: UDP                    # UDP通讯协议 支持HTTP/3 + QUIC

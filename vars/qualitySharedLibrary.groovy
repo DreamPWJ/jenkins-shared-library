@@ -1022,7 +1022,7 @@ def pullProjectCode() {
     // 当前job是否有代码变更记录并提醒
     JenkinsCI.getNoChangeLogAndTip(this)
 
-    // 源码直接部署方式
+    // 无构建部署 源码直接部署方式
     sourceCodeDeploy()
 }
 
@@ -1065,7 +1065,7 @@ def packageDeploy() {
 }
 
 /**
- * 源码直接部署方式
+ * 无构建部署 源码直接部署方式
  * 无需打包 只需要压缩上传到服务器上执行自定义命令启动
  */
 def sourceCodeDeploy() {
