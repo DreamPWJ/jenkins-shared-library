@@ -118,10 +118,10 @@ class JenkinsCI implements Serializable {
     }
 
     /**
-     * 获取是不是自动触发构建
+     * 获取CI自动触发构建信息
      */
     @NonCPS
-    static def isAutoTrigger(ctx) {
+    static def ciAutoTriggerInfo(ctx) {
         // 获取触发原因
         def causes = ctx.currentBuild.getBuildCauses()
         // ctx.println ("触发原因：${causes}")

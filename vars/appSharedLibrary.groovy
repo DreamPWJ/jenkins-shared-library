@@ -727,7 +727,7 @@ def initInfo(map) {
 def getGitBranch(map) {
     BRANCH_NAME = "${params.GIT_BRANCH}"  // Git分支
 
-    triggerCauses = JenkinsCI.isAutoTrigger(this)
+    triggerCauses = JenkinsCI.ciAutoTriggerInfo(this)
     if (IS_AUTO_TRIGGER == true) { // 自动触发构建
         BRANCH_NAME = "$ref".replaceAll("refs/heads/", "")  // 自动获取构建分支
     }

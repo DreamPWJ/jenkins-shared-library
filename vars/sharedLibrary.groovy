@@ -1107,7 +1107,7 @@ def getShellParams(map) {
  */
 def getUserInfo() {
     // 用户相关信息
-    def triggerCauses = JenkinsCI.isAutoTrigger(this)
+    def triggerCauses = JenkinsCI.ciAutoTriggerInfo(this)
     if (IS_AUTO_TRIGGER == true) { // 自动触发构建
         println("自动触发构建: " + triggerCauses)
         addBadge(id: "auto-trigger-badge", text: "自动触发", color: 'purple', cssClass: 'badge-text--background')
