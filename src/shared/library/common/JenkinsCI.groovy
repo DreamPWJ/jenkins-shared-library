@@ -126,18 +126,14 @@ class JenkinsCI implements Serializable {
         def causes = ctx.currentBuild.getBuildCauses()
         // ctx.println ("触发原因：${causes}")
         // 遍历触发原因，判断是否为自动触发类型
-        causes.each { cause ->
-            // 自动触发的常见类型：定时任务、SCM 提交、上游任务触发等
-            if (cause.to instanceof hudson.model.Cause.UserIdCause
-                    || cause instanceof org.jenkinsci.plugins.workflow.cps.replay.ReplayCause
-            ) {
-                // 手动触发
-                ctx.IS_AUTO_TRIGGER = false
-                return cause
-            } else {
-                ctx.IS_AUTO_TRIGGER = true
-                return cause
-            }
+        if (causes.toString().contains("UserIdCause") || causes.toString().contains("ReplayCause")) {
+            // 手动触发
+            ctx.IS_AUTO_TRIGGER = false
+            return causes
+        } else {
+            // 自动触发   自动触发的常见类型：定时任务、SCM 提交、上游任务触发等
+            ctx.IS_AUTO_TRIGGER = true
+            return causes
         }
     }
 
