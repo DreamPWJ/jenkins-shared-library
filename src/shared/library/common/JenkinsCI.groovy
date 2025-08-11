@@ -141,7 +141,7 @@ class JenkinsCI implements Serializable {
             } else if (causes.toString().contains("Timer")) {
                 userName = "时间触发"
             }
-            ctx.BUILD_USER = ctx.BUILD_USER ?: userName
+            ctx.env.BUILD_USER = ctx.env.BUILD_USER ?: userName
             return causes
         }
     }
