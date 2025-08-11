@@ -1110,6 +1110,7 @@ def getUserInfo() {
     def triggerCauses = JenkinsCI.isAutoTrigger(this)
     if (IS_AUTO_TRIGGER == true) { // 自动触发构建
         println("自动触发构建: " + triggerCauses)
+        BUILD_USER = env.BUILD_USER
         addBadge(id: "auto-trigger-badge", text: "自动触发", color: 'purple', cssClass: 'badge-text--background')
     } else {
         wrap([$class: 'BuildUser']) {
