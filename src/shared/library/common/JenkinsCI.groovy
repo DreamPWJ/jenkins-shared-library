@@ -135,16 +135,16 @@ class JenkinsCI implements Serializable {
             ctx.IS_AUTO_TRIGGER = true
             def userName = "自动触发"
             if (causes.toString().contains("Upstream")) {
-                userName = "上游任务触发"
+                userName = "上游任务触发"  // 可获取上游信息展示
             } else if (causes.toString().contains("SCM") || causes.toString().contains("Git")) {
-                userName = "代码触发 by " + "$ctx.env.git_user_name"
+                userName = "代码触发"  // 获取提交用户名  "by $ctx.env.git_user_name"
             } else if (causes.toString().contains("Timer")) {
                 userName = "时间触发"
             } else if (causes.toString().contains("Remote")) {
                 userName = "远程API触发"
             }
             ctx.env.BUILD_USER = ctx.env.BUILD_USER ?: userName
-            ctx.env.BUILD_USER_MOBILE = "18863302302"
+            ctx.env.BUILD_USER_MOBILE = "18863302302" // 管理员手机号 设计成全局变量
             return causes
         }
     }
