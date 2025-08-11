@@ -136,10 +136,12 @@ class JenkinsCI implements Serializable {
             def userName = "自动触发"
             if (causes.toString().contains("Upstream")) {
                 userName = "上游任务触发"
-            } else if (causes.toString().contains("SCM")) {
-                userName = "代码触发 by "+"$ctx.env.git_user_name"
+            } else if (causes.toString().contains("SCM") || causes.toString().contains("Git")) {
+                userName = "代码触发 by " + "$ctx.env.git_user_name"
             } else if (causes.toString().contains("Timer")) {
                 userName = "时间触发"
+            } else if (causes.toString().contains("Remote")) {
+                userName = "远程API触发"
             }
             ctx.env.BUILD_USER = ctx.env.BUILD_USER ?: userName
             ctx.env.BUILD_USER_MOBILE = "18863302302"
