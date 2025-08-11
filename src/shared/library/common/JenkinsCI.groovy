@@ -128,7 +128,7 @@ class JenkinsCI implements Serializable {
         // 遍历触发原因，判断是否为自动触发类型
         causes.each { cause ->
             // 自动触发的常见类型：定时任务、SCM 提交、上游任务触发等
-            if (cause instanceof hudson.model.Cause$UserIdCaus
+            if (cause.to instanceof hudson.model.Cause.UserIdCause
                     || cause instanceof org.jenkinsci.plugins.workflow.cps.replay.ReplayCause
             ) {
                 // 手动触发
