@@ -133,6 +133,15 @@ class JenkinsCI implements Serializable {
         } else {
             // 自动触发   自动触发的常见类型：定时任务、SCM 提交、上游任务触发等
             ctx.IS_AUTO_TRIGGER = true
+            def userName = "自动触发"
+            if (causes.toString().contains("Upstream")) {
+                userName = "上游任务触发"
+            } else if (causes.toString().contains("SCM")) {
+                userName = "代码触发"
+            } else if (causes.toString().contains("Timer")) {
+                userName = "时间触发"
+            }
+            ctx.BUILD_USER = ctx.BUILD_USER ?: userName
             return causes
         }
     }
