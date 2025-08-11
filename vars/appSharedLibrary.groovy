@@ -660,6 +660,7 @@ def getInitParams(map) {
     // 获取通讯录
     contactPeoples = ""
     try {
+        // 可使用configFileProvider动态配置
         def data = libraryResource('contacts.yaml')
         Map contacts = readYaml text: data
         contactPeoples = "${contacts.people}"
@@ -726,13 +727,8 @@ def initInfo(map) {
 def getGitBranch(map) {
     BRANCH_NAME = "${params.GIT_BRANCH}"  // Git分支
 
-    try {
-        echo "$git_event_name"
-        IS_AUTO_TRIGGER = true
-    } catch (e) {
-    }
-
-    if ("${IS_AUTO_TRIGGER}" == 'true') { // 自动触发构建
+    triggerCauses = JenkinsCI.isAutoTrigger(this)
+    if (IS_AUTO_TRIGGER == true) { // 自动触发构建
         BRANCH_NAME = "$ref".replaceAll("refs/heads/", "")  // 自动获取构建分支
     }
     println "Git构建分支是: ${BRANCH_NAME} 📇"
@@ -743,10 +739,8 @@ def getGitBranch(map) {
  */
 def getUserInfo() {
     // 用户相关信息
-    if ("${IS_AUTO_TRIGGER}" == 'true') { // 自动触发构建
-        BUILD_USER = "$git_user_name"
-        BUILD_USER_MOBILE = "18863302302"
-        // BUILD_USER_EMAIL = "$git_user_email"
+    if (IS_AUTO_TRIGGER == true) { // 自动触发构建
+        println("自动触发构建: " + triggerCauses)
     } else {
         wrap([$class: 'BuildUser']) {
             try {

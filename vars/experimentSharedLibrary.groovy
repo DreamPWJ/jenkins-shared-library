@@ -154,7 +154,7 @@ def call(String type = 'experiment', Map map) {
                 IS_BEFORE_DEPLOY_NOTICE = "${map.is_before_deploy_notice}" // 是否进行部署前通知
                 IS_GRACE_SHUTDOWN = "${map.is_grace_shutdown}" // 是否进行优雅停机
                 IS_NEED_SASS = "${map.is_need_sass}" // 是否需要css预处理器sass
-                IS_AUTO_TRIGGER = false // 是否是代码提交自动触发构建
+                IS_AUTO_TRIGGER = false // 是否是自动触发构建
                 IS_GEN_QR_CODE = false // 生成二维码 方便手机端扫描
                 IS_ARCHIVE = false // 是否归档  多个job会占用磁盘空间
                 IS_ONLY_NOTICE_CHANGE_LOG = "${map.is_only_notice_change_log}" // 是否只通知发布变更记录
@@ -444,6 +444,7 @@ def getInitParams(map) {
     // 获取通讯录
     env.contactPeoples = ""
     try {
+        // 可使用configFileProvider动态配置
         def data = libraryResource('contacts.yaml')
         Map contacts = readYaml text: data
         contactPeoples = "${contacts.people}"
@@ -495,11 +496,7 @@ def initInfo() {
     //sh 'printenv'
     //println "${env.PATH}"
     //println currentBuild
-    try {
-        echo "$git_event_name"  // 如 push
-        IS_AUTO_TRIGGER = true
-    } catch (e) {
-    }
+
     // 初始化docker环境变量
     Docker.initEnv(this)
 
@@ -606,11 +603,9 @@ def getShellParams(map) {
  */
 def getUserInfo() {
     // 用户相关信息
-    if ("${IS_AUTO_TRIGGER}" == 'true') { // 自动触发构建
-        println("代码提交自动触发构建")
-        BUILD_USER = "$git_user_name"
-        BUILD_USER_MOBILE = "18863302302"
-        // BUILD_USER_EMAIL = "$git_user_email"
+    def triggerCauses = JenkinsCI.isAutoTrigger(this)
+    if (IS_AUTO_TRIGGER == true) { // 自动触发构建
+        println("自动触发构建: " + triggerCauses)
     } else {
         wrap([$class: 'BuildUser']) {
             try {

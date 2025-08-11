@@ -118,6 +118,24 @@ class JenkinsCI implements Serializable {
     }
 
     /**
+     * 获取是不是自动触发构建
+     */
+    static def isAutoTrigger(ctx) {
+        // 获取触发原因
+        def causes = ctx.currentBuild.getBuildCauses()
+        // 遍历触发原因，判断是否为自动触发类型
+        causes.each { cause ->
+            // 自动触发的常见类型：定时任务、SCM 提交、上游任务触发
+            if (cause instanceof hudson.triggers.TimerTrigger.TimerTriggerCause ||
+                    cause instanceof hudson.scm.SCMTrigger.SCMTriggerCause ||
+                    cause instanceof hudson.model.Cause.UpstreamCause) {
+                ctx.IS_AUTO_TRIGGER = true
+                return cause
+            }
+        }
+    }
+
+    /**
      * 获取变更的模块 用于自动发布指定模块
      */
     static def getAutoPublishModule(ctx, pathPrefix) {

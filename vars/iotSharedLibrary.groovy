@@ -434,6 +434,7 @@ def getInitParams(map) {
     // 获取通讯录
     contactPeoples = ""
     try {
+        // 可使用configFileProvider动态配置
         def data = libraryResource('contacts.yaml')
         Map contacts = readYaml text: data
         contactPeoples = "${contacts.people}"
@@ -474,11 +475,7 @@ def initInfo() {
     //sh 'printenv'
     //println "${env.PATH}"
     //println currentBuild
-    try {
-        echo "$git_event_name"
-        IS_AUTO_TRIGGER = true
-    } catch (e) {
-    }
+
     // 初始化docker环境变量
     Docker.initEnv(this)
 }
@@ -495,10 +492,9 @@ def getShellParams(map) {
  */
 def getUserInfo() {
     // 用户相关信息
-    if ("${IS_AUTO_TRIGGER}" == 'true') { // 自动触发构建
-        BUILD_USER = "$git_user_name"
-        BUILD_USER_MOBILE = "18863302302"
-        // BUILD_USER_EMAIL = "$git_user_email"
+    def triggerCauses = JenkinsCI.isAutoTrigger(this)
+    if (IS_AUTO_TRIGGER == true) { // 自动触发构建
+        println("自动触发构建: " + triggerCauses)
     } else {
         wrap([$class: 'BuildUser']) {
             try {
