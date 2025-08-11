@@ -80,7 +80,7 @@ def call(String type = 'iot', Map map) {
 
             environment {
                 // 系统环境变量
-                CI_GIT_CREDENTIALS_ID = "${map.ci_git_credentials_id}" // CI仓库信任ID
+                CI_GIT_CREDENTIALS_ID = "${map.ci_git_credentials_id}" // CI仓库信任ID 账号和token组合
                 GIT_CREDENTIALS_ID = "${map.git_credentials_id}" // Git信任ID
                 DING_TALK_CREDENTIALS_ID = "${map.ding_talk_credentials_id}" // 钉钉授信ID 系统管理根目录里面配置 自动生成
                 PROJECT_TAG = "${map.project_tag}" // 项目标签或项目简称
