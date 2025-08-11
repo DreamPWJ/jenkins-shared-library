@@ -741,7 +741,6 @@ def getUserInfo() {
     // 用户相关信息
     if (IS_AUTO_TRIGGER == true) { // 自动触发构建
         println("自动触发构建: " + triggerCauses)
-        BUILD_USER = env.BUILD_USER
     } else {
         wrap([$class: 'BuildUser']) {
             try {
