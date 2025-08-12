@@ -50,6 +50,10 @@ while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:" opt; do
     echo "docker_repo_registry_and_namespace=$OPTARG"
     docker_repo_registry_and_namespace=$OPTARG # docker容器仓库地址和命名空间拼接
     ;;
+  l)
+    echo "custom_dockerfile_name=$OPTARG"
+    custom_dockerfile_name=$OPTARG # 自定义部署Dockerfile名称 如 Dockerfile.xxx
+    ;;
   ?)
     echo "未知参数"
     exit 1
@@ -118,13 +122,22 @@ set -x # 开启shell命令打印模式
 if [[ ${is_push_docker_repo} == false ]]; then
   echo "🏗️  开始构建Docker镜像(无缓存构建)"
   # 拉取基础镜像避免重复下载
+  docker_file_name="Dockerfile"
   docker_pull_image_name=nginx:stable-alpine
+    if [[ "$custom_dockerfile_name" == *".ssr" ]]; then
+       docker_file_name=$custom_dockerfile_name
+       docker_pull_image_name="node:bullseye-slim"
+    fi
+    if [[ "$custom_dockerfile_name" == *".caddy" ]]; then
+       docker_file_name=$custom_dockerfile_name
+       docker_pull_image_name="caddy:alpine"
+    fi
   [ -z "$(docker images -q ${docker_pull_image_name})" ] && docker pull ${docker_pull_image_name} || echo "基础镜像 ${docker_pull_image_name} 已存在 无需重新pull拉取镜像"
 
     docker build -t ${docker_image_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg NPM_PACKAGE_FOLDER=${npm_package_folder} \
     --build-arg PROJECT_NAME=${project_name} --build-arg WEB_STRIP_COMPONENTS=${web_strip_components} \
-    -f /${deploy_folder}/web/Dockerfile .
+    -f /${deploy_folder}/web/${docker_file_name} .
 else
     echo "执行远程镜像仓库方式 无需在部署机器执行镜像构建"
 fi
