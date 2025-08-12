@@ -15,6 +15,9 @@ USER caddy
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+# 构建镜像docker build --build-arg 或 docker-compose.yaml args参数传入
+ARG NPM_PACKAGE_FOLDER
+
 # 拷贝自定义配置文件
 COPY  Caddyfile /etc/caddy/Caddyfile
 # 复制代码到容器 ADD 会自动解压，COPY 不会解压

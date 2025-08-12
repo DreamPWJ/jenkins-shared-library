@@ -90,6 +90,7 @@ cd /${deploy_folder} && ./docker-common.sh is_enable_buildkit
 # 复制配置文件
 cd /${deploy_folder}/web && cp -p default.conf ${deploy_file}/
 cd /${deploy_folder}/web && cp -p nginx.conf ${deploy_file}/
+cd /${deploy_folder}/web && cp -p Caddyfile ${deploy_file}/
 #cp -r ssl/ ${deploy_file}/
 
 echo "进入部署文件目录构建镜像: ${deploy_file}"
