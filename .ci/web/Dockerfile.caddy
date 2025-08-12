@@ -8,8 +8,8 @@ FROM caddy:alpine
 # 设置工作目录
 WORKDIR /html
 
-# 使用非 root 用户运行
-USER caddy
+# 指定用户
+USER root
 
 # 设置时区
 ENV TZ=Asia/Shanghai
