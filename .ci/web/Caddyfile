@@ -21,7 +21,7 @@ example.com {  # 替换为你的域名
          # 刷新SPA应用路由支持
          #try_files {path} /index.html
          # 启用 Gzip 压缩
-         encode gzip
+         # encode gzip
         }
 
   # 指定反向代理
