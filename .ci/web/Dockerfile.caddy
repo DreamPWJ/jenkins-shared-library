@@ -21,9 +21,7 @@ COPY  Caddyfile /etc/caddy/Caddyfile
 COPY  ${NPM_PACKAGE_FOLDER}.tar.gz .
 
 # 暴露端口
-EXPOSE 80   # HTTP
-EXPOSE 443  # HTTPS (TCP)
-EXPOSE 443/udp # HTTP/3 (QUIC/UDP)
+EXPOSE 80 443 443/udp
 
 # 设置容器健康检查
 HEALTHCHECK --interval=30s --timeout=3s \

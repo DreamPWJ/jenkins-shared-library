@@ -145,7 +145,7 @@ class Docker implements Serializable {
                             """
             } else if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
                 def webDockerFileName = "Dockerfile"
-                if ("${ctx.CUSTOM_DOCKERFILE_NAME}" != webDockerFileName) { // 非默认Dockerfile
+                if ("${ctx.CUSTOM_DOCKERFILE_NAME}" != "${webDockerFileName}") { // 非默认Dockerfile
                     webDockerFileName = "${ctx.CUSTOM_DOCKERFILE_NAME}"
                     // 如Node构建环境 SSR方式等
                     // 拉取基础镜像避免重复下载
