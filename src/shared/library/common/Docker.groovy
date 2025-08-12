@@ -150,9 +150,9 @@ class Docker implements Serializable {
                     // 如Node构建环境 SSR方式等
                     // 拉取基础镜像避免重复下载
                     def dockerImagesName = ""
-                    if (webDockerFileName.endsWithIgnoreCase(".ssr")) {
+                    if (webDockerFileName.endsWith(".ssr")) {
                         dockerImagesName = "node:bullseye-slim"
-                    } else if (webDockerFileName.endsWithIgnoreCase(".caddy")) {
+                    } else if (webDockerFileName.endsWith(".caddy")) {
                         dockerImagesName = "caddy:alpine"
                     }
                     ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
