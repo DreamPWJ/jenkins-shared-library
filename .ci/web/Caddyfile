@@ -10,22 +10,27 @@
     # 自动申请和续期 Let's Encrypt 证书
 #    email 406798106@qq.com # 替换为你的邮箱
 #    acme_ca https://acme-v02.api.letsencrypt.org/directory
+   # 日志级别
+   # log_level info
 }
 
 # 主站点配置 默认监听 80 和 443 端口
-:80 {  # 替换为你的域名
+:80 {  # 替换为你的域名 如果使用域名，请确保 DNS 已正确指向服务器
   # 根目录设置
     root * /html
-  # 启用文件服务器
-    file_server {
-         # 刷新SPA应用路由支持
-         # try_files {path} /index.html
-         # 启用 Gzip 压缩
-         # encode gzip
-        }
+  # 启用静态文件服务器
+    file_server
 
-  # 指定反向代理
-   #reverse_proxy localhost:80
+  # 允许跨域请求
+	header Access-Control-Allow-Origin *
+	header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+	header Access-Control-Allow-Headers "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+
+  # 刷新SPA应用路由支持
+	try_files {path} {path}/ /index.html
+
+  # 指定反向代理 将 /api 前缀的请求代理到后端服务器
+   #reverse_proxy /api/* localhost:3000
 
   # HTTP/3 声明头
 #    header {
