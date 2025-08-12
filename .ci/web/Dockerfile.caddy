@@ -17,11 +17,19 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 构建镜像docker build --build-arg 或 docker-compose.yaml args参数传入
 ARG NPM_PACKAGE_FOLDER
+ARG PROJECT_NAME
+ARG WEB_STRIP_COMPONENTS
 
 # 拷贝自定义配置文件
 COPY  Caddyfile /etc/caddy/Caddyfile
 # 复制代码到容器 ADD 会自动解压，COPY 不会解压
-ADD  ${NPM_PACKAGE_FOLDER}.tar.gz .
+COPY  ${NPM_PACKAGE_FOLDER}.tar.gz .
+
+# 解压文件到当前文件夹下并删除压缩文件
+RUN pwd \
+ && tar -xzvf ${NPM_PACKAGE_FOLDER}.tar.gz --strip-components ${WEB_STRIP_COMPONENTS} >/dev/null 2>&1 \
+ && rm -f ${NPM_PACKAGE_FOLDER}.tar.gz \
+ && ls
 
 # 暴露端口
 EXPOSE 80 443 443/udp
