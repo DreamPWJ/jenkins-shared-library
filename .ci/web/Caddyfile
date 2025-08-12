@@ -21,9 +21,9 @@
   # 启用静态文件服务器
     file_server
 
-    localhost {
-        respond "Hello, Caddy!"
-    }
+#    localhost {
+#        respond "Hello, Caddy!"
+#    }
 
   # 允许跨域请求
 	header Access-Control-Allow-Origin *
