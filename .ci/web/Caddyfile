@@ -1,11 +1,11 @@
 # 自动 HTTPS + HTTP/3 配置
 {
     # 启用 HTTP/3 (QUIC)
-    servers {
-        protocol {
-            experimental_http3
-        }
-    }
+#    servers {
+#        protocol {
+#            experimental_http3
+#        }
+#    }
     
     # 自动申请和续期 Let's Encrypt 证书
     email 406798106@qq.com # 替换为你的邮箱
