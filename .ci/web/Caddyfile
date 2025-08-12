@@ -18,6 +18,8 @@ example.com {  # 替换为你的域名
     root * /html
   # 启用文件服务器
     file_server {
+         # 刷新SPA应用路由支持
+         try_files {path} /index.html
          # 启用 Gzip 压缩
          encode gzip
         }
