@@ -690,7 +690,7 @@ def getInitParams(map) {
     // 自定义健康探测HTTP路径Path  默认根目录 /
     CUSTOM_HEALTH_CHECK_PATH = jsonParams.CUSTOM_HEALTH_CHECK_PATH ? jsonParams.CUSTOM_HEALTH_CHECK_PATH.trim() : "/"
     // 自定义部署Dockerfile名称 如 Dockerfile.xxx
-    CUSTOM_DOCKERFILE_NAME = jsonParams.CUSTOM_DOCKERFILE_NAME ? jsonParams.CUSTOM_DOCKERFILE_NAME.trim() : ""
+    CUSTOM_DOCKERFILE_NAME = jsonParams.CUSTOM_DOCKERFILE_NAME ? jsonParams.CUSTOM_DOCKERFILE_NAME.trim() : "Dockerfile"
     // 自定义Python版本
     CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.10.0"
     // 自定义Python启动文件名称 默认app.py文件
