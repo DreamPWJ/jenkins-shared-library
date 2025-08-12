@@ -51,7 +51,7 @@
     # 安全增强头
     header {
         # 内容安全策略 允许 unsafe-eval
-        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-eval';"
+        # Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-eval';"
         # XSS 防护
         X-XSS-Protection "1; mode=block"
         # 禁用 MIME 类型嗅探
