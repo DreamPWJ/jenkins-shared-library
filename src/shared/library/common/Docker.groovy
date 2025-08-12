@@ -147,12 +147,11 @@ class Docker implements Serializable {
                 def webDockerFileName = "Dockerfile"
                 if ("${ctx.CUSTOM_DOCKERFILE_NAME}" != "${webDockerFileName}") { // 非默认Dockerfile
                     webDockerFileName = "${ctx.CUSTOM_DOCKERFILE_NAME}"
-                    // 如Node构建环境 SSR方式等
                     // 拉取基础镜像避免重复下载
                     def dockerImagesName = ""
-                    if (webDockerFileName.endsWith(".ssr")) {
+                    if (webDockerFileName.endsWith(".ssr")) {  // 如Node构建环境 SSR方式等
                         dockerImagesName = "node:bullseye-slim"
-                    } else if (webDockerFileName.endsWith(".caddy")) {
+                    } else if (webDockerFileName.endsWith(".caddy")) {  // Caddy Web服务器
                         dockerImagesName = "caddy:alpine"
                     }
                     ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
