@@ -16,16 +16,16 @@
 example.com {  # 替换为你的域名
   # 根目录设置
     root * /html
-    file_server {
-        # 启用 Gzip 压缩
-        encode gzip zstd
-    }
+#    file_server {
+#        # 启用 Gzip 压缩
+#        encode gzip zstd
+#    }
 
   # HTTP/3 声明头
-    header {
-         # 声明支持 HTTP/3
-         Alt-Svc h3=":443"; ma=86400
-        }
+#    header {
+#         # 声明支持 HTTP/3
+#         Alt-Svc h3=":443"; ma=86400
+#        }
 
     # 日志配置
     log {
