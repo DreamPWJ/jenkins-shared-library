@@ -2,6 +2,7 @@
 # Version 1.0.0
 # Description: 自定义构建Caddy Web项目镜像
 
+# 基础镜像
 FROM caddy:alpine
 
 # 设置工作目录
@@ -14,12 +15,10 @@ USER caddy
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-
-# 复制静态文件到容器
-COPY ./public/ ./
-
-# 复制 Caddyfile 配置
-COPY ./Caddyfile /etc/caddy/Caddyfile
+# 拷贝自定义配置文件
+COPY  Caddyfile /etc/caddy/Caddyfile
+# 复制代码到容器 ADD 会自动解压，COPY 不会解压
+COPY  ${NPM_PACKAGE_FOLDER}.tar.gz .
 
 # 暴露端口
 EXPOSE 80   # HTTP
@@ -29,7 +28,6 @@ EXPOSE 443/udp # HTTP/3 (QUIC/UDP)
 # 设置容器健康检查
 HEALTHCHECK --interval=30s --timeout=3s \
   CMD curl -f http://localhost:80 || exit 1
-
 
 # 启动 Caddy
 CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
