@@ -16,6 +16,9 @@
 example.com {  # 替换为你的域名
   # 根目录设置
     root * /html
+  # 指定反向代理
+    reverse_proxy localhost:80
+
 #    file_server {
 #        # 启用 Gzip 压缩
 #        encode gzip zstd
