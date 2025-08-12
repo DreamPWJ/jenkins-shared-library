@@ -414,7 +414,7 @@ def call(String type = 'android-ios', Map map) {
                     }
                 }
 
-                stage('钉钉通知') {
+                stage('消息通知') {
                     when {
                         beforeAgent true
                         expression { return ("${params.IS_DING_NOTICE}" == 'true') }

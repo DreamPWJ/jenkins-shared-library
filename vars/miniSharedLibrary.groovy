@@ -294,7 +294,7 @@ def call(String type = 'wx-mini', Map map) {
                     }
                 }
 
-                stage('钉钉通知') {
+                stage('消息通知') {
                     when {
                         expression { return ("${params.IS_DING_NOTICE}" == 'true') }
                     }

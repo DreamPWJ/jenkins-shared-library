@@ -417,7 +417,7 @@ def call(String type = 'web', Map map) {
                     }
                 }
 
-                stage('钉钉通知') {
+                stage('消息通知') {
                     when {
                         expression { return true }
                     }
