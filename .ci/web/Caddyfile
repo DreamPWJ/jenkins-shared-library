@@ -2,24 +2,25 @@
 {
     # 启用 HTTP/3 (QUIC)
 #    servers {
+        # 显式指定监听地址
+        # listen [::]:443
 #        protocol {
 #            experimental_http3
 #        }
 #    }
 
     # 自动申请和续期 Let's Encrypt 证书
-#    email 406798106@qq.com # 替换为你的邮箱
-#    acme_ca https://acme-v02.api.letsencrypt.org/directory
+   email 406798106@qq.com # 替换为你的邮箱
+   acme_ca https://acme-v02.api.letsencrypt.org/directory
+   # 禁用所有自动重定向
+   auto_https disable_redirects
 
    # 日志级别
    # log_level info
-
-   # 禁用所有自动重定向
-   auto_https disable_redirects
 }
 
 # 主站点配置 默认监听 80 和 443 端口
-:80 {  # 替换为你的域名 如果使用域名，请确保 DNS 已正确指向服务器
+:80, :443, [::]:80, [::]:443 {  # 替换为你的域名 如果使用域名，请确保 DNS 已正确指向服务器
   # 根目录设置
     root * /html
   # 启用静态文件服务器
