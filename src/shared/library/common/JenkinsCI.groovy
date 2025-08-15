@@ -31,6 +31,24 @@ class JenkinsCI implements Serializable {
     }
 
     /**
+     * 获取所有分布式node节点信息
+     */
+    static def getAllNodes(ctx) {
+        def nodesArray = ["master"] // 添加 Master 节点标签
+        // 获取所有节点
+        def allNodes = Jenkins.instance.nodes
+        // 遍历节点并输出名称
+        for (node in allNodes) {
+            def computer = node.toComputer()
+            if (computer.online) { // 是否在线
+                nodesArray.add(node.nodeName) // 匹配的是label标签 而非名称
+            }
+            // ctx.println( "Node Name: ${node.nodeName}")
+        }
+        return nodesArray
+    }
+
+    /**
      * 当前job是否有代码变更记录并提醒
      */
     static def getNoChangeLogAndTip(ctx) {
@@ -150,61 +168,6 @@ class JenkinsCI implements Serializable {
     }
 
     /**
-     * 获取变更的模块 用于自动发布指定模块
-     */
-    static def getAutoPublishModule(ctx, pathPrefix) {
-        // 使用Set容器去重，保证待发布模块只有一份
-        def modulePaths = new HashSet<String>();
-        for (def filePath in getChangedFilesList(ctx)) {
-            // 忽略非模块的文件，比如 Jenkinsfile 等
-            if (filePath.startsWith(pathPrefix)) {
-                // 从超过模块前缀长度的下标开始，获取下一个/的位置。即分串位置
-                int index = filePath.indexOf('/', pathPrefix.length() + 1)
-                // 分串得到模块路径，比如 develop/panweiji/app
-                def modulePath = filePath.substring(0, index)
-                // println 'add module path: ' + modulePath
-                modulePaths.add(modulePath)
-            }
-        }
-        println '自动获取变更发布模块列表：' + modulePaths
-        return modulePaths;
-    }
-
-    /**
-     * 自动触发
-     */
-    static def trigger(ctx, jenkinsUrl, deployJobName, token, params) {
-        // 远程访问Open API文档: https://www.jenkins.io/doc/book/using/remote-access-api/
-        // WORKSPACE returns working directory which is /var/lib/jenkins/jobs/FOLDER/...
-        def folder = ctx.WORKSPACE.split('/')[5]
-        // http://jenkins.domain.com/generic-webhook-trigger/invoke?token=jenkins-app
-        def url = "$jenkinsUrl/job/$folder/job/$deployJobName/buildWithParameters?token=$token"
-        params.each { param ->
-            url = url + "\\&$param.key=$param.value"
-        }
-        ctx.echo("jenkins job自动触发部署: $url")
-        ctx.sh(script: "curl -fk $url")
-    }
-
-    /**
-     * 获取所有分布式node节点信息
-     */
-    static def getAllNodes(ctx) {
-        def nodesArray = ["master"] // 添加 Master 节点标签
-        // 获取所有节点
-        def allNodes = Jenkins.instance.nodes
-        // 遍历节点并输出名称
-        for (node in allNodes) {
-            def computer = node.toComputer()
-            if (computer.online) { // 是否在线
-                nodesArray.add(node.nodeName) // 匹配的是label标签 而非名称
-            }
-            // ctx.println( "Node Name: ${node.nodeName}")
-        }
-        return nodesArray
-    }
-
-    /**
      * 获取所有job信息 并更新等
      */
     static def getAllJobs(ctx) {
@@ -242,6 +205,44 @@ class JenkinsCI implements Serializable {
      */
     static def reload(ctx) {
         // curl -X POST http://localhost:9090/reload -u "<your-admin-username>:<your-admin-api-token>"
+    }
+
+
+    /**
+     * 获取变更的模块 用于自动发布指定模块
+     */
+    static def getAutoPublishModule(ctx, pathPrefix) {
+        // 使用Set容器去重，保证待发布模块只有一份
+        def modulePaths = new HashSet<String>();
+        for (def filePath in getChangedFilesList(ctx)) {
+            // 忽略非模块的文件，比如 Jenkinsfile 等
+            if (filePath.startsWith(pathPrefix)) {
+                // 从超过模块前缀长度的下标开始，获取下一个/的位置。即分串位置
+                int index = filePath.indexOf('/', pathPrefix.length() + 1)
+                // 分串得到模块路径，比如 develop/panweiji/app
+                def modulePath = filePath.substring(0, index)
+                // println 'add module path: ' + modulePath
+                modulePaths.add(modulePath)
+            }
+        }
+        println '自动获取变更发布模块列表：' + modulePaths
+        return modulePaths;
+    }
+
+    /**
+     * 自动触发
+     */
+    static def trigger(ctx, jenkinsUrl, deployJobName, token, params) {
+        // 远程访问Open API文档: https://www.jenkins.io/doc/book/using/remote-access-api/
+        // WORKSPACE returns working directory which is /var/lib/jenkins/jobs/FOLDER/...
+        def folder = ctx.WORKSPACE.split('/')[5]
+        // http://jenkins.domain.com/generic-webhook-trigger/invoke?token=jenkins-app
+        def url = "$jenkinsUrl/job/$folder/job/$deployJobName/buildWithParameters?token=$token"
+        params.each { param ->
+            url = url + "\\&$param.key=$param.value"
+        }
+        ctx.echo("jenkins job自动触发部署: $url")
+        ctx.sh(script: "curl -fk $url")
     }
 
     /**
