@@ -54,8 +54,8 @@ class JenkinsCI implements Serializable {
            */
         // 判断指定的构建节点不在线 自动切换成在线的节点构建部署 保障高可用
         if (!nodesArray.contains(ctx.params.SELECT_BUILD_NODE)) {
-            ctx.println( "指定的构建节点不在线${ctx.params.SELECT_BUILD_NODE} 自动动态调度到主节点的${masterName}构建")
-            ctx.params.SELECT_BUILD_NODE = masterName
+            ctx.println( "指定的构建节点${ctx.params.SELECT_BUILD_NODE}不在线 自动动态调度到主节点${masterName}构建")
+            ctx.env.params.SELECT_BUILD_NODE = masterName
         }
 
         return nodesArray
