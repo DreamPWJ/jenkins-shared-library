@@ -87,7 +87,7 @@ arp -a
 
 - 首先将服务器系统版本的ISO镜像下载到高配U盘 , 使用Rufus软件(引导ISO镜像Windows、Linux、VMware ESXI、UEFI等)制作的USB的系统启动引导盘 (安装完成reboot now重启系统前先拔出U盘, 再物理重启进入系统) , Help选项可提前进入shell控制
 - 插入U盘启动主机大部分长按Delete或F2可以进入BIOS页面选择USB系统启动引导盘 F10保存设置 (BIOS界面不同电脑快捷键不一样 有EFI源文件安装 一般台式机开机按delete键可以进入BIOS，笔记本按F2键进入BIOS)
-- 断电后上电自动启动系统: 在服务器的BIOS设置中，找到相关的自启动选项。 通常选项称为“Power AC”或类似的名称。 将其设置为“On”或“Always On”，服务器在断电后上电就会自动启动  Linux默认上电自动开机自启动
+- 断电后上电自动启动系统: 在服务器的硬件层BIOS/UEFI设置中，找到相关的自启动选项。 通常选项称为“Power AC”或类似的名称。 将其设置为“On”或“Always On”，服务器在断电后上电后主板会触发开机动作
 - 安装参考文章: https://developer.aliyun.com/article/927675  设置阿里云镜像源: http://mirrors.aliyun.com/ubuntu/
 - Ubuntu系统设置固定静态IP地址: _linux/network目录下有配置 命令如 sudo nano /etc/netplan/00-installer-config.yaml
 - CentOS系统设置固定静态IP地址: 在 /etc/sysconfig/network-scripts/ifcfg-* 配置后执行systemctl restart network生效 在VMware中使用自动桥接配置 网关使用宿主机相同的网关地址并且主网络开启桥接协议、 journalctl查看xfs_repair修复emergency mode紧急模式磁盘挂载故障
