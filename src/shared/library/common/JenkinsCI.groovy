@@ -34,7 +34,8 @@ class JenkinsCI implements Serializable {
      * 获取所有分布式node节点信息
      */
     static def getAllNodes(ctx, map) {
-        def nodesArray = ["master"] // 添加 Master 节点标签
+        def masterName = "master"
+        def nodesArray = [masterName] // 添加 Master 节点标签
         // 获取所有节点
         def allNodes = Jenkins.instance.nodes
         // 遍历节点并输出名称
@@ -48,11 +49,13 @@ class JenkinsCI implements Serializable {
 
         // 对节点进行优先级排序
         /*   def configNodeName = "${ctx.PROJECT_TYPE.toInteger() == ctx.GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
-               int targetIndex = allNodes.findIndexOf { it == configNodeName }
-               ctx.ALL_ONLINE_NODES = targetIndex == -1 ? allNodes : [allNodes[targetIndex]] + allNodes.minus(configNodeName).sort()
-            */
+         int targetIndex = allNodes.findIndexOf { it == configNodeName }
+              ctx.ALL_ONLINE_NODES = targetIndex == -1 ? allNodes : [allNodes[targetIndex]] + allNodes.minus(configNodeName).sort()
+           */
         // 判断指定的构建节点不在线 自动切换成在线的节点构建部署 保障高可用
-        // ctx.params.SELECT_BUILD_NODE=nodesArray[0] // 或者默认 master
+        if (!nodesArray.contains(ctx.params.SELECT_BUILD_NODE)) {
+            ctx.params.SELECT_BUILD_NODE = masterName // 动态调度到默认的master构建
+        }
 
         return nodesArray
     }
