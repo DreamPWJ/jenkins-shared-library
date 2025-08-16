@@ -33,7 +33,6 @@ class JenkinsCI implements Serializable {
     /**
      * 获取所有分布式node节点信息
      */
-    @NonCPS
     static def getAllNodes(ctx, map) {
         def masterName = "master"
         def nodesArray = [masterName] // 添加 Master 节点标签
@@ -55,7 +54,8 @@ class JenkinsCI implements Serializable {
            */
         // 判断指定的构建节点不在线 自动切换成在线的节点构建部署 保障高可用
         if (!nodesArray.contains(ctx.params.SELECT_BUILD_NODE)) {
-            ctx.params.SELECT_BUILD_NODE = masterName // 动态调度到默认的master构建
+            ctx.println( "指定的构建节点不在线${ctx.params.SELECT_BUILD_NODE} 自动动态调度到主节点的${masterName}构建")
+            ctx.params.SELECT_BUILD_NODE = masterName
         }
 
         return nodesArray
