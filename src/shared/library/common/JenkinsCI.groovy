@@ -33,6 +33,7 @@ class JenkinsCI implements Serializable {
     /**
      * 获取所有分布式node节点信息
      */
+    @NonCPS
     static def getAllNodes(ctx, map) {
         def masterName = "master"
         def nodesArray = [masterName] // 添加 Master 节点标签
