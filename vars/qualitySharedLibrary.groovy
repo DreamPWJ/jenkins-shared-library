@@ -349,7 +349,7 @@ def call(String type = 'quality', Map map) {
                         }
                     }
                     matrix {
-                        agent any
+                        // agent any
                         axes {
                             axis {
                                 name 'PLATFORM'
