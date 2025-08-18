@@ -53,6 +53,7 @@ class JenkinsCI implements Serializable {
         def configNodeName = "${ctx.PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
         int targetIndex = nodesArray.findIndexOf { it == configNodeName }
         ctx.ALL_ONLINE_NODES = targetIndex == -1 ? nodesArray : [nodesArray[targetIndex]] + nodesArray.minus(configNodeName).sort()
+        ctx.println("在线构建节点: ${ctx.ALL_ONLINE_NODES} ")
 
         // 判断指定的构建节点不在线 自动切换成在线可用的节点构建部署 保障高可用
         if (!nodesArray.contains(ctx.params.SELECT_BUILD_NODE)) {
