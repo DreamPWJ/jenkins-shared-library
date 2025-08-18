@@ -38,9 +38,7 @@ def call(String type = 'quality', Map map) {
     if (type == "quality") { // 针对标准项目
         pipeline {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
-            agent { label "${params.SELECT_BUILD_NODE}" }
-            //agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}" }
-            //agent any
+            agent { label "${params.SELECT_BUILD_NODE} || any" }
 
             parameters {
                 choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback, GlobalVars.start, GlobalVars.stop, GlobalVars.destroy, GlobalVars.restart],

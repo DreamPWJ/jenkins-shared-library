@@ -24,7 +24,7 @@ def call(String type = 'iot', Map map) {
     if (type == "iot") { // 针对标准项目
         pipeline {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
-            agent { label "${map.jenkins_node}" }
+            agent { label "${map.jenkins_node} || any" }
 
             parameters {
                 choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback],

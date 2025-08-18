@@ -23,7 +23,7 @@ def call(String type = 'wx-mini', Map map) {
     if (type == "wx-mini") { // 针对微信小程序项目Pipeline脚本
         pipeline {
             agent {
-                label "${map.jenkins_node}"  // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
+                label "${map.jenkins_node} || any"  // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
             }
 
             parameters {
