@@ -56,10 +56,10 @@ class JenkinsCI implements Serializable {
         if (!nodesArray.contains(ctx.params.SELECT_BUILD_NODE)) {
             ctx.println("指定的${ctx.params.SELECT_BUILD_NODE}构建节点不在线 ⚠️ 为同一组节点配置相同标签，Jenkins 会自动选择标签匹配的首个可用节点 ")
             //ctx.params.SELECT_BUILD_NODE = [masterName]
-            // 停止当前构建
-            // ctx.currentBuild.result = 'FAILURE'
             // 因缓存构建节点  需要重新触发执行流水更新
             triggerUpstreamJob(ctx, ctx.env.JOB_NAME)
+            // 停止当前构建
+            ctx.currentBuild.result = 'FAILURE'
         }
 
         return nodesArray
