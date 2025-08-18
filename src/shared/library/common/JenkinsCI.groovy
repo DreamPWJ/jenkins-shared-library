@@ -63,7 +63,7 @@ class JenkinsCI implements Serializable {
             // triggerUpstreamJob(ctx, ctx.env.JOB_NAME)
             // 停止当前构建
             ctx.currentBuild.result = 'ABORTED'
-            ctx.error("指定的${ctx.params.SELECT_BUILD_NODE}构建节点不在线, 重新自动触发当前Pipeline运行 自动切换成在线可用的节点构建部署 ⚠️")
+            //ctx.error("指定的${ctx.params.SELECT_BUILD_NODE}构建节点不在线, 重新自动触发当前Pipeline运行 自动切换成在线可用的节点构建部署 ⚠️")
         }
 
         return nodesArray
