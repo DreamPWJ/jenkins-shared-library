@@ -703,6 +703,9 @@ def getInitParams(map) {
 
     // 获取分布式构建节点 可动态构建在不同机器上
     def allNodes = JenkinsCI.getAllOnlineNodes(this, map)
+    def configNodeName = "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
+    int targetIndex = allNodes.findIndexOf { it == configNodeName }
+    ALL_ONLINE_NODES = targetIndex == -1 ? allNodes : [allNodes[targetIndex]] + allNodes.minus(configNodeName).sort()
 
     // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值
     if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
