@@ -50,9 +50,9 @@ class JenkinsCI implements Serializable {
         nodesArray.add(masterName) // 添加 Master 节点标签 最后添加主节点 使用优先级最低 尽量实现构建和调度分离 高效资源利用
 
         // 对节点进行优先级排序
-   /*     def configNodeName = "${ctx.PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
+        def configNodeName = "${ctx.PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
         int targetIndex = nodesArray.findIndexOf { it == configNodeName }
-        ctx.ALL_ONLINE_NODES = targetIndex == -1 ? nodesArray : [nodesArray[targetIndex]] + nodesArray.minus(configNodeName).sort()*/
+        ctx.ALL_ONLINE_NODES = targetIndex == -1 ? nodesArray : [nodesArray[targetIndex]] + nodesArray.minus(configNodeName).sort()
 
         // 判断指定的构建节点不在线 自动切换成在线可用的节点构建部署 保障高可用
         if (!nodesArray.contains(ctx.params.SELECT_BUILD_NODE)) {
