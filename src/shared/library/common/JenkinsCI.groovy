@@ -57,7 +57,7 @@ class JenkinsCI implements Serializable {
 
         // 判断指定的构建节点不在线 自动切换成在线可用的节点构建部署 保障高可用
         if (!nodesArray.contains(ctx.params.SELECT_BUILD_NODE)) {
-            ctx.println("指定的${ctx.params.SELECT_BUILD_NODE}构建节点不在线 ⚠️ 为同一组节点配置相同标签，Jenkins 会自动选择标签匹配的首个可用节点 ")
+            ctx.println("指定的${ctx.params.SELECT_BUILD_NODE}构建节点不在线 ⚠️ 为同一组节点配置相同标签或标签表达式，Jenkins 会自动选择标签匹配的首个可用节点 ")
             //ctx.params.SELECT_BUILD_NODE = [masterName]
             // 因缓存构建节点  需要重新触发执行流水更新
             // triggerUpstreamJob(ctx, ctx.env.JOB_NAME) // 防止循环调用
