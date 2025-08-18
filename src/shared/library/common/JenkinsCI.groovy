@@ -49,10 +49,10 @@ class JenkinsCI implements Serializable {
         nodesArray.add(masterName) // 添加 Master 节点标签 最后添加主节点 使用优先级最低 尽量实现构建和调度分离 高效资源利用
 
         // 对节点进行优先级排序
-        /*   def configNodeName = "${ctx.PROJECT_TYPE.toInteger() == ctx.GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
-         int targetIndex = allNodes.findIndexOf { it == configNodeName }
-              ctx.ALL_ONLINE_NODES = targetIndex == -1 ? allNodes : [allNodes[targetIndex]] + allNodes.minus(configNodeName).sort()
-           */
+        def configNodeName = "${ctx.PROJECT_TYPE.toInteger() == ctx.GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
+        int targetIndex = allNodes.findIndexOf { it == configNodeName }
+        ctx.ALL_ONLINE_NODES = targetIndex == -1 ? allNodes : [allNodes[targetIndex]] + allNodes.minus(configNodeName).sort()
+
         // 判断指定的构建节点不在线 自动切换成在线可用的节点构建部署 保障高可用
         if (!nodesArray.contains(ctx.params.SELECT_BUILD_NODE)) {
             ctx.println("指定的${ctx.params.SELECT_BUILD_NODE}构建节点不在线 ⚠️ 为同一组节点配置相同标签，Jenkins 会自动选择标签匹配的首个可用节点 ")
@@ -61,7 +61,7 @@ class JenkinsCI implements Serializable {
             triggerUpstreamJob(ctx, ctx.env.JOB_NAME)
             // 停止当前构建
             ctx.currentBuild.result = 'ABORTED'
-            error("指定的${ctx.params.SELECT_BUILD_NODE}构建节点不在线, 重新自动触发当前Pipeline运行 自动切换成在线可用的节点构建部署 ⚠️")
+            ctx.error("指定的${ctx.params.SELECT_BUILD_NODE}构建节点不在线, 重新自动触发当前Pipeline运行 自动切换成在线可用的节点构建部署 ⚠️")
         }
 
         return nodesArray
