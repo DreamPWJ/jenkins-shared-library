@@ -35,7 +35,7 @@ class JenkinsCI implements Serializable {
      */
     static def getAllNodes(ctx, map) {
         def masterName = "master"
-        def nodesArray = [masterName] // 添加 Master 节点标签
+        def nodesArray = []
         // 获取所有节点
         def allNodes = Jenkins.instance.nodes
         // 遍历节点并输出名称
@@ -46,6 +46,7 @@ class JenkinsCI implements Serializable {
             }
             // ctx.println( "Node Name: ${node.nodeName}")
         }
+        nodesArray.add(masterName) // 添加 Master 节点标签 最后添加主节点 实现构建和调度分离 高效资源利用
 
         // 对节点进行优先级排序
         /*   def configNodeName = "${ctx.PROJECT_TYPE.toInteger() == ctx.GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
