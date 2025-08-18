@@ -46,7 +46,7 @@ class JenkinsCI implements Serializable {
             }
             // ctx.println( "Node Name: ${node.nodeName}")
         }
-        nodesArray.add(masterName) // 添加 Master 节点标签 最后添加主节点 实现构建和调度分离 高效资源利用
+        nodesArray.add(masterName) // 添加 Master 节点标签 最后添加主节点 使用优先级最低 尽量实现构建和调度分离 高效资源利用
 
         // 对节点进行优先级排序
         /*   def configNodeName = "${ctx.PROJECT_TYPE.toInteger() == ctx.GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
@@ -60,7 +60,8 @@ class JenkinsCI implements Serializable {
             // 因缓存构建节点  需要重新触发执行流水更新
             triggerUpstreamJob(ctx, ctx.env.JOB_NAME)
             // 停止当前构建
-            ctx.currentBuild.result = 'FAILURE'
+            ctx.currentBuild.result = 'ABORTED'
+            error("指定的${ctx.params.SELECT_BUILD_NODE}构建节点不在线, 重新自动触发当前Pipeline运行 ❌")
         }
 
         return nodesArray
