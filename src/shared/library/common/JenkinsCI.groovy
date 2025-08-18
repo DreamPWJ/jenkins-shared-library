@@ -51,7 +51,7 @@ class JenkinsCI implements Serializable {
 
         // 对节点进行优先级排序
         def configNodeName = "${ctx.PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
-        int targetIndex = allNodes.findIndexOf { it == configNodeName }
+        int targetIndex = nodesArray.findIndexOf { it == configNodeName }
         ctx.ALL_ONLINE_NODES = targetIndex == -1 ? allNodes : [allNodes[targetIndex]] + allNodes.minus(configNodeName).sort()
 
         // 判断指定的构建节点不在线 自动切换成在线可用的节点构建部署 保障高可用
