@@ -49,7 +49,7 @@ class JenkinsCI implements Serializable {
         nodesArray.add(masterName) // 添加 Master 节点标签 最后添加主节点 使用优先级最低 尽量实现构建和调度分离 高效资源利用
 
         // 对节点进行优先级排序
-        def configNodeName = "${ctx.PROJECT_TYPE.toInteger() == ctx.GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
+        def configNodeName = "${ctx.PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
         int targetIndex = allNodes.findIndexOf { it == configNodeName }
         ctx.ALL_ONLINE_NODES = targetIndex == -1 ? allNodes : [allNodes[targetIndex]] + allNodes.minus(configNodeName).sort()
 
