@@ -85,7 +85,7 @@ map.put('jenkins_node', 'node-3')
 map.put('jenkins_node_frontend', 'node-3')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.9
-map.put('nodejs', 'Node18')
+map.put('nodejs', 'Node20')
 map.put('maven', 'Maven3.6')
 map.put('jdk_publisher', 'openjdk')
 map.put('jdk', '11')
@@ -169,7 +169,6 @@ JSON_PARAMS
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "pengbo-admin" ,
     "SHELL_PARAMS" : "pengbo-admin web 9011 80 test" ,
-    "NODE_VERSION": "16" ,
     "NPM_RUN_PARAMS" : "build-operations:test",
 }
 
@@ -183,7 +182,6 @@ JSON_PARAMS
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "pengbo-park-admin" ,
     "SHELL_PARAMS" : "pengbo-park-admin web 9012 80 test" ,
-    "NODE_VERSION": "16" ,
     "NPM_RUN_PARAMS" : "build-parking:test",
 }
 
@@ -196,7 +194,6 @@ JSON_PARAMS
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "pengbo-park-merchant" ,
     "SHELL_PARAMS" : "pengbo-park-merchant web 9013 80 test" ,
-    "NODE_VERSION": "16" ,
     "NPM_RUN_PARAMS" : "build-merchant:test",
 }
 
