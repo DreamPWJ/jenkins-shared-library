@@ -41,6 +41,7 @@ class Tests implements Serializable {
      * 安全测试报告
      */
     static def createSecurityReport(ctx) {
+        // OWASP Dependency-Check 漏洞扫描  高危漏洞等 地址: https://github.com/dependency-check/DependencyCheck
 
     }
 

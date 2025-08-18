@@ -1,0 +1,72 @@
+# 全局配置块 自动 HTTPS + HTTP/3 配置
+{
+    # 启用 HTTP/3 (QUIC)
+#    servers {
+        # 显式指定监听地址
+        # listen [::]:443
+#        protocol {
+#            experimental_http3
+#        }
+#    }
+
+    # 自动申请和续期 Let's Encrypt 证书
+   #email 406798106@qq.com # 替换为你的邮箱
+   #acme_ca https://acme-v02.api.letsencrypt.org/directory
+   # 禁用所有自动 HTTP→HTTPS 重定向
+   auto_https disable_redirects
+
+   # 日志级别
+   # log_level info
+}
+
+# 主站点配置 默认监听 80 和 443 端口
+:80 {  # 替换为你的域名 如果使用域名，请确保 DNS 已正确指向服务器
+  # 根目录设置
+    root * /html
+  # 启用静态文件服务器
+    file_server
+  # 启动压缩
+    encode gzip
+
+#    localhost {
+#        respond "Hello, Caddy!"
+#    }
+
+  # 允许跨域请求
+	header Access-Control-Allow-Origin *
+	header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+	header Access-Control-Allow-Headers "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+
+  # 刷新SPA应用路由支持
+	try_files {path} {path}/ /index.html
+
+  # 指定反向代理 将 /api 前缀的请求代理到后端服务器
+   #reverse_proxy /api/* localhost:3000
+
+  # HTTP/3 声明头
+#    header {
+#         # 声明支持 HTTP/3
+#         Alt-Svc h3=":443"; ma=86400
+#        }
+
+    # 日志配置
+    log {
+        output stdout
+        format console
+        #output file /var/log/caddy/access.log
+        #format json
+    }
+
+    # 安全增强头
+    header {
+        # 内容安全策略 允许 unsafe-eval
+        # Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-eval';"
+        # XSS 防护
+        X-XSS-Protection "1; mode=block"
+        # 禁用 MIME 类型嗅探
+        X-Content-Type-Options "nosniff"
+        # 防止点击劫持
+        X-Frame-Options "DENY"
+    }
+
+}

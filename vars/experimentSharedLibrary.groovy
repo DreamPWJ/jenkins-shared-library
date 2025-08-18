@@ -38,9 +38,7 @@ def call(String type = 'experiment', Map map) {
     if (type == "experiment") { // 针对标准项目
         pipeline {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
-            agent { label "${params.SELECT_BUILD_NODE}" }
-            // agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}" }
-            // agent any
+            agent { label "${params.SELECT_BUILD_NODE} || any" }
 
             parameters {
                 choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback, GlobalVars.start, GlobalVars.stop, GlobalVars.destroy, GlobalVars.restart],
@@ -133,7 +131,7 @@ def call(String type = 'experiment', Map map) {
                 // 动态设置环境变量  配置相关自定义工具
                 //PATH = "${JAVA_HOME}/bin:$PATH"
 
-                CI_GIT_CREDENTIALS_ID = "${map.ci_git_credentials_id}" // CI仓库信任ID
+                CI_GIT_CREDENTIALS_ID = "${map.ci_git_credentials_id}" // CI仓库信任ID 账号和token组合
                 GIT_CREDENTIALS_ID = "${map.git_credentials_id}" // Git信任ID
                 DING_TALK_CREDENTIALS_ID = "${map.ding_talk_credentials_id}" // 钉钉授信ID 系统管理根目录里面配置 自动生成
                 DEPLOY_FOLDER = "${map.deploy_folder}" // 服务器上部署所在的文件夹名称
@@ -154,7 +152,7 @@ def call(String type = 'experiment', Map map) {
                 IS_BEFORE_DEPLOY_NOTICE = "${map.is_before_deploy_notice}" // 是否进行部署前通知
                 IS_GRACE_SHUTDOWN = "${map.is_grace_shutdown}" // 是否进行优雅停机
                 IS_NEED_SASS = "${map.is_need_sass}" // 是否需要css预处理器sass
-                IS_AUTO_TRIGGER = false // 是否是代码提交自动触发构建
+                IS_AUTO_TRIGGER = false // 是否是自动触发构建
                 IS_GEN_QR_CODE = false // 生成二维码 方便手机端扫描
                 IS_ARCHIVE = false // 是否归档  多个job会占用磁盘空间
                 IS_ONLY_NOTICE_CHANGE_LOG = "${map.is_only_notice_change_log}" // 是否只通知发布变更记录
@@ -371,7 +369,7 @@ def getInitParams(map) {
     // 自定义健康探测HTTP路径Path  默认根目录 /
     env.CUSTOM_HEALTH_CHECK_PATH = jsonParams.CUSTOM_HEALTH_CHECK_PATH ? jsonParams.CUSTOM_HEALTH_CHECK_PATH.trim() : "/"
     // 自定义部署Dockerfile名称 如 Dockerfile.xxx
-    env.CUSTOM_DOCKERFILE_NAME = jsonParams.CUSTOM_DOCKERFILE_NAME ? jsonParams.CUSTOM_DOCKERFILE_NAME.trim() : ""
+    env.CUSTOM_DOCKERFILE_NAME = jsonParams.CUSTOM_DOCKERFILE_NAME ? jsonParams.CUSTOM_DOCKERFILE_NAME.trim() : "Dockerfile"
     // 自定义Python版本
     env.CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.10.0"
     // 自定义Python启动文件名称 默认app.py文件
@@ -379,10 +377,7 @@ def getInitParams(map) {
 
 
     // 获取分布式构建节点 可动态构建在不同机器上
-    def allNodes = JenkinsCI.getAllNodes(this)
-    def configNodeName = "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
-    int targetIndex = allNodes.findIndexOf { it == configNodeName }
-    ALL_ONLINE_NODES = targetIndex == -1 ? allNodes : [allNodes[targetIndex]] + allNodes.minus(configNodeName).sort()
+    def allNodes = JenkinsCI.getAllOnlineNodes(this, map)
 
     // 统一处理第一次CI/CD部署或更新pipeline代码导致jenkins构建参数不存在 初始化默认值
     if (IS_CANARY_DEPLOY == null) {  // 判断参数不存在 设置默认值
@@ -444,6 +439,7 @@ def getInitParams(map) {
     // 获取通讯录
     env.contactPeoples = ""
     try {
+        // 可使用configFileProvider动态配置
         def data = libraryResource('contacts.yaml')
         Map contacts = readYaml text: data
         contactPeoples = "${contacts.people}"
@@ -495,11 +491,7 @@ def initInfo() {
     //sh 'printenv'
     //println "${env.PATH}"
     //println currentBuild
-    try {
-        echo "$git_event_name"  // 如 push
-        IS_AUTO_TRIGGER = true
-    } catch (e) {
-    }
+
     // 初始化docker环境变量
     Docker.initEnv(this)
 
@@ -555,7 +547,7 @@ def getShellParams(map) {
     if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
         SHELL_WEB_PARAMS_GETOPTS = " -a ${SHELL_PROJECT_NAME} -b ${SHELL_PROJECT_TYPE} -c ${SHELL_HOST_PORT} " +
                 "-d ${SHELL_EXPOSE_PORT} -e ${SHELL_ENV_MODE}  -f ${DEPLOY_FOLDER} -g ${NPM_PACKAGE_FOLDER} -h ${WEB_STRIP_COMPONENTS} " +
-                "-i ${IS_PUSH_DOCKER_REPO}  -k ${DOCKER_REPO_REGISTRY}/${DOCKER_REPO_NAMESPACE}  "
+                "-i ${IS_PUSH_DOCKER_REPO}  -k ${DOCKER_REPO_REGISTRY}/${DOCKER_REPO_NAMESPACE} -l ${CUSTOM_DOCKERFILE_NAME} "
     } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd) {
         // 使用getopts的方式进行shell参数传递
         SHELL_PARAMS_GETOPTS = " -a ${SHELL_PROJECT_NAME} -b ${SHELL_PROJECT_TYPE} -c ${SHELL_HOST_PORT} " +
@@ -606,11 +598,9 @@ def getShellParams(map) {
  */
 def getUserInfo() {
     // 用户相关信息
-    if ("${IS_AUTO_TRIGGER}" == 'true') { // 自动触发构建
-        println("代码提交自动触发构建")
-        BUILD_USER = "$git_user_name"
-        BUILD_USER_MOBILE = "18863302302"
-        // BUILD_USER_EMAIL = "$git_user_email"
+    def triggerCauses = JenkinsCI.ciAutoTriggerInfo(this)
+    if (IS_AUTO_TRIGGER == true) { // 自动触发构建
+        println("自动触发构建: " + triggerCauses)
     } else {
         wrap([$class: 'BuildUser']) {
             try {

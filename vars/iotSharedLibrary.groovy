@@ -24,7 +24,7 @@ def call(String type = 'iot', Map map) {
     if (type == "iot") { // 针对标准项目
         pipeline {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
-            agent { label "${map.jenkins_node}" }
+            agent { label "${map.jenkins_node} || any" }
 
             parameters {
                 choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback],
@@ -80,7 +80,7 @@ def call(String type = 'iot', Map map) {
 
             environment {
                 // 系统环境变量
-                CI_GIT_CREDENTIALS_ID = "${map.ci_git_credentials_id}" // CI仓库信任ID
+                CI_GIT_CREDENTIALS_ID = "${map.ci_git_credentials_id}" // CI仓库信任ID 账号和token组合
                 GIT_CREDENTIALS_ID = "${map.git_credentials_id}" // Git信任ID
                 DING_TALK_CREDENTIALS_ID = "${map.ding_talk_credentials_id}" // 钉钉授信ID 系统管理根目录里面配置 自动生成
                 PROJECT_TAG = "${map.project_tag}" // 项目标签或项目简称
@@ -285,7 +285,7 @@ def call(String type = 'iot', Map map) {
                     }
                 }
 
-                stage('钉钉通知') {
+                stage('消息通知') {
                     when {
                         expression { return true }
                     }
@@ -434,6 +434,7 @@ def getInitParams(map) {
     // 获取通讯录
     contactPeoples = ""
     try {
+        // 可使用configFileProvider动态配置
         def data = libraryResource('contacts.yaml')
         Map contacts = readYaml text: data
         contactPeoples = "${contacts.people}"
@@ -474,11 +475,7 @@ def initInfo() {
     //sh 'printenv'
     //println "${env.PATH}"
     //println currentBuild
-    try {
-        echo "$git_event_name"
-        IS_AUTO_TRIGGER = true
-    } catch (e) {
-    }
+
     // 初始化docker环境变量
     Docker.initEnv(this)
 }
@@ -495,10 +492,9 @@ def getShellParams(map) {
  */
 def getUserInfo() {
     // 用户相关信息
-    if ("${IS_AUTO_TRIGGER}" == 'true') { // 自动触发构建
-        BUILD_USER = "$git_user_name"
-        BUILD_USER_MOBILE = "18863302302"
-        // BUILD_USER_EMAIL = "$git_user_email"
+    def triggerCauses = JenkinsCI.ciAutoTriggerInfo(this)
+    if (IS_AUTO_TRIGGER == true) { // 自动触发构建
+        println("自动触发构建: " + triggerCauses)
     } else {
         wrap([$class: 'BuildUser']) {
             try {

@@ -24,7 +24,7 @@ def call(String type = 'desktop', Map map) {
     if (type == "desktop") {
         pipeline {
             agent {
-                label "${map.jenkins_node}"  // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
+                label "${map.jenkins_node} || any"  // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
             }
 
             parameters {
@@ -77,7 +77,7 @@ def call(String type = 'desktop', Map map) {
                 GEM_HOME = "~/.gems" // gem环境 ~/.gems  执行gem env或bundle env查看
 
                 NODE_VERSION = "${map.nodejs}" // nodejs版本
-                CI_GIT_CREDENTIALS_ID = "${map.ci_git_credentials_id}" // CI仓库信任IDÒ
+                CI_GIT_CREDENTIALS_ID = "${map.ci_git_credentials_id}" // CI仓库信任ID 账号和token组合
                 GIT_CREDENTIALS_ID = "${map.git_credentials_id}" // Git信任ID
                 PROJECT_TAG = "${map.project_tag}" // 项目标签或项目简称
                 IS_AUTO_TRIGGER = false // 是否是自动触发构建
@@ -336,7 +336,7 @@ def call(String type = 'desktop', Map map) {
                     }
                 }
 
-                stage('钉钉通知') {
+                stage('消息通知') {
                     when {
                         expression { return ("${params.IS_DING_NOTICE}" == 'true') }
                     }
@@ -445,6 +445,7 @@ def getInitParams(map) {
     // 获取通讯录
     contactPeoples = ""
     try {
+        // 可使用configFileProvider动态配置
         def data = libraryResource('contacts.yaml')
         Map contacts = readYaml text: data
         contactPeoples = "${contacts.people}"
@@ -499,13 +500,8 @@ def getInitParams(map) {
 def getGitBranch(map) {
     BRANCH_NAME = "${params.GIT_BRANCH}"  // Git分支
 
-    try {
-        echo "$git_event_name"
-        IS_AUTO_TRIGGER = true
-    } catch (e) {
-    }
-
-    if ("${IS_AUTO_TRIGGER}" == 'true') { // 自动触发构建
+    triggerCauses = JenkinsCI.ciAutoTriggerInfo(this)
+    if (IS_AUTO_TRIGGER == true) { // 自动触发构建
         BRANCH_NAME = "$ref".replaceAll("refs/heads/", "")  // 自动获取构建分支
     }
     println "Git构建分支是: ${BRANCH_NAME} 📇"
@@ -516,10 +512,8 @@ def getGitBranch(map) {
  */
 def getUserInfo() {
     // 用户相关信息
-    if ("${IS_AUTO_TRIGGER}" == 'true') { // 自动触发构建
-        BUILD_USER = "$git_user_name"
-        BUILD_USER_MOBILE = "18863302302"
-        // BUILD_USER_EMAIL = "$git_user_email"
+    if (IS_AUTO_TRIGGER == true) { // 自动触发构建
+        println("自动触发构建: " + triggerCauses)
     } else {
         wrap([$class: 'BuildUser']) {
             try {

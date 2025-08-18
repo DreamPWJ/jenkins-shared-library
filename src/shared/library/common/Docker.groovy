@@ -145,11 +145,15 @@ class Docker implements Serializable {
                             """
             } else if ("${ctx.PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
                 def webDockerFileName = "Dockerfile"
-                if ("${ctx.CUSTOM_DOCKERFILE_NAME}" != "") {
+                if ("${ctx.CUSTOM_DOCKERFILE_NAME}" != "${webDockerFileName}") { // 非默认Dockerfile
                     webDockerFileName = "${ctx.CUSTOM_DOCKERFILE_NAME}"
-                    // 如Node构建环境 SSR方式等
                     // 拉取基础镜像避免重复下载
-                    def dockerImagesName = "node:bullseye-slim"
+                    def dockerImagesName = ""
+                    if (webDockerFileName.endsWith(".ssr")) {  // 如Node构建环境 SSR方式等
+                        dockerImagesName = "node:bullseye-slim"
+                    } else if (webDockerFileName.endsWith(".caddy")) {  // Caddy Web服务器
+                        dockerImagesName = "caddy:alpine"
+                    }
                     ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} && pwd && \
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \

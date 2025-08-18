@@ -50,6 +50,10 @@ while getopts ":a:b:c:d:e:f:g:h:i:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:" opt; do
     echo "docker_repo_registry_and_namespace=$OPTARG"
     docker_repo_registry_and_namespace=$OPTARG # docker容器仓库地址和命名空间拼接
     ;;
+  l)
+    echo "custom_dockerfile_name=$OPTARG"
+    custom_dockerfile_name=$OPTARG # 自定义部署Dockerfile名称 如 Dockerfile.xxx
+    ;;
   ?)
     echo "未知参数"
     exit 1
@@ -86,6 +90,7 @@ cd /${deploy_folder} && ./docker-common.sh is_enable_buildkit
 # 复制配置文件
 cd /${deploy_folder}/web && cp -p default.conf ${deploy_file}/
 cd /${deploy_folder}/web && cp -p nginx.conf ${deploy_file}/
+cd /${deploy_folder}/web && cp -p Caddyfile ${deploy_file}/
 #cp -r ssl/ ${deploy_file}/
 
 echo "进入部署文件目录构建镜像: ${deploy_file}"
@@ -118,13 +123,22 @@ set -x # 开启shell命令打印模式
 if [[ ${is_push_docker_repo} == false ]]; then
   echo "🏗️  开始构建Docker镜像(无缓存构建)"
   # 拉取基础镜像避免重复下载
+  docker_file_name="Dockerfile"
   docker_pull_image_name=nginx:stable-alpine
+    if [[ "$custom_dockerfile_name" == *".ssr" ]]; then
+       docker_file_name=$custom_dockerfile_name
+       docker_pull_image_name="node:bullseye-slim"
+    fi
+    if [[ "$custom_dockerfile_name" == *".caddy" ]]; then
+       docker_file_name=$custom_dockerfile_name
+       docker_pull_image_name="caddy:alpine"
+    fi
   [ -z "$(docker images -q ${docker_pull_image_name})" ] && docker pull ${docker_pull_image_name} || echo "基础镜像 ${docker_pull_image_name} 已存在 无需重新pull拉取镜像"
 
     docker build -t ${docker_image_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg NPM_PACKAGE_FOLDER=${npm_package_folder} \
     --build-arg PROJECT_NAME=${project_name} --build-arg WEB_STRIP_COMPONENTS=${web_strip_components} \
-    -f /${deploy_folder}/web/Dockerfile .
+    -f /${deploy_folder}/web/${docker_file_name} .
 else
     echo "执行远程镜像仓库方式 无需在部署机器执行镜像构建"
 fi
@@ -160,7 +174,7 @@ if [[ "${exist_port_code}" == 1 ]]; then
 fi
 
 echo -e "\033[32m 👨‍💻 启动运行Docker容器 环境: ${env_mode} 映射端口: ${host_port}:${expose_port} \033[0m"
-docker run -d --restart=on-failure:6 -p ${host_port}:${expose_port} -p ${host_port}:${expose_port}/udp \
+docker run -d --restart=on-failure:6 -p ${host_port}:${expose_port} -p ${host_port}:443/udp \
   -m 4G --log-opt max-size=100m --log-opt max-file=1  ${dynamic_run_args} \
   --name ${docker_container_name} ${docker_image_name}
 

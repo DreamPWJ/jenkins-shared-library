@@ -70,7 +70,7 @@ map.put('is_grace_shutdown', false)
 // 是否进行服务启动健康探测 K8S集群类型设置false使用自带健康探测
 map.put('is_health_check', false)
 // 是否Pipeline内脚本钉钉通知  总开关
-map.put('is_ding_notice', false)
+map.put('is_ding_notice', true)
 // 是否进行部署前通知
 map.put('is_before_deploy_notice', false)
 // 是否只通知发布变更记录
@@ -139,22 +139,6 @@ JSON_PARAMS
    "APPLICATION_DOMAIN" : "https://oauth2.pengbocloud.com"
 }
 
-authorization-server-k8s-prod
-基于Sa-Token的OAuth授权中心-k8s集群
-JSON_PARAMS
-{
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
-   "BRANCH_NAME" : "feature/infra" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "authorization-server" ,
-   "SHELL_PARAMS" : "authorization-server app 6869 9000 prod",
-   "IS_MAVEN_SINGLE_MODULE" : true,
-   "IS_K8S_DEPLOY" : true,
-   "K8S_POD_REPLICAS" : "1",
-   "CUSTOM_HEALTH_CHECK_PATH" : "/health-check",
-   "GIT_PROJECT_FOLDER_NAME" : "single-module-projects/authorization-server",
-   "APPLICATION_DOMAIN" : "https://oauth.pengbocloud.com"
-}
 
 */
 

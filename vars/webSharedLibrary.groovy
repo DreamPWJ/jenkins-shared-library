@@ -39,7 +39,6 @@ def call(String type = 'web', Map map) {
         pipeline {
             // 指定流水线每个阶段在哪里执行(物理机、虚拟机、Docker容器) agent any
             agent { label "${PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}" }
-            //agent { label "${map.jenkins_node}" }
 
             parameters {
                 choice(name: 'DEPLOY_MODE', choices: [GlobalVars.release, GlobalVars.rollback, GlobalVars.start, GlobalVars.stop, GlobalVars.destroy, GlobalVars.restart],
@@ -100,7 +99,7 @@ def call(String type = 'web', Map map) {
                 //PATH = "${JAVA_HOME}/bin:$PATH"
                 SYSTEM_HOME = "$HOME" // 系统主目录
 
-                CI_GIT_CREDENTIALS_ID = "${map.ci_git_credentials_id}" // CI仓库信任ID
+                CI_GIT_CREDENTIALS_ID = "${map.ci_git_credentials_id}" // CI仓库信任ID 账号和token组合
                 GIT_CREDENTIALS_ID = "${map.git_credentials_id}" // Git信任ID
                 DING_TALK_CREDENTIALS_ID = "${map.ding_talk_credentials_id}" // 钉钉授信ID 系统管理根目录里面配置 自动生成
                 DEPLOY_FOLDER = "${map.deploy_folder}" // 服务器上部署所在的文件夹名称
@@ -117,7 +116,7 @@ def call(String type = 'web', Map map) {
                 IS_SAME_SERVER = "${map.is_same_server}" // 是否在同一台服务器分布式部署
                 IS_BEFORE_DEPLOY_NOTICE = "${map.is_before_deploy_notice}" // 是否进行部署前通知
                 IS_NEED_SASS = "${map.is_need_sass}" // 是否需要css预处理器sass
-                IS_AUTO_TRIGGER = false // 是否是代码提交自动触发构建
+                IS_AUTO_TRIGGER = false // 是否是自动触发构建
                 IS_GEN_QR_CODE = false // 生成二维码 方便手机端扫描
                 IS_ARCHIVE = false // 是否归档
                 IS_INTEGRATION_TESTING = false // 是否进集成测试
@@ -417,7 +416,7 @@ def call(String type = 'web', Map map) {
                     }
                 }
 
-                stage('钉钉通知') {
+                stage('消息通知') {
                     when {
                         expression { return true }
                     }
@@ -590,7 +589,7 @@ def getInitParams(map) {
     // 自定义健康探测HTTP路径Path  默认根目录 /
     CUSTOM_HEALTH_CHECK_PATH = jsonParams.CUSTOM_HEALTH_CHECK_PATH ? jsonParams.CUSTOM_HEALTH_CHECK_PATH.trim() : "/"
     // 自定义部署Dockerfile名称 如 Dockerfile.xxx
-    CUSTOM_DOCKERFILE_NAME = jsonParams.CUSTOM_DOCKERFILE_NAME ? jsonParams.CUSTOM_DOCKERFILE_NAME.trim() : ""
+    CUSTOM_DOCKERFILE_NAME = jsonParams.CUSTOM_DOCKERFILE_NAME ? jsonParams.CUSTOM_DOCKERFILE_NAME.trim() : "Dockerfile"
 
     // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
     if ("${map.default_git_branch}".trim() != "") {
@@ -656,6 +655,7 @@ def getInitParams(map) {
     // 获取通讯录
     contactPeoples = ""
     try {
+        // 可使用configFileProvider动态配置
         def data = libraryResource('contacts.yaml')
         Map contacts = readYaml text: data
         contactPeoples = "${contacts.people}"
@@ -697,11 +697,7 @@ def initInfo() {
     //sh 'printenv'
     //println "${env.PATH}"
     //println currentBuild
-    try {
-        echo "$git_event_name"
-        IS_AUTO_TRIGGER = true
-    } catch (e) {
-    }
+
     // 初始化docker环境变量
     Docker.initEnv(this)
 }
@@ -712,7 +708,7 @@ def initInfo() {
 def getShellParams(map) {
     SHELL_WEB_PARAMS_GETOPTS = " -a ${SHELL_PROJECT_NAME} -b ${SHELL_PROJECT_TYPE} -c ${SHELL_HOST_PORT} " +
             "-d ${SHELL_EXPOSE_PORT} -e ${SHELL_ENV_MODE}  -f ${DEPLOY_FOLDER} -g ${NPM_PACKAGE_FOLDER} -h ${WEB_STRIP_COMPONENTS} " +
-            "-i ${IS_PUSH_DOCKER_REPO}  -k ${DOCKER_REPO_REGISTRY}/${DOCKER_REPO_NAMESPACE}  "
+            "-i ${IS_PUSH_DOCKER_REPO}  -k ${DOCKER_REPO_REGISTRY}/${DOCKER_REPO_NAMESPACE} -l ${CUSTOM_DOCKERFILE_NAME} "
 }
 
 /**
@@ -720,10 +716,9 @@ def getShellParams(map) {
  */
 def getUserInfo() {
     // 用户相关信息
-    if ("${IS_AUTO_TRIGGER}" == 'true') { // 自动触发构建
-        BUILD_USER = "$git_user_name"
-        BUILD_USER_MOBILE = "18863302302"
-        // BUILD_USER_EMAIL = "$git_user_email"
+    def triggerCauses = JenkinsCI.ciAutoTriggerInfo(this)
+    if (IS_AUTO_TRIGGER == true) { // 自动触发构建
+        println("自动触发构建: " + triggerCauses)
     } else {
         wrap([$class: 'BuildUser']) {
             try {

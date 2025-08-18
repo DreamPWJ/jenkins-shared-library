@@ -132,6 +132,7 @@ JSON_PARAMS
    "PROJECT_NAME" : "github-test" ,
    "SHELL_PARAMS" : "github-test code 9021 80 prod" ,
    "NPM_RUN_PARAMS" : "build",
+   "CUSTOM_DOCKERFILE_NAME" : "Dockerfile.caddy",
 }
 
 

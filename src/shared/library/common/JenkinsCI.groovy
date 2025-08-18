@@ -31,6 +31,45 @@ class JenkinsCI implements Serializable {
     }
 
     /**
+     * 获取所有在线分布式node节点信息
+     */
+    @NonCPS
+    static def getAllOnlineNodes(ctx, map) {
+        def masterName = "master"
+        def nodesArray = []
+        // 获取所有节点
+        def allNodes = Jenkins.instance.nodes
+        // 遍历节点并输出名称
+        for (node in allNodes) {
+            def computer = node.toComputer()
+            if (computer.online) { // 是否在线
+                nodesArray.add(node.nodeName) // 匹配的是label标签 而非名称 标签可以是一组实现高可用
+            }
+            // ctx.println( "Node Name: ${node.nodeName}")
+        }
+        nodesArray.add(masterName) // 添加 Master 节点标签 最后添加主节点 使用优先级最低 尽量实现构建和调度分离 高效资源利用
+
+        // 对节点进行优先级排序
+        def configNodeName = "${ctx.PROJECT_TYPE.toInteger() == GlobalVars.frontEnd ? "${map.jenkins_node_frontend}" : "${map.jenkins_node}"}"
+        int targetIndex = nodesArray.findIndexOf { it == configNodeName }
+        ctx.ALL_ONLINE_NODES = targetIndex == -1 ? nodesArray : [nodesArray[targetIndex]] + nodesArray.minus(configNodeName).sort()
+        // ctx.println("在线构建节点: ${ctx.ALL_ONLINE_NODES} ")
+
+        // 判断指定的构建节点不在线 自动切换成在线可用的节点构建部署 保障高可用
+        if (!nodesArray.contains(ctx.params.SELECT_BUILD_NODE)) {
+            ctx.println("指定的${ctx.params.SELECT_BUILD_NODE}构建节点不在线 ⚠️ 为同一组节点配置相同标签或标签表达式，Jenkins 会自动选择标签匹配的首个可用节点 ")
+            //ctx.params.SELECT_BUILD_NODE = [masterName]
+            // 因缓存构建节点  需要重新触发执行流水更新
+            // triggerUpstreamJob(ctx, ctx.env.JOB_NAME) // 防止循环调用
+            // 停止当前构建
+            ctx.currentBuild.result = 'ABORTED'
+            ctx.error("指定的${ctx.params.SELECT_BUILD_NODE}构建节点不在线, 重新自动触发当前Pipeline运行 自动切换成在线可用的节点构建部署 ⚠️")
+        }
+
+        return nodesArray
+    }
+
+    /**
      * 当前job是否有代码变更记录并提醒
      */
     static def getNoChangeLogAndTip(ctx) {
@@ -83,6 +122,7 @@ class JenkinsCI implements Serializable {
             def isWait = false // 是否等待子流水线完成后 上游才算完成
             def nextJob = ctx.build job: "${nextJobName}",
                     parameters: [
+                            ctx.gitParameter(name: 'GIT_BRANCH', value: "${ctx.params.GIT_BRANCH}"),
                             ctx.booleanParam(name: 'IS_CODE_QUALITY_ANALYSIS', value: ctx.params.IS_CODE_QUALITY_ANALYSIS),
                             ctx.booleanParam(name: 'IS_DING_NOTICE', value: ctx.params.IS_DING_NOTICE),
                     ],
@@ -118,58 +158,35 @@ class JenkinsCI implements Serializable {
     }
 
     /**
-     * 获取变更的模块 用于自动发布指定模块
+     * 获取CI自动触发构建信息
      */
-    static def getAutoPublishModule(ctx, pathPrefix) {
-        // 使用Set容器去重，保证待发布模块只有一份
-        def modulePaths = new HashSet<String>();
-        for (def filePath in getChangedFilesList(ctx)) {
-            // 忽略非模块的文件，比如 Jenkinsfile 等
-            if (filePath.startsWith(pathPrefix)) {
-                // 从超过模块前缀长度的下标开始，获取下一个/的位置。即分串位置
-                int index = filePath.indexOf('/', pathPrefix.length() + 1)
-                // 分串得到模块路径，比如 develop/panweiji/app
-                def modulePath = filePath.substring(0, index)
-                // println 'add module path: ' + modulePath
-                modulePaths.add(modulePath)
+    @NonCPS
+    static def ciAutoTriggerInfo(ctx) {
+        // 获取触发原因
+        def causes = ctx.currentBuild.getBuildCauses()
+        // ctx.println ("触发原因：${causes}")
+        // 遍历触发原因，判断是否为自动触发类型
+        if (causes.toString().contains("UserIdCause") || causes.toString().contains("ReplayCause")) {
+            // 手动触发
+            ctx.IS_AUTO_TRIGGER = false
+            return causes
+        } else {
+            // 自动触发   自动触发的常见类型：定时任务、SCM 提交、上游任务触发等
+            ctx.IS_AUTO_TRIGGER = true
+            def userName = "自动触发"
+            if (causes.toString().contains("Upstream")) {
+                userName = "上游任务触发"  // 可获取上游信息展示
+            } else if (causes.toString().contains("SCM") || causes.toString().contains("Git")) {
+                userName = "代码触发"  // 获取提交用户名  "by $ctx.env.git_user_name"
+            } else if (causes.toString().contains("Timer")) {
+                userName = "时间触发"
+            } else if (causes.toString().contains("Remote")) {
+                userName = "远程API触发"
             }
+            ctx.env.BUILD_USER = ctx.env.BUILD_USER ?: userName
+            ctx.env.BUILD_USER_MOBILE = "18863302302" // 管理员手机号 设计成全局变量
+            return causes
         }
-        println '自动获取变更发布模块列表：' + modulePaths
-        return modulePaths;
-    }
-
-    /**
-     * 自动触发
-     */
-    static def trigger(ctx, jenkinsUrl, deployJobName, token, params) {
-        // 远程访问Open API文档: https://www.jenkins.io/doc/book/using/remote-access-api/
-        // WORKSPACE returns working directory which is /var/lib/jenkins/jobs/FOLDER/...
-        def folder = ctx.WORKSPACE.split('/')[5]
-        // http://jenkins.domain.com/generic-webhook-trigger/invoke?token=jenkins-app
-        def url = "$jenkinsUrl/job/$folder/job/$deployJobName/buildWithParameters?token=$token"
-        params.each { param ->
-            url = url + "\\&$param.key=$param.value"
-        }
-        ctx.echo("jenkins job自动触发部署: $url")
-        ctx.sh(script: "curl -fk $url")
-    }
-
-    /**
-     * 获取所有分布式node节点信息
-     */
-    static def getAllNodes(ctx) {
-        def nodesArray = ["master"] // 添加 Master 节点标签
-        // 获取所有节点
-        def allNodes = Jenkins.instance.nodes
-        // 遍历节点并输出名称
-        for (node in allNodes) {
-            def computer = node.toComputer()
-            if (computer.online) { // 是否在线
-                nodesArray.add(node.nodeName) // 匹配的是label标签 而非名称
-            }
-            // ctx.println( "Node Name: ${node.nodeName}")
-        }
-        return nodesArray
     }
 
     /**
@@ -210,6 +227,44 @@ class JenkinsCI implements Serializable {
      */
     static def reload(ctx) {
         // curl -X POST http://localhost:9090/reload -u "<your-admin-username>:<your-admin-api-token>"
+    }
+
+
+    /**
+     * 获取变更的模块 用于自动发布指定模块
+     */
+    static def getAutoPublishModule(ctx, pathPrefix) {
+        // 使用Set容器去重，保证待发布模块只有一份
+        def modulePaths = new HashSet<String>();
+        for (def filePath in getChangedFilesList(ctx)) {
+            // 忽略非模块的文件，比如 Jenkinsfile 等
+            if (filePath.startsWith(pathPrefix)) {
+                // 从超过模块前缀长度的下标开始，获取下一个/的位置。即分串位置
+                int index = filePath.indexOf('/', pathPrefix.length() + 1)
+                // 分串得到模块路径，比如 develop/panweiji/app
+                def modulePath = filePath.substring(0, index)
+                // println 'add module path: ' + modulePath
+                modulePaths.add(modulePath)
+            }
+        }
+        println '自动获取变更发布模块列表：' + modulePaths
+        return modulePaths;
+    }
+
+    /**
+     * 自动触发
+     */
+    static def trigger(ctx, jenkinsUrl, deployJobName, token, params) {
+        // 远程访问Open API文档: https://www.jenkins.io/doc/book/using/remote-access-api/
+        // WORKSPACE returns working directory which is /var/lib/jenkins/jobs/FOLDER/...
+        def folder = ctx.WORKSPACE.split('/')[5]
+        // http://jenkins.domain.com/generic-webhook-trigger/invoke?token=jenkins-app
+        def url = "$jenkinsUrl/job/$folder/job/$deployJobName/buildWithParameters?token=$token"
+        params.each { param ->
+            url = url + "\\&$param.key=$param.value"
+        }
+        ctx.echo("jenkins job自动触发部署: $url")
+        ctx.sh(script: "curl -fk $url")
     }
 
     /**
