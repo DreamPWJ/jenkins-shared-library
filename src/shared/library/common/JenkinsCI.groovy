@@ -43,7 +43,7 @@ class JenkinsCI implements Serializable {
         for (node in allNodes) {
             def computer = node.toComputer()
             if (computer.online) { // 是否在线
-                nodesArray.add(node.nodeName) // 匹配的是label标签 而非名称
+                nodesArray.add(node.nodeName) // 匹配的是label标签 而非名称 标签可以是一组实现高可用
             }
             // ctx.println( "Node Name: ${node.nodeName}")
         }
