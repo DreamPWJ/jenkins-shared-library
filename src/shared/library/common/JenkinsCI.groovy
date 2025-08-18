@@ -59,7 +59,7 @@ class JenkinsCI implements Serializable {
             // 停止当前构建
             // ctx.currentBuild.result = 'FAILURE'
             // 因缓存构建节点  需要重新触发执行流水更新
-            // triggerUpstreamJob(ctx, ctx.env.JOB_NAME)
+            triggerUpstreamJob(ctx, ctx.env.JOB_NAME)
         }
 
         return nodesArray

@@ -349,7 +349,7 @@ def call(String type = 'quality', Map map) {
                         }
                     }
                     matrix {
-                        // agent any
+                        // agent any // agent any会选择任意可用节点
                         axes {
                             axis {
                                 name 'PLATFORM'
