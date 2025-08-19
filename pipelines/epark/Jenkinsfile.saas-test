@@ -206,7 +206,6 @@ JSON_PARAMS
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "pengbo-mini" ,
     "SHELL_PARAMS" : "pengbo-mini h5 9018 80 test" ,
-    "NODE_VERSION": "20" ,
     "NPM_RUN_PARAMS" : "build:h5-test",
     "IS_MONO_REPO" : true,
 }
@@ -221,7 +220,6 @@ JSON_PARAMS
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "java-monorepo-docs" ,
     "SHELL_PARAMS" : "java-monorepo docs 9999 80 prod",
-    "NODE_VERSION": "20" ,
     "NPM_RUN_PARAMS" : "docs:build",
     "GIT_PROJECT_FOLDER_NAME" : ".athena-doc/vite-press",
 }

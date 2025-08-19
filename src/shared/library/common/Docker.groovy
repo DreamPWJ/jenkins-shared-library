@@ -377,7 +377,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
             ctx.println("执行Web服务Docker镜像回滚运行")
             ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} " +
                     " ' cd /${ctx.DEPLOY_FOLDER} && " +
-                    " docker run -d --restart=on-failure:6  " +
+                    " docker run -d --restart=always  " +
                     " -p ${ctx.SHELL_HOST_PORT}:${ctx.SHELL_EXPOSE_PORT} " +
                     " -m 4G --log-opt max-size=100m --log-opt max-file=1" +
                     " ${dockerVolumeMount} " +
@@ -388,7 +388,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
                 ctx.println("执行Java服务Docker镜像回滚运行")
                 ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} " +
                         " ' cd /${ctx.DEPLOY_FOLDER} && " +
-                        " docker run -d --restart=on-failure:16 --privileged=true --pid=host " +
+                        " docker run -d --restart=always --privileged=true --pid=host " +
                         " -p ${ctx.SHELL_HOST_PORT}:${ctx.SHELL_EXPOSE_PORT} " +
                         " -e \"SPRING_PROFILES_ACTIVE=${ctx.SHELL_ENV_MODE}\" -e \"PROJECT_NAME=${ctx.PROJECT_NAME}\" " +
                         " -e \"JAVA_OPTS=-Xms128m ${map.docker_java_opts}\" -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1 " +
@@ -399,7 +399,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
                 ctx.println("执行Python服务Docker镜像回滚运行")
                 ctx.sh " ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} " +
                         " ' cd /${ctx.DEPLOY_FOLDER} && " +
-                        " docker run -d --restart=on-failure:16 --privileged=true --pid=host " +
+                        " docker run -d --restart=always--privileged=true --pid=host " +
                         " -p ${ctx.SHELL_HOST_PORT}:${ctx.SHELL_EXPOSE_PORT} " +
                         " -e \"PROJECT_NAME=${ctx.PROJECT_NAME}\" -e PYTHON_START_FILE=\"${ctx.CUSTOM_PYTHON_START_FILE}\" " +
                         " -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1 " +

@@ -174,7 +174,7 @@ if [[ "${exist_port_code}" == 1 ]]; then
 fi
 
 echo -e "\033[32m 👨‍💻 启动运行Docker容器 环境: ${env_mode} 映射端口: ${host_port}:${expose_port} \033[0m"
-docker run -d --restart=on-failure:6 -p ${host_port}:${expose_port} -p ${host_port}:443/udp \
+docker run -d --restart=always -p ${host_port}:${expose_port} -p ${host_port}:443/udp \
   -m 4G --log-opt max-size=100m --log-opt max-file=1  ${dynamic_run_args} \
   --name ${docker_container_name} ${docker_image_name}
 
