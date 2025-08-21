@@ -219,7 +219,7 @@ if [[ ${is_prod} == false && ${remote_debug_port} ]]; then
 fi
 
 echo "👨‍💻 启动运行Docker容器 环境: ${env_mode} 映射端口: ${host_port}:${expose_port}"
-docker run -d --restart=on-failure:16 -p ${host_port}:${expose_port} --privileged=true --pid=host \
+docker run -d --restart=always -p ${host_port}:${expose_port} --privileged=true --pid=host \
   -e "PROJECT_NAME=${project_name}" -e PYTHON_START_FILE="${python_start_file}" \
   -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1   ${dynamic_run_args} \
   -e "REMOTE_DEBUGGING_PARAM=${remote_debugging_param}" -e HOST_NAME=$(hostname) \

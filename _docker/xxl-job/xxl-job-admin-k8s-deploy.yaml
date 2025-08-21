@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: xxl-job-admin
-          image: docker.lanneng.tech/xuxueli/xxl-job-admin:3.0.0
+          image: docker.lanneng.tech/xuxueli/xxl-job-admin:3.1.1
           imagePullPolicy: Always     # 优先使用本地镜像
           resources: # 合理设置内存 防止内存溢出 导致整个服务器宕机 如0/3 nodes are available: 3 Insufficient memory
             requests:

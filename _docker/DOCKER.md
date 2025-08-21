@@ -53,13 +53,13 @@ docker run -d --restart=always  -p 18083:18083 -p 1883:1883 -p 8083:8083 -p 8084
 --privileged --name emqx  emqx/emqx:latest
 
 #### 安装 分布式任务调度平台XXL-JOB服务 在浏览器中使用http://ip:8081/xxl-job-admin/ 默认用户名 admin 密码 123456
-docker pull xuxueli/xxl-job-admin:3.0.0
+docker pull xuxueli/xxl-job-admin:3.1.1
 
 docker run -d --restart=always -p 8081:8080  \
 -e PARAMS="--spring.config.location=/application.properties" \
 -v /my/xxl-job/applogs:/data/applogs  -v /my/xxl-job/application.properties:/application.properties \
 --cpus=2 -m 2048m --log-opt max-size=200m --log-opt max-file=1   \
---name xxl-job-admin xuxueli/xxl-job-admin:3.0.0
+--name xxl-job-admin xuxueli/xxl-job-admin:3.1.1
 
 #### RocketMQ消息队列服务  官方文档： https://github.com/apache/rocketmq-docker
 #### 已运行的容器动态修改内存限制 docker update --memory 1024m --memory-swap -1 rocketmq-broker
