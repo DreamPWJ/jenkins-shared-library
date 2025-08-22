@@ -15,9 +15,6 @@
    # 禁用所有自动 HTTP→HTTPS 重定向
    auto_https disable_redirects
 
-   # 启用 Early Hints 加速首页加载速度
-   early_hints
-
    # 日志级别
    # log_level info
 }
@@ -30,6 +27,8 @@
     file_server
   # 启动压缩
     encode gzip
+   # 启用 Early Hints 加速Web首页预加载速度
+    early_hints
 
 #    localhost {
 #        respond "Hello, Caddy!"
