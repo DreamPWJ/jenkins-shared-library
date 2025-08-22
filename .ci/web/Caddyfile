@@ -28,7 +28,11 @@
   # 启动压缩
     encode gzip
   # 启用 Early Hints 加速Web首页预加载速度
-
+    route {
+          header Link "</style.css>; rel=preload; as=style"
+          header Link "</script.js>; rel=preload; as=script"
+          respond 103
+      }
 
 #    localhost {
 #        respond "Hello, Caddy!"
