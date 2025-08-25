@@ -12,8 +12,8 @@
     # 自动申请和续期 Let's Encrypt 证书
    #email 406798106@qq.com # 替换为你的邮箱
    #acme_ca https://acme-v02.api.letsencrypt.org/directory
-   # 禁用所有自动 HTTP→HTTPS 重定向
-   auto_https disable_redirects
+   # 开发环境禁用所有自动证书和 HTTP→HTTPS 重定向
+   auto_https off
 
    # 日志级别
    # log_level info

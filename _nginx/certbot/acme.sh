@@ -9,7 +9,7 @@ source ~/.bashrc
 # 默认CA  acme.sh 脚本默认 CA 服务器是 ZeroSSL
 acme.sh --set-default-ca --server letsencrypt
 
-# 推荐WebRoot方式 无需DNS验证 -d：需申请证书的域名(可多个)  --webroot：网站根目录路径（需确保目录可写入）
+# 推荐WebRoot HTTP方式 无需DNS验证 -d：需申请证书的域名(可多个)  --webroot：网站根目录路径（需确保目录可写入）
 acme.sh --issue -d example.com -d www.example.com --webroot /var/www/html
 # 使用 Nginx 模式 智能的从 Nginx 的配置中自动完成验证，不需要指定网站根目
 acme.sh --issue --nginx -d example.com -d www.example.com

@@ -31,7 +31,7 @@ if [[ ! $(command -v certbot) ]]; then
   # 在虚拟环境中执行即可
   /root/venv_python/bin/certbot --version || certbot --version
 
-  # 初始化阿里云域名DNS验证插件  固定版本  pip install certbot-dns-aliyun==0.38.1  也使用更简单的WebRoot方式验证
+  # 初始化阿里云域名DNS验证插件  固定版本  pip install certbot-dns-aliyun==0.38.1  也使用更简单的WebRoot HTTP方式验证
   sudo apt install -y python3-pip || true && sudo yum install python3-pip -y || true && pip install certbot-dns-aliyun
   sudo pip3 install --upgrade certbot certbot-dns-aliyun
 
@@ -78,7 +78,7 @@ EOF
 chmod 600 /my/credentials.ini
 
 # Certbot 生成域名相关的SSL证书
-# 1. 使用更简单的WebRoot方式验证  适合那些已经在运行Web服务器 --webroot -w <web_root> 指定您的 Web 服务器的站点根目录 如/usr/share/nginx/html
+# 1. 使用更简单的WebRoot HTTP方式验证  适合那些已经在运行Web服务器 --webroot -w <web_root> 指定您的 Web 服务器的站点根目录 如/usr/share/nginx/html
 sudo certbot certonly --webroot -w /path/web/root --non-interactive --agree-tos \
      -d panweiji.com  -d www.panweiji.com \
      --email 406798106@qq.com
