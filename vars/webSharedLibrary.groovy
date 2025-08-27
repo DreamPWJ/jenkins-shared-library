@@ -545,7 +545,7 @@ def getInitParams(map) {
 
     // npm包管理工具类型 如:  npm、yarn、pnpm
     NODE_VERSION = jsonParams.NODE_VERSION ? jsonParams.NODE_VERSION.trim() : "${map.nodejs}" // nodejs版本
-    NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
+    NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "pnpm"
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [build]的前端项目参数
     // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
     MAVEN_ONE_LEVEL = jsonParams.MAVEN_ONE_LEVEL ? jsonParams.MAVEN_ONE_LEVEL.trim() : "${map.maven_one_level}"
@@ -914,7 +914,7 @@ def nodeBuildProject() {
                         if (Git.isExistsChangeFile(this) || retryCount >= 2) { // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
                             println("安装依赖 📥")
                             // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱但依赖lock文件
-                            sh " npm install || pnpm install || yarn install || npm ci "
+                            sh " ${NPM_PACKAGE_TYPE} install || pnpm install || npm ci || yarn install "
                             // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
                         }
 

@@ -131,7 +131,6 @@ JSON_PARAMS
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "lanneng-landing-page" ,
     "SHELL_PARAMS" : "lanneng-landing-page web 8000 3000 prod" ,
-    "NODE_VERSION": "20" ,
     "NPM_RUN_PARAMS" : "build",
     "CUSTOM_DOCKERFILE_NAME" : "Dockerfile.ssr",
     "IS_K8S_DEPLOY" : true,
