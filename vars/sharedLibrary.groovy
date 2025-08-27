@@ -795,7 +795,7 @@ def getInitParams(map) {
     NODE_VERSION = jsonParams.NODE_VERSION ? jsonParams.NODE_VERSION.trim() : "${map.nodejs}" // 自定义Node版本
     TOMCAT_VERSION = jsonParams.TOMCAT_VERSION ? jsonParams.TOMCAT_VERSION.trim() : "7.0" // 自定义非内嵌的Tomcat老版本
     // npm包管理工具类型 如:  npm、yarn、pnpm
-    NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
+    NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "pnpm"
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [build]的前端项目参数
     // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
     MAVEN_ONE_LEVEL = jsonParams.MAVEN_ONE_LEVEL ? jsonParams.MAVEN_ONE_LEVEL.trim() : "${map.maven_one_level}"
