@@ -392,7 +392,7 @@ def getInitParams(map) {
     // 原生小程序是否需要npm
     IS_MINI_NATIVE_NEED_NPM = jsonParams.IS_MINI_NATIVE_NEED_NPM ? jsonParams.IS_MINI_NATIVE_NEED_NPM : false
     // npm包管理工具类型 如:  npm、yarn、pnpm
-    NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "npm"
+    NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "pnpm"
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [build]的前端项目参数
     NPM_BUILD_DIRECTORY = jsonParams.NPM_BUILD_DIRECTORY ? jsonParams.NPM_BUILD_DIRECTORY.trim() : "" // npm 构建目录
     PROJECT_CHINESE_NAME = jsonParams.PROJECT_CHINESE_NAME ? jsonParams.PROJECT_CHINESE_NAME.trim() : "" // 自定义项目中文名称
@@ -652,13 +652,13 @@ def buildProject(map) {
         //if (!fileExists("${env.WORKSPACE}/node_modules/miniprogram-ci")) {
         println("本地离线安装miniprogram-ci")
         // sh " yarn add miniprogram-ci --dev --offline "
-        sh 'npm install miniprogram-ci --prefer-offline' // 参数优先使用本地缓存，减少网络请
+        sh "${NPM_PACKAGE_TYPE} install miniprogram-ci --prefer-offline" // 参数优先使用本地缓存，减少网络请
         //}
     } catch (e) {
         println(e.getMessage())
         retry(3) {
             println("远程线上安装miniprogram-ci")
-            sh " pnpm install miniprogram-ci  || yarn add miniprogram-ci  || npm install miniprogram-ci  "
+            sh " ${NPM_PACKAGE_TYPE} install miniprogram-ci  || yarn add miniprogram-ci  || npm install miniprogram-ci  "
         }
     }
 
@@ -667,13 +667,13 @@ def buildProject(map) {
         try {
             retry(2) {
                 println("安装依赖 📥")
-                sh "pnpm install"
+                sh "${NPM_PACKAGE_TYPE} install"
                 sh "npm run bootstrap:all"
             }
         } catch (e) {
             println(e.getMessage())
             sh "rm -rf node_modules && rm -f *lock*"
-            sh "pnpm install"
+            sh "${NPM_PACKAGE_TYPE} install"
             sh "npm run bootstrap:all"
         }
     }

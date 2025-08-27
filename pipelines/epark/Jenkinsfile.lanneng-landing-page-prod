@@ -85,7 +85,7 @@ map.put('jenkins_node', 'node-3')
 map.put('jenkins_node_frontend', 'node-3')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.9
-map.put('nodejs', 'Node14')
+map.put('nodejs', 'Node24')
 map.put('maven', 'Maven3.6')
 map.put('jdk_publisher', 'openjdk')
 map.put('jdk', '11')
@@ -131,7 +131,6 @@ JSON_PARAMS
     "PROJECT_TYPE" : "1" ,
     "PROJECT_NAME" : "lanneng-landing-page" ,
     "SHELL_PARAMS" : "lanneng-landing-page web 8000 3000 prod" ,
-    "NODE_VERSION": "20" ,
     "NPM_RUN_PARAMS" : "build",
     "CUSTOM_DOCKERFILE_NAME" : "Dockerfile.ssr",
     "IS_K8S_DEPLOY" : true,
