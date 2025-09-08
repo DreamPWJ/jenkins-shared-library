@@ -69,6 +69,8 @@ metadata:
     nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, DELETE, PATCH, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
 
+    # 启用 HTTP 2.0
+    nginx.ingress.kubernetes.io/http2: "true"
     # 配置是否同时支持http和https访问应用
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 
