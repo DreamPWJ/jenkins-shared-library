@@ -221,7 +221,7 @@ class Utils implements Serializable {
     }
 
     /**
-     * 获取系统内存大小 单位 M
+     * 获取系统内存大小 单位 Mb
      */
     static getMemorySize(ctx) {
         def memorySize = ctx.sh(returnStdout: true, script: " free -m | awk '/Mem:/ {print \$2}' ")
