@@ -287,9 +287,12 @@ def call(String type = 'web-java', Map map) {
                             def nodeVersion = "${NODE_VERSION.replace('Node', '')}"
                             def dockerImageName = "panweiji/node-build"
                             def dockerImageTag = "${nodeVersion}"
+                            def dockerParams = Docker.setDockerParameters(this);
                             Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
-                            docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
-                                nodeBuildProject(map)
+                            docker.image("${dockerImageName}:${dockerImageTag}").withRun(dockerParams) { c ->
+                                docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
+                                    nodeBuildProject(map)
+                                }
                             }
                             // }
                         }
@@ -347,8 +350,10 @@ def call(String type = 'web-java', Map map) {
                                 def jdkVersion = "${JDK_VERSION}"
                                 def dockerImageName = "gradle"
                                 def dockerImageTag = "$gradleVersion-jdk$jdkVersion"
-                                docker.image("${dockerImageName}:${dockerImageTag}").inside("-v $HOME/.gradle:/root/.gradle -v $HOME/.gradle:/home/gradle/.gradle") {
-                                    gradleBuildProject(map)
+                                docker.image("${dockerImageName}:${dockerImageTag}").withRun(dockerParams) { c ->
+                                    docker.image("${dockerImageName}:${dockerImageTag}").inside("-v $HOME/.gradle:/root/.gradle -v $HOME/.gradle:/home/gradle/.gradle") {
+                                        gradleBuildProject(map)
+                                    }
                                 }
                             } else {
                                 if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
@@ -364,8 +369,10 @@ def call(String type = 'web-java', Map map) {
                                         }
                                     }
                                 } else {
-                                    docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-                                        mavenBuildProject(map)
+                                    docker.image("${dockerImageName}:${dockerImageTag}").withRun(dockerParams) { c ->
+                                        docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+                                            mavenBuildProject(map)
+                                        }
                                     }
                                 }
                             }
