@@ -695,6 +695,10 @@ def futureLab(map) {
     println("构建机器名称: ${NODE_NAME}")
     println("仓库地址: ${REPO_URL}")
 
+    println("cpu数量：" + Utils.getCPUCount(this))
+    println("内存大小：" + Utils.getMemorySize(this))
+    println("cpu数量：" + Utils.getCPUCount(this) *0.8)
+    println("内存大小：" + Utils.getMemorySize(this)*0.8)
 /*
     def logs = Git.getGitLogByTime(this)
     println("Git日志: ${logs}")
