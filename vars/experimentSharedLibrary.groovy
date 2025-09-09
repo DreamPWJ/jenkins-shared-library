@@ -697,8 +697,8 @@ def futureLab(map) {
 
     println("cpu数量：" + Utils.getCPUCount(this))
     println("内存大小：" + Utils.getMemorySize(this))
-    println("cpu数量：" + Utils.getCPUCount(this) *0.8)
-    println("内存大小：" + Utils.getMemorySize(this)*0.8)
+    println("cpu数量：" + Integer.parseInt(Utils.getCPUCount(this)) * 0.8)
+    println("内存大小：" + Math.floor(Integer.parseInt(Utils.getMemorySize(this) * 0.8)) + "m")
 /*
     def logs = Git.getGitLogByTime(this)
     println("Git日志: ${logs}")
