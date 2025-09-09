@@ -331,6 +331,17 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
     }
 
     /**
+     * 根据系统资源动态设置docker参数
+     */
+    static def setDockerParameters(ctx) {
+        def cpuCount = Utils.getCPUCount(this)
+        def memorySize = Utils.getMemorySize(this)
+        def percentage = 0.8
+        def dockerParams=  " -cpus=" + Integer.parseInt(cpuCount) * percentage + " -m " + Math.floor(Integer.parseInt(memorySize) * percentage) + "m "
+        return dockerParams
+    }
+
+    /**
      *  Docker镜像容器回滚版本
      *  当服务启动失败的时候 回滚服务版本 保证服务高可用
      */
