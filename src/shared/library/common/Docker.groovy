@@ -336,7 +336,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
     static def setDockerParameters(ctx) {
         def cpuCount = Utils.getCPUCount(ctx)
         def memorySize = Utils.getMemorySize(ctx)
-        def percentage = 0.8 // 使用多少百分比资源
+        def percentage = 0.8 // 最大使用多少百分比资源 防止系统整体负载过高全部挂掉
         def cpuPercentage = Integer.parseInt(cpuCount) * percentage
         def memoryPercentage = Math.floor(Integer.parseInt(memorySize) * percentage) + "m"
 
