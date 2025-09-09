@@ -217,7 +217,7 @@ class Utils implements Serializable {
      */
     static getCPUCount(ctx) {
         def cpuCount = ctx.sh(returnStdout: true, script: " cat /proc/cpuinfo | grep processor | wc -l ")
-        return cpuCount
+        return cpuCount.trim()
     }
 
     /**
@@ -225,7 +225,7 @@ class Utils implements Serializable {
      */
     static getMemorySize(ctx) {
         def memorySize = ctx.sh(returnStdout: true, script: " free -m | awk '/Mem:/ {print \$2}' ")
-        return memorySize
+        return memorySize.trim()
     }
 
     /**
