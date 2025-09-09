@@ -341,7 +341,6 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
         def memoryPercentage = Math.floor(Integer.parseInt(memorySize) * percentage) + "m"
 
         def dockerParams = " -cpus=${cpuPercentage}" + " -m ${memoryPercentage} "
-        ctx.println("Docker参数: " + dockerParams)
         return dockerParams
     }
 

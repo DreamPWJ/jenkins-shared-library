@@ -340,13 +340,14 @@ def call(String type = 'web-java', Map map) {
                           }*/
                     steps {
                         script {
+                            def dockerParams = Docker.setDockerParameters(this);
                             // Gradle构建方式
                             if (IS_GRADLE_BUILD == true) {
                                 def gradleVersion = "8" // Gradle版本 要动态配置
                                 def jdkVersion = "${JDK_VERSION}"
                                 def dockerImageName = "gradle"
                                 def dockerImageTag = "$gradleVersion-jdk$jdkVersion"
-                                docker.image("${dockerImageName}:${dockerImageTag}").inside("-v $HOME/.gradle:/root/.gradle -v $HOME/.gradle:/home/gradle/.gradle") {
+                                docker.image("${dockerImageName}:${dockerImageTag}").inside("-v $HOME/.gradle:/root/.gradle -v $HOME/.gradle:/home/gradle/.gradle" + dockerParams) {
                                     gradleBuildProject(map)
                                 }
                             } else {
@@ -357,11 +358,11 @@ def call(String type = 'web-java', Map map) {
                                     def dockerImageName = "panweiji/mvnd-jdk"
                                     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
                                     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk", dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}")
-                                    docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+                                    docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2" + dockerParams) {
                                         mavenBuildProject(map, 0, "mvnd")
                                     }
                                 } else {
-                                    docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+                                    docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2" + dockerParams) {
                                         mavenBuildProject(map)
                                     }
                                 }
