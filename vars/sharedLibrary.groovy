@@ -369,8 +369,9 @@ def call(String type = 'web-java', Map map) {
                                         }
                                     }
                                 } else {
-                                    docker.image("${dockerImageName}:${dockerImageTag}").withRun(dockerParams) { c ->
-                                        docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+                                    def dockerImageNameAndTag="${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
+                                    docker.image("${dockerImageNameAndTag}").withRun(dockerParams) { c ->
+                                        docker.image("${dockerImageNameAndTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
                                             mavenBuildProject(map)
                                         }
                                     }
