@@ -213,6 +213,22 @@ class Utils implements Serializable {
     }
 
     /**
+     * 获取系统CPU核数
+     */
+    static getCPUCount(ctx) {
+        def cpuCount = ctx.sh(returnStdout: true, script: " cat /proc/cpuinfo | grep processor | wc -l ")
+        return cpuCount.trim()
+    }
+
+    /**
+     * 获取系统内存大小 单位 Mb
+     */
+    static getMemorySize(ctx) {
+        def memorySize = ctx.sh(returnStdout: true, script: " free -m | awk '/Mem:/ {print \$2}' ")
+        return memorySize.trim()
+    }
+
+    /**
      * 获取系统CPU使用率
      */
     static getCPURate(ctx) {
@@ -238,7 +254,7 @@ class Utils implements Serializable {
         if (versionNum == '') {
             versionNum = ctx.env.BUILD_NUMBER
         }
-        return  "v" + "${versionNum}"
+        return "v" + "${versionNum}"
     }
 
     /**

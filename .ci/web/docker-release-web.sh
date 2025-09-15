@@ -135,7 +135,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     fi
   [ -z "$(docker images -q ${docker_pull_image_name})" ] && docker pull ${docker_pull_image_name} || echo "基础镜像 ${docker_pull_image_name} 已存在 无需重新pull拉取镜像"
 
-    docker build --pull -t ${docker_image_name} \
+    docker build -t ${docker_image_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg NPM_PACKAGE_FOLDER=${npm_package_folder} \
     --build-arg PROJECT_NAME=${project_name} --build-arg WEB_STRIP_COMPONENTS=${web_strip_components} \
     -f /${deploy_folder}/web/${docker_file_name} .

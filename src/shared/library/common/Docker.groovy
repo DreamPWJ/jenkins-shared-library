@@ -173,7 +173,7 @@ class Docker implements Serializable {
                     ctx.sh """  cp -p ${ctx.env.WORKSPACE}/ci/.ci/web/default.conf ${ctx.env.WORKSPACE}/${webProjectDir} &&
                             cp -p ${ctx.env.WORKSPACE}/ci/.ci/web/nginx.conf ${ctx.env.WORKSPACE}/${webProjectDir} &&
                             cd ${ctx.env.WORKSPACE}/${webProjectDir} && pwd && \
-                            docker ${dockerBuildDiffStr} --pull  -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
+                            docker ${dockerBuildDiffStr} --pull -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
                             --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}"  --build-arg WEB_STRIP_COMPONENTS="${ctx.WEB_STRIP_COMPONENTS}" \
                             --build-arg NPM_PACKAGE_FOLDER=${ctx.NPM_PACKAGE_FOLDER}  -f ${ctx.env.WORKSPACE}/ci/.ci/web/${webDockerFileName} . --no-cache \
                             ${dockerPushDiffStr}
@@ -328,6 +328,20 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
 
         // 让容器配置服务生效 reload 不会重启 Docker 服务，但会使新的配置生效
         // ctx.sh " sudo systemctl reload docker "
+    }
+
+    /**
+     * 根据系统资源动态设置docker参数
+     */
+    static def setDockerParameters(ctx) {
+        def percentage = 0.9 // 最大使用多少百分比资源 防止系统整体负载过高全部挂掉
+        def cpuCount = Utils.getCPUCount(ctx)
+        def memorySize = Utils.getMemorySize(ctx)
+        def cpuPercentage = Integer.parseInt(cpuCount) * percentage
+        def memoryPercentage = Math.floor(Integer.parseInt(memorySize) * percentage) + "m"
+
+        def dockerParams = " --cpus=${cpuPercentage}" + " -m ${memoryPercentage} "
+        return dockerParams
     }
 
     /**

@@ -287,9 +287,12 @@ def call(String type = 'web-java', Map map) {
                             def nodeVersion = "${NODE_VERSION.replace('Node', '')}"
                             def dockerImageName = "panweiji/node-build"
                             def dockerImageTag = "${nodeVersion}"
+                            def dockerParams = Docker.setDockerParameters(this);
                             Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
-                            docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
-                                nodeBuildProject(map)
+                            docker.image("${dockerImageName}:${dockerImageTag}").withRun(dockerParams) { c ->
+                                docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
+                                    nodeBuildProject(map)
+                                }
                             }
                             // }
                         }
@@ -340,14 +343,17 @@ def call(String type = 'web-java', Map map) {
                           }*/
                     steps {
                         script {
+                            def dockerParams = Docker.setDockerParameters(this);
                             // Gradle构建方式
                             if (IS_GRADLE_BUILD == true) {
                                 def gradleVersion = "8" // Gradle版本 要动态配置
                                 def jdkVersion = "${JDK_VERSION}"
                                 def dockerImageName = "gradle"
                                 def dockerImageTag = "$gradleVersion-jdk$jdkVersion"
-                                docker.image("${dockerImageName}:${dockerImageTag}").inside("-v $HOME/.gradle:/root/.gradle -v $HOME/.gradle:/home/gradle/.gradle") {
-                                    gradleBuildProject(map)
+                                docker.image("${dockerImageName}:${dockerImageTag}").withRun(dockerParams) { c ->
+                                    docker.image("${dockerImageName}:${dockerImageTag}").inside("-v $HOME/.gradle:/root/.gradle -v $HOME/.gradle:/home/gradle/.gradle") {
+                                        gradleBuildProject(map)
+                                    }
                                 }
                             } else {
                                 if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
@@ -357,12 +363,17 @@ def call(String type = 'web-java', Map map) {
                                     def dockerImageName = "panweiji/mvnd-jdk"
                                     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
                                     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk", dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}")
-                                    docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-                                        mavenBuildProject(map, 0, "mvnd")
+                                    docker.image("${dockerImageName}:${dockerImageTag}").withRun(dockerParams) { c ->
+                                        docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+                                            mavenBuildProject(map, 0, "mvnd")
+                                        }
                                     }
                                 } else {
-                                    docker.image("${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-                                        mavenBuildProject(map)
+                                    def dockerImageNameAndTag="${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
+                                    docker.image("${dockerImageNameAndTag}").withRun(dockerParams) { c ->
+                                        docker.image("${dockerImageNameAndTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
+                                            mavenBuildProject(map)
+                                        }
                                     }
                                 }
                             }
