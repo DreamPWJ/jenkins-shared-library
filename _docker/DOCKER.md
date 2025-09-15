@@ -24,7 +24,7 @@ docker pull rabbitmq:management
 sudo docker run -d --restart=always -p 5672:5672 -p 15672:15672 --name rabbitmq \
 -v /my/rabbitmq:/var/lib/rabbitmq -v /etc/localtime:/etc/localtime:ro \
 --cpus=2 -m 2048m --log-opt max-size=200m --log-opt max-file=1   \
--e RABBITMQ_DEFAULT_USER=root -e RABBITMQ_DEFAULT_PASS=panweiji2020 rabbitmq:management
+-e RABBITMQ_DEFAULT_USER=root -e RABBITMQ_DEFAULT_PASS=root@0633 rabbitmq:management
 
 #### ZooKeeper分布式应用程序调度服务
 docker pull zookeeper
