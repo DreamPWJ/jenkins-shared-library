@@ -13,7 +13,7 @@ docker pull redis:latest
 
 #### redis docker容器启动 -d开启 守护进程Daemon模式 -v指定数据持久化存储宿主机位置 --requirepass "mypassword"设置密码 --appendonly yes数据持久化
 sudo docker run -d --restart=always -p 6379:6379 --name redis -v /my/redis/data:/data -v /etc/localtime:/etc/localtime:ro  \
---cpus=2 -m 4096m redis:latest redis-server --appendonly yes --requirepass "panweiji2020"
+--cpus=2 -m 4096m redis:latest redis-server --appendonly yes --requirepass "admin@0633"
 
 #### 从Docker Hub里拉取RabbitMQ镜像来部署
 docker pull rabbitmq:management

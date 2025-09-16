@@ -2,16 +2,29 @@
 # Author: 潘维吉
 # Description: CentOS宿主机版mysql安装
 
-echo "CentOS安装MySQL8.0"
+echo "CentOS安装MySQL"
 
-echo "下载包"
-wget https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
-rpm -ivh mysql80-community-release-el7-3.noarch.rpm
+# 设置MySQL版本（可选：5.7 或 8.0）
+MYSQL_VERSION="8.0"
+
+echo " 添加MySQL Yum源"
+rpm -Uvh https://repo.mysql.com/mysql80-community-release-el7-9.noarch.rpm
+
+#  根据选择的版本启用对应的源
+if [[ "$MYSQL_VERSION" == "5.7" ]]; then
+    yum-config-manager --disable mysql80-community
+    yum-config-manager --enable mysql57-community
+elif [[ "$MYSQL_VERSION" == "8.0" ]]; then
+    echo "Using MySQL 8.0 community repo"
+else
+    echo "Unsupported MySQL version: $MYSQL_VERSION"
+    exit 1
+fi
 
 echo "更新yum命令"
 yum clean all && yum makecache
 
-echo "安装MySQL"
+echo "安装MySQL服务器和客户端"
 yum install -y mysql-community-server
 
 echo "更新配置文件"
