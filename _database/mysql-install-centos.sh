@@ -8,10 +8,12 @@ echo "CentOS安装MySQL"
 MYSQL_VERSION="8.0"
 
 echo " 添加MySQL Yum源"
-#rpm -Uvh https://repo.mysql.com/mysql80-community-release-el7-9.noarch.rpm
+rpm -Uvh https://repo.mysql.com/mysql80-community-release-el7-9.noarch.rpm
 # 国内镜像源
 #sudo rpm -Uvh https://mirrors.tuna.tsinghua.edu.cn/mysql/repo/mysql80-community-release-el7-9.noarch.rpm
-sudo rpm -Uvh https://mirrors.aliyun.com/mysql/repo/mysql80-community-release-el7-9.noarch.rpm
+#sudo rpm -Uvh https://mirrors.aliyun.com/mysql/repo/mysql80-community-release-el7-9.noarch.rpm
+# 导入GPG密钥
+sudo rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2023
 
 #  根据选择的版本启用对应的源
 if [[ "$MYSQL_VERSION" == "5.7" ]]; then
@@ -32,7 +34,7 @@ echo "安装MySQL服务器和客户端"
 yum install -y mysql-community-server
 
 echo "更新配置文件"
-sudo cat <<EOF >/etc/mysql/my.cnf
+sudo cat <<EOF >/etc/my.cnf
 [mysqld]
 port=3306
 bind-address=0.0.0.0
@@ -91,7 +93,7 @@ systemctl status mysqld
 # show variables like 'skip_networking';
 
 # 注意默认3306端口外部ip无法访问, 以下配置放开 !!!
-# vim /etc/mysql/my.cnf  添加 [mysqld] 和 bind-address=0.0.0.0
+# vim /etc/my.cnf  添加 [mysqld] 和 bind-address=0.0.0.0
 
 # systemctl restart mysqld && systemctl status mysqld
 
