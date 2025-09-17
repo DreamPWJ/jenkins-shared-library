@@ -30,7 +30,7 @@ server-id=1
 log-bin=mysql-bin
 
 default-authentication-plugin=caching_sha2_password
-#skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0
+#skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0 ！！！
 
 # 关闭SQL严格模式
 #sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
@@ -65,7 +65,7 @@ log-bin=mysql-slave-bin
 relay-log=mysql-relay
 
 default-authentication-plugin=caching_sha2_password
-#skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0
+#skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0 ！！！
 
 group_concat_max_len=1024000000
 max_connections=6000

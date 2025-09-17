@@ -47,7 +47,7 @@ user=mysql
 innodb_buffer_pool_size=4G
 
 default-authentication-plugin=caching_sha2_password
-skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0
+skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0 ！！！
 
 group_concat_max_len=1024000000
 max_connections=6000
