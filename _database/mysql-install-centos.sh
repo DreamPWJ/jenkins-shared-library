@@ -8,7 +8,10 @@ echo "CentOS安装MySQL"
 MYSQL_VERSION="8.0"
 
 echo " 添加MySQL Yum源"
-rpm -Uvh https://repo.mysql.com/mysql80-community-release-el7-9.noarch.rpm
+#rpm -Uvh https://repo.mysql.com/mysql80-community-release-el7-9.noarch.rpm
+# 国内镜像源
+#sudo rpm -Uvh https://mirrors.tuna.tsinghua.edu.cn/mysql/repo/mysql80-community-release-el7-9.noarch.rpm
+sudo rpm -Uvh https://mirrors.aliyun.com/mysql/repo/mysql80-community-release-el7-9.noarch.rpm
 
 #  根据选择的版本启用对应的源
 if [[ "$MYSQL_VERSION" == "5.7" ]]; then
@@ -23,6 +26,7 @@ fi
 
 echo "更新yum命令"
 yum clean all && yum makecache
+sudo yum update -y || true
 
 echo "安装MySQL服务器和客户端"
 yum install -y mysql-community-server

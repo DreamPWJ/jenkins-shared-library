@@ -20,7 +20,6 @@ docker pull rabbitmq:management
 
 #### RabbitMQ docker容器启动 -d开启 守护进程Daemon模式 指定--hostname默认为主机名存储数据 image启动容器的时候会自动生成hostname
 #### 5672端口对应的是amqp，25672端口对应的是clustering，15672端口对应的是http（也就是登录RabbitMQ后台管理端口）
-
 sudo docker run -d --restart=always -p 5672:5672 -p 15672:15672 --name rabbitmq \
 -v /my/rabbitmq:/var/lib/rabbitmq -v /etc/localtime:/etc/localtime:ro \
 --cpus=2 -m 2048m --log-opt max-size=200m --log-opt max-file=1   \
