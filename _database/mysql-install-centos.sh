@@ -52,7 +52,7 @@ skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会�
 group_concat_max_len=1024000000
 max_connections=6000
 max_connect_errors=2000
-lower_case_table_names=1
+#lower_case_table_names=0
 
 [mysqld_safe]
 log-error=/var/log/mysqld.log
@@ -79,12 +79,12 @@ systemctl status mysqld
 # SHOW VARIABLES LIKE 'validate_password%';
 # set global validate_password_policy=0;
 
-# ALTER USER 'root'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji2020!@#';
+# ALTER USER 'root'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji@2025!#';
 # CREATE database if NOT EXISTS panweiji;
 # show databases;
 
 #echo "新建远程用户"
-# CREATE USER IF NOT EXISTS 'panweiji'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji2020!@#';
+# CREATE USER IF NOT EXISTS 'panweiji'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji@2025!#';
 # GRANT all privileges ON *.* TO 'panweiji'@'%';
 # flush privileges;
 

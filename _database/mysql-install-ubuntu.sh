@@ -102,12 +102,12 @@ lsof -i:3306
 # SHOW VARIABLES LIKE 'validate_password%';
 # set global validate_password_policy=0;
 
-# ALTER USER 'root'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji2021';
+# ALTER USER 'root'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji@2025';
 # CREATE database if NOT EXISTS database_name_test;
 # show databases;
 
 # echo "新建远程用户"
-# CREATE USER IF NOT EXISTS 'user_name'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji2021';
+# CREATE USER IF NOT EXISTS 'user_name'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji@2025';
 # GRANT all privileges ON *.* TO 'user_name'@'%';
 # flush privileges;
 
