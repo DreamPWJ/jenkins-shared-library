@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description:  LVM（Logical Volume Manager）逻辑卷管理  初始化和无感在线扩容硬盘
 # 超融合架构自带在线扩容  磁盘只能扩容不能缩容

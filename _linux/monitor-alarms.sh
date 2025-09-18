@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description:  脚本来监控CPU、内存和磁盘的使用率，并在使用率超过预设阈值时发送告警
 # 使用Ansible中心化统一批量管理多机器脚本

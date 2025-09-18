@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description: 通过域名获取证书的过期时间 检测ssl有效期并提醒
 

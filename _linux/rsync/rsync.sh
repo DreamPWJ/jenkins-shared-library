@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description:  使用rsync工具远程迁移数据 全量+增量同步方式 也支持-P断点续传
 

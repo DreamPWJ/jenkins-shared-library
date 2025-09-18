@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description: 执行Docker发布部署shell脚本 同一台服务器主从分布式部署
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description: 自定义git hook提交信息规范 文件提交权限 代码格式化等
 # 启动Spring Boot服务后 将自动复制本文件到本地项目.git/hooks目录下 才能生效

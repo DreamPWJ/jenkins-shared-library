@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description: 通用Shell脚本复用和模块化  随着Shell编写复杂度提高, 需要大量的复用和模块化情况
 
