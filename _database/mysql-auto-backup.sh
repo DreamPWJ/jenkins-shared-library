@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Author: 潘维吉
 # Linux的crontab自动定时任务 自动化备份mysql数据库
 # chmod +x /my/backup/mysql-auto-backup.sh　 给执行文件可执行权限

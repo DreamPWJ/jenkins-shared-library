@@ -23,7 +23,7 @@ vgcreate vg_data /dev/sdb1
 vgdisplay
 
 # 新建一个LVM逻辑卷  lvdisplay 查看所有逻辑卷信息 -L 参数小于存储容量
-lvcreate -L 299G -n lv_data vg_data
+lvcreate -L 99G -n lv_data vg_data
 lvdisplay
 
 # 格式化分区 注意会擦除数据！！！  执行 blkid 命令查看UUID和文件类型
