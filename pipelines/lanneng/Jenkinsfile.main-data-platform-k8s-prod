@@ -162,7 +162,7 @@ JSON_PARAMS
     "PROJECT_NAME" : "main-data-admin",
     "SHELL_PARAMS" : "main-data admin-web 9109 80 prod",
     "NPM_RUN_PARAMS" : "build",
-    "GIT_PROJECT_FOLDER_NAME" : "projects/main-data-admin",
+    "IS_MONO_REPO" : true,
     "IS_K8S_DEPLOY" : true,
     "K8S_POD_REPLICAS" : "1",
     "APPLICATION_DOMAIN" : "https://main-data-admin.pengbocloud.com"
