@@ -30,7 +30,7 @@ server-id=1
 log-bin=mysql-bin
 
 default-authentication-plugin=caching_sha2_password
-#skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0
+#skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0 ！！！
 
 # 关闭SQL严格模式
 #sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
@@ -65,7 +65,7 @@ log-bin=mysql-slave-bin
 relay-log=mysql-relay
 
 default-authentication-plugin=caching_sha2_password
-#skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0
+#skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会为0 ！！！
 
 group_concat_max_len=1024000000
 max_connections=6000
@@ -95,19 +95,18 @@ lsof -i:3306
 
 #echo "修改账号密码并创建数据库"
 # 进入MySQL shell  修改密码 新建数据库
-# mysql -u root
+# mysql -u root  带密码访问 mysql -u root -p
 # use mysql;
 
-# install plugin validate_password soname 'validate_password.so';
-# SHOW VARIABLES LIKE 'validate_password%';
-# set global validate_password_policy=0;
-
-# ALTER USER 'root'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji2021';
-# CREATE database if NOT EXISTS database_name_test;
+# FLUSH PRIVILEGES;
+# CREATE USER 'root'@'%' IDENTIFIED WITH caching_sha2_password BY 'PanWeiJi@20250818!#';
+# GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+# FLUSH PRIVILEGES;
+# CREATE database if NOT EXISTS design;
 # show databases;
 
 # echo "新建远程用户"
-# CREATE USER IF NOT EXISTS 'user_name'@'%' IDENTIFIED WITH caching_sha2_password BY 'panweiji2021';
+# CREATE USER IF NOT EXISTS 'user_name'@'%' IDENTIFIED WITH caching_sha2_password BY 'PanWeiJi@20250818!#';
 # GRANT all privileges ON *.* TO 'user_name'@'%';
 # flush privileges;
 
