@@ -40,6 +40,7 @@ df -h
 # 挂载永久生效  在 vim /etc/fstab内保存 重启等永久有效!!!
 vim /etc/fstab
 # /dev/mapper/vg_data-lv_data /var/lib/mysql xfs defaults 0 1
+# /dev/mapper/vg_data-lv_data /var/lib/mysql ext4 defaults 0 1
 systemctl daemon-reload
 
 # 卸载分区
