@@ -32,14 +32,14 @@ fdisk -l
 
 # 挂载分区
 mkdir /mnt/data
-mount /dev/vg_data/lv_data /tidb-data
+mount /dev/vg_data/lv_data /var/lib/mysql
 
 # 检查是否挂载成功
 df -h
 
 # 挂载永久生效  在 vim /etc/fstab内保存 重启等永久有效!!!
-# /dev/mapper/vg_data-lv_data /tidb-data xfs defaults 0 1
 vim /etc/fstab
+# /dev/mapper/vg_data-lv_data /var/lib/mysql xfs defaults 0 1
 systemctl daemon-reload
 
 # 卸载分区
