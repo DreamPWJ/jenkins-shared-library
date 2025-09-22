@@ -55,7 +55,7 @@ if [[ "$OS" =~ ^(centos|rhel|rocky|almalinux)$ ]]; then
   else
     echo "[INFO] 使用 yum 安装 docker-ce"
     sudo yum install -y yum-utils device-mapper-persistent-data lvm2
-    sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    sudo yum-config-manager --add-repo $DOCKER_REPO # 设置镜像源
     sudo yum install -y docker-ce  # 按需排除 --exclude=docker-compose-plugin
   fi
 else
