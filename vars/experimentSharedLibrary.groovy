@@ -806,7 +806,7 @@ def futureLab(map) {
     }*/
 
 
-/*
+
    def mvndVersion = "1.0.2"
     def jdkVersion = "25"
     def dockerImageName = "panweiji/mvnd-jdk"
@@ -824,7 +824,7 @@ def futureLab(map) {
         //sh "mvnd  install"
         //sh "mvn  install"
     }
-*/
+
 
 /*    def gradleVersion = "8" // Gradle版本 要动态配置
     def jdkVersion = "${JDK_VERSION}"
