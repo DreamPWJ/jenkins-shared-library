@@ -23,7 +23,6 @@ ENV JAVA_HOME=/opt/java/openjdk \
 # ============================
 FROM ubuntu:latest
 
-ARG JDK_VERSION
 ARG MVND_VERSION
 
 # 设置工作目录
@@ -42,8 +41,8 @@ COPY --from=jdk-builder ${JAVA_HOME} ${JAVA_HOME}
 
 # 安装最小依赖
 RUN apt-get update && \
-    apt-get install -y ca-certificates bash && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y ca-certificates bash curl wget zip unzip gzip  && \
+    rm -rf /var/lib/apt/lists/* \
 
 # 安装 mvnd  使用Cloudflare Worker代理github.com地址加速访问
 RUN curl -L https://git.code.lanneng.tech/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
