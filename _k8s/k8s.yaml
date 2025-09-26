@@ -52,7 +52,7 @@ spec:
               value: Asia/Shanghai
             - name: SPRING_PROFILES_ACTIVE
               value: {SPRING_PROFILE}
-            - name: JAVA_OPTS
+            - name: JAVA_OPTS # 生产服务器将-Xms和-Xmx设置为相同值是强烈推荐的黄金法则 主要好处是避免内存动态调整导致性能抖动 垃圾回收行为更可预测
               value: "-Xms512m {JAVA_OPTS_XMX}" # K8s中不会自动解析ENTRYPOINT环境变量 导致配置无效 最大堆内存 如 -Xmx1024m
             - name: EXTEND_PORT
               value: "{CONTAINER_PORT}"
