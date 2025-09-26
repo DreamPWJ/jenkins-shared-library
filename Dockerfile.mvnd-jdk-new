@@ -6,12 +6,10 @@
 # Stage 1: 使用官方 JDK 镜像构建
 # ============================
 ARG JDK_VERSION
+ARG JDK_VERSION
 
 FROM amazoncorretto:${JDK_VERSION}-jdk AS jdk-builder
 
-# 设置环境
-ENV JAVA_HOME=/usr/lib/jvm/java-${JDK_VERSION}-amazon-corretto \
-    PATH=$PATH:${JAVA_HOME}/bin
 
 # （可选）这里可以执行编译操作，比如构建你的应用
 # COPY . /app
@@ -24,6 +22,7 @@ ENV JAVA_HOME=/usr/lib/jvm/java-${JDK_VERSION}-amazon-corretto \
 FROM ubuntu:latest
 
 ARG MVND_VERSION
+ARG JDK_VERSION
 
 # 设置工作目录
 WORKDIR /app
@@ -32,8 +31,10 @@ WORKDIR /app
 USER root
 
 # 设置环境
-ENV DEBIAN_FRONTEND=noninteractive \
-    MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz
+ENV DEBIAN_FRONTEND=noninteractive  \
+    MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz \
+    JAVA_HOME=/usr/lib/jvm/java-${JDK_VERSION}-amazon-corretto \
+    PATH=$PATH:${JAVA_HOME}/bin
 
 # 拷贝 JDK（runtime 只保留需要的 JDK）
 COPY --from=jdk-builder ${JAVA_HOME} ${JAVA_HOME}
@@ -56,7 +57,7 @@ RUN curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-m
 # COPY --from=jdk-builder /app/target/myapp.jar /opt/myapp.jar
 
 # 验证版本
-RUN java -version && mvnd --version && mvn -v
+RUN mvnd --version && java -version && mvn -v
 
 # 默认启动命令
 CMD ["/bin/bash"]
