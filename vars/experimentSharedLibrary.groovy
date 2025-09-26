@@ -805,7 +805,7 @@ def futureLab(map) {
      // sh "playwright --version || true"
     }*/
 
-    def mvndVersion = "1.0.3"
+/*  def mvndVersion = "1.0.3"
     def jdkVersion = "25"
     def dockerImageName = "panweiji/mvnd-jdk"
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
@@ -822,7 +822,7 @@ def futureLab(map) {
         //sh "mvn clean install  -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvnd  install"
         //sh "mvn  install"
-    }
+    }*/
 
 
 /*    def gradleVersion = "8" // Gradle版本 要动态配置
