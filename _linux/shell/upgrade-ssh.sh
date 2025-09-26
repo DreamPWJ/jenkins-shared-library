@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description:  升级OpenSSH 版本  支持更高级特性 比如跳板机 jump host -J 模式
 

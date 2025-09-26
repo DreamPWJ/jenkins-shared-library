@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description:  Git自动merge脚本
 

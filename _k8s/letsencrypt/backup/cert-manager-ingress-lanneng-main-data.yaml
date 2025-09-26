@@ -51,6 +51,12 @@ spec:
     - hosts:
         - main-data-api.pengbocloud.com
       secretName: main-data-api.pengbocloud.com-tls
+    - hosts:
+        - main-dataadmin-api.pengbocloud.com
+      secretName: main-data-admin-api.pengbocloud.com-tls
+    - hosts:
+        - main-data-admin.pengbocloud.com
+      secretName: main-data-admin.pengbocloud.com-tls
 
   rules:
     #自定义域名
@@ -65,4 +71,30 @@ spec:
                 #服务端口
                 port:
                   number: 9868
+            pathType: Prefix
+
+    - host: main-data-admin-api.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: main-data-admin-service
+                #服务端口
+                port:
+                  number: 9869
+            pathType: Prefix
+
+    - host: main-data-admin.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: main-data-admin-web-service
+                #服务端口
+                port:
+                  number: 9109
             pathType: Prefix

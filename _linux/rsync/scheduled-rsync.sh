@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description:  rsync+nohup定时任务同步数据
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description:  Shell脚本方式上传阿里云OSS
 

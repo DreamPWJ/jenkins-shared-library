@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description:  Ansible自动批量执行Linux命令 同时管理N台机器  在 sudo vim /etc/ansible/hosts
 # 参考文章：https://blog.51cto.com/395469372/2133486

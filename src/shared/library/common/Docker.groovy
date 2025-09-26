@@ -273,7 +273,7 @@ class Docker implements Serializable {
         def imageRepoFullNameTag = "${imageRepoFullName}:${imageTag}"
         // Docker方式回滚 拉取镜像之前设置回滚策略 不适合K8S方式
         if (ctx.IS_K8S_DEPLOY == false) {
-            ctx.println("重命名上一个版本远程镜像tag 用于纯Docker方式回滚版本控制策略")
+            ctx.println("重命名上一个版本远程镜像tag 用于纯Docker部署方式回滚版本控制策略")
             ctx.sh """  
                      ssh ${ctx.proxyJumpSSHText} ${ctx.remote.user}@${ctx.remote.host} \
                     'docker rmi ${imageRepoFullName}:previous || true && \

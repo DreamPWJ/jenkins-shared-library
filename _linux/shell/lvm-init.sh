@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description:  LVM（Logical Volume Manager）逻辑卷管理  初始化和无感在线扩容硬盘
 # 超融合架构自带在线扩容  磁盘只能扩容不能缩容
@@ -9,9 +9,10 @@ lsblk
 
 # 安装
 sudo apt-get install lvm2
+sudo yum install lvm2
 
 # 第一次分LVM区设置 执行下面步骤
-# 分区磁盘 分别选m n p t(t代表LVM分区表 code设置8e) p w  (fdisk支持2TB大小内分区 新的空GPT分区表解决)
+# 分区磁盘 分别选m n p 【默认】 t(t代表LVM分区表 code设置8e) p w  (fdisk支持2TB大小内分区 新的空GPT分区表解决)
 fdisk /dev/sdb
 
 # 新建一个物理卷 pvdisplay 查看所有物理卷信息
@@ -23,7 +24,7 @@ vgcreate vg_data /dev/sdb1
 vgdisplay
 
 # 新建一个LVM逻辑卷  lvdisplay 查看所有逻辑卷信息 -L 参数小于存储容量
-lvcreate -L 299G -n lv_data vg_data
+lvcreate -L 239G -n lv_data vg_data
 lvdisplay
 
 # 格式化分区 注意会擦除数据！！！  执行 blkid 命令查看UUID和文件类型
@@ -32,14 +33,15 @@ fdisk -l
 
 # 挂载分区
 mkdir /mnt/data
-mount /dev/vg_data/lv_data /tidb-data
+mount /dev/vg_data/lv_data /mnt/data
 
 # 检查是否挂载成功
 df -h
 
-# 挂载永久生效  在 vim /etc/fstab内保存 重启等永久有效!!!
-# /dev/mapper/vg_data-lv_data /tidb-data xfs defaults 0 1
+# 挂载永久生效  在 cat /etc/fstab 内保存 重启等永久有效!!!
 vim /etc/fstab
+# /dev/mapper/vg_data-lv_data /mnt/data xfs defaults 0 1
+# /dev/mapper/vg_data-lv_data /mnt/data ext4 defaults 0 1
 systemctl daemon-reload
 
 # 卸载分区

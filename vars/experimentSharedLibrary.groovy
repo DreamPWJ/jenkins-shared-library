@@ -210,7 +210,7 @@ def call(String type = 'experiment', Map map) {
                             filename 'Dockerfile.mvnd-jdk' // 在WORKSPACE工作区代码目录
                             label "panweiji/mvnd-jdk-${JDK_PUBLISHER}-${JDK_VERSION}:latest"
                             dir "${env.WORKSPACE}/ci"
-                            additionalBuildArgs "--build-arg MVND_VERSION=1.0.2 --build-arg JDK_PUBLISHER=${JDK_PUBLISHER} --build-arg JDK_VERSION=${JDK_VERSION}"
+                            additionalBuildArgs "--build-arg MVND_VERSION=1.0.3 --build-arg JDK_PUBLISHER=${JDK_PUBLISHER} --build-arg JDK_VERSION=${JDK_VERSION}"
                             args " -v /var/cache/maven/.m2:/root/.m2  "
                             reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
                         }
@@ -784,16 +784,16 @@ def futureLab(map) {
         sh "python -V"
     }*/
 
-/*    def dockerImageName = "panweiji/k8s-build"
+/*  def dockerImageName = "panweiji/k8s-build"
     def dockerImageTag = "latest"
-    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.k8s-new", dockerImageName, dockerImageTag, "")
+    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.k8s-new", dockerImageName, dockerImageTag, "", true)
     docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
         sh "python -V"
         sh "kubectl version --client"
         // sh "helm version"
     }*/
 
-/*    def nodeVersion = "${"Node24".replace('Node', '')}"
+/*   def nodeVersion = "${"Node24".replace('Node', '')}"
     def dockerImageName = "panweiji/node-build"
     def dockerImageTag = "${nodeVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
@@ -805,24 +805,25 @@ def futureLab(map) {
      // sh "playwright --version || true"
     }*/
 
-
-/*    def mvndVersion = "1.0.2"
-    def jdkVersion = "21"
+   def mvndVersion = "1.0.3"
+    def jdkVersion = "25"
     def dockerImageName = "panweiji/mvnd-jdk"
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
-    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk", dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}")
+    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk-new", dockerImageName, dockerImageTag,
+            "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}", true)
 
     docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
 
         sh "mvnd --version"
-        sh "mvn --version"
+        // sh "mvn --version"
         sh "java --version"
 
         sh "mvnd clean install -T 4C -Dmvnd.threads=8 -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvn clean install  -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvnd  install"
         //sh "mvn  install"
-    }*/
+    }
+
 
 /*    def gradleVersion = "8" // Gradle版本 要动态配置
     def jdkVersion = "${JDK_VERSION}"

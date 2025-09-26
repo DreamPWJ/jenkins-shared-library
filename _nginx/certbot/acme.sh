@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description: 创建域名SSL证书和过期自动更新  与certbot比优势零依赖系统内安装简单 多CA支持 自动智能续期
 # 通过与Let's Encrypt、ZeroSSL等权威CA机构对接，实现了证书申请-部署-续期全流程自动化
