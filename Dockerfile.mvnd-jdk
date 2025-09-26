@@ -27,7 +27,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # 安装 OpenJDK
-RUN apt-get upgrade -y && \
+RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         openjdk-${JDK_VERSION}-jdk && \
     rm -rf /var/lib/apt/lists/* && \
