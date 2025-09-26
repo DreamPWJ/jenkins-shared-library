@@ -8,7 +8,7 @@
 ARG JDK_VERSION
 ARG JDK_VERSION
 
-FROM amazoncorretto:${JDK_VERSION}-jdk AS jdk-builder
+FROM amazoncorretto:${JDK_VERSION} AS jdk-builder
 
 
 # （可选）这里可以执行编译操作，比如构建你的应用
