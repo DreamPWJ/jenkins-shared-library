@@ -793,7 +793,7 @@ def futureLab(map) {
         // sh "helm version"
     }*/
 
-/*  def nodeVersion = "${"Node24".replace('Node', '')}"
+    def nodeVersion = "${"Node24".replace('Node', '')}"
     def dockerImageName = "panweiji/node-build"
     def dockerImageTag = "${nodeVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
@@ -803,10 +803,10 @@ def futureLab(map) {
         sh "yarn --version"
         sh "pnpm --version"
      // sh "playwright --version || true"
-    }*/
+    }
 
-   def mvndVersion = "1.0.3"
-    def jdkVersion = "11"
+/*    def mvndVersion = "1.0.3"
+    def jdkVersion = "25"
     def dockerImageName = "panweiji/mvnd-jdk"
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk-new", dockerImageName, dockerImageTag,
@@ -822,7 +822,7 @@ def futureLab(map) {
         //sh "mvn clean install  -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvnd  install"
         //sh "mvn  install"
-    }
+    }*/
 
 
 /*    def gradleVersion = "8" // Gradle版本 要动态配置
