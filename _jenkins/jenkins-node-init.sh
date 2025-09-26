@@ -36,7 +36,7 @@ fi
 
 if [[ ! $(command -v mvn) ]]; then
   echo "安装Maven" # export HOMEBREW_BOTTLE_DOMAIN=''
-  maven_version=3.9.9
+  maven_version=3.9.11
   mkdir -p /opt/maven && cd /opt/maven
   wget https://archive.apache.org/dist/maven/maven-3/${maven_version}/binaries/apache-maven-${maven_version}-bin.tar.gz
   tar -xzvf apache-maven-${maven_version}-bin.tar.gz --strip-components=1
