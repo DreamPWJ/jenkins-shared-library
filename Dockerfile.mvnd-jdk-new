@@ -15,7 +15,7 @@ FROM amazoncorretto:${JDK_VERSION}-jdk AS jdk-builder
 # COPY . /app
 # WORKDIR /app
 # RUN ./mvnw package -DskipTests
-RUN  java -version || true && which java
+RUN  java -version || true && echo $JAVA_HOME
 
 # ============================
 # Stage 2: 基于 Ubuntu 的运行环境
