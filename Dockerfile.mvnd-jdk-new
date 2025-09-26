@@ -1,0 +1,67 @@
+# Author: 潘维吉
+# Version 1.0.0
+# Description: 自定义mvnd与JDK构建部署环境
+
+# ============================
+# Stage 1: 使用官方 JDK 镜像构建
+# ============================
+ARG JDK_VERSION
+
+FROM openjdk:${JDK_VERSION}-jdk AS jdk-builder
+# 如果需要指定版本，可以替换为 openjdk:11-jdk, openjdk:21-jdk 等
+
+# （可选）这里可以执行编译操作，比如构建你的应用
+# COPY . /app
+# WORKDIR /app
+# RUN ./mvnw package -DskipTests
+
+# ============================
+# Stage 2: 基于 Ubuntu 的运行环境
+# ============================
+FROM ubuntu:latest
+
+ARG MVND_VERSION
+
+# 设置工作目录
+WORKDIR /app
+
+# 指定切换用户
+USER root
+
+# 设置环境
+ENV DEBIAN_FRONTEND=noninteractive \
+    JAVA_HOME=/opt/java \
+    MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz  \
+    PATH=$PATH:${JAVA_HOME}/bin:${MVND_HOME}/bin
+
+# 拷贝 JDK（runtime 只保留需要的 JDK）
+COPY --from=jdk-builder ${JAVA_HOME} ${JAVA_HOME}
+
+# 安装最小依赖
+RUN apt-get update && \
+    apt-get install -y ca-certificates bash && \
+    rm -rf /var/lib/apt/lists/*
+
+# 安装 mvnd  使用Cloudflare Worker代理github.com地址加速访问
+
+RUN curl -L https://git.code.lanneng.tech/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
+    tar -xzf /tmp/${MVND_TAR} -C /opt && \
+    mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
+    rm -f /tmp/${MVND_TAR} && \
+    ln -s ${MVND_HOME}/mvn/bin/mvn /usr/local/bin/mvn && \
+    export PATH=$MVND_HOME/bin:$PATH \
+
+# （可选）拷贝你的应用 jar 包
+# COPY --from=jdk-builder /app/target/myapp.jar /opt/myapp.jar
+
+# 验证版本
+RUN java -version && mvnd --version && mvn -v
+
+# 默认启动命令
+CMD ["/bin/bash"]
+
+
+# 自定义构建镜像
+# DOCKER_BUILDKIT=1 docker build --build-arg MVND_VERSION=1.0.2 --build-arg JDK_VERSION=25 -t panweiji/mvnd-jdk:latest  -f /my/Dockerfile.mvnd-jdk . --no-cache
+# 上传镜像 先 docker login 登录
+# docker push panweiji/mvnd-jdk:1.0.2-25
