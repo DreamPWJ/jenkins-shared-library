@@ -10,7 +10,7 @@ ARG JDK_VERSION
 FROM amazoncorretto:${JDK_VERSION}-jdk AS jdk-builder
 
 # 设置环境
-ENV JAVA_HOME=/usr/lib/jvm/java-${JDK_VERSION}-amazon-corretto
+ENV JAVA_HOME=/usr/lib/jvm/java-${JDK_VERSION}-amazon-corretto \
     PATH=$PATH:${JAVA_HOME}/bin
 
 # （可选）这里可以执行编译操作，比如构建你的应用
