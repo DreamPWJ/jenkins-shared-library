@@ -806,7 +806,7 @@ def futureLab(map) {
     }*/
 
     def mvndVersion = "1.0.3"
-    def jdkVersion = "21"
+    def jdkVersion = "25"
     def dockerImageName = "panweiji/mvnd-jdk"
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk-new", dockerImageName, dockerImageTag,
