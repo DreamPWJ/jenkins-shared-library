@@ -56,7 +56,7 @@ RUN curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-m
 # COPY --from=jdk-builder /app/target/myapp.jar /opt/myapp.jar
 
 # 验证版本
-#RUN java -version && mvnd --version && mvn -v
+RUN java -version && mvnd --version && mvn -v
 
 # 默认启动命令
 CMD ["/bin/bash"]
