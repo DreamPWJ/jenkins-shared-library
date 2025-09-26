@@ -9,6 +9,10 @@ ARG JDK_VERSION
 
 FROM openjdk:${JDK_VERSION}-jdk AS jdk-builder
 
+# 设置环境
+ENV JAVA_HOME=/opt/java/openjdk \
+    PATH=$PATH:${JAVA_HOME}/bin
+
 # （可选）这里可以执行编译操作，比如构建你的应用
 # COPY . /app
 # WORKDIR /app
@@ -30,9 +34,8 @@ USER root
 
 # 设置环境
 ENV DEBIAN_FRONTEND=noninteractive \
-    JAVA_HOME=/opt/java/openjdk \
     MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz  \
-    PATH=$PATH:${JAVA_HOME}/bin:${MVND_HOME}/bin
+    PATH=${MVND_HOME}/bin
 
 # 拷贝 JDK（runtime 只保留需要的 JDK）
 COPY --from=jdk-builder ${JAVA_HOME} ${JAVA_HOME}
