@@ -15,6 +15,7 @@ FROM amazoncorretto:${JDK_VERSION}-jdk AS jdk-builder
 # COPY . /app
 # WORKDIR /app
 # RUN ./mvnw package -DskipTests
+RUN  java -version || true && which java
 
 # ============================
 # Stage 2: 基于 Ubuntu 的运行环境
@@ -50,7 +51,7 @@ RUN curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-m
     tar -xzf /tmp/${MVND_TAR} -C /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
     rm -f /tmp/${MVND_TAR} && \
-  # ln -s ${MVND_HOME}/mvn/bin/mvn /usr/local/bin/mvn && \
+    ln -s ${MVND_HOME}/mvn/bin/mvn /usr/local/bin/mvn && \
     export PATH=$MVND_HOME/bin:$PATH
 
 # （可选）拷贝你的应用 jar 包
