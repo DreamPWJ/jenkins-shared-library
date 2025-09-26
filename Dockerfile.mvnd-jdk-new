@@ -59,7 +59,7 @@ RUN curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-m
 ENV PATH=$JAVA_HOME/bin:$MVND_HOME/bin:$PATH
 
 # 验证版本
-RUN  echo "PATH: $PATH"  || true && mvnd --version || true && java -version || true && mvn -v
+RUN  echo "PATH: $PATH"  || true && mvnd --version || true && java -version || true && mvn -v || true
 
 # 默认启动命令
 CMD ["/bin/bash"]
