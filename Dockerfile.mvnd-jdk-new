@@ -30,7 +30,7 @@ USER root
 
 # 设置环境
 ENV DEBIAN_FRONTEND=noninteractive \
-    JAVA_HOME=/opt/java \
+    JAVA_HOME=/usr/local/openjdk-${JDK_VERSION} \
     MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz  \
     PATH=$PATH:${JAVA_HOME}/bin:${MVND_HOME}/bin
 
