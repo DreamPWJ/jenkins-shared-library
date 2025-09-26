@@ -33,8 +33,7 @@ USER root
 
 # 设置环境
 ENV DEBIAN_FRONTEND=noninteractive \
-    MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz  \
-    PATH=${MVND_HOME}/bin
+    MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz
 
 # 拷贝 JDK（runtime 只保留需要的 JDK）
 COPY --from=jdk-builder ${JAVA_HOME} ${JAVA_HOME}
@@ -45,7 +44,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* \
 
 # 安装 mvnd  使用Cloudflare Worker代理github.com地址加速访问
-RUN curl -L https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
+RUN curl  https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
     tar -xzf /tmp/${MVND_TAR} -C /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
     rm -f /tmp/${MVND_TAR} && \
