@@ -45,7 +45,8 @@ RUN sed -i 's|http://.*.ubuntu.com|http://mirrors.aliyun.com|g' /etc/apt/sources
     rm -rf /var/lib/apt/lists/*
 
 # 安装 mvnd  使用Cloudflare Worker代理github.com地址加速访问
-RUN curl -L https://git.code.lanneng.tech/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
+# https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz
+RUN curl -L https://maven.aliyun.com/repository/central/org/apache/maven/mvnd/mvnd-dist/${MVND_VERSION}/mvnd-dist-${MVND_VERSION}-linux-amd64.zip -o /tmp/${MVND_TAR} && \
     tar -xzf /tmp/${MVND_TAR} -C /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
     rm -f /tmp/${MVND_TAR} && \
