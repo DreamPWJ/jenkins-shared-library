@@ -2,14 +2,11 @@
 # Version 1.0.0
 # Description: 自定义mvnd与JDK构建部署环境
 
-# ============================
+ARG JDK_VERSION
+ARG JDK_VERSION
+
 # Stage 1: 使用官方 JDK 镜像构建
-# ============================
-ARG JDK_VERSION
-ARG JDK_VERSION
-
 FROM amazoncorretto:${JDK_VERSION} AS jdk-builder
-
 
 # （可选）这里可以执行编译操作，比如构建你的应用
 # COPY . /app
@@ -18,9 +15,7 @@ FROM amazoncorretto:${JDK_VERSION} AS jdk-builder
 # 验证 JDK 安装并显示路径
 RUN  java -version || true && echo "JAVA_HOME: $JAVA_HOME"
 
-# ============================
 # Stage 2: 基于 Ubuntu 的运行环境
-# ============================
 FROM ubuntu:latest
 
 ARG MVND_VERSION
@@ -59,7 +54,7 @@ RUN curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-m
 ENV PATH=$JAVA_HOME/bin:$MVND_HOME/bin:$PATH
 
 # 验证版本
-RUN  echo "PATH: $PATH"  || true && mvnd --version || true && java -version || true && mvn -v || true
+RUN  echo "PATH: $PATH"  || true && mvnd --version || true && java -version
 
 # 默认启动命令
 CMD ["/bin/bash"]
