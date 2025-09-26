@@ -50,7 +50,7 @@ RUN curl -L https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSIO
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
     rm -f /tmp/${MVND_TAR} && \
     ln -s ${MVND_HOME}/mvn/bin/mvn /usr/local/bin/mvn && \
-    export PATH=$MVND_HOME/bin:$PATH \
+    export PATH=$MVND_HOME/bin:$PATH
 
 # （可选）拷贝你的应用 jar 包
 # COPY --from=jdk-builder /app/target/myapp.jar /opt/myapp.jar
