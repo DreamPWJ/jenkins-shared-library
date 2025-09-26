@@ -41,7 +41,7 @@ COPY --from=jdk-builder ${JAVA_HOME} ${JAVA_HOME}
 
 # 安装最小依赖
 RUN apt-get update && \
-    apt-get install -y ca-certificates bash curl wget zip unzip gzip  && \
+    apt-get install -y --no-install-recommends curl wget zip unzip gzip  && \
     rm -rf /var/lib/apt/lists/* \
 
 # 安装 mvnd  使用Cloudflare Worker代理github.com地址加速访问
