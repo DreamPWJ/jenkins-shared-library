@@ -210,7 +210,7 @@ def call(String type = 'experiment', Map map) {
                             filename 'Dockerfile.mvnd-jdk' // 在WORKSPACE工作区代码目录
                             label "panweiji/mvnd-jdk-${JDK_PUBLISHER}-${JDK_VERSION}:latest"
                             dir "${env.WORKSPACE}/ci"
-                            additionalBuildArgs "--build-arg MVND_VERSION=1.0.2 --build-arg JDK_PUBLISHER=${JDK_PUBLISHER} --build-arg JDK_VERSION=${JDK_VERSION}"
+                            additionalBuildArgs "--build-arg MVND_VERSION=1.0.3 --build-arg JDK_PUBLISHER=${JDK_PUBLISHER} --build-arg JDK_VERSION=${JDK_VERSION}"
                             args " -v /var/cache/maven/.m2:/root/.m2  "
                             reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
                         }
@@ -805,7 +805,7 @@ def futureLab(map) {
      // sh "playwright --version || true"
     }*/
 
-/*   def mvndVersion = "1.0.2"
+/*   def mvndVersion = "1.0.3"
     def jdkVersion = "25"
     def dockerImageName = "panweiji/mvnd-jdk"
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"

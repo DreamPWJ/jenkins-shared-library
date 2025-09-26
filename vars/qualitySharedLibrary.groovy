@@ -451,7 +451,7 @@ def call(String type = 'quality', Map map) {
                             } else {
                                 if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
                                     // mvnd支持条件
-                                    def mvndVersion = "1.0.2"  // Mvnd版本 要动态配置
+                                    def mvndVersion = "1.0.3"  // Mvnd版本 要动态配置
                                     def jdkVersion = "${JDK_VERSION}"
                                     def dockerImageName = "panweiji/mvnd-jdk"
                                     def dockerImageTag = "${mvndVersion}-${jdkVersion}"

@@ -330,7 +330,7 @@ def call(String type = 'web-java', Map map) {
                                   filename 'Dockerfile.mvnd-jdk' // 在WORKSPACE工作区代码目录
                                   label "panweiji/mvnd-jdk-${JDK_PUBLISHER}-${JDK_VERSION}:latest"
                                   dir "${env.WORKSPACE}/ci"
-                                  additionalBuildArgs "--build-arg MVND_VERSION=1.0.2 --build-arg JDK_PUBLISHER=${JDK_PUBLISHER} --build-arg JDK_VERSION=${JDK_VERSION}"
+                                  additionalBuildArgs "--build-arg MVND_VERSION=1.0.3 --build-arg JDK_PUBLISHER=${JDK_PUBLISHER} --build-arg JDK_VERSION=${JDK_VERSION}"
                                   args " -v /var/cache/maven/.m2:/root/.m2  "
                                   reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
                               }
@@ -358,7 +358,7 @@ def call(String type = 'web-java', Map map) {
                             } else {
                                 if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
                                     // mvnd支持条件
-                                    def mvndVersion = "1.0.2"  // Mvnd版本 要动态配置
+                                    def mvndVersion = "1.0.3"  // Mvnd版本 要动态配置
                                     def jdkVersion = "${JDK_VERSION}"
                                     def dockerImageName = "panweiji/mvnd-jdk"
                                     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
