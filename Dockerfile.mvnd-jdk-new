@@ -15,7 +15,7 @@ FROM amazoncorretto:${JDK_VERSION}-jdk AS jdk-builder
 # COPY . /app
 # WORKDIR /app
 # RUN ./mvnw package -DskipTests
-RUN  java -version || true && echo $JAVA_HOME
+# RUN  java -version || true && echo $JAVA_HOME
 
 # ============================
 # Stage 2: 基于 Ubuntu 的运行环境
@@ -31,14 +31,13 @@ WORKDIR /app
 # 指定切换用户
 USER root
 
+# 拷贝 JDK（runtime 只保留需要的 JDK）
+COPY --from=jdk-builder ${JAVA_HOME} ${JAVA_HOME}
+
 # 设置环境
 ENV DEBIAN_FRONTEND=noninteractive  \
     MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz \
-    JAVA_HOME=/usr/lib/jvm/java-${JDK_VERSION}-amazon-corretto \
     PATH=$PATH:${JAVA_HOME}/bin
-
-# 拷贝 JDK（runtime 只保留需要的 JDK）
-COPY --from=jdk-builder ${JAVA_HOME} ${JAVA_HOME}
 
 # 安装最小依赖
 RUN sed -i 's|http://.*.ubuntu.com|http://mirrors.aliyun.com|g' /etc/apt/sources.list && \
@@ -51,7 +50,7 @@ RUN curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-m
     tar -xzf /tmp/${MVND_TAR} -C /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
     rm -f /tmp/${MVND_TAR} && \
-    ln -s ${MVND_HOME}/mvn/bin/mvn /usr/local/bin/mvn && \
+    ln -s ${MVND_HOME} ${MVND_HOME} && \
     export PATH=$MVND_HOME/bin:$PATH
 
 # （可选）拷贝你的应用 jar 包
