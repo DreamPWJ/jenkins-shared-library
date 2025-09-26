@@ -8,7 +8,6 @@
 ARG JDK_VERSION
 
 FROM openjdk:${JDK_VERSION}-jdk AS jdk-builder
-# 如果需要指定版本，可以替换为 openjdk:11-jdk, openjdk:21-jdk 等
 
 # （可选）这里可以执行编译操作，比如构建你的应用
 # COPY . /app
@@ -20,6 +19,7 @@ FROM openjdk:${JDK_VERSION}-jdk AS jdk-builder
 # ============================
 FROM ubuntu:latest
 
+ARG JDK_VERSION
 ARG MVND_VERSION
 
 # 设置工作目录
