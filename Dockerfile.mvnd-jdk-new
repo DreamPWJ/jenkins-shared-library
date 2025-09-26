@@ -32,12 +32,13 @@ WORKDIR /app
 # 指定切换用户
 USER root
 
-# 拷贝 JDK（runtime 只保留需要的 JDK）
-COPY --from=jdk-builder ${JAVA_HOME} ${JAVA_HOME}
-
 # 设置环境
 ENV DEBIAN_FRONTEND=noninteractive  \
-    MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz
+    MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz \
+    JAVA_HOME=/usr/lib/jvm/java-${JDK_VERSION}-amazon-corretto
+
+# 拷贝 JDK（runtime 只保留需要的 JDK）
+COPY --from=jdk-builder ${JAVA_HOME} ${JAVA_HOME}
 
 # 安装最小依赖
 RUN sed -i 's|http://.*.ubuntu.com|http://mirrors.aliyun.com|g' /etc/apt/sources.list && \
