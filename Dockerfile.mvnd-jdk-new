@@ -37,8 +37,7 @@ COPY --from=jdk-builder ${JAVA_HOME} ${JAVA_HOME}
 
 # 设置环境
 ENV DEBIAN_FRONTEND=noninteractive  \
-    MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz \
-    PATH=${JAVA_HOME}/bin:$MVND_HOME/bin:$PATH
+    MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz
 
 # 安装最小依赖
 RUN sed -i 's|http://.*.ubuntu.com|http://mirrors.aliyun.com|g' /etc/apt/sources.list && \
@@ -54,6 +53,9 @@ RUN curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-m
 
 # （可选）拷贝你的应用 jar 包
 # COPY --from=jdk-builder /app/target/myapp.jar /opt/myapp.jar
+
+# 更新 PATH 环境变量
+ENV PATH=$JAVA_HOME/bin:$MVND_HOME/bin:$PATH
 
 # 验证版本
 RUN  echo "PATH: $PATH"  || true && mvnd --version || true && java -version || true && mvn -v
