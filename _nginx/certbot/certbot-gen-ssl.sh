@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description: 创建域名SSL证书和过期自动更新 使用的是Let’s Encrypt签发的证书，配合Certbot客户端
 # Let’s Encrypt 是一个自动签发 https 证书的免费项目

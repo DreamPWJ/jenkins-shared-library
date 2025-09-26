@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Author: 潘维吉
 # Description:  初始化磁盘相当于Linux恢复出厂设置  先安装expect，yum -y install expect

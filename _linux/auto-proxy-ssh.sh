@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description:  跳板机方式自动批量执行SSH ProxyJump免密登录 chmod +x auto-proxy-ssh.sh  在proxy_jump_hosts.json内批量设置机器的ip 用户名 密码
 # !!!注意当前机器先执行 ssh-keygen -t rsa  确保所有机器OpenSSH使用高版本才支持SSH跳板方式

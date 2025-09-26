@@ -9,11 +9,32 @@ if [[ $(command -v docker) ]]; then
   exit
 fi
 
+# 检查是否为root
+if [ "$(id -u)" -ne 0 ]; then
+  echo "请使用 root 或 sudo 运行此脚本"
+  exit 1
+fi
+
+#echo "[INFO] 检测系统版本..."
+OS=""
+VERSION_ID=""
+
+if [ -f /etc/os-release ]; then
+  . /etc/os-release
+  OS=$ID
+  VERSION_ID=${VERSION_ID%%.*}  # 取主版本号
+else
+  echo "[ERROR] 无法识别操作系统版本，脚本退出"
+  exit 1
+fi
+echo "[INFO] 检测到系统为: $OS $VERSION_ID"
+
 # uname -r 验证  Docker要求Linux系统的内核版本高于 3.10
 echo "查看linux内核或版本"
 lsb_release -a || cat /etc/redhat-release
 
 echo "更新yum系统包到最新、安装Docker相关依赖、设置yum镜像源"
+DOCKER_REPO="https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo" # 国内镜像源地址（阿里云）
 # 设置yum源 https://download.docker.com/linux/centos/docker-ce.repo 或者直接将docker-ce.repo文件放在/etc/yum.repos.d目录下
 sudo curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
 # sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
@@ -22,15 +43,26 @@ sudo curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Ce
 sudo yum clean all || true
 sudo yum update -y || true
 
-# 安装需要的软件包， yum-util 提供yum-config-manager功能，另外两个是devicemapper驱动依赖的
-sudo yum install -y yum-utils device-mapper-persistent-data lvm2
-
 echo "安装Docker环境"
 sudo yum makecache # 将服务器上的软件包信息 现在本地缓存,以提高 搜索 安装软件的速度
-# sudo yum install -y docker-ce  # 对于老旧系统可手动执行命令安装
-# sudo dnf -y install docker-ce --nobest # CentOS8 dnf新包方式
-# sudo yum -y downgrade docker-ce-cli-19.03.8-3.el7 # 兼容 错误error response from daemon: client version 1.40 is too new. Maximum supported API version is 1.39
-curl -s --connect-timeout 60 --retry 6 https://get.docker.com/ | sudo sh || sudo yum install -y docker-ce # curl方式下载docker
+# 统一处理 CentOS / RHEL / Rocky / AlmaLinux
+if [[ "$OS" =~ ^(centos|rhel|rocky|almalinux)$ ]]; then
+  if [[ "$VERSION_ID" -ge 8 ]]; then
+    echo "[INFO] 使用 dnf 安装 docker-ce"
+    sudo dnf -y install dnf-plugins-core
+    sudo dnf config-manager --add-repo $DOCKER_REPO
+    sudo dnf -y install docker-ce --nobest
+  else
+    echo "[INFO] 使用 yum 安装 docker-ce"
+    sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+    sudo yum-config-manager --add-repo $DOCKER_REPO # 设置镜像源
+    # 查看系统可用版本 yum list docker-ce --showduplicates | sort -r
+    sudo yum install -y docker-ce-18.06.3.ce-3.el7  # 指定版本号如 docker-ce-26.0.*, 按需排除 --exclude=docker-compose-plugin
+  fi
+else
+  echo "[WARN] 非 RHEL/CentOS 系，尝试 get.docker.com 安装"
+  curl -s --connect-timeout 60 --retry 6 https://get.docker.com/ | sh || sudo yum install -y docker-ce
+fi
 
 echo "启动Docker并加入开机自启动"
 #sudo systemctl enable --now docker

@@ -2,6 +2,15 @@
 # Author: 潘维吉
 # Description: CentOS宿主机版MySql卸载
 
+echo "数据库重新初始化"
+systemctl stop mysqld
+# 删除数据目录 (注意备份)
+rm -rf /var/lib/mysql/*
+# 重新初始化
+mysqld --initialize --user=mysql --datadir=/var/lib/mysql
+systemctl start mysqld
+
+
 echo "检查是否存在mysql"
 rpm -qa | grep mysql
 

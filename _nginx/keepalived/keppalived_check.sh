@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description: 定时检测Keepalived的服务状态，如果Keepalived停止，会尝试重新启动Keepalived
 # chmod 755 /etc/keepalived/keppalived_check.sh && systemctl restart keepalived  给shell脚本执行文件可执行权限

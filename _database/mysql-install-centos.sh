@@ -52,7 +52,7 @@ skip-grant-tables # 免密 设置完密码后注释 重启mysql 否则端口会�
 group_concat_max_len=1024000000
 max_connections=6000
 max_connect_errors=2000
-#lower_case_table_names=0
+lower_case_table_names=1
 
 [mysqld_safe]
 log-error=/var/log/mysqld.log

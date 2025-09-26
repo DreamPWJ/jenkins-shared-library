@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description: 通用Shell脚本复用和模块化  随着Shell编写复杂度提高, 需要大量的复用和模块化情况
 
@@ -26,11 +26,11 @@ function is_enable_buildkit() {
   fi
 }
 
-# 重命名上一个版本镜像tag 用于纯Docker方式回滚版本控制策略
+# 重命名上一个版本镜像tag 用于纯Docker部署方式回滚版本控制策略
 function set_docker_rollback_tag() {
     if [[  $2 == false ]]; then
       if [ "$(docker images  | grep $1)" ]; then
-        echo "重命名上一个版本本地镜像tag 用于纯Docker方式回滚版本控制策略"
+        echo "重命名上一个版本本地镜像tag 用于纯Docker部署方式回滚版本控制策略"
         docker rmi $1:previous || true
         # 对于远程镜像仓库应在pull新镜像之前重命名tag , 对于部署机器构建镜像在构建新镜像之前重命名tag
         docker tag $1:latest $1:previous || true

@@ -7,7 +7,7 @@ FROM ubuntu:latest
 
 ARG JDK_VERSION
 ARG MVND_VERSION
-ARG MAVEN_VERSION=3.9.9
+ARG MAVEN_VERSION=3.9.11
 
 # 设置工作目录
 WORKDIR /app
@@ -20,7 +20,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     JAVA_HOME=/opt/java \
     MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz  \
     MAVEN_HOME=/opt/maven MAVEN_TAR=apache-maven-${MAVEN_VERSION}-bin.tar.gz \
-    PATH=$PATH:/opt/java/bin:/opt/mvnd/bin
+    PATH=$PATH:${JAVA_HOME}/bin:${MVND_HOME}/bin
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends curl wget zip unzip gzip  && \
@@ -39,7 +39,7 @@ RUN apt-get update && \
 #echo "nameserver 8.8.8.8\nnameserver 114.114.114.114" > /etc/resolv.conf && \
     #echo "20.205.243.166 github.com\n151.101.1.194 github.global.ssl.fastly.net" >> /etc/hosts && \
 
-RUN curl -L https://git.code.lanneng.tech/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
+RUN curl -L https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
     tar -xzf /tmp/${MVND_TAR} -C /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
     rm -f /tmp/${MVND_TAR} && \
@@ -61,6 +61,6 @@ CMD ["/bin/bash"]
 
 
 # 自定义构建镜像
-# DOCKER_BUILDKIT=1 docker build --build-arg MVND_VERSION=1.0.2 --build-arg JDK_VERSION=21 -t panweiji/mvnd-jdk:latest  -f /my/Dockerfile.mvnd-jdk . --no-cache
+# DOCKER_BUILDKIT=1 docker build --build-arg MVND_VERSION=1.0.3 --build-arg JDK_VERSION=21 -t panweiji/mvnd-jdk:latest  -f /my/Dockerfile.mvnd-jdk . --no-cache
 # 上传镜像 先 docker login 登录
-# docker push panweiji/mvnd-jdk:1.0.2-21
+# docker push panweiji/mvnd-jdk:1.0.3-21

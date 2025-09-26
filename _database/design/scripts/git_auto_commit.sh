@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Linux的crontab自动定时任务 Git自动化管理数据库版本DDL文件
 

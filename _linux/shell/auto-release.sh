@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: 潘维吉
 # Description: 执行自动化发布部署shell脚本 用于独立部署的项目或无外网的项目或大量的终端部署项目情况 主动触发升级部署
 # 基于AI大语言模型自动生成的本脚本
 
 echo -e "\033[32m执行自动化部署Java语言脚本  👇 \033[0m"
 
-#!/bin/bash
+#!/usr/bin/env bash
 
 # 定义项目路径、Git仓库地址及分支
 PROJECT_DIR="/opt/my-java-app"
