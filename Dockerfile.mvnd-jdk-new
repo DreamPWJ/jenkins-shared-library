@@ -30,7 +30,7 @@ USER root
 
 # 设置环境
 ENV DEBIAN_FRONTEND=noninteractive \
-    JAVA_HOME=/usr/local/openjdk-${JDK_VERSION} \
+    JAVA_HOME=/usr/lib/jvm/java-${JDK_VERSION}-openjdk-amd64 \
     MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz  \
     PATH=$PATH:${JAVA_HOME}/bin:${MVND_HOME}/bin
 
@@ -43,7 +43,6 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # 安装 mvnd  使用Cloudflare Worker代理github.com地址加速访问
-
 RUN curl -L https://git.code.lanneng.tech/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
     tar -xzf /tmp/${MVND_TAR} -C /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
