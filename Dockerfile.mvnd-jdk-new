@@ -42,7 +42,7 @@ COPY --from=jdk-builder ${JAVA_HOME} ${JAVA_HOME}
 RUN sed -i 's|http://.*.ubuntu.com|http://mirrors.aliyun.com|g' /etc/apt/sources.list && \
     apt-get update && \
     apt-get install -y --no-install-recommends curl wget zip unzip gzip  && \
-    rm -rf /var/lib/apt/lists/* \
+    rm -rf /var/lib/apt/lists/*
 
 # 安装 mvnd  使用Cloudflare Worker代理github.com地址加速访问
 RUN curl -L https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
