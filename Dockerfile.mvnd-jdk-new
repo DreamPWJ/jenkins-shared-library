@@ -39,7 +39,9 @@ ENV DEBIAN_FRONTEND=noninteractive \
 COPY --from=jdk-builder ${JAVA_HOME} ${JAVA_HOME}
 
 # 安装最小依赖
-RUN apt-get install -y --no-install-recommends curl wget zip unzip gzip  && \
+RUN sed -i 's|http://.*.ubuntu.com|http://mirrors.aliyun.com|g' /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends curl wget zip unzip gzip  && \
     rm -rf /var/lib/apt/lists/* \
 
 # 安装 mvnd  使用Cloudflare Worker代理github.com地址加速访问
@@ -54,7 +56,7 @@ RUN curl -L https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSIO
 # COPY --from=jdk-builder /app/target/myapp.jar /opt/myapp.jar
 
 # 验证版本
-RUN java -version && mvnd --version && mvn -v
+#RUN java -version && mvnd --version && mvn -v
 
 # 默认启动命令
 CMD ["/bin/bash"]
