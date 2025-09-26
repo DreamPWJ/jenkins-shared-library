@@ -41,14 +41,13 @@ COPY --from=jdk-builder ${JAVA_HOME} ${JAVA_HOME}
 # 安装最小依赖
 RUN sed -i 's|http://.*.ubuntu.com|http://mirrors.aliyun.com|g' /etc/apt/sources.list && \
     apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates bash curl wget zip unzip gzip  && \
+    apt-get install -y --no-install-recommends curl wget zip unzip gzip  && \
     rm -rf /var/lib/apt/lists/*
 
 # 安装 mvnd  使用Cloudflare Worker代理github.com地址加速访问
-# https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz
-RUN curl -L https://maven.aliyun.com/repository/central/org/apache/maven/mvnd/mvnd-dist/${MVND_VERSION}/mvnd-dist-${MVND_VERSION}-linux-amd64.zip -o /tmp/${MVND_TAR} && \
+RUN curl -L https://github.com/apache/maven-mvnd/releases/download/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
     tar -xzf /tmp/${MVND_TAR} -C /opt && \
-    mv /opt/mvnd-dist-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
+    mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
     rm -f /tmp/${MVND_TAR} && \
     ln -s ${MVND_HOME}/mvn/bin/mvn /usr/local/bin/mvn && \
     export PATH=$MVND_HOME/bin:$PATH
