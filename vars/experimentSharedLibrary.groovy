@@ -784,14 +784,14 @@ def futureLab(map) {
         sh "python -V"
     }*/
 
-/*    def dockerImageName = "panweiji/k8s-build"
+    def dockerImageName = "panweiji/k8s-build"
     def dockerImageTag = "latest"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.k8s-new", dockerImageName, dockerImageTag, "")
     docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
         sh "python -V"
         sh "kubectl version --client"
         // sh "helm version"
-    }*/
+    }
 
 /*    def nodeVersion = "${"Node24".replace('Node', '')}"
     def dockerImageName = "panweiji/node-build"
@@ -805,9 +805,7 @@ def futureLab(map) {
      // sh "playwright --version || true"
     }*/
 
-
-
-   def mvndVersion = "1.0.2"
+/*   def mvndVersion = "1.0.2"
     def jdkVersion = "25"
     def dockerImageName = "panweiji/mvnd-jdk"
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
@@ -824,7 +822,7 @@ def futureLab(map) {
         //sh "mvn clean install  -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvnd  install"
         //sh "mvn  install"
-    }
+    } */
 
 
 /*    def gradleVersion = "8" // Gradle版本 要动态配置
