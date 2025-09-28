@@ -31,7 +31,7 @@ docker pull elasticsearch:9.1.4
 touch /my/elasticsearch/config/elasticsearch.yml 
 sudo docker run -d --restart=always -p 9200:9200 -p 9300:9300 --name elasticsearch \
 -v /my/elasticsearch/data:/usr/share/elasticsearch/data -v /my/elasticsearch/logs:/usr/share/elasticsearch/logs  \
--e "ES_JAVA_OPTS=-Xms1g -Xmx1g" -e "discovery.type=single-node" -e "xpack.security.enabled=true" -e "ELASTIC_PASSWORD=elastic@0633" \
+-e "ES_JAVA_OPTS=-Xms1024m -Xmx1024m" -e "discovery.type=single-node" -e "xpack.security.enabled=true" -e "ELASTIC_PASSWORD=elastic@0633" \
 --cpus=2 -m 4096m  --privileged  elasticsearch:9.1.4
 
 #### ZooKeeper分布式应用程序调度服务
@@ -77,7 +77,7 @@ mkdir -p /my/rocketmq/broker/conf && sudo chmod 777  /my/rocketmq/ -R
 
 docker run -d --restart=always -p 9876:9876 \
 -v /my/rocketmq/server/logs:/home/rocketmq/logs \
--e TZ="Asia/Shanghai" -e "JAVA_OPT_EXT=-Xms1024M -Xmx1024M -Xmn128m" --cpus=2 -m 1048m \
+-e TZ="Asia/Shanghai" -e "JAVA_OPT_EXT=-Xms1024m -Xmx1024m -Xmn128m" --cpus=2 -m 1048m \
 --name rocketmq-server  apache/rocketmq:latest  \
 sh mqnamesrv
 
