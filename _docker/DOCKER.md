@@ -30,7 +30,7 @@ docker pull elasticsearch:9.1.4
 
 chown -R 1000:0 /my/elasticsearch && chmod -R 755 /my/elasticsearch && touch /my/elasticsearch/config/elasticsearch.yml 
 sudo docker run -d --restart=always -p 9200:9200 -p 9300:9300 --name elasticsearch \
--v /my/elasticsearch/data:/usr/share/elasticsearch/data -v /my/elasticsearch/logs:/usr/share/elasticsearch/logs  \
+-v /my/elasticsearch/data:/usr/share/elasticsearch/data -v /my/elasticsearch/logs:/usr/share/elasticsearch/logs -v /my/elasticsearch/plugins:/usr/share/elasticsearch/plugins \
 -e "ES_JAVA_OPTS=-Xms1024m -Xmx1024m" -e "discovery.type=single-node" -e "xpack.security.enabled=true" -e "ELASTIC_PASSWORD=elastic@0633" \
 --cpus=2 -m 4096m  --privileged  elasticsearch:9.1.4
 
