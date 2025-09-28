@@ -8,10 +8,10 @@ sudo docker run -d --restart=always -p 80:80 -p 443:443/tcp -p 443:443/udp --nam
 --log-opt max-size=200m --log-opt max-file=1   \
 nginx:stable
 
-#### 从Docker Hub里拉取redis镜像来部署 密码强度要求：8位及以上，包含大小写，字母，特殊符号
+#### 从Docker Hub里拉取Redis镜像来部署 
 docker pull redis:latest
 
-#### redis docker容器启动 -d开启 守护进程Daemon模式 -v指定数据持久化存储宿主机位置 --requirepass "mypassword"设置密码 --appendonly yes数据持久化
+#### Redis docker容器启动 -d开启 守护进程Daemon模式 -v指定数据持久化存储宿主机位置 密码强度要求：8位及以上，包含大小写，字母，特殊符号 --requirepass "mypassword"设置密码 --appendonly yes数据持久化
 sudo docker run -d --restart=always -p 6379:6379 --name redis -v /my/redis/data:/data -v /etc/localtime:/etc/localtime:ro  \
 --cpus=2 -m 4096m redis:latest redis-server --appendonly yes --requirepass "admin@0633"
 
@@ -24,6 +24,14 @@ sudo docker run -d --restart=always -p 5672:5672 -p 15672:15672 --name rabbitmq 
 -v /my/rabbitmq:/var/lib/rabbitmq -v /etc/localtime:/etc/localtime:ro \
 --cpus=2 -m 2048m --log-opt max-size=200m --log-opt max-file=1   \
 -e RABBITMQ_DEFAULT_USER=root -e RABBITMQ_DEFAULT_PASS=root@0633 rabbitmq:management
+
+#### 从Docker Hub里拉取ElasticSearch镜像来部署
+docker pull elasticsearch:9.1.4
+
+sudo docker run -d --restart=always -p 9200:9200 -p 9300:9300 --name elasticsearch \
+-v /my/elasticsearch:/usr/share/elasticsearch \
+-e "ES_JAVA_OPTS=-Xms1024m -Xmx1024m" -e "discovery.type=single-node" \
+--cpus=2 -m 4096m  elasticsearch:9.1.4
 
 #### ZooKeeper分布式应用程序调度服务
 docker pull zookeeper
