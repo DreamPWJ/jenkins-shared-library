@@ -1318,7 +1318,7 @@ def nodeBuildProject(map) {
                     Web.needSass(this)
                 }
 
-                timeout(time: 30, unit: 'MINUTES') {
+                timeout(time: 45, unit: 'MINUTES') {
                     try {
                         def retryCount = 0 // 重试次数初始值
                         retry(3) {
@@ -1389,7 +1389,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
         MAVEN_ONE_LEVEL = "${MAVEN_ONE_LEVEL}".trim() != "" ? "${MAVEN_ONE_LEVEL}/" : "${MAVEN_ONE_LEVEL}".trim()
         println("执行Maven构建 🏗️  ")
         def isMavenTest = "${IS_RUN_MAVEN_TEST}" == "true" ? "" : "-Dmaven.test.skip=true"  // 是否Maven单元测试
-        timeout(time: 30, unit: 'MINUTES') { // 超时终止防止非正常构建情况 长时间占用资源
+        timeout(time: 45, unit: 'MINUTES') { // 超时终止防止非正常构建情况 长时间占用资源
             retry(2) {
                 // 对于Spring Boot 3.x及Spring Native与GaalVM集成的项目，通过以下命令来构建原生镜像  特性：性能明显提升 使用资源明显减少
                 if ("${IS_SPRING_NATIVE}" == "true") { // 构建原生镜像包

@@ -130,7 +130,7 @@ JSON_PARAMS
    "BRANCH_NAME" : "master" ,
    "PROJECT_TYPE" : "2" ,
    "PROJECT_NAME" : "hrm-web" ,
-   "SHELL_PARAMS" : "hrm-java app 9878 8080 prod",
+   "SHELL_PARAMS" : "hrm-java app 9878 44311 prod",
    "IS_K8S_DEPLOY" : true,
    "K8S_POD_REPLICAS" : "1",
    "CUSTOM_HEALTH_CHECK_PATH" : "/health-check",
