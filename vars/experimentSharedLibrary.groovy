@@ -793,18 +793,18 @@ def futureLab(map) {
         // sh "helm version"
     }*/
 
-    def nodeVersion = "${"Node16".replace('Node', '')}"
+/*    def nodeVersion = "${"Node24".replace('Node', '')}"
     def dockerImageName = "panweiji/node-build"
     def dockerImageTag = "${nodeVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag,
-            "--build-arg NODE_VERSION=${nodeVersion}", true)
+            "--build-arg NODE_VERSION=${nodeVersion}", false)
     docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
         sh "node -v"
         sh "npm -v"
         sh "yarn --version"
         sh "pnpm --version"
         // sh "playwright --version || true"
-    }
+    }*/
 
 /*  def mvndVersion = "1.0.3"
     def jdkVersion = "25"
