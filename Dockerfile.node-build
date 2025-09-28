@@ -20,11 +20,11 @@ ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 自定义环境
-RUN node -v && npm -v && npm config set registry https://registry.npmmirror.com && npm install -g pnpm --unsafe-perm && npm install -g yarn  \
+RUN node -v && npm -v && npm config set registry https://registry.npmmirror.com && npm install -g pnpm --unsafe-perm || true && npm install -g yarn || true  \
  && yarn config set registry https://registry.npmmirror.com && pnpm config set registry https://registry.npmmirror.com \
- && apt-get install -y git \
- && npm i -g lerna && npm i -g dotenv-cli && npm i -g cross-env && npm i -g rimraf && npm i -g yargs \
- && npm i -g playwright && npm i -g app-info-parser || true  && npm install miniprogram-ci || true
+ && npm i -g lerna || true && npm i -g dotenv-cli || true  && npm i -g cross-env || true && npm i -g rimraf || true && npm i -g yargs || true \
+ && npm i -g playwright || true && npm i -g app-info-parser || true  && npm install miniprogram-ci || true \
+ && apt-get install -y git || true
 
 
 # 对外暴露端口
