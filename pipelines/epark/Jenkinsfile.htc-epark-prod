@@ -259,6 +259,22 @@ JSON_PARAMS
 }
 REMOTE_IP: 172.16.99.53
 
+
+htc-epark-old-h5-prod
+好停车老H5服务编译后源码 Web前端 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/epark-old-h5.git" ,
+    "BRANCH_NAME" : "master" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "epark-old-h5" ,
+    "SHELL_PARAMS" : "epark-old h5 8010 80 prod" ,
+    "NPM_RUN_PARAMS" : "build",
+    "CUSTOM_NGINX_CONFIG" : "config/nginx.conf",
+    "APPLICATION_DOMAIN" : "http://idc.pengbocloud.com:8010"
+}
+REMOTE_IP: 172.16.99.57
+
 */
 
 
