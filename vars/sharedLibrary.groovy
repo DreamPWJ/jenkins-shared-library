@@ -1259,6 +1259,10 @@ def sourceCodeDeploy() {
                     " tar --warning=no-file-changed -zcvf  ${tarFile} --exclude='.git' --exclude='ci' --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
             buildPackageSize = Utils.getFileSize(this, "${tarFile}")
             Tools.printColor(this, "源码压缩打包成功 ✅")
+            if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
+                // 替换自定义的nginx配置文件
+                Deploy.replaceNginxConfig(this)
+            }
         }
     }
 }
