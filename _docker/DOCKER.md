@@ -28,6 +28,7 @@ sudo docker run -d --restart=always -p 5672:5672 -p 15672:15672 --name rabbitmq 
 #### 从Docker Hub里拉取ElasticSearch镜像来部署
 docker pull elasticsearch:9.1.4
 
+#### 执行命令自动生成 bin/elasticsearch-reset-password -u elastic -a
 chown -R 1000:0 /my/elasticsearch && chmod -R 755 /my/elasticsearch  
 sudo docker run -d --restart=always -p 9200:9200 -p 9300:9300 --name elasticsearch \
 -v /my/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro -v /my/elasticsearch/data:/usr/share/elasticsearch/data -v /my/elasticsearch/logs:/usr/share/elasticsearch/logs -v /my/elasticsearch/plugins:/usr/share/elasticsearch/plugins \
