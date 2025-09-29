@@ -57,7 +57,7 @@ if [[ "$OS" =~ ^(centos|rhel|rocky|almalinux)$ ]]; then
     sudo yum install -y yum-utils device-mapper-persistent-data lvm2
     sudo yum-config-manager --add-repo $DOCKER_REPO # 设置镜像源
     # 查看系统可用版本 yum list docker-ce --showduplicates | sort -r
-    sudo yum install -y docker-ce-18.06.3.ce-3.el7  # 指定版本号如 docker-ce-26.0.*, 按需排除 --exclude=docker-compose-plugin
+    sudo yum install -y docker-ce-20.10.*  # 指定版本号如 docker-ce-26.0.*, 按需排除 --exclude=docker-compose-plugin
   fi
 else
   echo "[WARN] 非 RHEL/CentOS 系，尝试 get.docker.com 安装"
