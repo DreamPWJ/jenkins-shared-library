@@ -369,7 +369,7 @@ def call(String type = 'web-java', Map map) {
                                         }
                                     }
                                 } else {
-                                    def dockerImageNameAndTag="${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
+                                    def dockerImageNameAndTag = "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
                                     docker.image("${dockerImageNameAndTag}").withRun(dockerParams) { c ->
                                         docker.image("${dockerImageNameAndTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
                                             mavenBuildProject(map)
@@ -1229,16 +1229,18 @@ def pullCIRepo() {
 def packageDeploy() {
     // 参数化上传或者Git仓库下载或从http地址下载包
     try { // 是否存在声明
-        println("上传文件中: ${DEPLOY_PACKAGE_FILENAME}")
-        unstash 'DEPLOY_PACKAGE' // 获取文件 上传到具体job根目录下和源码同级结构
-        // sh 'cat DEPLOY_PACKAGE'
-        // 文件恢复原始文件名称  原始文件名称是 定义变量名称+ _FILENAME 固定后缀组合
-        sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME'
-        Tools.printColor(this, "${DEPLOY_PACKAGE_FILENAME} 文件上传成功 ✅")
-        buildPackageSize = Utils.getFileSize(this, "${DEPLOY_PACKAGE_FILENAME}")
-        IS_PACKAGE_DEPLOY = true
-        // 统一部署文件名称 SSH传输包到部署服务器
-
+        if ("${IS_SOURCE_CODE_DEPLOY}" != 'true') {
+            println("上传文件中: ${DEPLOY_PACKAGE_FILENAME}")
+            unstash 'DEPLOY_PACKAGE' // 获取文件 上传到具体job根目录下和源码同级结构
+            // sh 'cat DEPLOY_PACKAGE'
+            // 文件恢复原始文件名称  原始文件名称是 定义变量名称+ _FILENAME 固定后缀组合
+            // 文件恢复原始文件名称  原始文件名称是 定义变量名称+ _FILENAME 固定后缀组合
+            sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME'
+            Tools.printColor(this, "${DEPLOY_PACKAGE_FILENAME} 文件上传成功 ✅")
+            buildPackageSize = Utils.getFileSize(this, "${DEPLOY_PACKAGE_FILENAME}")
+            IS_PACKAGE_DEPLOY = true
+            // 统一部署文件名称 SSH传输包到部署服务器
+        }
     } catch (error) {
         // 如果是必须上传文件的job任务 构建后报错提醒 或者构建先input提醒
     }
@@ -1254,7 +1256,7 @@ def sourceCodeDeploy() {
         dir("${env.WORKSPACE}/") { // 源码在特定目录下
             def tarFile = "${sourceCodeDeployName}.tar.gz"
             sh " rm -f ${tarFile} && " +
-                    " tar --warning=no-file-changed -zcvf  ${tarFile} --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
+                    " tar --warning=no-file-changed -zcvf  ${tarFile} --exclude='.git' --exclude='ci' --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
             buildPackageSize = Utils.getFileSize(this, "${tarFile}")
             Tools.printColor(this, "源码压缩打包成功 ✅")
         }
