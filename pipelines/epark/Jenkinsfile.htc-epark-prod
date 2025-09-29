@@ -270,6 +270,7 @@ JSON_PARAMS
     "PROJECT_NAME" : "epark-old-h5" ,
     "SHELL_PARAMS" : "epark-old h5 8010 80 prod" ,
     "NPM_RUN_PARAMS" : "build",
+    "IS_SOURCE_CODE_DEPLOY" : true,
     "CUSTOM_NGINX_CONFIG" : "config/nginx.conf",
     "APPLICATION_DOMAIN" : "http://idc.pengbocloud.com:8010"
 }
