@@ -1200,11 +1200,11 @@ def pullProjectCode() {
         existCiCode()
     }
 
-    // 当前job是否有代码变更记录并提醒
-    JenkinsCI.getNoChangeLogAndTip(this)
-
     // 无构建部署 源码直接部署方式
     sourceCodeDeploy()
+
+    // 当前job是否有代码变更记录并提醒
+    JenkinsCI.getNoChangeLogAndTip(this)
 }
 
 /**
@@ -1260,6 +1260,7 @@ def sourceCodeDeploy() {
             buildPackageSize = Utils.getFileSize(this, "${tarFile}")
             Tools.printColor(this, "源码压缩打包成功 ✅")
             if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
+                NPM_PACKAGE_FOLDER = "${sourceCodeDeployName}"
                 // 替换自定义的nginx配置文件
                 Deploy.replaceNginxConfig(this)
             }
