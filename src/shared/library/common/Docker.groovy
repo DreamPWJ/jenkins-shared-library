@@ -336,7 +336,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
      */
     static def setK8sDockerSecret(ctx, map) {
         def SECRET_NAME = "${map.k8s_image_pull_secrets}" // Secret 名称
-        def NAMESPACE = "default"  //  命名空间 建议不同项目使用不同命名空间隔离
+        def NAMESPACE = "default"  //  命名空间 建议不同环境和项目使用不同命名空间隔离
 
         // 尝试检查 Secret 是否存在
         def secretExists = ctx.sh(
