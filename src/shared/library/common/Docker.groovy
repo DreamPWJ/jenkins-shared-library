@@ -337,11 +337,13 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
     static def setK8sDockerSecret(ctx, map) {
         def SECRET_NAME = "ci-cd-k8s-docker-registry-secret" // Secret 名称
         def NAMESPACE = "default"  //  命名空间 建议不同项目使用不同命名空间隔离
+
         // 尝试检查 Secret 是否存在
         def secretExists = ctx.sh(
                 script: "kubectl get secret ${SECRET_NAME} -n ${NAMESPACE} > /dev/null 2>&1",
                 returnStatus: true
         ) == 0 // 如果命令执行成功（返回状态为0），则表示 Secret 已存在
+
         // 创建 docker-registry secret
         if (!secretExists) {
             ctx.println("Secret ${SECRET_NAME} does not exist in namespace ${NAMESPACE}. Creating it now...")
