@@ -331,6 +331,38 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
     }
 
     /**
+     *  K8s上Docker镜像仓库密钥初始化自动化设置
+     *  私有镜像拉取密钥配置   参考文档：https://kubernetes.io/docs/concepts/containers/images/#creating-a-secret-with-a-docker-config
+     */
+    static def setK8sDockerSecret(ctx, map) {
+        def SECRET_NAME = "${map.k8s_image_pull_secrets}" // Secret 名称
+        def NAMESPACE = "default"  //  命名空间 建议不同环境和项目使用不同命名空间隔离
+
+        // 尝试检查 Secret 是否存在
+        def secretExists = ctx.sh(
+                script: "kubectl get secret ${SECRET_NAME} -n ${NAMESPACE} > /dev/null 2>&1",
+                returnStatus: true
+        ) == 0 // 如果命令执行成功（返回状态为0），则表示 Secret 已存在
+
+        // 创建 docker-registry secret
+        if (!secretExists) {
+            ctx.println("Secret ${SECRET_NAME} does not exist in namespace ${NAMESPACE}. Creating it now...")
+            ctx.withCredentials([ctx.usernamePassword(credentialsId: "${ctx.DOCKER_REPO_CREDENTIALS_ID}",
+                    usernameVariable: 'DOCKER_HUB_USER_NAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                ctx.sh """
+                    kubectl create secret docker-registry ${SECRET_NAME} \
+                        --docker-server=${ctx.env.DOCKER_REPO_REGISTRY} \
+                        --docker-username=${ctx.DOCKER_HUB_USER_NAME} \
+                        --docker-password=${ctx.DOCKER_HUB_PASSWORD}  \
+                        --docker-email=406798106@qqq.com \
+                        -n ${NAMESPACE}
+                        """
+            }
+            ctx.println("Secret ${SECRET_NAME} created successfully.  ✅")
+        }
+    }
+
+    /**
      * 根据系统资源动态设置docker参数
      */
     static def setDockerParameters(ctx) {
