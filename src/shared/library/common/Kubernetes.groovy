@@ -17,7 +17,7 @@ class Kubernetes implements Serializable {
 
     static def k8sYamlFile = "k8s.yaml" // k8s集群应用部署yaml定义文件
     static def pythonYamlFile = "k8s_yaml.py" // 使用Python动态处理Yaml文件
-    static def k8sNameSpace = "default" // k8s默认命名空间
+    static def k8sNameSpace = "default" // k8s默认命名空间 建议不同环境和项目使用不同命名空间隔离
     static def canaryDeploymentName = "" // 灰度发布部署名称
 
     /**
@@ -118,9 +118,9 @@ class Kubernetes implements Serializable {
 
         // 如果使用容器镜像仓库和k8s是一个云厂商 镜像仓库地址建议使用内网地址 下载加速和节省流量
         def dockerRepoRegistry = "${ctx.DOCKER_REPO_REGISTRY}"
-        if ("${ctx.DOCKER_REPO_REGISTRY}".endsWithAny("aliyun.com", "ksyun.com")) {
+      /*  if ("${ctx.DOCKER_REPO_REGISTRY}".endsWithAny("aliyun.com", "ksyun.com")) {
             dockerRepoRegistry = "${ctx.DOCKER_REPO_REGISTRY}".replace("hub-", "hub-vpc-")  // 转换成内网仓库地址
-        }
+        }*/
 
         // 基于统一k8s yaml核心配置模版动态替换参数 实现不同类型应用部署
         ctx.sh "sed -e 's#{IMAGE_URL}#${dockerRepoRegistry}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
@@ -235,80 +235,13 @@ class Kubernetes implements Serializable {
     }
 
     /**
-     * 七层负载和灰度发布配置部署
-     */
-    static def ingressNginx(ctx, map) {
-        def yamlName = "ingress.yaml"
-        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
-                " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
-        ctx.sh " cat ${yamlName} "
-
-        // 部署七层负载和灰度发布配置
-        ctx.sh "kubectl apply -f ${yamlName}"
-        //ctx.sh "kubectl get ing"
-    }
-
-    /**
-     * 灰度发布  金丝雀发布  A/B测试
-     * 参考文档: https://help.aliyun.com/document_detail/200941.html
-     */
-    static def ingressDeploy(ctx, map) {
-        // 需要提供一下几个参数：
-        // 灰度发布匹配的方式  1、 header  2、 cookie   3. weight
-        // yaml文件中灰度匹配的名称version  灰度匹配的值new  。 version=new 表示新版本
-        // 灰度发布初始化流量权重 当时灰度部署完成后的新版流量权重 如20%访问流量到新版本
-        // 新版发布后启动等待时间, 每隔多长时间更改流量规则, 单位秒  逐渐提高新版流量权重实现灰度发布
-        // 新版发布全部完成老版本下线等待时间, 隔多长时间下线旧应用, 单位秒  流量全部切到新版本后下线旧应用等待保证稳定性
-
-        // 定义 ingress yaml数据
-        def ingressJson = [
-                "host": "${ctx.APPLICATION_DOMAIN}",
-                "http": ["paths": [["path"   : "/v2", "pathType": "Prefix",
-                                    "backend": ["service": ["name": "${ctx.FULL_PROJECT_NAME}-service", "port": ["number": ctx.SHELL_HOST_PORT]]]]],
-                ],
-        ]
-
-        // 根据service名称找到ingress的名称
-        def ingressName = ctx.sh("kubectl get ingress -n ${k8sNameSpace} -o jsonpath='{.items[?(@.spec.rules[0].host==\"${ctx.APPLICATION_DOMAIN}\")].metadata.name}'").trim()
-
-        // 基于 kubectl patch 动态更新方案（无需重建）
-        // 新增 host 规则 /spec/rules/- yaml路径数组最后一个新增
-        ctx.sh " kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{" op ": " add ", " path ": " / spec / rules / -", " value ": " $ { ingressJson } "}]' "
-
-        // 查看yaml数组
-        // kubectl get ingress my-ingress -n ${k8sNameSpace} -o jsonpath='{.spec.rules}'
-
-        // 删除 host 规则 /spec/rules/index yaml路径数组index下标 查看API版本 kubectl get ingress my-ingress -n default -o jsonpath='{.apiVersion}'
-        // kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "remove", "path": "/spec/rules/1"}]' -v9
-
-
-        ctx.sh "kubectl apply -f ingress.yaml"
-        ctx.sh "kubectl get ingress || true"
-        // 系统运行一段时间后，当新版本服务已经稳定并且符合预期后，需要下线老版本的服务 ，仅保留新版本服务在线上运行。
-        // 为了达到该目标，需要将旧版本的Service指向新版本服务的Deployment，并且删除旧版本的Deployment和新版本的Service。
-
-        // 修改旧版本Service，使其指向新版本服务 更改selector: app的新pod名称
-        ctx.sh "kubectl apply -f service.yaml"
-        // 删除Canary Ingress资源gray-release-canary
-        ctx.sh "kubectl delete ingress gray-release-canary"
-        // 删除旧版本的Deployment和新版本的Service
-        ctx.sh "kubectl delete deployment old-deployment-name"
-        ctx.sh "kubectl delete svc new-service-name"
-    }
-
-    /**
-     * K8S方式实现蓝绿部署
-     */
-    static def blueGreenDeploy(ctx, map) {
-        // 蓝绿发布是为新版本创建一个与老版本完全一致的生产环境，在不影响老版本的前提下，按照一定的规则把部分流量切换到新版本，
-        // 当新版本试运行一段时间没有问题后，将用户的全量流量从老版本迁移至新版本。
-        ctx.sh " "
-    }
-
-    /**
      *  K8S部署后执行的脚本
      */
     static def afterDeployRun(ctx, map, deployNum) {
+
+        // K8s上Docker镜像仓库密钥初始化自动化设置
+        // Docker.setK8sDockerSecret(ctx, map) // 影响性能暂时关闭
+
         // 查看个组件的状态  如 kubectl get svc
         // kubectl top pods || true
         ctx.sh """ 
@@ -423,6 +356,77 @@ class Kubernetes implements Serializable {
         ctx.sh " kubectl rollout undo deployment/deployment-name -n ${k8sNameSpace} "
         // 回滚到指定版本
         ctx.sh " kubectl rollout undo deployment/deployment-name -n ${k8sNameSpace} --revision=2 "
+    }
+
+    /**
+     * 七层负载和灰度发布配置部署
+     */
+    static def ingressNginx(ctx, map) {
+        def yamlName = "ingress.yaml"
+        ctx.sh "sed -e ' s#{APP_NAME}#${ctx.FULL_PROJECT_NAME}#g;s#{HOST_PORT}#${ctx.SHELL_HOST_PORT}#g; " +
+                " ' ${ctx.WORKSPACE}/ci/_k8s/${yamlName} > ${yamlName} "
+        ctx.sh " cat ${yamlName} "
+
+        // 部署七层负载和灰度发布配置
+        ctx.sh "kubectl apply -f ${yamlName}"
+        //ctx.sh "kubectl get ing"
+    }
+
+    /**
+     * 灰度发布  金丝雀发布  A/B测试
+     * 参考文档: https://help.aliyun.com/document_detail/200941.html
+     */
+    static def ingressDeploy(ctx, map) {
+        // 需要提供一下几个参数：
+        // 灰度发布匹配的方式  1、 header  2、 cookie   3. weight
+        // yaml文件中灰度匹配的名称version  灰度匹配的值new  。 version=new 表示新版本
+        // 灰度发布初始化流量权重 当时灰度部署完成后的新版流量权重 如20%访问流量到新版本
+        // 新版发布后启动等待时间, 每隔多长时间更改流量规则, 单位秒  逐渐提高新版流量权重实现灰度发布
+        // 新版发布全部完成老版本下线等待时间, 隔多长时间下线旧应用, 单位秒  流量全部切到新版本后下线旧应用等待保证稳定性
+
+        // 定义 ingress yaml数据
+        def ingressJson = [
+                "host": "${ctx.APPLICATION_DOMAIN}",
+                "http": ["paths": [["path"   : "/v2", "pathType": "Prefix",
+                                    "backend": ["service": ["name": "${ctx.FULL_PROJECT_NAME}-service", "port": ["number": ctx.SHELL_HOST_PORT]]]]],
+                ],
+        ]
+
+        // 根据service名称找到ingress的名称
+        def ingressName = ctx.sh("kubectl get ingress -n ${k8sNameSpace} -o jsonpath='{.items[?(@.spec.rules[0].host==\"${ctx.APPLICATION_DOMAIN}\")].metadata.name}'").trim()
+
+        // 基于 kubectl patch 动态更新方案（无需重建）
+        // 新增 host 规则 /spec/rules/- yaml路径数组最后一个新增
+        ctx.sh " kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{" op ": " add ", " path ": " / spec / rules / -", " value ": " $ { ingressJson } "}]' "
+
+        // 查看yaml数组
+        // kubectl get ingress my-ingress -n ${k8sNameSpace} -o jsonpath='{.spec.rules}'
+
+        // 删除 host 规则 /spec/rules/index yaml路径数组index下标 查看API版本 kubectl get ingress my-ingress -n default -o jsonpath='{.apiVersion}'
+        // kubectl patch ingress my-ingress -n ${k8sNameSpace} --type='json' -p='[{"op": "remove", "path": "/spec/rules/1"}]' -v9
+
+
+        ctx.sh "kubectl apply -f ingress.yaml"
+        ctx.sh "kubectl get ingress || true"
+        // 系统运行一段时间后，当新版本服务已经稳定并且符合预期后，需要下线老版本的服务 ，仅保留新版本服务在线上运行。
+        // 为了达到该目标，需要将旧版本的Service指向新版本服务的Deployment，并且删除旧版本的Deployment和新版本的Service。
+
+        // 修改旧版本Service，使其指向新版本服务 更改selector: app的新pod名称
+        ctx.sh "kubectl apply -f service.yaml"
+        // 删除Canary Ingress资源gray-release-canary
+        ctx.sh "kubectl delete ingress gray-release-canary"
+        // 删除旧版本的Deployment和新版本的Service
+        ctx.sh "kubectl delete deployment old-deployment-name"
+        ctx.sh "kubectl delete svc new-service-name"
+    }
+
+    /**
+     * K8S方式实现蓝绿部署
+     */
+    static def blueGreenDeploy(ctx, map) {
+        // 蓝绿发布是为新版本创建一个与老版本完全一致的生产环境，在不影响老版本的前提下，按照一定的规则把部分流量切换到新版本，
+        // 当新版本试运行一段时间没有问题后，将用户的全量流量从老版本迁移至新版本。
+        ctx.sh " "
     }
 
     /**
