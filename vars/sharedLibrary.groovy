@@ -1256,7 +1256,7 @@ def sourceCodeDeploy() {
         dir("${env.WORKSPACE}/") { // 源码在特定目录下
             def tarFile = "${sourceCodeDeployName}.tar.gz"
             sh " rm -f ${tarFile} && rm -f DEPLOY_PACKAGE && " +
-                    " tar --warning=no-file-changed -zcvf  ${tarFile} --exclude='.git' --exclude='ci' --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
+                    " tar --warning=no-file-changed -zcvf  ${tarFile} --exclude='.git' --exclude='ci*' --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
             buildPackageSize = Utils.getFileSize(this, "${tarFile}")
             Tools.printColor(this, "源码压缩打包成功 ✅")
             if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
