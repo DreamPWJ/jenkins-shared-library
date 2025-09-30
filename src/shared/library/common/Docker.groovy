@@ -335,7 +335,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
      *  私有镜像拉取密钥配置   参考文档：https://kubernetes.io/docs/concepts/containers/images/#creating-a-secret-with-a-docker-config
      */
     static def setK8sDockerSecret(ctx, map) {
-        def SECRET_NAME = "ci-cd-k8s-docker-registry-secret" // Secret 名称
+        def SECRET_NAME = "${map.k8s_image_pull_secrets}" // Secret 名称
         def NAMESPACE = "default"  //  命名空间 建议不同项目使用不同命名空间隔离
 
         // 尝试检查 Secret 是否存在
