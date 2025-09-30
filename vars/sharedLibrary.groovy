@@ -256,7 +256,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return (IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) }
+                        expression { return (IS_SOURCE_CODE_DEPLOY == false && IS_DOCKER_BUILD == true && "${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) }
                     }
 /*                    agent {
                         // label "linux"
@@ -369,7 +369,7 @@ def call(String type = 'web-java', Map map) {
                                         }
                                     }
                                 } else {
-                                    def dockerImageNameAndTag="${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
+                                    def dockerImageNameAndTag = "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
                                     docker.image("${dockerImageNameAndTag}").withRun(dockerParams) { c ->
                                         docker.image("${dockerImageNameAndTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
                                             mavenBuildProject(map)
@@ -1058,6 +1058,9 @@ def initInfo() {
  */
 def getShellParams(map) {
     if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
+        if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {
+            NPM_PACKAGE_FOLDER = "${sourceCodeDeployName}"
+        }
         SHELL_WEB_PARAMS_GETOPTS = " -a ${SHELL_PROJECT_NAME} -b ${SHELL_PROJECT_TYPE} -c ${SHELL_HOST_PORT} " +
                 "-d ${SHELL_EXPOSE_PORT} -e ${SHELL_ENV_MODE}  -f ${DEPLOY_FOLDER} -g ${NPM_PACKAGE_FOLDER} -h ${WEB_STRIP_COMPONENTS} " +
                 "-i ${IS_PUSH_DOCKER_REPO}  -k ${DOCKER_REPO_REGISTRY}/${DOCKER_REPO_NAMESPACE} -l ${CUSTOM_DOCKERFILE_NAME} "
@@ -1200,11 +1203,11 @@ def pullProjectCode() {
         existCiCode()
     }
 
-    // 当前job是否有代码变更记录并提醒
-    JenkinsCI.getNoChangeLogAndTip(this)
-
     // 无构建部署 源码直接部署方式
     sourceCodeDeploy()
+
+    // 当前job是否有代码变更记录并提醒
+    JenkinsCI.getNoChangeLogAndTip(this)
 }
 
 /**
@@ -1229,16 +1232,18 @@ def pullCIRepo() {
 def packageDeploy() {
     // 参数化上传或者Git仓库下载或从http地址下载包
     try { // 是否存在声明
-        println("上传文件中: ${DEPLOY_PACKAGE_FILENAME}")
-        unstash 'DEPLOY_PACKAGE' // 获取文件 上传到具体job根目录下和源码同级结构
-        // sh 'cat DEPLOY_PACKAGE'
-        // 文件恢复原始文件名称  原始文件名称是 定义变量名称+ _FILENAME 固定后缀组合
-        sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME'
-        Tools.printColor(this, "${DEPLOY_PACKAGE_FILENAME} 文件上传成功 ✅")
-        buildPackageSize = Utils.getFileSize(this, "${DEPLOY_PACKAGE_FILENAME}")
-        IS_PACKAGE_DEPLOY = true
-        // 统一部署文件名称 SSH传输包到部署服务器
-
+        if ("${IS_SOURCE_CODE_DEPLOY}" != 'true') {
+            println("上传文件中: ${DEPLOY_PACKAGE_FILENAME}")
+            unstash 'DEPLOY_PACKAGE' // 获取文件 上传到具体job根目录下和源码同级结构
+            // sh 'cat DEPLOY_PACKAGE'
+            // 文件恢复原始文件名称  原始文件名称是 定义变量名称+ _FILENAME 固定后缀组合
+            // 文件恢复原始文件名称  原始文件名称是 定义变量名称+ _FILENAME 固定后缀组合
+            sh 'mv DEPLOY_PACKAGE $DEPLOY_PACKAGE_FILENAME'
+            Tools.printColor(this, "${DEPLOY_PACKAGE_FILENAME} 文件上传成功 ✅")
+            buildPackageSize = Utils.getFileSize(this, "${DEPLOY_PACKAGE_FILENAME}")
+            IS_PACKAGE_DEPLOY = true
+            // 统一部署文件名称 SSH传输包到部署服务器
+        }
     } catch (error) {
         // 如果是必须上传文件的job任务 构建后报错提醒 或者构建先input提醒
     }
@@ -1253,10 +1258,14 @@ def sourceCodeDeploy() {
     if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {
         dir("${env.WORKSPACE}/") { // 源码在特定目录下
             def tarFile = "${sourceCodeDeployName}.tar.gz"
-            sh " rm -f ${tarFile} && " +
-                    " tar --warning=no-file-changed -zcvf  ${tarFile} --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
+            sh " rm -f ${tarFile} && rm -f DEPLOY_PACKAGE && " +
+                    " tar --warning=no-file-changed -zcvf  ${tarFile} --exclude='.git' --exclude='ci*' --exclude='*.log' --exclude='*.tar.gz' ./${GIT_PROJECT_FOLDER_NAME} "
             buildPackageSize = Utils.getFileSize(this, "${tarFile}")
             Tools.printColor(this, "源码压缩打包成功 ✅")
+            if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
+                // 替换自定义的nginx配置文件
+                Deploy.replaceNginxConfig(this)
+            }
         }
     }
 }
@@ -1318,7 +1327,7 @@ def nodeBuildProject(map) {
                     Web.needSass(this)
                 }
 
-                timeout(time: 30, unit: 'MINUTES') {
+                timeout(time: 45, unit: 'MINUTES') {
                     try {
                         def retryCount = 0 // 重试次数初始值
                         retry(3) {
@@ -1332,7 +1341,7 @@ def nodeBuildProject(map) {
                                 // 自动判断是否需要下载依赖  根据依赖配置文件在Git代码是否变化
                                 println("安装依赖 📥")
                                 // npm ci 与 npm install类似 进行CI/CD或生产发布时，最好使用npm ci 防止版本号错乱但依赖lock文件
-                                sh " ${NPM_PACKAGE_TYPE} install || pnpm install || npm ci || yarn install "
+                                sh " ${NPM_PACKAGE_TYPE} install || npm install || pnpm install || npm ci || yarn install "
                                 // --prefer-offline &> /dev/null 加速安装速度 优先离线获取包不打印日志 但有兼容性问题
                             }
 
@@ -1389,7 +1398,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
         MAVEN_ONE_LEVEL = "${MAVEN_ONE_LEVEL}".trim() != "" ? "${MAVEN_ONE_LEVEL}/" : "${MAVEN_ONE_LEVEL}".trim()
         println("执行Maven构建 🏗️  ")
         def isMavenTest = "${IS_RUN_MAVEN_TEST}" == "true" ? "" : "-Dmaven.test.skip=true"  // 是否Maven单元测试
-        timeout(time: 30, unit: 'MINUTES') { // 超时终止防止非正常构建情况 长时间占用资源
+        timeout(time: 45, unit: 'MINUTES') { // 超时终止防止非正常构建情况 长时间占用资源
             retry(2) {
                 // 对于Spring Boot 3.x及Spring Native与GaalVM集成的项目，通过以下命令来构建原生镜像  特性：性能明显提升 使用资源明显减少
                 if ("${IS_SPRING_NATIVE}" == "true") { // 构建原生镜像包

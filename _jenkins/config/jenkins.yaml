@@ -1054,7 +1054,7 @@ tool:
               installers:
                 - maven:
                     id: "3.6.3"
-      - name: "Maven3.8"
+      - name: "Maven3.9"
         properties:
           - installSource:
               installers:
