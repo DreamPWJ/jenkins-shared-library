@@ -271,7 +271,7 @@ JSON_PARAMS
     "SHELL_PARAMS" : "epark-old h5 8010 80 prod" ,
     "NPM_RUN_PARAMS" : "build",
     "IS_SOURCE_CODE_DEPLOY" : true,
-    "CUSTOM_NGINX_CONFIG" : "config/nginx.conf",
+    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf",
     "APPLICATION_DOMAIN" : "http://idc.pengbocloud.com:8010"
 }
 REMOTE_IP: 172.16.99.57
