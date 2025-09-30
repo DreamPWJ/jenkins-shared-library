@@ -1058,6 +1058,9 @@ def initInfo() {
  */
 def getShellParams(map) {
     if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
+        if ("${IS_SOURCE_CODE_DEPLOY}" == 'true') {
+            NPM_PACKAGE_FOLDER = "${sourceCodeDeployName}"
+        }
         SHELL_WEB_PARAMS_GETOPTS = " -a ${SHELL_PROJECT_NAME} -b ${SHELL_PROJECT_TYPE} -c ${SHELL_HOST_PORT} " +
                 "-d ${SHELL_EXPOSE_PORT} -e ${SHELL_ENV_MODE}  -f ${DEPLOY_FOLDER} -g ${NPM_PACKAGE_FOLDER} -h ${WEB_STRIP_COMPONENTS} " +
                 "-i ${IS_PUSH_DOCKER_REPO}  -k ${DOCKER_REPO_REGISTRY}/${DOCKER_REPO_NAMESPACE} -l ${CUSTOM_DOCKERFILE_NAME} "
@@ -1260,7 +1263,6 @@ def sourceCodeDeploy() {
             buildPackageSize = Utils.getFileSize(this, "${tarFile}")
             Tools.printColor(this, "源码压缩打包成功 ✅")
             if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-                NPM_PACKAGE_FOLDER = "${sourceCodeDeployName}"
                 // 替换自定义的nginx配置文件
                 Deploy.replaceNginxConfig(this)
             }
