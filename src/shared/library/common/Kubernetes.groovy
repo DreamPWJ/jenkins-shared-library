@@ -36,8 +36,6 @@ class Kubernetes implements Serializable {
                 // ctx.println("k8s集群访问配置：${ctx.KUBECONFIG}")  ctx.sh "kubectl version"
 
                 ctx.println("开始部署Kubernetes云原生应用 🏗️ ")
-                // K8s上Docker镜像仓库密钥初始化自动化设置
-                Docker.setK8sDockerSecret(ctx, map)
 
                 // 动态替换k8s yaml声明式部署文件
                 setYamlConfig(ctx, map, deployNum)
@@ -311,6 +309,10 @@ class Kubernetes implements Serializable {
      *  K8S部署后执行的脚本
      */
     static def afterDeployRun(ctx, map, deployNum) {
+
+        // K8s上Docker镜像仓库密钥初始化自动化设置
+        Docker.setK8sDockerSecret(ctx, map)
+
         // 查看个组件的状态  如 kubectl get svc
         // kubectl top pods || true
         ctx.sh """ 
