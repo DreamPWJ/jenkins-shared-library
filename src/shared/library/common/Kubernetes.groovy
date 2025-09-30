@@ -17,7 +17,7 @@ class Kubernetes implements Serializable {
 
     static def k8sYamlFile = "k8s.yaml" // k8s集群应用部署yaml定义文件
     static def pythonYamlFile = "k8s_yaml.py" // 使用Python动态处理Yaml文件
-    static def k8sNameSpace = "default" // k8s默认命名空间
+    static def k8sNameSpace = "default" // k8s默认命名空间 建议不同项目使用不同命名空间隔离
     static def canaryDeploymentName = "" // 灰度发布部署名称
 
     /**
@@ -36,6 +36,8 @@ class Kubernetes implements Serializable {
                 // ctx.println("k8s集群访问配置：${ctx.KUBECONFIG}")  ctx.sh "kubectl version"
 
                 ctx.println("开始部署Kubernetes云原生应用 🏗️ ")
+                // K8s上Docker镜像仓库密钥初始化自动化设置
+                Docker.setK8sDockerSecret(ctx, map)
 
                 // 动态替换k8s yaml声明式部署文件
                 setYamlConfig(ctx, map, deployNum)
