@@ -121,7 +121,7 @@ if set_yaml_args is not None and set_custom_startup_command is None :
     print(set_yaml_args)
     # 适配Java Spring Boot框架容器动态启动命令  比如 JVM堆栈内存控制
     yaml_containers[0]["command"] = ["java"]  # 覆盖或补充 ENTRYPOINT 或 CMD
-    yaml_containers[0]["args"] = ["-jar", "-Xms256m", set_yaml_args,
+    yaml_containers[0]["args"] = ["-jar", "-Xms512m", set_yaml_args,
                                   "-Djava.security.egd=file:/dev/./urandom", "/server.jar"]
 
 # 设置python语言相关的参数

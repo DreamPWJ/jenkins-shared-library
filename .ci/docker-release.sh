@@ -245,7 +245,7 @@ if [[ ${is_push_docker_repo} == false ]]; then
     docker build -t ${docker_image_name} \
     --build-arg DEPLOY_FOLDER=${deploy_folder} --build-arg PROJECT_NAME=${project_name} \
     --build-arg EXPOSE_PORT="${build_expose_ports}" --build-arg JDK_PUBLISHER=${jdk_publisher} --build-arg JDK_VERSION=${jdk_version} \
-    --build-arg TOMCAT_VERSION=${tomcat_version} --build-arg JAVA_OPTS="-Xms256m ${docker_java_opts}" \
+    --build-arg TOMCAT_VERSION=${tomcat_version} --build-arg JAVA_OPTS="-Xms512m ${docker_java_opts}" \
     -f /${deploy_folder}/${docker_file_name} . --no-cache
 else
     echo "执行远程镜像仓库方式 无需在部署机器执行镜像构建"
@@ -286,7 +286,7 @@ echo -e "\033[32m 👨‍💻  启动运行Docker容器 环境: ${env_mode} 映�
 # --pid=host 使用宿主机命名空间 方便容器获取宿主机所有进程 解决多个docker节点RocketMQ重复消费消息等问题
 docker run -d --restart=always -p ${host_port}:${expose_port} --privileged=true --pid=host \
   -e "SPRING_PROFILES_ACTIVE=${env_mode}" -e "PROJECT_NAME=${project_name}" -e "DOCKER_SERVICE_PORT=${build_expose_ports}" \
-  -e "JAVA_OPTS=-Xms256m ${docker_java_opts}" -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1  ${dynamic_run_args} \
+  -e "JAVA_OPTS=-Xms512m ${docker_java_opts}" -m ${docker_memory} --log-opt ${docker_log_opts} --log-opt max-file=1  ${dynamic_run_args} \
   -e "REMOTE_DEBUGGING_PARAM=${remote_debugging_param}" -e HOST_NAME=$(hostname) \
   -e "CUSTOM_STARTUP_COMMAND=${custom_startup_command}" \
   -v /${deploy_folder}/${project_name}/logs:/logs \
