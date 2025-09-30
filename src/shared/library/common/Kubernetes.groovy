@@ -240,7 +240,7 @@ class Kubernetes implements Serializable {
     static def afterDeployRun(ctx, map, deployNum) {
 
         // K8s上Docker镜像仓库密钥初始化自动化设置
-        Docker.setK8sDockerSecret(ctx, map)
+        // Docker.setK8sDockerSecret(ctx, map) // 影响性能暂时关闭
 
         // 查看个组件的状态  如 kubectl get svc
         // kubectl top pods || true
