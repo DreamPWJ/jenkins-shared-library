@@ -10,7 +10,7 @@
 version: '3.7'
 services:
   elasticsearch:
-    image: elasticsearch:7.5.1
+    image: elasticsearch:9.1.4
     container_name: elasticsearch
     restart: always
     environment:
@@ -26,7 +26,7 @@ services:
       - elk
 
   logstash:
-    image: logstash:7.5.1
+    image: logstash:9.1.4
     container_name: logstash
     restart: always
     volumes:
@@ -41,7 +41,7 @@ services:
       - elk
 
   kibana:
-    image: kibana:7.5.1
+    image: kibana:9.1.4
     container_name: kibana
     restart: always
     links:

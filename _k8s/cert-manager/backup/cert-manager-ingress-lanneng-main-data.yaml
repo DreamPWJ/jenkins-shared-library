@@ -52,7 +52,7 @@ spec:
         - main-data-api.pengbocloud.com
       secretName: main-data-api.pengbocloud.com-tls
     - hosts:
-        - main-dataadmin-api.pengbocloud.com
+        - main-data-admin-api.pengbocloud.com
       secretName: main-data-admin-api.pengbocloud.com-tls
     - hosts:
         - main-data-admin.pengbocloud.com
