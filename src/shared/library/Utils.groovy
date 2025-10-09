@@ -217,7 +217,7 @@ class Utils implements Serializable {
      */
     static getCPUCount(ctx) {
         def cpuCount = ctx.sh(returnStdout: true, script: " cat /proc/cpuinfo | grep processor | wc -l ")
-        return cpuCount.trim()
+        return cpuCount.trim() // 因机器资源基本固定和构建提高性能 可缓存计算数据
     }
 
     /**
