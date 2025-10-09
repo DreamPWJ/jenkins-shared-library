@@ -7,7 +7,6 @@ package shared.library;
  * @email 406798106@qq.com
  * @description 全局缓存工具类 - 基于文件系统
  */
-
 class GlobalCache implements Serializable  {
     static String CACHE_DIR = "/tmp/jenkins_cache"
 
@@ -69,4 +68,5 @@ class GlobalCache implements Serializable  {
             }
         }
     }
+
 }

@@ -367,7 +367,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
      * 根据系统资源动态设置docker参数
      */
     static def setDockerParameters(ctx) {
-        def cacheDockerKey = "SET_DOCKER_BUILD_PARAMS"
+        def cacheDockerKey = "SET_DOCKER_BUILD_PARAMS" + "_" + "${ctx.env.NODE_NAME}"
         // GlobalCache.delete(cacheDockerKey)
         def cacheDockerParams = GlobalCache.get(cacheDockerKey)
         if (cacheDockerParams && cacheDockerParams != null) {
