@@ -118,9 +118,9 @@ class Kubernetes implements Serializable {
 
         // 如果使用容器镜像仓库和k8s是一个云厂商 镜像仓库地址建议使用内网地址 下载加速和节省流量
         def dockerRepoRegistry = "${ctx.DOCKER_REPO_REGISTRY}"
-      /*  if ("${ctx.DOCKER_REPO_REGISTRY}".endsWithAny("aliyun.com", "ksyun.com")) {
+        if ("${ctx.DOCKER_REPO_REGISTRY}".endsWithAny("aliyun.com", "ksyun.com")) {
             dockerRepoRegistry = "${ctx.DOCKER_REPO_REGISTRY}".replace("hub-", "hub-vpc-")  // 转换成内网仓库地址
-        }*/
+        }
 
         // 基于统一k8s yaml核心配置模版动态替换参数 实现不同类型应用部署
         ctx.sh "sed -e 's#{IMAGE_URL}#${dockerRepoRegistry}/${ctx.DOCKER_REPO_NAMESPACE}/${ctx.dockerImageName}#g;s#{IMAGE_TAG}#${imageTag}#g;" +
@@ -239,9 +239,6 @@ class Kubernetes implements Serializable {
      */
     static def afterDeployRun(ctx, map, deployNum) {
 
-        // K8s上Docker镜像仓库密钥初始化自动化设置
-        // Docker.setK8sDockerSecret(ctx, map) // 影响性能暂时关闭
-
         // 查看个组件的状态  如 kubectl get svc
         // kubectl top pods || true
         ctx.sh """ 
@@ -263,7 +260,7 @@ class Kubernetes implements Serializable {
 
         def k8sStartTime = new Date()
         // K8S部署验证是否成功
-        verifyDeployment(ctx)
+        verifyDeployment(ctx, map)
         // 计算应用部署启动时间
         ctx.healthCheckTimeDiff = Utils.getTimeDiff(k8sStartTime, new Date(), "${ctx.K8S_POD_REPLICAS}".toInteger())
 
@@ -272,7 +269,7 @@ class Kubernetes implements Serializable {
     /**
      * K8S验证部署是否成功
      */
-    static def verifyDeployment(ctx) {
+    static def verifyDeployment(ctx, map) {
         try {
             // 前提开启 readinessProbe和livenessProbe 健康探测
             ctx.println("K8S集群所有Pod节点健康探测中, 请耐心等待... 🚀")
@@ -328,6 +325,9 @@ class Kubernetes implements Serializable {
                 } else { //  健康探测失败
                     Tools.printColor(ctx, "K8S集群中Pod服务部署启动失败  ❌", "red")
                     ctx.error("K8S集群中Pod服务部署启动失败 终止流水线运行 ❌")
+
+                    // K8s上Docker镜像仓库密钥初始化自动化设置
+                    Docker.setK8sDockerSecret(ctx, map)
                 }
             }
         } catch (e) {
