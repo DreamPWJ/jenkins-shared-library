@@ -2,6 +2,7 @@ package shared.library.common
 
 import shared.library.GlobalVars
 import shared.library.Utils
+import shared.library.GlobalCache
 
 /**
  * @author 潘维吉
@@ -367,7 +368,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
      */
     static def setDockerParameters(ctx) {
         def cacheDockerKey = "SET_DOCKER_BUILD_PARAMS"
-        def cacheDockerParams = Utils.getCache(cacheDockerKey)
+        def cacheDockerParams = GlobalCache.get(cacheDockerKey)
         if (cacheDockerParams && cacheDockerParams != null) {
             return cacheDockerParams
         } else {
@@ -379,7 +380,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
 
             def dockerParams = " --cpus=${cpuPercentage}" + " -m ${memoryPercentage} "
             // 因机器资源基本固定和构建提高性能 可缓存计算数据
-            Utils.putCache(cacheDockerKey, dockerParams)
+            GlobalCache.set(cacheDockerKey, dockerParams, 7 * 24 * 60)
             return dockerParams
         }
     }
