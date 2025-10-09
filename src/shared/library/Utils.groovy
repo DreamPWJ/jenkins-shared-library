@@ -5,7 +5,6 @@ package shared.library
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import groovy.transform.Field
 //@Grab('org.apache.commons:commons-lang3:3.10+')
 //import org.apache.commons.lang.time.StopWatch
 
@@ -40,7 +39,7 @@ class Utils implements Serializable {
      * 使用 Shared Library 全局缓存
      * 缓存在 pipeline 控制器 JVM 内存中
      */
-    @Field static Map cache = [:]
+    static Map cache = [:]
 
     static def putCache(key, value) {
         cache[key] = value
