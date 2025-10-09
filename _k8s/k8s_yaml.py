@@ -117,16 +117,16 @@ if set_custom_startup_command is not None:
 
 # Java动态设置k8s  yaml args参数
 set_yaml_args = args.set_yaml_args
-if set_yaml_args is not None and set_custom_startup_command is None :
+if set_yaml_args is not None and set_custom_startup_command is None:
     print(set_yaml_args)
     # 适配Java Spring Boot框架容器动态启动命令  比如 JVM堆栈内存控制
     yaml_containers[0]["command"] = ["java"]  # 覆盖或补充 ENTRYPOINT 或 CMD
-    yaml_containers[0]["args"] = ["-jar", "-Xms512m -XX:MaxMetaspaceSize=512m", set_yaml_args,
+    yaml_containers[0]["args"] = ["-jar", "-Xms512m", "-XX:MaxMetaspaceSize=512m", set_yaml_args,
                                   "-Djava.security.egd=file:/dev/./urandom", "/server.jar"]
 
 # 设置python语言相关的参数
 set_python_start_file = args.set_python_start_file
-if set_python_start_file is not None and set_custom_startup_command is None :
+if set_python_start_file is not None and set_custom_startup_command is None:
     print(set_python_start_file)
     # 启动命令
     yaml_containers[0]["command"] = ["python"]  # 覆盖或补充 ENTRYPOINT 或 CMD
@@ -157,8 +157,6 @@ with open(k8s_yaml_file, mode='w', encoding='utf-8') as file:
     yaml.dump(yamlContent[0], file)
     file.write("\n---\n")
     yaml.dump(yamlContent[1], file)
-
-
 
 #  示例代码
 # yamlText = """\
