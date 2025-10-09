@@ -366,10 +366,10 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
      * 根据系统资源动态设置docker参数
      */
     static def setDockerParameters(ctx) {
-        if (ctx.SET_DOCKER_BUILD_PARAMS != null) {
+        if (ctx.SET_DOCKER_BUILD_PARAMS && ctx.SET_DOCKER_BUILD_PARAMS != null) {
             ctx.println("已存在Docker参数配置")
             return ctx.SET_DOCKER_BUILD_PARAMS
-        } else if (ctx.SET_DOCKER_BUILD_PARAMS == null) {
+        } else {
             def percentage = 0.9 // 最大使用多少百分比资源 防止系统整体负载过高全部挂掉
             def cpuCount = Utils.getCPUCount(ctx)
             def memorySize = Utils.getMemorySize(ctx)
