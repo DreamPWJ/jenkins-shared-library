@@ -139,7 +139,7 @@ class Docker implements Serializable {
                 ctx.sh """ cd ${ctx.env.WORKSPACE}/ && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}" --build-arg EXPOSE_PORT="${ctx.SHELL_EXPOSE_PORT}" --build-arg TOMCAT_VERSION=${ctx.TOMCAT_VERSION} \
-                            --build-arg JDK_PUBLISHER=${jdkPublisher} --build-arg JDK_VERSION=${ctx.JDK_VERSION} --build-arg JAVA_OPTS="-Xms512m ${ctx.DOCKER_JAVA_OPTS}" \
+                            --build-arg JDK_PUBLISHER=${jdkPublisher} --build-arg JDK_VERSION=${ctx.JDK_VERSION} --build-arg JAVA_OPTS="-Xms512m -XX:MaxMetaspaceSize=256m ${ctx.DOCKER_JAVA_OPTS}" \
                             --build-arg SOURCE_CODE_FILE="${ctx.sourceCodeDeployName}"  \
                             -f ${ctx.env.WORKSPACE}/ci/.ci/${codeDockerFileName} . --no-cache \
                             ${dockerPushDiffStr}
@@ -218,7 +218,7 @@ class Docker implements Serializable {
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.GIT_PROJECT_FOLDER_NAME}/${ctx.buildPackageLocationDir} && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}" --build-arg EXPOSE_PORT="${exposePort}" --build-arg TOMCAT_VERSION=${ctx.TOMCAT_VERSION} \
-                            --build-arg JDK_PUBLISHER=${jdkPublisher} --build-arg JDK_VERSION=${ctx.JDK_VERSION} --build-arg JAVA_OPTS="-Xms512m ${ctx.DOCKER_JAVA_OPTS}" \
+                            --build-arg JDK_PUBLISHER=${jdkPublisher} --build-arg JDK_VERSION=${ctx.JDK_VERSION} --build-arg JAVA_OPTS="-Xms512m -XX:MaxMetaspaceSize=256m ${ctx.DOCKER_JAVA_OPTS}" \
                             -f ${ctx.env.WORKSPACE}/ci/.ci/${dockerFileName} . --no-cache \
                             ${dockerPushDiffStr}
                             """
@@ -447,7 +447,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
                         " docker run -d --restart=always --privileged=true --pid=host " +
                         " -p ${ctx.SHELL_HOST_PORT}:${ctx.SHELL_EXPOSE_PORT} " +
                         " -e \"SPRING_PROFILES_ACTIVE=${ctx.SHELL_ENV_MODE}\" -e \"PROJECT_NAME=${ctx.PROJECT_NAME}\" " +
-                        " -e \"JAVA_OPTS=-Xms512m ${map.docker_java_opts}\" -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1 " +
+                        " -e \"JAVA_OPTS=-Xms512m -XX:MaxMetaspaceSize=256m ${map.docker_java_opts}\" -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1 " +
                         " -e HOST_NAME=\$(hostname) " +
                         " ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs " +
                         " --name ${containerName} ${imageName}:${dockerRollBackTag} ' "
