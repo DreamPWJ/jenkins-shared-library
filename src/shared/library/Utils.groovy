@@ -35,6 +35,19 @@ class Utils implements Serializable {
                 encoding: 'UTF-8'
         ).trim()
     }
+    /**
+     * 使用 Shared Library 全局缓存
+     * 缓存在 pipeline 控制器 JVM 内存中
+     */
+    @Field static Map cache = [:]
+
+    static def putCache(key, value) {
+        cache[key] = value
+    }
+
+    static def getCache(key) {
+        return cache[key]
+    }
 
     /**
      * 格式化时间

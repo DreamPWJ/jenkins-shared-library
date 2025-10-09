@@ -366,9 +366,10 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
      * 根据系统资源动态设置docker参数
      */
     static def setDockerParameters(ctx) {
-        if (ctx.env.SET_DOCKER_BUILD_PARAMS && ctx.env.SET_DOCKER_BUILD_PARAMS != null) {
-            // ctx.println("已存在Docker参数配置")
-            return ctx.env.SET_DOCKER_BUILD_PARAMS
+        def cacheDockerKey = "SET_DOCKER_BUILD_PARAMS"
+        def cacheDockerParams = Utils.getCache(cacheDockerKey)
+        if (cacheDockerParams && cacheDockerParams != null) {
+            return cacheDockerParams
         } else {
             def percentage = 0.9 // 最大使用多少百分比资源 防止系统整体负载过高全部挂掉
             def cpuCount = Utils.getCPUCount(ctx)
@@ -378,7 +379,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
 
             def dockerParams = " --cpus=${cpuPercentage}" + " -m ${memoryPercentage} "
             // 因机器资源基本固定和构建提高性能 可缓存计算数据
-            ctx.env.SET_DOCKER_BUILD_PARAMS = dockerParams
+            Utils.putCache(cacheDockerKey, dockerParams)
             return dockerParams
         }
     }
