@@ -2,6 +2,7 @@ package shared.library.common
 
 import shared.library.GlobalVars
 import shared.library.Utils
+import shared.library.GlobalCache
 
 /**
  * @author 潘维吉
@@ -138,7 +139,7 @@ class Docker implements Serializable {
                 ctx.sh """ cd ${ctx.env.WORKSPACE}/ && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}" --build-arg EXPOSE_PORT="${ctx.SHELL_EXPOSE_PORT}" --build-arg TOMCAT_VERSION=${ctx.TOMCAT_VERSION} \
-                            --build-arg JDK_PUBLISHER=${jdkPublisher} --build-arg JDK_VERSION=${ctx.JDK_VERSION} --build-arg JAVA_OPTS="-Xms512m ${ctx.DOCKER_JAVA_OPTS}" \
+                            --build-arg JDK_PUBLISHER=${jdkPublisher} --build-arg JDK_VERSION=${ctx.JDK_VERSION} --build-arg JAVA_OPTS="-Xms512m -XX:MaxMetaspaceSize=512m ${ctx.DOCKER_JAVA_OPTS}" \
                             --build-arg SOURCE_CODE_FILE="${ctx.sourceCodeDeployName}"  \
                             -f ${ctx.env.WORKSPACE}/ci/.ci/${codeDockerFileName} . --no-cache \
                             ${dockerPushDiffStr}
@@ -217,7 +218,7 @@ class Docker implements Serializable {
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.GIT_PROJECT_FOLDER_NAME}/${ctx.buildPackageLocationDir} && pwd &&
                             docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName} --build-arg DEPLOY_FOLDER="${ctx.DEPLOY_FOLDER}" \
                             --build-arg PROJECT_NAME="${ctx.PROJECT_NAME}" --build-arg EXPOSE_PORT="${exposePort}" --build-arg TOMCAT_VERSION=${ctx.TOMCAT_VERSION} \
-                            --build-arg JDK_PUBLISHER=${jdkPublisher} --build-arg JDK_VERSION=${ctx.JDK_VERSION} --build-arg JAVA_OPTS="-Xms512m ${ctx.DOCKER_JAVA_OPTS}" \
+                            --build-arg JDK_PUBLISHER=${jdkPublisher} --build-arg JDK_VERSION=${ctx.JDK_VERSION} --build-arg JAVA_OPTS="-Xms512m -XX:MaxMetaspaceSize=512m ${ctx.DOCKER_JAVA_OPTS}" \
                             -f ${ctx.env.WORKSPACE}/ci/.ci/${dockerFileName} . --no-cache \
                             ${dockerPushDiffStr}
                             """
@@ -366,14 +367,23 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
      * 根据系统资源动态设置docker参数
      */
     static def setDockerParameters(ctx) {
-        def percentage = 0.9 // 最大使用多少百分比资源 防止系统整体负载过高全部挂掉
-        def cpuCount = Utils.getCPUCount(ctx)
-        def memorySize = Utils.getMemorySize(ctx)
-        def cpuPercentage = Integer.parseInt(cpuCount) * percentage
-        def memoryPercentage = Math.floor(Integer.parseInt(memorySize) * percentage) + "m"
+        def cacheDockerKey = "SET_DOCKER_BUILD_PARAMS" + "_" + "${ctx.env.NODE_NAME}"
+        // GlobalCache.delete(cacheDockerKey)
+        def cacheDockerParams = GlobalCache.get(cacheDockerKey)
+        if (cacheDockerParams && cacheDockerParams != null) {
+            return cacheDockerParams
+        } else {
+            def percentage = 0.9 // 最大使用多少百分比资源 防止系统整体负载过高全部挂掉
+            def cpuCount = Utils.getCPUCount(ctx)
+            def memorySize = Utils.getMemorySize(ctx)
+            def cpuPercentage = Integer.parseInt(cpuCount) * percentage
+            def memoryPercentage = Math.floor(Integer.parseInt(memorySize) * percentage) + "m"
 
-        def dockerParams = " --cpus=${cpuPercentage}" + " -m ${memoryPercentage} "
-        return dockerParams
+            def dockerParams = " --cpus=${cpuPercentage}" + " -m ${memoryPercentage} "
+            // 因机器资源基本固定和构建提高性能 可缓存计算数据
+            GlobalCache.set(cacheDockerKey, dockerParams, 7 * 24 * 60)
+            return dockerParams
+        }
     }
 
     /**
@@ -437,7 +447,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
                         " docker run -d --restart=always --privileged=true --pid=host " +
                         " -p ${ctx.SHELL_HOST_PORT}:${ctx.SHELL_EXPOSE_PORT} " +
                         " -e \"SPRING_PROFILES_ACTIVE=${ctx.SHELL_ENV_MODE}\" -e \"PROJECT_NAME=${ctx.PROJECT_NAME}\" " +
-                        " -e \"JAVA_OPTS=-Xms512m ${map.docker_java_opts}\" -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1 " +
+                        " -e \"JAVA_OPTS=-Xms512m -XX:MaxMetaspaceSize=512m ${map.docker_java_opts}\" -m ${map.docker_memory} --log-opt ${map.docker_log_opts} --log-opt max-file=1 " +
                         " -e HOST_NAME=\$(hostname) " +
                         " ${dockerVolumeMount} -v /${ctx.DEPLOY_FOLDER}/${ctx.PROJECT_NAME}/logs:/logs " +
                         " --name ${containerName} ${imageName}:${dockerRollBackTag} ' "

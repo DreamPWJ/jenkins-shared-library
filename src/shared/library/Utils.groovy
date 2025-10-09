@@ -5,7 +5,6 @@ package shared.library
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-
 //@Grab('org.apache.commons:commons-lang3:3.10+')
 //import org.apache.commons.lang.time.StopWatch
 
@@ -34,6 +33,20 @@ class Utils implements Serializable {
                 returnStdout: true, // returnStdout：将命令的执行结果赋值给变  returnStatus：将命令的执行状态码赋值给变量
                 encoding: 'UTF-8'
         ).trim()
+    }
+
+    /**
+     * 使用 Shared Library 全局缓存
+     * 缓存在 pipeline 控制器 JVM 内存中
+     */
+    static Map cache = [:]
+
+    static def putCache(key, value) {
+        cache[key] = value
+    }
+
+    static def getCache(key) {
+        return cache[key]
     }
 
     /**
@@ -217,7 +230,7 @@ class Utils implements Serializable {
      */
     static getCPUCount(ctx) {
         def cpuCount = ctx.sh(returnStdout: true, script: " cat /proc/cpuinfo | grep processor | wc -l ")
-        return cpuCount.trim()
+        return cpuCount.trim() // 因机器资源基本固定和构建提高性能 可缓存计算数据
     }
 
     /**
