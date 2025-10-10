@@ -28,7 +28,7 @@ map.put('default_git_branch', ' ')
 map.put('default_frontend_git_branch', ' ')
 
 // 保持构建的最大个数
-map.put('build_num_keep', 3)
+map.put('build_num_keep', 2)
 
 // 容器Docker相关参数
 // JVM内存设置
@@ -59,7 +59,7 @@ map.put('k8s_credentials_ids', ' ')
 map.put('k8s_image_pull_secrets', ' ')
 
 // 项目标签或项目简称
-map.put('project_tag', 'Spring Boot3与JDK21新引擎')
+map.put('project_tag', 'Spring Boot3与JDK25新引擎')
 
 // 是否是生产环境
 map.put('is_prod', false)
@@ -123,7 +123,7 @@ sharedLibrary(map)
 /*
 
 spring-boot3-jdk21-test
-Spring Boot3与JDK21新引擎服务端
+Spring Boot3与JDK25新引擎服务端
 JSON_PARAMS
 {
    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
