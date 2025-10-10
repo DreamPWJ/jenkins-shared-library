@@ -132,7 +132,7 @@ jenkins:
                 - home: "/usr/bin/git"
                   key: "hudson.plugins.git.GitTool$DescriptorImpl@Default"
                 - home: "/opt/maven/apache-maven-3.6.3"
-                  key: "hudson.tasks.Maven$MavenInstallation$DescriptorImpl@Maven3.6"
+                  key: "hudson.tasks.Maven$MavenInstallation$DescriptorImpl@Maven3.9"
         numExecutors: 2
         remoteFS: "/my/jenkins/"
         retentionStrategy: "always"
@@ -1048,7 +1048,7 @@ tool:
                     id: "jdk-8u221-oth-JPR"
   maven:
     installations:
-      - name: "Maven3.6"
+      - name: "Maven3.9"
         properties:
           - installSource:
               installers:
