@@ -288,7 +288,8 @@ def call(String type = 'web-java', Map map) {
                             def dockerImageName = "panweiji/node-build"
                             def dockerImageTag = "${nodeVersion}"
                             def dockerParams = Docker.setDockerParameters(this);
-                            Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
+                            Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build",
+                                    dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}", false)
                             docker.image("${dockerImageName}:${dockerImageTag}").withRun(dockerParams) { c ->
                                 docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
                                     nodeBuildProject(map)
@@ -346,7 +347,7 @@ def call(String type = 'web-java', Map map) {
                             def dockerParams = Docker.setDockerParameters(this);
                             // Gradle构建方式
                             if (IS_GRADLE_BUILD == true) {
-                                def gradleVersion = "8" // Gradle版本 要动态配置
+                                def gradleVersion = "9" // Gradle版本 要动态配置
                                 def jdkVersion = "${JDK_VERSION}"
                                 def dockerImageName = "gradle"
                                 def dockerImageTag = "$gradleVersion-jdk$jdkVersion"
@@ -356,13 +357,15 @@ def call(String type = 'web-java', Map map) {
                                     }
                                 }
                             } else {
-                                if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
+                                if (("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot || "${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.Quarkus)
+                                        && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
                                     // mvnd支持条件
                                     def mvndVersion = "1.0.3"  // Mvnd版本 要动态配置
                                     def jdkVersion = "${JDK_VERSION}"
                                     def dockerImageName = "panweiji/mvnd-jdk"
                                     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
-                                    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk-new", dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}")
+                                    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk-new",
+                                            dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}", false)
                                     docker.image("${dockerImageName}:${dockerImageTag}").withRun(dockerParams) { c ->
                                         docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
                                             mavenBuildProject(map, 0, "mvnd")
@@ -1435,7 +1438,8 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
             // 核心包在 target/quarkus-app/ 下面  启动命令 java -jar target/quarkus-app/quarkus-run.jar
             javaPackageType = "tar.gz"
             def quarkusAppName = "quarkus-app"
-            sh "cd ${mavenTarget}/ && tar -zcvf ${quarkusAppName}.${javaPackageType} ${quarkusAppName} >/dev/null 2>&1 "
+            sh "cd ${mavenTarget}/ && pwd && ls && chmod -R 755 ${quarkusAppName} && " +
+                    "tar -zcvf ${quarkusAppName}.${javaPackageType} ${quarkusAppName} " // >/dev/null 2>&1
         }
 
         // Maven打包产出物位置

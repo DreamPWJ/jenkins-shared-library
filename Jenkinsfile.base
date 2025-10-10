@@ -93,7 +93,7 @@ map.put('jenkins_node_frontend', 'master')
 map.put('nodejs', 'Node24')
 map.put('maven', 'Maven3.9')
 map.put('jdk_publisher', 'openjdk')
-map.put('jdk', '21')
+map.put('jdk', '25')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '45392b97-5c21-4451-b323-bbf104f70e51')

@@ -441,7 +441,7 @@ def call(String type = 'quality', Map map) {
                         script {
                             // Gradle构建方式
                             if (IS_GRADLE_BUILD == true) {
-                                def gradleVersion = "8" // Gradle版本 要动态配置
+                                def gradleVersion = "9" // Gradle版本 要动态配置
                                 def jdkVersion = "${JDK_VERSION}"
                                 def dockerImageName = "gradle"
                                 def dockerImageTag = "$gradleVersion-jdk$jdkVersion"
