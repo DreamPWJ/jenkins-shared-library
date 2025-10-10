@@ -362,7 +362,8 @@ def call(String type = 'web-java', Map map) {
                                     def jdkVersion = "${JDK_VERSION}"
                                     def dockerImageName = "panweiji/mvnd-jdk"
                                     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
-                                    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk-new", dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}")
+                                    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk-new",
+                                            dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}", true)
                                     docker.image("${dockerImageName}:${dockerImageTag}").withRun(dockerParams) { c ->
                                         docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
                                             mavenBuildProject(map, 0, "mvnd")
