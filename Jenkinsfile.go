@@ -86,7 +86,7 @@ map.put('jenkins_node_frontend', 'master')
 
 // 构建环境变量
 map.put('nodejs', 'Node14')
-map.put('maven', 'Maven3.6')
+map.put('maven', 'Maven3.9')
 map.put('jdk_publisher', 'openjdk')
 map.put('jdk', '11')
 
