@@ -288,7 +288,8 @@ def call(String type = 'web-java', Map map) {
                             def dockerImageName = "panweiji/node-build"
                             def dockerImageTag = "${nodeVersion}"
                             def dockerParams = Docker.setDockerParameters(this);
-                            Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build", dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}")
+                            Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build",
+                                    dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}", false)
                             docker.image("${dockerImageName}:${dockerImageTag}").withRun(dockerParams) { c ->
                                 docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
                                     nodeBuildProject(map)
