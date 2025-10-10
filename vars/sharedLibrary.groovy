@@ -1435,7 +1435,8 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
             // 核心包在 target/quarkus-app/ 下面  启动命令 java -jar target/quarkus-app/quarkus-run.jar
             javaPackageType = "tar.gz"
             def quarkusAppName = "quarkus-app"
-            sh "cd ${mavenTarget}/ &&  tar -zcvf ${quarkusAppName}.${javaPackageType} --exclude='*.log' ${quarkusAppName} " // >/dev/null 2>&1
+            sh "cd ${mavenTarget}/ && pwd && chmod -R 755 ${quarkusAppName} && " +
+                    "tar -zcvf ${quarkusAppName}.${javaPackageType} --exclude='*.log' ${quarkusAppName} " // >/dev/null 2>&1
         }
 
         // Maven打包产出物位置
