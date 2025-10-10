@@ -356,7 +356,8 @@ def call(String type = 'web-java', Map map) {
                                     }
                                 }
                             } else {
-                                if ("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
+                                if (("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot || "${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.Quarkus)
+                                        && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
                                     // mvnd支持条件
                                     def mvndVersion = "1.0.3"  // Mvnd版本 要动态配置
                                     def jdkVersion = "${JDK_VERSION}"
