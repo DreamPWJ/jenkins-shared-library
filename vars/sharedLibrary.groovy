@@ -1436,7 +1436,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
             javaPackageType = "tar.gz"
             def quarkusAppName = "quarkus-app"
             sh "cd ${mavenTarget}/ && pwd && chmod -R 755 ${quarkusAppName} && " +
-                    "tar -zcvf ${quarkusAppName}.${javaPackageType} --exclude='*.log' ${quarkusAppName} " // >/dev/null 2>&1
+                    "tar -zcvf ${quarkusAppName}.${javaPackageType} ${quarkusAppName} " // >/dev/null 2>&1
         }
 
         // Maven打包产出物位置
