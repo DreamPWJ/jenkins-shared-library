@@ -1400,7 +1400,6 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
         // maven如果存在多级目录 一级目录设置
         MAVEN_ONE_LEVEL = "${MAVEN_ONE_LEVEL}".trim() != "" ? "${MAVEN_ONE_LEVEL}/" : "${MAVEN_ONE_LEVEL}".trim()
         println("执行Maven构建 🏗️  ")
-        sh " export MAVEN_OPTS=\"-Djdk.tls.client.protocols=TLSv1.2,TLSv1.3 -Dhttps.protocols=TLSv1.2,TLSv1.3\" " // 兼容性适配
         def isMavenTest = "${IS_RUN_MAVEN_TEST}" == "true" ? "" : "-Dmaven.test.skip=true"  // 是否Maven单元测试
         timeout(time: 45, unit: 'MINUTES') { // 超时终止防止非正常构建情况 长时间占用资源
             retry(2) {
