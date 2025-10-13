@@ -34,7 +34,7 @@ map.put('build_num_keep', 3)
 // JVM内存设置
 map.put('docker_java_opts', '-Xmx2800m')
 // 容器最大cpu限制 m是千分之一 100m是0.1个CPU
-map.put('docker_limit_cpu', '1500m')
+map.put('docker_limit_cpu', '1600m')
 // 容器最大内存限制 不支持小数点形式设置
 map.put('docker_memory', '3G')
 // docker日志限制
