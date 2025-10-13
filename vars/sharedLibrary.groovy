@@ -2154,11 +2154,12 @@ def alwaysPost() {
         } else {
             addBadge(id: "env-badge", text: "${releaseEnvironment}".toUpperCase(), color: 'blue', cssClass: 'badge-text--background')
         }
-        addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: "${noticeHealthCheckUrl}", target: '_blank')
-        removeBadges(id: "launch-badge")
         if (IS_CANARY_DEPLOY == true) { // 金丝雀部署方式
             addBadge(id: "canary-deploy-badge", text: "金丝雀", color: 'purple', cssClass: 'badge-text--background')
         }
+
+        addBadge(id: "url-badge", icon: 'symbol-link plugin-ionicons-api', text: '访问地址', link: "${noticeHealthCheckUrl}", target: '_blank')
+        removeBadges(id: "launch-badge")
     } catch (error) {
         println error.getMessage()
     }
