@@ -52,7 +52,9 @@ docker exec proxy-nginx nginx -s reload || true
 
 # 针对证书目录有要求情况  复制证书文件到另一个目录 并授权
 # cp -p /etc/letsencrypt/live/*/privkey.pem /my/letsencrypt/live/
+# cp -p /etc/letsencrypt/live/*/fullchain.pem /my/letsencrypt/live/
 # chmod 755 /my/letsencrypt/live/*/privkey.pem
+# chmod 755 /my/letsencrypt/live/*/fullchain.pem
 # 重新加载emqx配置才会生效
 # docker exec -it emqx emqx_ctl conf reload     # 重新加载配置
 
