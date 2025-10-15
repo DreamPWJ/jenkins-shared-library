@@ -55,7 +55,7 @@ docker exec proxy-nginx nginx -s reload || true
 # cp -p /etc/letsencrypt/live/*/fullchain.pem /my/letsencrypt/live/
 # chmod 755 /my/letsencrypt/live/*/privkey.pem
 # chmod 755 /my/letsencrypt/live/*/fullchain.pem
-# 重新加载emqx配置才会生效
+# MQTT配置 重新加载emqx配置才会生效
 # docker exec -it emqx emqx_ctl conf reload   # 重新加载配置 reload方式 SSL证书监听器不会生效
 # docker exec emqx emqx_ctl listeners restart ssl:default
 # docker exec emqx emqx_ctl listeners restart wss:default
