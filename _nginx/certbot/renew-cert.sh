@@ -52,9 +52,14 @@ docker exec proxy-nginx nginx -s reload || true
 
 # 针对证书目录有要求情况  复制证书文件到另一个目录 并授权
 # cp -p /etc/letsencrypt/live/*/privkey.pem /my/letsencrypt/live/
+# cp -p /etc/letsencrypt/live/*/fullchain.pem /my/letsencrypt/live/
 # chmod 755 /my/letsencrypt/live/*/privkey.pem
-# 重新加载emqx配置才会生效
-# docker exec -it emqx emqx_ctl conf reload     # 重新加载配置
+# chmod 755 /my/letsencrypt/live/*/fullchain.pem
+# MQTT配置 重新加载emqx配置才会生效
+# docker exec -it emqx emqx_ctl conf reload   # 重新加载配置 conf reload方式 SSL证书监听器不会生效
+# docker exec emqx emqx_ctl listeners restart ssl:default # 使用listeners restart方式 SSL证书监听器生效
+# docker exec emqx emqx_ctl listeners restart wss:default
+# docker restart emqx                         # 重启EMQX服务SSL证书监听器才会生效
 
 # 设置ssh免密登录后 scp 复制证书到另一个服务器 比如Keepalived双机热备情况都需要一样的证书
 # scp -r /etc/letsencrypt/live/* root@172.16.1.99:/etc/letsencrypt/live/

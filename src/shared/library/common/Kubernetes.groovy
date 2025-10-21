@@ -325,9 +325,11 @@ class Kubernetes implements Serializable {
                 } else { //  健康探测失败
                     Tools.printColor(ctx, "K8S集群中Pod服务部署启动失败  ❌", "red")
                     ctx.error("K8S集群中Pod服务部署启动失败 终止流水线运行 ❌")
-
                     // K8s上Docker镜像仓库密钥初始化自动化设置
                     Docker.setK8sDockerSecret(ctx, map)
+                    // 查看pod错误日志信息并打印日志 或手动登录Lens管理工具查看
+                    // ctx.sh "kubectl describe pod <pod-name> -n <namespace>"
+                    // ctx.sh "kubectl logs <pod名称> -n <命名空间>"
                 }
             }
         } catch (e) {
