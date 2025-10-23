@@ -125,12 +125,13 @@ hrms-app-test
 HR人力资源平台
 JSON_PARAMS
 {
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/hrmso.git" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/hrms.git" ,
    "BRANCH_NAME" : "master" ,
    "PROJECT_TYPE" : "2" ,
    "COMPUTER_LANGUAGE" : "3" ,
    "PROJECT_NAME" : "hrms-app" ,
-   "SHELL_PARAMS" : "hrms-app test 8188 8000 test",
+   "SHELL_PARAMS" : "hrms-app test 8000 8000 test",
+   "IS_SOURCE_CODE_DEPLOY" : true,
    "CUSTOM_STARTUP_COMMAND" : "docker compose up -d",
 }
 */
