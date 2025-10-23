@@ -1668,6 +1668,7 @@ def runProject(map) {
     try {
         retry(2) { // 重试几次 可能网络等问题导致构建失败
             if (IS_CODE_AND_COMMAND_DEPLOY == true) { // 只依赖代码和命令直接部署方式
+                // tar -xzf /源目录/源文件.tar.gz -C /目标目录
                 sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} '${CUSTOM_STARTUP_COMMAND}' "
             } else {
                 // 初始化docker
