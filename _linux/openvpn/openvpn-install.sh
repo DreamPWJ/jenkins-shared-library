@@ -11,3 +11,6 @@
 
 # 执行 ./openvpn-install.sh 即可 初始化和生成证书文件等
 wget https://git.io/vpn -O openvpn-install.sh && bash openvpn-install.sh
+
+# WireGuard新网络 初始化和生成证书文件等
+# wget https://git.io/wireguard -O wireguard-install.sh && bash wireguard-install.sh
