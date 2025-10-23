@@ -132,6 +132,7 @@ JSON_PARAMS
    "PROJECT_NAME" : "hrms-app" ,
    "SHELL_PARAMS" : "hrms-app test 8000 8000 test",
    "IS_SOURCE_CODE_DEPLOY" : true,
+   "IS_CODE_AND_COMMAND_DEPLOY" : true,
    "CUSTOM_STARTUP_COMMAND" : "docker compose up -d",
 }
 */
