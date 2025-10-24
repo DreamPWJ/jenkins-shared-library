@@ -7,8 +7,6 @@ ARG MVND_VERSION
 
 # 使用 Amazon Corretto 作为基础镜像
 FROM amazoncorretto:${JDK_VERSION}
-# 验证 JDK 安装并显示路径
-RUN  java -version || true && echo "JAVA_HOME: $JAVA_HOME"
 
 # 设置工作目录
 WORKDIR /app
@@ -21,8 +19,7 @@ ENV MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz
 
 # 安装基础工具
 RUN yum update -y && \
-    yum install -y curl tar which && \
-    yum clean all
+    yum install -y curl tar which
 
 # 安装 Maven
 #RUN curl -fsSL https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz -o /tmp/maven.tar.gz \
@@ -39,7 +36,7 @@ RUN curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-m
 
 
 # 更新 PATH 环境变量
-ENV PATH=$JAVA_HOME/bin:$MVND_HOME/bin:$PATH
+ENV PATH=$MVND_HOME/bin:$PATH
 
 # 验证版本
 RUN  echo "PATH: $PATH"  || true && mvnd --version || true && java -version
