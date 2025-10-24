@@ -16,6 +16,9 @@ WORKDIR /app
 # 指定切换用户
 USER root
 
+# 设置环境
+ENV MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz
+
 # 安装基础工具
 RUN sed -i 's/amazon\./mirrors.aliyun.com\/amazonlinux\//g' /etc/yum.repos.d/amzn2.repo && \
     yum update -y && \
