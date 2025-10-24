@@ -18,8 +18,9 @@ USER root
 ENV MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz
 
 # 安装基础工具
-RUN yum update -y && \
-    yum install -y curl tar which
+#RUN yum update -y && \
+#    yum install -y curl tar which && \
+#    yum clean all
 
 # 安装 Maven
 #RUN curl -fsSL https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz -o /tmp/maven.tar.gz \
