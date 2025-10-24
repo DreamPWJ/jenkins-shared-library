@@ -20,8 +20,7 @@ USER root
 ENV MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz
 
 # 安装基础工具
-RUN sed -i 's/amazon\./mirrors.aliyun.com\/amazonlinux\//g' /etc/yum.repos.d/amzn2.repo && \
-    yum update -y && \
+RUN yum update -y && \
     yum install -y curl tar which && \
     yum clean all
 
