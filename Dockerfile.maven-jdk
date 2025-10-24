@@ -1,0 +1,52 @@
+# Author: 潘维吉
+# Version 1.0.0
+# Description: 自定义Maven与JDK构建部署环境
+
+ARG JDK_VERSION
+
+# 使用 Amazon Corretto 作为基础镜像
+FROM amazoncorretto:${JDK_VERSION}
+
+# 设置工作目录
+WORKDIR /app
+
+# 指定切换用户
+USER root
+
+# 设置环境
+ENV MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz
+
+ARG MVND_VERSION
+
+# 安装基础工具
+RUN yum update -y && \
+    yum install -y wget tar zip unzip gzip
+
+# 安装 Maven
+#RUN curl -fsSL https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz -o /tmp/maven.tar.gz \
+#    && mkdir -p $MAVEN_HOME \
+#    && tar xzf /tmp/maven.tar.gz -C $MAVEN_HOME --strip-components=1 \
+#    && ln -s $MAVEN_HOME/bin/mvn /usr/local/bin/mvn \
+#    && rm -f /tmp/maven.tar.gz
+
+# 安装 Maven Daemon (mvnd)
+RUN curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
+    tar -xzf /tmp/${MVND_TAR} -C /opt && \
+    mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
+    rm -f /tmp/${MVND_TAR}
+
+
+# 更新 PATH 环境变量
+ENV PATH=$MVND_HOME/bin:$PATH
+
+# 验证版本
+RUN  echo "PATH: $PATH"  || true && mvnd --version || true && java -version
+
+# 默认启动命令
+CMD ["/bin/bash"]
+
+
+# 自定义构建镜像
+# DOCKER_BUILDKIT=1 docker build --build-arg MVND_VERSION=1.0.3 --build-arg JDK_VERSION=25 -t panweiji/maven-jdk:latest  -f /my/Dockerfile.maven-jdk . --no-cache
+# 上传镜像 先 docker login 登录
+# docker push panweiji/maven-jdk:1.0.3-25

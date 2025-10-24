@@ -362,9 +362,9 @@ def call(String type = 'web-java', Map map) {
                                     // mvnd支持条件
                                     def mvndVersion = "1.0.3"  // Mvnd版本 要动态配置
                                     def jdkVersion = "${JDK_VERSION}"
-                                    def dockerImageName = "panweiji/mvnd-jdk"
+                                    def dockerImageName = "panweiji/maven-jdk"
                                     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
-                                    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk-new",
+                                    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.maven-jdk",
                                             dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}", false)
                                     docker.image("${dockerImageName}:${dockerImageTag}").withRun(dockerParams) { c ->
                                         docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
@@ -405,7 +405,7 @@ def call(String type = 'web-java', Map map) {
                     when {
                         beforeAgent true
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
-                        expression { return ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) }
+                        expression { return (IS_SOURCE_CODE_DEPLOY == false && "${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) }
                     }
                     steps {
                         script {
@@ -850,6 +850,8 @@ def getInitParams(map) {
     IS_INTEGRATION_TESTING = jsonParams.IS_INTEGRATION_TESTING ? jsonParams.IS_INTEGRATION_TESTING : false
     // 是否直接源码部署 无需打包 自定义命令启动
     IS_SOURCE_CODE_DEPLOY = jsonParams.IS_SOURCE_CODE_DEPLOY ? jsonParams.IS_SOURCE_CODE_DEPLOY : false
+    // 是否只依赖源码和自定义命令部署方式
+    IS_CODE_AND_COMMAND_DEPLOY = jsonParams.IS_CODE_AND_COMMAND_DEPLOY ? jsonParams.IS_CODE_AND_COMMAND_DEPLOY : false
     // 是否直接构建包部署方式  如无源码的情况
     IS_PACKAGE_DEPLOY = jsonParams.IS_PACKAGE_DEPLOY ? jsonParams.IS_PACKAGE_DEPLOY : false
     // 是否使用Gradle构建方式
@@ -1569,7 +1571,9 @@ def uploadRemote(filePath, map) {
         autoSshLogin(map)
         timeout(time: 2, unit: 'MINUTES') {
             // 同步脚本和配置到部署服务器
-            syncScript()
+            if (IS_CODE_AND_COMMAND_DEPLOY == false) {
+                syncScript()
+            }
         }
         println("上传部署文件到部署服务器中... 🚀 ")
 
@@ -1665,32 +1669,38 @@ def manualApproval(map) {
 def runProject(map) {
     try {
         retry(2) { // 重试几次 可能网络等问题导致构建失败
-            // 初始化docker
-            initDocker()
+            if (IS_CODE_AND_COMMAND_DEPLOY == true) { // 只依赖代码和命令直接部署方式
+                // tar -xzf /源目录/源文件.tar.gz -C /目标目录
+                sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} '${CUSTOM_STARTUP_COMMAND}' "
+            } else {
+                // 初始化docker
+                initDocker()
 
-            if ("${IS_PUSH_DOCKER_REPO}" == 'true') {
-                // 拉取远程仓库Docker镜像
-                Docker.pull(this, "${dockerImageName}")
+                if ("${IS_PUSH_DOCKER_REPO}" == 'true') {
+                    // 拉取远程仓库Docker镜像
+                    Docker.pull(this, "${dockerImageName}")
+                }
+                if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
+                    sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/web " +
+                            "&& ./docker-release-web.sh '${SHELL_WEB_PARAMS_GETOPTS}' ' "
+                } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
+                    // 部署之前的相关操作
+                    beforeRunProject(map)
+                    sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} " +
+                            "&& ./docker-release.sh '${SHELL_PARAMS_GETOPTS}' '  "
+                } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
+                    // Go.deploy(this)
+                    sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/go " +
+                            "&& ./docker-release-go.sh '${SHELL_PARAMS_GETOPTS}' '  "
+                } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
+                    sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/python " +
+                            "&& ./docker-release-python.sh '${SHELL_PARAMS_GETOPTS}' '  "
+                } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) {
+                    sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/cpp " +
+                            "&& ./docker-release-cpp.sh '${SHELL_PARAMS_GETOPTS}' '  "
+                }
             }
-            if ("${PROJECT_TYPE}".toInteger() == GlobalVars.frontEnd) {
-                sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/web " +
-                        "&& ./docker-release-web.sh '${SHELL_WEB_PARAMS_GETOPTS}' ' "
-            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Java) {
-                // 部署之前的相关操作
-                beforeRunProject(map)
-                sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER} " +
-                        "&& ./docker-release.sh '${SHELL_PARAMS_GETOPTS}' '  "
-            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Go) {
-                // Go.deploy(this)
-                sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/go " +
-                        "&& ./docker-release-go.sh '${SHELL_PARAMS_GETOPTS}' '  "
-            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Python) {
-                sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/python " +
-                        "&& ./docker-release-python.sh '${SHELL_PARAMS_GETOPTS}' '  "
-            } else if ("${PROJECT_TYPE}".toInteger() == GlobalVars.backEnd && "${COMPUTER_LANGUAGE}".toInteger() == GlobalVars.Cpp) {
-                sh " ssh ${proxyJumpSSHText} ${remote.user}@${remote.host} 'cd /${DEPLOY_FOLDER}/cpp " +
-                        "&& ./docker-release-cpp.sh '${SHELL_PARAMS_GETOPTS}' '  "
-            }
+
             Tools.printColor(this, "执行应用部署完成 ✅")
         }
     } catch (error) {

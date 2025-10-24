@@ -3,15 +3,10 @@
 # Description: 自定义mvnd与JDK构建部署环境
 
 ARG JDK_VERSION
-ARG JDK_VERSION
 
 # Stage 1: 使用官方 JDK 镜像构建
 FROM amazoncorretto:${JDK_VERSION} AS jdk-builder
 
-# （可选）这里可以执行编译操作，比如构建你的应用
-# COPY . /app
-# WORKDIR /app
-# RUN ./mvnw package -DskipTests
 # 验证 JDK 安装并显示路径
 RUN  java -version || true && echo "JAVA_HOME: $JAVA_HOME"
 
@@ -38,17 +33,15 @@ COPY --from=jdk-builder ${JAVA_HOME} ${JAVA_HOME}
 # 安装最小依赖
 RUN sed -i 's|http://.*.ubuntu.com|http://mirrors.aliyun.com|g' /etc/apt/sources.list && \
     apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates bash curl wget zip unzip gzip  && \
+    apt-get install -y --no-install-recommends bash curl wget zip unzip gzip && \
+    apt-get install -y --no-install-recommends ca-certificates && update-ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# 安装 mvnd  使用Cloudflare Worker代理github.com地址加速访问
+# 安装 Maven Daemon (mvnd)
 RUN curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
     tar -xzf /tmp/${MVND_TAR} -C /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
     rm -f /tmp/${MVND_TAR}
-
-# （可选）拷贝你的应用 jar 包
-# COPY --from=jdk-builder /app/target/myapp.jar /opt/myapp.jar
 
 # 更新 PATH 环境变量
 ENV PATH=$JAVA_HOME/bin:$MVND_HOME/bin:$PATH
