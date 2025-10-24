@@ -99,7 +99,9 @@ spec:
             timeoutSeconds: 2
             successThreshold: 1       # 连续探测1次成功表示成功
             failureThreshold: 3
-          #securityContext: # 容器安全级别配置增强
+          securityContext: # 容器安全级别配置增强
+            capabilities: # 为容器添加额外的 Linux 内核能力（capability）
+              add: [ "NET_RAW" ] # NET_RAW允许容器发送和接收 ICMP 包 也就是 ping 命令
             #readOnlyRootFilesystem: true      # 将容器根文件系统设为只读 防止恶意写入关键目录 可能导致容器无法启动
             #allowPrivilegeEscalation: false   # 禁止进程通过 sudo 等方式提高权限 防止病毒控制 可能影响业务
       terminationGracePeriodSeconds: {K8S_GRACE_PERIOD_SECONDS}  # 优雅终止宽限期 默认30秒 减少时间可缩短Pod销毁等待时 根据是否有健康绪探测变化值大小

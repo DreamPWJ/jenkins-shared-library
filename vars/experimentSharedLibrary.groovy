@@ -807,11 +807,11 @@ def futureLab(map) {
         // sh "playwright --version || true"
     }*/
 
-/*  def mvndVersion = "1.0.3"
+/*    def mvndVersion = "1.0.3"
     def jdkVersion = "25"
-    def dockerImageName = "panweiji/mvnd-jdk"
+    def dockerImageName = "panweiji/maven-jdk"
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
-    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.mvnd-jdk-new", dockerImageName, dockerImageTag,
+    Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.maven-jdk", dockerImageName, dockerImageTag,
             "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}", true)
 
     docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {

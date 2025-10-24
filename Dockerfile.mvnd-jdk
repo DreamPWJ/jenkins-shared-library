@@ -33,7 +33,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/lib/jvm/java-${JDK_VERSION}-openjdk-amd64 ${JAVA_HOME}
 
-# 安装 mvnd  使用Cloudflare Worker代理github.com地址加速访问
+# 安装 Maven Daemon (mvnd)
 #RUN curl -L "https://get.sdkman.io" | bash && \
 #    sdk install mvnd
 #echo "nameserver 8.8.8.8\nnameserver 114.114.114.114" > /etc/resolv.conf && \
