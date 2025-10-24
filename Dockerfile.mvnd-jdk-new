@@ -57,6 +57,9 @@ ENV PATH=$JAVA_HOME/bin:$MVND_HOME/bin:$PATH
 # 验证版本
 RUN  echo "PATH: $PATH"  || true && mvnd --version || true && java -version
 
+# JDK正确关联系统证书
+RUN ln -sf /etc/ssl/certs/java/cacerts $JAVA_HOME/lib/security/cacerts
+
 # 默认启动命令
 CMD ["/bin/bash"]
 
