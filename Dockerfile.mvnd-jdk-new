@@ -42,6 +42,18 @@ RUN sed -i 's|http://.*.ubuntu.com|http://mirrors.aliyun.com|g' /etc/apt/sources
     apt-get install -y --no-install-recommends ca-certificates && update-ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
+# 同步系统 CA 证书到 JDK
+RUN keytool -importkeystore \
+    -srckeystore /etc/ssl/certs/java/cacerts \
+    -destkeystore ${JAVA_HOME}/lib/security/cacerts \
+    -srcstorepass changeit -deststorepass changeit \
+    -noprompt || \
+    (for cert in /etc/ssl/certs/*.pem; do \
+        keytool -import -trustcacerts -alias $(basename $cert .pem) \
+        -file $cert -keystore ${JAVA_HOME}/lib/security/cacerts \
+        -storepass changeit -noprompt 2>/dev/null || true; \
+    done)
+
 # 安装 mvnd  使用Cloudflare Worker代理github.com地址加速访问
 RUN curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
     tar -xzf /tmp/${MVND_TAR} -C /opt && \
@@ -55,7 +67,8 @@ RUN curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-m
 ENV PATH=$JAVA_HOME/bin:$MVND_HOME/bin:$PATH
 
 # 验证版本
-RUN  echo "PATH: $PATH"  || true && mvnd --version || true && java -version
+RUN  echo "PATH: $PATH"  || true && mvnd --version || true && java -version && \
+     keytool -list -keystore ${JAVA_HOME}/lib/security/cacerts -storepass changeit | head -20
 
 # 默认启动命令
 CMD ["/bin/bash"]
