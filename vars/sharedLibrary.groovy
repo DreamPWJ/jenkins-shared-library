@@ -289,7 +289,7 @@ def call(String type = 'web-java', Map map) {
                             def dockerImageTag = "${nodeVersion}"
                             def dockerParams = Docker.setDockerParameters(this);
                             Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.node-build",
-                                    dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}", false)
+                                    dockerImageName, dockerImageTag, "--build-arg NODE_VERSION=${nodeVersion}", true)
                             docker.image("${dockerImageName}:${dockerImageTag}").withRun(dockerParams) { c ->
                                 docker.image("${dockerImageName}:${dockerImageTag}").inside("") {
                                     nodeBuildProject(map)
