@@ -1414,7 +1414,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
                         MAVEN_ONE_LEVEL = ""
                         // 在pom.xml文件目录下执行 规范是pom.xml在代码根目录
                         // def pomPath = Utils.getShEchoResult(this, " find . -name \"pom.xml\" ").replace("pom.xml", "")
-                        sh "${mavenCommandType} clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true"
+                        sh "${mavenCommandType} clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} "
                     } else {  // 多模块情况
                         // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
                         sh "${mavenCommandType} clean install -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.compile.fork=true ${isMavenTest} "
