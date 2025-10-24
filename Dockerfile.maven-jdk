@@ -30,7 +30,7 @@ ENV MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz
 #    && rm -f /tmp/maven.tar.gz
 
 # 安装 mvnd  使用Cloudflare Worker代理github.com地址加速访问
-RUN curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
+RUN yum install -y  tar && curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
     tar -xzf /tmp/${MVND_TAR} -C /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
     rm -f /tmp/${MVND_TAR}
