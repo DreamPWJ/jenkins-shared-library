@@ -20,7 +20,7 @@ ARG MVND_VERSION
 
 # 安装基础工具
 RUN yum update -y && \
-    yum install -y wget tar  zip unzip gzip
+    yum install -y wget tar zip unzip gzip
 
 # 安装 Maven
 #RUN curl -fsSL https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz -o /tmp/maven.tar.gz \
