@@ -362,7 +362,7 @@ def call(String type = 'web-java', Map map) {
                                     // mvnd支持条件
                                     def mvndVersion = "1.0.3"  // Mvnd版本 要动态配置
                                     def jdkVersion = "${JDK_VERSION}"
-                                    def dockerImageName = "panweiji/mvnd-jdk"
+                                    def dockerImageName = "panweiji/maven-jdk"
                                     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
                                     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.maven-jdk",
                                             dockerImageName, dockerImageTag, "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}", false)
