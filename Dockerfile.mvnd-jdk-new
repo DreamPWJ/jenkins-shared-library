@@ -39,7 +39,7 @@ COPY --from=jdk-builder ${JAVA_HOME} ${JAVA_HOME}
 RUN sed -i 's|http://.*.ubuntu.com|http://mirrors.aliyun.com|g' /etc/apt/sources.list && \
     apt-get update && \
     apt-get install -y --no-install-recommends bash curl wget zip unzip gzip && \
-    apt-get install -y ca-certificates && update-ca-certificates \
+    apt-get install -y ca-certificates \
     rm -rf /var/lib/apt/lists/*
 
 # 安装 mvnd  使用Cloudflare Worker代理github.com地址加速访问
