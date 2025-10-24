@@ -37,7 +37,7 @@ RUN sed -i 's|http://.*.ubuntu.com|http://mirrors.aliyun.com|g' /etc/apt/sources
     apt-get install -y --no-install-recommends ca-certificates && update-ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# 安装 mvnd  使用Cloudflare Worker代理github.com地址加速访问
+# 安装 Maven Daemon (mvnd)
 RUN curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
     tar -xzf /tmp/${MVND_TAR} -C /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \

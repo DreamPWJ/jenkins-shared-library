@@ -3,7 +3,6 @@
 # Description: 自定义Maven与JDK构建部署环境
 
 ARG JDK_VERSION
-ARG MVND_VERSION
 
 # 使用 Amazon Corretto 作为基础镜像
 FROM amazoncorretto:${JDK_VERSION}
@@ -17,6 +16,8 @@ USER root
 # 设置环境
 ENV MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz
 
+ARG MVND_VERSION
+
 # 安装基础工具
 #RUN yum update -y && \
 #    yum install -y curl tar which && \
@@ -29,8 +30,8 @@ ENV MVND_HOME=/opt/mvnd MVND_TAR=mvnd.tar.gz
 #    && ln -s $MAVEN_HOME/bin/mvn /usr/local/bin/mvn \
 #    && rm -f /tmp/maven.tar.gz
 
-# 安装 mvnd  使用Cloudflare Worker代理github.com地址加速访问
-RUN yum install -y  tar && curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
+# 安装 Maven Daemon (mvnd)
+RUN yum install -y tar && curl -L https://mirrors.aliyun.com/apache/maven/mvnd/${MVND_VERSION}/maven-mvnd-${MVND_VERSION}-linux-amd64.tar.gz -o /tmp/${MVND_TAR} && \
     tar -xzf /tmp/${MVND_TAR} -C /opt && \
     mv /opt/maven-mvnd-${MVND_VERSION}-linux-amd64 ${MVND_HOME} && \
     rm -f /tmp/${MVND_TAR}
