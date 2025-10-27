@@ -185,6 +185,20 @@ JSON_PARAMS
     "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf"
 }
 
+htc-park-card-web-new-prod
+好停车停车卡 Web前端 新 ❤️
+JSON_PARAMS
+{
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/park_coupon.git" ,
+    "BRANCH_NAME" : "master" ,
+    "PROJECT_TYPE" : "1" ,
+    "PROJECT_NAME" : "park-card" ,
+    "SHELL_PARAMS" : "park-card web 8007 80 prod" ,
+    "NPM_RUN_PARAMS" : "build:merchantadminprod",
+    "IS_ROLL_DEPLOY" : true,
+    "CUSTOM_NGINX_CONFIG" : "config/default-rizhao.conf",
+    "APPLICATION_DOMAIN" : "http://idc.pengbocloud.com:18804"
+}
 
 htc-epark-h5-prod
 好停车H5 Web前端 ❤️
