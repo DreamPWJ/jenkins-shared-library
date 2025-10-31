@@ -1571,9 +1571,9 @@ def uploadRemote(filePath, map) {
         autoSshLogin(map)
         timeout(time: 2, unit: 'MINUTES') {
             // 同步脚本和配置到部署服务器
-            if (IS_CODE_AND_COMMAND_DEPLOY == false) {
+            // if (IS_CODE_AND_COMMAND_DEPLOY == false) {
                 syncScript()
-            }
+            // }
         }
         println("上传部署文件到部署服务器中... 🚀 ")
 
