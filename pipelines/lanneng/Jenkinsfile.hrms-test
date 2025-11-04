@@ -11,7 +11,7 @@
 def map = [:]
 
 // 远程服务器地址 k8s集群方式可填空或填公网代理负载IP
-map.put('remote_ip', '192.168.0.22')
+map.put('remote_ip', '192.168.0.100')
 // 工作服务器地址 同时支持N个服务器自动化分布式部署
 map.put('remote_worker_ips', [])
 // 远程服务器用户名
@@ -68,7 +68,7 @@ map.put('is_same_server', false)
 // 是否进行优雅停机
 map.put('is_grace_shutdown', false)
 // 是否进行服务启动健康探测 K8S集群类型设置false使用自带健康探测
-map.put('is_health_check', true)
+map.put('is_health_check', false)
 // 是否Pipeline内脚本钉钉通知  总开关
 map.put('is_ding_notice', false)
 // 是否进行部署前通知
@@ -133,7 +133,8 @@ JSON_PARAMS
    "SHELL_PARAMS" : "hrms-app test 8000 8000 test",
    "IS_SOURCE_CODE_DEPLOY" : true,
    "IS_CODE_AND_COMMAND_DEPLOY" : true,
-   "CUSTOM_STARTUP_COMMAND" : "tar -xzf /my/hrms-app-test/source-code.tar.gz -C /my/frappe/hrms && cd /my/frappe/hrms/docker && docker compose down frappe && docker compose up -d --build frappe",
+   "CUSTOM_STARTUP_COMMAND" : "tar -xzf /my/hrms-app-test/source-code.tar.gz -C /my/frappe/ && docker exec docker-frappe-1 bash /workspace/upgrade.sh ",
+   "CUSTOM_STARTUP_COMMAND" : "tar -xzf /my/hrms-app-test/source-code.tar.gz -C /my/frappe/ && cd /my/frappe/docker && docker compose -f docker-compose.yml up -d --build --force-recreate frappe ",
 }
 */
 
