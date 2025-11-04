@@ -38,7 +38,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY  spring-native-graalvm /app/
 
 # 给应用程序赋予执行权限
-RUN chmod +x /app/spring-native-graalvm
+RUN chmod +x /app/spring-native-graalvm && apk add --no-cache iputils || true && yum install -y iputils || true && microdnf install -y iputils || true
 
 # 定义环境变量（如果需要的话）
 #ENV APP_ENV=production

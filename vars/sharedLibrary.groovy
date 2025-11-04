@@ -328,8 +328,8 @@ def call(String type = 'web-java', Map map) {
                     }
                     /*      agent {
                               dockerfile {
-                                  filename 'Dockerfile.mvnd-jdk' // 在WORKSPACE工作区代码目录
-                                  label "panweiji/mvnd-jdk-${JDK_PUBLISHER}-${JDK_VERSION}:latest"
+                                  filename 'Dockerfile.maven-jdk' // 在WORKSPACE工作区代码目录
+                                  label "panweiji/maven-jdk-${JDK_PUBLISHER}-${JDK_VERSION}:latest"
                                   dir "${env.WORKSPACE}/ci"
                                   additionalBuildArgs "--build-arg MVND_VERSION=1.0.3 --build-arg JDK_PUBLISHER=${JDK_PUBLISHER} --build-arg JDK_VERSION=${JDK_VERSION}"
                                   args " -v /var/cache/maven/.m2:/root/.m2  "
@@ -1571,9 +1571,9 @@ def uploadRemote(filePath, map) {
         autoSshLogin(map)
         timeout(time: 2, unit: 'MINUTES') {
             // 同步脚本和配置到部署服务器
-            if (IS_CODE_AND_COMMAND_DEPLOY == false) {
+            // if (IS_CODE_AND_COMMAND_DEPLOY == false) {
                 syncScript()
-            }
+            // }
         }
         println("上传部署文件到部署服务器中... 🚀 ")
 
