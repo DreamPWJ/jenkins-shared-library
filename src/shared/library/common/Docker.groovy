@@ -478,7 +478,7 @@ export DOCKER_REGISTRY_MIRROR='https://docker.lanneng.tech,https://em1sutsj.mirr
             imagesExistCommand = " docker image inspect ${imageName}:${imageTag} >/dev/null 2>&1 || "
         }
         ctx.sh " ${imagesExistCommand} " +
-                " DOCKER_BUILDKIT=1 docker build ${buildParams} -t ${imageName}:${imageTag}  -f ${dockerFilePath} . --no-cache "
+                " docker build ${buildParams} -t ${imageName}:${imageTag}  -f ${dockerFilePath} . --no-cache "
     }
 
 

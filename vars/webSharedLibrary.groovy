@@ -366,7 +366,7 @@ def call(String type = 'web', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (params.IS_HEALTH_CHECK == true && IS_BLUE_GREEN_DEPLOY == false)
+                            return (params.IS_HEALTH_CHECK == true && IS_BLUE_GREEN_DEPLOY == false && IS_K8S_DEPLOY == false)
                         }
                     }
                     steps {

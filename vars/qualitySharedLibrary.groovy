@@ -502,7 +502,7 @@ def call(String type = 'quality', Map map) {
                     when {
                         environment name: 'DEPLOY_MODE', value: GlobalVars.release
                         expression {
-                            return (params.IS_HEALTH_CHECK == true && IS_BLUE_GREEN_DEPLOY == false && false)
+                            return (params.IS_HEALTH_CHECK == true && IS_BLUE_GREEN_DEPLOY == false && IS_K8S_DEPLOY == false && false)
                         }
                     }
                     steps {
