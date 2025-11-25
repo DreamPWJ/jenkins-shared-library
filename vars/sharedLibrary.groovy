@@ -880,6 +880,8 @@ def getInitParams(map) {
     NFS_MOUNT_PATHS = jsonParams.NFS_MOUNT_PATHS ? jsonParams.NFS_MOUNT_PATHS.trim() : ""
     // 自定义健康探测HTTP路径Path  默认根目录 /
     CUSTOM_HEALTH_CHECK_PATH = jsonParams.CUSTOM_HEALTH_CHECK_PATH ? jsonParams.CUSTOM_HEALTH_CHECK_PATH.trim() : "/"
+    // 自定义Maven打包命令参数
+    CUSTOM_MAVEN_PACKAGE_COMMAND = jsonParams.CUSTOM_MAVEN_PACKAGE_COMMAND ? jsonParams.CUSTOM_MAVEN_PACKAGE_COMMAND.trim() : ""
     // 自定义部署Dockerfile名称 如 Dockerfile.xxx
     CUSTOM_DOCKERFILE_NAME = jsonParams.CUSTOM_DOCKERFILE_NAME ? jsonParams.CUSTOM_DOCKERFILE_NAME.trim() : "Dockerfile"
     // 自定义Python版本
@@ -890,7 +892,6 @@ def getInitParams(map) {
     CUSTOM_STARTUP_COMMAND = jsonParams.CUSTOM_STARTUP_COMMAND ? jsonParams.CUSTOM_STARTUP_COMMAND.trim() : ""
     // 自定义服务部署安装包 多个空格分隔
     CUSTOM_INSTALL_PACKAGES = jsonParams.CUSTOM_INSTALL_PACKAGES ? jsonParams.CUSTOM_INSTALL_PACKAGES.trim() : ""
-
 
     // 获取分布式构建节点 可动态构建在不同机器上
     def allNodes = JenkinsCI.getAllOnlineNodes(this, map)
@@ -1403,7 +1404,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
         MAVEN_ONE_LEVEL = "${MAVEN_ONE_LEVEL}".trim() != "" ? "${MAVEN_ONE_LEVEL}/" : "${MAVEN_ONE_LEVEL}".trim()
         println("执行Maven构建 🏗️  ")
         def isMavenTest = "${IS_RUN_MAVEN_TEST}" == "true" ? "" : "-Dmaven.test.skip=true"  // 是否Maven单元测试
-        def isMavenProfile = " " // 基于Maven Profile方式动态添加依赖包和插件 设置Profile ID值 -P package
+        def isMavenProfile = " " // 基于Maven Profile方式动态添加依赖包和插件 设置Profile ID值 如 -P package
         timeout(time: 45, unit: 'MINUTES') { // 超时终止防止非正常构建情况 长时间占用资源
             retry(2) {
                 // 对于Spring Boot 3.x及Spring Native与GaalVM集成的项目，通过以下命令来构建原生镜像  特性：性能明显提升 使用资源明显减少
@@ -1418,7 +1419,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
                         sh "${mavenCommandType} clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} "
                     } else {  // 多模块情况
                         // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
-                        sh "${mavenCommandType} clean install -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.compile.fork=true ${isMavenTest} ${isMavenProfile} "
+                        sh "${mavenCommandType} clean install -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.compile.fork=true ${isMavenTest} ${CUSTOM_MAVEN_PACKAGE_COMMAND} "
                     }
                 } else {
                     // 基于自定义setting.xml文件方式打包 如私有包等
