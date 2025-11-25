@@ -227,7 +227,7 @@ JSON_PARAMS
    "PROJECT_NAME" : "rsu-controller" ,
    "SHELL_PARAMS" : "rsu-controller python 7199 7199 prod",
    "GIT_PROJECT_FOLDER_NAME" : "rsu_controller_luce",
-   "CUSTOM_PYTHON_VERSION" : "3.12.0",
+   "CUSTOM_PYTHON_VERSION" : "3.14.0",
    "CUSTOM_PYTHON_START_FILE" : "main.py"
 }
 

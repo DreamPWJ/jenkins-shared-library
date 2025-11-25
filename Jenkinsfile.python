@@ -131,7 +131,7 @@ JSON_PARAMS
     "PROJECT_NAME" : "test-python" ,
     "SHELL_PARAMS" : "test-python demo 8079 5000 sit",
     "CUSTOM_PYTHON_START_FILE" : "main.py",
-    "CUSTOM_PYTHON_VERSION" : "3.12.0",
+    "CUSTOM_PYTHON_VERSION" : "3.14.0",
 }
 
 */

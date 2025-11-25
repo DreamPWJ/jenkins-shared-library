@@ -883,7 +883,7 @@ def getInitParams(map) {
     // 自定义部署Dockerfile名称 如 Dockerfile.xxx
     CUSTOM_DOCKERFILE_NAME = jsonParams.CUSTOM_DOCKERFILE_NAME ? jsonParams.CUSTOM_DOCKERFILE_NAME.trim() : "Dockerfile"
     // 自定义Python版本
-    CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.12.0"
+    CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.14.0"
     // 自定义Python启动文件名称 默认app.py文件
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
     // 自定义服务部署启动命令
@@ -1403,6 +1403,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
         MAVEN_ONE_LEVEL = "${MAVEN_ONE_LEVEL}".trim() != "" ? "${MAVEN_ONE_LEVEL}/" : "${MAVEN_ONE_LEVEL}".trim()
         println("执行Maven构建 🏗️  ")
         def isMavenTest = "${IS_RUN_MAVEN_TEST}" == "true" ? "" : "-Dmaven.test.skip=true"  // 是否Maven单元测试
+        def isMavenProfile=" -P package " // 基于Maven Profile方式动态添加依赖包和插件 设置Profile ID值
         timeout(time: 45, unit: 'MINUTES') { // 超时终止防止非正常构建情况 长时间占用资源
             retry(2) {
                 // 对于Spring Boot 3.x及Spring Native与GaalVM集成的项目，通过以下命令来构建原生镜像  特性：性能明显提升 使用资源明显减少
@@ -1417,7 +1418,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
                         sh "${mavenCommandType} clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} "
                     } else {  // 多模块情况
                         // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
-                        sh "${mavenCommandType} clean install -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.compile.fork=true ${isMavenTest} "
+                        sh "${mavenCommandType} clean install -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.compile.fork=true ${isMavenTest} ${isMavenProfile} "
                     }
                 } else {
                     // 基于自定义setting.xml文件方式打包 如私有包等
