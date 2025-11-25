@@ -371,7 +371,7 @@ def getInitParams(map) {
     // 自定义部署Dockerfile名称 如 Dockerfile.xxx
     env.CUSTOM_DOCKERFILE_NAME = jsonParams.CUSTOM_DOCKERFILE_NAME ? jsonParams.CUSTOM_DOCKERFILE_NAME.trim() : "Dockerfile"
     // 自定义Python版本
-    env.CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.12.0"
+    env.CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.14.0"
     // 自定义Python启动文件名称 默认app.py文件
     env.CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
 

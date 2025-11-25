@@ -70,6 +70,10 @@ spec:
     - hosts:
         - admin-client-api.pengbocloud.com
       secretName: admin-client-api.pengbocloud.com-tls
+    - hosts:
+        - third-party-api.pengbocloud.com
+      secretName: third-party-api.pengbocloud.com-tls
+
   rules:
     #自定义域名
     - host: app-api.pengbocloud.com
@@ -122,4 +126,17 @@ spec:
                 #服务端口
                 port:
                   number: 8183
+            pathType: Prefix
+
+    - host: third-party-api.pengbocloud.com
+      http:
+        paths:
+          - path: /
+            backend:
+              #服务名称
+              service:
+                name: pengbo-park-third-party-service
+                #服务端口
+                port:
+                  number: 8187
             pathType: Prefix

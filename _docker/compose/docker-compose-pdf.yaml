@@ -1,0 +1,16 @@
+services:
+  stirling-pdf:
+    image: frooodle/s-pdf:latest
+    ports:
+      - '8060:8080'
+    volumes:
+      - ./trainingData:/usr/share/tessdata  # 用于OCR额外语言包
+      - ./extraConfigs:/configs
+      # - ./customFiles:/customFiles/  # 可选，用于自定义界面
+      # - ./logs:/logs/                 # 可选，用于记录日志
+    environment:
+      - DOCKER_ENABLE_SECURITY=false
+      - INSTALL_BOOK_AND_ADVANCED_HTML_OPS=false
+      - LANGS=zh_CN
+
+# 执行命令 docker compose -f docker-compose-pdf.yaml up -d
