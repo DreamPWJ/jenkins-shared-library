@@ -2400,8 +2400,8 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                     }
 
                     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
-                            "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
-                            "### 📄 ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉 \n" +
+                            "📄 ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
+                            "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉 \n" +
                                     "#### 项目: ${PROJECT_NAME} \n" +
                                     "#### 环境: *${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}* \n" +
                                     "##### 描述: ${JenkinsCI.getCurrentBuildDescription(this)} \n" +
