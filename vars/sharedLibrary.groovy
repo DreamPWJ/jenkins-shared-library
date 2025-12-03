@@ -2319,7 +2319,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                     }
 
                     DingTalk.noticeActionCard(this, map.ding_talk_credentials_ids,
-                            "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
+                            "✅ CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
                             "${screenshot} \n" +
                                     "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL}) \n" +
                                     "##### Nginx Web服务启动${msg} \n" +
@@ -2352,7 +2352,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                     }
 
                     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
-                            "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
+                            "✅ CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
                             "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL}) \n" +
                                     "#### CI/CD部署启动${msg} \n" +
                                     "##### ${deployType} \n" +
@@ -2371,7 +2371,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                 }
             } else if (type == 2 && "${IS_ONLY_NOTICE_CHANGE_LOG}" == 'false') { // 部署之前
                 DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
-                        "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署前通知",
+                        "🚀 CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署前通知",
                         "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${envTypeMark}${projectTypeName}](${env.JOB_URL}) \n" +
                                 "#### ${PROJECT_TAG}服务部署启动中 🚀  请稍等...  ☕ \n" +
                                 "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_NAME} \n" +
@@ -2401,7 +2401,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
 
                     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
                             "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
-                            "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉 \n" +
+                            "### 📄 ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉 \n" +
                                     "#### 项目: ${PROJECT_NAME} \n" +
                                     "#### 环境: *${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}* \n" +
                                     "##### 描述: ${JenkinsCI.getCurrentBuildDescription(this)} \n" +
