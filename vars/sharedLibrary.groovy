@@ -2394,7 +2394,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
 
                     try {
                         if ("${tagVersion}") {
-                            titlePrefix = "${PROJECT_TAG} ${tagVersion}"
+                            titlePrefix = "${PROJECT_TAG} <font color=green>${tagVersion}</font>"
                         }
                     } catch (e) {
                     }
