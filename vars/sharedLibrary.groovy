@@ -2299,7 +2299,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             if (type == 0) { // 失败
                 if (!isHealthCheckFail) {
                     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
-                            "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}流水线失败通知",
+                            "❌ CI/CD失败通知 ${PROJECT_TAG}${envTypeMark}${projectTypeName}",
                             "### [${env.JOB_NAME}#${env.BUILD_NUMBER}](${env.BUILD_URL}) ${PROJECT_TAG}${envTypeMark}${projectTypeName}项目${msg} \n" +
                                     "#### 请及时处理 🏃 \n" +
                                     "##### <font color=red> 流水线失败原因:</font> [运行日志](${env.BUILD_URL}console) 👈  \n" +
