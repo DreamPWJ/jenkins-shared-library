@@ -46,6 +46,13 @@ chmod 600 /my/credentials.ini || true
 # 如果certbot名称不存在 which certbot 查看 执行命令添加路径 如 /root/miniconda3/bin/certbot renew 或 /root/venv_python/bin/certbot renew
 sudo certbot renew
 
+# 检查证书文件的修改日期是否是今天 更新证书后才真正执行后续操作
+#if [ "$(date -r /path/to/your/cert.pem +%Y-%m-%d)" = "$(date +%Y-%m-%d)" ]; then
+#    echo "证书文件是今天更新的"
+#else
+#    echo "证书文件不是今天更新的"
+#fi
+
 # 重新加载nginx配置才会生效
 docker exec proxy-nginx nginx -t -c /etc/nginx/nginx.conf || true
 docker exec proxy-nginx nginx -s reload || true
