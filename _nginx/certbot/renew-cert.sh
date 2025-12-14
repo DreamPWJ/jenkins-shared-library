@@ -47,7 +47,7 @@ chmod 600 /my/credentials.ini || true
 sudo certbot renew
 
 # 检查证书文件的修改日期是否是今天 更新证书后才真正执行后续操作
-#if [ "$(date -r /path/to/your/cert.pem +%Y-%m-%d)" = "$(date +%Y-%m-%d)" ]; then
+#if [ "$(date -r /etc/letsencrypt/live/*/privkey.pem +%Y-%m-%d)" = "$(date +%Y-%m-%d)" ]; then
 #    echo "证书文件是今天更新的"
 #else
 #    echo "证书文件不是今天更新的"
