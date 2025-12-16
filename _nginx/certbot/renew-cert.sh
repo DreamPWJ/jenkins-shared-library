@@ -46,6 +46,13 @@ chmod 600 /my/credentials.ini || true
 # 如果certbot名称不存在 which certbot 查看 执行命令添加路径 如 /root/miniconda3/bin/certbot renew 或 /root/venv_python/bin/certbot renew
 sudo certbot renew
 
+# 检查证书文件的修改日期是否是今天 更新证书后才真正执行后续操作
+#if [ "$(date -r /etc/letsencrypt/live/*/privkey.pem +%Y-%m-%d)" = "$(date +%Y-%m-%d)" ]; then
+#    echo "证书文件是今天更新的"
+#else
+#    echo "证书文件不是今天更新的"
+#fi
+
 # 重新加载nginx配置才会生效
 docker exec proxy-nginx nginx -t -c /etc/nginx/nginx.conf || true
 docker exec proxy-nginx nginx -s reload || true
@@ -56,10 +63,6 @@ docker exec proxy-nginx nginx -s reload || true
 # chmod 755 /my/letsencrypt/live/*/privkey.pem
 # chmod 755 /my/letsencrypt/live/*/fullchain.pem
 # MQTT配置 重新加载emqx配置才会生效
-# docker exec -it emqx emqx_ctl pem_cache clean all  # 用于强制 EMQX 重新加载更新后的 PEM（X.509 密钥和证书）文件
-# docker exec -it emqx emqx_ctl conf reload   # 重新加载配置 conf reload方式 SSL证书监听器不会生效
-# docker exec emqx emqx_ctl listeners restart ssl:default # 使用listeners restart方式 SSL证书监听器生效
-# docker exec emqx emqx_ctl listeners restart wss:default
 # docker restart emqx                         # 重启EMQX服务SSL证书监听器才会生效
 
 # 设置ssh免密登录后 scp 复制证书到另一个服务器 比如Keepalived双机热备情况都需要一样的证书

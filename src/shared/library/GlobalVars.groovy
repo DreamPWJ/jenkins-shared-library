@@ -50,7 +50,7 @@ class GlobalVars implements Serializable {
     static int miniNativeCode = 1  // 原生小程序
     static int taro = 2 // Taro跨端小程序
     static int uniApp = 3 // uni-app跨端小程序
-    static int mpvue = 4 // mpvue跨端小程序
+    static int mpVue = 4 // mpVue跨端小程序
 
     /**
      * APP客户端项目类型
@@ -66,6 +66,7 @@ class GlobalVars implements Serializable {
     static int ionic = 9 // Ionic跨平台项目
     static int nativeScript = 10 // NativeScript跨平台项目
     static int xamarin = 11 // Xamarin跨平台项目
+    static int tauri = 12 //  Tauri (JavaScript代码)跨平台项目
 
     /**
      * Web端技术实现类型
@@ -113,8 +114,8 @@ class GlobalVars implements Serializable {
     /**
      * CI代码库 jenkins-shared-library仓库 自动同步部署脚本和配置等
      */
-    static String CI_REPO_URL = "https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git"
     // https://github.com/DreamPWJ/jenkins-shared-library.git
+    static String CI_REPO_URL = "https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git"
 
     /**
      * Git常量

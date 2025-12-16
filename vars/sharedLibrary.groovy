@@ -880,17 +880,18 @@ def getInitParams(map) {
     NFS_MOUNT_PATHS = jsonParams.NFS_MOUNT_PATHS ? jsonParams.NFS_MOUNT_PATHS.trim() : ""
     // 自定义健康探测HTTP路径Path  默认根目录 /
     CUSTOM_HEALTH_CHECK_PATH = jsonParams.CUSTOM_HEALTH_CHECK_PATH ? jsonParams.CUSTOM_HEALTH_CHECK_PATH.trim() : "/"
+    // 自定义Maven打包命令参数
+    CUSTOM_MAVEN_PACKAGE_COMMAND = jsonParams.CUSTOM_MAVEN_PACKAGE_COMMAND ? jsonParams.CUSTOM_MAVEN_PACKAGE_COMMAND.trim() : ""
     // 自定义部署Dockerfile名称 如 Dockerfile.xxx
     CUSTOM_DOCKERFILE_NAME = jsonParams.CUSTOM_DOCKERFILE_NAME ? jsonParams.CUSTOM_DOCKERFILE_NAME.trim() : "Dockerfile"
     // 自定义Python版本
-    CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.12.0"
+    CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.14.0"
     // 自定义Python启动文件名称 默认app.py文件
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
     // 自定义服务部署启动命令
     CUSTOM_STARTUP_COMMAND = jsonParams.CUSTOM_STARTUP_COMMAND ? jsonParams.CUSTOM_STARTUP_COMMAND.trim() : ""
     // 自定义服务部署安装包 多个空格分隔
     CUSTOM_INSTALL_PACKAGES = jsonParams.CUSTOM_INSTALL_PACKAGES ? jsonParams.CUSTOM_INSTALL_PACKAGES.trim() : ""
-
 
     // 获取分布式构建节点 可动态构建在不同机器上
     def allNodes = JenkinsCI.getAllOnlineNodes(this, map)
@@ -1403,6 +1404,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
         MAVEN_ONE_LEVEL = "${MAVEN_ONE_LEVEL}".trim() != "" ? "${MAVEN_ONE_LEVEL}/" : "${MAVEN_ONE_LEVEL}".trim()
         println("执行Maven构建 🏗️  ")
         def isMavenTest = "${IS_RUN_MAVEN_TEST}" == "true" ? "" : "-Dmaven.test.skip=true"  // 是否Maven单元测试
+        def isMavenProfile = " " // 基于Maven Profile方式动态添加依赖包和插件 设置Profile ID值 如 -P package
         timeout(time: 45, unit: 'MINUTES') { // 超时终止防止非正常构建情况 长时间占用资源
             retry(2) {
                 // 对于Spring Boot 3.x及Spring Native与GaalVM集成的项目，通过以下命令来构建原生镜像  特性：性能明显提升 使用资源明显减少
@@ -1417,7 +1419,7 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
                         sh "${mavenCommandType} clean install -T 2C -Dmaven.compile.fork=true ${isMavenTest} "
                     } else {  // 多模块情况
                         // 单独指定模块构建 -pl指定项目名 -am 同时构建依赖项目模块 跳过测试代码  -T 1C 参数，表示每个CPU核心跑一个工程并行构建
-                        sh "${mavenCommandType} clean install -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.compile.fork=true ${isMavenTest} "
+                        sh "${mavenCommandType} clean install -T 2C -pl ${MAVEN_ONE_LEVEL}${PROJECT_NAME} -am -Dmaven.compile.fork=true ${isMavenTest} ${CUSTOM_MAVEN_PACKAGE_COMMAND} "
                     }
                 } else {
                     // 基于自定义setting.xml文件方式打包 如私有包等
@@ -1572,7 +1574,7 @@ def uploadRemote(filePath, map) {
         timeout(time: 2, unit: 'MINUTES') {
             // 同步脚本和配置到部署服务器
             // if (IS_CODE_AND_COMMAND_DEPLOY == false) {
-                syncScript()
+            syncScript()
             // }
         }
         println("上传部署文件到部署服务器中... 🚀 ")
@@ -2297,7 +2299,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             if (type == 0) { // 失败
                 if (!isHealthCheckFail) {
                     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
-                            "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}流水线失败通知",
+                            "❌ CI/CD失败通知 ${PROJECT_TAG}${envTypeMark}${projectTypeName}",
                             "### [${env.JOB_NAME}#${env.BUILD_NUMBER}](${env.BUILD_URL}) ${PROJECT_TAG}${envTypeMark}${projectTypeName}项目${msg} \n" +
                                     "#### 请及时处理 🏃 \n" +
                                     "##### <font color=red> 流水线失败原因:</font> [运行日志](${env.BUILD_URL}console) 👈  \n" +
@@ -2317,7 +2319,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                     }
 
                     DingTalk.noticeActionCard(this, map.ding_talk_credentials_ids,
-                            "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
+                            "✅ CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
                             "${screenshot} \n" +
                                     "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL}) \n" +
                                     "##### Nginx Web服务启动${msg} \n" +
@@ -2350,7 +2352,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                     }
 
                     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
-                            "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
+                            "✅ CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署结果通知",
                             "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${PROJECT_TAG}${envTypeMark}${projectTypeName} ${MACHINE_TAG}](${env.JOB_URL}) \n" +
                                     "#### CI/CD部署启动${msg} \n" +
                                     "##### ${deployType} \n" +
@@ -2369,7 +2371,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
                 }
             } else if (type == 2 && "${IS_ONLY_NOTICE_CHANGE_LOG}" == 'false') { // 部署之前
                 DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
-                        "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署前通知",
+                        "🚀 CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}部署前通知",
                         "### [${env.JOB_NAME}#${env.BUILD_NUMBER} ${envTypeMark}${projectTypeName}](${env.JOB_URL}) \n" +
                                 "#### ${PROJECT_TAG}服务部署启动中 🚀  请稍等...  ☕ \n" +
                                 "###### 发布人: ${BUILD_USER}  构建机器: ${NODE_NAME} \n" +
@@ -2392,13 +2394,13 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
 
                     try {
                         if ("${tagVersion}") {
-                            titlePrefix = "${PROJECT_TAG} ${tagVersion}"
+                            titlePrefix = "${PROJECT_TAG} <font color=green>${tagVersion}</font>"
                         }
                     } catch (e) {
                     }
 
                     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
-                            "${titlePrefix} ${envTypeMark}${projectTypeName}发布日志",
+                            "📜 ${PROJECT_TAG} ${tagVersion} ${envTypeMark}${projectTypeName}发布日志",
                             "### ${titlePrefix} ${envTypeMark}${projectTypeName}发布日志 🎉 \n" +
                                     "#### 项目: ${PROJECT_NAME} \n" +
                                     "#### 环境: *${projectTypeName} ${IS_PROD == 'true' ? "生产环境" : "${releaseEnvironment}内测环境"}* \n" +

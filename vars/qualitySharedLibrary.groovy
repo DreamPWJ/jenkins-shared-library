@@ -690,7 +690,7 @@ def getInitParams(map) {
     // 自定义部署Dockerfile名称 如 Dockerfile.xxx
     CUSTOM_DOCKERFILE_NAME = jsonParams.CUSTOM_DOCKERFILE_NAME ? jsonParams.CUSTOM_DOCKERFILE_NAME.trim() : "Dockerfile"
     // 自定义Python版本
-    CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.12.0"
+    CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.14.0"
     // 自定义Python启动文件名称 默认app.py文件
     CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
     // 自定义服务部署启动命令
@@ -1706,7 +1706,7 @@ def dingNotice(map, int type, msg = '', atMobiles = '') {
             if (type == 0) { // 失败
                 if (!isHealthCheckFail) {
                     DingTalk.noticeMarkDown(this, map.ding_talk_credentials_ids,
-                            "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}流水线失败通知",
+                            "❌ CI/CD失败通知 ${PROJECT_TAG}${envTypeMark}${projectTypeName}",
                             "### [${env.JOB_NAME}#${env.BUILD_NUMBER}](${env.BUILD_URL}) ${PROJECT_TAG}${envTypeMark}${projectTypeName}项目${msg} \n" +
                                     "#### 请及时处理 🏃 \n" +
                                     "##### <font color=red> 流水线失败原因:</font> [运行日志](${env.BUILD_URL}console) 👈  \n" +
