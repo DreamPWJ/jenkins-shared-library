@@ -148,7 +148,7 @@ class Docker implements Serializable {
                 def webDockerFileName = "Dockerfile"
                 if ("${ctx.CUSTOM_DOCKERFILE_NAME}" != "${webDockerFileName}") { // 非默认Dockerfile
                     webDockerFileName = "${ctx.CUSTOM_DOCKERFILE_NAME}"
-                    // 拉取基础镜像避免重复下载
+                    // 拉取基础镜像避免重复下载  选项 --pull 每次都下载最新镜像
                     def dockerImagesName = ""
                     if (webDockerFileName.endsWith(".ssr")) {  // 如Node构建环境 SSR方式等
                         dockerImagesName = "node:bullseye-slim"
@@ -157,7 +157,7 @@ class Docker implements Serializable {
                     }
                     ctx.sh " [ -z \"\$(docker images -q ${dockerImagesName})\" ] && docker pull ${dockerImagesName} || echo \"基础镜像 ${dockerImagesName} 已存在 无需重新pull拉取镜像\" "
                     ctx.sh """ cd ${ctx.env.WORKSPACE}/${ctx.monoRepoProjectDir} && pwd && \
-                            docker ${dockerBuildDiffStr} --pull -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
+                            docker ${dockerBuildDiffStr} -t ${ctx.DOCKER_REPO_REGISTRY}/${imageFullName}  \
                             --build-arg EXPOSE_PORT="${ctx.SHELL_EXPOSE_PORT}" \
                             -f ${ctx.env.WORKSPACE}/ci/.ci/web/${webDockerFileName} . --no-cache \
                             ${dockerPushDiffStr}
