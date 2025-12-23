@@ -22,6 +22,8 @@ rm -f /var/lib/docker/overlay2/*/diff/var/log/nginx/*.log || true
 rm -f /var/lib/docker/overlay2/*/diff/etc/nginx/on || true
 # 隐藏占用情况 查找进程没有关闭导致内核无法回收占用空间的隐藏要删除的文件
 lsof -w | grep 'deleted' | awk '{print $2}' | xargs kill -9  || true
+# 处理麒麟操作系统等网络不通问题
+# systemctl restart network || service network restart && sudo systemctl daemon-reload && sudo systemctl restart docker
 
 # 移除 Docker 构建缓存  CI/CD服务器或服务端构建镜像显著有效
 docker builder prune --force  || true

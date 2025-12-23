@@ -4,7 +4,7 @@
 # 使用Ansible中心化统一批量管理多机器脚本
 
 # 项目服务器名称
-PROJECT_SERVER_NAME="服务器"
+PROJECT_SERVER_NAME="【服务名】"
 # 钉钉机器人的Webhook地址
 DING_TALK_WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=383391980b120c38f0f9a4a398349739fa67a623f9cfa834df9c5374e81b2081"
 # 钉钉通知KEY
@@ -115,7 +115,8 @@ if [ ${DISK_USAGE} -gt ${DISK_USAGE_THRESHOLD} ]; then
         find /my -type d -name "log*" -exec rm -rf {} + || true
         docker builder prune --force  || true
         rm -f /var/lib/docker/overlay2/*/diff/etc/nginx/on || true
-        lsof -w | grep 'deleted' | awk '{print $2}' | xargs kill -9  || true
+        # 隐藏占用情况 查找进程没有关闭导致内核无法回收占用空间的隐藏要删除的文件
+        lsof -w | grep 'deleted' | awk '{print $2}' | xargs kill -15 || true
 
         # ./my/clean_disk.sh
         # STATUS_FILE="/tmp/monitor_status"
