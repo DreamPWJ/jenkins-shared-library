@@ -4,7 +4,7 @@
 # 使用Ansible中心化统一批量管理多机器脚本
 
 # 项目服务器名称
-PROJECT_SERVER_NAME="服务器"
+PROJECT_SERVER_NAME="【服务名称】"
 # 钉钉机器人的Webhook地址
 DING_TALK_WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=383391980b120c38f0f9a4a398349739fa67a623f9cfa834df9c5374e81b2081"
 # 钉钉通知KEY
