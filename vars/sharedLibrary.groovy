@@ -331,7 +331,7 @@ def call(String type = 'web-java', Map map) {
                                   filename 'Dockerfile.maven-jdk' // 在WORKSPACE工作区代码目录
                                   label "panweiji/maven-jdk-${JDK_PUBLISHER}-${JDK_VERSION}:latest"
                                   dir "${env.WORKSPACE}/ci"
-                                  additionalBuildArgs "--build-arg MVND_VERSION=1.0.3 --build-arg JDK_PUBLISHER=${JDK_PUBLISHER} --build-arg JDK_VERSION=${JDK_VERSION}"
+                                  additionalBuildArgs "--build-arg MVND_VERSION=${MVND_VERSION} --build-arg JDK_PUBLISHER=${JDK_PUBLISHER} --build-arg JDK_VERSION=${JDK_VERSION}"
                                   args " -v /var/cache/maven/.m2:/root/.m2  "
                                   reuseNode true  // 使用根节点 不设置会进入其它如@2代码工作目录
                               }
@@ -347,7 +347,7 @@ def call(String type = 'web-java', Map map) {
                             def dockerParams = Docker.setDockerParameters(this);
                             // Gradle构建方式
                             if (IS_GRADLE_BUILD == true) {
-                                def gradleVersion = "9" // Gradle版本 要动态配置
+                                def gradleVersion = $GRADLE_VERSION // Gradle版本 要动态配置
                                 def jdkVersion = "${JDK_VERSION}"
                                 def dockerImageName = "gradle"
                                 def dockerImageTag = "$gradleVersion-jdk$jdkVersion"
@@ -360,7 +360,7 @@ def call(String type = 'web-java', Map map) {
                                 if (("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot || "${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.Quarkus)
                                         && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
                                     // mvnd支持条件
-                                    def mvndVersion = "1.0.3"  // Mvnd版本 要动态配置
+                                    def mvndVersion = $MVND_VERSION  // Mvnd版本 要动态配置
                                     def jdkVersion = "${JDK_VERSION}"
                                     def dockerImageName = "panweiji/maven-jdk"
                                     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
@@ -808,6 +808,8 @@ def getInitParams(map) {
     JDK_PUBLISHER = jsonParams.JDK_PUBLISHER ? jsonParams.JDK_PUBLISHER.trim() : "${map.jdk_publisher}" // JDK版本发行商
     NODE_VERSION = jsonParams.NODE_VERSION ? jsonParams.NODE_VERSION.trim() : "${map.nodejs}" // 自定义Node版本
     TOMCAT_VERSION = jsonParams.TOMCAT_VERSION ? jsonParams.TOMCAT_VERSION.trim() : "7.0" // 自定义非内嵌的Tomcat老版本
+    MVND_VERSION = jsonParams.MVND_VERSION ? jsonParams.MVND_VERSION.trim() : "1.0.3" // 自定义mvnd版本
+    GRADLE_VERSION = jsonParams.GRADLE_VERSION ? jsonParams.GRADLE_VERSION.trim() : "9" // 自定义Gradle版本
     // npm包管理工具类型 如:  npm、yarn、pnpm
     NPM_PACKAGE_TYPE = jsonParams.NPM_PACKAGE_TYPE ? jsonParams.NPM_PACKAGE_TYPE.trim() : "pnpm"
     NPM_RUN_PARAMS = jsonParams.NPM_RUN_PARAMS ? jsonParams.NPM_RUN_PARAMS.trim() : "" // npm run [build]的前端项目参数
