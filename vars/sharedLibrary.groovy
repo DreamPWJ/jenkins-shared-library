@@ -347,7 +347,7 @@ def call(String type = 'web-java', Map map) {
                             def dockerParams = Docker.setDockerParameters(this);
                             // Gradle构建方式
                             if (IS_GRADLE_BUILD == true) {
-                                def gradleVersion = ${GRADLE_VERSION} // Gradle版本 要动态配置
+                                def gradleVersion = "${GRADLE_VERSION}" // Gradle版本 要动态配置
                                 def jdkVersion = "${JDK_VERSION}"
                                 def dockerImageName = "gradle"
                                 def dockerImageTag = "$gradleVersion-jdk$jdkVersion"
@@ -360,7 +360,7 @@ def call(String type = 'web-java', Map map) {
                                 if (("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot || "${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.Quarkus)
                                         && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
                                     // mvnd支持条件
-                                    def mvndVersion = ${MVND_VERSION}  // Mvnd版本 要动态配置
+                                    def mvndVersion = "${MVND_VERSION}"  // Mvnd版本 要动态配置
                                     def jdkVersion = "${JDK_VERSION}"
                                     def dockerImageName = "panweiji/maven-jdk"
                                     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
