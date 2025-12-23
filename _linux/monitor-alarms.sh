@@ -116,7 +116,7 @@ if [ ${DISK_USAGE} -gt ${DISK_USAGE_THRESHOLD} ]; then
         docker builder prune --force  || true
         rm -f /var/lib/docker/overlay2/*/diff/etc/nginx/on || true
         # 隐藏占用情况 查找进程没有关闭导致内核无法回收占用空间的隐藏要删除的文件
-        lsof -w | grep 'deleted' | awk '{print $2}' | xargs kill -9  || true
+        lsof -w | grep 'deleted' | awk '{print $2}' | xargs kill -15 || true
 
         # ./my/clean_disk.sh
         # STATUS_FILE="/tmp/monitor_status"
