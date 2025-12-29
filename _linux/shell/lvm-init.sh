@@ -13,7 +13,7 @@ sudo yum install lvm2
 
 # 第一次分LVM区设置 执行下面步骤
 # 分区磁盘 分别选m n p (Select用默认) t(t代表LVM分区表 code设置8e) p w  (fdisk支持2TB大小内分区 新的空GPT分区表解决)
-fdisk /dev/sdb  # sd名称根据lsblk显示disk类型的前缀 b c d等 按顺序等依次划分磁盘分区
+fdisk /dev/sda  # 根据lsblk显示SIZE的NAME名称  可根据b c d等 按顺序等依次划分磁盘分区
 
 # 新建一个物理卷 pvdisplay 查看所有物理卷信息
 pvcreate /dev/sdb1
