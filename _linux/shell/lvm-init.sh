@@ -61,3 +61,14 @@ vgextend vg_data /dev/sdc1 # 扩展VG到新磁盘 将新盘添加到VG卷管理�
 lvextend -L +2046G /dev/vg_data/lv_data # 扩容逻辑卷  -L 参数小于分区存储容量   系统盘默认设置了LVM扩容从这步开始
 xfs_growfs /dev/vg_data/lv_data # xfs扩容文件系统 和 ext格式扩容 resize2fs /dev/ubuntu-vg/ubuntu-lv
 df -h  # 查看扩容后分区大小
+
+
+# -------------------------- 新系统安装的Ubuntu设置LVM  -----------------------------
+# 创建新的逻辑卷（LV 使用卷组（ubuntu-vg）中的全部剩余空间创建一个名为 data-lv的新逻辑卷
+sudo vgdisplay ubuntu-vg
+sudo lvcreate -l 100%FREE -n data-lv  ubuntu-vg
+sudo mkfs.xfs /dev/ubuntu-vg/data-lv # 格式化逻辑卷
+# 临时挂载
+sudo mkdir /data
+sudo mount /dev/ubuntu-vg/data-lv /data
+#为了避免服务器重启后需要手动重新挂载，需要将挂载信息写入 /etc/fstab文件
