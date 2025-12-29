@@ -44,6 +44,7 @@ df -h
 vim /etc/fstab
 # /dev/mapper/vg_data-lv_data /mnt/data xfs defaults 0 1
 # /dev/mapper/vg_data-lv_data /mnt/data ext4 defaults 0 1
+# UUID= /data xfs defaults 0 1
 systemctl daemon-reload
 
 # 卸载分区
