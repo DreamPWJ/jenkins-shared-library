@@ -29,7 +29,7 @@ vgdisplay
 lvcreate -L 239G -n lv_data vg_data
 lvdisplay
 
-# 格式化分区 注意会擦除数据！！！  执行 blkid 命令查看UUID和文件类型
+# 格式化分区 注意会擦除数据！！！
 mkfs.xfs /dev/vg_data/lv_data -f  # mkfs.ext4 /dev/vg_data/lv_data
 fdisk -l
 
@@ -44,7 +44,7 @@ df -h
 vim /etc/fstab
 # /dev/mapper/vg_data-lv_data /mnt/data xfs defaults 0 1
 # /dev/mapper/vg_data-lv_data /mnt/data ext4 defaults 0 1
-# UUID= /data xfs defaults 0 1
+# UUID= /data xfs defaults 0 1 # 执行 blkid 命令查看UUID和文件类型
 systemctl daemon-reload
 
 # 卸载分区
