@@ -67,6 +67,7 @@ df -h  # 查看扩容后分区大小
 
 # -------------------------- 新系统安装的Ubuntu初始化设置LVM  -----------------------------
 # 创建新的逻辑卷（LV 使用卷组（ubuntu-vg）中的全部剩余空间创建一个名为 data-lv的新逻辑卷
+sudo -i
 sudo vgdisplay
 sudo lvcreate -l 100%FREE -n data-lv  ubuntu-vg
 sudo mkfs.xfs /dev/ubuntu-vg/data-lv # 格式化逻辑卷
