@@ -4,6 +4,8 @@
 # 超融合架构自带在线扩容  磁盘只能扩容不能缩容
 # 如果没有提前设置LVM设置想扩容思路： 新增大硬盘做好LVM并挂载到临时目录 将数据复制到新存储  卸载旧磁盘再将新盘挂载到目标目录
 
+# 使用root用户执行
+sudo -i
 # 查看磁盘分区情况
 lsblk
 
@@ -12,9 +14,8 @@ sudo apt-get install lvm2
 sudo yum install lvm2
 
 # 第一次分LVM区设置 执行下面步骤
-# 分区磁盘 分别选m n p 【默认】 t(t代表LVM分区表 code设置8e) p w  (fdisk支持2TB大小内分区 新的空GPT分区表解决)
-fdisk /dev/sdb
-
+# 创建新空间分区 分别选m n p (Select可用默认) t(t代表LVM分区表 code设置8e) p w  (fdisk支持2TB大小内分区 新的空GPT分区表解决)
+fdisk /dev/sdb  # 物理sda 和 虚拟vda   根据lsblk的外层名称
 # 新建一个物理卷 pvdisplay 查看所有物理卷信息
 pvcreate /dev/sdb1
 pvdisplay
@@ -27,7 +28,7 @@ vgdisplay
 lvcreate -L 239G -n lv_data vg_data
 lvdisplay
 
-# 格式化分区 注意会擦除数据！！！  执行 blkid 命令查看UUID和文件类型
+# 格式化分区 注意会擦除数据！！！
 mkfs.xfs /dev/vg_data/lv_data -f  # mkfs.ext4 /dev/vg_data/lv_data
 fdisk -l
 
@@ -42,19 +43,34 @@ df -h
 vim /etc/fstab
 # /dev/mapper/vg_data-lv_data /mnt/data xfs defaults 0 1
 # /dev/mapper/vg_data-lv_data /mnt/data ext4 defaults 0 1
+# 执行 blkid 命令查看UUID和文件类型
+# UUID= /data xfs defaults 0 1
 systemctl daemon-reload
 
 # 卸载分区
 umount /dev/vg_data/lv_data
 
 
-# -------------------------- 已设置LVM重新在线扩容硬盘情况 -----------------------------
+# -------------------------- 已设置LVM重新在线扩容硬盘情况  -----------------------------
 # 在线扩容硬盘  重新挂载新磁盘 从这直接开始  注意区分设置的vg和lv名称
 lsblk
-fdisk /dev/sdc # fdisk分区 分别选m n p t(t代表LVM分区表 code设置8e) p w
+fdisk /dev/sdc # fdisk分区 根据fdisk -l显示SIZE的NAME名称 分别选m n p t(t代表LVM分区表 code设置8e) p w
 pvcreate /dev/sdc1 # 创建新物理卷
 vgextend vg_data /dev/sdc1 # 扩展VG到新磁盘 将新盘添加到VG卷管理中  或ubuntu-vg
 
+# 新系统已设置LVM  跳过所有上面步骤 执行下面步骤！！！
 lvextend -L +2046G /dev/vg_data/lv_data # 扩容逻辑卷  -L 参数小于分区存储容量   系统盘默认设置了LVM扩容从这步开始
 xfs_growfs /dev/vg_data/lv_data # xfs扩容文件系统 和 ext格式扩容 resize2fs /dev/ubuntu-vg/ubuntu-lv
 df -h  # 查看扩容后分区大小
+
+
+# -------------------------- 新系统安装的Ubuntu初始化设置LVM  -----------------------------
+# 创建新的逻辑卷（LV 使用卷组（ubuntu-vg）中的全部剩余空间创建一个名为 data-lv的新逻辑卷
+sudo -i
+sudo vgdisplay
+sudo lvcreate -l 100%FREE -n data-lv  ubuntu-vg
+sudo mkfs.xfs /dev/ubuntu-vg/data-lv # 格式化逻辑卷
+# 临时挂载
+sudo mkdir /data
+sudo mount /dev/ubuntu-vg/data-lv /data
+#为了避免服务器重启后需要手动重新挂载，需要将挂载信息写入 /etc/fstab文件

@@ -1,4 +1,4 @@
-#### 基于Docker安装部署nginx
+#### 基于Docker安装部署Nginx
 docker pull nginx:stable
 
 #### 启动运行nginx容器  创建目录 mkdir -p /my/nginx/config && mkdir -p /my/nginx/ssl
