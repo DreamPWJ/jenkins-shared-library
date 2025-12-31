@@ -740,7 +740,7 @@ def call(String type = 'web-java', Map map) {
                     script {
                         echo '当前失败时才运行'
                         dingNotice(map, 0, "CI/CD流水线失败 ❌")
-                        // AI人工智能分析错误日志帮助人类解释与理解 插件: Explain Error Plugin
+                        // AI人工智能分析错误日志帮助人类解释与理解 需要大模型api key支持 插件: Explain Error Plugin
                         // explainError()
                     }
                 }

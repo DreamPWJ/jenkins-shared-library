@@ -4,16 +4,19 @@ docker info
 sudo cat <<EOF >/etc/docker/daemon.json
 {
 "registry-mirrors": [
-  "https://docker.lanneng.tech",
-  "https://em1sutsj.mirror.aliyuncs.com",
-  "https://dockerpull.cn"
+"https://docker.xuanyuan.me",
+"https://docker.1ms.run",
+"https://docker.m.daocloud.io"
 ],
-"dns": ["8.8.8.8", "114.114.114.114"],
-"log-driver":"json-file",
+"log-driver": "json-file",
 "log-opts": {
-"max-size": "100m",
-"max-file": "2"
-}
+"max-size": "10m",
+"max-file": "3"
+},
+"data-root": "/var/lib/docker",
+"storage-driver": "overlay2",
+"live-restore": true,
+"exec-opts": ["native.cgroupdriver=systemd"]
 }
 EOF
 sudo systemctl reload docker # reload 不会重启 Docker 服务，但会使新的配置生效
