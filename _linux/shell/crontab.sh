@@ -14,4 +14,4 @@ crontab -l            # 查看crond列表
 # crontab -e
 # crontab -l > temp.cron # 下载配置文件
 # tail -f /var/log/cron  如果定时任务执行失败通过以下命令查看任务日志
-# GNU nano编辑器CTRL+O 再 CTRL+X 保存退出
+# GNU nano编辑器CTRL+X 直接保存并退出

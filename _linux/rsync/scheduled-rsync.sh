@@ -23,4 +23,4 @@ find /tidb-data/backup -name "*.sql.gz" -type f -mtime +7 -exec rm -rf {} \; >/d
 # 0 2 * * * /bin/bash /my/scheduled-rsync.sh >/my/rsync-crontab.log 2>&1
 # service crond restart , Ubuntu 使用 sudo service cron restart # 重启crond生效
 # crontab -l # 查看crond列表
-# GNU nano编辑器CTRL+O 再 CTRL+X 保存退出
+# GNU nano编辑器CTRL+X 直接保存并退出
