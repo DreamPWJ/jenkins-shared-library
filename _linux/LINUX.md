@@ -83,7 +83,7 @@ arp -a
 - sudo vim /etc/resolv.conf
 - 锁死 chattr +i /etc/resolv.conf 防止重启系统数据丢失
 
-#### 安装Windows、Linux服务器系统或VMWare ESXI裸机虚拟化
+#### 安装Windows、Linux服务器系统 Proxmox VE或VMWare ESXI裸机虚拟化
 
 - 首先将服务器系统版本的ISO镜像下载到高配U盘 , 使用Rufus软件(引导ISO镜像Windows、Linux、VMware ESXI、UEFI等)制作的USB的系统启动引导盘 (安装完成reboot now重启系统前先拔出U盘, 再物理重启进入系统) , Help选项可提前进入shell控制
 - 浏览器访问服务器IPMI地址管理或插入U盘启动主机大部分长按Delete或F2可以进入BIOS页面选择USB系统启动引导盘 F10保存设置 (BIOS或新UEFI界面不同电脑快捷键不一样 有EFI源文件安装 一般台式机开机按delete键可以进入BIOS，笔记本按F2键进入BIOS)
