@@ -1,4 +1,4 @@
-### 企业级VPN
+### 企业级VPN实现所有节点互联互通
 
  - 技术方案 ： OpenVPN的Pritunl页面端管理
  - 服务安装: https://docs.pritunl.com/docs/installation?utm_source=chatgpt.com#other-providers-ubuntu-2404
