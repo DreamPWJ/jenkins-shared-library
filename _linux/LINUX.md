@@ -85,7 +85,7 @@ arp -a
 
 #### 安装Windows、Linux服务器系统 Proxmox VE或VMWare ESXI裸金属虚拟化
 
-- 首先将服务器系统版本的ISO镜像下载到高配U盘 , 使用Ventoy或Rufus软件(引导ISO镜像Windows、Linux、VMware ESXI、UEFI等)制作的USB的系统启动引导盘 (安装完成reboot now重启系统前先拔出U盘, 再物理重启进入系统) , Help选项可提前进入shell控制
+- 首先将服务器系统版本的ISO镜像下载到高配U盘 , 使用balenaEtcher或Ventoy或Rufus软件(引导ISO镜像Windows、Linux、VMware ESXI、UEFI等)制作的USB的系统启动引导盘 (安装完成reboot now重启系统前先拔出U盘, 再物理重启进入系统) , Help选项可提前进入shell控制
 - 浏览器访问服务器IPMI地址管理或插入U盘启动主机大部分长按Delete或F2可以进入BIOS页面选择USB系统启动引导盘 F10保存设置 (BIOS或新UEFI界面不同电脑快捷键不一样 有EFI源文件安装 一般台式机开机按delete键可以进入BIOS，笔记本按F2键进入BIOS)
 - 断电后上电自动启动系统: 在服务器的硬件层BIOS/UEFI设置中，找到相关的自启动选项。 通常选项称为“Power AC”或类似的名称。 将其设置为“On”或“Always On”，服务器在断电后上电后主板会触发开机动作
 - 安装参考文章: https://developer.aliyun.com/article/927675  设置阿里云镜像源: http://mirrors.aliyun.com/ubuntu/
