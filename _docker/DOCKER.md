@@ -91,3 +91,23 @@ sh mqbroker -c /home/rocketmq/conf/broker.conf  && sudo chmod 777  /my/rocketmq/
 docker run -d --restart=always -p 6765:8080 \
 -e TZ="Asia/Shanghai" -e "JAVA_OPTS=-Drocketmq.namesrv.addr=172.31.3.120:9876 -Xms512m -Xmx512m" --cpus=2 -m 1024m \
 --name rocketmq-dashboard  apacherocketmq/rocketmq-dashboard:latest
+
+
+#### 对象存储服务
+
+docker pull minio/minio
+docker run -d --restart=always -p 9000:9000 -p 9001:9001 \
+-e "MINIO_ROOT_USER=admin" -e "MINIO_ROOT_PASSWORD=object-storage@0633-2026" \
+-v /mnt/data/minio/data:/data -v /mnt/data/minio/config:/root/.minio \
+--name minio-server minio/minio server /data --console-address ":9001"
+
+##### 标准minio控制命令mc
+mc alias set myminio http://127.0.0.1:9000 YOUR-ACCESS-KEY YOUR-SECRET-KEY # 设置别名和密钥
+mc admin user add myminio NEW-ACCESS-KEY NEW-SECRET-KEY # 创建用户（密钥对)
+mc admin policy attach myminio readwrite --user your-access-key  # 创建一个读写策略
+mc anonymous set download myminio/my-bucket  # 指定的存储桶设置安全访问策略
+mc version enable myminio/my-bucket   # 开启版本控制 可防止误删除
+mc alias list
+
+openssl rand -hex 20 # 生成40位Access Key
+openssl rand -hex 40 # 生成80位Secret Key
