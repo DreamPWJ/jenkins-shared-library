@@ -10,7 +10,7 @@ source ~/.bashrc
 acme.sh --set-default-ca --server letsencrypt
 
 # 申请证书 推荐WebRoot HTTP-01方式 无需DNS验证 -d：需申请证书的域名(可多个)  --webroot：网站根目录路径（需确保目录可写入）
-acme.sh --issue -d example.com -d www.example.com --webroot /var/www/html
+#acme.sh --issue -d example.com -d www.example.com --webroot /var/www/html
 # 宿主机部署Nginx模式 不支持Docker 智能的从 Nginx 的配置中自动完成验证，不需要指定网站根目
 #acme.sh --issue --nginx -d example.com -d www.example.com
 
@@ -30,7 +30,8 @@ acme.sh --issue --dns dns_ali -d example.com
 # 如果服务器上没有运行任何 Web 服务，80 端口必须是一直空闲的，那么 acme.sh 还能假装自己是一个 WebServer，临时监听 80 端口，完成验证
 #acme.sh --issue --standalone -d example.com -d www.example.com -d example.com
 
-# 生成证书 重新加载nginx配置才会生效 续期成功才自动reload
+# nginx证书生成 重新加载nginx配置才会生效 续期成功才自动reload
+mkdir /etc/letsencrypt/live/example.com
 acme.sh --install-cert -d example.com \
   --key-file       /etc/letsencrypt/live/example.com/privkey.pem \
   --fullchain-file /etc/letsencrypt/live/example.com/fullchain.pem \
