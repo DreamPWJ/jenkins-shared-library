@@ -6,7 +6,9 @@ sudo cat <<EOF >/etc/docker/daemon.json
 "registry-mirrors": [
 "https://docker.xuanyuan.me",
 "https://docker.1ms.run",
-"https://docker.m.daocloud.io"
+"https://docker.m.daocloud.io",
+"https://docker.lanneng.tech",
+"https://em1sutsj.mirror.aliyuncs.com"
 ],
 "log-driver": "json-file",
 "log-opts": {
