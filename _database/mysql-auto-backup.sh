@@ -40,7 +40,7 @@ find ${backup_dir} -name "*.sql.gz" -type f -mtime +3 -exec rm -rf {} \; >/dev/n
 # 0 0,12 * * * /bin/bash /my/backup/mysql-auto-backup.sh
 # service crond restart  , Ubuntu 使用 sudo service cron restart # 重启crond生效
 # crontab -l # 查看crond列表
-# GNU nano编辑器CTRL+O 再 CTRL+X 保存退出
+# GNU nano编辑器CTRL+X 直接保存并退出
 
 # 新版的mysqldump默认启用了一个新标志  禁用统计--column-statistics=0
 

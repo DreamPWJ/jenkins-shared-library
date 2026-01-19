@@ -6,7 +6,9 @@ sudo cat <<EOF >/etc/docker/daemon.json
 "registry-mirrors": [
 "https://docker.xuanyuan.me",
 "https://docker.1ms.run",
-"https://docker.m.daocloud.io"
+"https://docker.m.daocloud.io",
+"https://docker.lanneng.tech",
+"https://em1sutsj.mirror.aliyuncs.com"
 ],
 "log-driver": "json-file",
 "log-opts": {
@@ -49,7 +51,7 @@ docker pull postgres
 docker run -d --restart=always  -p 5432:5432 --name postgres  -v /my/postgresql:/var/lib/postgresql -v /etc/localtime:/etc/localtime:ro  \
 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=123456 -e POSTGRES_DB=design  postgres
 
-#### 安装Mongodb数据库
+#### 安装MongoDB数据库
 docker pull mongo:latest
 
 docker run -d --restart=always -p 27017:27017 \
