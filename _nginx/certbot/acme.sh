@@ -30,7 +30,7 @@ acme.sh --issue --dns dns_ali -d example.com
 # 如果服务器上没有运行任何 Web 服务，80 端口必须是一直空闲的，那么 acme.sh 还能假装自己是一个 WebServer，临时监听 80 端口，完成验证
 #acme.sh --issue --standalone -d example.com -d www.example.com -d example.com
 
-# nginx证书生成 重新加载nginx配置才会生效 续期成功才自动reload
+# 续期成功会自动执行nginx证书生成 install-cert 负责“复制 + reload, 重新加载nginx配置才会生效 续期成功才自动reload
 mkdir /etc/letsencrypt/live/example.com
 acme.sh --install-cert -d example.com \
   --key-file       /etc/letsencrypt/live/example.com/privkey.pem \
