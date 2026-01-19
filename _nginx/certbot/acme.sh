@@ -9,11 +9,9 @@ source ~/.bashrc
 # 默认CA  acme.sh 脚本默认 CA 服务器是 ZeroSSL
 acme.sh --set-default-ca --server letsencrypt
 
-# 宿主机目录 HTTP 校验依赖
-mkdir -p /my/acme-challenge
 # 申请证书 推荐WebRoot HTTP-01方式 无需DNS验证 -d：需申请证书的域名(可多个)  --webroot：网站根目录路径（需确保目录可写入）
 acme.sh --issue -d example.com -d www.example.com --webroot /var/www/html
-# 使用 Nginx 模式 智能的从 Nginx 的配置中自动完成验证，不需要指定网站根目
+# 宿主机部署Nginx模式 不支持Docker 智能的从 Nginx 的配置中自动完成验证，不需要指定网站根目
 #acme.sh --issue --nginx -d example.com -d www.example.com
 
 # DNS模式验证（无需开放端口）
@@ -25,8 +23,8 @@ SAVED_Ali_Secret="你的域名阿里云Secret"
 EOF
 chmod 600 ~/.acme.sh/account.conf
 
-# 申请证书
-#acme.sh --issue --dns dns_ali -d *.example.com
+# 申请证书 DNS模式
+acme.sh --issue --dns dns_ali -d example.com
 
 # Standalone模式： 临时启动HTTP服务完成验证（适合无Web服务场景和代理服务情况）
 # 如果服务器上没有运行任何 Web 服务，80 端口必须是一直空闲的，那么 acme.sh 还能假装自己是一个 WebServer，临时监听 80 端口，完成验证
