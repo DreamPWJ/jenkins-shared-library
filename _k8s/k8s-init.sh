@@ -1,23 +1,23 @@
 #!/bin/bash
 # Author: 潘维吉
-# Description: Kubernetes集群自动化部署脚本
+# Description: Kubernetes集群初始化自动化部署脚本
 # Version: 2.0
-# 支持单机/多机部署，支持最新K8s版本，支持多种容器运行时和网络插件
+# kubeadm官方工具支持单机/多机部署，支持最新K8s版本，支持多种容器运行时和网络插件
 #
 # 使用示例:
 # chmod +x k8s-init.sh
 
 # 单机部署（默认使用containerd）:
-#   ./k8s-init.sh --mode single
+# ./k8s-init.sh --mode single
 #
 # 多机部署 - 主节点:
-#   ./k8s-init.sh --mode master --apiserver-advertise 192.168.1.100
+# ./k8s-init.sh --mode master --apiserver-advertise 192.168.1.100
 #
 # 多机部署 - 工作节点:
-#   ./k8s-init.sh --mode worker --master-ip 192.168.1.100 --token <token> --hash <hash>
+# ./k8s-init.sh --mode worker --master-ip 192.168.1.100 --token <token> --hash <hash>
 #
 # 自定义配置:
-#   ./k8s-init.sh --mode single --version 1.35.0 --runtime containerd --network calico
+# ./k8s-init.sh --mode single --version 1.35.0 --runtime containerd --network calico
 
 set -euo pipefail  # 严格错误处理
 IFS=$'\n\t'
@@ -26,9 +26,9 @@ IFS=$'\n\t'
 # 全局配置参数
 # ============================================================================
 SCRIPT_VERSION="2.0"
-K8S_VERSION="1.35.0"                    # Kubernetes版本
-POD_NETWORK_CIDR="10.244.0.0/16"        # Pod网络CIDR
-SERVICE_CIDR="10.96.0.0/12"             # Service网络CIDR
+K8S_VERSION="1.35.0"                     # Kubernetes版本
+POD_NETWORK_CIDR="10.244.0.0/16"         # Pod网络CIDR
+SERVICE_CIDR="10.96.0.0/12"              # Service网络CIDR
 CLUSTER_MODE="single"                    # 集群模式：single/master/worker
 CONTAINER_RUNTIME="containerd"           # 容器运行时：docker/containerd
 NETWORK_PLUGIN="flannel"                 # 网络插件：flannel/calico/cilium
