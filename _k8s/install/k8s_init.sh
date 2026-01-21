@@ -135,18 +135,18 @@ install_containerd() {
     if command -v containerd >/dev/null 2>&1; then
         log_info "检测到 containerd 已安装,版本: $(containerd --version | awk '{print $3}')"
         if systemctl is-active --quiet containerd; then
-            log_info "containerd 服务正在运行, 跳过安装, 并升级到最新版本"
-                case $OS in
-                    ubuntu|debian)
-                       sudo apt install --only-upgrade containerd.io
-                        ;;
-                    centos|rhel)
-                        sudo yum update containerd.io
-                        ;;
-                    *)
-                        log_error "不支持的操作系统: $OS"
-                        ;;
-                esac
+#            log_info "containerd 服务正在运行, 跳过安装, 并升级到最新版本"
+#                case $OS in
+#                    ubuntu|debian)
+#                       sudo apt install --only-upgrade containerd.io
+#                        ;;
+#                    centos|rhel)
+#                        sudo yum update containerd.io
+#                        ;;
+#                    *)
+#                        log_error "不支持的操作系统: $OS"
+#                        ;;
+#                esac
 
             # 验证 CRI 接口
             if ! crictl version > /dev/null 2>&1; then
@@ -469,7 +469,7 @@ nodeRegistration:
 EOF
     fi
 
-    log_info "Kubeadm初始化K8s环境..."
+    log_info "Kubeadm初始化K8s v${K8S_VERSION}版本集群环境..."
     kubeadm init --config=$INIT_CONFIG --upload-certs
     
     # 配置 kubectl
