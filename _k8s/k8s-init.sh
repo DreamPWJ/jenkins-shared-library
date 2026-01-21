@@ -26,7 +26,7 @@ IFS=$'\n\t'
 # 全局配置参数
 # ============================================================================
 SCRIPT_VERSION="2.0"
-K8S_VERSION="1.35.0"                     # Kubernetes版本
+K8S_VERSION="1.33.7"                     # Kubernetes版本
 POD_NETWORK_CIDR="10.244.0.0/16"         # Pod网络CIDR
 SERVICE_CIDR="10.96.0.0/12"              # Service网络CIDR
 CLUSTER_MODE="single"                    # 集群模式：single/master/worker
@@ -37,7 +37,7 @@ MASTER_IP=""                             # 主节点IP（worker模式必需）
 JOIN_TOKEN=""                            # 加入令牌（worker模式必需）
 JOIN_HASH=""                             # CA证书哈希（worker模式必需）
 CONTROL_PLANE_ENDPOINT=""                # 控制平面端点（高可用）
-IMAGE_REPOSITORY="registry.aliyuncs.com/google_containers k8s.gcr.io docker.io/google_containers"  # 镜像仓库
+IMAGE_REPOSITORY="registry.aliyuncs.com/google_containers"  # 主镜像仓库
 LOG_FILE="/var/log/k8s-init-$(date +%Y%m%d-%H%M%S).log"
 DRY_RUN=false                            # 干运行模式
 SKIP_PREFLIGHT=false                     # 跳过预检查
