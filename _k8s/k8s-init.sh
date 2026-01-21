@@ -751,4 +751,331 @@ install_k8s_ubuntu() {
         log_warn "未找到精确版本 $K8S_VERSION，将安装最新的 $(echo $K8S_VERSION | cut -d'.' -f1,2).x 版本"
         $PKG_MANAGER install -y kubelet kubeadm kubectl
     else
-        $PKG_MANAGER install -y kubelet=$version_
+        $PKG_MANAGER install -y kubelet=$version_suffix kubeadm=$version_suffix kubectl=$version_suffix
+    fi
+
+    # 阻止自动更新
+    apt-mark hold kubelet kubeadm kubectl
+
+    log_success "Kubernetes组件安装完成"
+}
+
+# CentOS安装K8s
+install_k8s_centos() {
+    log_info "在CentOS上安装Kubernetes组件..."
+
+    # 添加Kubernetes仓库
+    cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://pkgs.k8s.io/core:/stable:/v$(echo $K8S_VERSION | cut -d'.' -f1,2)/rpm/
+enabled=1
+gpgcheck=1
+gpgkey=https://pkgs.k8s.io/core:/stable:/v$(echo $K8S_VERSION | cut -d'.' -f1,2)/rpm/repodata/repomd.xml.key
+EOF
+
+    # 安装指定版本
+    $PKG_MANAGER makecache
+
+    # 查找可用版本
+    if yum list --showduplicates kubelet | grep -q "$K8S_VERSION"; then
+        $PKG_MANAGER install -y kubelet-$K8S_VERSION kubeadm-$K8S_VERSION kubectl-$K8S_VERSION
+    else
+        log_warn "未找到精确版本 $K8S_VERSION，将安装最新版本"
+        $PKG_MANAGER install -y kubelet kubeadm kubectl
+    fi
+
+    log_success "Kubernetes组件安装完成"
+}
+
+# ============================================================================
+# 初始化Kubernetes集群
+# ============================================================================
+init_kubernetes_cluster() {
+    log_step "初始化Kubernetes集群"
+
+    if [[ "$DRY_RUN" == true ]]; then
+        log_info "干运行模式，跳过实际初始化"
+        return
+    fi
+
+    # 创建kubeadm配置文件
+    local kubeadm_config_file="/tmp/kubeadm-config-$(date +%s).yaml"
+
+    cat > "$kubeadm_config_file" << EOF
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: ${APISERVER_ADVERTISE_ADDRESS}
+  bindPort: 6443
+nodeRegistration:
+  criSocket: unix:///var/run/containerd/containerd.sock
+  kubeletExtraArgs:
+    cgroup-driver: systemd
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+kubernetesVersion: v${K8S_VERSION}
+controlPlaneEndpoint: "${CONTROL_PLANE_ENDPOINT:-${APISERVER_ADVERTISE_ADDRESS}:6443}"
+imageRepository: "${IMAGE_REPOSITORY}"
+networking:
+  serviceSubnet: "${SERVICE_CIDR}"
+  podSubnet: "${POD_NETWORK_CIDR}"
+  dnsDomain: cluster.local
+EOF
+
+    log_info "使用kubeadm配置文件: $kubeadm_config_file"
+
+    # 拉取Kubernetes镜像
+    log_info "拉取Kubernetes镜像..."
+    kubeadm config images pull --config="$kubeadm_config_file"
+
+    # 初始化集群
+    log_info "开始初始化集群..."
+
+    local init_args=("--config" "$kubeadm_config_file")
+    if [[ "$SKIP_PREFLIGHT" == true ]]; then
+        init_args+=("--skip-phases=preflight")
+    fi
+
+    kubeadm init "${init_args[@]}"
+
+    # 配置kubectl
+    mkdir -p $HOME/.kube
+    cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+    chown $(id -u):$(id -g) $HOME/.kube/config
+
+    # 单机模式：移除主节点的污点，允许调度Pod
+    if [[ "$CLUSTER_MODE" == "single" ]]; then
+        kubectl taint nodes --all node-role.kubernetes.io/control-plane- || true
+        log_info "已配置单机模式（主节点可调度Pod）"
+    fi
+
+    # 清理临时文件
+    rm -f "$kubeadm_config_file"
+
+    log_success "Kubernetes集群初始化完成"
+}
+
+# ============================================================================
+# 安装网络插件
+# ============================================================================
+install_network_addon() {
+    log_step "安装网络插件: $NETWORK_PLUGIN"
+
+    case $NETWORK_PLUGIN in
+        flannel)
+            install_flannel
+            ;;
+        calico)
+            install_calico
+            ;;
+        cilium)
+            install_cilium
+            ;;
+        *)
+            log_error "不支持的网络插件: $NETWORK_PLUGIN"
+            exit 1
+            ;;
+    esac
+}
+
+# 安装Flannel
+install_flannel() {
+    log_info "安装Flannel网络插件..."
+
+    kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+    # 等待网络插件就绪
+    wait_for_pods "kube-system" "app=flannel"
+    log_success "Flannel安装完成"
+}
+
+# 安装Calico
+install_calico() {
+    log_info "安装Calico网络插件..."
+
+    kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/tigera-operator.yaml
+    kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/custom-resources.yaml
+
+    # 等待网络插件就绪
+    wait_for_pods "calico-system"
+    log_success "Calico安装完成"
+}
+
+# 安装Cilium
+install_cilium() {
+    log_info "安装Cilium网络插件..."
+
+    curl -L --remote-name-all https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz
+    sudo tar xzvfC cilium-linux-amd64.tar.gz /usr/local/bin
+
+    cilium install
+
+    # 等待网络插件就绪
+    cilium status --wait
+    log_success "Cilium安装完成"
+}
+
+# ============================================================================
+# 工作节点加入集群
+# ============================================================================
+join_worker_node() {
+    log_step "工作节点加入集群"
+
+    if [[ -z "$JOIN_TOKEN" ]] || [[ -z "$JOIN_HASH" ]]; then
+        log_error "加入集群需要token和hash参数"
+        exit 1
+    fi
+
+    local join_args=(
+        "$MASTER_IP:6443"
+        "--token" "$JOIN_TOKEN"
+        "--discovery-token-ca-cert-hash" "$JOIN_HASH"
+    )
+
+    if [[ "$SKIP_PREFLIGHT" == true ]]; then
+        join_args+=("--skip-phases=preflight")
+    fi
+
+    kubeadm join "${join_args[@]}"
+
+    log_success "工作节点加入集群完成"
+}
+
+# ============================================================================
+# 工具函数
+# ============================================================================
+
+# 等待Pod就绪
+wait_for_pods() {
+    local namespace=$1
+    local selector=${2:-""}
+    local timeout=300
+    local interval=5
+    local elapsed=0
+
+    log_info "等待 $namespace 命名空间下的Pod就绪..."
+
+    while [[ $elapsed -lt $timeout ]]; do
+        if kubectl get pods -n "$namespace" ${selector:+-l $selector} --field-selector=status.phase=Running | grep -q Running; then
+            return 0
+        fi
+        sleep $interval
+        elapsed=$((elapsed + interval))
+        log_info "等待中... ${elapsed}/${timeout}秒"
+    done
+
+    log_error "Pod就绪超时"
+    return 1
+}
+
+# ============================================================================
+# 主执行流程
+# ============================================================================
+main() {
+    log_step "开始Kubernetes集群部署"
+    log_info "集群模式: $CLUSTER_MODE"
+    log_info "Kubernetes版本: $K8S_VERSION"
+    log_info "容器运行时: $CONTAINER_RUNTIME"
+    log_info "网络插件: $NETWORK_PLUGIN"
+
+    # 执行部署流程
+    check_privileges
+    parse_arguments "$@"
+    validate_arguments
+    detect_environment
+    preflight_checks
+
+    if [[ "$DRY_RUN" == true ]]; then
+        log_info "干运行模式结束"
+        return 0
+    fi
+
+    configure_system
+    install_container_runtime
+
+    if [[ "$CLUSTER_MODE" != "worker" ]]; then
+        install_k8s_components
+        init_kubernetes_cluster
+        install_network_addon
+        verify_cluster_status
+    else
+        install_k8s_components
+        join_worker_node
+    fi
+
+    show_deployment_summary
+}
+
+# ============================================================================
+# 验证集群状态
+# ============================================================================
+verify_cluster_status() {
+    log_step "验证集群状态"
+
+    log_info "检查节点状态..."
+    kubectl get nodes
+
+    log_info "检查系统Pod状态..."
+    kubectl get pods -n kube-system
+
+    log_info "集群信息:"
+    kubectl cluster-info
+
+    log_success "集群状态验证完成"
+}
+
+# ============================================================================
+# 显示部署摘要
+# ============================================================================
+show_deployment_summary() {
+    log_step "部署摘要"
+
+    cat << EOF
+
+${GREEN}🎉 Kubernetes集群部署成功！${NC}
+
+${BOLD}部署信息:${NC}
+  集群模式: $CLUSTER_MODE
+  Kubernetes版本: $K8S_VERSION
+  容器运行时: $CONTAINER_RUNTIME
+  网络插件: $NETWORK_PLUGIN
+
+${BOLD}访问配置:${NC}
+  配置文件: $HOME/.kube/config
+  使用命令: kubectl get nodes
+
+EOF
+
+    if [[ "$CLUSTER_MODE" != "worker" ]]; then
+        # 显示加入集群命令
+        local join_command=$(kubeadm token create --print-join-command 2>/dev/null || echo "无法生成加入命令")
+        cat << EOF
+${BOLD}工作节点加入命令:${NC}
+  $join_command
+
+${YELLOW}提示:${NC}
+  1. 在工作节点上运行上述加入命令
+  2. 使用 'kubectl get nodes' 查看节点状态
+
+EOF
+    fi
+
+    log_info "日志文件: $LOG_FILE"
+}
+
+# ============================================================================
+# 脚本入口点
+# ============================================================================
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    # 设置信号处理
+    trap 'log_error "脚本被用户中断"; exit 130' INT
+    trap 'log_error "脚本终止"; exit 143' TERM
+
+    # 执行主函数
+    main "$@"
+
+    # 记录完成时间
+    log_info "脚本执行完成于: $(date)"
+fi
