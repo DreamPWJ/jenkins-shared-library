@@ -15,7 +15,7 @@ BLUE='\033[0;36m'
 NC='\033[0m'
 
 # 配置变量
-MICROK8S_CHANNEL=${MICROK8S_CHANNEL:-"1.28/stable"}  # 版本通道
+MICROK8S_CHANNEL=${MICROK8S_CHANNEL:-"1.35/stable"}  # 版本通道
 CLUSTER_MODE=${CLUSTER_MODE:-"single"}  # single or cluster
 NODE_ROLE=${NODE_ROLE:-"master"}  # master or worker
 ENABLE_HA=${ENABLE_HA:-"no"}  # 是否启用高可用
@@ -320,13 +320,10 @@ MicroK8s 可用版本通道:
   - latest/edge      (最新开发版)
 
 特定版本:
-  - 1.31/stable      (Kubernetes 1.31)
-  - 1.30/stable      (Kubernetes 1.30)
+  - 1.35/stable      (Kubernetes 1.35)
   - 1.29/stable      (Kubernetes 1.29)
   - 1.28/stable      (Kubernetes 1.28)
-  - 1.27/stable      (Kubernetes 1.27)
-  - 1.26/stable      (Kubernetes 1.26)
-  - 1.25/stable      (Kubernetes 1.25)
+
 
 查看完整列表: snap info microk8s
 ========================================
@@ -385,7 +382,7 @@ show_usage() {
 使用说明:
 ========================================
 环境变量:
-  MICROK8S_CHANNEL - MicroK8s 版本通道 (默认: 1.28/stable)
+  MICROK8S_CHANNEL - MicroK8s 版本通道 (默认: 1.35/stable)
                      示例: 1.29/stable, 1.30/stable, latest/stable
   CLUSTER_MODE     - 集群模式 single/cluster (默认: single)
   NODE_ROLE        - 节点角色 master/worker (默认: master)
