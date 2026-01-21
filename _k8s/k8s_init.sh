@@ -14,7 +14,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 # 配置变量
-K8S_VERSION=${K8S_VERSION:-"1.33.0"}
+K8S_VERSION=${K8S_VERSION:-"1.35.0"}
 CONTAINER_RUNTIME=${CONTAINER_RUNTIME:-"containerd"}  # containerd or docker
 POD_NETWORK_CIDR=${POD_NETWORK_CIDR:-"10.244.0.0/16"}
 SERVICE_CIDR=${SERVICE_CIDR:-"10.96.0.0/12"}
@@ -435,7 +435,8 @@ nodeRegistration:
   criSocket: unix:///var/run/containerd/containerd.sock
 EOF
     fi
-    
+
+    log_info "kubeadm初始化K8S"
     kubeadm init --config=$INIT_CONFIG --upload-certs
     
     # 配置 kubectl
@@ -489,7 +490,7 @@ show_usage() {
 使用说明:
 ========================================
 环境变量:
-  K8S_VERSION       - K8s 版本 (默认: 1.33.0)
+  K8S_VERSION       - K8s 版本 (默认: 1.35.0)
   CONTAINER_RUNTIME - 容器运行时 containerd/docker (默认: containerd)
   POD_NETWORK_CIDR  - Pod 网络 CIDR (默认: 10.244.0.0/16)
   SERVICE_CIDR      - Service CIDR (默认: 10.96.0.0/12)
@@ -498,6 +499,9 @@ show_usage() {
   USE_MIRROR        - 使用镜像源 auto/yes/no (默认: auto)
 
 使用示例:
+  # 检查关键端口
+  netstat -tunlp | grep -E '6443|10259|10257|10250|2379|2380'
+
   # 单机模式部署 K8s
   sudo ./k8s_init.sh
   
