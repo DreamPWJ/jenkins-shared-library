@@ -113,7 +113,7 @@ EOF
 
 # 安装依赖包
 install_dependencies() {
-    log_info "安装依赖包..."
+    log_info "安装Kubernetes依赖包..."
     
     case $OS in
         ubuntu|debian)
@@ -149,7 +149,6 @@ install_containerd() {
                 esac
 
             # 验证 CRI 接口
-            log_info "验证 CRI 接口..."
             if ! crictl version > /dev/null 2>&1; then
                 log_error "CRI 接口验证失败，containerd 配置有问题"
                 log_info "开始启用CRI插件配置..."
@@ -172,7 +171,7 @@ install_containerd() {
 
             return 0
         else
-            log_warn "containerd 已安装但未运行,将重新配置"
+            log_warn "containerd 已安装但未运行, 将重新配置"
         fi
     fi
     
@@ -350,7 +349,7 @@ install_k8s_tools() {
         local CURRENT_VERSION=$(kubeadm version -o short 2>/dev/null | sed 's/v//')
         log_info "检测到 Kubernetes 工具已安装,版本: $CURRENT_VERSION"
         if [ "$CURRENT_VERSION" = "$K8S_VERSION" ]; then
-            log_info "K8s版本匹配, 跳过安装"
+            log_info "K8s已安装版本匹配, 跳过安装"
             return 0
         else
             log_warn "版本不匹配(当前: $CURRENT_VERSION, 目标: $K8S_VERSION),将重新安装"
