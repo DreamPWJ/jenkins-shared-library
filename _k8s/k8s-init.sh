@@ -2,13 +2,13 @@
 # Author: 潘维吉
 # Description: Kubernetes集群自动化部署脚本 kubeadm支持单机模式和多机模式的Kubernetes集群部署
 # 赋予执行权限
-#chmod +x k8s-deploy.sh
+#chmod +x k8s-init.sh
 # 单机部署（默认）
-#./k8s-deploy.sh --single
+#./k8s-init.sh --single
 # 多机部署（需要指定主节点IP）
-#./k8s-deploy.sh --multi 192.168.1.100
+#./k8s-init.sh --multi 192.168.1.100
 # 指定Kubernetes版本
-#./k8s-deploy.sh --single --version 1.35.0
+#./k8s-init.sh --single --version 1.35.0
 
 
 set -e  # 遇到错误立即退出
