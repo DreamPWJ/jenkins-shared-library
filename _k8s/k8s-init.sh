@@ -7,7 +7,7 @@
 # 使用示例:
 # chmod +x k8s-init.sh
 
-# 单机部署（默认使用containerd）:
+# 单机部署（默认使用containerd）尝试运行 --dry-run :
 # ./k8s-init.sh --mode single
 #
 # 多机部署 - 主节点:
@@ -104,7 +104,11 @@ show_progress() {
 # 错误处理和清理
 # ============================================================================
 cleanup() {
-    local exit_code=$?
+ local exit_code=$?
+
+    # 清理临时文件
+    rm -f /tmp/kubeadm-*.yaml /tmp/kubeadm-*.yaml.bak 2>/dev/null || true
+
     if [ $exit_code -ne 0 ]; then
         log_error "脚本执行失败，退出码: $exit_code"
         log_warn "日志文件位置: $LOG_FILE"
@@ -799,67 +803,32 @@ init_kubernetes_cluster() {
         return
     fi
 
-    # 创建kubeadm配置文件 - 使用最新的API版本
-    local kubeadm_config_file="/tmp/kubeadm-config-$(date +%s).yaml"
+    # 安装yq工具
+    install_yq
 
-    # 根据Kubernetes版本选择合适的API版本
-    local api_version="kubeadm.k8s.io/v1beta4"
+    # 设置镜像仓库
+    setup_image_repositories
 
-    # 检查Kubernetes版本，如果版本较低则使用兼容的API版本
-    local major_version=$(echo $K8S_VERSION | cut -d'.' -f1)
-    local minor_version=$(echo $K8S_VERSION | cut -d'.' -f2)
+    # 生成正确的kubeadm配置
+    local kubeadm_config_file
+    kubeadm_config_file=$(generate_proper_kubeadm_config)
 
-    if [[ $major_version -eq 1 ]] && [[ $minor_version -lt 27 ]]; then
-        api_version="kubeadm.k8s.io/v1beta3"
-        log_info "Kubernetes版本较低 ($K8S_VERSION)，使用v1beta3 API"
-    else
-        log_info "使用最新的v1beta4 API"
-    fi
-
-    cat > "$kubeadm_config_file" << EOF
-apiVersion: $api_version
-kind: InitConfiguration
-localAPIEndpoint:
-  advertiseAddress: ${APISERVER_ADVERTISE_ADDRESS}
-  bindPort: 6443
-nodeRegistration:
-  criSocket: unix:///var/run/containerd/containerd.sock
-  kubeletExtraArgs:
-    cgroup-driver: systemd
----
-apiVersion: $api_version
-kind: ClusterConfiguration
-kubernetesVersion: v${K8S_VERSION}
-controlPlaneEndpoint: "${CONTROL_PLANE_ENDPOINT:-${APISERVER_ADVERTISE_ADDRESS}:6443}"
-imageRepository: "${IMAGE_REPOSITORY}"
-networking:
-  serviceSubnet: "${SERVICE_CIDR}"
-  podSubnet: "${POD_NETWORK_CIDR}"
-  dnsDomain: cluster.local
-apiServer:
-  extraArgs:
-    enable-admission-plugins: "NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
-controllerManager:
-  extraArgs:
-    node-cidr-mask-size: "24"
-scheduler:
-  extraArgs: {}
-EOF
-
-    log_info "使用kubeadm配置文件: $kubeadm_config_file (API版本: $api_version)"
-
-    # 验证配置文件
-    if ! kubeadm config validate --config="$kubeadm_config_file"; then
-        log_error "kubeadm配置文件验证失败"
-        log_info "尝试使用kubeadm内置配置生成..."
-        kubeadm_config_file=$(generate_kubeadm_config_dynamically)
+    # 验证配置文件语法
+    if ! python3 -c "import yaml; yaml.safe_load(open('$kubeadm_config_file'))" 2>/dev/null; then
+        log_error "配置文件语法错误"
+        log_info "使用kubeadm内置配置生成..."
+        kubeadm_config_file=$(generate_simple_kubeadm_config)
     fi
 
     # 拉取Kubernetes镜像
     log_info "拉取Kubernetes镜像..."
-    if ! kubeadm config images pull --config="$kubeadm_config_file"; then
+    if ! kubeadm config images pull --config="$kubeadm_config_file" 2>&1 | tee -a "$LOG_FILE"; then
         log_warn "镜像拉取失败，尝试使用备用镜像仓库"
-        try_alternative_image_repos "$kubeadm_config_file"
+        if ! try_alternative_image_repos "$kubeadm_config_file"; then
+            log_error "镜像拉取完全失败"
+            handle_image_pull_failure
+            return 1
+        fi
     fi
 
     # 初始化集群
@@ -870,14 +839,12 @@ EOF
         init_args+=("--ignore-preflight-errors=all")
     fi
 
-    if [[ "$OFFLINE_MODE" == true ]]; then
-        init_args+=("--upload-certs")
-    fi
-
-    if kubeadm init "${init_args[@]}"; then
+    local init_output
+    if init_output=$(kubeadm init "${init_args[@]}" 2>&1 | tee -a "$LOG_FILE"); then
         log_success "集群初始化成功"
     else
         log_error "集群初始化失败"
+        log_info "详细错误: $init_output"
         handle_init_failure
         return 1
     fi
@@ -891,9 +858,34 @@ EOF
     fi
 
     # 清理临时文件
-    rm -f "$kubeadm_config_file"
+    rm -f "$kubeadm_config_file" "$kubeadm_config_file.bak" 2>/dev/null || true
 
     log_success "Kubernetes集群初始化完成"
+}
+
+# 简化配置生成（备用方案）
+generate_simple_kubeadm_config() {
+    local config_file="/tmp/kubeadm-simple-$(date +%s).yaml"
+
+    cat > "$config_file" << EOF
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: ${APISERVER_ADVERTISE_ADDRESS}
+  bindPort: 6443
+nodeRegistration:
+  criSocket: unix:///var/run/containerd/containerd.sock
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+kubernetesVersion: v${K8S_VERSION}
+controlPlaneEndpoint: "${CONTROL_PLANE_ENDPOINT:-${APISERVER_ADVERTISE_ADDRESS}:6443}"
+networking:
+  serviceSubnet: "${SERVICE_CIDR}"
+  podSubnet: "${POD_NETWORK_CIDR}"
+EOF
+
+    echo "$config_file"
 }
 
 # 动态生成kubeadm配置
@@ -902,14 +894,6 @@ generate_kubeadm_config_dynamically() {
 
     # 使用kubeadm打印默认配置作为基础
     kubeadm config print init-defaults > "$temp_file"
-
-    if [[ "$OS" == "ubuntu" ]]; then
-      # 适用于 Ubuntu/Debian
-       sudo apt update && sudo apt install -y yq
-    elif [[ "$OS" == "centos" ]]; then
-       # 适用于 CentOS/RHEL/Fedora
-       sudo yum install -y yq  # 或者使用 dnf: sudo dnf install -y yq
-    fi
 
     # 修改关键配置项
     yq eval ".apiVersion = \"kubeadm.k8s.io/v1beta4\"" -i "$temp_file"
@@ -948,19 +932,220 @@ enable_master_scheduling() {
 
 # 处理初始化失败
 handle_init_failure() {
-    log_error "集群初始化失败，请检查以下内容："
-    log_info "1. 查看详细日志: journalctl -xeu kubelet"
-    log_info "2. 检查网络连接和防火墙设置"
-    log_info "3. 验证容器运行时状态"
-    log_info "4. 尝试重置后重新初始化: kubeadm reset -f"
+    log_error "集群初始化失败，正在诊断问题..."
 
-    # 提供重置选项
+    # 检查系统日志
+    log_info "检查kubelet日志:"
+    journalctl -u kubelet --no-pager -l --lines=10 | tee -a "$LOG_FILE" || true
+
+    # 检查容器运行时
+    log_info "检查容器运行时状态:"
+    systemctl status containerd --no-pager -l | tee -a "$LOG_FILE" || true
+
+    # 检查网络连接
+    log_info "检查网络连接:"
+    ping -c 2 8.8.8.8 | tee -a "$LOG_FILE" || true
+
+    log_info "建议的排查步骤:"
+    log_info "1. 检查网络连接和DNS配置"
+    log_info "2. 验证容器运行时状态: systemctl status containerd"
+    log_info "3. 检查防火墙和SELinux设置"
+    log_info "4. 查看详细日志: journalctl -u kubelet -f"
+    log_info "5. 重置环境: kubeadm reset -f"
+
     read -p "是否立即重置集群？(y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         kubeadm reset -f
         log_info "集群已重置"
     fi
+}
+
+# 安装yq工具
+install_yq() {
+    if command -v yq &>/dev/null; then
+        log_info "yq已安装: $(yq --version)"
+        return 0
+    fi
+
+    log_info "安装yq工具..."
+
+    local yq_version="v4.35.2"
+    local yq_binary="yq_linux_amd64"
+
+    # 下载yq
+    if wget -q "https://github.com/mikefarah/yq/releases/download/${yq_version}/${yq_binary}" -O /usr/local/bin/yq; then
+        chmod +x /usr/local/bin/yq
+        log_success "yq安装成功"
+    else
+        # 备用安装方法
+        if [[ "$OS" == "ubuntu" ]]; then
+            sudo snap install yq || apt-get install -y yq
+        elif [[ "$OS" == "centos" ]]; then
+            yum install -y yq || dnf install -y yq
+        fi
+    fi
+
+    # 验证安装
+    if command -v yq &>/dev/null; then
+        log_success "yq工具就绪: $(yq --version)"
+    else
+        log_error "yq安装失败，将使用备用配置方法"
+        return 1
+    fi
+}
+
+# kubeadm配置文件的API格式
+generate_proper_kubeadm_config() {
+    local config_file="/tmp/kubeadm-proper-$(date +%s).yaml"
+
+    # 根据Kubernetes版本选择合适的API版本
+    local major_version=$(echo $K8S_VERSION | cut -d'.' -f1)
+    local minor_version=$(echo $K8S_VERSION | cut -d'.' -f2)
+    local api_version="kubeadm.k8s.io/v1beta4"
+
+    if [[ $major_version -eq 1 ]] && [[ $minor_version -lt 27 ]]; then
+        api_version="kubeadm.k8s.io/v1beta3"
+    fi
+
+    log_info "生成kubeadm配置文件 (API: $api_version)"
+
+    # 创建符合API规范的配置文件
+    cat > "$config_file" << EOF
+apiVersion: $api_version
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: ${APISERVER_ADVERTISE_ADDRESS}
+  bindPort: 6443
+nodeRegistration:
+  criSocket: unix:///var/run/containerd/containerd.sock
+  kubeletExtraArgs:
+    cgroup-driver: systemd
+---
+apiVersion: $api_version
+kind: ClusterConfiguration
+kubernetesVersion: v${K8S_VERSION}
+controlPlaneEndpoint: "${CONTROL_PLANE_ENDPOINT:-${APISERVER_ADVERTISE_ADDRESS}:6443}"
+imageRepository: "${PRIMARY_IMAGE_REPO}"
+networking:
+  serviceSubnet: "${SERVICE_CIDR}"
+  podSubnet: "${POD_NETWORK_CIDR}"
+  dnsDomain: cluster.local
+# 注意：extraArgs的正确格式是简单的key-value对，不是数组
+apiServer:
+  extraArgs:
+    enable-admission-plugins: "NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
+    allow-privileged: "true"
+controllerManager:
+  extraArgs:
+    node-cidr-mask-size: "24"
+    allocate-node-cidrs: "true"
+scheduler:
+  extraArgs:
+    address: "0.0.0.0"
+    port: "10251"
+EOF
+
+    echo "$config_file"
+}
+
+# 实现完整的镜像仓库重试逻辑
+setup_image_repositories() {
+    log_info "配置镜像仓库..."
+
+    # 定义镜像仓库列表（按优先级排序）
+    IMAGE_REPOSITORIES=(
+        "registry.aliyuncs.com/google_containers"
+        "registry.cn-hangzhou.aliyuncs.com/google_containers"
+        "docker.io/google_containers"
+        "k8s.gcr.io"
+    )
+
+    # 设置主仓库
+    if [[ -n "$IMAGE_REPOSITORY" ]]; then
+        PRIMARY_IMAGE_REPO="$IMAGE_REPOSITORY"
+    else
+        PRIMARY_IMAGE_REPO="${IMAGE_REPOSITORIES[0]}"
+    fi
+
+    # 设置备用仓库
+    ALTERNATIVE_REPOS=()
+    for repo in "${IMAGE_REPOSITORIES[@]}"; do
+        if [[ "$repo" != "$PRIMARY_IMAGE_REPO" ]]; then
+            ALTERNATIVE_REPOS+=("$repo")
+        fi
+    done
+
+    log_info "主镜像仓库: $PRIMARY_IMAGE_REPO"
+    log_info "备用仓库: ${ALTERNATIVE_REPOS[*]}"
+}
+
+handle_image_pull_failure() {
+    log_error "镜像拉取失败处理"
+
+    log_info "尝试手动拉取镜像..."
+
+    # 定义需要拉取的镜像列表
+    local images=(
+        "kube-apiserver:v${K8S_VERSION}"
+        "kube-controller-manager:v${K8S_VERSION}"
+        "kube-scheduler:v${K8S_VERSION}"
+        "kube-proxy:v${K8S_VERSION}"
+        "pause:3.9"
+        "etcd:3.5.12-0"
+        "coredns:v1.11.1"  # 注意：这个版本需要根据K8s版本调整
+    )
+
+    for image in "${images[@]}"; do
+        for repo in "${IMAGE_REPOSITORIES[@]}"; do
+            local full_image="$repo/$image"
+            log_info "尝试拉取: $full_image"
+            if ctr images pull "$full_image" 2>/dev/null; then
+                log_success "拉取成功: $full_image"
+                break
+            fi
+        done
+    done
+
+    log_info "手动拉取完成，请重新运行初始化"
+}
+
+try_alternative_image_repos() {
+    local config_file=$1
+    local original_repo="$PRIMARY_IMAGE_REPO"
+
+    log_warn "主仓库拉取失败，尝试备用仓库..."
+
+    for repo in "${ALTERNATIVE_REPOS[@]}"; do
+        log_info "尝试仓库: $repo"
+
+        # 临时修改配置文件中的镜像仓库
+        sed -i.bak "s|imageRepository:.*|imageRepository: \"$repo\"|" "$config_file"
+
+        if kubeadm config images pull --config="$config_file" 2>/dev/null; then
+            log_success "从备用仓库拉取成功: $repo"
+            # 更新主仓库为成功的仓库
+            PRIMARY_IMAGE_REPO="$repo"
+            return 0
+        fi
+
+        # 恢复原始配置
+        mv "$config_file.bak" "$config_file"
+    done
+
+    # 如果所有仓库都失败，尝试不使用自定义仓库
+    log_warn "所有自定义仓库失败，尝试使用默认仓库"
+    sed -i.bak "s|imageRepository:.*||" "$config_file"
+
+    if kubeadm config images pull --config="$config_file" 2>/dev/null; then
+        log_success "从默认仓库拉取成功"
+        return 0
+    fi
+
+    # 恢复原始配置
+    mv "$config_file.bak" "$config_file"
+    log_error "所有镜像仓库尝试均失败"
+    return 1
 }
 
 # ============================================================================
