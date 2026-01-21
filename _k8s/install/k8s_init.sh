@@ -135,7 +135,18 @@ install_containerd() {
     if command -v containerd >/dev/null 2>&1; then
         log_info "检测到 containerd 已安装,版本: $(containerd --version | awk '{print $3}')"
         if systemctl is-active --quiet containerd; then
-            log_info "containerd 服务正在运行,跳过安装"
+            log_info "containerd 服务正在运行,跳过安装,并升级到最新版本"
+                case $OS in
+                    ubuntu|debian)
+                       sudo apt install --only-upgrade containerd.io
+                        ;;
+                    centos|rhel)
+                        sudo yum update containerd.io
+                        ;;
+                    *)
+                        log_error "不支持的操作系统: $OS"
+                        ;;
+                    esac
             return 0
         else
             log_warn "containerd 已安装但未运行,将重新配置"
@@ -407,7 +418,7 @@ init_master() {
     if detect_network; then
         log_info "配置使用阿里云镜像仓库..."
         cat <<EOF > $INIT_CONFIG
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
 kubernetesVersion: v${K8S_VERSION}
 imageRepository: registry.cn-hangzhou.aliyuncs.com/google_containers
@@ -415,21 +426,21 @@ networking:
   podSubnet: ${POD_NETWORK_CIDR}
   serviceSubnet: ${SERVICE_CIDR}
 ---
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: InitConfiguration
 nodeRegistration:
   criSocket: unix:///var/run/containerd/containerd.sock
 EOF
     else
         cat <<EOF > $INIT_CONFIG
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
 kubernetesVersion: v${K8S_VERSION}
 networking:
   podSubnet: ${POD_NETWORK_CIDR}
   serviceSubnet: ${SERVICE_CIDR}
 ---
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: InitConfiguration
 nodeRegistration:
   criSocket: unix:///var/run/containerd/containerd.sock
