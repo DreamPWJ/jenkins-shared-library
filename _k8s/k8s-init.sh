@@ -903,8 +903,10 @@ generate_kubeadm_config_dynamically() {
     # 使用kubeadm打印默认配置作为基础
     kubeadm config print init-defaults > "$temp_file"
 
-    # 适用于 Ubuntu/Debian CentOS/RHEL/Fedora
-    $PKG_MANAGER  install -y yq || true
+    # 适用于 Ubuntu/Debian
+    sudo apt update || true && sudo apt install -y yq || true
+    # 适用于 CentOS/RHEL/Fedora
+    sudo yum install -y yq || true # 或者使用 dnf: sudo dnf install -y yq
     # 修改关键配置项
     yq eval ".apiVersion = \"kubeadm.k8s.io/v1beta4\"" -i "$temp_file"
     yq eval ".kubernetesVersion = \"v${K8S_VERSION}\"" -i "$temp_file"
