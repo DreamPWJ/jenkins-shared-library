@@ -199,43 +199,6 @@ setup_user_permissions() {
     log_info "已配置 kubectl 别名 (重新登录后生效)"
 }
 
-# 配置 snap 国内镜像源
-configure_snap_mirror() {
-    log_step "配置 snap 国内镜像源..."
-
-    # 检测是否在国内网络环境
-    if ! curl -m 5 -s https://www.google.com > /dev/null 2>&1; then
-        log_info "检测到国内网络环境,配置清华大学镜像源..."
-
-        # 停止 snapd 服务
-        systemctl stop snapd.socket snapd.service
-
-        # 修改 snapd 配置使用国内镜像
-        mkdir -p /etc/systemd/system/snapd.service.d/
-        cat > /etc/systemd/system/snapd.service.d/override.conf <<EOF
-[Service]
-Environment="https_proxy=http://mirrors.tuna.tsinghua.edu.cn/snap-proxy/"
-EOF
-
-        # 或者使用中科大镜像
-        # cat > /etc/systemd/system/snapd.service.d/override.conf <<EOF
-# [Service]
-# Environment="https_proxy=http://mirrors.ustc.edu.cn/snap-proxy/"
-# EOF
-
-        # 重新加载并启动服务
-        systemctl daemon-reload
-        systemctl start snapd.socket snapd.service
-
-        # 等待服务就绪
-        sleep 3
-
-        log_info "snap 镜像源配置完成 (清华大学)"
-    else
-        log_info "网络正常,使用官方源"
-    fi
-}
-
 # 启用插件
 enable_addons() {
     log_step "启用 MicroK8s 插件..."
@@ -472,7 +435,6 @@ main() {
     check_root
     detect_os
     install_snap
-    configure_snap_mirror
     system_init
     install_microk8s
     setup_user_permissions
