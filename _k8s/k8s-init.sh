@@ -37,7 +37,7 @@ MASTER_IP=""                             # 主节点IP（worker模式必需）
 JOIN_TOKEN=""                            # 加入令牌（worker模式必需）
 JOIN_HASH=""                             # CA证书哈希（worker模式必需）
 CONTROL_PLANE_ENDPOINT=""                # 控制平面端点（高可用）
-IMAGE_REPOSITORY="registry.aliyuncs.com/google_containers"  # 镜像仓库
+IMAGE_REPOSITORY="registry.aliyuncs.com/google_containers k8s.gcr.io docker.io/google_containers"  # 镜像仓库
 LOG_FILE="/var/log/k8s-init-$(date +%Y%m%d-%H%M%S).log"
 DRY_RUN=false                            # 干运行模式
 SKIP_PREFLIGHT=false                     # 跳过预检查
@@ -799,11 +799,25 @@ init_kubernetes_cluster() {
         return
     fi
 
-    # 创建kubeadm配置文件
+    # 创建kubeadm配置文件 - 使用最新的API版本
     local kubeadm_config_file="/tmp/kubeadm-config-$(date +%s).yaml"
 
+    # 根据Kubernetes版本选择合适的API版本
+    local api_version="kubeadm.k8s.io/v1beta4"
+
+    # 检查Kubernetes版本，如果版本较低则使用兼容的API版本
+    local major_version=$(echo $K8S_VERSION | cut -d'.' -f1)
+    local minor_version=$(echo $K8S_VERSION | cut -d'.' -f2)
+
+    if [[ $major_version -eq 1 ]] && [[ $minor_version -lt 27 ]]; then
+        api_version="kubeadm.k8s.io/v1beta3"
+        log_info "Kubernetes版本较低 ($K8S_VERSION)，使用v1beta3 API"
+    else
+        log_info "使用最新的v1beta4 API"
+    fi
+
     cat > "$kubeadm_config_file" << EOF
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: $api_version
 kind: InitConfiguration
 localAPIEndpoint:
   advertiseAddress: ${APISERVER_ADVERTISE_ADDRESS}
@@ -813,7 +827,7 @@ nodeRegistration:
   kubeletExtraArgs:
     cgroup-driver: systemd
 ---
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: $api_version
 kind: ClusterConfiguration
 kubernetesVersion: v${K8S_VERSION}
 controlPlaneEndpoint: "${CONTROL_PLANE_ENDPOINT:-${APISERVER_ADVERTISE_ADDRESS}:6443}"
@@ -822,39 +836,123 @@ networking:
   serviceSubnet: "${SERVICE_CIDR}"
   podSubnet: "${POD_NETWORK_CIDR}"
   dnsDomain: cluster.local
+apiServer:
+  extraArgs:
+    enable-admission-plugins: "NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
+controllerManager:
+  extraArgs:
+    node-cidr-mask-size: "24"
+scheduler:
+  extraArgs: {}
 EOF
 
-    log_info "使用kubeadm配置文件: $kubeadm_config_file"
+    log_info "使用kubeadm配置文件: $kubeadm_config_file (API版本: $api_version)"
+
+    # 验证配置文件
+    if ! kubeadm config validate --config="$kubeadm_config_file"; then
+        log_error "kubeadm配置文件验证失败"
+        log_info "尝试使用kubeadm内置配置生成..."
+        kubeadm_config_file=$(generate_kubeadm_config_dynamically)
+    fi
 
     # 拉取Kubernetes镜像
     log_info "拉取Kubernetes镜像..."
-    kubeadm config images pull --config="$kubeadm_config_file"
+    if ! kubeadm config images pull --config="$kubeadm_config_file"; then
+        log_warn "镜像拉取失败，尝试使用备用镜像仓库"
+        try_alternative_image_repos "$kubeadm_config_file"
+    fi
 
     # 初始化集群
     log_info "开始初始化集群..."
 
     local init_args=("--config" "$kubeadm_config_file")
     if [[ "$SKIP_PREFLIGHT" == true ]]; then
-        init_args+=("--skip-phases=preflight")
+        init_args+=("--ignore-preflight-errors=all")
     fi
 
-    kubeadm init "${init_args[@]}"
+    if [[ "$OFFLINE_MODE" == true ]]; then
+        init_args+=("--upload-certs")
+    fi
+
+    if kubeadm init "${init_args[@]}"; then
+        log_success "集群初始化成功"
+    else
+        log_error "集群初始化失败"
+        handle_init_failure
+        return 1
+    fi
 
     # 配置kubectl
-    mkdir -p $HOME/.kube
-    cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-    chown $(id -u):$(id -g) $HOME/.kube/config
+    setup_kubectl_config
 
     # 单机模式：移除主节点的污点，允许调度Pod
     if [[ "$CLUSTER_MODE" == "single" ]]; then
-        kubectl taint nodes --all node-role.kubernetes.io/control-plane- || true
-        log_info "已配置单机模式（主节点可调度Pod）"
+        enable_master_scheduling
     fi
 
     # 清理临时文件
     rm -f "$kubeadm_config_file"
 
     log_success "Kubernetes集群初始化完成"
+}
+
+# 动态生成kubeadm配置
+generate_kubeadm_config_dynamically() {
+    local temp_file="/tmp/kubeadm-dynamic-$(date +%s).yaml"
+
+    # 使用kubeadm打印默认配置作为基础
+    kubeadm config print init-defaults > "$temp_file"
+
+    # 修改关键配置项
+    yq eval ".apiVersion = \"kubeadm.k8s.io/v1beta4\"" -i "$temp_file"
+    yq eval ".kubernetesVersion = \"v${K8S_VERSION}\"" -i "$temp_file"
+    yq eval ".controlPlaneEndpoint = \"${CONTROL_PLANE_ENDPOINT:-${APISERVER_ADVERTISE_ADDRESS}:6443}\"" -i "$temp_file"
+    yq eval ".imageRepository = \"${IMAGE_REPOSITORY}\"" -i "$temp_file"
+    yq eval ".networking.serviceSubnet = \"${SERVICE_CIDR}\"" -i "$temp_file"
+    yq eval ".networking.podSubnet = \"${POD_NETWORK_CIDR}\"" -i "$temp_file"
+    yq eval ".networking.dnsDomain = \"cluster.local\"" -i "$temp_file"
+
+    echo "$temp_file"
+}
+
+# 设置kubectl配置
+setup_kubectl_config() {
+    mkdir -p $HOME/.kube
+    if [[ -f /etc/kubernetes/admin.conf ]]; then
+        cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
+        chown $(id -u):$(id -g) $HOME/.kube/config
+        log_success "kubectl配置已设置"
+    else
+        log_warn "admin.conf文件不存在，kubectl配置可能需要手动设置"
+    fi
+}
+
+# 启用主节点调度
+enable_master_scheduling() {
+    if kubectl taint nodes --all node-role.kubernetes.io/control-plane- 2>/dev/null; then
+        log_info "已移除控制平面污点（Kubernetes 1.24+）"
+    elif kubectl taint nodes --all node-role.kubernetes.io/master- 2>/dev/null; then
+        log_info "已移除主节点污点（Kubernetes 1.23及更早版本）"
+    else
+        log_warn "移除污点失败，主节点可能无法调度Pod"
+    fi
+}
+
+# 处理初始化失败
+handle_init_failure() {
+    log_error "集群初始化失败，请检查以下内容："
+    log_info "1. 查看详细日志: journalctl -xeu kubelet"
+    log_info "2. 检查网络连接和防火墙设置"
+    log_info "3. 验证容器运行时状态"
+    log_info "4. 尝试重置后重新初始化: kubeadm reset -f"
+
+    # 提供重置选项
+    read -p "是否立即重置集群？(y/N): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        kubeadm reset -f
+        log_info "集群已重置"
+    fi
 }
 
 # ============================================================================
