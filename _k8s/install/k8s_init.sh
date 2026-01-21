@@ -147,6 +147,29 @@ install_containerd() {
                         log_error "不支持的操作系统: $OS"
                         ;;
                 esac
+
+            # 验证 CRI 接口
+            log_info "验证 CRI 接口..."
+            if ! crictl version > /dev/null 2>&1; then
+                log_error "CRI 接口验证失败，containerd 配置有问题"
+                log_info "开始启用CRI插件配置..."
+                # 1. 停止 containerd
+                sudo systemctl stop containerd
+                # 2. 备份当前配置
+                sudo cp /etc/containerd/config.toml /etc/containerd/config.toml.backup
+                # 3. 生成新的正确配置
+                sudo containerd config default > /etc/containerd/config.toml
+                # 4. 启用 CRI 插件和 systemd cgroup
+                sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
+                # 5. 重启服务
+                sudo systemctl daemon-reload
+                sudo systemctl start containerd
+                # 6. 验证 CRI
+                sudo crictl version
+            else
+                log_info "Containerd CRI 接口验证成功"
+            fi
+
             return 0
         else
             log_warn "containerd 已安装但未运行,将重新配置"
@@ -327,7 +350,7 @@ install_k8s_tools() {
         local CURRENT_VERSION=$(kubeadm version -o short 2>/dev/null | sed 's/v//')
         log_info "检测到 Kubernetes 工具已安装,版本: $CURRENT_VERSION"
         if [ "$CURRENT_VERSION" = "$K8S_VERSION" ]; then
-            log_info "版本匹配,跳过安装"
+            log_info "K8s版本匹配, 跳过安装"
             return 0
         else
             log_warn "版本不匹配(当前: $CURRENT_VERSION, 目标: $K8S_VERSION),将重新安装"
@@ -410,7 +433,7 @@ EOF
 
 # 初始化 Master 节点
 init_master() {
-    log_info "初始化 Master 节点..."
+    log_info "初始化Master节点..."
     
     local INIT_CONFIG="/tmp/kubeadm-config.yaml"
     
