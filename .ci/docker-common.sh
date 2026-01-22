@@ -74,6 +74,9 @@ function is_success_images() {
     sudo cat <<EOF >/etc/docker/daemon.json
 {
 "registry-mirrors": [
+  "https://docker.m.daocloud.io",
+  "https://docker.1ms.run",
+  "https://docker.xuanyuan.me",
   "https://docker.lanneng.tech",
   "https://em1sutsj.mirror.aliyuncs.com"
 ],
