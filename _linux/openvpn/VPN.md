@@ -7,4 +7,5 @@
 
 ####  服务器VPN客户端配置
 
+apt install -y openvpn
 openvpn --config client.ovpn --daemon
