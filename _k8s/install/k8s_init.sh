@@ -14,7 +14,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 # 配置变量
-K8S_VERSION=${K8S_VERSION:-"1.35.0"}
+K8S_VERSION=${K8S_VERSION:-"1.31.0"}
 CONTAINER_RUNTIME=${CONTAINER_RUNTIME:-"containerd"}  # containerd or docker
 POD_NETWORK_CIDR=${POD_NETWORK_CIDR:-"10.244.0.0/16"}
 SERVICE_CIDR=${SERVICE_CIDR:-"10.96.0.0/12"}
@@ -470,7 +470,7 @@ EOF
     fi
 
     log_info "Kubeadm初始化K8s v${K8S_VERSION}版本集群环境..."
-    kubeadm init --config=$INIT_CONFIG --upload-certs
+    kubeadm init --config=$INIT_CONFIG --upload-certs --v=5
     
     # 配置 kubectl
     mkdir -p $HOME/.kube

@@ -15,7 +15,7 @@ BLUE='\033[0;36m'
 NC='\033[0m'
 
 # 配置变量
-MICROK8S_CHANNEL=${MICROK8S_CHANNEL:-"1.35/stable"}  # 版本通道
+MICROK8S_CHANNEL=${MICROK8S_CHANNEL:-"1.31/stable"}  # 版本通道
 CLUSTER_MODE=${CLUSTER_MODE:-"single"}  # single or cluster
 NODE_ROLE=${NODE_ROLE:-"master"}  # master or worker
 ENABLE_HA=${ENABLE_HA:-"no"}  # 是否启用高可用
