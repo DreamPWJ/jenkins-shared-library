@@ -135,40 +135,6 @@ install_containerd() {
     if command -v containerd >/dev/null 2>&1; then
         log_info "检测到 containerd 已安装,版本: $(containerd --version | awk '{print $3}')"
         if systemctl is-active --quiet containerd; then
-#            log_info "containerd 服务正在运行, 跳过安装, 并升级到最新版本"
-#                case $OS in
-#                    ubuntu|debian)
-#                       sudo apt install --only-upgrade containerd.io
-#                        ;;
-#                    centos|rhel)
-#                        sudo yum update containerd.io
-#                        ;;
-#                    *)
-#                        log_error "不支持的操作系统: $OS"
-#                        ;;
-#                esac
-
-            # 验证 CRI 接口
-            if ! crictl version > /dev/null 2>&1; then
-                log_error "CRI 接口验证失败，containerd 配置有问题"
-                log_info "开始启用CRI插件配置..."
-                # 1. 停止 containerd
-                sudo systemctl stop containerd
-                # 2. 备份当前配置
-                sudo cp /etc/containerd/config.toml /etc/containerd/config.toml.backup
-                # 3. 生成新的正确配置
-                sudo containerd config default > /etc/containerd/config.toml
-                # 4. 启用 CRI 插件和 systemd cgroup
-                sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
-                # 5. 重启服务
-                sudo systemctl daemon-reload
-                sudo systemctl start containerd
-                # 6. 验证 CRI
-                sudo crictl version
-            else
-                log_info "Containerd CRI 接口验证成功"
-            fi
-
             return 0
         else
             log_warn "containerd 已安装但未运行, 将重新配置"
