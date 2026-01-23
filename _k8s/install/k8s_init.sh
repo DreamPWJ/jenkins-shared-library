@@ -14,7 +14,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 # 配置变量
-K8S_VERSION=${K8S_VERSION:-"1.31.0"}  # K8s版本 注意系统版本的兼容性
+K8S_VERSION=${K8S_VERSION:-"1.32.0"}  # K8s版本 注意系统版本的兼容性
 CONTAINER_RUNTIME=${CONTAINER_RUNTIME:-"containerd"}  # containerd or docker
 POD_NETWORK_CIDR=${POD_NETWORK_CIDR:-"10.244.0.0/16"}
 SERVICE_CIDR=${SERVICE_CIDR:-"10.96.0.0/12"}

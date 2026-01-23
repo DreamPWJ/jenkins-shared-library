@@ -15,7 +15,7 @@ BLUE='\033[0;36m'
 NC='\033[0m'
 
 # 配置变量
-MICROK8S_CHANNEL=${MICROK8S_CHANNEL:-"1.31/stable"}  # K8s版本通道 注意系统版本的兼容性
+MICROK8S_CHANNEL=${MICROK8S_CHANNEL:-"1.32/stable"}  # K8s版本通道 注意系统版本的兼容性
 CLUSTER_MODE=${CLUSTER_MODE:-"single"}  # single or cluster
 NODE_ROLE=${NODE_ROLE:-"master"}  # master or worker
 ENABLE_HA=${ENABLE_HA:-"no"}  # 是否启用高可用
