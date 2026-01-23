@@ -226,6 +226,17 @@ install_containerd() {
       else
           sed -i "/\[plugins.\"io.containerd.grpc.v1.cri\"\]/a\  sandbox_image = \"$PAUSE_IMAGE\"" "$CONTAINERD_CONFIG"
       fi
+
+    #  配置 registry mirrors（docker.io + registry.k8s.io）
+    cat >> "$CONTAINERD_CONFIG" <<'EOF'
+
+[plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
+  endpoint = ["https://registry.cn-hangzhou.aliyuncs.com"]
+
+[plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.k8s.io"]
+  endpoint = ["https://registry.cn-hangzhou.aliyuncs.com/google_containers"]
+EOF
+
   fi
 
 
