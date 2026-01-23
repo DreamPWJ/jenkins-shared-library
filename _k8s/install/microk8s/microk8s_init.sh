@@ -15,14 +15,16 @@ BLUE='\033[0;36m'
 NC='\033[0m'
 
 # 配置变量
-MICROK8S_CHANNEL=${MICROK8S_CHANNEL:-"1.32/stable"}  # K8s版本通道 注意系统版本的兼容性
-CLUSTER_MODE=${CLUSTER_MODE:-"single"}  # single or cluster
-NODE_ROLE=${NODE_ROLE:-"master"}  # master or worker
-ENABLE_HA=${ENABLE_HA:-"no"}  # 是否启用高可用
-USE_CLASSIC=${USE_CLASSIC:-"yes"}  # 是否使用 classic confinement (推荐)
+MICROK8S_CHANNEL=${MICROK8S_CHANNEL:-"1.32/stable"}
+CLUSTER_MODE=${CLUSTER_MODE:-"single"}
+NODE_ROLE=${NODE_ROLE:-"master"}
+ENABLE_HA=${ENABLE_HA:-"no"}
+USE_CLASSIC=${USE_CLASSIC:-"yes"}
+ADDONS=${ADDONS:-"dns storage ingress"}
 
-# 要启用的插件
-ADDONS=${ADDONS:-"dns storage ingress"}  # 默认插件
+# 超时配置
+WAIT_TIMEOUT=${WAIT_TIMEOUT:-600}  # 等待就绪超时时间（秒）
+RETRY_COUNT=${RETRY_COUNT:-3}      # 重试次数
 
 # 日志函数
 log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
@@ -68,7 +70,7 @@ install_snap() {
                     systemctl enable --now snapd.socket
                     ln -s /var/lib/snapd/snap /snap 2>/dev/null || true
                 else
-                    log_error "CentOS/RHEL 7 及更低版本不支持 snap,请升级系统或使用标准 kubeadm 安装方式"
+                    log_error "CentOS/RHEL 7 及更低版本不支持 snap"
                 fi
                 ;;
             fedora)
@@ -81,7 +83,6 @@ install_snap() {
                 ;;
         esac
 
-        # 等待 snapd 完全启动
         sleep 5
         log_info "snapd 安装完成"
     else
@@ -93,10 +94,9 @@ install_snap() {
 system_init() {
     log_step "系统初始化配置..."
 
-    # 关闭 swap (推荐但不是必须)
+    # 关闭 swap
     if [ "$(swapon --show | wc -l)" -gt 1 ]; then
         log_warn "检测到 swap 已启用"
-        log_info "MicroK8s 可以在启用 swap 的情况下运行,但建议关闭以获得最佳性能"
         read -p "是否关闭 swap? (yes/no, 默认 yes): " CLOSE_SWAP
         CLOSE_SWAP=${CLOSE_SWAP:-yes}
 
@@ -109,8 +109,6 @@ system_init() {
 
     # 配置防火墙规则
     log_info "配置防火墙规则..."
-
-    # MicroK8s 需要的端口
     PORTS=(16443 10250 10255 25000 12379 10257 10259 19001)
 
     if command -v ufw >/dev/null 2>&1 && ufw status | grep -q "Status: active"; then
@@ -119,7 +117,7 @@ system_init() {
             ufw allow $port/tcp 2>/dev/null || true
         done
         ufw allow 10250:10260/tcp 2>/dev/null || true
-        ufw allow 4789/udp 2>/dev/null || true  # Flannel VXLAN
+        ufw allow 4789/udp 2>/dev/null || true
     elif command -v firewall-cmd >/dev/null 2>&1 && systemctl is-active --quiet firewalld; then
         log_info "配置 firewalld 规则..."
         for port in "${PORTS[@]}"; do
@@ -135,11 +133,78 @@ system_init() {
     log_info "系统初始化完成"
 }
 
+# 等待 MicroK8s 服务完全就绪（增强版）
+wait_for_microk8s_ready() {
+    local max_wait=$WAIT_TIMEOUT
+    local elapsed=0
+    local interval=5
+
+    log_info "等待 MicroK8s 服务完全启动..."
+
+    # 步骤1: 等待基础服务启动
+    while [ $elapsed -lt $max_wait ]; do
+        if microk8s status --wait-ready --timeout 10 2>/dev/null; then
+            log_info "MicroK8s 基础服务已启动"
+            break
+        fi
+        sleep $interval
+        elapsed=$((elapsed + interval))
+        echo -n "."
+    done
+    echo ""
+
+    if [ $elapsed -ge $max_wait ]; then
+        log_error "MicroK8s 启动超时"
+    fi
+
+    # 步骤2: 等待 API Server 响应
+    log_info "等待 API Server 就绪..."
+    elapsed=0
+    while [ $elapsed -lt 120 ]; do
+        if microk8s kubectl get nodes >/dev/null 2>&1; then
+            log_info "API Server 已就绪"
+            break
+        fi
+        sleep 3
+        elapsed=$((elapsed + 3))
+    done
+
+    # 步骤3: 等待节点就绪
+    log_info "等待节点状态就绪..."
+    elapsed=0
+    while [ $elapsed -lt 120 ]; do
+        NODE_STATUS=$(microk8s kubectl get nodes -o jsonpath='{.items[0].status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || echo "")
+        if [ "$NODE_STATUS" = "True" ]; then
+            log_info "节点已就绪"
+            break
+        fi
+        sleep 3
+        elapsed=$((elapsed + 3))
+    done
+
+    # 步骤4: 等待核心 Pods 运行
+    log_info "等待核心系统 Pods 启动..."
+    elapsed=0
+    while [ $elapsed -lt 180 ]; do
+        PENDING_PODS=$(microk8s kubectl get pods -n kube-system --field-selector=status.phase!=Running,status.phase!=Succeeded 2>/dev/null | grep -v NAME | wc -l)
+        if [ "$PENDING_PODS" -eq 0 ]; then
+            log_info "核心系统 Pods 已全部运行"
+            break
+        fi
+        sleep 5
+        elapsed=$((elapsed + 5))
+    done
+
+    # 最后确认
+    sleep 10
+    log_info "MicroK8s 完全就绪"
+}
+
 # 安装 MicroK8s
 install_microk8s() {
     # 检查是否已安装
     if command -v microk8s >/dev/null 2>&1; then
-        CURRENT_VERSION=$(microk8s version | grep MicroK8s | awk '{print $2}')
+        CURRENT_VERSION=$(microk8s version 2>/dev/null | grep MicroK8s | awk '{print $2}' || echo "unknown")
         log_info "检测到 MicroK8s 已安装,版本: $CURRENT_VERSION"
 
         read -p "是否重新安装? (yes/no, 默认 no): " REINSTALL
@@ -150,12 +215,16 @@ install_microk8s() {
             return 0
         else
             log_info "卸载现有版本..."
+            microk8s stop 2>/dev/null || true
             snap remove microk8s --purge 2>/dev/null || true
-            sleep 3
+            sleep 5
         fi
     fi
 
     log_step "安装 MicroK8s (版本通道: $MICROK8S_CHANNEL)..."
+
+    # 清理可能存在的旧数据
+    rm -rf /var/snap/microk8s/common 2>/dev/null || true
 
     # 安装 MicroK8s
     if [ "$USE_CLASSIC" = "yes" ]; then
@@ -166,21 +235,33 @@ install_microk8s() {
 
     log_info "MicroK8s 安装完成"
 
-    # 等待 MicroK8s 启动
-    log_info "等待 MicroK8s 启动..."
-    microk8s status --wait-ready
+    # 启动并等待就绪（使用增强等待）
+    log_info "启动 MicroK8s..."
+    microk8s start 2>/dev/null || true
 
-    log_info "MicroK8s 已就绪"
+    wait_for_microk8s_ready
+
+    # 验证安装
+    log_info "验证安装..."
+    if ! microk8s kubectl get nodes >/dev/null 2>&1; then
+        log_error "MicroK8s 安装验证失败，请检查日志: journalctl -u snap.microk8s.daemon-kubelite -n 100"
+    fi
+
+    log_info "MicroK8s 安装验证成功"
 }
 
 # 配置用户权限
 setup_user_permissions() {
     log_step "配置用户权限..."
 
-    # 将当前用户添加到 microk8s 组
     if [ -n "$SUDO_USER" ]; then
         usermod -a -G microk8s $SUDO_USER
-        chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.kube 2>/dev/null || true
+
+        # 创建 .kube 目录
+        mkdir -p /home/$SUDO_USER/.kube
+        microk8s config > /home/$SUDO_USER/.kube/config 2>/dev/null || true
+        chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.kube
+
         log_info "已将用户 $SUDO_USER 添加到 microk8s 组"
         log_warn "请注销并重新登录以使组权限生效,或运行: su - $SUDO_USER"
     fi
@@ -188,43 +269,66 @@ setup_user_permissions() {
     # 创建 kubectl 别名
     log_info "配置 kubectl 命令..."
     if [ -n "$SUDO_USER" ]; then
-        echo "alias kubectl='microk8s kubectl'" >> /home/$SUDO_USER/.bashrc 2>/dev/null || true
-        echo "alias k='microk8s kubectl'" >> /home/$SUDO_USER/.bashrc 2>/dev/null || true
+        grep -q "alias kubectl='microk8s kubectl'" /home/$SUDO_USER/.bashrc 2>/dev/null || \
+            echo "alias kubectl='microk8s kubectl'" >> /home/$SUDO_USER/.bashrc
+        grep -q "alias k='microk8s kubectl'" /home/$SUDO_USER/.bashrc 2>/dev/null || \
+            echo "alias k='microk8s kubectl'" >> /home/$SUDO_USER/.bashrc
     fi
 
-    # 为 root 用户也创建别名
-    echo "alias kubectl='microk8s kubectl'" >> ~/.bashrc 2>/dev/null || true
-    echo "alias k='microk8s kubectl'" >> ~/.bashrc 2>/dev/null || true
+    grep -q "alias kubectl='microk8s kubectl'" ~/.bashrc 2>/dev/null || \
+        echo "alias kubectl='microk8s kubectl'" >> ~/.bashrc
+    grep -q "alias k='microk8s kubectl'" ~/.bashrc 2>/dev/null || \
+        echo "alias k='microk8s kubectl'" >> ~/.bashrc
 
-    log_info "已配置 kubectl 别名 (重新登录后生效)"
+    log_info "已配置 kubectl 别名"
 }
 
-# 启用插件
+# 启用插件（带重试机制）
 enable_addons() {
     log_step "启用 MicroK8s 插件..."
 
-    if [ -n "$ADDONS" ]; then
-        log_info "启用插件: $ADDONS"
-        for addon in $ADDONS; do
-            log_info "启用插件: $addon"
-            microk8s enable $addon
-        done
-        log_info "插件启用完成"
-    else
+    if [ -z "$ADDONS" ]; then
         log_info "未指定要启用的插件"
+        return 0
     fi
 
-    # 等待插件就绪
-    log_info "等待插件就绪..."
-    microk8s status --wait-ready
+    log_info "启用插件: $ADDONS"
+
+    for addon in $ADDONS; do
+        local retry=0
+        local success=false
+
+        while [ $retry -lt $RETRY_COUNT ]; do
+            log_info "启用插件: $addon (尝试 $((retry+1))/$RETRY_COUNT)"
+
+            if microk8s enable $addon; then
+                success=true
+                log_info "插件 $addon 启用成功"
+                break
+            else
+                log_warn "插件 $addon 启用失败，等待重试..."
+                sleep 10
+                retry=$((retry+1))
+            fi
+        done
+
+        if [ "$success" = false ]; then
+            log_error "插件 $addon 启用失败，已达最大重试次数"
+        fi
+
+        # 等待插件稳定
+        sleep 5
+    done
+
+    log_info "等待所有插件就绪..."
+    wait_for_microk8s_ready
+    log_info "插件启用完成"
 }
 
 # 单机模式配置
 setup_single_node() {
     log_step "配置单机模式..."
-
     log_info "单机模式配置完成"
-    log_info "MicroK8s 默认就是单机模式,可以直接使用"
 }
 
 # 集群主节点配置
@@ -234,6 +338,7 @@ setup_cluster_master() {
     if [ "$ENABLE_HA" = "yes" ]; then
         log_info "启用高可用模式..."
         microk8s enable ha-cluster
+        sleep 10
     fi
 
     # 生成加入令牌
@@ -267,9 +372,7 @@ join_cluster_worker() {
     log_info "执行加入集群..."
     eval $JOIN_COMMAND
 
-    log_info "等待节点就绪..."
-    microk8s status --wait-ready
-
+    wait_for_microk8s_ready
     log_info "Worker 节点已成功加入集群"
 }
 
@@ -298,13 +401,22 @@ show_cluster_info() {
     echo "  查看状态: microk8s status"
     echo "  查看节点: microk8s kubectl get nodes"
     echo "  查看 Pods: microk8s kubectl get pods -A"
+    echo "  查看日志: journalctl -u snap.microk8s.daemon-kubelite"
     echo "  启用插件: microk8s enable <addon>"
     echo "  禁用插件: microk8s disable <addon>"
-    echo "  查看插件: microk8s status"
     echo ""
-    echo "  或使用 kubectl 别名 (需重新登录):"
+    echo "  kubectl 别名 (需重新登录):"
     echo "  kubectl get nodes"
     echo "  k get pods -A"
+    echo ""
+
+    log_info "=========================================="
+    log_info "故障排查命令:"
+    log_info "=========================================="
+    echo "  查看服务状态: microk8s inspect"
+    echo "  查看系统日志: journalctl -u snap.microk8s.daemon-kubelite -f"
+    echo "  重启服务: microk8s stop && microk8s start"
+    echo "  重置集群: microk8s reset (危险操作)"
     echo ""
 }
 
@@ -316,14 +428,13 @@ MicroK8s 可用版本通道:
 最新版本:
   - latest/stable    (最新稳定版)
   - latest/candidate (最新候选版)
-  - latest/beta      (最新测试版)
-  - latest/edge      (最新开发版)
 
 特定版本:
-  - 1.35/stable      (Kubernetes 1.35)
+  - 1.32/stable      (Kubernetes 1.32)
+  - 1.31/stable      (Kubernetes 1.31)
+  - 1.30/stable      (Kubernetes 1.30)
   - 1.29/stable      (Kubernetes 1.29)
   - 1.28/stable      (Kubernetes 1.28)
-
 
 查看完整列表: snap info microk8s
 ========================================
@@ -348,27 +459,12 @@ MicroK8s 常用插件:
   metrics-server   - 资源指标
   observability    - 可观测性栈
 
-存储:
-  hostpath-storage - 主机路径存储
-  openebs          - OpenEBS 存储
-  rook-ceph        - Rook Ceph 存储
-
-网络:
-  cilium           - Cilium CNI
-  multus           - Multus CNI
-
-容器运行时:
-  gpu              - GPU 支持
-  registry         - 容器镜像仓库
-
-服务网格:
-  istio            - Istio 服务网格
-  linkerd          - Linkerd 服务网格
-
 其他:
   helm             - Helm 包管理器
   helm3            - Helm 3
   rbac             - RBAC 授权
+  registry         - 容器镜像仓库
+  gpu              - GPU 支持
 
 查看完整列表: microk8s status
 启用插件: microk8s enable <addon>
@@ -382,53 +478,29 @@ show_usage() {
 使用说明:
 ========================================
 环境变量:
-  MICROK8S_CHANNEL - MicroK8s 版本通道 (默认: 1.35/stable)
-                     示例: 1.29/stable, 1.30/stable, latest/stable
+  MICROK8S_CHANNEL - MicroK8s 版本通道 (默认: 1.32/stable)
   CLUSTER_MODE     - 集群模式 single/cluster (默认: single)
   NODE_ROLE        - 节点角色 master/worker (默认: master)
   ENABLE_HA        - 启用高可用 yes/no (默认: no)
   ADDONS           - 要启用的插件 (默认: "dns storage ingress")
-  USE_CLASSIC      - 使用 classic confinement yes/no (默认: yes)
+  WAIT_TIMEOUT     - 等待超时时间秒 (默认: 600)
+  RETRY_COUNT      - 插件启用重试次数 (默认: 3)
 
 使用示例:
-  # 1. 单机模式快速部署
   sudo ./microk8s_init.sh
-
-  # 2. 部署特定版本
   sudo MICROK8S_CHANNEL=1.29/stable ./microk8s_init.sh
-
-  # 3. 集群模式 - Master 节点
   sudo CLUSTER_MODE=cluster NODE_ROLE=master ./microk8s_init.sh
 
-  # 4. 集群模式 - Worker 节点
-  sudo CLUSTER_MODE=cluster NODE_ROLE=worker ./microk8s_init.sh
-
-  # 5. 启用高可用集群
-  sudo CLUSTER_MODE=cluster ENABLE_HA=yes ./microk8s_init.sh
-
-  # 6. 自定义插件
-  sudo ADDONS="dns storage ingress dashboard metrics-server" ./microk8s_init.sh
-
-  # 7. 查看可用版本
-  ./microk8s_init.sh --list-channels
-
-  # 8. 查看可用插件
-  ./microk8s_init.sh --list-addons
-
-MicroK8s 优势:
-  ✓ 安装简单,5分钟内完成
-  ✓ 资源占用少,适合边缘设备
-  ✓ 自带常用插件,一键启用
-  ✓ 支持 HA 高可用模式
-  ✓ 自动更新,安全可靠
-  ✓ 支持离线安装
+故障排查:
+  如遇到 localnode.yaml 错误，脚本已优化等待逻辑
+  查看详细日志: journalctl -u snap.microk8s.daemon-kubelite -n 200
 ========================================
 EOF
 }
 
 # 主函数
 main() {
-    log_info "=== MicroK8s 集群初始化脚本 ==="
+    log_info "=== MicroK8s 集群初始化脚本 (修复增强版) ==="
     log_info "版本通道: $MICROK8S_CHANNEL | 模式: $CLUSTER_MODE | 角色: $NODE_ROLE"
     echo ""
 
