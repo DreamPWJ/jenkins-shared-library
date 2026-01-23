@@ -220,28 +220,12 @@ install_containerd() {
       # 确保 config.toml 存在
       containerd config default > "$CONTAINERD_CONFIG"
 
-      # 1️ 设置 pause 镜像（最关键）
+      # 1 设置 pause 镜像（最关键）
       if grep -q "sandbox_image" "$CONTAINERD_CONFIG"; then
           sed -i "s|sandbox_image = \".*\"|sandbox_image = \"$PAUSE_IMAGE\"|" "$CONTAINERD_CONFIG"
       else
           sed -i "/\[plugins.\"io.containerd.grpc.v1.cri\"\]/a\  sandbox_image = \"$PAUSE_IMAGE\"" "$CONTAINERD_CONFIG"
       fi
-
-    # 2️ 配置 registry mirrors（docker.io + registry.k8s.io）
-    cat >> "$CONTAINERD_CONFIG" <<'EOF'
-
-[plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
-  endpoint = ["https://registry.cn-hangzhou.aliyuncs.com"]
-
-[plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.k8s.io"]
-  endpoint = ["https://registry.cn-hangzhou.aliyuncs.com/google_containers"]
-EOF
-
-      # 3️ 确保 systemd cgroup
-      sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' "$CONTAINERD_CONFIG"
-
-      systemctl restart containerd
-      systemctl restart kubelet
   fi
 
 
