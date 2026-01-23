@@ -220,7 +220,7 @@ install_containerd() {
       # 确保 config.toml 存在
       containerd config default > "$CONTAINERD_CONFIG"
 
-      # 1 设置 pause 镜像（最关键）
+      # 设置 pause 镜像
       if grep -q "sandbox_image" "$CONTAINERD_CONFIG"; then
           sed -i "s|sandbox_image = \".*\"|sandbox_image = \"$PAUSE_IMAGE\"|" "$CONTAINERD_CONFIG"
       else
