@@ -247,9 +247,15 @@ install_containerd() {
     # 配置镜像加速
   if detect_network; then
       log_info "配置 containerd 国内镜像加速..."
+      K8S_VERSION=$(kubeadm version -o short | sed 's/v//' | cut -d. -f1,2)
 
+      case "$K8S_VERSION" in
+        1.29) PAUSE_TAG="3.9" ;;
+        1.30|1.31|1.32) PAUSE_TAG="3.10" ;;
+        *) PAUSE_TAG="3.10.1" ;;
+      esac
       CONTAINERD_CONFIG="/etc/containerd/config.toml"
-      PAUSE_IMAGE="registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.10.1" # 根据k8s版本变化
+      PAUSE_IMAGE="registry.cn-hangzhou.aliyuncs.com/google_containers/pause:${PAUSE_TAG}" # 根据k8s版本变化
 
       # 确保 config.toml 存在
       containerd config default > "$CONTAINERD_CONFIG"
