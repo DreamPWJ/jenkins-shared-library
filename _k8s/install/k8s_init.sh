@@ -51,7 +51,7 @@ detect_network() {
     fi
     
     # 自动检测
-    log_info "检测网络环境..."
+    #log_info "检测网络环境..."
     if curl -m 5 -s https://www.google.com > /dev/null 2>&1; then
         log_info "检测到可访问国际网络,使用官方源"
         return 1
@@ -243,21 +243,47 @@ install_containerd() {
     
     # 配置 systemd cgroup 驱动
     sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
-    
+
     # 配置镜像加速
-    if detect_network; then
-        log_info "配置国内镜像加速..."
-        # 配置阿里云镜像加速
-        sed -i '/\[plugins."io.containerd.grpc.v1.cri".registry.mirrors\]/a\        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]\n          endpoint = ["https://registry.cn-hangzhou.aliyuncs.com"]' /etc/containerd/config.toml
-        sed -i 's|registry.k8s.io/pause:3.8|registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.9|' /etc/containerd/config.toml
-        sed -i 's|registry.k8s.io/pause:3.9|registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.9|' /etc/containerd/config.toml
-    fi
-    
-    systemctl restart containerd
-    systemctl enable containerd
-    
-    log_info "containerd 安装配置完成"
-}
+  if detect_network; then
+      log_info "配置 containerd 国内镜像加速..."
+
+      CONTAINERD_CONFIG="/etc/containerd/config.toml"
+      PAUSE_IMAGE="registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.10.1" # 根据k8s版本变化
+
+      # 确保 config.toml 存在
+      containerd config default > "$CONTAINERD_CONFIG"
+
+      # 1️ 设置 pause 镜像（最关键）
+      if grep -q "sandbox_image" "$CONTAINERD_CONFIG"; then
+          sed -i "s|sandbox_image = \".*\"|sandbox_image = \"$PAUSE_IMAGE\"|" "$CONTAINERD_CONFIG"
+      else
+          sed -i "/\[plugins.\"io.containerd.grpc.v1.cri\"\]/a\  sandbox_image = \"$PAUSE_IMAGE\"" "$CONTAINERD_CONFIG"
+      fi
+
+    # 2️ 配置 registry mirrors（docker.io + registry.k8s.io）
+    cat >> "$CONTAINERD_CONFIG" <<'EOF'
+
+[plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
+  endpoint = ["https://registry.cn-hangzhou.aliyuncs.com"]
+
+[plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.k8s.io"]
+  endpoint = ["https://registry.cn-hangzhou.aliyuncs.com/google_containers"]
+EOF
+
+      # 3️ 确保 systemd cgroup
+      sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' "$CONTAINERD_CONFIG"
+
+      systemctl restart containerd
+      systemctl restart kubelet
+  fi
+
+
+      systemctl restart containerd
+      systemctl enable containerd
+
+      log_info "containerd 安装配置完成"
+  }
 
 # 安装 Docker (可选)
 install_docker() {
