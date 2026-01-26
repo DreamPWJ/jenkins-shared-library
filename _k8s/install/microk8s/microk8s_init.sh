@@ -15,13 +15,13 @@ BLUE='\033[0;36m'
 NC='\033[0m'
 
 # 配置变量
-MICROK8S_CHANNEL=${MICROK8S_CHANNEL:-"1.32/stable"}
-CLUSTER_MODE=${CLUSTER_MODE:-"single"}
-NODE_ROLE=${NODE_ROLE:-"master"}
-ENABLE_HA=${ENABLE_HA:-"no"}
-USE_CLASSIC=${USE_CLASSIC:-"yes"}
-ADDONS=${ADDONS:-"dns storage ingress"}
-
+MICROK8S_CHANNEL=${MICROK8S_CHANNEL:-"1.32/stable"}  # K8s版本通道 注意系统版本的兼容性
+CLUSTER_MODE=${CLUSTER_MODE:-"single"}  # single or cluster
+NODE_ROLE=${NODE_ROLE:-"master"}  # master or worker
+ENABLE_HA=${ENABLE_HA:-"no"}  # 是否启用高可用
+USE_CLASSIC=${USE_CLASSIC:-"yes"}  # 是否使用 classic confinement (推荐)
+# 要启用的插件
+ADDONS=${ADDONS:-"dns storage ingress"}  # 默认插件
 # 超时配置
 WAIT_TIMEOUT=${WAIT_TIMEOUT:-600}  # 等待就绪超时时间（秒）
 RETRY_COUNT=${RETRY_COUNT:-3}      # 重试次数
