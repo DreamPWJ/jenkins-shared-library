@@ -44,7 +44,9 @@ tail -f /var/log/cron
 
 #### 英伟达GPU驱动安装
 
+lspci | grep -i nvidia
 sudo ubuntu-drivers autoinstall
+nvidia-smi
 
 #### Linux扩容磁盘步骤  在线不停机扩容磁盘设置LVM（Logical Volume Manager）逻辑卷管理
 
