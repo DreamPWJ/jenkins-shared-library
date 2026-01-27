@@ -160,6 +160,7 @@ install_containerd() {
 
     # 检查是否已安装
     if command -v containerd &> /dev/null; then
+        containerd --version
         log_warn "containerd 已安装,跳过..."
         return
     fi
