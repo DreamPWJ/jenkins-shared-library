@@ -1,7 +1,8 @@
 #!/bin/bash
 
 #################################################
-# Kubernetes 集群部署脚本
+# Kubernetes 集群部署脚本 v2.0
+# 支持: Ubuntu 20.04/22.04/24.04
 # 模式: 单机(Single) / 多机(Multi)
 #################################################
 
@@ -58,8 +59,8 @@ check_ubuntu_version() {
     log_info "检测到 Ubuntu $VERSION_ID"
 }
 
-# 配置参数 - 更新到最新稳定版本
-K8S_VERSION="1.32.11"
+# 配置参数
+K8S_VERSION="1.31.13"
 CONTAINERD_VERSION="1.7.22"
 CNI_VERSION="1.5.1"
 CALICO_VERSION="v3.29.1"
@@ -230,31 +231,59 @@ EOF
     log_info "containerd 安装完成"
 }
 
-# 安装 crictl (容器运行时命令行工具)
+# 安装 crictl (容器运行时命令行工具) - 可选
 install_crictl() {
-    log_info "安装 crictl..."
+    log_info "尝试安装 crictl (可选工具,失败不影响集群部署)..."
 
     if command -v crictl &> /dev/null; then
-        log_warn "crictl 已安装,跳过..."
-        return
+        log_info "crictl 已安装,跳过"
+        return 0
     fi
 
     CRICTL_VERSION="v1.31.1"
-    wget -q https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz \
-        -O /tmp/crictl.tar.gz || log_warn "crictl 下载失败,跳过..."
 
-    if [[ -f /tmp/crictl.tar.gz ]]; then
-        tar -zxf /tmp/crictl.tar.gz -C /usr/local/bin/
-        rm -f /tmp/crictl.tar.gz
+    # 尝试从国内镜像下载
+    local success=0
 
-        # 配置 crictl
-        cat > /etc/crictl.yaml <<EOF
+    # 方法1: 尝试从阿里云镜像下载
+    log_debug "尝试从阿里云镜像下载 crictl..."
+    if wget -q --timeout=10 --tries=2 \
+        "https://mirrors.aliyun.com/kubernetes/crictl/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz" \
+        -O /tmp/crictl.tar.gz 2>/dev/null; then
+        success=1
+    fi
+
+    # 方法2: 尝试从 GitHub (可能需要代理)
+    if [[ $success -eq 0 ]]; then
+        log_debug "尝试从 GitHub 下载 crictl..."
+        if wget -q --timeout=10 --tries=1 \
+            "https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz" \
+            -O /tmp/crictl.tar.gz 2>/dev/null; then
+            success=1
+        fi
+    fi
+
+    # 安装
+    if [[ $success -eq 1 ]] && [[ -f /tmp/crictl.tar.gz ]]; then
+        if tar -zxf /tmp/crictl.tar.gz -C /usr/local/bin/ 2>/dev/null; then
+            rm -f /tmp/crictl.tar.gz
+
+            # 配置 crictl
+            cat > /etc/crictl.yaml <<EOF
 runtime-endpoint: unix:///run/containerd/containerd.sock
 image-endpoint: unix:///run/containerd/containerd.sock
 timeout: 10
 EOF
-        log_info "crictl 安装完成"
+            log_info "crictl 安装成功"
+            return 0
+        fi
     fi
+
+    # 安装失败,不影响继续
+    log_warn "crictl 安装失败,已跳过 (不影响集群功能)"
+    log_warn "如需手动安装: apt-get install -y cri-tools"
+    rm -f /tmp/crictl.tar.gz 2>/dev/null
+    return 0
 }
 
 # 安装 kubeadm、kubelet、kubectl
@@ -674,7 +703,7 @@ deploy_single_node() {
     configure_apt_mirror
     install_dependencies
     install_containerd
-    install_crictl
+    # install_crictl  # 可选工具,已跳过
     install_kubernetes
     prefetch_images
     init_master
@@ -709,7 +738,7 @@ deploy_master_node() {
     configure_apt_mirror
     install_dependencies
     install_containerd
-    install_crictl
+    # install_crictl  # 可选工具,已跳过
     install_kubernetes
     prefetch_images
     init_master
@@ -746,7 +775,7 @@ deploy_worker_node() {
     configure_apt_mirror
     install_dependencies
     install_containerd
-    install_crictl
+    # install_crictl  # 可选工具,已跳过
     install_kubernetes
 
     echo ""
@@ -779,7 +808,7 @@ install_components_only() {
     configure_apt_mirror
     install_dependencies
     install_containerd
-    install_crictl
+    # install_crictl  # 可选工具,已跳过
     install_kubernetes
 
     log_info "=========================================="
