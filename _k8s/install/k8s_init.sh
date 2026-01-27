@@ -7,6 +7,18 @@
 
 set -e
 
+# 配置参数
+K8S_VERSION="1.31.4"
+CONTAINERD_VERSION="1.7.13"
+CNI_VERSION="1.4.0"
+CALICO_VERSION="v3.28.2"
+
+# 国内镜像源 - 使用多个备用源
+ALIYUN_MIRROR="registry.cn-hangzhou.aliyuncs.com/google_containers"
+ALIYUN_K8S_MIRROR="registry.aliyuncs.com/k8sxio"  # 新增备用源
+DOCKER_MIRROR="https://docker.mirrors.ustc.edu.cn"
+
+
 # 颜色输出
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -53,16 +65,6 @@ check_ubuntu_version() {
     log_info "检测到 Ubuntu $VERSION_ID"
 }
 
-# 配置参数
-K8S_VERSION="1.31.4"
-CONTAINERD_VERSION="1.7.13"
-CNI_VERSION="1.4.0"
-CALICO_VERSION="v3.28.2"
-
-# 国内镜像源 - 使用多个备用源
-ALIYUN_MIRROR="registry.cn-hangzhou.aliyuncs.com/google_containers"
-ALIYUN_K8S_MIRROR="registry.aliyuncs.com/k8sxio"  # 新增备用源
-DOCKER_MIRROR="https://docker.mirrors.ustc.edu.cn"
 
 # 系统初始化
 system_init() {
