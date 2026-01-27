@@ -225,24 +225,25 @@ EOF
 
 # 安装 crictl 工具（用于调试）
 install_crictl() {
-    CRICTL_VERSION="v1.35.0"
-    log_info "安装 crictl $CRICTL_VERSION 工具..." +
-    wget -q https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz -O /tmp/crictl.tar.gz || {
-        log_warn "crictl 下载失败，跳过..."
-        return
-    }
-
-    tar zxf /tmp/crictl.tar.gz -C /usr/local/bin
-    rm -f /tmp/crictl.tar.gz
-
-    # 配置 crictl
-    cat > /etc/crictl.yaml <<EOF
-runtime-endpoint: unix:///run/containerd/containerd.sock
-image-endpoint: unix:///run/containerd/containerd.sock
-timeout: 10
-EOF
-
-    log_info "crictl 安装完成"
+  log_info "crictl 工具下载速度慢 跳过安装"
+#    CRICTL_VERSION="v1.35.0"
+#    log_info "安装 crictl $CRICTL_VERSION 工具..." +
+#    wget -q https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz -O /tmp/crictl.tar.gz || {
+#        log_warn "crictl 下载失败，跳过..."
+#        return
+#    }
+#
+#    tar zxf /tmp/crictl.tar.gz -C /usr/local/bin
+#    rm -f /tmp/crictl.tar.gz
+#
+#    # 配置 crictl
+#    cat > /etc/crictl.yaml <<EOF
+#runtime-endpoint: unix:///run/containerd/containerd.sock
+#image-endpoint: unix:///run/containerd/containerd.sock
+#timeout: 10
+#EOF
+#
+#    log_info "crictl 安装完成"
 }
 
 # 安装 kubeadm、kubelet、kubectl
@@ -433,8 +434,8 @@ diagnose_image_issues() {
     curl -I https://registry.aliyuncs.com 2>&1 | head -5
 
     # 列出已拉取的镜像
-    log_info "已拉取的镜像:"
-    crictl images 2>/dev/null || ctr -n k8s.io images ls 2>/dev/null | head -20
+#    log_info "已拉取的镜像:"
+#    crictl images 2>/dev/null || ctr -n k8s.io images ls 2>/dev/null | head -20
 
     # 检查失败的 Pod
     log_info "问题 Pod 详情:"
