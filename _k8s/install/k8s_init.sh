@@ -60,7 +60,7 @@ check_ubuntu_version() {
 }
 
 # 配置参数
-K8S_VERSION="1.31.13"
+K8S_VERSION="1.31.4"
 CONTAINERD_VERSION="1.7.22"
 CNI_VERSION="1.5.1"
 CALICO_VERSION="v3.29.1"
