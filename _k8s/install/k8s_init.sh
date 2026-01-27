@@ -9,9 +9,8 @@ set -e
 
 # 配置参数
 K8S_VERSION="1.32.11"
-CONTAINERD_VERSION="1.7.13"
-CNI_VERSION="1.4.0"
-CALICO_VERSION="v3.28.2"
+CONTAINERD_VERSION="1.7.30"
+CALICO_VERSION="v3.31.3"
 
 # 国内镜像源 - 使用多个备用源
 ALIYUN_MIRROR="registry.cn-hangzhou.aliyuncs.com/google_containers"
@@ -62,7 +61,7 @@ check_ubuntu_version() {
         error_exit "此脚本仅支持 Ubuntu 系统"
     fi
 
-    log_info "检测到 Ubuntu $VERSION_ID"
+    log_info "系统版本: Ubuntu $VERSION_ID"
 }
 
 
@@ -134,7 +133,7 @@ EOF
 
 # 安装依赖包
 install_dependencies() {
-    log_info "安装依赖包..."
+    log_info "安装K8s依赖包..."
 
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
         apt-transport-https \
@@ -150,14 +149,14 @@ install_dependencies() {
         conntrack \
         socat \
         jq \
-        || error_exit "依赖包安装失败"
+        || error_exit "K8s依赖包安装失败"
 
-    log_info "依赖包安装完成"
+    log_info "K8s依赖包安装完成"
 }
 
 # 安装 containerd
 install_containerd() {
-    log_info "安装 containerd..."
+    log_info "安装 containerd 容器..."
 
     # 检查是否已安装
     if command -v containerd &> /dev/null; then
@@ -220,13 +219,14 @@ EOF
     fi
 
     log_info "containerd 安装完成"
+    # 打印版本
+    containerd --version
 }
 
 # 安装 crictl 工具（用于调试）
 install_crictl() {
-    log_info "安装 crictl 工具..."
-
-    CRICTL_VERSION="v1.31.1"
+    CRICTL_VERSION="v1.35.0"
+    log_info "安装 crictl $CRICTL_VERSION 工具..." +
     wget -q https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz -O /tmp/crictl.tar.gz || {
         log_warn "crictl 下载失败，跳过..."
         return
@@ -247,7 +247,7 @@ EOF
 
 # 安装 kubeadm、kubelet、kubectl
 install_kubernetes() {
-    log_info "安装 Kubernetes 组件..."
+    log_info "安装 Kubernetes 组件(kubeadm、kubectl)..."
 
     # 添加阿里云 Kubernetes 源
     curl -fsSL https://mirrors.aliyun.com/kubernetes-new/core/stable/v1.31/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg || error_exit "添加 GPG 密钥失败"
@@ -275,8 +275,7 @@ EOF
     # 启动 kubelet
     systemctl enable kubelet
 
-    log_info "Kubernetes 组件安装完成"
-    log_info "安装的版本: $(kubeadm version -o short)"
+    log_info "Kubernetes $(kubeadm version -o short) 组件安装完成"
 }
 
 # 预拉取镜像（使用国内源）
@@ -331,11 +330,11 @@ EOF
     prefetch_images
 
     # 初始化集群
-    log_info "执行集群初始化(这可能需要几分钟)..."
-    kubeadm init --config=/tmp/kubeadm-config.yaml --upload-certs || error_exit "集群初始化失败"
+    log_info "执行K8S集群初始化(可能需要几分钟)..."
+    kubeadm init --config=/tmp/kubeadm-config.yaml --upload-certs || error_exit "K8S集群初始化失败"
 
     # 配置 kubectl
-    log_info "配置 kubectl..."
+    log_info "配置 kubectl组件..."
     mkdir -p $HOME/.kube
     cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
     chown $(id -u):$(id -g) $HOME/.kube/config
@@ -350,12 +349,12 @@ EOF
         fi
     done
 
-    log_info "Master 节点初始化完成"
+    log_info "K8S Master 节点初始化完成"
 }
 
 # 安装 Calico 网络插件
 install_calico() {
-    log_info "安装 Calico 网络插件..."
+    log_info "安装 Calico ${CALICO_VERSION} 网络插件..."
 
     # 下载 Calico manifest
     local calico_url="https://docs.tigera.io/calico/latest/manifests/calico.yaml"
@@ -367,12 +366,12 @@ install_calico() {
     # 应用 Calico
     kubectl apply -f /tmp/calico.yaml || error_exit "Calico 安装失败"
 
-    log_info "Calico 网络插件安装完成"
+    log_info "Calico ${CALICO_VERSION} 网络插件安装完成"
 }
 
 # 单机模式:允许 Master 调度 Pod
 enable_master_scheduling() {
-    log_info "配置单机模式:允许 Master 节点调度 Pod..."
+    log_info "配置单机模式: 允许 Master 节点调度 Pod..."
 
     # 等待节点就绪
     sleep 10
@@ -470,23 +469,23 @@ generate_join_command() {
 # 显示集群信息
 show_cluster_info() {
     log_info "=========================================="
-    log_info "集群部署完成!"
+    log_info "K8s集群部署完成!"
     log_info "=========================================="
     echo ""
 
-    log_info "集群节点信息:"
+    log_info "K8s集群节点信息:"
     kubectl get nodes -o wide
     echo ""
 
-    log_info "集群 Pod 信息:"
+    log_info "K8s集群 Pod 信息:"
     kubectl get pods -A -o wide
     echo ""
 
-    log_info "集群组件状态:"
+    log_info "K8s集群组件状态:"
     kubectl get componentstatuses 2>/dev/null || log_warn "ComponentStatus API 已弃用"
     echo ""
 
-    log_info "常用命令:"
+    log_info "K8s常用命令:"
     echo "  查看节点: kubectl get nodes"
     echo "  查看Pod:  kubectl get pods -A"
     echo "  查看服务: kubectl get svc -A"
@@ -495,8 +494,8 @@ show_cluster_info() {
     echo ""
 
     log_info "版本信息:"
-    echo "  Kubernetes: $(kubectl version --short 2>/dev/null | grep Server || kubectl version --client)"
-    echo "  Containerd: $(containerd --version | awk '{print $3}')"
+    echo "Kubernetes: $(kubectl version --short 2>/dev/null | grep Server || kubectl version --client)"
+    echo "Containerd: $(containerd --version | awk '{print $3}')"
     echo ""
 }
 
@@ -504,7 +503,7 @@ show_cluster_info() {
 main_menu() {
     clear
     echo "=========================================="
-    echo "   Kubernetes 集群部署脚本 - 修复版"
+    echo "   Kubernetes 集群部署脚本"
     echo "   版本: K8s ${K8S_VERSION}"
     echo "=========================================="
     echo ""
@@ -575,7 +574,7 @@ diagnose_existing_cluster() {
 # 单机模式部署
 deploy_single_node() {
     log_info "=========================================="
-    log_info "开始单机模式部署"
+    log_info "开始单机K8S集群部署"
     log_info "Kubernetes 版本: ${K8S_VERSION}"
     log_info "=========================================="
     echo ""
@@ -599,7 +598,7 @@ deploy_single_node() {
     show_cluster_info
 
     log_info "=========================================="
-    log_info "✅ 单机模式部署完成!"
+    log_info "✅ 单机K8S集群部署完成!"
     log_info "=========================================="
 }
 
