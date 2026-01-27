@@ -8,7 +8,7 @@
 set -e
 
 # 配置参数
-K8S_VERSION="1.32.11"
+K8S_VERSION="1.31.13"
 CONTAINERD_VERSION="1.7.30"
 CALICO_VERSION="v3.31.3"
 
@@ -381,7 +381,7 @@ enable_master_scheduling() {
     kubectl taint nodes --all node-role.kubernetes.io/control-plane- 2>/dev/null || true
     kubectl taint nodes --all node-role.kubernetes.io/master- 2>/dev/null || true
 
-    log_info "单机模式配置完成"
+    log_info "单机K8s集群配置完成"
 }
 
 # 等待所有 Pod 就绪（健康检查）
