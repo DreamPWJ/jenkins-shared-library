@@ -54,13 +54,14 @@ check_ubuntu_version() {
 }
 
 # 配置参数
-K8S_VERSION="1.28.2"
-CONTAINERD_VERSION="1.7.8"
-CNI_VERSION="1.3.0"
-CALICO_VERSION="v3.26.3"
+K8S_VERSION="1.31.4"
+CONTAINERD_VERSION="1.7.13"
+CNI_VERSION="1.4.0"
+CALICO_VERSION="v3.28.2"
 
-# 国内镜像源
+# 国内镜像源 - 使用多个备用源
 ALIYUN_MIRROR="registry.cn-hangzhou.aliyuncs.com/google_containers"
+ALIYUN_K8S_MIRROR="registry.aliyuncs.com/k8sxio"  # 新增备用源
 DOCKER_MIRROR="https://docker.mirrors.ustc.edu.cn"
 
 # 系统初始化
@@ -114,7 +115,7 @@ configure_apt_mirror() {
     log_info "配置 APT 国内镜像源..."
 
     # 备份原有源
-    cp /etc/apt/sources.list /etc/apt/sources.list.bak.$(date +%Y%m%d%H%M%S)
+    cp /etc/apt/sources.list /etc/apt/sources.list.bak.$(date +%Y%m%d%H%M%S) 2>/dev/null || true
 
     # 使用阿里云镜像源
     cat > /etc/apt/sources.list <<EOF
@@ -146,6 +147,7 @@ install_dependencies() {
         ipset \
         conntrack \
         socat \
+        jq \
         || error_exit "依赖包安装失败"
 
     log_info "依赖包安装完成"
@@ -173,11 +175,37 @@ install_containerd() {
     # 配置 systemd cgroup 驱动
     sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
 
-    # 配置国内镜像加速
-    sed -i '/\[plugins."io.containerd.grpc.v1.cri".registry.mirrors\]/a\        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]\n          endpoint = ["https://docker.mirrors.ustc.edu.cn"]' /etc/containerd/config.toml
+    # 配置多个国内镜像加速源（修复关键）
+    log_info "配置镜像加速源..."
 
-    # 配置 sandbox_image 使用国内镜像
-    sed -i "s|registry.k8s.io/pause:|${ALIYUN_MIRROR}/pause:|g" /etc/containerd/config.toml
+    # 备份原配置
+    cp /etc/containerd/config.toml /etc/containerd/config.toml.bak
+
+    # 使用更可靠的配置方式
+    cat > /etc/containerd/config.toml <<EOF
+version = 2
+[plugins]
+  [plugins."io.containerd.grpc.v1.cri"]
+    sandbox_image = "registry.aliyuncs.com/google_containers/pause:3.9"
+    [plugins."io.containerd.grpc.v1.cri".containerd]
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+          runtime_type = "io.containerd.runc.v2"
+          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+            SystemdCgroup = true
+    [plugins."io.containerd.grpc.v1.cri".registry]
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
+          endpoint = ["https://docker.mirrors.ustc.edu.cn", "https://hub-mirror.c.163.com"]
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."k8s.gcr.io"]
+          endpoint = ["https://registry.aliyuncs.com/google_containers"]
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.k8s.io"]
+          endpoint = ["https://registry.aliyuncs.com/google_containers"]
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."gcr.io"]
+          endpoint = ["https://gcr.mirrors.ustc.edu.cn"]
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."quay.io"]
+          endpoint = ["https://quay.mirrors.ustc.edu.cn"]
+EOF
 
     # 启动 containerd
     systemctl daemon-reload
@@ -192,42 +220,87 @@ install_containerd() {
     log_info "containerd 安装完成"
 }
 
+# 安装 crictl 工具（用于调试）
+install_crictl() {
+    log_info "安装 crictl 工具..."
+
+    CRICTL_VERSION="v1.31.1"
+    wget -q https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz -O /tmp/crictl.tar.gz || {
+        log_warn "crictl 下载失败，跳过..."
+        return
+    }
+
+    tar zxf /tmp/crictl.tar.gz -C /usr/local/bin
+    rm -f /tmp/crictl.tar.gz
+
+    # 配置 crictl
+    cat > /etc/crictl.yaml <<EOF
+runtime-endpoint: unix:///run/containerd/containerd.sock
+image-endpoint: unix:///run/containerd/containerd.sock
+timeout: 10
+EOF
+
+    log_info "crictl 安装完成"
+}
+
 # 安装 kubeadm、kubelet、kubectl
 install_kubernetes() {
     log_info "安装 Kubernetes 组件..."
 
     # 添加阿里云 Kubernetes 源
-    curl -fsSL https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add - || error_exit "添加 GPG 密钥失败"
+    curl -fsSL https://mirrors.aliyun.com/kubernetes-new/core/stable/v1.31/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg || error_exit "添加 GPG 密钥失败"
 
     cat > /etc/apt/sources.list.d/kubernetes.list <<EOF
-deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
+deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://mirrors.aliyun.com/kubernetes-new/core/stable/v1.31/deb/ /
 EOF
 
     # 更新软件包列表
     apt-get update -y || error_exit "更新软件包列表失败"
 
     # 安装指定版本
-    KUBE_VERSION="${K8S_VERSION}-00"
+    KUBE_VERSION="${K8S_VERSION}-1.1"
 
     # 检查版本是否可用
     if ! apt-cache madison kubeadm | grep -q "$KUBE_VERSION"; then
-        log_warn "指定版本 $KUBE_VERSION 不可用,安装最新稳定版本"
-        KUBE_VERSION=""
+        log_warn "指定版本 $KUBE_VERSION 不可用,尝试安装最新版本"
+        apt-get install -y kubelet kubeadm kubectl || error_exit "Kubernetes 组件安装失败"
+    else
+        apt-get install -y kubelet=$KUBE_VERSION kubeadm=$KUBE_VERSION kubectl=$KUBE_VERSION || error_exit "Kubernetes 组件安装失败"
     fi
 
-    # 安装 Kubernetes 组件
-    if [[ -n "$KUBE_VERSION" ]]; then
-        apt-get install -y kubelet=$KUBE_VERSION kubeadm=$KUBE_VERSION kubectl=$KUBE_VERSION || error_exit "Kubernetes 组件安装失败"
-        apt-mark hold kubelet kubeadm kubectl
-    else
-        apt-get install -y kubelet kubeadm kubectl || error_exit "Kubernetes 组件安装失败"
-        apt-mark hold kubelet kubeadm kubectl
-    fi
+    apt-mark hold kubelet kubeadm kubectl
 
     # 启动 kubelet
     systemctl enable kubelet
 
     log_info "Kubernetes 组件安装完成"
+    log_info "安装的版本: $(kubeadm version -o short)"
+}
+
+# 预拉取镜像（使用国内源）
+prefetch_images() {
+    log_info "预拉取 Kubernetes 核心镜像..."
+
+    # 获取所需镜像列表
+    kubeadm config images list --kubernetes-version=v${K8S_VERSION} > /tmp/k8s-images.txt 2>/dev/null || true
+
+    # 使用 ctr 直接拉取阿里云镜像
+    local images=(
+        "registry.aliyuncs.com/google_containers/kube-apiserver:v${K8S_VERSION}"
+        "registry.aliyuncs.com/google_containers/kube-controller-manager:v${K8S_VERSION}"
+        "registry.aliyuncs.com/google_containers/kube-scheduler:v${K8S_VERSION}"
+        "registry.aliyuncs.com/google_containers/kube-proxy:v${K8S_VERSION}"
+        "registry.aliyuncs.com/google_containers/coredns:v1.11.3"
+        "registry.aliyuncs.com/google_containers/pause:3.9"
+        "registry.aliyuncs.com/google_containers/etcd:3.5.15-0"
+    )
+
+    for image in "${images[@]}"; do
+        log_info "拉取镜像: $image"
+        ctr -n k8s.io image pull "$image" || log_warn "镜像 $image 拉取失败，将在初始化时重试"
+    done
+
+    log_info "镜像预拉取完成"
 }
 
 # 初始化 Master 节点
@@ -242,7 +315,7 @@ init_master() {
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
 kubernetesVersion: v${K8S_VERSION}
-imageRepository: ${ALIYUN_MIRROR}
+imageRepository: registry.aliyuncs.com/google_containers
 networking:
   podSubnet: ${pod_network_cidr}
   serviceSubnet: ${service_cidr}
@@ -253,12 +326,11 @@ cgroupDriver: systemd
 EOF
 
     # 提前拉取镜像
-    log_info "拉取 Kubernetes 镜像..."
-    kubeadm config images pull --config=/tmp/kubeadm-config.yaml || log_warn "镜像拉取失败,继续初始化..."
+    prefetch_images
 
     # 初始化集群
     log_info "执行集群初始化(这可能需要几分钟)..."
-    kubeadm init --config=/tmp/kubeadm-config.yaml || error_exit "集群初始化失败"
+    kubeadm init --config=/tmp/kubeadm-config.yaml --upload-certs || error_exit "集群初始化失败"
 
     # 配置 kubectl
     log_info "配置 kubectl..."
@@ -284,8 +356,10 @@ install_calico() {
     log_info "安装 Calico 网络插件..."
 
     # 下载 Calico manifest
-    wget -q https://docs.projectcalico.org/${CALICO_VERSION}/manifests/calico.yaml -O /tmp/calico.yaml || \
-    wget -q https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/calico.yaml -O /tmp/calico.yaml || \
+    local calico_url="https://docs.tigera.io/calico/latest/manifests/calico.yaml"
+
+    wget -q "$calico_url" -O /tmp/calico.yaml || \
+    wget -q "https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/calico.yaml" -O /tmp/calico.yaml || \
     error_exit "Calico manifest 下载失败"
 
     # 应用 Calico
@@ -306,6 +380,69 @@ enable_master_scheduling() {
     kubectl taint nodes --all node-role.kubernetes.io/master- 2>/dev/null || true
 
     log_info "单机模式配置完成"
+}
+
+# 等待所有 Pod 就绪（健康检查）
+wait_for_pods_ready() {
+    log_info "等待所有系统 Pod 启动完成..."
+
+    local max_wait=600  # 最多等待10分钟
+    local wait_time=0
+    local check_interval=10
+
+    while [ $wait_time -lt $max_wait ]; do
+        # 获取所有 kube-system 命名空间的 Pod 状态
+        local pending_pods=$(kubectl get pods -n kube-system --no-headers 2>/dev/null | grep -v "Running\|Completed" | wc -l)
+        local total_pods=$(kubectl get pods -n kube-system --no-headers 2>/dev/null | wc -l)
+        local running_pods=$((total_pods - pending_pods))
+
+        if [ $pending_pods -eq 0 ] && [ $total_pods -gt 0 ]; then
+            log_info "所有系统 Pod 已就绪! ($running_pods/$total_pods)"
+            return 0
+        fi
+
+        log_info "等待 Pod 就绪... ($running_pods/$total_pods 就绪, $pending_pods 待启动) - ${wait_time}s/${max_wait}s"
+
+        # 显示未就绪的 Pod
+        kubectl get pods -n kube-system --no-headers 2>/dev/null | grep -v "Running\|Completed" | awk '{print "  - "$1" ("$3")"}'
+
+        sleep $check_interval
+        wait_time=$((wait_time + check_interval))
+    done
+
+    log_warn "等待超时，但集群可能仍在初始化中"
+    log_warn "请手动检查 Pod 状态: kubectl get pods -A"
+    return 1
+}
+
+# 诊断镜像拉取问题
+diagnose_image_issues() {
+    log_info "诊断镜像拉取问题..."
+
+    # 检查 containerd 状态
+    log_info "Containerd 状态:"
+    systemctl status containerd --no-pager -l | head -20
+
+    # 检查镜像配置
+    log_info "镜像源配置:"
+    cat /etc/containerd/config.toml | grep -A 10 "registry.mirrors"
+
+    # 检查网络连接
+    log_info "测试镜像源连接:"
+    curl -I https://registry.aliyuncs.com 2>&1 | head -5
+
+    # 列出已拉取的镜像
+    log_info "已拉取的镜像:"
+    crictl images 2>/dev/null || ctr -n k8s.io images ls 2>/dev/null | head -20
+
+    # 检查失败的 Pod
+    log_info "问题 Pod 详情:"
+    kubectl get pods -A | grep -E "ImagePull|ErrImage|Pending" | while read line; do
+        local pod=$(echo $line | awk '{print $2}')
+        local ns=$(echo $line | awk '{print $1}')
+        echo "=== Pod: $ns/$pod ==="
+        kubectl describe pod $pod -n $ns | grep -A 5 "Events:"
+    done
 }
 
 # 生成 Worker 节点加入命令
@@ -330,9 +467,6 @@ generate_join_command() {
 
 # 显示集群信息
 show_cluster_info() {
-    log_info "等待集群就绪..."
-    sleep 15
-
     log_info "=========================================="
     log_info "集群部署完成!"
     log_info "=========================================="
@@ -343,13 +477,24 @@ show_cluster_info() {
     echo ""
 
     log_info "集群 Pod 信息:"
-    kubectl get pods -A
+    kubectl get pods -A -o wide
+    echo ""
+
+    log_info "集群组件状态:"
+    kubectl get componentstatuses 2>/dev/null || log_warn "ComponentStatus API 已弃用"
     echo ""
 
     log_info "常用命令:"
     echo "  查看节点: kubectl get nodes"
     echo "  查看Pod:  kubectl get pods -A"
     echo "  查看服务: kubectl get svc -A"
+    echo "  查看日志: kubectl logs <pod-name> -n <namespace>"
+    echo "  诊断Pod:  kubectl describe pod <pod-name> -n <namespace>"
+    echo ""
+
+    log_info "版本信息:"
+    echo "  Kubernetes: $(kubectl version --short 2>/dev/null | grep Server || kubectl version --client)"
+    echo "  Containerd: $(containerd --version | awk '{print $3}')"
     echo ""
 }
 
@@ -357,7 +502,8 @@ show_cluster_info() {
 main_menu() {
     clear
     echo "=========================================="
-    echo "   Kubernetes 集群部署脚本"
+    echo "   Kubernetes 集群部署脚本 - 修复版"
+    echo "   版本: K8s ${K8S_VERSION}"
     echo "=========================================="
     echo ""
     echo "请选择部署模式:"
@@ -365,9 +511,10 @@ main_menu() {
     echo "  2) 多机模式 - Master 节点"
     echo "  3) 多机模式 - Worker 节点"
     echo "  4) 仅安装基础组件(不初始化集群)"
+    echo "  5) 诊断现有集群问题"
     echo "  0) 退出"
     echo ""
-    read -p "请输入选项 [0-4]: " choice
+    read -p "请输入选项 [0-5]: " choice
 
     case $choice in
         1)
@@ -382,6 +529,9 @@ main_menu() {
         4)
             install_components_only
             ;;
+        5)
+            diagnose_existing_cluster
+            ;;
         0)
             log_info "退出脚本"
             exit 0
@@ -393,10 +543,38 @@ main_menu() {
     esac
 }
 
+# 诊断现有集群
+diagnose_existing_cluster() {
+    log_info "=========================================="
+    log_info "诊断现有集群"
+    log_info "=========================================="
+    echo ""
+
+    check_root
+
+    # 检查集群状态
+    log_info "集群节点状态:"
+    kubectl get nodes -o wide
+    echo ""
+
+    log_info "Pod 状态:"
+    kubectl get pods -A -o wide
+    echo ""
+
+    # 诊断镜像问题
+    diagnose_image_issues
+
+    echo ""
+    log_info "=========================================="
+    log_info "诊断完成"
+    log_info "=========================================="
+}
+
 # 单机模式部署
 deploy_single_node() {
     log_info "=========================================="
     log_info "开始单机模式部署"
+    log_info "Kubernetes 版本: ${K8S_VERSION}"
     log_info "=========================================="
     echo ""
 
@@ -407,14 +585,19 @@ deploy_single_node() {
     configure_apt_mirror
     install_dependencies
     install_containerd
+    install_crictl
     install_kubernetes
     init_master
     install_calico
     enable_master_scheduling
+
+    # 等待 Pod 就绪
+    wait_for_pods_ready
+
     show_cluster_info
 
     log_info "=========================================="
-    log_info "单机模式部署完成!"
+    log_info "✅ 单机模式部署完成!"
     log_info "=========================================="
 }
 
@@ -422,6 +605,7 @@ deploy_single_node() {
 deploy_master_node() {
     log_info "=========================================="
     log_info "开始 Master 节点部署"
+    log_info "Kubernetes 版本: ${K8S_VERSION}"
     log_info "=========================================="
     echo ""
 
@@ -432,14 +616,19 @@ deploy_master_node() {
     configure_apt_mirror
     install_dependencies
     install_containerd
+    install_crictl
     install_kubernetes
     init_master
     install_calico
     generate_join_command
+
+    # 等待 Pod 就绪
+    wait_for_pods_ready
+
     show_cluster_info
 
     log_info "=========================================="
-    log_info "Master 节点部署完成!"
+    log_info "✅ Master 节点部署完成!"
     log_info "请在 Worker 节点上运行加入命令"
     log_info "=========================================="
 }
@@ -458,11 +647,12 @@ deploy_worker_node() {
     configure_apt_mirror
     install_dependencies
     install_containerd
+    install_crictl
     install_kubernetes
 
     echo ""
     log_info "=========================================="
-    log_info "Worker 节点基础组件安装完成!"
+    log_info "✅ Worker 节点基础组件安装完成!"
     log_info "=========================================="
     echo ""
     log_warn "请在 Master 节点执行以下命令获取加入命令:"
@@ -486,10 +676,11 @@ install_components_only() {
     configure_apt_mirror
     install_dependencies
     install_containerd
+    install_crictl
     install_kubernetes
 
     log_info "=========================================="
-    log_info "基础组件安装完成!"
+    log_info "✅ 基础组件安装完成!"
     log_info "=========================================="
 }
 
