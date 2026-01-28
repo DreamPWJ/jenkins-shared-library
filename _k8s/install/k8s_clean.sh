@@ -45,6 +45,7 @@ echo ""
 # 1. 重置 kubeadm
 log_step "1/15: 重置 kubeadm..."
 kubeadm reset -f 2>/dev/null || log_warn "kubeadm reset 失败或未安装"
+apt-get remove  kubeadm || true
 log_info "kubeadm 已重置"
 
 # 2. 停止所有 K8s 服务
@@ -93,6 +94,7 @@ log_info "etcd 数据已删除"
 
 # 8. 删除 kubelet 数据
 log_step "8/15: 删除 kubelet 数据..."
+apt-get remove kubelet  kubectl || true
 rm -rf /var/lib/kubelet/ 2>/dev/null || true
 log_info "kubelet 数据已删除"
 
@@ -145,7 +147,9 @@ if command -v ipvsadm >/dev/null 2>&1; then
 fi
 
 # 13. 删除临时配置文件
-log_step "13/15: 删除临时配置文件..."
+log_step "13/15: 删除密钥和临时配置文件..."
+rm -f /etc/apt/keyrings/kubernetes-apt-keyring.gpg || true
+rm -f /etc/apt/sources.list.d/kubernetes.list || true
 rm -f /tmp/kubeadm-config*.yaml 2>/dev/null || true
 log_info "临时文件已删除"
 
