@@ -509,8 +509,8 @@ show_cluster_info() {
     echo ""
 
     log_info "=========================================="
-    log_info "K8s集群部署完成!"
-    log_info "KubeConfig配置文件通常位于Master节点的 /etc/kubernetes/admin.conf"
+    # log_info "K8s集群部署完成!"
+    log_info "KubeConfig管理配置文件通常位于Master节点的: /etc/kubernetes/admin.conf"
     log_info "=========================================="
     echo ""
 }
