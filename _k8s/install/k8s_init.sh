@@ -13,12 +13,6 @@ CONTAINERD_VERSION="1.7.30"
 CALICO_VERSION="v3.31.3"
 COREDNS_VERSION="v1.13.2"
 
-# 国内镜像源 - 使用多个备用源
-ALIYUN_MIRROR="registry.cn-hangzhou.aliyuncs.com/google_containers"
-ALIYUN_K8S_MIRROR="registry.aliyuncs.com/k8sxio"  # 新增备用源
-DOCKER_MIRROR="https://docker.mirrors.ustc.edu.cn"
-
-
 # 颜色输出
 RED='\033[0;31m'
 GREEN='\033[0;32m'
