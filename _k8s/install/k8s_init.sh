@@ -251,19 +251,19 @@ install_crictl() {
 # 安装 kubeadm、kubelet、kubectl
 install_kubernetes() {
     log_info "安装 Kubernetes 组件(kubeadm、kubectl)..."
-
+    k8s_main_version=$(echo $K8S_VERSION | cut -d. -f1-2)
     # 添加阿里云 Kubernetes 源
-    curl -fsSL https://mirrors.aliyun.com/kubernetes-new/core/stable/v1.31/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg || error_exit "添加 GPG 密钥失败"
+    curl -fsSL https://mirrors.aliyun.com/kubernetes-new/core/stable/v${k8s_main_version}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg || error_exit "添加 GPG 密钥失败"
 
     cat > /etc/apt/sources.list.d/kubernetes.list <<EOF
-deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://mirrors.aliyun.com/kubernetes-new/core/stable/v1.31/deb/ /
+deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://mirrors.aliyun.com/kubernetes-new/core/stable/v${k8s_main_version}/deb/ /
 EOF
 
     # 更新软件包列表
     apt-get update -y || error_exit "更新软件包列表失败"
 
     # 安装指定版本
-    KUBE_VERSION="${K8S_VERSION}-1.1"
+    KUBE_VERSION="${K8S_VERSION}-1.1" # 版本后缀不同 - 新版 -1.1，旧版 -00
 
     # 检查版本是否可用
     if ! apt-cache madison kubeadm | grep -q "$KUBE_VERSION"; then
