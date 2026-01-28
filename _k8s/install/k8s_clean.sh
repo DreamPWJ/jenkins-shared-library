@@ -199,7 +199,7 @@ echo ""
 
 log_info "已清理的内容:"
 echo "  ✓ kubeadm 配置已重置"
-echo "  ✓ 所有容器已删除"
+echo "  ✓ 所有容器和环境已删除"
 echo "  ✓ Kubernetes 配置文件已删除"
 echo "  ✓ CNI 网络配置已删除"
 echo "  ✓ etcd 数据已删除"

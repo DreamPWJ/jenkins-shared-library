@@ -308,8 +308,8 @@ prefetch_images() {
 
 # 初始化 Master 节点
 init_master() {
-    local pod_network_cidr="10.244.0.0/16"
-    local service_cidr="10.96.0.0/12"
+    local pod_network_cidr="10.244.0.0/16" # 集群 Pod 网络 CIDR
+    local service_cidr="10.96.0.0/12"      # 集群 Service 网络 CIDR
 
     log_info "初始化 Kubernetes Master 节点..."
 
@@ -345,9 +345,20 @@ EOF
     for user_home in /home/*; do
         if [[ -d "$user_home" ]]; then
             local username=$(basename "$user_home")
-            mkdir -p "$user_home/.kube"
-            cp -f /etc/kubernetes/admin.conf "$user_home/.kube/config"
-            chown -R "$username:$username" "$user_home/.kube"
+            
+            # 检查用户是否真实存在
+            if id "$username" &>/dev/null; then
+                local user_shell=$(getent passwd "$username" | cut -d: -f7)
+                local user_uid=$(id -u "$username")
+
+                # 只为真实用户配置（UID >= 1000 且有有效shell）
+                if [[ $user_uid -ge 1000 ]] && [[ "$user_shell" =~ (bash|sh|zsh|fish)$ ]]; then
+                    log_info "配置 kubectl for user: $username"
+                    mkdir -p "$user_home/.kube"
+                    cp -f /etc/kubernetes/admin.conf "$user_home/.kube/config"
+                    chown -R "$username:$username" "$user_home/.kube"  #  安全
+                fi
+            fi
         fi
     done
 
