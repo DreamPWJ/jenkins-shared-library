@@ -460,18 +460,16 @@ generate_join_command() {
 
     local join_command=$(kubeadm token create --print-join-command)
 
-    echo ""
     log_info "=========================================="
     log_info "Worker 节点加入命令:"
-    echo ""
     echo "$join_command"
-    echo ""
     log_info "=========================================="
-    echo ""
+
     echo "$join_command" > /root/k8s-join-command.sh
     chmod +x /root/k8s-join-command.sh
 
     log_info "加入命令已保存到: /root/k8s-join-command.sh"
+    echo ""
 }
 
 # 显示集群信息
@@ -641,7 +639,7 @@ deploy_master_node() {
 
     log_info "=========================================="
     log_info "✅ K8s v${K8S_VERSION} Master 节点部署完成!"
-    log_info "请在 K8s Worker 节点上运行加入命令"
+    #log_info "请在 K8s Worker 节点上运行加入命令"
     log_info "=========================================="
 }
 
