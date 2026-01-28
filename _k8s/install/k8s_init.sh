@@ -310,7 +310,7 @@ init_master() {
 
     # 创建 kubeadm 配置文件
     cat > /tmp/kubeadm-config.yaml <<EOF
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
 kubernetesVersion: v${K8S_VERSION}
 imageRepository: registry.aliyuncs.com/google_containers
