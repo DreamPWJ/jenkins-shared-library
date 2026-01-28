@@ -7,16 +7,11 @@
 
 set -e
 
-# 配置参数
-K8S_VERSION="1.31.13"
+# 版本配置参数
+K8S_VERSION="1.33.7"
 CONTAINERD_VERSION="1.7.30"
 CALICO_VERSION="v3.31.3"
-
-# 国内镜像源 - 使用多个备用源
-ALIYUN_MIRROR="registry.cn-hangzhou.aliyuncs.com/google_containers"
-ALIYUN_K8S_MIRROR="registry.aliyuncs.com/k8sxio"  # 新增备用源
-DOCKER_MIRROR="https://docker.mirrors.ustc.edu.cn"
-
+COREDNS_VERSION="v1.13.2"
 
 # 颜色输出
 RED='\033[0;31m'
@@ -247,22 +242,22 @@ install_crictl() {
 #    log_info "crictl 安装完成"
 }
 
-# 安装 kubeadm、kubelet、kubectl
+# 安装 kubeadm、kubectl 、kubelet
 install_kubernetes() {
-    log_info "安装 Kubernetes 组件(kubeadm、kubectl)..."
-
+    log_info "安装 Kubernetes ${K8S_VERSION} 组件(kubeadm、kubectl)..."
+    k8s_main_version=$(echo $K8S_VERSION | cut -d. -f1-2)
     # 添加阿里云 Kubernetes 源
-    curl -fsSL https://mirrors.aliyun.com/kubernetes-new/core/stable/v1.31/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg || error_exit "添加 GPG 密钥失败"
+    curl -fsSL https://mirrors.aliyun.com/kubernetes-new/core/stable/v${k8s_main_version}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg || error_exit "添加 GPG 密钥失败"
 
     cat > /etc/apt/sources.list.d/kubernetes.list <<EOF
-deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://mirrors.aliyun.com/kubernetes-new/core/stable/v1.31/deb/ /
+deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://mirrors.aliyun.com/kubernetes-new/core/stable/v${k8s_main_version}/deb/ /
 EOF
 
     # 更新软件包列表
     apt-get update -y || error_exit "更新软件包列表失败"
 
     # 安装指定版本
-    KUBE_VERSION="${K8S_VERSION}-1.1"
+    KUBE_VERSION="${K8S_VERSION}-1.1" # 版本后缀不同 - 新版 -1.1，旧版 -00
 
     # 检查版本是否可用
     if ! apt-cache madison kubeadm | grep -q "$KUBE_VERSION"; then
@@ -293,9 +288,9 @@ prefetch_images() {
         "registry.aliyuncs.com/google_containers/kube-controller-manager:v${K8S_VERSION}"
         "registry.aliyuncs.com/google_containers/kube-scheduler:v${K8S_VERSION}"
         "registry.aliyuncs.com/google_containers/kube-proxy:v${K8S_VERSION}"
-        "registry.aliyuncs.com/google_containers/coredns:v1.11.3"
-        "registry.aliyuncs.com/google_containers/pause:3.9"
-        "registry.aliyuncs.com/google_containers/etcd:3.5.15-0"
+        "registry.aliyuncs.com/google_containers/coredns:${COREDNS_VERSION}"
+        "registry.aliyuncs.com/google_containers/pause:3.10.1"
+        "registry.aliyuncs.com/google_containers/etcd:3.5.26-0"
     )
 
     for image in "${images[@]}"; do
@@ -308,14 +303,14 @@ prefetch_images() {
 
 # 初始化 Master 节点
 init_master() {
-    local pod_network_cidr="10.244.0.0/16"
-    local service_cidr="10.96.0.0/12"
+    local pod_network_cidr="10.244.0.0/16" # 集群 Pod 网络 CIDR
+    local service_cidr="10.96.0.0/12"      # 集群 Service 网络 CIDR
 
     log_info "初始化 Kubernetes Master 节点..."
 
     # 创建 kubeadm 配置文件
     cat > /tmp/kubeadm-config.yaml <<EOF
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
 kubernetesVersion: v${K8S_VERSION}
 imageRepository: registry.aliyuncs.com/google_containers
@@ -345,9 +340,20 @@ EOF
     for user_home in /home/*; do
         if [[ -d "$user_home" ]]; then
             local username=$(basename "$user_home")
-            mkdir -p "$user_home/.kube"
-            cp -f /etc/kubernetes/admin.conf "$user_home/.kube/config"
-            chown -R "$username:$username" "$user_home/.kube"
+
+            # 检查用户是否真实存在
+            if id "$username" &>/dev/null; then
+                local user_shell=$(getent passwd "$username" | cut -d: -f7)
+                local user_uid=$(id -u "$username")
+
+                # 只为真实用户配置（UID >= 1000 且有有效shell）
+                if [[ $user_uid -ge 1000 ]] && [[ "$user_shell" =~ (bash|sh|zsh|fish)$ ]]; then
+                    log_info "配置 kubectl for user: $username"
+                    mkdir -p "$user_home/.kube"
+                    cp -f /etc/kubernetes/admin.conf "$user_home/.kube/config"
+                    chown -R "$username:$username" "$user_home/.kube"  #  安全
+                fi
+            fi
         fi
     done
 
@@ -373,7 +379,7 @@ install_calico() {
 
 # 单机模式:允许 Master 调度 Pod
 enable_master_scheduling() {
-    log_info "配置单机模式: 允许 Master 节点调度 Pod..."
+    log_info "配置单机模式: 允许 K8s Master 节点调度 Pod..."
 
     # 等待节点就绪
     sleep 10
@@ -389,7 +395,7 @@ enable_master_scheduling() {
 wait_for_pods_ready() {
     log_info "等待所有系统 Pod 启动完成..."
 
-    local max_wait=1000  # 最多等待多少秒
+    local max_wait=1800  # 最多等待多少秒
     local wait_time=0
     local check_interval=10
 
@@ -450,30 +456,24 @@ diagnose_image_issues() {
 
 # 生成 Worker 节点加入命令
 generate_join_command() {
-    log_info "生成 Worker 节点加入命令..."
+    log_info "生成 K8s Worker 节点加入命令..."
 
     local join_command=$(kubeadm token create --print-join-command)
 
-    echo ""
     log_info "=========================================="
     log_info "Worker 节点加入命令:"
-    echo ""
     echo "$join_command"
-    echo ""
     log_info "=========================================="
-    echo ""
+
     echo "$join_command" > /root/k8s-join-command.sh
     chmod +x /root/k8s-join-command.sh
 
     log_info "加入命令已保存到: /root/k8s-join-command.sh"
+    echo ""
 }
 
 # 显示集群信息
 show_cluster_info() {
-    log_info "=========================================="
-    log_info "K8s集群部署完成!"
-    log_info "KubeConfig配置文件通常位于Master节点的 /etc/kubernetes/admin.conf"
-    log_info "=========================================="
     echo ""
 
     log_info "K8s集群节点信息:"
@@ -500,6 +500,12 @@ show_cluster_info() {
     echo "Kubernetes: $(kubectl version --short 2>/dev/null | grep Server || kubectl version --client)"
     echo "Containerd: $(containerd --version | awk '{print $3}')"
     echo ""
+
+    log_info "=========================================="
+    # log_info "K8s集群部署完成!"
+    log_info "KubeConfig管理配置文件通常位于Master节点的: /etc/kubernetes/admin.conf"
+    log_info "=========================================="
+    echo ""
 }
 
 # 主菜单
@@ -510,7 +516,7 @@ main_menu() {
     echo "   版本: K8s ${K8S_VERSION}"
     echo "=========================================="
     echo ""
-    echo "请选择部署模式:"
+    echo "请选择K8s部署模式:"
     echo "  1) 单机模式 (Single Node)"
     echo "  2) 多机模式 - Master 节点"
     echo "  3) 多机模式 - Worker 节点"
@@ -601,14 +607,14 @@ deploy_single_node() {
     show_cluster_info
 
     log_info "=========================================="
-    log_info "✅ 单机K8S集群部署完成!"
+    log_info "✅ 单机K8S v${K8S_VERSION}集群部署完成!"
     log_info "=========================================="
 }
 
 # Master 节点部署
 deploy_master_node() {
     log_info "=========================================="
-    log_info "开始 Master 节点部署"
+    log_info "开始 K8s Master 节点部署"
     log_info "Kubernetes 版本: ${K8S_VERSION}"
     log_info "=========================================="
     echo ""
@@ -624,23 +630,23 @@ deploy_master_node() {
     install_kubernetes
     init_master
     install_calico
-    generate_join_command
 
     # 等待 Pod 就绪
     wait_for_pods_ready
 
     show_cluster_info
+    generate_join_command
 
     log_info "=========================================="
-    log_info "✅ Master 节点部署完成!"
-    log_info "请在 Worker 节点上运行加入命令"
+    log_info "✅ K8s v${K8S_VERSION} Master 节点部署完成!"
+    #log_info "请在 K8s Worker 节点上运行加入命令"
     log_info "=========================================="
 }
 
 # Worker 节点部署
 deploy_worker_node() {
     log_info "=========================================="
-    log_info "开始 Worker 节点部署"
+    log_info "开始 K8s Worker 节点部署"
     log_info "=========================================="
     echo ""
 
@@ -656,13 +662,13 @@ deploy_worker_node() {
 
     echo ""
     log_info "=========================================="
-    log_info "✅ Worker 节点基础组件安装完成!"
+    log_info "✅ K8s v${K8S_VERSION} Worker 节点基础组件安装完成!"
     log_info "=========================================="
     echo ""
-    log_warn "请在 Master 节点执行以下命令获取加入命令:"
+    log_warn "请在 K8s Master 节点执行以下命令获取加入命令:"
     echo "  kubeadm token create --print-join-command"
     echo ""
-    log_warn "然后在本节点执行该命令加入集群"
+    log_warn "然后在本节点执行该命令加入K8S集群!"
     echo ""
 }
 
@@ -684,7 +690,7 @@ install_components_only() {
     install_kubernetes
 
     log_info "=========================================="
-    log_info "✅ 基础组件安装完成!"
+    log_info "✅ K8s基础组件安装完成!"
     log_info "=========================================="
 }
 

@@ -45,6 +45,7 @@ echo ""
 # 1. 重置 kubeadm
 log_step "1/15: 重置 kubeadm..."
 kubeadm reset -f 2>/dev/null || log_warn "kubeadm reset 失败或未安装"
+apt-get remove  kubeadm || true
 log_info "kubeadm 已重置"
 
 # 2. 停止所有 K8s 服务
@@ -55,15 +56,33 @@ systemctl stop docker 2>/dev/null || true
 log_info "服务已停止"
 
 # 3. 删除所有运行中的容器
-log_step "3/15: 删除所有容器..."
+log_step "3/15: 删除所有容器和Docker环境..."
+# 是否确定提示
 if command -v crictl >/dev/null 2>&1; then
     crictl --runtime-endpoint unix:///var/run/containerd/containerd.sock rm -af 2>/dev/null || true
     log_info "crictl 容器已删除"
+    rm -rf /var/lib/containerd/* || true
+    rm -rf /run/containerd/* || true
+    rm -rf /etc/containerd/config.toml || true
+    log_info "✓ containerd 数据已清理"
 fi
 
 if command -v docker >/dev/null 2>&1; then
     docker rm -f $(docker ps -aq) 2>/dev/null || true
     log_info "docker 容器已删除"
+    log_info "完全卸载 Docker..."
+    apt-get remove -y docker docker-engine docker.io containerd runc docker-ce docker-ce-cli containerd.io 2>/dev/null || true
+    apt-get purge -y docker docker-engine docker.io containerd runc docker-ce docker-ce-cli containerd.io 2>/dev/null || true
+    apt-get autoremove -y 2>/dev/null || true
+    log_info "✓ Docker 已卸载"
+    log_info "清理 Docker 遗留数据..."
+    rm -rf /var/lib/docker || true
+    rm -rf /var/lib/dockershim  || true
+    rm -rf /etc/docker  || true
+    rm -rf /var/run/docker.sock  || true
+    rm -rf /var/run/docker  || true
+    rm -rf ~/.docker  || true
+    log_info "✓ Docker 数据已清理"
 fi
 
 # 4. 删除所有 Pod 和镜像
@@ -93,6 +112,7 @@ log_info "etcd 数据已删除"
 
 # 8. 删除 kubelet 数据
 log_step "8/15: 删除 kubelet 数据..."
+apt-get remove kubelet  kubectl || true
 rm -rf /var/lib/kubelet/ 2>/dev/null || true
 log_info "kubelet 数据已删除"
 
@@ -145,7 +165,9 @@ if command -v ipvsadm >/dev/null 2>&1; then
 fi
 
 # 13. 删除临时配置文件
-log_step "13/15: 删除临时配置文件..."
+log_step "13/15: 删除密钥和临时配置文件..."
+rm -f /etc/apt/keyrings/kubernetes-apt-keyring.gpg || true
+rm -f /etc/apt/sources.list.d/kubernetes.list || true
 rm -f /tmp/kubeadm-config*.yaml 2>/dev/null || true
 log_info "临时文件已删除"
 
@@ -177,7 +199,7 @@ echo ""
 
 log_info "已清理的内容:"
 echo "  ✓ kubeadm 配置已重置"
-echo "  ✓ 所有容器已删除"
+echo "  ✓ 所有容器和环境已删除"
 echo "  ✓ Kubernetes 配置文件已删除"
 echo "  ✓ CNI 网络配置已删除"
 echo "  ✓ etcd 数据已删除"
