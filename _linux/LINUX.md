@@ -42,6 +42,12 @@ tail -f /var/log/cron
 - tar -zcvf my.tar.gz /my
 - tar -xzvf my.tar.gz && rm -f my.tar.gz
 
+#### 英伟达GPU驱动安装
+
+lspci | grep -i nvidia
+sudo ubuntu-drivers autoinstall
+nvidia-smi
+
 #### Linux扩容磁盘步骤  在线不停机扩容磁盘设置LVM（Logical Volume Manager）逻辑卷管理
 
 - 查看所有设备挂载情况 :  lsblk 或 lsblk -f
