@@ -656,7 +656,7 @@ deploy_worker_node() {
 
     echo ""
     log_info "=========================================="
-    log_info "✅ Worker 节点基础组件安装完成!"
+    log_info "✅ K8s Worker 节点基础组件安装完成!"
     log_info "=========================================="
     echo ""
     log_warn "请在 Master 节点执行以下命令获取加入命令:"
@@ -684,7 +684,7 @@ install_components_only() {
     install_kubernetes
 
     log_info "=========================================="
-    log_info "✅ 基础组件安装完成!"
+    log_info "✅ K8s基础组件安装完成!"
     log_info "=========================================="
 }
 
