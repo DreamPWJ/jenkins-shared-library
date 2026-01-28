@@ -7,10 +7,11 @@
 
 set -e
 
-# 配置参数
+# 版本配置参数
 K8S_VERSION="1.31.13"
 CONTAINERD_VERSION="1.7.30"
 CALICO_VERSION="v3.31.3"
+COREDNS_VERSION="v1.13.2"
 
 # 国内镜像源 - 使用多个备用源
 ALIYUN_MIRROR="registry.cn-hangzhou.aliyuncs.com/google_containers"
@@ -293,9 +294,12 @@ prefetch_images() {
         "registry.aliyuncs.com/google_containers/kube-controller-manager:v${K8S_VERSION}"
         "registry.aliyuncs.com/google_containers/kube-scheduler:v${K8S_VERSION}"
         "registry.aliyuncs.com/google_containers/kube-proxy:v${K8S_VERSION}"
-        "registry.aliyuncs.com/google_containers/coredns:v1.11.3"
-        "registry.aliyuncs.com/google_containers/pause:3.9"
-        "registry.aliyuncs.com/google_containers/etcd:3.5.15-0"
+        "registry.aliyuncs.com/google_containers/cni:${CALICO_VERSION}"
+        "registry.aliyuncs.com/google_containers/node:${CALICO_VERSION}"
+        "registry.aliyuncs.com/google_containers/kube-controller:${CALICO_VERSION}"
+        "registry.aliyuncs.com/google_containers/coredns:${COREDNS_VERSION}"
+        "registry.aliyuncs.com/google_containers/pause:3.10.1"
+        "registry.aliyuncs.com/google_containers/etcd:3.5.26-0"
     )
 
     for image in "${images[@]}"; do
