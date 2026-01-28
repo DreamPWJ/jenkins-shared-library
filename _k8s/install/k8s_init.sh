@@ -8,7 +8,7 @@
 set -e
 
 # 版本配置参数
-K8S_VERSION="1.32.11"
+K8S_VERSION="1.31.13"
 CONTAINERD_VERSION="1.7.30"
 CALICO_VERSION="v3.31.3"
 COREDNS_VERSION="v1.13.2"
@@ -248,7 +248,7 @@ install_crictl() {
 #    log_info "crictl 安装完成"
 }
 
-# 安装 kubeadm、kubelet、kubectl
+# 安装 kubeadm、kubectl 、kubelet
 install_kubernetes() {
     log_info "安装 Kubernetes ${K8S_VERSION} 组件(kubeadm、kubectl)..."
     k8s_main_version=$(echo $K8S_VERSION | cut -d. -f1-2)
