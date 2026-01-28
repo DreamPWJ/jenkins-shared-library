@@ -345,7 +345,7 @@ EOF
     for user_home in /home/*; do
         if [[ -d "$user_home" ]]; then
             local username=$(basename "$user_home")
-            
+
             # 检查用户是否真实存在
             if id "$username" &>/dev/null; then
                 local user_shell=$(getent passwd "$username" | cut -d: -f7)
@@ -400,7 +400,7 @@ enable_master_scheduling() {
 wait_for_pods_ready() {
     log_info "等待所有系统 Pod 启动完成..."
 
-    local max_wait=1000  # 最多等待多少秒
+    local max_wait=1800  # 最多等待多少秒
     local wait_time=0
     local check_interval=10
 
