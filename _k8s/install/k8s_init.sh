@@ -8,7 +8,7 @@
 set -e
 
 # 版本配置参数
-K8S_VERSION="1.31.13"
+K8S_VERSION="1.32.11"
 CONTAINERD_VERSION="1.7.30"
 CALICO_VERSION="v3.31.3"
 COREDNS_VERSION="v1.13.2"
@@ -294,9 +294,6 @@ prefetch_images() {
         "registry.aliyuncs.com/google_containers/kube-controller-manager:v${K8S_VERSION}"
         "registry.aliyuncs.com/google_containers/kube-scheduler:v${K8S_VERSION}"
         "registry.aliyuncs.com/google_containers/kube-proxy:v${K8S_VERSION}"
-        "registry.aliyuncs.com/google_containers/cni:${CALICO_VERSION}"
-        "registry.aliyuncs.com/google_containers/node:${CALICO_VERSION}"
-        "registry.aliyuncs.com/google_containers/kube-controller:${CALICO_VERSION}"
         "registry.aliyuncs.com/google_containers/coredns:${COREDNS_VERSION}"
         "registry.aliyuncs.com/google_containers/pause:3.10.1"
         "registry.aliyuncs.com/google_containers/etcd:3.5.26-0"
