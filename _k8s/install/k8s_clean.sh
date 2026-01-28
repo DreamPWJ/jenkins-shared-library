@@ -56,15 +56,33 @@ systemctl stop docker 2>/dev/null || true
 log_info "服务已停止"
 
 # 3. 删除所有运行中的容器
-log_step "3/15: 删除所有容器..."
+log_step "3/15: 删除所有容器和Docker环境..."
+# 是否确定提示
 if command -v crictl >/dev/null 2>&1; then
     crictl --runtime-endpoint unix:///var/run/containerd/containerd.sock rm -af 2>/dev/null || true
     log_info "crictl 容器已删除"
+    rm -rf /var/lib/containerd/* || true
+    rm -rf /run/containerd/* || true
+    rm -rf /etc/containerd/config.toml || true
+    log_info "✓ containerd 数据已清理"
 fi
 
 if command -v docker >/dev/null 2>&1; then
     docker rm -f $(docker ps -aq) 2>/dev/null || true
     log_info "docker 容器已删除"
+    log_info "完全卸载 Docker..."
+    apt-get remove -y docker docker-engine docker.io containerd runc docker-ce docker-ce-cli containerd.io 2>/dev/null || true
+    apt-get purge -y docker docker-engine docker.io containerd runc docker-ce docker-ce-cli containerd.io 2>/dev/null || true
+    apt-get autoremove -y 2>/dev/null || true
+    log_info "✓ Docker 已卸载"
+    log_info "清理 Docker 遗留数据..."
+    rm -rf /var/lib/docker || true
+    rm -rf /var/lib/dockershim  || true
+    rm -rf /etc/docker  || true
+    rm -rf /var/run/docker.sock  || true
+    rm -rf /var/run/docker  || true
+    rm -rf ~/.docker  || true
+    log_info "✓ Docker 数据已清理"
 fi
 
 # 4. 删除所有 Pod 和镜像
