@@ -8,7 +8,7 @@
 set -e
 
 # 版本配置参数
-K8S_VERSION="1.32.11"
+K8S_VERSION="1.33.7"
 CONTAINERD_VERSION="1.7.30"
 CALICO_VERSION="v3.31.3"
 COREDNS_VERSION="v1.13.2"
@@ -615,7 +615,7 @@ deploy_single_node() {
     show_cluster_info
 
     log_info "=========================================="
-    log_info "✅ 单机K8S集群部署完成!"
+    log_info "✅ 单机K8S v${K8S_VERSION}集群部署完成!"
     log_info "=========================================="
 }
 
@@ -646,7 +646,7 @@ deploy_master_node() {
     generate_join_command
 
     log_info "=========================================="
-    log_info "✅ K8s Master 节点部署完成!"
+    log_info "✅ K8s v${K8S_VERSION} Master 节点部署完成!"
     log_info "请在 K8s Worker 节点上运行加入命令"
     log_info "=========================================="
 }
@@ -670,7 +670,7 @@ deploy_worker_node() {
 
     echo ""
     log_info "=========================================="
-    log_info "✅ K8s Worker 节点基础组件安装完成!"
+    log_info "✅ K8s v${K8S_VERSION} Worker 节点基础组件安装完成!"
     log_info "=========================================="
     echo ""
     log_warn "请在 K8s Master 节点执行以下命令获取加入命令:"
