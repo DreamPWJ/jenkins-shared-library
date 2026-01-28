@@ -373,7 +373,7 @@ install_calico() {
 
 # 单机模式:允许 Master 调度 Pod
 enable_master_scheduling() {
-    log_info "配置单机模式: 允许 Master 节点调度 Pod..."
+    log_info "配置单机模式: 允许 K8s Master 节点调度 Pod..."
 
     # 等待节点就绪
     sleep 10
@@ -450,7 +450,7 @@ diagnose_image_issues() {
 
 # 生成 Worker 节点加入命令
 generate_join_command() {
-    log_info "生成 Worker 节点加入命令..."
+    log_info "生成 K8s Worker 节点加入命令..."
 
     local join_command=$(kubeadm token create --print-join-command)
 
@@ -470,10 +470,6 @@ generate_join_command() {
 
 # 显示集群信息
 show_cluster_info() {
-    log_info "=========================================="
-    log_info "K8s集群部署完成!"
-    log_info "KubeConfig配置文件通常位于Master节点的 /etc/kubernetes/admin.conf"
-    log_info "=========================================="
     echo ""
 
     log_info "K8s集群节点信息:"
@@ -500,6 +496,12 @@ show_cluster_info() {
     echo "Kubernetes: $(kubectl version --short 2>/dev/null | grep Server || kubectl version --client)"
     echo "Containerd: $(containerd --version | awk '{print $3}')"
     echo ""
+
+    log_info "=========================================="
+    log_info "K8s集群部署完成!"
+    log_info "KubeConfig配置文件通常位于Master节点的 /etc/kubernetes/admin.conf"
+    log_info "=========================================="
+    echo ""
 }
 
 # 主菜单
@@ -510,7 +512,7 @@ main_menu() {
     echo "   版本: K8s ${K8S_VERSION}"
     echo "=========================================="
     echo ""
-    echo "请选择部署模式:"
+    echo "请选择K8s部署模式:"
     echo "  1) 单机模式 (Single Node)"
     echo "  2) 多机模式 - Master 节点"
     echo "  3) 多机模式 - Worker 节点"
@@ -608,7 +610,7 @@ deploy_single_node() {
 # Master 节点部署
 deploy_master_node() {
     log_info "=========================================="
-    log_info "开始 Master 节点部署"
+    log_info "开始 K8s Master 节点部署"
     log_info "Kubernetes 版本: ${K8S_VERSION}"
     log_info "=========================================="
     echo ""
@@ -624,23 +626,23 @@ deploy_master_node() {
     install_kubernetes
     init_master
     install_calico
-    generate_join_command
 
     # 等待 Pod 就绪
     wait_for_pods_ready
 
     show_cluster_info
+    generate_join_command
 
     log_info "=========================================="
-    log_info "✅ Master 节点部署完成!"
-    log_info "请在 Worker 节点上运行加入命令"
+    log_info "✅ K8s Master 节点部署完成!"
+    log_info "请在 K8s Worker 节点上运行加入命令"
     log_info "=========================================="
 }
 
 # Worker 节点部署
 deploy_worker_node() {
     log_info "=========================================="
-    log_info "开始 Worker 节点部署"
+    log_info "开始 K8s Worker 节点部署"
     log_info "=========================================="
     echo ""
 
@@ -659,10 +661,10 @@ deploy_worker_node() {
     log_info "✅ K8s Worker 节点基础组件安装完成!"
     log_info "=========================================="
     echo ""
-    log_warn "请在 Master 节点执行以下命令获取加入命令:"
+    log_warn "请在 K8s Master 节点执行以下命令获取加入命令:"
     echo "  kubeadm token create --print-join-command"
     echo ""
-    log_warn "然后在本节点执行该命令加入集群"
+    log_warn "然后在本节点执行该命令加入K8S集群!"
     echo ""
 }
 
