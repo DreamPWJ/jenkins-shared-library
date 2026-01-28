@@ -389,7 +389,7 @@ enable_master_scheduling() {
 wait_for_pods_ready() {
     log_info "等待所有系统 Pod 启动完成..."
 
-    local max_wait=600  # 最多等待10分钟
+    local max_wait=1000  # 最多等待多少秒
     local wait_time=0
     local check_interval=10
 
