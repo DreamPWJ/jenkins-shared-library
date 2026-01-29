@@ -226,7 +226,8 @@ version = 2
     [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
 
       [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
-        endpoint = ["https://docker.m.daocloud.io",
+        endpoint = [
+          "https://docker.m.daocloud.io",
           "https://docker.1ms.run",
           "https://docker.xuanyuan.me",
           "https://docker.lanneng.tech",
