@@ -303,8 +303,8 @@ prefetch_images() {
 
 # 初始化 Master 节点
 init_master() {
-    local pod_network_cidr="10.244.0.0/16" # 集群 Pod 网络 CIDR
-    local service_cidr="10.96.0.0/12"      # 集群 Service 网络 CIDR
+    local pod_network_cidr="10.244.0.0/16"         # 集群 Pod 网络 CIDR
+    local service_network_cidr="10.96.0.0/12"      # 集群 Service 网络 CIDR  不可回收ip 所以网段要大
 
     log_info "初始化 Kubernetes Master 节点..."
 
@@ -316,7 +316,7 @@ kubernetesVersion: v${K8S_VERSION}
 imageRepository: registry.aliyuncs.com/google_containers
 networking:
   podSubnet: ${pod_network_cidr}
-  serviceSubnet: ${service_cidr}
+  serviceSubnet: ${service_network_cidr}
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
