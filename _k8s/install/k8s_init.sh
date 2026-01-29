@@ -213,15 +213,45 @@ install_containerd() {
     cat > /etc/containerd/config.toml <<EOF
 version = 2
 [plugins."io.containerd.grpc.v1.cri"]
-  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-    runtime_type = "io.containerd.runc.v2"
-    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-      SystemdCgroup = true
-  [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
-    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
-      endpoint = ["https://docker.m.daocloud.io", "https://docker.1ms.run", "https://docker.xuanyuan.me", "https://docker.lanneng.tech", "https://em1sutsj.mirror.aliyuncs.com"]
-    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.k8s.io"]
-      endpoint = ["https://registry.aliyuncs.com/google_containers"]
+  sandbox_image = "registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.10.1"
+
+  [plugins."io.containerd.grpc.v1.cri".containerd]
+    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+        runtime_type = "io.containerd.runc.v2"
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+          SystemdCgroup = true
+
+  [plugins."io.containerd.grpc.v1.cri".registry]
+    [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
+        endpoint = ["https://docker.m.daocloud.io",
+          "https://docker.1ms.run",
+          "https://docker.xuanyuan.me",
+          "https://docker.lanneng.tech",
+          "https://em1sutsj.mirror.aliyuncs.com"
+          ]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.k8s.io"]
+        endpoint = [
+          "https://registry.cn-hangzhou.aliyuncs.com/google_containers"
+        ]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors."k8s.gcr.io"]
+        endpoint = [
+          "https://registry.cn-hangzhou.aliyuncs.com/google_containers"
+        ]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors."gcr.io"]
+        endpoint = [
+          "https://registry.cn-hangzhou.aliyuncs.com"
+        ]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors."quay.io"]
+        endpoint = [
+          "https://quay.mirrors.aliyuncs.com"
+        ]
 EOF
 
     # 启动 containerd
@@ -234,7 +264,7 @@ EOF
         error_exit "容器 containerd 启动失败"
     fi
 
-    log_info "容器 containerd 安装完成, 版本:"
+    log_info "容器 containerd 安装完成, 版本信息:"
     # 打印版本
     containerd --version
     echo ""
@@ -242,7 +272,7 @@ EOF
 
 # 安装 crictl 工具（用于调试）
 install_crictl() {
-  log_info "crictl 工具下载速度慢 跳过安装"
+   log_info "crictl 工具github下载速度慢 跳过安装"
 #    CRICTL_VERSION="v1.35.0"
 #    log_info "安装 crictl $CRICTL_VERSION 工具..." +
 #    wget -q https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz -O /tmp/crictl.tar.gz || {
