@@ -211,27 +211,43 @@ install_containerd() {
     # 使用更可靠的配置方式
     cat > /etc/containerd/config.toml <<EOF
 version = 2
-[plugins]
-  [plugins."io.containerd.grpc.v1.cri"]
-    sandbox_image = "registry.aliyuncs.com/google_containers/pause:3.9"
-    [plugins."io.containerd.grpc.v1.cri".containerd]
-      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
-        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-          runtime_type = "io.containerd.runc.v2"
-          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-            SystemdCgroup = true
-    [plugins."io.containerd.grpc.v1.cri".registry]
-      [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
-          endpoint = ["https://docker.mirrors.ustc.edu.cn", "https://hub-mirror.c.163.com"]
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."k8s.gcr.io"]
-          endpoint = ["https://registry.aliyuncs.com/google_containers"]
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.k8s.io"]
-          endpoint = ["https://registry.aliyuncs.com/google_containers"]
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."gcr.io"]
-          endpoint = ["https://gcr.mirrors.ustc.edu.cn"]
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."quay.io"]
-          endpoint = ["https://quay.mirrors.ustc.edu.cn"]
+[plugins."io.containerd.grpc.v1.cri"]
+  sandbox_image = "registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.10"
+
+  [plugins."io.containerd.grpc.v1.cri".containerd]
+    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+        runtime_type = "io.containerd.runc.v2"
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+          SystemdCgroup = true
+
+  [plugins."io.containerd.grpc.v1.cri".registry]
+    [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
+        endpoint = [
+          "https://registry.cn-hangzhou.aliyuncs.com"
+        ]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.k8s.io"]
+        endpoint = [
+          "https://registry.cn-hangzhou.aliyuncs.com/google_containers"
+        ]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors."k8s.gcr.io"]
+        endpoint = [
+          "https://registry.cn-hangzhou.aliyuncs.com/google_containers"
+        ]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors."gcr.io"]
+        endpoint = [
+          "https://registry.cn-hangzhou.aliyuncs.com"
+        ]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors."quay.io"]
+        endpoint = [
+          "https://quay.mirrors.aliyuncs.com"
+        ]
 EOF
 
     # 启动 containerd
