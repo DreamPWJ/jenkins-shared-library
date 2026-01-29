@@ -348,7 +348,7 @@ prefetch_images() {
         ctr -n k8s.io image pull "$image" || log_warn "镜像 $image 拉取失败，将在初始化时重试"
     done
 
-    log_info "镜像预拉取完成"
+    log_info "ctr容器镜像预拉取完成"
 }
 
 # 生成kubeadm 配置文件
@@ -452,7 +452,8 @@ init_master() {
     prefetch_images
 
     # 初始化集群
-    log_info "执行K8S集群初始化(可能需要几分钟)..."
+    echo ""
+    log_info "自动执行K8S集群初始化(可能需要几分钟)..."
     kubeadm init --config=/tmp/kubeadm-config.yaml --upload-certs || error_exit "K8S集群初始化失败"
 
     # 配置 kubectl
@@ -483,6 +484,7 @@ init_master() {
     done
 
     log_info "K8S Master 节点初始化完成"
+    echo  ""
 }
 
 # 安装 Calico 网络插件
@@ -500,11 +502,12 @@ install_calico() {
     kubectl apply -f /tmp/calico.yaml || error_exit "Calico 安装失败"
 
     log_info "Calico ${CALICO_VERSION} 网络插件安装完成"
+    echo ""
 }
 
 # 单机模式:允许 Master 调度 Pod
 enable_master_scheduling() {
-    log_info "配置单机模式: 允许 K8s Master 节点调度 Pod..."
+    log_info "配置单机模式: 允许 K8s Master 节点调度 Pod服务..."
 
     # 等待节点就绪
     sleep 10
@@ -513,12 +516,13 @@ enable_master_scheduling() {
     kubectl taint nodes --all node-role.kubernetes.io/control-plane- 2>/dev/null || true
     kubectl taint nodes --all node-role.kubernetes.io/master- 2>/dev/null || true
 
-    log_info "单机K8s集群配置完成"
+    log_info "单机K8s集群调度模式配置完成"
 }
 
 # 等待所有 Pod 就绪（健康检查）
 wait_for_pods_ready() {
-    log_info "等待所有系统 Pod 启动完成..."
+    echo  ""
+    log_info "等待系统所有 Pod 启动完成 健康探测中..."
 
     local max_wait=1800  # 最多等待多少秒
     local wait_time=0
