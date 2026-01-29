@@ -383,15 +383,14 @@ gen_kubeadm_config() {
 
     # 如果没有自定义域名，使用公网IP或内网IP
     if [[ -z "$control_plane_endpoint" ]]; then
-        if [[ -n "$public_ip" ]]; then
-            control_plane_endpoint="${public_ip}:6443"
-            log_info "API Server 将使用公网IP: $public_ip"
+        if [[ -n "$private_ip" ]]; then # 优先使用内网IP
+              control_plane_endpoint="${private_ip}:6443"
+              log_info "API Server 将使用内网IP: $private_ip"
         else
-            control_plane_endpoint="${private_ip}:6443"
-            log_info "API Server 将使用内网IP: $private_ip"
+              control_plane_endpoint="${public_ip}:6443"
+              log_info "API Server 将使用公网IP: $public_ip"
         fi
     fi
-
     log_info "API Server 访问地址: https://$control_plane_endpoint"
 
     # 创建 kubeadm 配置文件
