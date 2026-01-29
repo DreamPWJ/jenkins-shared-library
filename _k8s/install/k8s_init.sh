@@ -204,7 +204,7 @@ install_containerd() {
     sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
 
     # 配置多个国内镜像加速源
-    log_info "配置 containerd 容器镜像国内加速源"
+    log_info "配置 containerd 容器镜像国内加速源..."
 
     # 备份原配置
     cp /etc/containerd/config.toml /etc/containerd/config.toml.bak
@@ -392,7 +392,7 @@ gen_kubeadm_config() {
         fi
     fi
 
-    log_info "API Server 访问地址: $control_plane_endpoint"
+    log_info "API Server 访问地址: https://$control_plane_endpoint"
 
     # 创建 kubeadm 配置文件
     local kubeadm_api_version="v1beta4"             # K8s安装工具 kubeadm API版本  考虑和k8s版本兼容性
