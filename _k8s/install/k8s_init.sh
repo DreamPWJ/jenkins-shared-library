@@ -213,14 +213,13 @@ install_containerd() {
     cat > /etc/containerd/config.toml <<EOF
 version = 2
 [plugins."io.containerd.grpc.v1.cri"]
-  sandbox_image = "registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.10"
   [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
     runtime_type = "io.containerd.runc.v2"
     [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
       SystemdCgroup = true
   [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
     [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
-      endpoint = ["https://docker.m.daocloud.io", "https://docker.1ms.run", "https://docker.xuanyuan.me"，"https://docker.lanneng.tech","https://em1sutsj.mirror.aliyuncs.com"]
+      endpoint = ["https://docker.m.daocloud.io", "https://docker.1ms.run", "https://docker.xuanyuan.me", "https://docker.lanneng.tech", "https://em1sutsj.mirror.aliyuncs.com"]
     [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.k8s.io"]
       endpoint = ["https://registry.aliyuncs.com/google_containers"]
 EOF
