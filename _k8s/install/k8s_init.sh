@@ -9,7 +9,7 @@ set -e
 
 # 版本配置参数
 K8S_VERSION="1.33.7"
-CONTAINERD_VERSION="1.7.30"
+#CONTAINERD_VERSION="1.7.30"
 CALICO_VERSION="v3.31.3"
 COREDNS_VERSION="v1.13.2"
 
@@ -511,7 +511,7 @@ install_calico() {
 
 # 单机模式:允许 Master 调度 Pod
 enable_master_scheduling() {
-    log_info "配置单机模式: 允许 K8s Master 节点调度 Pod服务..."
+    log_info "配置单机模式: 允许 K8s Master 节点调度 Pod 服务..."
 
     # 等待节点就绪
     sleep 10
@@ -629,7 +629,7 @@ show_cluster_info() {
     echo "  诊断Pod:  kubectl describe pod <pod-name> -n <namespace>"
     echo ""
 
-    log_info "版本信息:"
+    log_info "K8s版本信息:"
     echo "Kubernetes: $(kubectl version --short 2>/dev/null | grep Server || kubectl version --client)"
     echo "Containerd: $(containerd --version | awk '{print $3}')"
     echo ""
@@ -739,7 +739,7 @@ deploy_single_node() {
     show_cluster_info
 
     log_info "=========================================="
-    log_info "✅ 单机K8S v${K8S_VERSION} 集群部署完成 🎉"
+    log_info "✅ 单机 K8S v${K8S_VERSION} 集群部署完成 🎉"
     log_info "=========================================="
 }
 
