@@ -293,7 +293,7 @@ install_crictl() {
 # 安装 kubeadm、kubectl 、kubelet
 install_kubernetes() {
     echo  ""
-    log_info "安装 Kubernetes ${K8S_VERSION} 组件(如kubeadm、kubectl) ..."
+    log_info "安装 Kubernetes ${K8S_VERSION} 组件(如kubeadm、kubectl)..."
     k8s_main_version=$(echo $K8S_VERSION | cut -d. -f1-2)
     # 添加阿里云 Kubernetes 源
     curl -fsSL https://mirrors.aliyun.com/kubernetes-new/core/stable/v${k8s_main_version}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg || error_exit "添加 GPG 密钥失败"
@@ -355,7 +355,6 @@ prefetch_images() {
 gen_kubeadm_config() {
     local pod_network_cidr="10.244.0.0/16"         # 集群 Pod 网络 CIDR
     local service_network_cidr="10.96.0.0/12"      # 集群 Service 网络 CIDR  不可回收ip 所以网段要大
-    local kubeadm_api_version="v1beta4"              # kubeadm API版本 考虑和k8s版本兼容性
 
     log_info "初始化 Kubernetes Master 节点..."
     # 获取网络信息
@@ -396,6 +395,8 @@ gen_kubeadm_config() {
     log_info "API Server 访问地址: $control_plane_endpoint"
 
     # 创建 kubeadm 配置文件
+    local kubeadm_api_version="v1beta4"             # K8s安装工具 kubeadm API版本  考虑和k8s版本兼容性
+    local kubelet_api_version="v1beta1"             # Node代理服务 kubelet API版本
     cat > /tmp/kubeadm-config.yaml <<EOF
 apiVersion: kubeadm.k8s.io/${kubeadm_api_version}
 kind: ClusterConfiguration
@@ -427,10 +428,12 @@ EOF
     # 继续添加配置
     cat >> /tmp/kubeadm-config.yaml <<EOF
   extraArgs:
-    advertise-address: ${private_ip}
-    bind-address: 0.0.0.0
+    - name: advertise-address
+      value: ${private_ip}
+    - name: bind-address
+      value: "0.0.0.0"
 ---
-apiVersion: kubelet.config.k8s.io/v1beta1
+apiVersion: kubelet.config.k8s.io/${kubelet_api_version}
 kind: KubeletConfiguration
 cgroupDriver: systemd
 EOF
