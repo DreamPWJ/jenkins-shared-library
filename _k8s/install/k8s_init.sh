@@ -273,7 +273,7 @@ EOF
 
 # 安装 crictl 工具（用于调试）
 install_crictl() {
-   log_info "crictl 工具github下载速度慢 跳过安装"
+   log_info "crictl 调试工具在github下载速度慢 暂时跳过安装"
 #    CRICTL_VERSION="v1.35.0"
 #    log_info "安装 crictl $CRICTL_VERSION 工具..." +
 #    wget -q https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz -O /tmp/crictl.tar.gz || {
@@ -794,7 +794,7 @@ deploy_worker_node() {
 
     echo ""
     log_info "=========================================="
-    log_info "✅ K8s v${K8S_VERSION} Worker 节点基础组件安装完成!"
+    log_info "✅ K8s v${K8S_VERSION} Worker 节点基础组件安装完成 🎉"
     log_info "=========================================="
     echo ""
     log_warn "请在 K8s Master 节点执行以下命令获取加入命令:"
