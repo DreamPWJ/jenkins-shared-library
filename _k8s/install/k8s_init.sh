@@ -65,12 +65,12 @@ system_init() {
     log_info "开始系统初始化..."
 
     # 关闭swap
-    log_info "关闭 swap..."
+    log_info "关闭 swap 交换分区..."
     swapoff -a
     sed -i '/swap/s/^/#/' /etc/fstab
 
     # 关闭防火墙
-    log_info "配置防火墙..."
+    log_info "配置网络防火墙..."
     systemctl stop ufw 2>/dev/null || true
     systemctl disable ufw 2>/dev/null || true
 
@@ -81,7 +81,7 @@ system_init() {
     fi
 
     # 配置内核参数
-    log_info "配置内核参数..."
+    log_info "配置系统内核参数..."
     cat > /etc/sysctl.d/k8s.conf <<EOF
 net.bridge.bridge-nf-call-iptables  = 1
 net.bridge.bridge-nf-call-ip6tables = 1
@@ -108,7 +108,7 @@ EOF
 
 # 配置国内镜像源
 configure_apt_mirror() {
-    log_info "配置 APT 国内镜像源..."
+    log_info "配置 apt 安装包国内镜像源..."
 
     # 备份原有源
     cp /etc/apt/sources.list /etc/apt/sources.list.bak.$(date +%Y%m%d%H%M%S) 2>/dev/null || true
@@ -121,9 +121,9 @@ deb http://mirrors.aliyun.com/ubuntu/ $(lsb_release -cs)-updates main restricted
 deb http://mirrors.aliyun.com/ubuntu/ $(lsb_release -cs)-backports main restricted universe multiverse
 EOF
 
-    # 更新软件包列表
-    log_info "更新软件包列表..."
-    apt-get update -y || error_exit "APT 更新失败"
+    # 更新系统软件包列表
+    log_info "更新系统软件包列表..."
+    apt-get update -y || error_exit "apt 更新失败"
 }
 
 get_private_ip() {
@@ -181,6 +181,7 @@ install_dependencies() {
 
 # 安装 containerd
 install_containerd() {
+    echo ""
     log_info "安装 containerd 容器..."
 
     # 检查是否已安装
@@ -203,7 +204,7 @@ install_containerd() {
     sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
 
     # 配置多个国内镜像加速源
-    log_info "配置containerd容器镜像国内加速源..."
+    log_info "配置containerd容器镜像国内加速源"
 
     # 备份原配置
     cp /etc/containerd/config.toml /etc/containerd/config.toml.bak
@@ -257,12 +258,13 @@ EOF
 
     # 验证安装
     if ! systemctl is-active --quiet containerd; then
-        error_exit "containerd 启动失败"
+        error_exit "容器 containerd 启动失败"
     fi
 
-    log_info "containerd 安装完成"
+    log_info "容器 containerd 安装完成"
     # 打印版本
     containerd --version
+    echo ""
 }
 
 # 安装 crictl 工具（用于调试）
@@ -290,6 +292,7 @@ install_crictl() {
 
 # 安装 kubeadm、kubectl 、kubelet
 install_kubernetes() {
+    echo  ""
     log_info "安装 Kubernetes ${K8S_VERSION} 组件(kubeadm、kubectl)..."
     k8s_main_version=$(echo $K8S_VERSION | cut -d. -f1-2)
     # 添加阿里云 Kubernetes 源
@@ -319,6 +322,7 @@ EOF
     systemctl enable kubelet
 
     log_info "Kubernetes $(kubeadm version -o short) 组件安装完成"
+    echo  ""
 }
 
 # 预拉取镜像（使用国内源）
@@ -368,29 +372,27 @@ gen_kubeadm_config() {
     local custom_domain=""
     local control_plane_endpoint=""
 
-    read -p "是否配置K8S API Server自定义域名？(y/N): " use_custom_domain
-    if [[ "$use_custom_domain" =~ ^[Yy]$ ]]; then
-        read -p "请输入自定义域名（如: k8s.example.com）: " custom_domain
-        if [[ -n "$custom_domain" ]]; then
-            control_plane_endpoint="${custom_domain}:6443"
-            log_info "将使用域名: $custom_domain"
-        fi
-    fi
+#    read -p "是否配置K8S API Server自定义域名？(y/N): " use_custom_domain
+#    if [[ "$use_custom_domain" =~ ^[Yy]$ ]]; then
+#        read -p "请输入自定义域名（如: k8s.example.com）: " custom_domain
+#        if [[ -n "$custom_domain" ]]; then
+#            control_plane_endpoint="${custom_domain}:6443"
+#            log_info "将使用域名: $custom_domain"
+#        fi
+#    fi
 
     # 如果没有自定义域名，使用公网IP或内网IP
     if [[ -z "$control_plane_endpoint" ]]; then
         if [[ -n "$public_ip" ]]; then
             control_plane_endpoint="${public_ip}:6443"
-            log_info "将使用公网IP: $public_ip"
+            log_info "API Server 将使用公网IP: $public_ip"
         else
             control_plane_endpoint="${private_ip}:6443"
-            log_info "将使用内网IP: $private_ip"
+            log_info "API Server 将使用内网IP: $private_ip"
         fi
     fi
 
-    echo ""
     log_info "API Server 访问地址: $control_plane_endpoint"
-    echo  ""
 
     # 创建 kubeadm 配置文件
     local kubeadm_api_version=v1beta4 # kubeadm API版本 考虑和k8s版本兼容性
@@ -434,7 +436,6 @@ cgroupDriver: systemd
 EOF
 
     log_info "kubeadm 配置文件已生成:"
-    echo ""
     cat /tmp/kubeadm-config.yaml
     echo ""
 
