@@ -204,7 +204,7 @@ install_containerd() {
     sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
 
     # 配置多个国内镜像加速源
-    log_info "配置containerd容器镜像国内加速源"
+    log_info "配置 containerd 容器镜像国内加速源"
 
     # 备份原配置
     cp /etc/containerd/config.toml /etc/containerd/config.toml.bak
@@ -261,7 +261,7 @@ EOF
         error_exit "容器 containerd 启动失败"
     fi
 
-    log_info "容器 containerd 安装完成"
+    log_info "容器 containerd 安装完成, 版本:"
     # 打印版本
     containerd --version
     echo ""
@@ -293,7 +293,7 @@ install_crictl() {
 # 安装 kubeadm、kubectl 、kubelet
 install_kubernetes() {
     echo  ""
-    log_info "安装 Kubernetes ${K8S_VERSION} 组件(kubeadm、kubectl)..."
+    log_info "安装 Kubernetes ${K8S_VERSION} 组件(如kubeadm、kubectl) ..."
     k8s_main_version=$(echo $K8S_VERSION | cut -d. -f1-2)
     # 添加阿里云 Kubernetes 源
     curl -fsSL https://mirrors.aliyun.com/kubernetes-new/core/stable/v${k8s_main_version}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg || error_exit "添加 GPG 密钥失败"
