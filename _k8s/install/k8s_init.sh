@@ -631,7 +631,6 @@ show_cluster_info() {
     echo ""
 
     log_info "=========================================="
-    # log_info "K8s集群部署完成!"
     log_info "KubeConfig管理配置文件通常位于Master节点的: /etc/kubernetes/admin.conf"
     log_info "=========================================="
     echo ""
@@ -736,7 +735,7 @@ deploy_single_node() {
     show_cluster_info
 
     log_info "=========================================="
-    log_info "✅ 单机K8S v${K8S_VERSION}集群部署完成!"
+    log_info "✅ 单机K8S v${K8S_VERSION} 集群部署完成 🎉"
     log_info "=========================================="
 }
 
@@ -767,7 +766,7 @@ deploy_master_node() {
     generate_join_command
 
     log_info "=========================================="
-    log_info "✅ K8s v${K8S_VERSION} Master 节点部署完成!"
+    log_info "✅ K8s v${K8S_VERSION} Master 节点部署完成 🎉"
     #log_info "请在 K8s Worker 节点上运行加入命令"
     log_info "=========================================="
 }
