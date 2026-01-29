@@ -589,19 +589,19 @@ diagnose_image_issues() {
 
 # 生成 Worker 节点加入命令
 generate_join_command() {
-    log_info "生成 K8s Worker 节点加入命令..."
+    log_info "生成 K8s Worker 节点加入Master集群命令..."
 
     local join_command=$(kubeadm token create --print-join-command)
 
     log_info "=========================================="
-    log_info "Worker 节点加入命令:"
+    log_info "Worker 节点加入Master集群命令:"
     echo "$join_command"
     log_info "=========================================="
 
     echo "$join_command" > /root/k8s-join-command.sh
     chmod +x /root/k8s-join-command.sh
 
-    log_info "加入命令已保存到: /root/k8s-join-command.sh"
+    log_info "Worker节点加入Master集群命令已保存到: /root/k8s-join-command.sh"
     echo ""
 }
 
