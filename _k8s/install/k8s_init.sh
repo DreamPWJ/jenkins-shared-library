@@ -385,13 +385,13 @@ gen_kubeadm_config() {
     if [[ -z "$control_plane_endpoint" ]]; then
         if [[ -n "$private_ip" ]]; then # 优先使用内网IP
               control_plane_endpoint="${private_ip}:6443"
-              log_info "API Server 将使用内网IP: $private_ip"
+              log_info "ControlPlane 将使用内网IP: $private_ip"
         else
               control_plane_endpoint="${public_ip}:6443"
-              log_info "API Server 将使用公网IP: $public_ip"
+              log_info "ControlPlane 将使用公网IP: $public_ip"
         fi
     fi
-    log_info "API Server 访问地址: https://$control_plane_endpoint"
+    log_info "控制面板访问地址: https://$control_plane_endpoint"
 
     # 创建 kubeadm 配置文件
     local kubeadm_api_version="v1beta4"             # K8s安装工具 kubeadm API版本  考虑和k8s版本兼容性
