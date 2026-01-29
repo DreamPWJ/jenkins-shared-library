@@ -186,12 +186,12 @@ install_containerd() {
     # 检查是否已安装
     if command -v containerd &> /dev/null; then
         containerd --version
-        log_warn "containerd 已安装,跳过..."
+        log_warn "容器 containerd 已安装,跳过..."
         return
     fi
 
     # 安装 containerd
-    apt-get install -y containerd || error_exit "containerd 安装失败"
+    apt-get install -y containerd || error_exit "容器 containerd 安装失败"
 
     # 创建配置目录
     mkdir -p /etc/containerd
@@ -202,8 +202,8 @@ install_containerd() {
     # 配置 systemd cgroup 驱动
     sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
 
-    # 配置多个国内镜像加速源（修复关键）
-    log_info "配置镜像加速源..."
+    # 配置多个国内镜像加速源
+    log_info "配置containerd容器镜像国内加速源..."
 
     # 备份原配置
     cp /etc/containerd/config.toml /etc/containerd/config.toml.bak
