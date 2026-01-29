@@ -293,7 +293,7 @@ install_crictl() {
 # 安装 kubeadm、kubectl 、kubelet
 install_kubernetes() {
     echo  ""
-    log_info "安装 Kubernetes ${K8S_VERSION} 组件(如kubeadm、kubectl)..."
+    log_info "安装 Kubernetes ${K8S_VERSION} 组件(如 kubeadm、kubectl、kubelet)..."
     k8s_main_version=$(echo $K8S_VERSION | cut -d. -f1-2)
     # 添加阿里云 Kubernetes 源
     curl -fsSL https://mirrors.aliyun.com/kubernetes-new/core/stable/v${k8s_main_version}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg || error_exit "添加 GPG 密钥失败"
