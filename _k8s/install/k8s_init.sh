@@ -126,6 +126,36 @@ EOF
     apt-get update -y || error_exit "APT 更新失败"
 }
 
+get_private_ip() {
+    # 获取内网IP（私有IP）
+    local private_ip=$(ip route get 1.1.1.1 2>/dev/null | awk '{print $7; exit}')
+
+    if [[ -z "$private_ip" ]]; then
+        private_ip=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v '127.0.0.1' | head -1)
+    fi
+
+    echo "$private_ip"
+}
+
+get_public_ip() {
+    # 获取公网IP（外网IP）
+    local public_ip=""
+
+    # 尝试多个服务
+    public_ip=$(curl -s --connect-timeout 3 https://api.ipify.org 2>/dev/null)
+
+    if [[ -z "$public_ip" ]]; then
+        public_ip=$(curl -s --connect-timeout 3 https://ifconfig.me 2>/dev/null)
+    fi
+
+    if [[ -z "$public_ip" ]]; then
+        public_ip=$(curl -s --connect-timeout 3 https://ip.sb 2>/dev/null)
+    fi
+
+    echo "$public_ip"
+}
+
+
 # 安装依赖包
 install_dependencies() {
     log_info "安装K8s依赖包..."
@@ -257,7 +287,7 @@ EOF
     apt-get update -y || error_exit "更新软件包列表失败"
 
     # 安装指定版本
-    KUBE_VERSION="${K8S_VERSION}-1.1" # 版本后缀不同 - 新版 -1.1，旧版 -00
+    KUBE_VERSION="${K8S_VERSION}-1.1" # 版本后缀不同  新版 1.1，旧版 00 或 "0" "1" "2 等
 
     # 检查版本是否可用
     if ! apt-cache madison kubeadm | grep -q "$KUBE_VERSION"; then
@@ -301,27 +331,103 @@ prefetch_images() {
     log_info "镜像预拉取完成"
 }
 
-# 初始化 Master 节点
-init_master() {
+# 生成kubeadm 配置文件
+gen_kubeadm_config() {
     local pod_network_cidr="10.244.0.0/16"         # 集群 Pod 网络 CIDR
     local service_network_cidr="10.96.0.0/12"      # 集群 Service 网络 CIDR  不可回收ip 所以网段要大
 
     log_info "初始化 Kubernetes Master 节点..."
+    # 获取网络信息
+    local hostname=$(hostname)
+    local private_ip=$(get_private_ip)
+    local public_ip=$(get_public_ip)
+
+    log_info "网络配置信息:"
+    echo "  主机名: $hostname"
+    echo "  内网IP: $private_ip"
+    echo "  公网IP: ${public_ip:-未获取到}"
+    echo ""
+
+    # 询问是否使用自定义域名
+    local custom_domain=""
+    local control_plane_endpoint=""
+
+    read -p "是否配置K8S API Server自定义域名？(y/N): " use_custom_domain
+    if [[ "$use_custom_domain" =~ ^[Yy]$ ]]; then
+        read -p "请输入自定义域名（如: k8s.example.com）: " custom_domain
+        if [[ -n "$custom_domain" ]]; then
+            control_plane_endpoint="${custom_domain}:6443"
+            log_info "将使用域名: $custom_domain"
+        fi
+    fi
+
+    # 如果没有自定义域名，使用公网IP或内网IP
+    if [[ -z "$control_plane_endpoint" ]]; then
+        if [[ -n "$public_ip" ]]; then
+            control_plane_endpoint="${public_ip}:6443"
+            log_info "将使用公网IP: $public_ip"
+        else
+            control_plane_endpoint="${private_ip}:6443"
+            log_info "将使用内网IP: $private_ip"
+        fi
+    fi
+
+    echo ""
+    log_info "API Server 访问地址: $control_plane_endpoint"
+    echo  ""
 
     # 创建 kubeadm 配置文件
+    local kubeadm_api_version=v1beta4 # kubeadm API版本 考虑和k8s版本兼容性
     cat > /tmp/kubeadm-config.yaml <<EOF
-apiVersion: kubeadm.k8s.io/v1beta4
+apiVersion: kubeadm.k8s.io/${kubeadm_api_version}
 kind: ClusterConfiguration
 kubernetesVersion: v${K8S_VERSION}
 imageRepository: registry.aliyuncs.com/google_containers
+controlPlaneEndpoint: ${control_plane_endpoint}
 networking:
   podSubnet: ${pod_network_cidr}
   serviceSubnet: ${service_network_cidr}
+apiServer:
+  certSANs:
+    - localhost
+    - 127.0.0.1
+    - ${hostname}
+    - ${private_ip}
+EOF
+    # 添加公网IP（如果有）
+    if [[ -n "$public_ip" ]]; then
+        cat >> /tmp/kubeadm-config.yaml <<EOF
+    - ${public_ip}
+EOF
+    fi
+    # 添加自定义域名（如果有）
+    if [[ -n "$custom_domain" ]]; then
+        cat >> /tmp/kubeadm-config.yaml <<EOF
+    - ${custom_domain}
+EOF
+    fi
+    # 继续添加配置
+    cat >> /tmp/kubeadm-config.yaml <<EOF
+  extraArgs:
+    advertise-address: ${private_ip}
+    bind-address: 0.0.0.0
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
 cgroupDriver: systemd
 EOF
+
+    log_info "kubeadm 配置文件已生成:"
+    echo ""
+    cat /tmp/kubeadm-config.yaml
+    echo ""
+
+ }
+
+# 初始化 Master 节点
+init_master() {
+    # 生成 kubeadm 配置文件
+    gen_kubeadm_config
 
     # 提前拉取镜像
     prefetch_images
