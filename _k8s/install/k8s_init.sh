@@ -722,11 +722,58 @@ install_cert_manager() {
 # 自动安装 Prometheus
 install_prometheus() {
     log_info "开始安装 Prometheus 监控..."
+   # 添加 Prometheus 的 Helm 仓库（带重试机制）
+     MAX_RETRY=10
+     RETRY_COUNT=0
 
-    # 添加 Prometheus 的 Helm 仓库
-    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts    # 官方镜像源
-    #helm repo add prometheus-community https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts # 国内镜像源
-    helm repo update
+     while [ $RETRY_COUNT -lt $MAX_RETRY ]; do
+         echo "尝试添加 Prometheus Helm 仓库 (尝试 $((RETRY_COUNT+1))/$MAX_RETRY)..."
+
+         # 先移除可能存在的旧仓库
+         helm repo remove prometheus-community 2>/dev/null || true
+
+         # 添加仓库 官方镜像
+         if helm repo add prometheus-community https://prometheus-community.github.io/helm-charts; then
+             echo "Helm 仓库添加成功"
+             break
+         else
+             RETRY_COUNT=$((RETRY_COUNT+1))
+             if [ $RETRY_COUNT -lt $MAX_RETRY ]; then
+                 echo "添加失败，等待 5 秒后重试..."
+                 sleep 5
+             else
+                 echo "添加 Helm 仓库失败，请检查："
+                 echo "1. 网络连接是否正常"
+                 echo "2. 是否需要设置代理 (export http_proxy=... https_proxy=...)"
+                 echo "3. DNS 是否正常解析"
+                 echo ""
+                 echo "可以手动执行以下命令测试："
+                 echo "curl -I https://prometheus-community.github.io/helm-charts/index.yaml"
+                 return 1
+             fi
+         fi
+     done
+
+     # 更新仓库（带重试）
+     RETRY_COUNT=0
+     while [ $RETRY_COUNT -lt $MAX_RETRY ]; do
+         echo "更新 Helm 仓库..."
+         if helm repo update; then
+             echo "Helm 仓库更新成功"
+             break
+         else
+             RETRY_COUNT=$((RETRY_COUNT+1))
+             if [ $RETRY_COUNT -lt $MAX_RETRY ]; then
+                 echo "更新失败，等待 5 秒后重试..."
+                 sleep 5
+             else
+                 echo "更新 Helm 仓库失败"
+                 return 1
+             fi
+         fi
+     done
+
+    #helm repo update
 
     # 创建 monitoring 命名空间
     kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
@@ -830,7 +877,7 @@ main_menu() {
     echo "  8) 安装Prometheus监控运维组件"
     echo "  0) 退出"
     echo ""
-    read -p "请输入选项 [0-5]: " choice
+    read -p "请输入选项 [0-8]: " choice
 
     case $choice in
         1)
