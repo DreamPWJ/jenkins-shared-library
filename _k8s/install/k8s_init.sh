@@ -828,7 +828,6 @@ install_ingress_controller() {
            kubectl apply -f ingress-nginx.yaml
     fi
 
-
     log_info "等待 Ingress Controller 启动..."
     kubectl wait --for=condition=ready --timeout=300s pod -l app.kubernetes.io/name=ingress-nginx -n ingress-nginx
 
@@ -850,22 +849,28 @@ install_ingress_controller() {
 install_metallb() {
     log_info "开始安装 MetalLB 负载均衡..."
 
-    # 添加 MetalLB Helm 仓库
-    helm repo add metallb https://metallb.github.io/metallb
-    helm repo update
+   if curl -I --connect-timeout 5 "https://metallb.github.io/metallb/index.yaml" > /dev/null 2>&1; then
+       # 添加 MetalLB Helm 仓库
+       helm repo add metallb https://metallb.github.io/metallb
+       helm repo update
 
-    # 创建命名空间
-    kubectl create namespace metallb-system --dry-run=client -o yaml | kubectl apply -f -
+       # 创建命名空间
+       kubectl create namespace metallb-system --dry-run=client -o yaml | kubectl apply -f -
 
-    # 使用 Helm 安装 MetalLB
-    log_info "使用 Helm 安装 MetalLB..."
-    helm install metallb metallb/metallb \
-        --namespace metallb-system \
-        --wait
+       # 使用 Helm 安装 MetalLB
+       log_info "使用 Helm 安装 MetalLB..."
+       helm install metallb metallb/metallb \
+           --namespace metallb-system \
+           --wait
 
-    if [ $? -ne 0 ]; then
-        log_error "MetalLB 安装失败"
-        return 1
+       if [ $? -ne 0 ]; then
+           log_error "MetalLB 安装失败"
+           return 1
+       fi
+    else
+           log_error "MetalLB的Helm包网络不通"
+           log_info  "使用k8s yaml文件离线安装 MetalLB"
+           kubectl apply -f metallb.yaml
     fi
 
     log_info "等待 MetalLB 组件启动..."
