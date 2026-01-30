@@ -707,11 +707,11 @@ install_cert_manager() {
 
     # 等待 cert-manager 部署完成
     log_info "等待 cert-manager 启动..."
-    kubectl wait --for=condition=available --timeout=300s \
+    kubectl wait --for=condition=available --timeout=600s \
         deployment/cert-manager -n cert-manager
-    kubectl wait --for=condition=available --timeout=300s \
+    kubectl wait --for=condition=available --timeout=600s \
         deployment/cert-manager-webhook -n cert-manager
-    kubectl wait --for=condition=available --timeout=300s \
+    kubectl wait --for=condition=available --timeout=600s \
         deployment/cert-manager-cainjector -n cert-manager
 
     log_info "cert-manager 安装完成 ✅ "
@@ -746,8 +746,8 @@ install_prometheus() {
 
     # 等待 Prometheus 部署完成
     log_info "等待 Prometheus 与 Grafana 启动..."
-    kubectl wait --for=condition=available --timeout=300s deployment/prometheus -n monitoring 2>/dev/null || true
-    kubectl wait --for=condition=available --timeout=300s deployment/grafana -n monitoring 2>/dev/null || true
+    kubectl wait --for=condition=available --timeout=600s deployment/prometheus -n monitoring 2>/dev/null || true
+    kubectl wait --for=condition=available --timeout=600s deployment/grafana -n monitoring 2>/dev/null || true
 
     log_info "Prometheus 安装完成 ✅ "
     echo ""
@@ -829,7 +829,7 @@ install_ingress_controller() {
     fi
 
     log_info "等待 Ingress Controller 启动..."
-    kubectl wait --for=condition=ready --timeout=300s pod -l app.kubernetes.io/name=ingress-nginx -n ingress-nginx
+    kubectl wait --for=condition=ready --timeout=600s pod -l app.kubernetes.io/name=ingress-nginx -n ingress-nginx
 
     echo ""
     log_info "Nginx Ingress Controller 安装完成  ✅"
@@ -874,7 +874,7 @@ install_metallb() {
     fi
 
     log_info "等待 MetalLB 组件启动..."
-    kubectl wait --for=condition=ready --timeout=300s pod -l app.kubernetes.io/name=metallb -n metallb-system
+    kubectl wait --for=condition=ready --timeout=600s pod -l app=metallb -n metallb-system 2>/dev/null || true
 
     echo ""
     log_info "MetalLB 组件安装完成，现在配置 IP 地址池..."
