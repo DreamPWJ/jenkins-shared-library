@@ -798,6 +798,49 @@ install_gateway_api() {
     fi
 }
 
+# 初始化 Ingress Controller (使用 Nginx Ingress Controller)
+install_ingress_controller() {
+    log_info "开始安装 Nginx Ingress Controller 路由控制器..."
+
+    # 添加 Nginx Ingress Helm 仓库
+    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+    helm repo update
+
+    # 创建命名空间
+    kubectl create namespace ingress-nginx --dry-run=client -o yaml | kubectl apply -f -
+
+    # 使用 Helm 安装 Nginx Ingress Controller
+    log_info "使用 Helm 安装 Nginx Ingress Controller..."
+    helm install ingress-nginx ingress-nginx/ingress-nginx \
+        --namespace ingress-nginx \
+        --set controller.service.type=LoadBalancer \
+        --set controller.metrics.enabled=true \
+        --set controller.podAnnotations."prometheus\.io/scrape"=true \
+        --set controller.podAnnotations."prometheus\.io/port"=10254 \
+        --wait
+
+    if [ $? -ne 0 ]; then
+        log_error "Ingress Controller 安装失败"
+        return 1
+    fi
+
+    log_info "等待 Ingress Controller 启动..."
+    kubectl wait --for=condition=ready --timeout=300s pod -l app.kubernetes.io/name=ingress-nginx -n ingress-nginx
+
+    echo ""
+    log_info " Nginx Ingress Controller 安装完成  ✅"
+    echo ""
+    log_info "查看 Ingress Controller 状态:"
+    kubectl get pods -n ingress-nginx
+    echo ""
+    log_info "查看 Ingress Controller Service:"
+    kubectl get svc -n ingress-nginx
+    echo ""
+    log_warn "提示: Ingress Controller Service 类型为 LoadBalancer，需要配合 MetalLB 获取外部 IP"
+    echo ""
+
+}
+
 # 初始化 MetalLB
 install_metallb() {
     log_info "开始安装 MetalLB 负载均衡..."
@@ -828,23 +871,23 @@ install_metallb() {
     echo ""
 
     # 获取用户输入 IP 地址范围
-    read -p "请输入 MetalLB IP 地址池范围 (例如: 192.168.1.240-192.168.1.250): " IP_RANGE
+    read -p "请输入 MetalLB IP 地址池范围 (例如: 172.16.1.240-172.16.1.250): " IP_RANGE
 
     if [ -z "$IP_RANGE" ]; then
         echo "未输入 IP 地址范围，跳过自动配置"
         echo ""
         echo "你可以稍后手动创建配置:"
         cat <<'EXAMPLE'
-apiVersion: metallb.io/v1beta1
+apiVersion: metallb.io/v1beta2
 kind: IPAddressPool
 metadata:
   name: default-pool
   namespace: metallb-system
 spec:
   addresses:
-  - 192.168.1.240-192.168.1.250
+  - 172.16.1.240-172.16.1.250
 ---
-apiVersion: metallb.io/v1beta1
+apiVersion: metallb.io/v1beta2
 kind: L2Advertisement
 metadata:
   name: default-l2
@@ -858,7 +901,7 @@ EXAMPLE
 
     # 创建 IP 地址池配置
     cat <<EOF | kubectl apply -f -
-apiVersion: metallb.io/v1beta1
+apiVersion: metallb.io/v1beta2
 kind: IPAddressPool
 metadata:
   name: default-pool
@@ -867,7 +910,7 @@ spec:
   addresses:
   - ${IP_RANGE}
 ---
-apiVersion: metallb.io/v1beta1
+apiVersion: metallb.io/v1beta2
 kind: L2Advertisement
 metadata:
   name: default-l2
@@ -878,7 +921,7 @@ spec:
 EOF
 
     echo ""
-    log_info " MetalLB 安装并配置完成 ✅"
+    log_info "MetalLB 安装并配置完成 ✅"
     echo ""
     log_info "查看 MetalLB 状态:"
     kubectl get pods -n metallb-system
@@ -962,9 +1005,12 @@ main_menu() {
     echo "  6) 安装Helm包管理"
     echo "  7) 安装Cert Manager自动化证书组件"
     echo "  8) 安装Prometheus监控运维组件"
+    echo "  9) 安装Ingress Controller路由控制组件"
+    echo "  10) 安装MetalLB负载均衡组件"
+    echo "  11) 安装Gateway API网关组件"
     echo "  0) 退出"
     echo ""
-    read -p "请输入选项 [0-8]: " choice
+    read -p "请输入选项 [0-11]: " choice
 
     case $choice in
         1)
@@ -990,6 +1036,15 @@ main_menu() {
             ;;
         8)
             install_prometheus
+            ;;
+        9)
+            install_ingress_controller
+            ;;
+        10)
+            install_metallb
+            ;;
+        11)
+            install_gateway_api
             ;;
         0)
             log_info "退出脚本"
