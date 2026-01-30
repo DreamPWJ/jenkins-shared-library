@@ -800,27 +800,34 @@ install_gateway_api() {
 install_ingress_controller() {
     log_info "开始安装 Nginx Ingress Controller 路由控制器..."
 
-    # 添加 Nginx Ingress Helm 仓库
-    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-    helm repo update
+   if curl -I --connect-timeout 5 "https://kubernetes.github.io/ingress-nginx/index.yaml" > /dev/null 2>&1; then
+       # 添加 Nginx Ingress Helm 仓库
+       helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+       helm repo update
 
-    # 创建命名空间
-    kubectl create namespace ingress-nginx --dry-run=client -o yaml | kubectl apply -f -
+       # 创建命名空间
+       kubectl create namespace ingress-nginx --dry-run=client -o yaml | kubectl apply -f -
 
-    # 使用 Helm 安装 Nginx Ingress Controller
-    log_info "使用 Helm 安装 Nginx Ingress Controller..."
-    helm install ingress-nginx ingress-nginx/ingress-nginx \
-        --namespace ingress-nginx \
-        --set controller.service.type=LoadBalancer \
-        --set controller.metrics.enabled=true \
-        --set controller.podAnnotations."prometheus\.io/scrape"=true \
-        --set controller.podAnnotations."prometheus\.io/port"=10254 \
-        --wait
+       # 使用 Helm 安装 Nginx Ingress Controller
+       log_info "使用 Helm 安装 Nginx Ingress Controller..."
+       helm install ingress-nginx ingress-nginx/ingress-nginx \
+           --namespace ingress-nginx \
+           --set controller.service.type=LoadBalancer \
+           --set controller.metrics.enabled=true \
+           --set controller.podAnnotations."prometheus\.io/scrape"=true \
+           --set controller.podAnnotations."prometheus\.io/port"=10254 \
+           --wait
 
-    if [ $? -ne 0 ]; then
-        log_error "Ingress Controller 安装失败"
-        return 1
+       if [ $? -ne 0 ]; then
+           log_error "Ingress Controller 安装失败"
+           return 1
+       fi
+    else
+           log_error "Ingress Controller的Helm包网络不通"
+           log_info  "使用k8s yaml文件离线安装 Ingress Controller"
+           kubectl apply -f ingress-nginx.yaml
     fi
+
 
     log_info "等待 Ingress Controller 启动..."
     kubectl wait --for=condition=ready --timeout=300s pod -l app.kubernetes.io/name=ingress-nginx -n ingress-nginx
