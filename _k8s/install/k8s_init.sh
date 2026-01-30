@@ -722,87 +722,47 @@ install_cert_manager() {
 # 自动安装 Prometheus
 install_prometheus() {
     log_info "开始安装 Prometheus 监控..."
-   # 添加 Prometheus 的 Helm 仓库（带重试机制）
-     MAX_RETRY=10
-     RETRY_COUNT=0
+   # 添加 Prometheus 的 Helm 仓库
+    curl -I https://prometheus-community.github.io/helm-charts/index.yaml
+    if [ $? -eq 0 ]; then
+           log_info "在线安装helm prometheus "
+           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+           helm repo update
 
-     while [ $RETRY_COUNT -lt $MAX_RETRY ]; do
-         echo "尝试添加 Prometheus Helm 仓库 (尝试 $((RETRY_COUNT+1))/$MAX_RETRY)..."
+           # 创建 monitoring 命名空间
+           kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
 
-         # 先移除可能存在的旧仓库
-         helm repo remove prometheus-community 2>/dev/null || true
-
-         # 添加仓库 官方镜像
-         if helm repo add prometheus-community https://prometheus-community.github.io/helm-charts; then
-             echo "Helm 仓库添加成功"
-             break
-         else
-             RETRY_COUNT=$((RETRY_COUNT+1))
-             if [ $RETRY_COUNT -lt $MAX_RETRY ]; then
-                 echo "添加失败，等待 5 秒后重试..."
-                 sleep 5
-             else
-                 echo "添加 Helm 仓库失败，请检查："
-                 echo "1. 网络连接是否正常"
-                 echo "2. 是否需要设置代理 (export http_proxy=... https_proxy=...)"
-                 echo "3. DNS 是否正常解析"
-                 echo ""
-                 echo "可以手动执行以下命令测试："
-                 echo "curl -I https://prometheus-community.github.io/helm-charts/index.yaml"
-                 return 1
-             fi
-         fi
-     done
-
-     # 更新仓库（带重试）
-     RETRY_COUNT=0
-     while [ $RETRY_COUNT -lt $MAX_RETRY ]; do
-         echo "更新 Helm 仓库..."
-         if helm repo update; then
-             echo "Helm 仓库更新成功"
-             break
-         else
-             RETRY_COUNT=$((RETRY_COUNT+1))
-             if [ $RETRY_COUNT -lt $MAX_RETRY ]; then
-                 echo "更新失败，等待 5 秒后重试..."
-                 sleep 5
-             else
-                 echo "更新 Helm 仓库失败"
-                 return 1
-             fi
-         fi
-     done
-
-    #helm repo update
-
-    # 创建 monitoring 命名空间
-    kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
-
-    # 安装 kube-prometheus-stack (包含 Prometheus, Grafana, Alertmanager 等)
-        local grafana_admin_password="admin@0633"
-    helm install prometheus prometheus-community/kube-prometheus-stack \
-        --namespace monitoring \
-        --set prometheus.prometheusSpec.retention=15d \
-        --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage=20Gi \
-        --set grafana.adminPassword=${grafana_admin_password} \
-        --wait
+           # 安装 kube-prometheus-stack (包含 Prometheus, Grafana, Alertmanager 等)
+           local grafana_admin_password="admin@0633"
+           helm install prometheus prometheus-community/kube-prometheus-stack \
+               --namespace monitoring \
+               --set prometheus.prometheusSpec.retention=15d \
+               --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage=20Gi \
+               --set grafana.adminPassword=${grafana_admin_password} \
+               --wait
+    else
+           log_info "网络不通 离线安装helm prometheus "
+           kubectl apply -f prometheus-complete.yaml
+    fi
 
     # 等待 Prometheus 部署完成
-    echo "等待 Prometheus 启动..."
-    kubectl wait --for=condition=available --timeout=300s \
-        deployment/prometheus-kube-prometheus-operator -n monitoring
-    kubectl wait --for=condition=available --timeout=300s \
-        deployment/prometheus-grafana -n monitoring
+    echo "等待 Prometheus 与 Grafana 启动..."
+    kubectl wait --for=condition=available --timeout=300s deployment/prometheus -n monitoring 2>/dev/null || true
+    kubectl wait --for=condition=available --timeout=300s deployment/grafana -n monitoring 2>/dev/null || true
 
     log_info "Prometheus 安装完成 ✅ "
     echo ""
-    log_info "Grafana 默认密码: ${grafana_admin_password}"
     kubectl get pods -n monitoring
 
     # 显示访问信息
+    log_warn "要访问 Prometheus ，请先执行："
+    log_info "kubectl port-forward -n monitoring svc/prometheus 9090:9090"
+    log_info "Prometheus: http://localhost:9090"
+    echo ""
     log_warn "要访问 Grafana，请先执行："
-    log_info "kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80"
+    log_info "kubectl port-forward -n monitoring svc/grafana 3000:3000"
     log_info "Grafana访问地址: http://localhost:3000"
+    log_info "Grafana 默认用户名admin 密码: ${grafana_admin_password}"
 }
 
 # 生成 Worker 节点加入命令
