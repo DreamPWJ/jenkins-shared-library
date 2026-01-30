@@ -785,12 +785,10 @@ install_gateway_api() {
     kubectl get crd | grep gateway.networking.k8s.io
 
     if [ $? -eq 0 ]; then
+        echo ""
         log_info "Gateway API ${gateway_api_version} 安装完成 ✅"
         echo ""
-        log_info "已安装的 CRDs:"
-        kubectl get crd | grep gateway.networking.k8s.io
-        echo ""
-        log_warn "提示: Gateway API 已安装，需要配合网关实现使用（如 Istio、Nginx Gateway、Envoy Gateway 等）"
+        log_warn "提示: 标准 Gateway API 已安装，需要配合网关实现使用（如 Istio、Traefik、Nginx Gateway、Envoy Gateway、Kong Gateway 等）"
         return 0
     else
         log_error "Gateway API 安装失败 ❌"
@@ -828,7 +826,7 @@ install_ingress_controller() {
     kubectl wait --for=condition=ready --timeout=300s pod -l app.kubernetes.io/name=ingress-nginx -n ingress-nginx
 
     echo ""
-    log_info " Nginx Ingress Controller 安装完成  ✅"
+    log_info "Nginx Ingress Controller 安装完成  ✅"
     echo ""
     log_info "查看 Ingress Controller 状态:"
     kubectl get pods -n ingress-nginx
