@@ -157,7 +157,7 @@ metadata:
 #    prometheus.io/port: "{CONTAINER_PORT}"      # /metric接口的端口
 
 spec:
-  type: LoadBalancer                   # 规格类型ClusterIP、NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡 LoadBalancer不支持同时多个协议
+  type: LoadBalancer                   # 按需动态定义规格类型ClusterIP、NodePort、LoadBalancer、Ingress实现Pod外网访问和负载均衡 LoadBalancer不支持同时多个协议
   selector:
     app: {APP_COMMON_NAME}             # 通过Pod的labels指定Pod 建立关联  Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
   ports:
