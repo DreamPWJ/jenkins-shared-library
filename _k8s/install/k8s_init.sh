@@ -707,7 +707,7 @@ install_cert_manager() {
         --wait
 
     # 等待 cert-manager 部署完成
-    echo "等待 cert-manager 启动..."
+    log_info "等待 cert-manager 启动..."
     kubectl wait --for=condition=available --timeout=300s \
         deployment/cert-manager -n cert-manager
     kubectl wait --for=condition=available --timeout=300s \
@@ -746,7 +746,7 @@ install_prometheus() {
     fi
 
     # 等待 Prometheus 部署完成
-    echo "等待 Prometheus 与 Grafana 启动..."
+    log_info "等待 Prometheus 与 Grafana 启动..."
     kubectl wait --for=condition=available --timeout=300s deployment/prometheus -n monitoring 2>/dev/null || true
     kubectl wait --for=condition=available --timeout=300s deployment/grafana -n monitoring 2>/dev/null || true
 
@@ -755,6 +755,7 @@ install_prometheus() {
     kubectl get pods -n monitoring
 
     # 显示访问信息
+    echo ""
     log_warn "要访问 Prometheus ，请先执行："
     log_info "kubectl port-forward -n monitoring svc/prometheus 9090:9090"
     log_info "Prometheus: http://localhost:9090"
