@@ -119,7 +119,8 @@ class Kubernetes implements Serializable {
         // 如果使用容器镜像仓库和k8s是一个云厂商 镜像仓库地址建议使用内网地址 下载加速和节省流量
         def dockerRepoRegistry = "${ctx.DOCKER_REPO_REGISTRY}"
         if ("${ctx.DOCKER_REPO_REGISTRY}".endsWithAny("aliyun.com", "ksyun.com")) {
-            dockerRepoRegistry = "${ctx.DOCKER_REPO_REGISTRY}".replace("hub-", "hub-vpc-")  // 转换成内网仓库地址
+            // 可能会影响其他网络不通的服务拉去镜像 暂时关闭内网地址 后面要精准匹配后开放
+            // dockerRepoRegistry = "${ctx.DOCKER_REPO_REGISTRY}".replace("hub-", "hub-vpc-")  // 转换成内网仓库地址
         }
 
         // 基于统一k8s yaml核心配置模版动态替换参数 实现不同类型应用部署
