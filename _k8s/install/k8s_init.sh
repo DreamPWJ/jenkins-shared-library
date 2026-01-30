@@ -724,18 +724,20 @@ install_prometheus() {
     log_info "开始安装 Prometheus 监控..."
 
     # 添加 Prometheus 的 Helm 仓库
-    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts    # 官方镜像源
+    #helm repo add prometheus-community https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts # 国内镜像源
     helm repo update
 
     # 创建 monitoring 命名空间
     kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
 
     # 安装 kube-prometheus-stack (包含 Prometheus, Grafana, Alertmanager 等)
+        local grafana_admin_password="admin@0633"
     helm install prometheus prometheus-community/kube-prometheus-stack \
         --namespace monitoring \
         --set prometheus.prometheusSpec.retention=15d \
         --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage=20Gi \
-        --set grafana.adminPassword=admin123 \
+        --set grafana.adminPassword=${grafana_admin_password} \
         --wait
 
     # 等待 Prometheus 部署完成
@@ -746,14 +748,14 @@ install_prometheus() {
         deployment/prometheus-grafana -n monitoring
 
     log_info "Prometheus 安装完成 ✅ "
-    echo "Grafana 默认密码: admin123"
+    echo ""
+    log_info "Grafana 默认密码: ${grafana_admin_password}"
     kubectl get pods -n monitoring
 
     # 显示访问信息
-    echo ""
-    echo "要访问 Grafana，请执行："
-    echo "kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80"
-    echo "Grafana访问 http://localhost:3000"
+    log_warn "要访问 Grafana，请先执行："
+    log_info "kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80"
+    log_info "Grafana访问地址: http://localhost:3000"
 }
 
 # 生成 Worker 节点加入命令
