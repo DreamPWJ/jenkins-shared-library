@@ -240,9 +240,9 @@ class Kubernetes implements Serializable {
     static def afterDeployRun(ctx, map, deployNum) {
 
         // 查看个组件的状态  如 kubectl get svc
-        // kubectl top pods || true
+        // kubectl top pods || kubectl get pods || true
         ctx.sh """ 
-                    kubectl top nodes || true
+                    kubectl top nodes || kubectl get nodes || true
                     """
 
         // 部署Pod弹性水平扩缩容 可基于QPS自动伸缩  只需要初始化一次 定时任务没做分布式处理情况不建议扩缩容
