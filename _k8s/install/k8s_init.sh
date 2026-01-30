@@ -587,6 +587,103 @@ diagnose_image_issues() {
     done
 }
 
+
+# 自动安装 Helm
+install_helm() {
+    echo "开始安装 Helm 包管理..."
+
+    # 检查是否已安装 Helm
+    if command -v helm &> /dev/null; then
+        HELM_VERSION=$(helm version --short 2>/dev/null || helm version --template='{{.Version}}' 2>/dev/null)
+        echo "Helm 已安装: $HELM_VERSION"
+        read -p "是否重新安装? (y/n): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo "跳过 Helm 安装"
+            return 0
+        fi
+    fi
+
+    # 检测操作系统
+    OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+    ARCH=$(uname -m)
+
+    # 转换架构名称
+    case $ARCH in
+        x86_64)
+            ARCH="amd64"
+            ;;
+        aarch64|arm64)
+            ARCH="arm64"
+            ;;
+        armv7l)
+            ARCH="arm"
+            ;;
+        *)
+            echo "不支持的架构: $ARCH"
+            return 1
+            ;;
+    esac
+
+    echo "检测到系统: $OS-$ARCH"
+
+    # 下载并安装 Helm
+    HELM_INSTALL_DIR="/usr/local/bin"
+    TMP_DIR=$(mktemp -d)
+
+    echo "下载 Helm 安装脚本..."
+    curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 -o "$TMP_DIR/get_helm.sh"
+
+    if [ $? -ne 0 ]; then
+        echo "下载失败，尝试使用备用方法..."
+        # 备用方法：直接下载二进制文件
+        HELM_VERSION="v3.13.3"
+        HELM_TAR="helm-${HELM_VERSION}-${OS}-${ARCH}.tar.gz"
+        DOWNLOAD_URL="https://get.helm.sh/${HELM_TAR}"
+
+        echo "下载 Helm ${HELM_VERSION}..."
+        curl -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/$HELM_TAR"
+
+        if [ $? -ne 0 ]; then
+            echo "下载失败，请检查网络连接"
+            rm -rf "$TMP_DIR"
+            return 1
+        fi
+
+        echo "解压 Helm..."
+        tar -zxf "$TMP_DIR/$HELM_TAR" -C "$TMP_DIR"
+
+        echo "安装 Helm 到 $HELM_INSTALL_DIR..."
+        sudo mv "$TMP_DIR/${OS}-${ARCH}/helm" "$HELM_INSTALL_DIR/helm"
+        sudo chmod +x "$HELM_INSTALL_DIR/helm"
+    else
+        # 使用官方安装脚本
+        chmod +x "$TMP_DIR/get_helm.sh"
+        bash "$TMP_DIR/get_helm.sh"
+    fi
+
+    # 清理临时文件
+    rm -rf "$TMP_DIR"
+
+    # 验证安装
+    if command -v helm &> /dev/null; then
+        INSTALLED_VERSION=$(helm version --short 2>/dev/null || helm version --template='{{.Version}}' 2>/dev/null)
+        echo "✓ Helm 安装成功: $INSTALLED_VERSION"
+
+        # 添加常用的 Helm 仓库
+        echo "添加常用 Helm 仓库..."
+        helm repo add stable https://charts.helm.sh/stable 2>/dev/null || true
+        helm repo add bitnami https://charts.bitnami.com/bitnami 2>/dev/null || true
+        helm repo update
+
+        echo "Helm 安装完成！"
+        return 0
+    else
+        echo "✗ Helm 安装失败"
+        return 1
+    fi
+}
+
 # 自动安装 cert-manager
 install_cert_manager() {
     echo "开始安装 cert-manager ACME证书管理..."
@@ -726,8 +823,9 @@ main_menu() {
     echo "  3) 多机模式 - Worker 节点"
     echo "  4) 仅安装基础组件(不初始化集群)"
     echo "  5) 诊断现有集群问题"
-    echo "  6) 安装cert manager自动化证书"
-    echo "  7) 安装Prometheus监控"
+    echo "  6) 安装Helm包管理"
+    echo "  7) 安装Cert Manager自动化证书组件"
+    echo "  8) 安装Prometheus监控运维组件"
     echo "  0) 退出"
     echo ""
     read -p "请输入选项 [0-5]: " choice
@@ -749,9 +847,12 @@ main_menu() {
             diagnose_existing_cluster
             ;;
         6)
-            install_cert_manager
+            install_helm
             ;;
         7)
+            install_cert_manager
+            ;;
+        8)
             install_prometheus
             ;;
         0)
