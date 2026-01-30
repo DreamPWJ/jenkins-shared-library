@@ -587,6 +587,78 @@ diagnose_image_issues() {
     done
 }
 
+# 自动安装 cert-manager
+install_cert_manager() {
+    echo "开始安装 cert-manager ACME证书管理..."
+    local  cert_manager_version="v1.19.2"
+
+    # 添加 cert-manager 的 Helm 仓库
+    helm repo add jetstack https://charts.jetstack.io
+    helm repo update
+
+    # 创建 cert-manager 命名空间
+    kubectl create namespace cert-manager --dry-run=client -o yaml | kubectl apply -f -
+
+    # 安装 cert-manager CRDs
+    kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/${cert_manager_version}/cert-manager.crds.yaml
+
+    # 使用 Helm 安装 cert-manager
+    helm install cert-manager jetstack/cert-manager \
+        --namespace cert-manager \
+        --version ${cert_manager_version} \
+        --set installCRDs=false \
+        --wait
+
+    # 等待 cert-manager 部署完成
+    echo "等待 cert-manager 启动..."
+    kubectl wait --for=condition=available --timeout=300s \
+        deployment/cert-manager -n cert-manager
+    kubectl wait --for=condition=available --timeout=300s \
+        deployment/cert-manager-webhook -n cert-manager
+    kubectl wait --for=condition=available --timeout=300s \
+        deployment/cert-manager-cainjector -n cert-manager
+
+    echo "cert-manager 安装完成"
+    kubectl get pods -n cert-manager
+}
+
+# 自动安装 Prometheus
+install_prometheus() {
+    echo "开始安装 Prometheus 监控..."
+
+    # 添加 Prometheus 的 Helm 仓库
+    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+    helm repo update
+
+    # 创建 monitoring 命名空间
+    kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
+
+    # 安装 kube-prometheus-stack (包含 Prometheus, Grafana, Alertmanager 等)
+    helm install prometheus prometheus-community/kube-prometheus-stack \
+        --namespace monitoring \
+        --set prometheus.prometheusSpec.retention=15d \
+        --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage=20Gi \
+        --set grafana.adminPassword=admin123 \
+        --wait
+
+    # 等待 Prometheus 部署完成
+    echo "等待 Prometheus 启动..."
+    kubectl wait --for=condition=available --timeout=300s \
+        deployment/prometheus-kube-prometheus-operator -n monitoring
+    kubectl wait --for=condition=available --timeout=300s \
+        deployment/prometheus-grafana -n monitoring
+
+    echo "Prometheus 安装完成 "
+    echo "Grafana 默认密码: admin123"
+    kubectl get pods -n monitoring
+
+    # 显示访问信息
+    echo ""
+    echo "要访问 Grafana，请执行："
+    echo "kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80"
+    echo "Grafana访问 http://localhost:3000"
+}
+
 # 生成 Worker 节点加入命令
 generate_join_command() {
     log_info "生成 K8s Worker 节点加入Master集群命令..."
