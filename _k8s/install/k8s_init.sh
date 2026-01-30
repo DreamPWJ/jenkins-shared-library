@@ -637,7 +637,7 @@ install_helm() {
     if [ $? -ne 0 ]; then
         echo "下载失败，尝试使用备用方法..."
         # 备用方法：直接下载二进制文件
-        HELM_VERSION="v3.13.3"
+        HELM_VERSION="v3.19.5"
         HELM_TAR="helm-${HELM_VERSION}-${OS}-${ARCH}.tar.gz"
         DOWNLOAD_URL="https://get.helm.sh/${HELM_TAR}"
 
@@ -668,7 +668,7 @@ install_helm() {
     # 验证安装
     if command -v helm &> /dev/null; then
         INSTALLED_VERSION=$(helm version --short 2>/dev/null || helm version --template='{{.Version}}' 2>/dev/null)
-        echo " Helm 安装成功: $INSTALLED_VERSION"
+        echo "Helm 安装成功: $INSTALLED_VERSION"
 
         # 添加常用的 Helm 仓库
         echo "添加常用 Helm 仓库..."
