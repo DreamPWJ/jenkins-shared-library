@@ -723,9 +723,8 @@ install_cert_manager() {
 install_prometheus() {
     log_info "开始安装 Prometheus 监控..."
    # 添加 Prometheus 的 Helm 仓库
-    curl -I https://prometheus-community.github.io/helm-charts/index.yaml
-    if [ $? -eq 0 ]; then
-           log_info "在线安装helm prometheus "
+   if curl -I --connect-timeout 5 "https://prometheus-community.github.io/helm-charts/index.yaml" > /dev/null 2>&1; then
+           log_info "使用helm在线安装 prometheus与grafana"
            helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
            helm repo update
 
@@ -741,7 +740,8 @@ install_prometheus() {
                --set grafana.adminPassword=${grafana_admin_password} \
                --wait
     else
-           log_info "网络不通 离线安装helm prometheus "
+           log_error "Prometheus的Helm包网络不通"
+           log_info  "使用k8s yaml文件离线安装 prometheus grafana"
            kubectl apply -f prometheus-complete.yaml
     fi
 
