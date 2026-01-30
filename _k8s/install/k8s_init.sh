@@ -155,7 +155,6 @@ get_public_ip() {
     echo "$public_ip"
 }
 
-
 # 安装依赖包
 install_dependencies() {
     log_info "安装K8s依赖包..."
@@ -511,7 +510,7 @@ install_calico() {
 
 # 单机模式: 允许 Master 调度 Pod
 enable_master_scheduling() {
-    log_info "配置单机K8s部署模式: 去除Master节点的污点, 允许Master节点调度运行 Pod 服务..."
+    log_info "配置单机K8s部署模式: 去除Master节点的污点, 允许其调度运行 Pod 服务..."
 
     # 等待节点就绪
     sleep 10
@@ -687,7 +686,7 @@ install_helm() {
 # 自动安装 cert-manager
 install_cert_manager() {
     log_info "开始安装 cert-manager ACME证书管理..."
-    local  cert_manager_version="v1.19.2"
+    local cert_manager_version="v1.19.2"
 
     # 添加 cert-manager 的 Helm 仓库
     helm repo add jetstack https://charts.jetstack.io
@@ -764,6 +763,133 @@ install_prometheus() {
     log_info "kubectl port-forward -n monitoring svc/grafana 3000:3000"
     log_info "Grafana访问地址: http://localhost:3000"
     log_info "Grafana 默认用户名admin 密码: ${grafana_admin_password}"
+}
+
+# 初始化 Gateway API
+install_gateway_api() {
+    local gateway_api_version="v1.4.1"     # Gateway API 版本
+    log_info "开始安装 K8s官方 Gateway API ${gateway_api_version} 网关..."
+
+    log_info "安装 Gateway API CRDs..."
+    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${gateway_api_version}/standard-install.yaml
+
+    if [ $? -ne 0 ]; then
+        log_error "Gateway API 安装失败"
+        return 1
+    fi
+
+    log_info "等待 Gateway API CRDs 就绪..."
+    sleep 5
+
+    # 验证安装
+    kubectl get crd | grep gateway.networking.k8s.io
+
+    if [ $? -eq 0 ]; then
+        log_info "Gateway API ${gateway_api_version} 安装完成 ✅"
+        echo ""
+        log_info "已安装的 CRDs:"
+        kubectl get crd | grep gateway.networking.k8s.io
+        echo ""
+        log_warn "提示: Gateway API 已安装，需要配合网关实现使用（如 Istio、Nginx Gateway、Envoy Gateway 等）"
+        return 0
+    else
+        log_error "Gateway API 安装失败 ❌"
+        return 1
+    fi
+}
+
+# 初始化 MetalLB
+install_metallb() {
+    log_info "开始安装 MetalLB 负载均衡..."
+
+    # 添加 MetalLB Helm 仓库
+    helm repo add metallb https://metallb.github.io/metallb
+    helm repo update
+
+    # 创建命名空间
+    kubectl create namespace metallb-system --dry-run=client -o yaml | kubectl apply -f -
+
+    # 使用 Helm 安装 MetalLB
+    log_info "使用 Helm 安装 MetalLB..."
+    helm install metallb metallb/metallb \
+        --namespace metallb-system \
+        --wait
+
+    if [ $? -ne 0 ]; then
+        log_error "MetalLB 安装失败"
+        return 1
+    fi
+
+    log_info "等待 MetalLB 组件启动..."
+    kubectl wait --for=condition=ready --timeout=300s pod -l app.kubernetes.io/name=metallb -n metallb-system
+
+    echo ""
+    log_info "MetalLB 组件安装完成，现在配置 IP 地址池..."
+    echo ""
+
+    # 获取用户输入 IP 地址范围
+    read -p "请输入 MetalLB IP 地址池范围 (例如: 192.168.1.240-192.168.1.250): " IP_RANGE
+
+    if [ -z "$IP_RANGE" ]; then
+        echo "未输入 IP 地址范围，跳过自动配置"
+        echo ""
+        echo "你可以稍后手动创建配置:"
+        cat <<'EXAMPLE'
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: default-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - 192.168.1.240-192.168.1.250
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: default-l2
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - default-pool
+EXAMPLE
+        return 0
+    fi
+
+    # 创建 IP 地址池配置
+    cat <<EOF | kubectl apply -f -
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: default-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - ${IP_RANGE}
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: default-l2
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - default-pool
+EOF
+
+    echo ""
+    log_info " MetalLB 安装并配置完成 ✅"
+    echo ""
+    log_info "查看 MetalLB 状态:"
+    kubectl get pods -n metallb-system
+    echo ""
+    log_info "查看 IP 地址池:"
+    kubectl get ipaddresspool -n metallb-system
+    echo ""
+    log_info "测试 MetalLB:"
+    log_info "  kubectl create deployment nginx --image=nginx"
+    log_info "  kubectl expose deployment nginx --port=80 --type=LoadBalancer"
+    log_info "  kubectl get svc nginx"
 }
 
 # 生成 Worker 节点加入命令
