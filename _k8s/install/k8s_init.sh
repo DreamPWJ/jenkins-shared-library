@@ -590,7 +590,7 @@ diagnose_image_issues() {
 
 # 自动安装 Helm
 install_helm() {
-    echo "开始安装 Helm 包管理..."
+    log_info "开始安装 Helm 包管理..."
 
     # 检查是否已安装 Helm
     if command -v helm &> /dev/null; then
@@ -668,25 +668,25 @@ install_helm() {
     # 验证安装
     if command -v helm &> /dev/null; then
         INSTALLED_VERSION=$(helm version --short 2>/dev/null || helm version --template='{{.Version}}' 2>/dev/null)
-        echo "✓ Helm 安装成功: $INSTALLED_VERSION"
+        echo " Helm 安装成功: $INSTALLED_VERSION"
 
         # 添加常用的 Helm 仓库
         echo "添加常用 Helm 仓库..."
         helm repo add stable https://charts.helm.sh/stable 2>/dev/null || true
-        helm repo add bitnami https://charts.bitnami.com/bitnami 2>/dev/null || true
+        #helm repo add bitnami https://charts.bitnami.com/bitnami 2>/dev/null || true
         helm repo update
 
-        echo "Helm 安装完成！"
+        log_info "Helm 安装完成 ✅ "
         return 0
     else
-        echo "✗ Helm 安装失败"
+        log_error "Helm 安装失败 ❌"
         return 1
     fi
 }
 
 # 自动安装 cert-manager
 install_cert_manager() {
-    echo "开始安装 cert-manager ACME证书管理..."
+    log_info "开始安装 cert-manager ACME证书管理..."
     local  cert_manager_version="v1.19.2"
 
     # 添加 cert-manager 的 Helm 仓库
@@ -715,13 +715,13 @@ install_cert_manager() {
     kubectl wait --for=condition=available --timeout=300s \
         deployment/cert-manager-cainjector -n cert-manager
 
-    echo "cert-manager 安装完成"
+    log_info "cert-manager 安装完成 ✅ "
     kubectl get pods -n cert-manager
 }
 
 # 自动安装 Prometheus
 install_prometheus() {
-    echo "开始安装 Prometheus 监控..."
+    log_info "开始安装 Prometheus 监控..."
 
     # 添加 Prometheus 的 Helm 仓库
     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -745,7 +745,7 @@ install_prometheus() {
     kubectl wait --for=condition=available --timeout=300s \
         deployment/prometheus-grafana -n monitoring
 
-    echo "Prometheus 安装完成 "
+    log_info "Prometheus 安装完成 ✅ "
     echo "Grafana 默认密码: admin123"
     kubectl get pods -n monitoring
 
