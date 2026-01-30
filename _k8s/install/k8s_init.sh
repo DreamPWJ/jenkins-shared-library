@@ -726,6 +726,8 @@ main_menu() {
     echo "  3) 多机模式 - Worker 节点"
     echo "  4) 仅安装基础组件(不初始化集群)"
     echo "  5) 诊断现有集群问题"
+    echo "  6) 安装cert manager自动化证书"
+    echo "  7) 安装Prometheus监控"
     echo "  0) 退出"
     echo ""
     read -p "请输入选项 [0-5]: " choice
@@ -745,6 +747,12 @@ main_menu() {
             ;;
         5)
             diagnose_existing_cluster
+            ;;
+        6)
+            install_cert_manager
+            ;;
+        7)
+            install_prometheus
             ;;
         0)
             log_info "退出脚本"
