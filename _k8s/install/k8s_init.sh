@@ -509,9 +509,9 @@ install_calico() {
     echo ""
 }
 
-# 单机模式:允许 Master 调度 Pod
+# 单机模式: 允许 Master 调度 Pod
 enable_master_scheduling() {
-    log_info "配置单机模式: 允许 K8s Master 节点调度 Pod 服务..."
+    log_info "配置单机K8s部署模式: 去除Master节点的污点, 允许Master节点调度运行 Pod 服务..."
 
     # 等待节点就绪
     sleep 10
