@@ -742,7 +742,7 @@ install_prometheus() {
                --wait
     else
            log_error "Prometheus的Helm包网络不通"
-           log_info  "使用k8s yaml文件离线安装 prometheus grafana"
+           log_info  "使用K8s yaml文件离线安装 prometheus grafana"
            kubectl apply -f prometheus-complete.yaml
     fi
 
@@ -917,7 +917,7 @@ install_ingress_controller() {
        fi
     else
         log_error "Ingress Controller的Helm包网络不通"
-        log_info  "使用k8s yaml文件离线安装 Ingress Controller"
+        log_info  "使用K8s yaml文件离线安装 Ingress Controller"
         kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-${nginx_ingress_version}/deploy/static/provider/cloud/deploy.yaml 2>/dev/null
         if [ $? -ne 0 ]; then
              log_warn "GitHub 访问失败，使用离线 YAML安装 Nginx Ingress Controller..."
@@ -966,7 +966,7 @@ install_metallb() {
        fi
     else
       log_error "MetalLB的Helm包网络不通"
-      log_info  "使用k8s yaml文件离线安装 MetalLB"
+      log_info  "使用K8s yaml文件离线安装 MetalLB"
       kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/${metallb_version}/config/manifests/metallb-native.yaml 2>/dev/null
       if [ $? -ne 0 ]; then
            log_warn "GitHub 访问失败，使用离线 YAML安装 MetalLB..."
