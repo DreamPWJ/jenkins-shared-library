@@ -822,7 +822,7 @@ install_envoy_gateway() {
         --version "${envoy_gateway_version}" \
         --wait; then
 
-        log_info "Helm (OCI) 安装 Envoy Gateway 成功"
+        log_info "Helm 安装 Envoy Gateway 成功"
         INSTALL_SUCCESS=1
     else
         log_error "Helm  安装失败，尝试使用 kubectl 安装..."
