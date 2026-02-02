@@ -771,8 +771,11 @@ install_gateway_api() {
     log_info "开始安装 K8s官方 Gateway API ${gateway_api_version} 网关..."
 
     log_info "安装 Gateway API CRDs扩展..."
-    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${gateway_api_version}/standard-install.yaml
-    #kubectl apply -f gateway-api.yaml
+    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${gateway_api_version}/standard-install.yaml 2>/dev/null
+    if [ $? -ne 0 ]; then
+         log_warn "GitHub 访问失败，使用离线 YAML安装 Gateway API..."
+         kubectl apply -f gateway-api.yaml
+    fi
 
     if [ $? -ne 0 ]; then
         log_error "Gateway API 安装失败"
@@ -888,10 +891,13 @@ install_ingress_controller() {
            return 1
        fi
     else
-           log_error "Ingress Controller的Helm包网络不通"
-           log_info  "使用k8s yaml文件离线安装 Ingress Controller"
-           kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-${nginx_ingress_version}/deploy/static/provider/cloud/deploy.yaml
-           #kubectl apply -f ingress-nginx.yaml
+        log_error "Ingress Controller的Helm包网络不通"
+        log_info  "使用k8s yaml文件离线安装 Ingress Controller"
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-${nginx_ingress_version}/deploy/static/provider/cloud/deploy.yaml 2>/dev/null
+        if [ $? -ne 0 ]; then
+             log_warn "GitHub 访问失败，使用离线 YAML安装 Nginx Ingress Controller..."
+             kubectl apply -f ingress-nginx.yaml
+        fi
     fi
 
     log_info "等待 Ingress Controller 启动..."
@@ -934,10 +940,13 @@ install_metallb() {
            return 1
        fi
     else
-           log_error "MetalLB的Helm包网络不通"
-           log_info  "使用k8s yaml文件离线安装 MetalLB"
-           kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/${metallb_version}/config/manifests/metallb-native.yaml
-           # kubectl apply -f metallb.yaml
+      log_error "MetalLB的Helm包网络不通"
+      log_info  "使用k8s yaml文件离线安装 MetalLB"
+      kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/${metallb_version}/config/manifests/metallb-native.yaml 2>/dev/null
+      if [ $? -ne 0 ]; then
+           log_warn "GitHub 访问失败，使用离线 YAML安装 MetalLB..."
+           kubectl apply -f metallb.yaml
+      fi
     fi
 
     log_info "等待 MetalLB 组件启动..."
