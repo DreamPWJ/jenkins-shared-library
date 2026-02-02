@@ -788,7 +788,7 @@ install_gateway_api() {
         echo ""
         log_info "Gateway API ${gateway_api_version} 安装完成 ✅"
         echo ""
-        log_warn "提示: 标准 Gateway API 已安装，需要配合网关实现使用（如 Istio、Traefik、Nginx Gateway、Envoy Gateway、Kong Gateway 等）"
+        log_warn "提示: 标准 Gateway API 已安装，需要配合网关实现使用（如 Envoy Gateway、Istio、Traefik、Nginx Gateway、Kong Gateway 等）"
         return 0
     else
         log_error "Gateway API 安装失败 ❌"
