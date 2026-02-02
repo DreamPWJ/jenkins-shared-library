@@ -589,12 +589,13 @@ diagnose_image_issues() {
 
 # 自动安装 Helm
 install_helm() {
-    log_info "开始安装 Helm 包管理..."
+    local helm_version="v3.19.5"
+    log_info "开始安装 Helm ${helm_version} 包管理..."
 
     # 检查是否已安装 Helm
     if command -v helm &> /dev/null; then
-        HELM_VERSION=$(helm version --short 2>/dev/null || helm version --template='{{.Version}}' 2>/dev/null)
-        echo "Helm 已安装: $HELM_VERSION"
+        current_helm_version=$(helm version --short 2>/dev/null || helm version --template='{{.Version}}' 2>/dev/null)
+        echo "Helm 已安装: $current_helm_version"
         read -p "是否重新安装? (y/n): " -n 1 -r
         echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -636,11 +637,11 @@ install_helm() {
     if [ $? -ne 0 ]; then
         echo "下载失败，尝试使用备用方法..."
         # 备用方法：直接下载二进制文件
-        HELM_VERSION="v3.19.5"
-        HELM_TAR="helm-${HELM_VERSION}-${OS}-${ARCH}.tar.gz"
+
+        HELM_TAR="helm-${helm_version}-${OS}-${ARCH}.tar.gz"
         DOWNLOAD_URL="https://get.helm.sh/${HELM_TAR}"
 
-        echo "下载 Helm ${HELM_VERSION}..."
+        echo "下载 Helm ${helm_version}..."
         curl -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/$HELM_TAR"
 
         if [ $? -ne 0 ]; then
@@ -666,8 +667,8 @@ install_helm() {
 
     # 验证安装
     if command -v helm &> /dev/null; then
-        INSTALLED_VERSION=$(helm version --short 2>/dev/null || helm version --template='{{.Version}}' 2>/dev/null)
-        echo "Helm 安装成功: $INSTALLED_VERSION"
+        INSTALLED_HELM_VERSION=$(helm version --short 2>/dev/null || helm version --template='{{.Version}}' 2>/dev/null)
+        echo "Helm 安装成功: $INSTALLED_HELM_VERSION"
 
         # 添加常用的 Helm 仓库
         echo "添加常用 Helm 仓库..."
@@ -675,7 +676,8 @@ install_helm() {
         #helm repo add bitnami https://charts.bitnami.com/bitnami 2>/dev/null || true
         helm repo update
 
-        log_info "Helm 安装完成 ✅ "
+        log_info "Helm ${INSTALLED_HELM_VERSION} 安装完成 ✅ "
+        log_warn "如果使用海外源有问题，设置代理: export HELM_REPO_URL="https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts" "
         return 0
     else
         log_error "Helm 安装失败 ❌"
@@ -806,6 +808,7 @@ install_gateway_api() {
 install_envoy_gateway() {
     # Envoy Gateway 版本
     local envoy_gateway_version="v1.6.3"
+    INSTALL_SUCCESS=0
     echo  ""
     log_info "开始安装 Envoy Gateway ${envoy_gateway_version} 版本..."
 
@@ -823,12 +826,22 @@ install_envoy_gateway() {
              --wait; then
              log_info "Helm 安装 Envoy Gateway  成功"
          else
-             echo "Helm 安装失败，尝试使用 kubectl..."
-             install_envoy_gateway_kubectl ${envoy_gateway_version}
+             log_info "Helm 安装失败，尝试使用 kubectl..."
+             if install_envoy_gateway_kubectl ${envoy_gateway_version}; then
+                    INSTALL_SUCCESS=1
+             fi
          fi
     else
         log_error "Helm 仓库添加失败，使用 kubectl 安装..."
-        install_envoy_gateway_kubectl ${envoy_gateway_version}
+        if install_envoy_gateway_kubectl ${envoy_gateway_version}; then
+               INSTALL_SUCCESS=1
+        fi
+    fi
+
+  # 检查安装是否成功
+    if [ $INSTALL_SUCCESS -eq 0 ]; then
+        log_info "Envoy Gateway 安装失败"
+        return 1
     fi
 
     # 验证安装
@@ -836,8 +849,24 @@ install_envoy_gateway() {
     log_info "等待 Envoy Gateway 启动..."
     kubectl wait --for=condition=available --timeout=300s deployment/envoy-gateway -n envoy-gateway-system 2>/dev/null || true
 
+ # 检查 GatewayClass 是否存在，不存在则创建
     echo ""
-    log_info "Envoy Gateway ${envoy_gateway_version} 安装完成  ✅"
+    log_info "检查 GatewayClass..."
+    if ! kubectl get gatewayclass eg >/dev/null 2>&1; then
+        log_warn "GatewayClass 不存在，正在创建..."
+        cat <<EOF | kubectl apply -f -
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: eg
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+EOF
+        sleep 5
+    fi
+
+    echo ""
+    log_info "Envoy Gateway ${envoy_gateway_version} 安装完成 ✅"
     echo ""
     log_info "查看 Envoy Gateway 状态:"
     kubectl get pods -n envoy-gateway-system
