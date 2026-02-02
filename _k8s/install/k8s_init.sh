@@ -819,18 +819,16 @@ install_envoy_gateway() {
     if helm install eg oci://docker.io/envoyproxy/gateway-helm \
         --namespace envoy-gateway-system \
         --create-namespace \
-        --version "v${envoy_gateway_version}" \
+        --version "${envoy_gateway_version}" \
         --wait; then
 
         log_info "Helm (OCI) 安装 Envoy Gateway 成功"
         INSTALL_SUCCESS=1
-
     else
         log_error "Helm  安装失败，尝试使用 kubectl 安装..."
         if install_envoy_gateway_kubectl "${envoy_gateway_version}"; then
             INSTALL_SUCCESS=1
         else
-            log_error "Envoy Gateway 安装失败"
             INSTALL_SUCCESS=0
         fi
     fi
@@ -881,6 +879,7 @@ install_envoy_gateway_kubectl() {
 
     # 尝试从 GitHub 安装
     kubectl apply -f https://github.com/envoyproxy/gateway/releases/download/$1/install.yaml 2>/dev/null
+    #kubectl apply -f https://github.com/envoyproxy/gateway/releases/download/$1/quickstart.yaml -n default
 
     if [ $? -ne 0 ]; then
         log_warn "GitHub 访问失败，使用离线 YAML安装 Envoy Gateway..."
@@ -891,7 +890,7 @@ install_envoy_gateway_kubectl() {
 
 # 初始化 Ingress Controller (使用 Nginx Ingress Controller)
 install_ingress_controller() {
-   local nginx_ingress_version="1.14.2"
+   local nginx_ingress_version="v1.14.2"
    log_info "开始安装 Nginx Ingress Controller ${nginx_ingress_version} 路由控制器..."
 
    if curl -I --connect-timeout 5 "https://kubernetes.github.io/ingress-nginx/index.yaml" > /dev/null 2>&1; then
