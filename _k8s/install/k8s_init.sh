@@ -677,7 +677,7 @@ install_helm() {
         helm repo update
 
         log_info "Helm ${INSTALLED_HELM_VERSION} 安装完成 ✅ "
-        log_warn "如果使用海外源有问题，设置代理: export HELM_REPO_URL="https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts" "
+        log_warn "如果使用海外源有问题，设置代理 "
         return 0
     else
         log_error "Helm 安装失败 ❌"
@@ -840,7 +840,7 @@ install_envoy_gateway() {
 
   # 检查安装是否成功
     if [ $INSTALL_SUCCESS -eq 0 ]; then
-        log_info "Envoy Gateway 安装失败"
+        log_error "Envoy Gateway 安装失败"
         return 1
     fi
 
