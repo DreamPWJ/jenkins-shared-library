@@ -789,6 +789,7 @@ install_gateway_api() {
         log_info "Gateway API ${gateway_api_version} 安装完成 ✅"
         echo ""
         log_warn "提示: 标准 Gateway API 已安装，需要配合网关实现使用（如 Envoy Gateway、Istio、Traefik、Nginx Gateway、Kong Gateway 等）"
+        sleep 3
         install_envoy_gateway
         return 0
     else
@@ -839,11 +840,14 @@ install_envoy_gateway() {
     echo ""
     log_info "查看 GatewayClass:"
     kubectl get gatewayclass
+    echo ""
+    log_warn "提示: Envoy Gateway Service 类型为 LoadBalancer，需要配合 MetalLB 获取外部 IP"
+    echo ""
 }
 
 # 使用 kubectl 安装 Envoy Gateway
 install_envoy_gateway_kubectl() {
-    log_info "使用 kubectl 直接安装 Envoy Gateway..."
+    log_info "使用 kubectl 直接安装 Envoy Gateway $1 版本..."
 
     # 尝试从 GitHub 安装
     kubectl apply -f https://github.com/envoyproxy/gateway/releases/download/$1/install.yaml 2>/dev/null
@@ -857,7 +861,8 @@ install_envoy_gateway_kubectl() {
 
 # 初始化 Ingress Controller (使用 Nginx Ingress Controller)
 install_ingress_controller() {
-    log_info "开始安装 Nginx Ingress Controller 路由控制器..."
+   local nginx_ingress_version="1.14.2"
+   log_info "开始安装 Nginx Ingress Controller ${nginx_ingress_version} 路由控制器..."
 
    if curl -I --connect-timeout 5 "https://kubernetes.github.io/ingress-nginx/index.yaml" > /dev/null 2>&1; then
        # 添加 Nginx Ingress Helm 仓库
@@ -884,7 +889,8 @@ install_ingress_controller() {
     else
            log_error "Ingress Controller的Helm包网络不通"
            log_info  "使用k8s yaml文件离线安装 Ingress Controller"
-           kubectl apply -f ingress-nginx.yaml
+           kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-${nginx_ingress_version}/deploy/static/provider/cloud/deploy.yaml
+           #kubectl apply -f ingress-nginx.yaml
     fi
 
     log_info "等待 Ingress Controller 启动..."
@@ -901,12 +907,12 @@ install_ingress_controller() {
     echo ""
     log_warn "提示: Ingress Controller Service 类型为 LoadBalancer，需要配合 MetalLB 获取外部 IP"
     echo ""
-
 }
 
 # 初始化 MetalLB
 install_metallb() {
-    log_info "开始安装 MetalLB 负载均衡..."
+    local metallb_version="v0.15.3"
+    log_info "开始安装 MetalLB ${metallb_version}负载均衡..."
 
    if curl -I --connect-timeout 5 "https://metallb.github.io/metallb/index.yaml" > /dev/null 2>&1; then
        # 添加 MetalLB Helm 仓库
@@ -929,7 +935,8 @@ install_metallb() {
     else
            log_error "MetalLB的Helm包网络不通"
            log_info  "使用k8s yaml文件离线安装 MetalLB"
-           kubectl apply -f metallb.yaml
+           kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/${metallb_version}/config/manifests/metallb-native.yaml
+           # kubectl apply -f metallb.yaml
     fi
 
     log_info "等待 MetalLB 组件启动..."
