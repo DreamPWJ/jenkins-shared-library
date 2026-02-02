@@ -770,7 +770,7 @@ install_gateway_api() {
     local gateway_api_version="v1.4.1"     # Gateway API 版本
     log_info "开始安装 K8s官方 Gateway API ${gateway_api_version} 网关..."
 
-    log_info "安装 Gateway API CRDs..."
+    log_info "安装 Gateway API CRDs扩展..."
     kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${gateway_api_version}/standard-install.yaml
 
     if [ $? -ne 0 ]; then
@@ -801,31 +801,29 @@ install_gateway_api() {
 install_envoy_gateway() {
     # Envoy Gateway 版本
     local envoy_gateway_version="v1.6.3"
+    echo  ""
     log_info "开始安装 Envoy Gateway ${envoy_gateway_version} 版本..."
 
     # 方法1: 使用 Helm 安装
-    helm repo add envoy-gateway https://gateway.envoyproxy.io/charts 2>/dev/null
-
-    if [ $? -eq 0 ]; then
+    if helm repo add envoy-gateway https://gateway.envoyproxy.io/charts 2>&1 | grep -q "successfully\|already exists"; then
         log_info "使用 Helm 安装 Envoy Gateway..."
         helm repo update
 
         kubectl create namespace envoy-gateway-system --dry-run=client -o yaml | kubectl apply -f -
 
-        helm install eg envoy-gateway/gateway-helm \
-            --namespace envoy-gateway-system \
-            --create-namespace \
-            --wait
-
-        if [ $? -eq 0 ]; then
-            log_info "Helm 安装 Envoy Gateway  成功"
-        else
-            log_info "Helm 安装失败，尝试使用 kubectl..."
-            install_envoy_gateway_kubectl
-        fi
+         if helm install eg envoy-gateway/gateway-helm \
+             --namespace envoy-gateway-system \
+             --create-namespace \
+             --version ${envoy_gateway_version} \
+             --wait; then
+             log_info "Helm 安装 Envoy Gateway  成功"
+         else
+             echo "Helm 安装失败，尝试使用 kubectl..."
+             install_envoy_gateway_kubectl ${envoy_gateway_version}
+         fi
     else
         log_error "Helm 仓库添加失败，使用 kubectl 安装..."
-        install_envoy_gateway_kubectl
+        install_envoy_gateway_kubectl ${envoy_gateway_version}
     fi
 
     # 验证安装
@@ -848,7 +846,7 @@ install_envoy_gateway_kubectl() {
     log_info "使用 kubectl 直接安装 Envoy Gateway..."
 
     # 尝试从 GitHub 安装
-    kubectl apply -f https://github.com/envoyproxy/gateway/releases/download/${ENVOY_GATEWAY_VERSION}/install.yaml 2>/dev/null
+    kubectl apply -f https://github.com/envoyproxy/gateway/releases/download/$1/install.yaml 2>/dev/null
 
     if [ $? -ne 0 ]; then
         log_warn "GitHub 访问失败，使用离线 YAML安装 Envoy Gateway..."
