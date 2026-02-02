@@ -527,7 +527,7 @@ wait_for_pods_ready() {
     echo  ""
     log_info "等待系统所有 Pod 启动完成 健康探测中..."
 
-    local max_wait=1800  # 最多等待多少秒
+    local max_wait=3600  # 最多等待多少秒
     local wait_time=0
     local check_interval=10
 
