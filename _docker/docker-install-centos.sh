@@ -61,7 +61,7 @@ if [[ "$OS" =~ ^(centos|rhel|rocky|almalinux)$ ]]; then
   fi
 else
   echo "[WARN] 非 RHEL/CentOS 系，尝试 get.docker.com 安装"
-  curl -fsSL --connect-timeout 60 --retry 6  https://get.docker.com | sh || sudo yum install -y docker-ce
+  curl -fsSL https://get.docker.com | sh || sudo yum install -y docker-ce
 fi
 
 echo "启动Docker并加入开机自启动"

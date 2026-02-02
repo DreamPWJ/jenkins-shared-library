@@ -31,7 +31,7 @@ sudo apt install -y linux-image-generic-lts-xenial || true
 # 非设置镜像情况安装Docker 网络原因可能比较慢或者失败
 echo "安装Docker环境"
 if [[ $(command -v curl) ]]; then
-  curl -fsSL --connect-timeout 60 --retry 6  https://get.docker.com | sh || sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  curl -fsSL https://get.docker.com | sh || sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 else
   sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 fi
