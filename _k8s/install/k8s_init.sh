@@ -772,6 +772,7 @@ install_gateway_api() {
 
     log_info "安装 Gateway API CRDs扩展..."
     kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${gateway_api_version}/standard-install.yaml
+    #kubectl apply -f gateway-api.yaml
 
     if [ $? -ne 0 ]; then
         log_error "Gateway API 安装失败"
