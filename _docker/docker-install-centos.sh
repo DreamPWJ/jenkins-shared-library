@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Author: 潘维吉
 
-echo -e "\033[32mCentOS系统Docker初始化安装  📥 \033[0m"
+echo -e "\033[32mCentOS系统初始化安装Docker引擎  📥 \033[0m"
 # chmod +x docker-install-centos.sh　给shell脚本执行文件可执行权限
 
 if [[ $(command -v docker) ]]; then
@@ -61,7 +61,7 @@ if [[ "$OS" =~ ^(centos|rhel|rocky|almalinux)$ ]]; then
   fi
 else
   echo "[WARN] 非 RHEL/CentOS 系，尝试 get.docker.com 安装"
-  curl -s --connect-timeout 60 --retry 6 https://get.docker.com/ | sh || sudo yum install -y docker-ce
+  curl -fsSL --connect-timeout 60 --retry 6  https://get.docker.com | sh || sudo yum install -y docker-ce
 fi
 
 echo "启动Docker并加入开机自启动"

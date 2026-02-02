@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Author: 潘维吉
 
-echo -e "\033[32mUbuntu系统Docker初始化安装  📥 \033[0m"
+echo -e "\033[32mUbuntu系统初始化安装Docker引擎  📥 \033[0m"
 # chmod +x docker-install-ubuntu.sh　给shell脚本执行文件可执行权限
 
 if [[ $(command -v docker) ]]; then
@@ -15,8 +15,8 @@ lsb_release -a
 
 echo "更新包管理器 安装程序包 添加软件镜像源信息"
 #sudo add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable" || true
-sudo apt-get update -y || true   # 更新软件包列表
-sudo apt-get upgrade -y || true  # 升级所有软件包
+sudo apt update -y || true   # 更新软件包列表
+sudo apt upgrade -y || true  # 升级所有软件包
 
 # Ubuntu 20以后 出现The following signatures couldn't be verified because the public key is not available: NO_PUBKEY
 # 执行 sudo apt-key adv --keyserver  hkp://keyserver.ubuntu.com:80 --recv-keys 7EA0A9C3F273FCD8  将公钥添加到服务器
@@ -24,15 +24,16 @@ sudo apt-get upgrade -y || true  # 升级所有软件包
 if [[ $(lsb_release -r --short | sed "s/\..*//g") -ge 20 ]]; then
   sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 7EA0A9C3F273FCD8 || true
 fi
-sudo apt-get install -y software-properties-common || true
-sudo apt-get install -y linux-image-generic-lts-xenial || true
+
+sudo apt install -y software-properties-common || true
+sudo apt install -y linux-image-generic-lts-xenial || true
 
 # 非设置镜像情况安装Docker 网络原因可能比较慢或者失败
 echo "安装Docker环境"
 if [[ $(command -v curl) ]]; then
-  curl -s --connect-timeout 60 --retry 6 https://get.docker.com/ | sudo sh
+  curl -fsSL --connect-timeout 60 --retry 6  https://get.docker.com | sh || sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 else
-  sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+  sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 fi
 
 echo "启动Docker并加入开机自启动"
