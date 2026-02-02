@@ -926,7 +926,7 @@ install_ingress_controller() {
     fi
 
     log_info "等待 Ingress Controller 启动..."
-    kubectl wait --for=condition=ready --timeout=600s pod -l app.kubernetes.io/name=ingress-nginx -n ingress-nginx
+    kubectl wait --for=condition=ready --timeout=1200s pod -l app.kubernetes.io/name=ingress-nginx -n ingress-nginx
 
     echo ""
     log_info "Nginx Ingress Controller ${nginx_ingress_version} 安装完成  ✅"
