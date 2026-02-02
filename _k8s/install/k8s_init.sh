@@ -768,6 +768,25 @@ install_prometheus() {
     echo ""
 }
 
+# 安装 Metrics Server
+install_metrics_server() {
+    log_info "安装 Metrics Server HPA指标服务..."
+    kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml && \
+    kubectl patch deployment metrics-server -n kube-system --type='json' -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+    sleep 5
+    log_info "Metrics Server验证安装:"
+    kubectl get deployment metrics-server -n kube-system
+}
+
+# 安装 Node Exporter
+install_node_exporter() {
+    log_info "安装 Node Exporter 节点监控指标..."
+    kubectl create namespace monitoring 2>/dev/null || true && \
+    kubectl apply -f node-exporter.yaml
+    log_info "Node Exporter验证安装:"
+    kubectl get pods -n monitoring -l app=node-exporter
+}
+
 # 初始化 Gateway API
 install_gateway_api() {
     local gateway_api_version="v1.4.1"     # Gateway API 版本
@@ -1116,7 +1135,7 @@ main_menu() {
     echo "  5) 诊断现有集群问题"
     echo "  6) 安装Helm包管理"
     echo "  7) 安装Cert Manager自动化证书组件"
-    echo "  8) 安装Prometheus监控运维组件"
+    echo "  8) 安装Metrics Server与Node Exporter监控运维组件"
     echo "  9) 安装Gateway API网关与Envoy Gateway组件"
     echo "  10) 安装MetalLB负载均衡组件"
     echo "  11) 安装Ingress Controller路由控制组件"
@@ -1148,7 +1167,9 @@ main_menu() {
             install_cert_manager
             ;;
         8)
-            install_prometheus
+            install_metrics_server
+            install_node_exporter
+            #install_prometheus
             ;;
         9)
             install_gateway_api
