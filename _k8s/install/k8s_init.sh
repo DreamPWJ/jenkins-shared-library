@@ -897,7 +897,7 @@ install_ingress_controller() {
     kubectl wait --for=condition=ready --timeout=600s pod -l app.kubernetes.io/name=ingress-nginx -n ingress-nginx
 
     echo ""
-    log_info "Nginx Ingress Controller 安装完成  ✅"
+    log_info "Nginx Ingress Controller ${nginx_ingress_version} 安装完成  ✅"
     echo ""
     log_info "查看 Ingress Controller 状态:"
     kubectl get pods -n ingress-nginx
@@ -912,7 +912,7 @@ install_ingress_controller() {
 # 初始化 MetalLB
 install_metallb() {
     local metallb_version="v0.15.3"
-    log_info "开始安装 MetalLB ${metallb_version}负载均衡..."
+    log_info "开始安装 MetalLB ${metallb_version} 负载均衡..."
 
    if curl -I --connect-timeout 5 "https://metallb.github.io/metallb/index.yaml" > /dev/null 2>&1; then
        # 添加 MetalLB Helm 仓库
@@ -997,7 +997,7 @@ spec:
 EOF
 
     echo ""
-    log_info "MetalLB 安装并配置完成 ✅"
+    log_info "MetalLB ${metallb_version} 安装并配置完成 ✅"
     echo ""
     log_info "查看 MetalLB 状态:"
     kubectl get pods -n metallb-system
