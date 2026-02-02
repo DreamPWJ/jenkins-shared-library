@@ -813,28 +813,25 @@ install_envoy_gateway() {
     log_info "开始安装 Envoy Gateway ${envoy_gateway_version} 版本..."
 
     # 方法1: 使用 Helm 安装
-    if helm repo add envoy-gateway https://gateway.envoyproxy.io/charts 2>&1 | grep -q "successfully\|already exists"; then
-        log_info "使用 Helm 安装 Envoy Gateway..."
-        helm repo update
+    kubectl create namespace envoy-gateway-system \
+      --dry-run=client -o yaml | kubectl apply -f -
 
-        kubectl create namespace envoy-gateway-system --dry-run=client -o yaml | kubectl apply -f -
+    if helm install eg oci://docker.io/envoyproxy/gateway-helm \
+        --namespace envoy-gateway-system \
+        --create-namespace \
+        --version "v${envoy_gateway_version}" \
+        --wait; then
 
-         if helm install eg envoy-gateway/gateway-helm \
-             --namespace envoy-gateway-system \
-             --create-namespace \
-             --version ${envoy_gateway_version} \
-             --wait; then
-             log_info "Helm 安装 Envoy Gateway  成功"
-         else
-             log_info "Helm 安装失败，尝试使用 kubectl..."
-             if install_envoy_gateway_kubectl ${envoy_gateway_version}; then
-                    INSTALL_SUCCESS=1
-             fi
-         fi
+        log_info "Helm (OCI) 安装 Envoy Gateway 成功"
+        INSTALL_SUCCESS=1
+
     else
-        log_error "Helm 仓库添加失败，使用 kubectl 安装..."
-        if install_envoy_gateway_kubectl ${envoy_gateway_version}; then
-               INSTALL_SUCCESS=1
+        log_error "Helm  安装失败，尝试使用 kubectl 安装..."
+        if install_envoy_gateway_kubectl "${envoy_gateway_version}"; then
+            INSTALL_SUCCESS=1
+        else
+            log_error "Envoy Gateway 安装失败"
+            INSTALL_SUCCESS=0
         fi
     fi
 
