@@ -789,10 +789,71 @@ install_gateway_api() {
         log_info "Gateway API ${gateway_api_version} 安装完成 ✅"
         echo ""
         log_warn "提示: 标准 Gateway API 已安装，需要配合网关实现使用（如 Envoy Gateway、Istio、Traefik、Nginx Gateway、Kong Gateway 等）"
+        install_envoy_gateway
         return 0
     else
         log_error "Gateway API 安装失败 ❌"
         return 1
+    fi
+}
+
+# 安装 Envoy Gateway
+install_envoy_gateway() {
+    # Envoy Gateway 版本
+    local envoy_gateway_version="v1.6.3"
+    log_info "开始安装 Envoy Gateway ${envoy_gateway_version} 版本..."
+
+    # 方法1: 使用 Helm 安装
+    helm repo add envoy-gateway https://gateway.envoyproxy.io/charts 2>/dev/null
+
+    if [ $? -eq 0 ]; then
+        log_info "使用 Helm 安装 Envoy Gateway..."
+        helm repo update
+
+        kubectl create namespace envoy-gateway-system --dry-run=client -o yaml | kubectl apply -f -
+
+        helm install eg envoy-gateway/gateway-helm \
+            --namespace envoy-gateway-system \
+            --create-namespace \
+            --wait
+
+        if [ $? -eq 0 ]; then
+            log_info "Helm 安装 Envoy Gateway  成功"
+        else
+            log_info "Helm 安装失败，尝试使用 kubectl..."
+            install_envoy_gateway_kubectl
+        fi
+    else
+        log_error "Helm 仓库添加失败，使用 kubectl 安装..."
+        install_envoy_gateway_kubectl
+    fi
+
+    # 验证安装
+    echo ""
+    log_info "等待 Envoy Gateway 启动..."
+    kubectl wait --for=condition=available --timeout=300s deployment/envoy-gateway -n envoy-gateway-system 2>/dev/null || true
+
+    echo ""
+    log_info "Envoy Gateway ${envoy_gateway_version} 安装完成  ✅"
+    echo ""
+    log_info "查看 Envoy Gateway 状态:"
+    kubectl get pods -n envoy-gateway-system
+    echo ""
+    log_info "查看 GatewayClass:"
+    kubectl get gatewayclass
+}
+
+# 使用 kubectl 安装 Envoy Gateway
+install_envoy_gateway_kubectl() {
+    log_info "使用 kubectl 直接安装 Envoy Gateway..."
+
+    # 尝试从 GitHub 安装
+    kubectl apply -f https://github.com/envoyproxy/gateway/releases/download/${ENVOY_GATEWAY_VERSION}/install.yaml 2>/dev/null
+
+    if [ $? -ne 0 ]; then
+        log_warn "GitHub 访问失败，使用离线 YAML安装 Envoy Gateway..."
+        # 创建基础配置
+         kubectl apply -f envoy-gateway.yaml
     fi
 }
 
@@ -1015,9 +1076,10 @@ main_menu() {
     echo "  6) 安装Helm包管理"
     echo "  7) 安装Cert Manager自动化证书组件"
     echo "  8) 安装Prometheus监控运维组件"
-    echo "  9) 安装Ingress Controller路由控制组件"
+    echo "  9) 安装Gateway API网关与Envoy Gateway组件"
     echo "  10) 安装MetalLB负载均衡组件"
-    echo "  11) 安装Gateway API网关组件"
+    echo "  11) 安装Ingress Controller路由控制组件"
+
     echo "  0) 退出"
     echo ""
     read -p "请输入选项 [0-11]: " choice
@@ -1048,13 +1110,13 @@ main_menu() {
             install_prometheus
             ;;
         9)
-            install_ingress_controller
+            install_gateway_api
             ;;
         10)
             install_metallb
             ;;
         11)
-            install_gateway_api
+            install_ingress_controller
             ;;
         0)
             log_info "退出脚本"
