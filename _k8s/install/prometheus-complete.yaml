@@ -3,6 +3,276 @@ kind: Namespace
 metadata:
   name: monitoring
 ---
+# ============================================
+# Metrics Server 部署 (用于 kubectl top 命令)
+# ============================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: metrics-server
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: system:aggregated-metrics-reader
+  labels:
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+rules:
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["pods", "nodes"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: system:metrics-server
+rules:
+  - apiGroups: [""]
+    resources: ["nodes/metrics"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["pods", "nodes"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: metrics-server:system:auth-delegator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+  - kind: ServiceAccount
+    name: metrics-server
+    namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: system:metrics-server
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:metrics-server
+subjects:
+  - kind: ServiceAccount
+    name: metrics-server
+    namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: metrics-server-auth-reader
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: extension-apiserver-authentication-reader
+subjects:
+  - kind: ServiceAccount
+    name: metrics-server
+    namespace: kube-system
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metrics-server
+  namespace: kube-system
+  labels:
+    kubernetes.io/name: "Metrics-server"
+    kubernetes.io/cluster-service: "true"
+spec:
+  selector:
+    k8s-app: metrics-server
+  ports:
+    - port: 443
+      protocol: TCP
+      targetPort: https
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metrics-server
+  namespace: kube-system
+  labels:
+    k8s-app: metrics-server
+spec:
+  selector:
+    matchLabels:
+      k8s-app: metrics-server
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        k8s-app: metrics-server
+    spec:
+      serviceAccountName: metrics-server
+      containers:
+        - name: metrics-server
+          image: metrics-server/metrics-server:v0.8.1
+          imagePullPolicy: IfNotPresent
+          args:
+            - --cert-dir=/tmp
+            - --secure-port=10250
+            - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+            - --kubelet-use-node-status-port
+            - --metric-resolution=15s
+            # 如果遇到 TLS 问题，可以添加以下参数（仅用于测试环境）
+            # - --kubelet-insecure-tls
+          ports:
+            - name: https
+              containerPort: 10250
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /livez
+              port: https
+              scheme: HTTPS
+            periodSeconds: 10
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: https
+              scheme: HTTPS
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 200Mi
+            limits:
+              cpu: 200m
+              memory: 400Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: tmp-dir
+              mountPath: /tmp
+      priorityClassName: system-cluster-critical
+      volumes:
+        - name: tmp-dir
+          emptyDir: {}
+---
+apiVersion: apiregistration.k8s.io/v1
+kind: APIService
+metadata:
+  name: v1beta1.metrics.k8s.io
+spec:
+  service:
+    name: metrics-server
+    namespace: kube-system
+  group: metrics.k8s.io
+  version: v1beta1
+  insecureSkipTLSVerify: true
+  groupPriorityMinimum: 100
+  versionPriority: 100
+---
+# ============================================
+# Node Exporter 部署 (提供详细的节点指标)
+# ============================================
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-exporter
+  namespace: monitoring
+  labels:
+    app: node-exporter
+spec:
+  selector:
+    matchLabels:
+      app: node-exporter
+  template:
+    metadata:
+      labels:
+        app: node-exporter
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9100"
+    spec:
+      hostNetwork: true
+      hostPID: true
+      containers:
+        - name: node-exporter
+          image: prom/node-exporter:v1.10.2
+          args:
+            - '--path.procfs=/host/proc'
+            - '--path.sysfs=/host/sys'
+            - '--path.rootfs=/host/root'
+            - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+          ports:
+            - containerPort: 9100
+              hostPort: 9100
+              name: metrics
+          volumeMounts:
+            - name: proc
+              mountPath: /host/proc
+              readOnly: true
+            - name: sys
+              mountPath: /host/sys
+              readOnly: true
+            - name: root
+              mountPath: /host/root
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+      volumes:
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: sys
+          hostPath:
+            path: /sys
+        - name: root
+          hostPath:
+            path: /
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-exporter
+  namespace: monitoring
+  labels:
+    app: node-exporter
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9100"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: node-exporter
+  ports:
+    - port: 9100
+      targetPort: 9100
+      name: metrics
+---
+# ============================================
+# Prometheus 配置
+# ============================================
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -18,6 +288,7 @@ rules:
     resources:
       - nodes
       - nodes/metrics
+      - nodes/proxy
       - services
       - endpoints
       - pods
@@ -57,12 +328,16 @@ data:
     global:
       scrape_interval: 15s
       evaluation_interval: 15s
+      external_labels:
+        cluster: 'kubernetes'
     
     scrape_configs:
+      # Prometheus 自身
       - job_name: 'prometheus'
         static_configs:
           - targets: ['localhost:9090']
       
+      # Kubernetes API Server
       - job_name: 'kubernetes-apiservers'
         kubernetes_sd_configs:
           - role: endpoints
@@ -75,6 +350,7 @@ data:
             action: keep
             regex: default;kubernetes;https
       
+      # Kubernetes 节点
       - job_name: 'kubernetes-nodes'
         kubernetes_sd_configs:
           - role: node
@@ -85,7 +361,14 @@ data:
         relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__meta_kubernetes_node_name]
+            regex: (.+)
+            target_label: __metrics_path__
+            replacement: /api/v1/nodes/${1}/proxy/metrics
       
+      # Kubernetes cAdvisor (容器指标)
       - job_name: 'kubernetes-cadvisor'
         kubernetes_sd_configs:
           - role: node
@@ -96,9 +379,35 @@ data:
         relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
-          - target_label: __metrics_path__
-            replacement: /metrics/cadvisor
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__meta_kubernetes_node_name]
+            regex: (.+)
+            target_label: __metrics_path__
+            replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
       
+      # Node Exporter (详细的节点指标，包括硬盘)
+      - job_name: 'node-exporter'
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+                - monitoring
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: node-exporter
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: metrics
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: kubernetes_pod_name
+          - source_labels: [__meta_kubernetes_pod_node_name]
+            target_label: node
+      
+      # Kubernetes Service Endpoints
       - job_name: 'kubernetes-service-endpoints'
         kubernetes_sd_configs:
           - role: endpoints
@@ -106,6 +415,10 @@ data:
           - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
             action: keep
             regex: true
+          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+            action: replace
+            target_label: __scheme__
+            regex: (https?)
           - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
             action: replace
             target_label: __metrics_path__
@@ -121,7 +434,10 @@ data:
             target_label: kubernetes_namespace
           - source_labels: [__meta_kubernetes_service_name]
             target_label: kubernetes_name
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: kubernetes_pod_name
       
+      # Kubernetes Pods
       - job_name: 'kubernetes-pods'
         kubernetes_sd_configs:
           - role: pod
@@ -173,6 +489,7 @@ spec:
             - '--web.console.libraries=/usr/share/prometheus/console_libraries'
             - '--web.console.templates=/usr/share/prometheus/consoles'
             - '--web.enable-lifecycle'
+            - '--web.enable-admin-api'
           ports:
             - containerPort: 9090
               name: http
@@ -188,6 +505,18 @@ spec:
             limits:
               memory: "2Gi"
               cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: 9090
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 9090
+            initialDelaySeconds: 30
+            periodSeconds: 10
       volumes:
         - name: config
           configMap:
@@ -203,13 +532,33 @@ metadata:
   labels:
     app: prometheus
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: prometheus
   ports:
     - port: 9090
       targetPort: 9090
+      nodePort: 30090
       name: http
+---
+# ============================================
+# Grafana 配置
+# ============================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: monitoring
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus:9090
+        isDefault: true
+        editable: true
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -241,9 +590,13 @@ spec:
               value: "admin@0633"
             - name: GF_USERS_ALLOW_SIGN_UP
               value: "false"
+            - name: GF_SERVER_ROOT_URL
+              value: "http://localhost:3000"
           volumeMounts:
             - name: storage
               mountPath: /var/lib/grafana
+            - name: datasources
+              mountPath: /etc/grafana/provisioning/datasources
           resources:
             requests:
               memory: "256Mi"
@@ -251,9 +604,24 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
       volumes:
         - name: storage
           emptyDir: {}
+        - name: datasources
+          configMap:
+            name: grafana-datasources
 ---
 apiVersion: v1
 kind: Service
@@ -263,10 +631,11 @@ metadata:
   labels:
     app: grafana
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: grafana
   ports:
     - port: 3000
       targetPort: 3000
+      nodePort: 30030
       name: http

@@ -751,8 +751,6 @@ install_prometheus() {
     kubectl wait --for=condition=available --timeout=600s deployment/prometheus -n monitoring 2>/dev/null || true
     kubectl wait --for=condition=available --timeout=600s deployment/grafana -n monitoring 2>/dev/null || true
 
-    log_info "Prometheus 安装完成 ✅ "
-    echo ""
     kubectl get pods -n monitoring
 
     # 显示访问信息
@@ -765,6 +763,9 @@ install_prometheus() {
     log_info "kubectl port-forward -n monitoring svc/grafana 3000:3000"
     log_info "Grafana访问地址: http://localhost:3000"
     log_info "Grafana 默认用户名admin 密码: ${grafana_admin_password}"
+    echo ""
+    log_info "Prometheus 安装完成 ✅ "
+    echo ""
 }
 
 # 初始化 Gateway API
