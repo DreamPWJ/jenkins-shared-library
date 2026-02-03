@@ -770,6 +770,7 @@ install_prometheus() {
 
 # 安装 Metrics Server
 install_metrics_server() {
+    echo ""
     log_info "安装 Metrics Server HPA指标服务..."
     kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml && \
     kubectl patch deployment metrics-server -n kube-system --type='json' -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
@@ -780,6 +781,7 @@ install_metrics_server() {
 
 # 安装 Node Exporter
 install_node_exporter() {
+    echo ""
     log_info "安装 Node Exporter 节点监控指标..."
     kubectl create namespace monitoring 2>/dev/null || true && \
     kubectl apply -f node-exporter.yaml
@@ -1139,10 +1141,10 @@ main_menu() {
     echo "  9) 安装Gateway API网关与Envoy Gateway组件"
     echo "  10) 安装MetalLB负载均衡组件"
     echo "  11) 安装Ingress Controller路由控制组件"
-
+    echo "  12) 安装Prometheus Grafana监控组件"
     echo "  0) 退出"
     echo ""
-    read -p "请输入选项 [0-11]: " choice
+    read -p "请输入选项 [0-12]: " choice
 
     case $choice in
         1)
@@ -1169,7 +1171,6 @@ main_menu() {
         8)
             install_metrics_server
             install_node_exporter
-            #install_prometheus
             ;;
         9)
             install_gateway_api
@@ -1179,6 +1180,9 @@ main_menu() {
             ;;
         11)
             install_ingress_controller
+            ;;
+        12)
+            install_prometheus
             ;;
         0)
             log_info "退出脚本"
