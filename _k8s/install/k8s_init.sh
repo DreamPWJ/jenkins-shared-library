@@ -967,23 +967,27 @@ install_ingress_controller() {
     log_info "配置国内镜像..."
 cat > values-china.yaml <<'EOF'
 controller:
+  replicaCount: 2
+
   image:
-    registry: registry.aliyuncs.com/google_containers
-    image: nginx-ingress-controller
+    registry: registry.aliyuncs.com
+    image: google_containers/ingress-nginx/controller
     tag: "v1.14.3"
     digest: null
-  replicaCount: 2
+
   service:
     type: NodePort
-admissionWebhooks:
-  patch:
-    image:
-      registry: registry.aliyuncs.com/google_containers
-      image: kube-webhook-certgen
-      tag: "v1.6.7"
-      digest: null
-ingressClassResource:
-  default: true
+
+  ingressClassResource:
+    default: true
+
+  admissionWebhooks:
+    patch:
+      image:
+        registry: registry.aliyuncs.com
+        image: google_containers/ingress-nginx/kube-webhook-certgen
+        tag: "v1.6.7"
+        digest: null
 EOF
 
     log_info "Helm安装Ingress Controller..."
@@ -992,6 +996,10 @@ EOF
       --create-namespace \
       --namespace ingress-nginx \
       --values values-china.yaml \
+      --set controller.service.type=LoadBalancer \
+      --set controller.metrics.enabled=true \
+      --set controller.podAnnotations."prometheus\.io/scrape"=true \
+      --set controller.podAnnotations."prometheus\.io/port"=10254 \
       --wait \
       --timeout 10m
 
