@@ -981,16 +981,9 @@ controller:
   ingressClassResource:
     default: true
 
-  admissionWebhooks:
-    patch:
-      image:
-        registry: registry.aliyuncs.com
-        image: google_containers/ingress-nginx/kube-webhook-certgen
-        tag: "v1.6.7"
-        digest: null
 EOF
 
-    log_info "Helm安装Ingress Controller..."
+    log_info "Helm 安装 Nginx Ingress Controller..."
     kubectl delete namespace ingress-nginx 2>/dev/null || true
     helm install ingress-nginx . \
       --create-namespace \
