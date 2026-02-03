@@ -673,7 +673,7 @@ install_helm() {
         # 添加常用的 Helm 仓库
         echo "添加常用 Helm 仓库..."
         helm repo add stable https://charts.helm.sh/stable 2>/dev/null || true
-        #helm repo add bitnami https://charts.bitnami.com/bitnami 2>/dev/null || true
+        helm repo add bitnami https://charts.bitnami.com/bitnami 2>/dev/null || true
         helm repo update
 
         log_info "Helm ${INSTALLED_HELM_VERSION} 安装完成 ✅ "
@@ -919,7 +919,7 @@ install_ingress_controller() {
    local nginx_ingress_version="v1.14.2"
    log_info "开始安装 Nginx Ingress Controller ${nginx_ingress_version} 路由控制器..."
 
-   if curl -I --connect-timeout 5 "https://kubernetes.github.io/ingress-nginx/index.yaml" > /dev/null 2>&1; then
+  if helm version >/dev/null 2>&1; then
        # 添加 Nginx Ingress Helm 仓库
        helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
        helm repo update
@@ -929,26 +929,14 @@ install_ingress_controller() {
 
        # 使用 Helm 安装 Nginx Ingress Controller
        log_info "使用 Helm 安装 Nginx Ingress Controller..."
-#       helm install ingress-nginx ingress-nginx/ingress-nginx \
-#           --namespace ingress-nginx \
-#           --set controller.service.type=LoadBalancer \
-#           --set controller.metrics.enabled=true \
-#           --set controller.podAnnotations."prometheus\.io/scrape"=true \
-#           --set controller.podAnnotations."prometheus\.io/port"=10254 \
-#           --wait
-      helm install ingress-nginx ingress-nginx/ingress-nginx \
-        --namespace ingress-nginx \
-        --set controller.image.registry=registry.aliyuncs.com \
-        --set controller.image.image=google_containers/ingress-nginx-controller \
-        --set controller.image.tag=${nginx_ingress_version} \
-        --set controller.admissionWebhooks.patch.image.registry=registry.aliyuncs.com \
-        --set controller.admissionWebhooks.patch.image.image=google_containers/kube-webhook-certgen \
-        --set controller.admissionWebhooks.patch.image.tag=v1.6.6 \
-        --set controller.metrics.enabled=true \
-        --set controller.podAnnotations."prometheus\.io/scrape"=true \
-        --set controller.podAnnotations."prometheus\.io/port"=10254 \
-        --set controller.service.type=LoadBalancer \
-        --wait
+       helm install ingress-nginx bitnami/nginx-ingress-controller  \
+           --namespace ingress-nginx \
+           --set controller.image.tag=${nginx_ingress_version} \
+           --set controller.service.type=LoadBalancer \
+           --set controller.metrics.enabled=true \
+           --set controller.podAnnotations."prometheus\.io/scrape"=true \
+           --set controller.podAnnotations."prometheus\.io/port"=10254 \
+           --wait
 
        if [ $? -ne 0 ]; then
            log_error "Ingress Controller 安装失败"
