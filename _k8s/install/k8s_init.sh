@@ -919,7 +919,7 @@ install_ingress_controller() {
    local nginx_ingress_version="v1.14.2"
    log_info "开始安装 Nginx Ingress Controller ${nginx_ingress_version} 路由控制器..."
    echo ""
-   log_info "=== 步骤 1: 删除现有的失败 Pod 和 Job ==="
+   log_info " 删除Nginx Ingress现有的失败 Pod 和 Job"
    kubectl delete pod -n ingress-nginx -l app.kubernetes.io/component=controller --force --grace-period=0 2>/dev/null || true
    kubectl delete job -n ingress-nginx ingress-nginx-admission-create 2>/dev/null || true
    kubectl delete job -n ingress-nginx ingress-nginx-admission-patch 2>/dev/null || true
@@ -947,6 +947,47 @@ install_ingress_controller() {
            log_error "Ingress Controller 安装失败"
            return 1
        fi
+    if helm version ; then
+        log_info "下载 Ingress Controller Helm Chart..."
+        curl -LO https://ghproxy.com/https://github.com/kubernetes/ingress-nginx/releases/download/helm-chart-4.11.3/ingress-nginx-4.11.3.tgz || \
+        curl -LO https://mirror.ghproxy.com/https://github.com/kubernetes/ingress-nginx/releases/download/helm-chart-4.11.3/ingress-nginx-4.11.3.tgz
+        tar -xzf ingress-nginx-4.11.3.tgz
+        cd ingress-nginx
+# 创建配置
+log_info "配置国内镜像..."
+cat > values-china.yaml <<'EOF'
+controller:
+  image:
+    registry: registry.aliyuncs.com/google_containers
+    image: nginx-ingress-controller
+    tag: "v1.14.3"
+    digest: null
+  replicaCount: 2
+  service:
+    type: NodePort
+admissionWebhooks:
+  patch:
+    image:
+      registry: registry.aliyuncs.com/google_containers
+      image: kube-webhook-certgen
+      tag: "v1.6.1"
+      digest: null
+ingressClassResource:
+  default: true
+EOF
+
+    log_info "Helm安装Ingress Controller ..."
+    helm install ingress-nginx . \
+      --namespace ingress-nginx \
+      --create-namespace \
+      --values values-china.yaml \
+      --set controller.service.type=LoadBalancer \
+      --set controller.metrics.enabled=true \
+      --set controller.podAnnotations."prometheus\.io/scrape"=true \
+      --set controller.podAnnotations."prometheus\.io/port"=10254 \
+      --wait \
+      --timeout 10m
+
     else
         log_error "Ingress Controller的Helm包网络不通"
         log_info  "使用K8s yaml文件离线安装 Ingress Controller"
