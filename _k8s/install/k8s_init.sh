@@ -919,11 +919,21 @@ install_ingress_controller() {
    local nginx_ingress_version="v1.14.2"
    log_info "开始安装 Nginx Ingress Controller ${nginx_ingress_version} 路由控制器..."
    echo ""
-   log_info " 删除Nginx Ingress现有的失败 Pod 和 Job"
+   log_info "删除Nginx Ingress现有的所有环境..."
    kubectl delete pod -n ingress-nginx -l app.kubernetes.io/component=controller --force --grace-period=0 2>/dev/null || true
    kubectl delete job -n ingress-nginx ingress-nginx-admission-create 2>/dev/null || true
    kubectl delete job -n ingress-nginx ingress-nginx-admission-patch 2>/dev/null || true
    kubectl delete secret -n ingress-nginx ingress-nginx-admission 2>/dev/null || true
+   kubectl delete clusterrole ingress-nginx 2>/dev/null || true
+   kubectl delete clusterrolebinding ingress-nginx 2>/dev/null || true
+   kubectl delete clusterrole ingress-nginx-admission 2>/dev/null || true
+   kubectl delete clusterrolebinding ingress-nginx-admission 2>/dev/null || true
+   kubectl delete validatingwebhookconfiguration ingress-nginx-admission 2>/dev/null || true
+   kubectl delete mutatingwebhookconfiguration ingress-nginx-admission 2>/dev/null || true
+   kubectl delete ingressclass nginx 2>/dev/null || true
+   helm uninstall ingress-nginx -n ingress-nginx 2>/dev/null || true
+   kubectl delete namespace ingress-nginx 2>/dev/null || true
+   kubectl wait --for=delete ns/ingress-nginx --timeout=120s 2>/dev/null || true
 
    if curl -I --connect-timeout 5 "https://kubernetes.github.io/ingress-nginx/index.yaml" > /dev/null 2>&1; then
        # 添加 Nginx Ingress Helm 仓库
@@ -947,14 +957,14 @@ install_ingress_controller() {
            log_error "Ingress Controller 安装失败"
            return 1
        fi
-    if helm version ; then
+   elif helm version ; then
         log_info "下载 Ingress Controller Helm Chart..."
-        curl -LO https://ghproxy.com/https://github.com/kubernetes/ingress-nginx/releases/download/helm-chart-4.11.3/ingress-nginx-4.11.3.tgz || \
-        curl -LO https://mirror.ghproxy.com/https://github.com/kubernetes/ingress-nginx/releases/download/helm-chart-4.11.3/ingress-nginx-4.11.3.tgz
-        tar -xzf ingress-nginx-4.11.3.tgz
+        curl -LO https://github.com/kubernetes/ingress-nginx/releases/download/helm-chart-4.14.3/ingress-nginx-4.14.3.tgz
+        tar -xzf ingress-nginx-4.14.3.tgz
         cd ingress-nginx
-# 创建配置
-log_info "配置国内镜像..."
+
+    # 创建配置
+    log_info "配置国内镜像..."
 cat > values-china.yaml <<'EOF'
 controller:
   image:
@@ -970,21 +980,18 @@ admissionWebhooks:
     image:
       registry: registry.aliyuncs.com/google_containers
       image: kube-webhook-certgen
-      tag: "v1.6.1"
+      tag: "v1.6.7"
       digest: null
 ingressClassResource:
   default: true
 EOF
 
-    log_info "Helm安装Ingress Controller ..."
+    log_info "Helm安装Ingress Controller..."
+    kubectl delete namespace ingress-nginx 2>/dev/null || true
     helm install ingress-nginx . \
-      --namespace ingress-nginx \
       --create-namespace \
+      --namespace ingress-nginx \
       --values values-china.yaml \
-      --set controller.service.type=LoadBalancer \
-      --set controller.metrics.enabled=true \
-      --set controller.podAnnotations."prometheus\.io/scrape"=true \
-      --set controller.podAnnotations."prometheus\.io/port"=10254 \
       --wait \
       --timeout 10m
 
