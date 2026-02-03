@@ -929,13 +929,26 @@ install_ingress_controller() {
 
        # 使用 Helm 安装 Nginx Ingress Controller
        log_info "使用 Helm 安装 Nginx Ingress Controller..."
-       helm install ingress-nginx ingress-nginx/ingress-nginx \
-           --namespace ingress-nginx \
-           --set controller.service.type=LoadBalancer \
-           --set controller.metrics.enabled=true \
-           --set controller.podAnnotations."prometheus\.io/scrape"=true \
-           --set controller.podAnnotations."prometheus\.io/port"=10254 \
-           --wait
+#       helm install ingress-nginx ingress-nginx/ingress-nginx \
+#           --namespace ingress-nginx \
+#           --set controller.service.type=LoadBalancer \
+#           --set controller.metrics.enabled=true \
+#           --set controller.podAnnotations."prometheus\.io/scrape"=true \
+#           --set controller.podAnnotations."prometheus\.io/port"=10254 \
+#           --wait
+      helm install ingress-nginx ingress-nginx/ingress-nginx \
+        --namespace ingress-nginx \
+        --set controller.image.registry=registry.aliyuncs.com \
+        --set controller.image.image=google_containers/ingress-nginx-controller \
+        --set controller.image.tag=${nginx_ingress_version} \
+        --set controller.admissionWebhooks.patch.image.registry=registry.aliyuncs.com \
+        --set controller.admissionWebhooks.patch.image.image=google_containers/kube-webhook-certgen \
+        --set controller.admissionWebhooks.patch.image.tag=v1.6.6 \
+        --set controller.metrics.enabled=true \
+        --set controller.podAnnotations."prometheus\.io/scrape"=true \
+        --set controller.podAnnotations."prometheus\.io/port"=10254 \
+        --set controller.service.type=LoadBalancer \
+        --wait
 
        if [ $? -ne 0 ]; then
            log_error "Ingress Controller 安装失败"
