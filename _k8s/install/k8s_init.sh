@@ -929,9 +929,8 @@ install_ingress_controller() {
 
        # 使用 Helm 安装 Nginx Ingress Controller
        log_info "使用 Helm 安装 Nginx Ingress Controller..."
-       helm install ingress-nginx bitnami/nginx-ingress-controller  \
+       helm install ingress-nginx ingress-nginx/ingress-nginx \
            --namespace ingress-nginx \
-           --set controller.image.tag=${nginx_ingress_version} \
            --set controller.service.type=LoadBalancer \
            --set controller.metrics.enabled=true \
            --set controller.podAnnotations."prometheus\.io/scrape"=true \
