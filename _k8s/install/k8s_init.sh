@@ -771,12 +771,13 @@ install_prometheus() {
 # 安装 Metrics Server
 install_metrics_server() {
     echo ""
-    log_info "安装 Metrics Server HPA指标服务..."
+    local metrics_server_version="v0.8.1"
+    log_info "安装 Metrics Server ${metrics_server_version}版本 指标服务..."
     kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml && \
     kubectl patch deployment metrics-server -n kube-system --type='json' -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
     # 更新镜像源 保证成功下载镜像
     kubectl -n kube-system set image deployment/metrics-server \
-      metrics-server=registry.aliyuncs.com/google_containers/metrics-server:v0.8.1
+      metrics-server=registry.aliyuncs.com/google_containers/metrics-server:${metrics_server_version}
     sleep 5
     log_info "Metrics Server验证安装:"
     kubectl get deployment metrics-server -n kube-system
