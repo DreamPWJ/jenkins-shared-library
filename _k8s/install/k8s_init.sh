@@ -918,8 +918,14 @@ install_envoy_gateway_kubectl() {
 install_ingress_controller() {
    local nginx_ingress_version="v1.14.2"
    log_info "开始安装 Nginx Ingress Controller ${nginx_ingress_version} 路由控制器..."
+   echo ""
+   log_info "=== 步骤 1: 删除现有的失败 Pod 和 Job ==="
+   kubectl delete pod -n ingress-nginx -l app.kubernetes.io/component=controller --force --grace-period=0 2>/dev/null || true
+   kubectl delete job -n ingress-nginx ingress-nginx-admission-create 2>/dev/null || true
+   kubectl delete job -n ingress-nginx ingress-nginx-admission-patch 2>/dev/null || true
+   kubectl delete secret -n ingress-nginx ingress-nginx-admission 2>/dev/null || true
 
-  if helm version >/dev/null 2>&1; then
+   if curl -I --connect-timeout 5 "https://kubernetes.github.io/ingress-nginx/index.yaml" > /dev/null 2>&1; then
        # 添加 Nginx Ingress Helm 仓库
        helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
        helm repo update
