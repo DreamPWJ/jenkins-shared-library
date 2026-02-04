@@ -958,14 +958,15 @@ install_ingress_controller() {
            return 1
        fi
    elif helm version ; then
-        log_info "下载 Ingress Controller Helm Chart..."
-        curl -LO https://github.com/kubernetes/ingress-nginx/releases/download/helm-chart-4.14.3/ingress-nginx-4.14.3.tgz
-        tar -xzf ingress-nginx-4.14.3.tgz
-        cd ingress-nginx
+       log_info "下载 Ingress Controller Helm Chart..."
+       helm pull ingress-nginx/ingress-nginx --untar || \
+       curl -LO https://github.com/kubernetes/ingress-nginx/releases/download/helm-chart-4.14.3/ingress-nginx-4.14.3.tgz
+       tar -xzf ingress-nginx-4.14.3.tgz
+       cd ingress-nginx
 
     # 创建配置
     log_info "配置国内镜像..."
-cat > values-china.yaml <<'EOF'
+cat > ingress-nginx-values.yaml <<'EOF'
 controller:
   replicaCount: 2
 
@@ -984,15 +985,10 @@ controller:
 EOF
 
     log_info "Helm 安装 Nginx Ingress Controller..."
-    kubectl delete namespace ingress-nginx 2>/dev/null || true
+    kubectl create namespace ingress-nginx || true
     helm install ingress-nginx . \
-      --create-namespace \
-      --namespace ingress-nginx \
-      --values values-china.yaml \
-      --set controller.service.type=LoadBalancer \
-      --set controller.metrics.enabled=true \
-      --set controller.podAnnotations."prometheus\.io/scrape"=true \
-      --set controller.podAnnotations."prometheus\.io/port"=10254 \
+      -n ingress-nginx \
+      -f ingress-nginx-values.yaml \
       --wait \
       --timeout 10m
 
