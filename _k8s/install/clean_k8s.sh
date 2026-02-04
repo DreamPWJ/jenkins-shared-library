@@ -118,6 +118,9 @@ log_info "kubelet 数据已删除"
 
 # 9. 删除容器运行时数据
 log_step "9/15: 删除容器运行时数据..."
+apt-get remove -y  containerd  containerd.io 2>/dev/null || true
+apt-get purge -y  containerd  containerd.io 2>/dev/null || true
+
 rm -rf /var/lib/containerd/ 2>/dev/null || true
 rm -rf /var/lib/docker/ 2>/dev/null || true
 log_info "容器运行时数据已删除"

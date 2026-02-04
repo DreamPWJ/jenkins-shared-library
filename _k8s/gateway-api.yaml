@@ -1,0 +1,181 @@
+# Author: 潘维吉
+# Description: 执行云原生K8S七层负载 - Gateway API版本
+# Gateway API 提供了比 Ingress 更强大和灵活的流量管理能力
+
+---
+# Gateway 资源 - 定义监听器和TLS配置
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gray-release-gateway
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  gatewayClassName: k8s-gateway
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      hostname: "panweiji.com"
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: "panweiji.com"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: panweiji-tls-secret
+      allowedRoutes:
+        namespaces:
+          from: Same
+
+---
+# HTTPRoute 资源 - 主路由（稳定版本）
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: gray-release-stable
+  namespace: default
+  annotations:
+    # CORS 配置
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-max-age: "64800"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, DELETE, PATCH, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    
+    # 超时配置
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    
+    # Session保持
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/affinity-mode: "persistent"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
+    
+    # 文件上传大小限制
+    nginx.ingress.kubernetes.io/client-body-buffer-size: 1024m
+    nginx.ingress.kubernetes.io/proxy-max-temp-file-size: 2048m
+    nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+    
+    # 限流配置
+    nginx.ingress.kubernetes.io/limit-rps: "50"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "10"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      limit_req_status 429;
+spec:
+  parentRefs:
+    - name: gray-release-gateway
+      namespace: default
+  hostnames:
+    - "panweiji.com"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: {APP_NAME}-service
+          port: {HOST_PORT}
+          weight: 100
+
+---
+# HTTPRoute 资源 - 金丝雀版本（Canary）
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: gray-release-canary
+  namespace: default
+  annotations:
+    # CORS 配置
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-max-age: "64800"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, DELETE, PATCH, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    
+    # 超时配置
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    
+    # Session保持
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/affinity-mode: "persistent"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
+    
+    # 文件上传大小限制
+    nginx.ingress.kubernetes.io/client-body-buffer-size: 1024m
+    nginx.ingress.kubernetes.io/proxy-max-temp-file-size: 2048m
+    nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+    
+    # 限流配置
+    nginx.ingress.kubernetes.io/limit-rps: "50"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "10"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      limit_req_status 429;
+spec:
+  parentRefs:
+    - name: gray-release-gateway
+      namespace: default
+  hostnames:
+    - "panweiji.com"
+  rules:
+    # 金丝雀规则：基于Header的流量分发
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+          headers:
+            - name: version
+              type: Exact
+              value: v2.0.0
+      backendRefs:
+        - name: {APP_NAME}-canary-service  # 金丝雀版本的服务名
+          port: {HOST_PORT}
+          weight: 100
+
+---
+# ReferenceGrant（如果需要跨命名空间引用）
+# apiVersion: gateway.networking.k8s.io/v1beta1
+# kind: ReferenceGrant
+# metadata:
+#   name: gray-release-grant
+#   namespace: default
+# spec:
+#   from:
+#     - group: gateway.networking.k8s.io
+#       kind: HTTPRoute
+#       namespace: default
+#   to:
+#     - group: ""
+#       kind: Service
+
+---
+# 使用说明和命令
+# 
+# 安装 Gateway API CRDs:
+# kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/standard-install.yaml
+#
+# 应用配置:
+# kubectl apply -f gateway-api.yaml
+#
+# 查看 Gateway:
+# kubectl get gateway gray-release-gateway
+# kubectl describe gateway gray-release-gateway
+#
+# 查看 HTTPRoute:
+# kubectl get httproute
+# kubectl describe httproute gray-release-stable
+# kubectl describe httproute gray-release-canary
+#
+# 删除资源:
+# kubectl delete httproute gray-release-stable gray-release-canary
+# kubectl delete gateway gray-release-gateway
+#
+# 测试金丝雀发布:
+# curl -H "version: v2.0.0" https://panweiji.com/
+# curl https://panweiji.com/  # 访问稳定版本
