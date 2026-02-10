@@ -964,9 +964,14 @@ install_ingress_controller() {
         log_info  "使用K8s Yaml文件离线安装 Ingress Controller"
         # kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-${nginx_ingress_version}/deploy/static/provider/cloud/deploy.yaml 2>/dev/null
         curl -L https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-${nginx_ingress_version}/deploy/static/provider/cloud/deploy.yaml -o ingress-nginx.yaml
-        # 一次性替换镜像源
+        # 一次性替换国内镜像源
         sed -i 's|registry.k8s.io|registry.aliyuncs.com/google_containers|g' ingress-nginx.yaml
+        # 禁用 admission webhook 防止创建安装 Ingress 失败
+        sed -i 's/--enable-admission-webhook/--enable-admission-webhook=false/g' ingress-nginx.yaml
         kubectl apply -f ingress-nginx.yaml
+        # 重新开启 admission webhook 合法语法校验
+#        sed -i 's/--enable-admission-webhook/--enable-admission-webhook=true/g' ingress-nginx.yaml
+#        kubectl apply -f ingress-nginx.yaml
 
         if [ $? -ne 0 ]; then
              log_warn "GitHub 访问失败，使用离线 YAML安装 Nginx Ingress Controller..."
