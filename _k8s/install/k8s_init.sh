@@ -965,7 +965,7 @@ install_ingress_controller() {
         local ingress_controller_yaml_url="https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-${nginx_ingress_version}/deploy/static/provider/cloud/deploy.yaml"
         log_info  "使用K8s Yaml文件离线安装 Ingress Controller , Yaml访问地址: ${ingress_controller_yaml_url} "
         # kubectl apply -f ${ingress_controller_yaml_url} 2>/dev/null
-        curl -L ${ingress_controller_yaml_url} -o ingress-nginx.yaml
+        #curl -L ${ingress_controller_yaml_url} -o ingress-nginx.yaml
         # 一次性替换国内镜像源
         sed -i 's|registry.k8s.io/ingress-nginx/controller|registry.aliyuncs.com/google_containers/nginx-ingress-controller|g' ingress-nginx.yaml
         sed -i 's|registry.k8s.io/ingress-nginx/kube-webhook-certgen|registry.aliyuncs.com/google_containers/kube-webhook-certgen|g' ingress-nginx.yaml
