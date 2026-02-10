@@ -963,11 +963,12 @@ install_ingress_controller() {
     else
         log_error "Ingress Controller的Helm安装包网络不通"
         local ingress_controller_yaml_url="https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-${nginx_ingress_version}/deploy/static/provider/cloud/deploy.yaml"
-        log_info  "使用K8s Yaml文件离线安装 Ingress Controller , Yaml地址: ${ngress_controller_yaml_url} "
+        log_info  "使用K8s Yaml文件离线安装 Ingress Controller , Yaml访问地址: ${ingress_controller_yaml_url} "
         # kubectl apply -f ${ingress_controller_yaml_url} 2>/dev/null
-        curl -L ${ingress_controller_yaml_url} -o ingress-nginx-original.yaml
+        curl -L ${ingress_controller_yaml_url} -o ingress-nginx.yaml
         # 一次性替换国内镜像源
-        sed -i 's|registry.k8s.io|registry.aliyuncs.com/google_containers|g' ingress-nginx.yaml
+        sed -i 's|registry.k8s.io/ingress-nginx/controller|registry.aliyuncs.com/google_containers/nginx-ingress-controller|g' ingress-nginx.yaml
+        sed -i 's|registry.k8s.io/ingress-nginx/kube-webhook-certgen|registry.aliyuncs.com/google_containers/kube-webhook-certgen|g' ingress-nginx.yaml
         # 禁用 admission webhook 防止创建安装 Ingress 失败
 
         kubectl apply -f ingress-nginx.yaml
