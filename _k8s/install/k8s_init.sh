@@ -951,7 +951,7 @@ install_ingress_controller() {
            --set controller.metrics.enabled=true \
            --set controller.podAnnotations."prometheus\.io/scrape"=true \
            --set controller.podAnnotations."prometheus\.io/port"=10254 \
-           --wait
+           --atomic=true --wait
 
        if [ $? -ne 0 ]; then
            log_error "Ingress Controller 安装失败"
@@ -960,9 +960,14 @@ install_ingress_controller() {
    #elif helm version ; then
 
     else
-        log_error "Ingress Controller的Helm包网络不通"
-        log_info  "使用K8s yaml文件离线安装 Ingress Controller"
-        kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-${nginx_ingress_version}/deploy/static/provider/cloud/deploy.yaml 2>/dev/null
+        log_error "Ingress Controller的Helm安装包网络不通"
+        log_info  "使用K8s Yaml文件离线安装 Ingress Controller"
+        # kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-${nginx_ingress_version}/deploy/static/provider/cloud/deploy.yaml 2>/dev/null
+        curl -L https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-${nginx_ingress_version}/deploy/static/provider/cloud/deploy.yaml -o ingress-nginx.yaml
+        # 一次性替换镜像源
+        sed -i 's|registry.k8s.io|registry.aliyuncs.com/google_containers|g' ingress-nginx.yaml
+        kubectl apply -f ingress-nginx.yaml
+
         if [ $? -ne 0 ]; then
              log_warn "GitHub 访问失败，使用离线 YAML安装 Nginx Ingress Controller..."
              kubectl apply -f ingress-nginx.yaml
