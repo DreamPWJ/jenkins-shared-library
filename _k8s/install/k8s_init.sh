@@ -919,6 +919,7 @@ install_ingress_controller() {
    local nginx_ingress_version="v1.14.2"
    log_info "开始安装 Nginx Ingress Controller ${nginx_ingress_version} 路由控制器..."
    echo ""
+
    log_info "删除Nginx Ingress现有的所有环境..."
    kubectl delete pod -n ingress-nginx -l app.kubernetes.io/component=controller --force --grace-period=0 2>/dev/null || true
    kubectl delete job -n ingress-nginx ingress-nginx-admission-create 2>/dev/null || true
@@ -964,12 +965,13 @@ install_ingress_controller() {
         local ingress_controller_yaml_url="https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-${nginx_ingress_version}/deploy/static/provider/cloud/deploy.yaml"
         log_info  "使用K8s Yaml文件离线安装 Ingress Controller , Yaml地址: ${ngress_controller_yaml_url} "
         # kubectl apply -f ${ingress_controller_yaml_url} 2>/dev/null
-        curl -L ${ingress_controller_yaml_url} -o ingress-nginx.yaml
+        curl -L ${ingress_controller_yaml_url} -o ingress-nginx-original.yaml
         # 一次性替换国内镜像源
         sed -i 's|registry.k8s.io|registry.aliyuncs.com/google_containers|g' ingress-nginx.yaml
         # 禁用 admission webhook 防止创建安装 Ingress 失败
-        sed -i 's/--enable-admission-webhook/--enable-admission-webhook=false/g' ingress-nginx.yaml
+
         kubectl apply -f ingress-nginx.yaml
+
         # 重新开启 admission webhook 合法语法校验
 
         if [ $? -ne 0 ]; then
