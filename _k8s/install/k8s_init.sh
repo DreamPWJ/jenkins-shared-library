@@ -797,6 +797,17 @@ install_node_exporter() {
 install_gateway_api() {
     local gateway_api_version="v1.4.1"     # Gateway API 版本
     log_info "开始安装 K8s官方 Gateway API ${gateway_api_version} 网关..."
+    echo  ""
+    log_info "清理Gateway API 存在的旧版本..."
+    kubectl delete crd gatewayclasses.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd gateways.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd httproutes.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd referencegrants.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd backendtlspolicies.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd grpcroutes.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd tcproutes.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd tlsroutes.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd udproutes.gateway.networking.k8s.io --ignore-not-found=true
 
     log_info "安装 Gateway API CRDs 扩展..."
     kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${gateway_api_version}/standard-install.yaml 2>/dev/null
@@ -837,17 +848,6 @@ install_envoy_gateway() {
     INSTALL_SUCCESS=0
     echo  ""
     log_info "开始安装 Envoy Gateway ${envoy_gateway_version} 版本..."
-    echo  ""
-    log_info "清理Envoy Gateway存在的旧版本..."
-    kubectl delete crd gatewayclasses.gateway.networking.k8s.io --ignore-not-found=true
-    kubectl delete crd gateways.gateway.networking.k8s.io --ignore-not-found=true
-    kubectl delete crd httproutes.gateway.networking.k8s.io --ignore-not-found=true
-    kubectl delete crd referencegrants.gateway.networking.k8s.io --ignore-not-found=true
-    kubectl delete crd backendtlspolicies.gateway.networking.k8s.io --ignore-not-found=true
-    kubectl delete crd grpcroutes.gateway.networking.k8s.io --ignore-not-found=true
-    kubectl delete crd tcproutes.gateway.networking.k8s.io --ignore-not-found=true
-    kubectl delete crd tlsroutes.gateway.networking.k8s.io --ignore-not-found=true
-    kubectl delete crd udproutes.gateway.networking.k8s.io --ignore-not-found=true
 
     #  使用 Helm 安装
     kubectl create namespace envoy-gateway-system \
