@@ -1,6 +1,7 @@
 # Author: 潘维吉
 # Description: 执行云原生K8S七层负载 - Gateway API版本
 # Gateway API 提供了比 Ingress 更强大和灵活的流量管理能力
+# 快速模版: https://github.com/envoyproxy/gateway/releases/download/v1.6.3/quickstart.yaml
 
 ---
 # Gateway 资源 - 定义监听器和TLS配置

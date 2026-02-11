@@ -798,7 +798,7 @@ install_gateway_api() {
     local gateway_api_version="v1.4.1"     # Gateway API 版本
     log_info "开始安装 K8s官方 Gateway API ${gateway_api_version} 网关..."
 
-    log_info "安装 Gateway API CRDs扩展..."
+    log_info "安装 Gateway API CRDs 扩展..."
     kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${gateway_api_version}/standard-install.yaml 2>/dev/null
     if [ $? -ne 0 ]; then
          log_warn "GitHub 访问失败，使用离线 YAML安装 Gateway API..."
@@ -904,8 +904,7 @@ install_envoy_gateway_kubectl() {
     log_info "使用 kubectl 直接安装 Envoy Gateway $1 版本..."
 
     # 尝试从 GitHub 安装
-    kubectl apply -f https://github.com/envoyproxy/gateway/releases/download/$1/install.yaml 2>/dev/null
-    #kubectl apply -f https://github.com/envoyproxy/gateway/releases/download/$1/quickstart.yaml -n default
+    kubectl apply -f https://github.com/envoyproxy/gateway/releases/download/v1.6.3/install.yaml 2>/dev/null
 
     if [ $? -ne 0 ]; then
         log_warn "GitHub 访问失败，使用离线 YAML安装 Envoy Gateway..."
@@ -965,7 +964,8 @@ install_ingress_controller() {
         local ingress_controller_yaml_url="https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-${nginx_ingress_version}/deploy/static/provider/cloud/deploy.yaml"
         log_info  "使用K8s Yaml文件离线安装 Ingress Controller , Yaml访问地址: ${ingress_controller_yaml_url} "
         # kubectl apply -f ${ingress_controller_yaml_url} 2>/dev/null
-        #curl -L ${ingress_controller_yaml_url} -o ingress-nginx.yaml
+
+        curl -L ${ingress_controller_yaml_url} -o ingress-nginx.yaml
         # 一次性替换国内镜像源
         sed -i 's|registry.k8s.io/ingress-nginx/controller|registry.aliyuncs.com/google_containers/nginx-ingress-controller|g' ingress-nginx.yaml
         sed -i 's|registry.k8s.io/ingress-nginx/kube-webhook-certgen|registry.aliyuncs.com/google_containers/kube-webhook-certgen|g' ingress-nginx.yaml
@@ -1175,7 +1175,7 @@ main_menu() {
     echo "  9) 安装Gateway API网关与Envoy Gateway组件"
     echo "  10) 安装MetalLB负载均衡组件"
     echo "  11) 安装Ingress Controller路由控制组件"
-    echo "  12) 安装Prometheus Grafana监控组件"
+    echo "  12) 安装Prometheus与Grafana监控组件"
     echo "  0) 退出"
     echo ""
     read -p "请输入选项 [0-12]: " choice
