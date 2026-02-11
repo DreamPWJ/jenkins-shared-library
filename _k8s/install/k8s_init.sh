@@ -894,11 +894,9 @@ metadata:
 spec:
   controllerName: gateway.envoyproxy.io/gatewayclass-controller
 EOF
-        sleep 5
+        sleep 10
     fi
 
-    echo ""
-    log_info "Envoy Gateway ${envoy_gateway_version} 安装完成 ✅"
     echo ""
     log_info "查看 Envoy Gateway 状态:"
     kubectl get pods -n envoy-gateway-system
@@ -906,7 +904,9 @@ EOF
     log_info "查看 GatewayClass:"
     kubectl get gatewayclass
     echo ""
-    log_warn "提示: Envoy Gateway Service 类型为 LoadBalancer，需要配合 MetalLB 获取外部 IP"
+    log_info "Envoy Gateway ${envoy_gateway_version} 安装完成 ✅"
+    echo ""
+    log_warn "提示: Envoy Gateway Service 类型要为 LoadBalancer，需要配合 MetalLB 获取外部 IP"
     echo ""
 }
 
