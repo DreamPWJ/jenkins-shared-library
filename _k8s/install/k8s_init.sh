@@ -837,8 +837,19 @@ install_envoy_gateway() {
     INSTALL_SUCCESS=0
     echo  ""
     log_info "开始安装 Envoy Gateway ${envoy_gateway_version} 版本..."
+    echo  ""
+    log_info "清理Envoy Gateway存在的旧版本..."
+    kubectl delete crd gatewayclasses.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd gateways.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd httproutes.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd referencegrants.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd backendtlspolicies.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd grpcroutes.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd tcproutes.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd tlsroutes.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd udproutes.gateway.networking.k8s.io --ignore-not-found=true
 
-    # 方法1: 使用 Helm 安装
+    #  使用 Helm 安装
     kubectl create namespace envoy-gateway-system \
       --dry-run=client -o yaml | kubectl apply -f -
 
@@ -904,12 +915,12 @@ install_envoy_gateway_kubectl() {
     log_info "使用 kubectl 直接安装 Envoy Gateway $1 版本..."
 
     # 尝试从 GitHub 安装
-    kubectl apply -f https://github.com/envoyproxy/gateway/releases/download/v1.6.3/install.yaml 2>/dev/null
+    kubectl apply -f https://github.com/envoyproxy/gateway/releases/download/$1/install.yaml 2>/dev/null
 
     if [ $? -ne 0 ]; then
         log_warn "GitHub 访问失败，使用离线 YAML安装 Envoy Gateway..."
         # 创建基础配置
-         kubectl apply -f envoy-gateway.yaml
+         kubectl apply --server-side --force-conflicts -f envoy-gateway.yaml
     fi
 }
 
@@ -918,7 +929,6 @@ install_ingress_controller() {
    local nginx_ingress_version="v1.14.2"
    log_info "开始安装 Nginx Ingress Controller ${nginx_ingress_version} 路由控制器..."
    echo ""
-
    log_info "删除Nginx Ingress现有的所有环境..."
    kubectl delete pod -n ingress-nginx -l app.kubernetes.io/component=controller --force --grace-period=0 2>/dev/null || true
    kubectl delete job -n ingress-nginx ingress-nginx-admission-create 2>/dev/null || true
