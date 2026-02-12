@@ -677,7 +677,9 @@ install_helm() {
         helm repo update
 
         log_info "Helm ${INSTALLED_HELM_VERSION} 安装完成 ✅ "
+        echo  ""
         log_warn "如果使用海外源有问题，设置代理 "
+        helm version
         return 0
     else
         log_error "Helm 安装失败 ❌"
@@ -687,8 +689,8 @@ install_helm() {
 
 # 自动安装 cert-manager
 install_cert_manager() {
-    log_info "开始安装 cert-manager ACME证书管理..."
     local cert_manager_version="v1.19.2"
+    log_info "开始安装 cert-manager ${cert_manager_version} acme证书管理..."
 
     # 添加 cert-manager 的 Helm 仓库
     helm repo add jetstack https://charts.jetstack.io
@@ -716,8 +718,10 @@ install_cert_manager() {
     kubectl wait --for=condition=available --timeout=600s \
         deployment/cert-manager-cainjector -n cert-manager
 
-    log_info "cert-manager 安装完成 ✅ "
     kubectl get pods -n cert-manager
+    echo  ""
+    log_info "cert-manager ${cert_manager_version} 安装完成 ✅ "
+
 }
 
 # 自动安装 Prometheus
@@ -772,15 +776,19 @@ install_prometheus() {
 install_metrics_server() {
     echo ""
     local metrics_server_version="v0.8.1"
-    log_info "安装 Metrics Server ${metrics_server_version}版本 指标服务..."
+    log_info "安装 Metrics Server ${metrics_server_version}版本指标服务..."
     kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml && \
     kubectl patch deployment metrics-server -n kube-system --type='json' -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
     # 更新镜像源 保证成功下载镜像
     kubectl -n kube-system set image deployment/metrics-server \
       metrics-server=registry.aliyuncs.com/google_containers/metrics-server:${metrics_server_version}
-    sleep 5
+    # 等待 Metrics Server 启动
+    log_info "等待 Metrics Server 启动..."
+    kubectl wait --for=condition=available --timeout=600s deployment/metrics-server -n kube-system
     log_info "Metrics Server验证安装:"
     kubectl get deployment metrics-server -n kube-system
+    echo  ""
+    log_info "Metrics Server 安装完成 ✅ "
 }
 
 # 安装 Node Exporter
@@ -789,8 +797,12 @@ install_node_exporter() {
     log_info "安装 Node Exporter 节点监控指标..."
     kubectl create namespace monitoring 2>/dev/null || true && \
     kubectl apply -f node-exporter.yaml
+    log_info "等待 Node Exporter 启动..."
+    kubectl wait --for=condition=ready pod -l app=node-exporter -n monitoring --timeout=600s
     log_info "Node Exporter验证安装:"
     kubectl get pods -n monitoring -l app=node-exporter
+    echo  ""
+    log_info "Node Exporter 安装完成 ✅ "
 }
 
 # 初始化 Gateway API
