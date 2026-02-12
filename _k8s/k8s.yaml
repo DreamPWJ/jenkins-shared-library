@@ -151,8 +151,8 @@ metadata:
   namespace: {K8S_NAMESPACE}
   labels:
     app: {APP_COMMON_NAME}-service
-#  annotations:
-#    metallb.io/loadBalancerIPs: 172.16.1.240    # 指定LoadBalancer固定IP 在 MetalLB IPAddressPool 范围内
+  annotations:
+    metallb.io/loadBalancerIPs: 172.16.2.240    # 指定LoadBalancer固定IP 在 MetalLB IPAddressPool 范围内
 #    prometheus.io/scrape: "true"                # 让prometheus自动发现
 #    prometheus.io/path: /actuator/prometheus    # /metric路径是集成内提供的 Prometheus 监控接口 或利用 exporter 服务来为 Prometheus 提供指标数据
 #    prometheus.io/port: "{CONTAINER_PORT}"      # /metric接口的端口
