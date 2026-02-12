@@ -1116,6 +1116,9 @@ EOF
     echo ""
     log_info "负载均衡 MetalLB ${metallb_version} 安装并配置完成 ✅"
     echo ""
+    log_warn "K8s核心数据流向: 客户端 -> NAT内外网地址转换 -> External IP（MetalLB 分配）-> Service (type=LoadBalancer) -> Ingress Controller Pod -> Ingress 规则 -> 后端 Service -> Pod "
+    log_warn "提示: MetalLB 是给四层网络 Service 分配 IP 的，不是给七层网络 Ingress 分配的"
+    log_warn "提示: MetalLB 默认使用 Layer2 简单网络协议，生产环境建议使用 BGP 协议的高性能路由"
 }
 
 # 生成 Worker 节点加入命令
