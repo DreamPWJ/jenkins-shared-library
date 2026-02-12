@@ -1059,7 +1059,7 @@ install_metallb() {
     if [ -z "$IP_RANGE" ]; then
         echo "未输入 IP 地址范围，跳过自动配置"
         echo ""
-        echo "你可以稍后手动创建配置:"
+        echo "你可以稍后 kubectl apply -f 手动创建配置:"
         cat <<'EXAMPLE'
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
