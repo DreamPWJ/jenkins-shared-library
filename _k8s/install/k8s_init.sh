@@ -742,7 +742,7 @@ install_prometheus() {
                --wait
     else
            log_error "Prometheus的Helm包网络不通"
-           log_info  "使用K8s yaml文件离线安装 prometheus grafana"
+           log_info  "使用K8s Yaml文件离线安装 prometheus 与 grafana"
            kubectl apply -f prometheus-complete.yaml
     fi
 
@@ -972,7 +972,7 @@ install_ingress_controller() {
     else
         log_error "Ingress Controller的Helm安装包网络不通"
         local ingress_controller_yaml_url="https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-${nginx_ingress_version}/deploy/static/provider/cloud/deploy.yaml"
-        log_info  "使用K8s Yaml文件离线安装 Ingress Controller , Yaml访问地址: ${ingress_controller_yaml_url} "
+        log_info  "使用K8s Yaml文件安装 Ingress Controller , Yaml访问地址: ${ingress_controller_yaml_url} "
         # kubectl apply -f ${ingress_controller_yaml_url} 2>/dev/null
 
         curl -L ${ingress_controller_yaml_url} -o ingress-nginx.yaml
@@ -1031,8 +1031,8 @@ install_metallb() {
            return 1
        fi
     else
-      log_error "MetalLB的Helm包网络不通"
-      log_info  "使用K8s yaml文件离线安装 MetalLB"
+      log_error "MetalLB的Helm包安装网络不通"
+      log_info  "使用K8s Yaml文件安装 MetalLB"
       kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/${metallb_version}/config/manifests/metallb-native.yaml 2>/dev/null
       if [ $? -ne 0 ]; then
            log_warn "GitHub 访问失败，使用离线 YAML安装 MetalLB..."
@@ -1048,7 +1048,7 @@ install_metallb() {
     echo ""
 
     # 获取用户输入 IP 地址范围
-    read -p "请输入 MetalLB IP 地址池范围 (例如: 172.16.1.240-172.16.1.250): " IP_RANGE
+    read -p "请输入 MetalLB IP 地址池范围 (例如: 172.16.2.240-172.16.2.249): " IP_RANGE
 
     if [ -z "$IP_RANGE" ]; then
         echo "未输入 IP 地址范围，跳过自动配置"
@@ -1062,7 +1062,7 @@ metadata:
   namespace: metallb-system
 spec:
   addresses:
-  - 172.16.1.240-172.16.1.250
+  - 172.16.2.240-172.16.2.249
 ---
 apiVersion: metallb.io/v1beta2
 kind: L2Advertisement
@@ -1097,19 +1097,19 @@ spec:
   - default-pool
 EOF
 
-    echo ""
-    log_info "MetalLB ${metallb_version} 安装并配置完成 ✅"
-    echo ""
     log_info "查看 MetalLB 状态:"
     kubectl get pods -n metallb-system
     echo ""
     log_info "查看 IP 地址池:"
     kubectl get ipaddresspool -n metallb-system
     echo ""
-    log_info "测试 MetalLB:"
-    log_info "  kubectl create deployment nginx --image=nginx"
-    log_info "  kubectl expose deployment nginx --port=80 --type=LoadBalancer"
-    log_info "  kubectl get svc nginx"
+    log_info "验证 MetalLB:"
+    log_info "kubectl create deployment nginx --image=nginx"
+    log_info "kubectl expose deployment nginx --port=80 --type=LoadBalancer"
+    log_info "kubectl get svc nginx"
+    echo ""
+    log_info "负载均衡 MetalLB ${metallb_version} 安装并配置完成 ✅"
+    echo ""
 }
 
 # 生成 Worker 节点加入命令
