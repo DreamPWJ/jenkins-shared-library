@@ -1040,7 +1040,7 @@ install_metallb() {
       fi
     fi
 
-    log_info "等待 MetalLB 组件启动..."
+    log_info "等待 MetalLB 负载均衡组件启动..."
     kubectl wait --for=condition=ready --timeout=600s pod -l app=metallb -n metallb-system 2>/dev/null || true
 
     echo ""
@@ -1055,7 +1055,7 @@ install_metallb() {
         echo ""
         echo "你可以稍后手动创建配置:"
         cat <<'EXAMPLE'
-apiVersion: metallb.io/v1beta2
+apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
   name: default-pool
@@ -1064,7 +1064,7 @@ spec:
   addresses:
   - 172.16.2.240-172.16.2.249
 ---
-apiVersion: metallb.io/v1beta2
+apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
   name: default-l2
@@ -1078,7 +1078,7 @@ EXAMPLE
 
     # 创建 IP 地址池配置
     cat <<EOF | kubectl apply -f -
-apiVersion: metallb.io/v1beta2
+apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
   name: default-pool
@@ -1087,7 +1087,7 @@ spec:
   addresses:
   - ${IP_RANGE}
 ---
-apiVersion: metallb.io/v1beta2
+apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
   name: default-l2
