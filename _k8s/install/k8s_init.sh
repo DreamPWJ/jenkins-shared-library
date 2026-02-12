@@ -1016,7 +1016,7 @@ install_ingress_controller() {
 # 初始化 MetalLB
 install_metallb() {
     local metallb_version="v0.15.3"
-    log_info "开始安装 MetalLB ${metallb_version} 负载均衡..."
+    log_info "开始安装 MetalLB ${metallb_version} 负载均衡"
 
    if curl -I --connect-timeout 5 "https://metallb.github.io/metallb/index.yaml" > /dev/null 2>&1; then
        # 添加 MetalLB Helm 仓库
@@ -1038,7 +1038,7 @@ install_metallb() {
        fi
     else
       log_error "MetalLB的Helm包安装网络不通"
-      log_info  "使用K8s Yaml文件安装 MetalLB"
+      log_info  "使用K8s Yaml文件安装 MetalLB..."
       kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/${metallb_version}/config/manifests/metallb-native.yaml 2>/dev/null
       if [ $? -ne 0 ]; then
            log_warn "GitHub 访问失败，使用离线 YAML安装 MetalLB..."
@@ -1118,7 +1118,7 @@ EOF
     echo ""
     log_warn "K8s核心数据流向: 客户端 -> NAT内外网地址转换 -> External IP（MetalLB 分配）-> Service (type=LoadBalancer) -> Ingress Controller Pod -> Ingress 规则 -> 后端 Service -> Pod "
     log_warn "提示: MetalLB 是给四层网络 Service 分配 IP 的，不是给七层网络 Ingress 分配的"
-    log_warn "提示: MetalLB 默认使用 Layer2 简单网络协议，生产环境建议使用 BGP 协议的高性能路由"
+    log_warn "提示: MetalLB 默认使用 Layer2 简单二层网络协议，生产环境建议使用 BGP 协议的高性能路由"
 }
 
 # 生成 Worker 节点加入命令
