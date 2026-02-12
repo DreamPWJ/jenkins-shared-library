@@ -511,9 +511,10 @@ install_calico() {
 # 单机模式: 允许 Master 调度 Pod
 enable_master_scheduling() {
     log_info "配置单机K8s部署模式: 去除Master节点的污点, 允许其调度运行 Pod 服务..."
-
     # 等待节点就绪
-    sleep 10
+    while [ "$(kubectl get nodes -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}')" != "True" ]; do
+        sleep 1
+    done
 
     # 去除 Master 节点的污点
     kubectl taint nodes --all node-role.kubernetes.io/control-plane- 2>/dev/null || true
@@ -727,6 +728,7 @@ install_cert_manager() {
 # 自动安装 Prometheus
 install_prometheus() {
     log_info "开始安装 Prometheus 监控..."
+    local grafana_admin_password="admin@0633" # Grafana 管理员默认密码
    # 添加 Prometheus 的 Helm 仓库
    if curl -I --connect-timeout 5 "https://prometheus-community.github.io/helm-charts/index.yaml" > /dev/null 2>&1; then
            log_info "使用helm在线安装 prometheus与grafana"
@@ -737,7 +739,6 @@ install_prometheus() {
            kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
 
            # 安装 kube-prometheus-stack (包含 Prometheus, Grafana, Alertmanager 等)
-           local grafana_admin_password="admin@0633"
            helm install prometheus prometheus-community/kube-prometheus-stack \
                --namespace monitoring \
                --set prometheus.prometheusSpec.retention=15d \
@@ -766,9 +767,9 @@ install_prometheus() {
     log_warn "要访问 Grafana，请先执行："
     log_info "kubectl port-forward -n monitoring svc/grafana 3000:3000"
     log_info "Grafana访问地址: http://localhost:3000"
-    log_info "Grafana 默认用户名admin 密码: ${grafana_admin_password}"
+    log_info "默认Grafana 用户名: admin , 密码: ${grafana_admin_password}"
     echo ""
-    log_info "Prometheus 安装完成 ✅ "
+    log_info "Prometheus 与 Grafana 安装完成 ✅ "
     echo ""
 }
 
@@ -834,7 +835,7 @@ install_gateway_api() {
     fi
 
     log_info "等待 Gateway API CRDs 就绪..."
-    sleep 5
+    kubectl wait --for=condition=Established --timeout=600s crd/gatewayclasses.gateway.networking.k8s.io
 
     # 验证安装
     kubectl get crd | grep gateway.networking.k8s.io
@@ -844,7 +845,7 @@ install_gateway_api() {
         log_info "Gateway API ${gateway_api_version} 安装完成 ✅"
         echo ""
         log_warn "提示: 标准 Gateway API 已安装，需要配合网关实现使用（如 Envoy Gateway、Istio、Traefik、Nginx Gateway、Kong Gateway 等）"
-        sleep 3
+        sleep 1
         install_envoy_gateway
         return 0
     else
