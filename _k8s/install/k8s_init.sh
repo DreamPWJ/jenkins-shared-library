@@ -893,7 +893,7 @@ install_envoy_gateway() {
     log_info "等待 Envoy Gateway 启动..."
     kubectl wait --for=condition=available --timeout=300s deployment/envoy-gateway -n envoy-gateway-system 2>/dev/null || true
 
- # 检查 GatewayClass 是否存在，不存在则创建
+    # 检查 GatewayClass 是否存在，不存在则创建
     echo ""
     log_info "检查 GatewayClass..."
     if ! kubectl get gatewayclass eg >/dev/null 2>&1; then
@@ -906,7 +906,8 @@ metadata:
 spec:
   controllerName: gateway.envoyproxy.io/gatewayclass-controller
 EOF
-        sleep 10
+    # 等待 GatewayClass 创建完成
+    kubectl wait --for=condition=available --timeout=300s deployment/envoy-gateway -n envoy-gateway-system
     fi
 
     echo ""
@@ -925,14 +926,11 @@ EOF
 # 使用 kubectl 安装 Envoy Gateway
 install_envoy_gateway_kubectl() {
     log_info "使用 kubectl 直接安装 Envoy Gateway $1 版本..."
-
-    # 尝试从 GitHub 安装
-    kubectl apply -f https://github.com/envoyproxy/gateway/releases/download/$1/install.yaml 2>/dev/null
-
-    if [ $? -ne 0 ]; then
+    if ! kubectl apply -f "https://github.com/envoyproxy/gateway/releases/download/$1/install.yaml" 2>/dev/null; then
         log_warn "GitHub 访问失败，使用离线 YAML安装 Envoy Gateway..."
-        # 创建基础配置
-         kubectl apply --server-side --force-conflicts -f envoy-gateway.yaml
+        kubectl apply --server-side --force-conflicts -f envoy-gateway.yaml
+    else
+        log_info "成功从 GitHub 安装 Envoy Gateway"
     fi
 }
 
