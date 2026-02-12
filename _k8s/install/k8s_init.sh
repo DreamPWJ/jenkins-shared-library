@@ -1069,6 +1069,7 @@ metadata:
 spec:
   addresses:
   - 172.16.2.240-172.16.2.249
+  autoAssign: true
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
@@ -1092,6 +1093,7 @@ metadata:
 spec:
   addresses:
   - ${IP_RANGE}
+  autoAssign: true
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
@@ -1254,7 +1256,6 @@ diagnose_existing_cluster() {
     log_info "诊断现有集群"
     log_info "=========================================="
     echo ""
-
     check_root
 
     # 检查集群状态
@@ -1278,11 +1279,10 @@ diagnose_existing_cluster() {
 # 单机模式部署
 deploy_single_node() {
     log_info "=========================================="
-    log_info "开始单机K8S集群部署"
+    log_info "开始单机K8s集群部署"
     log_info "Kubernetes 版本: ${K8S_VERSION}"
     log_info "=========================================="
     echo ""
-
     check_root
     check_ubuntu_version
 
@@ -1302,7 +1302,7 @@ deploy_single_node() {
     show_cluster_info
 
     log_info "=========================================="
-    log_info "✅ 单机 K8S v${K8S_VERSION} 集群部署完成 🎉"
+    log_info "✅ 单机 K8s v${K8S_VERSION} 集群部署完成 🎉"
     log_info "=========================================="
     echo ""
 }
@@ -1314,7 +1314,6 @@ deploy_master_node() {
     log_info "Kubernetes 版本: ${K8S_VERSION}"
     log_info "=========================================="
     echo ""
-
     check_root
     check_ubuntu_version
 
@@ -1346,7 +1345,6 @@ deploy_worker_node() {
     log_info "开始 K8s Worker 节点部署"
     log_info "=========================================="
     echo ""
-
     check_root
     check_ubuntu_version
 
@@ -1375,7 +1373,6 @@ install_components_only() {
     log_info "仅安装基础组件"
     log_info "=========================================="
     echo ""
-
     check_root
     check_ubuntu_version
 

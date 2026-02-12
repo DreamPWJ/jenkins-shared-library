@@ -46,14 +46,15 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 
 spec:
+  ingressClassName: nginx
   tls:
     - hosts:
-        - main-data-admin-self-built.pengbocloud.com
-      secretName: main-data-admin-self-built.pengbocloud.com-tls
+        - main-data-self-k8s-admin.pengbocloud.com
+      secretName: main-data-self-k8s-admin.pengbocloud.com-tls
 
   rules:
     #自定义域名
-    - host: main-data-admin-self-built.pengbocloud.com
+    - host: main-data-self-k8s-admin.pengbocloud.com
       http:
         paths:
           - path: /
