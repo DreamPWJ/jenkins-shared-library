@@ -511,9 +511,10 @@ install_calico() {
 # 单机模式: 允许 Master 调度 Pod
 enable_master_scheduling() {
     log_info "配置单机K8s部署模式: 去除Master节点的污点, 允许其调度运行 Pod 服务..."
-
     # 等待节点就绪
-    sleep 10
+    while [ "$(kubectl get nodes -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}')" != "True" ]; do
+        sleep 1
+    done
 
     # 去除 Master 节点的污点
     kubectl taint nodes --all node-role.kubernetes.io/control-plane- 2>/dev/null || true
@@ -677,7 +678,9 @@ install_helm() {
         helm repo update
 
         log_info "Helm ${INSTALLED_HELM_VERSION} 安装完成 ✅ "
+        echo  ""
         log_warn "如果使用海外源有问题，设置代理 "
+        helm version
         return 0
     else
         log_error "Helm 安装失败 ❌"
@@ -687,8 +690,8 @@ install_helm() {
 
 # 自动安装 cert-manager
 install_cert_manager() {
-    log_info "开始安装 cert-manager ACME证书管理..."
     local cert_manager_version="v1.19.2"
+    log_info "开始安装 cert-manager ${cert_manager_version} acme证书管理..."
 
     # 添加 cert-manager 的 Helm 仓库
     helm repo add jetstack https://charts.jetstack.io
@@ -716,13 +719,16 @@ install_cert_manager() {
     kubectl wait --for=condition=available --timeout=600s \
         deployment/cert-manager-cainjector -n cert-manager
 
-    log_info "cert-manager 安装完成 ✅ "
     kubectl get pods -n cert-manager
+    echo  ""
+    log_info "cert-manager ${cert_manager_version} 安装完成 ✅ "
+
 }
 
 # 自动安装 Prometheus
 install_prometheus() {
     log_info "开始安装 Prometheus 监控..."
+    local grafana_admin_password="admin@0633" # Grafana 管理员默认密码
    # 添加 Prometheus 的 Helm 仓库
    if curl -I --connect-timeout 5 "https://prometheus-community.github.io/helm-charts/index.yaml" > /dev/null 2>&1; then
            log_info "使用helm在线安装 prometheus与grafana"
@@ -733,7 +739,6 @@ install_prometheus() {
            kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
 
            # 安装 kube-prometheus-stack (包含 Prometheus, Grafana, Alertmanager 等)
-           local grafana_admin_password="admin@0633"
            helm install prometheus prometheus-community/kube-prometheus-stack \
                --namespace monitoring \
                --set prometheus.prometheusSpec.retention=15d \
@@ -742,7 +747,7 @@ install_prometheus() {
                --wait
     else
            log_error "Prometheus的Helm包网络不通"
-           log_info  "使用K8s yaml文件离线安装 prometheus grafana"
+           log_info  "使用K8s Yaml文件离线安装 prometheus 与 grafana"
            kubectl apply -f prometheus-complete.yaml
     fi
 
@@ -762,9 +767,9 @@ install_prometheus() {
     log_warn "要访问 Grafana，请先执行："
     log_info "kubectl port-forward -n monitoring svc/grafana 3000:3000"
     log_info "Grafana访问地址: http://localhost:3000"
-    log_info "Grafana 默认用户名admin 密码: ${grafana_admin_password}"
+    log_info "默认Grafana 用户名: admin , 密码: ${grafana_admin_password}"
     echo ""
-    log_info "Prometheus 安装完成 ✅ "
+    log_info "Prometheus 与 Grafana 安装完成 ✅ "
     echo ""
 }
 
@@ -772,15 +777,19 @@ install_prometheus() {
 install_metrics_server() {
     echo ""
     local metrics_server_version="v0.8.1"
-    log_info "安装 Metrics Server ${metrics_server_version}版本 指标服务..."
+    log_info "安装 Metrics Server ${metrics_server_version}版本指标服务..."
     kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml && \
     kubectl patch deployment metrics-server -n kube-system --type='json' -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
     # 更新镜像源 保证成功下载镜像
     kubectl -n kube-system set image deployment/metrics-server \
       metrics-server=registry.aliyuncs.com/google_containers/metrics-server:${metrics_server_version}
-    sleep 5
+    # 等待 Metrics Server 启动
+    log_info "等待 Metrics Server 启动..."
+    kubectl wait --for=condition=available --timeout=600s deployment/metrics-server -n kube-system
     log_info "Metrics Server验证安装:"
     kubectl get deployment metrics-server -n kube-system
+    echo  ""
+    log_info "Metrics Server 安装完成 ✅ "
 }
 
 # 安装 Node Exporter
@@ -789,16 +798,31 @@ install_node_exporter() {
     log_info "安装 Node Exporter 节点监控指标..."
     kubectl create namespace monitoring 2>/dev/null || true && \
     kubectl apply -f node-exporter.yaml
+    log_info "等待 Node Exporter 启动..."
+    kubectl wait --for=condition=ready pod -l app=node-exporter -n monitoring --timeout=600s
     log_info "Node Exporter验证安装:"
     kubectl get pods -n monitoring -l app=node-exporter
+    echo  ""
+    log_info "Node Exporter 安装完成 ✅ "
 }
 
 # 初始化 Gateway API
 install_gateway_api() {
     local gateway_api_version="v1.4.1"     # Gateway API 版本
     log_info "开始安装 K8s官方 Gateway API ${gateway_api_version} 网关..."
+    echo  ""
+    log_info "清理Gateway API 存在的旧版本..."
+    kubectl delete crd gatewayclasses.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd gateways.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd httproutes.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd referencegrants.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd backendtlspolicies.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd grpcroutes.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd tcproutes.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd tlsroutes.gateway.networking.k8s.io --ignore-not-found=true
+    kubectl delete crd udproutes.gateway.networking.k8s.io --ignore-not-found=true
 
-    log_info "安装 Gateway API CRDs扩展..."
+    log_info "安装 Gateway API CRDs 扩展..."
     kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/${gateway_api_version}/standard-install.yaml 2>/dev/null
     if [ $? -ne 0 ]; then
          log_warn "GitHub 访问失败，使用离线 YAML安装 Gateway API..."
@@ -811,7 +835,7 @@ install_gateway_api() {
     fi
 
     log_info "等待 Gateway API CRDs 就绪..."
-    sleep 5
+    kubectl wait --for=condition=Established --timeout=600s crd/gatewayclasses.gateway.networking.k8s.io
 
     # 验证安装
     kubectl get crd | grep gateway.networking.k8s.io
@@ -821,7 +845,7 @@ install_gateway_api() {
         log_info "Gateway API ${gateway_api_version} 安装完成 ✅"
         echo ""
         log_warn "提示: 标准 Gateway API 已安装，需要配合网关实现使用（如 Envoy Gateway、Istio、Traefik、Nginx Gateway、Kong Gateway 等）"
-        sleep 3
+        sleep 1
         install_envoy_gateway
         return 0
     else
@@ -838,7 +862,7 @@ install_envoy_gateway() {
     echo  ""
     log_info "开始安装 Envoy Gateway ${envoy_gateway_version} 版本..."
 
-    # 方法1: 使用 Helm 安装
+    #  使用 Helm 安装
     kubectl create namespace envoy-gateway-system \
       --dry-run=client -o yaml | kubectl apply -f -
 
@@ -870,7 +894,7 @@ install_envoy_gateway() {
     log_info "等待 Envoy Gateway 启动..."
     kubectl wait --for=condition=available --timeout=300s deployment/envoy-gateway -n envoy-gateway-system 2>/dev/null || true
 
- # 检查 GatewayClass 是否存在，不存在则创建
+    # 检查 GatewayClass 是否存在，不存在则创建
     echo ""
     log_info "检查 GatewayClass..."
     if ! kubectl get gatewayclass eg >/dev/null 2>&1; then
@@ -883,11 +907,10 @@ metadata:
 spec:
   controllerName: gateway.envoyproxy.io/gatewayclass-controller
 EOF
-        sleep 5
+    # 等待 GatewayClass 创建完成
+    kubectl wait --for=condition=available --timeout=300s deployment/envoy-gateway -n envoy-gateway-system
     fi
 
-    echo ""
-    log_info "Envoy Gateway ${envoy_gateway_version} 安装完成 ✅"
     echo ""
     log_info "查看 Envoy Gateway 状态:"
     kubectl get pods -n envoy-gateway-system
@@ -895,22 +918,20 @@ EOF
     log_info "查看 GatewayClass:"
     kubectl get gatewayclass
     echo ""
-    log_warn "提示: Envoy Gateway Service 类型为 LoadBalancer，需要配合 MetalLB 获取外部 IP"
+    log_info "Envoy Gateway ${envoy_gateway_version} 安装完成 ✅"
+    echo ""
+    log_warn "提示: Envoy Gateway Service 类型要为 LoadBalancer，需要配合 MetalLB 获取外部 IP"
     echo ""
 }
 
 # 使用 kubectl 安装 Envoy Gateway
 install_envoy_gateway_kubectl() {
     log_info "使用 kubectl 直接安装 Envoy Gateway $1 版本..."
-
-    # 尝试从 GitHub 安装
-    kubectl apply -f https://github.com/envoyproxy/gateway/releases/download/$1/install.yaml 2>/dev/null
-    #kubectl apply -f https://github.com/envoyproxy/gateway/releases/download/$1/quickstart.yaml -n default
-
-    if [ $? -ne 0 ]; then
+    if ! kubectl apply -f "https://github.com/envoyproxy/gateway/releases/download/$1/install.yaml" 2>/dev/null; then
         log_warn "GitHub 访问失败，使用离线 YAML安装 Envoy Gateway..."
-        # 创建基础配置
-         kubectl apply -f envoy-gateway.yaml
+        kubectl apply --server-side --force-conflicts -f envoy-gateway.yaml
+    else
+        log_info "成功从 GitHub 安装 Envoy Gateway"
     fi
 }
 
@@ -951,7 +972,7 @@ install_ingress_controller() {
            --set controller.metrics.enabled=true \
            --set controller.podAnnotations."prometheus\.io/scrape"=true \
            --set controller.podAnnotations."prometheus\.io/port"=10254 \
-           --wait
+           --atomic=true --wait
 
        if [ $? -ne 0 ]; then
            log_error "Ingress Controller 安装失败"
@@ -960,29 +981,36 @@ install_ingress_controller() {
    #elif helm version ; then
 
     else
-        log_error "Ingress Controller的Helm包网络不通"
-        log_info  "使用K8s yaml文件离线安装 Ingress Controller"
-        kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-${nginx_ingress_version}/deploy/static/provider/cloud/deploy.yaml 2>/dev/null
+        log_error "Ingress Controller的Helm安装包网络不通"
+        local ingress_controller_yaml_url="https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-${nginx_ingress_version}/deploy/static/provider/cloud/deploy.yaml"
+        log_info  "使用K8s Yaml文件安装 Ingress Controller , Yaml访问地址: ${ingress_controller_yaml_url} "
+        # kubectl apply -f ${ingress_controller_yaml_url} 2>/dev/null
+
+        curl -L ${ingress_controller_yaml_url} -o ingress-nginx.yaml
+        # 一次性替换国内镜像源
+        sed -i 's|registry.k8s.io/ingress-nginx/controller|registry.cn-hangzhou.aliyuncs.com/google_containers/nginx-ingress-controller|g' ingress-nginx.yaml
+        sed -i 's|registry.k8s.io/ingress-nginx/kube-webhook-certgen|registry.cn-hangzhou.aliyuncs.com/google_containers/kube-webhook-certgen|g' ingress-nginx.yaml
+        sed -i 's|@sha256:[a-f0-9]*||g' ingress-nginx.yaml
+        kubectl apply -f ingress-nginx.yaml
+
         if [ $? -ne 0 ]; then
-             log_warn "GitHub 访问失败，使用离线 YAML安装 Nginx Ingress Controller..."
+             log_info "使用离线YAML文件安装 Nginx Ingress Controller..."
              kubectl apply -f ingress-nginx.yaml
-        fi
+         fi
     fi
 
     log_info "等待 Ingress Controller 启动..."
-    kubectl wait --for=condition=ready --timeout=1200s pod -l app.kubernetes.io/name=ingress-nginx -n ingress-nginx
+    kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=600s
 
-    echo ""
-    log_info "Nginx Ingress Controller ${nginx_ingress_version} 安装完成  ✅"
-    echo ""
     log_info "查看 Ingress Controller 状态:"
     kubectl get pods -n ingress-nginx
     echo ""
     log_info "查看 Ingress Controller Service:"
     kubectl get svc -n ingress-nginx
     echo ""
-    log_warn "提示: Ingress Controller Service 类型为 LoadBalancer，需要配合 MetalLB 获取外部 IP"
+    log_info "Nginx Ingress Controller ${nginx_ingress_version} 安装完成  ✅"
     echo ""
+    log_warn "提示: Ingress Controller Service 类型要为 LoadBalancer，需要配合 MetalLB 获取外部 IP"
 }
 
 # 初始化 MetalLB
@@ -1009,8 +1037,8 @@ install_metallb() {
            return 1
        fi
     else
-      log_error "MetalLB的Helm包网络不通"
-      log_info  "使用K8s yaml文件离线安装 MetalLB"
+      log_error "MetalLB的Helm包安装网络不通"
+      log_info  "使用K8s Yaml文件安装 MetalLB"
       kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/${metallb_version}/config/manifests/metallb-native.yaml 2>/dev/null
       if [ $? -ne 0 ]; then
            log_warn "GitHub 访问失败，使用离线 YAML安装 MetalLB..."
@@ -1018,7 +1046,7 @@ install_metallb() {
       fi
     fi
 
-    log_info "等待 MetalLB 组件启动..."
+    log_info "等待 MetalLB 负载均衡组件启动..."
     kubectl wait --for=condition=ready --timeout=600s pod -l app=metallb -n metallb-system 2>/dev/null || true
 
     echo ""
@@ -1026,23 +1054,23 @@ install_metallb() {
     echo ""
 
     # 获取用户输入 IP 地址范围
-    read -p "请输入 MetalLB IP 地址池范围 (例如: 172.16.1.240-172.16.1.250): " IP_RANGE
+    read -p "请输入 MetalLB IP 地址池范围 (例如: 172.16.2.240-172.16.2.249): " IP_RANGE
 
     if [ -z "$IP_RANGE" ]; then
         echo "未输入 IP 地址范围，跳过自动配置"
         echo ""
         echo "你可以稍后手动创建配置:"
         cat <<'EXAMPLE'
-apiVersion: metallb.io/v1beta2
+apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
   name: default-pool
   namespace: metallb-system
 spec:
   addresses:
-  - 172.16.1.240-172.16.1.250
+  - 172.16.2.240-172.16.2.249
 ---
-apiVersion: metallb.io/v1beta2
+apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
   name: default-l2
@@ -1056,7 +1084,7 @@ EXAMPLE
 
     # 创建 IP 地址池配置
     cat <<EOF | kubectl apply -f -
-apiVersion: metallb.io/v1beta2
+apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
   name: default-pool
@@ -1065,7 +1093,7 @@ spec:
   addresses:
   - ${IP_RANGE}
 ---
-apiVersion: metallb.io/v1beta2
+apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
   name: default-l2
@@ -1075,19 +1103,19 @@ spec:
   - default-pool
 EOF
 
-    echo ""
-    log_info "MetalLB ${metallb_version} 安装并配置完成 ✅"
-    echo ""
     log_info "查看 MetalLB 状态:"
     kubectl get pods -n metallb-system
     echo ""
     log_info "查看 IP 地址池:"
     kubectl get ipaddresspool -n metallb-system
     echo ""
-    log_info "测试 MetalLB:"
-    log_info "  kubectl create deployment nginx --image=nginx"
-    log_info "  kubectl expose deployment nginx --port=80 --type=LoadBalancer"
-    log_info "  kubectl get svc nginx"
+    log_info "验证 MetalLB:"
+    log_info "kubectl create deployment nginx --image=nginx"
+    log_info "kubectl expose deployment nginx --port=80 --type=LoadBalancer"
+    log_info "kubectl get svc nginx"
+    echo ""
+    log_info "负载均衡 MetalLB ${metallb_version} 安装并配置完成 ✅"
+    echo ""
 }
 
 # 生成 Worker 节点加入命令
@@ -1163,7 +1191,7 @@ main_menu() {
     echo "  9) 安装Gateway API网关与Envoy Gateway组件"
     echo "  10) 安装MetalLB负载均衡组件"
     echo "  11) 安装Ingress Controller路由控制组件"
-    echo "  12) 安装Prometheus Grafana监控组件"
+    echo "  12) 安装Prometheus与Grafana监控组件"
     echo "  0) 退出"
     echo ""
     read -p "请输入选项 [0-12]: " choice
