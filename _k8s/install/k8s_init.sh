@@ -1125,14 +1125,29 @@ EOF
 
 # 设置HTTP代理
 http_proxy_set() {
-    log_info "设置 HTTP 代理 访问国外资源..."
-    local proxy_url="socks5h://raymond.mydarkcloud.info:1025"  # monocloud等服务账号查看
-    export http_proxy=$proxy_url
-    export https_proxy=$proxy_url
+    log_info "设置 HTTP 代理 或 直接安装Shadowsocks客户端 访问国外资源..."
+    # 安装Shadowsocks
+    #apt update
+    apt install shadowsocks-libev -y
+    # 启动本地代理 配置Shadowsocks 信息在 monocloud等服务账号查看
+    nohup ss-local \
+    -s charlotte.mydarkcloud.info \
+    -p 992 \
+    -l 1080 \
+    -k HKD1aXRb5pgg \
+    -m chacha20-ietf-poly1305 \
+    >/dev/null 2>&1 &
 
-    log_info "HTTP 代理已设置为: ${proxy_url}"
+    export ALL_PROXY=socks5h://127.0.0.1:1080
+    export http_proxy=socks5h://127.0.0.1:1080
+    export https_proxy=socks5h://127.0.0.1:1080
+
+    log_info "HTTP 代理或Shadowsocks配置已设置完成"
     echo $http_proxy
     echo $https_proxy
+    echo ""
+    log_info "查看是否ip变更成代理地址:"
+    curl cip.cc
 }
 
 # 关闭代理
