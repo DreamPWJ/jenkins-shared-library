@@ -264,7 +264,7 @@ EOF
         error_exit "容器 containerd 启动失败"
     fi
 
-    log_info "容器 containerd 安装完成, 版本信息:"
+    log_info "容器 containerd 安装完成 ✅ , 版本信息:"
     # 打印版本
     containerd --version
     echo ""
@@ -324,7 +324,7 @@ EOF
     # 启动 kubelet
     systemctl enable kubelet
 
-    log_info "Kubernetes $(kubeadm version -o short) 组件安装完成"
+    log_info "Kubernetes $(kubeadm version -o short) 组件安装完成 ✅"
     echo  ""
 }
 
@@ -366,9 +366,9 @@ gen_kubeadm_config() {
     local public_ip=$(get_public_ip)
 
     log_info "网络配置信息:"
-    echo "  主机名: $hostname"
-    echo "  内网IP: $private_ip"
-    echo "  公网IP: ${public_ip:-未获取到}"
+    echo "主机名: $hostname"
+    echo "内网IP: $private_ip"
+    echo "公网IP: ${public_ip:-未获取到}"
     echo ""
 
     # 询问是否使用自定义域名
@@ -486,7 +486,7 @@ init_master() {
         fi
     done
 
-    log_info "K8S Master 节点初始化完成"
+    log_info "K8S Master 节点初始化完成 ✅"
     echo  ""
 }
 
@@ -504,8 +504,9 @@ install_calico() {
     # 应用 Calico
     kubectl apply -f /tmp/calico.yaml || error_exit "Calico 安装失败"
 
-    log_info "Calico ${CALICO_VERSION} 网络插件安装完成"
+    log_info "Calico ${CALICO_VERSION} 网络插件安装完成 ✅"
     echo ""
+    log_warn "K8s网络组件主要基于CNI（容器网络接口）标准实现Pod间跨节点通信: Flannel（简单高效的VXLAN覆盖网络）、Calico（基于BGP的纯三层高可用网络，支持网络策略）、Cilium（基于eBPF的高性能网络与安全方案）以及 Weave Net"
 }
 
 # 单机模式: 允许 Master 调度 Pod
@@ -586,7 +587,6 @@ diagnose_image_issues() {
         kubectl describe pod $pod -n $ns | grep -A 5 "Events:"
     done
 }
-
 
 # 自动安装 Helm
 install_helm() {
@@ -1016,7 +1016,7 @@ install_ingress_controller() {
 # 初始化 MetalLB
 install_metallb() {
     local metallb_version="v0.15.3"
-    log_info "开始安装 MetalLB ${metallb_version} 实现集群对外虚拟IP自动分配"
+    log_info "开始安装 MetalLB ${metallb_version} 实现集群自动分配外部虚拟IP"
 
    if curl -I --connect-timeout 5 "https://metallb.github.io/metallb/index.yaml" > /dev/null 2>&1; then
        # 添加 MetalLB Helm 仓库
@@ -1118,7 +1118,7 @@ EOF
     echo ""
     log_info "负载均衡 MetalLB ${metallb_version} 安装并配置完成 ✅"
     echo ""
-    log_warn "K8s核心数据流向: 客户端 -> NAT内外网地址转换 -> External IP（MetalLB分配给Ingress）-> Ingress Controller Service (type=LoadBalancer)  -> Ingress 规则 -> 业务 Service -> Pod "
+    log_warn "K8s核心数据流向: 客户端 -> NAT内外网地址转换 -> External IP（MetalLB分配给Ingress）-> Ingress Controller(类型LoadBalancer)  -> Ingress 规则 -> 业务 Service -> Pod "
     log_warn "提示: MetalLB 是给四层网络 Service 分配 IP 的，不是给七层网络 Ingress 分配的"
     log_warn "提示: MetalLB 默认使用 Layer2 简单二层网络协议，生产环境建议使用 BGP 协议的高性能路由"
 }
