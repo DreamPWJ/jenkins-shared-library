@@ -1126,11 +1126,13 @@ EOF
 # 设置HTTP代理
 http_proxy_set() {
     log_info "设置 HTTP 代理 访问国外资源..."
-    local proxy_url="raymond.mydarkcloud.info:1025"
+    local proxy_url="raymond.mydarkcloud.info:1025"  # monocloud等服务账号查看
     export http_proxy="http://${proxy_url}"
     export https_proxy="https://${proxy_url}"
 
     log_info "HTTP 代理已设置为: ${proxy_url}"
+    echo $http_proxy
+    echo $https_proxy
 }
 
 # 关闭代理
