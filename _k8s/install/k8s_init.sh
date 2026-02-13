@@ -1016,7 +1016,7 @@ install_ingress_controller() {
 # 初始化 MetalLB
 install_metallb() {
     local metallb_version="v0.15.3"
-    log_info "开始安装 MetalLB ${metallb_version} 负载均衡"
+    log_info "开始安装 MetalLB ${metallb_version} 实现集群对外虚拟IP自动分配"
 
    if curl -I --connect-timeout 5 "https://metallb.github.io/metallb/index.yaml" > /dev/null 2>&1; then
        # 添加 MetalLB Helm 仓库
@@ -1118,7 +1118,7 @@ EOF
     echo ""
     log_info "负载均衡 MetalLB ${metallb_version} 安装并配置完成 ✅"
     echo ""
-    log_warn "K8s核心数据流向: 客户端 -> NAT内外网地址转换 -> External IP（MetalLB 分配）-> Service (type=LoadBalancer) -> Ingress Controller Pod -> Ingress 规则 -> 后端 Service -> Pod "
+    log_warn "K8s核心数据流向: 客户端 -> NAT内外网地址转换 -> External IP（MetalLB分配给Ingress）-> Ingress Controller Service (type=LoadBalancer)  -> Ingress 规则 -> 业务 Service -> Pod "
     log_warn "提示: MetalLB 是给四层网络 Service 分配 IP 的，不是给七层网络 Ingress 分配的"
     log_warn "提示: MetalLB 默认使用 Layer2 简单二层网络协议，生产环境建议使用 BGP 协议的高性能路由"
 }
