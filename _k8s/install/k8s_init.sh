@@ -1123,6 +1123,23 @@ EOF
     log_warn "提示: MetalLB 默认使用 Layer2 简单二层网络协议，生产环境建议使用 BGP 协议的高性能路由"
 }
 
+# 设置HTTP代理
+http_proxy_set() {
+    log_info "设置 HTTP 代理 访问国外资源..."
+    local proxy_url="raymond.mydarkcloud.info:1025"
+    export http_proxy="http://${proxy_url}"
+    export https_proxy="https://${proxy_url}"
+
+    log_info "HTTP 代理已设置为: ${proxy_url}"
+}
+
+# 关闭代理
+http_proxy_unset() {
+    unset https_proxy
+    unset http_proxy
+    log_info "HTTP代理已关闭"
+}
+
 # 生成 Worker 节点加入命令
 generate_join_command() {
     log_info "生成 K8s Worker 节点加入Master集群命令..."
@@ -1197,9 +1214,10 @@ main_menu() {
     echo "  10) 安装MetalLB负载均衡组件"
     echo "  11) 安装Ingress Controller路由控制组件"
     echo "  12) 安装Prometheus与Grafana监控组件"
+    echo "  13) 设置HTTP代理地址 访问国外资源"
     echo "  0) 退出"
     echo ""
-    read -p "请输入选项 [0-12]: " choice
+    read -p "请输入选项 [0-13]: " choice
 
     case $choice in
         1)
@@ -1238,6 +1256,9 @@ main_menu() {
             ;;
         12)
             install_prometheus
+            ;;
+        13)
+            http_proxy_set
             ;;
         0)
             log_info "退出脚本"
