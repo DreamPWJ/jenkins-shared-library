@@ -22,10 +22,9 @@ spec:
 #            name: ingress-k8s-self-built-main-data # 这个匹配是关键！！！  1. class是指定自动创建的 Ingress 的 ingress class  2. name是指定被自动修改的 Ingress 名称
       - dns01:
           webhook:
-            groupName: acme.panweiji.com
+            groupName: acme.cert-manager.io
             solverName: alidns
             config:
-              region: cn-hangzhou
               accessKeySecretRef:
                 name: alidns-secret
                 key: access-key
