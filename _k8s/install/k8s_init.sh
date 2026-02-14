@@ -264,7 +264,7 @@ EOF
         error_exit "容器 containerd 启动失败"
     fi
 
-    log_info "容器 containerd 安装完成, 版本信息:"
+    log_info "容器 containerd 安装完成 ✅ , 版本信息:"
     # 打印版本
     containerd --version
     echo ""
@@ -324,7 +324,7 @@ EOF
     # 启动 kubelet
     systemctl enable kubelet
 
-    log_info "Kubernetes $(kubeadm version -o short) 组件安装完成"
+    log_info "Kubernetes $(kubeadm version -o short) 组件安装完成 ✅"
     echo  ""
 }
 
@@ -366,9 +366,9 @@ gen_kubeadm_config() {
     local public_ip=$(get_public_ip)
 
     log_info "网络配置信息:"
-    echo "  主机名: $hostname"
-    echo "  内网IP: $private_ip"
-    echo "  公网IP: ${public_ip:-未获取到}"
+    echo "主机名: $hostname"
+    echo "内网IP: $private_ip"
+    echo "公网IP: ${public_ip:-未获取到}"
     echo ""
 
     # 询问是否使用自定义域名
@@ -486,7 +486,7 @@ init_master() {
         fi
     done
 
-    log_info "K8S Master 节点初始化完成"
+    log_info "K8S Master 节点初始化完成 ✅"
     echo  ""
 }
 
@@ -504,8 +504,9 @@ install_calico() {
     # 应用 Calico
     kubectl apply -f /tmp/calico.yaml || error_exit "Calico 安装失败"
 
-    log_info "Calico ${CALICO_VERSION} 网络插件安装完成"
+    log_info "Calico ${CALICO_VERSION} 网络插件安装完成 ✅"
     echo ""
+    log_warn "K8s网络组件主要基于CNI（容器网络接口）标准实现Pod间跨节点通信: Flannel（简单高效的VXLAN覆盖网络）、Calico（基于BGP的纯三层高可用网络，支持网络策略）、Cilium（基于eBPF的高性能网络与安全方案）以及 Weave Net"
 }
 
 # 单机模式: 允许 Master 调度 Pod
@@ -586,7 +587,6 @@ diagnose_image_issues() {
         kubectl describe pod $pod -n $ns | grep -A 5 "Events:"
     done
 }
-
 
 # 自动安装 Helm
 install_helm() {
@@ -723,6 +723,45 @@ install_cert_manager() {
     echo  ""
     log_info "cert-manager ${cert_manager_version} 安装完成 ✅ "
 
+}
+
+# 安装阿里云DNS WebHook域名证书
+install_cert_manager_alidns() {
+# 安装阿里云 DNS Webhook
+log_info "安装cert-manager 阿里云 DNS Webhook..."
+
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alidns-secret
+  namespace: cert-manager
+type: Opaque+
+stringData:
+  access-key: "YOUR_ACCESS_KEY_ID"
+  secret-key: "YOUR_ACCESS_KEY_SECRET"
+EOF
+
+# 安装 alidns-webhook
+# kubectl delete -f https://raw.githubusercontent.com/pragkent/alidns-webhook/master/deploy/bundle.yaml
+kubectl apply -f https://raw.githubusercontent.com/pragkent/alidns-webhook/master/deploy/bundle.yaml
+
+# 等待 webhook 就绪
+kubectl wait --for=condition=Available --timeout=300s  -n cert-manager deployment/alidns-webhook
+
+# 验证 RBAC 是否正确
+kubectl get clusterrole | grep alidns
+kubectl get clusterrolebinding | grep alidns
+
+# 重启 cert-manager
+kubectl rollout restart deployment/cert-manager -n cert-manager
+
+log_info "安装cert-manager 阿里云 DNS Webhook完成！请更新 alidns-secret 中的 AccessKey 与 SecretKey 信息"
 }
 
 # 自动安装 Prometheus
@@ -1016,7 +1055,7 @@ install_ingress_controller() {
 # 初始化 MetalLB
 install_metallb() {
     local metallb_version="v0.15.3"
-    log_info "开始安装 MetalLB ${metallb_version} 负载均衡..."
+    log_info "开始安装 MetalLB ${metallb_version} 实现集群自动分配外部虚拟IP"
 
    if curl -I --connect-timeout 5 "https://metallb.github.io/metallb/index.yaml" > /dev/null 2>&1; then
        # 添加 MetalLB Helm 仓库
@@ -1038,7 +1077,7 @@ install_metallb() {
        fi
     else
       log_error "MetalLB的Helm包安装网络不通"
-      log_info  "使用K8s Yaml文件安装 MetalLB"
+      log_info  "使用K8s Yaml文件安装 MetalLB..."
       kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/${metallb_version}/config/manifests/metallb-native.yaml 2>/dev/null
       if [ $? -ne 0 ]; then
            log_warn "GitHub 访问失败，使用离线 YAML安装 MetalLB..."
@@ -1059,7 +1098,7 @@ install_metallb() {
     if [ -z "$IP_RANGE" ]; then
         echo "未输入 IP 地址范围，跳过自动配置"
         echo ""
-        echo "你可以稍后手动创建配置:"
+        echo "你可以稍后 kubectl apply -f 手动创建配置:"
         cat <<'EXAMPLE'
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
@@ -1069,6 +1108,7 @@ metadata:
 spec:
   addresses:
   - 172.16.2.240-172.16.2.249
+  autoAssign: true
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
@@ -1092,6 +1132,7 @@ metadata:
 spec:
   addresses:
   - ${IP_RANGE}
+  autoAssign: true
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
@@ -1116,6 +1157,44 @@ EOF
     echo ""
     log_info "负载均衡 MetalLB ${metallb_version} 安装并配置完成 ✅"
     echo ""
+    log_warn "K8s核心数据流向: 客户端 -> NAT内外网地址转换 -> External IP（MetalLB分配给Ingress）-> Ingress Controller(类型LoadBalancer)  -> Ingress 规则 -> 业务 Service -> Pod "
+    log_warn "提示: MetalLB 是给四层网络 Service 分配 IP 的，不是给七层网络 Ingress 分配的"
+    log_warn "提示: MetalLB 默认使用 Layer2 简单二层网络协议，生产环境建议使用 BGP 协议的高性能路由"
+}
+
+# 设置HTTP代理
+http_proxy_set() {
+    log_info "设置 HTTP 代理 或 直接安装ShadowSocks客户端 访问国外资源..."
+    # 安装ShadowSocks 可以单独部署一个统一的客户端
+    #apt update
+    apt install shadowsocks-libev -y
+    # 启动本地代理 配置ShadowSocks 信息在 monocloud等服务账号查看
+    nohup ss-local \
+    -s charlotte.mydarkcloud.info \
+    -p 992 \
+    -l 1080 \
+    -k HKD1aXRb5pgg \
+    -m chacha20-ietf-poly1305 \
+    >/dev/null 2>&1 &
+
+    # 全局代理  细分流量请使用clash等工具
+    export ALL_PROXY=socks5h://127.0.0.1:1080
+    export http_proxy=socks5h://127.0.0.1:1080
+    export https_proxy=socks5h://127.0.0.1:1080
+
+    log_info "HTTP 代理或ShadowSocks配置已设置完成"
+    echo $http_proxy
+    echo $https_proxy
+    echo ""
+    log_info "查看是否ip变更成代理地址:"
+    curl cip.cc
+}
+# 关闭代理
+http_proxy_unset() {
+    unset https_proxy
+    unset http_proxy
+    unset ALL_PROXY
+    log_info "HTTP代理已关闭"
 }
 
 # 生成 Worker 节点加入命令
@@ -1192,9 +1271,10 @@ main_menu() {
     echo "  10) 安装MetalLB负载均衡组件"
     echo "  11) 安装Ingress Controller路由控制组件"
     echo "  12) 安装Prometheus与Grafana监控组件"
+    echo "  13) 设置HTTP代理地址 访问国外资源"
     echo "  0) 退出"
     echo ""
-    read -p "请输入选项 [0-12]: " choice
+    read -p "请输入选项 [0-13]: " choice
 
     case $choice in
         1)
@@ -1234,6 +1314,9 @@ main_menu() {
         12)
             install_prometheus
             ;;
+        13)
+            http_proxy_set
+            ;;
         0)
             log_info "退出脚本"
             exit 0
@@ -1251,7 +1334,6 @@ diagnose_existing_cluster() {
     log_info "诊断现有集群"
     log_info "=========================================="
     echo ""
-
     check_root
 
     # 检查集群状态
@@ -1275,11 +1357,10 @@ diagnose_existing_cluster() {
 # 单机模式部署
 deploy_single_node() {
     log_info "=========================================="
-    log_info "开始单机K8S集群部署"
+    log_info "开始单机K8s集群部署"
     log_info "Kubernetes 版本: ${K8S_VERSION}"
     log_info "=========================================="
     echo ""
-
     check_root
     check_ubuntu_version
 
@@ -1299,7 +1380,7 @@ deploy_single_node() {
     show_cluster_info
 
     log_info "=========================================="
-    log_info "✅ 单机 K8S v${K8S_VERSION} 集群部署完成 🎉"
+    log_info "✅ 单机 K8s v${K8S_VERSION} 集群部署完成 🎉"
     log_info "=========================================="
     echo ""
 }
@@ -1311,7 +1392,6 @@ deploy_master_node() {
     log_info "Kubernetes 版本: ${K8S_VERSION}"
     log_info "=========================================="
     echo ""
-
     check_root
     check_ubuntu_version
 
@@ -1343,7 +1423,6 @@ deploy_worker_node() {
     log_info "开始 K8s Worker 节点部署"
     log_info "=========================================="
     echo ""
-
     check_root
     check_ubuntu_version
 
@@ -1372,7 +1451,6 @@ install_components_only() {
     log_info "仅安装基础组件"
     log_info "=========================================="
     echo ""
-
     check_root
     check_ubuntu_version
 
