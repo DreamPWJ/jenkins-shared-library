@@ -748,6 +748,7 @@ stringData:
 EOF
 
 # 安装 alidns-webhook
+# kubectl delete -f https://raw.githubusercontent.com/pragkent/alidns-webhook/master/deploy/bundle.yaml
 kubectl apply -f https://raw.githubusercontent.com/pragkent/alidns-webhook/master/deploy/bundle.yaml
 
 # 等待 webhook 就绪
