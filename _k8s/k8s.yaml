@@ -152,12 +152,13 @@ metadata:
   labels:
     app: {APP_COMMON_NAME}-service
 #  annotations:
+#    metallb.io/loadBalancerIPs: 172.16.1.240    # 指定LoadBalancer固定IP 在 MetalLB IPAddressPool 范围内
 #    prometheus.io/scrape: "true"                # 让prometheus自动发现
 #    prometheus.io/path: /actuator/prometheus    # /metric路径是集成内提供的 Prometheus 监控接口 或利用 exporter 服务来为 Prometheus 提供指标数据
 #    prometheus.io/port: "{CONTAINER_PORT}"      # /metric接口的端口
 
 spec:
-  type: LoadBalancer                   # 按需动态定义规格类型ClusterIP、NodePort、LoadBalancer（需要MetalLB支持）、Ingress实现Pod外网访问和负载均衡 LoadBalancer不支持同时多个协议
+  type: LoadBalancer                   # 按需动态定义规格类型 ClusterIP、NodePort、LoadBalancer（需要MetalLB等支持）、Ingress实现Pod外网访问和负载均衡 LoadBalancer不支持同时多个协议
   selector:
     app: {APP_COMMON_NAME}             # 通过Pod的labels指定Pod 建立关联  Service的selector可以通过metadata labels来筛选，多个不同pod通过一个Service访问打相同的labels
   ports:

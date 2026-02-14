@@ -11,24 +11,24 @@
 def map = [:]
 
 // 远程服务器地址 k8s集群方式可填空或填公网代理负载IP
-map.put('remote_ip', '172.16.0.91')
+map.put('remote_ip', '120.92.149.246')
 // 工作服务器地址 同时支持N个服务器自动化分布式部署
 map.put('remote_worker_ips', [])
 // 远程服务器用户名
 map.put('remote_user_name', 'root')
 // 代理机或跳板机外网ip用于透传部署到内网目标机器 选填 目标机器外部无法直接访问情况填写内网ip
-map.put('proxy_jump_ip', '119.188.90.222')
+map.put('proxy_jump_ip', ' ')
 // 自定义跳板机ssh和scp访问用户名 可精细控制权限 默认root
 map.put('proxy_jump_user_name', 'root')
 // 自定义跳板机ssh和scp访问端口 默认22
-map.put('proxy_jump_port', '22')
+map.put('proxy_jump_port', ' ')
 
 // 默认统一设置项目级别的分支 方便整体控制改变分支 将覆盖单独job内的设置
 map.put('default_git_branch', ' ')
 map.put('default_frontend_git_branch', ' ')
 
 // 保持构建的最大个数
-map.put('build_num_keep', 2)
+map.put('build_num_keep', 3)
 
 // 容器Docker相关参数
 // JVM内存设置
@@ -48,21 +48,21 @@ map.put('is_push_docker_repo', true)
 // docker容器镜像仓库账号信任id
 map.put('docker_repo_credentials_id', '73f6b3b0-4580-4acf-b04a-63892fcf9ba8')
 // docker镜像仓库注册地址
-map.put('docker_repo_registry', 'docker.lanneng.tech')
+map.put('docker_repo_registry', 'hub-cn-shanghai-2.kce.ksyun.com')
 // docker仓库命名空间名称
 map.put('docker_repo_namespace', 'lanneng')
 
 // K8S集群相关参数
 // K8S集群部署集群访问授权账号kube.config配置信息信任ids 多集群,逗号分割   Jenkins系统管理的Manage Credentials，类型选择为“Secret file”配置
-map.put('k8s_credentials_ids', '74a3d376-cb4c-4a20-9bf7-7300a5eaa84d')
+map.put('k8s_credentials_ids', 'f9874869-ce3a-42b2-8a70-663c4c430523')
 // K8S集群私有镜像仓库拉取密钥 在集群内使用kubectl create secret命令生成
-map.put('k8s_image_pull_secrets', 'lannengkeji2022')
+map.put('k8s_image_pull_secrets', 'self-built-k8s-docker-registry-secret')
 
 // 项目标签或项目简称
-map.put('project_tag', ' ')
+map.put('project_tag', '自建K8S集群')
 
 // 是否是生产环境
-map.put('is_prod', false)
+map.put('is_prod', true)
 // 是否在同一台服务器蓝绿部署或滚动部署 非k8s集群方式设置
 map.put('is_same_server', false)
 // 是否进行优雅停机
@@ -76,19 +76,19 @@ map.put('is_before_deploy_notice', false)
 // 是否只通知发布变更记录
 map.put('is_only_notice_change_log', false)
 // 是否在生产环境发布成功后自动给Git仓库打Tag版本和生成变更记录
-map.put('is_git_tag', true)
+map.put('is_git_tag', false)
 // 是否需要css预处理器sass
 map.put('is_need_sass', false)
 
-// jenkins分布式构建节点label名称
-map.put('jenkins_node', 'master')
-map.put('jenkins_node_frontend', 'master')
+// jenkins分布式构建节点label名称  预配置在jenkins节点管理内
+map.put('jenkins_node', 'node-3')
+map.put('jenkins_node_frontend', 'node-3')
 
 // 构建环境变量 分别使用Node和Maven关键字加版本号方式 如Maven3.9
-map.put('nodejs', 'Node14')
-map.put('maven', 'Maven3.6')
-map.put('jdk_publisher', 'openjdk')
-map.put('jdk', '11')
+map.put('nodejs', 'Node24')
+map.put('maven', 'Maven3.9')
+map.put('jdk_publisher', 'amazoncorretto')
+map.put('jdk', '25')
 
 // 相关信任标识
 map.put('ci_git_credentials_id', '5379273a-f829-4091-ab19-46c184fcbeb2')
@@ -100,7 +100,7 @@ map.put('oss_credentials_id', ' ')
 // 直连方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接
 map.put('ssh_hosts_id', ' ')
 // 跳板机方式服务器集群自动SSH连接信息 实现CI构建机器和多台部署机之间的免密连接
-map.put('proxy_jump_hosts_id', ' ')
+map.put('proxy_jump_hosts_id', '47226244-73ca-48b9-be2d-f3413f62701a')
 
 // 服务器上部署所在的文件夹名称
 map.put('deploy_folder', "my")
@@ -109,7 +109,7 @@ map.put('npm_package_folder', "dist")
 // Web项目解压到指定目录层级
 map.put('web_strip_components', 1)
 // 如果Maven模块化存在二级模块目录 设置一级模块目录名称
-map.put('maven_one_level', ' ')
+map.put('maven_one_level', 'main-data')
 // Maven自定义settings.xml文件Secret file凭据  如设置私有库或镜像源情况
 map.put('maven_settings_xml_id', ' ')
 
@@ -118,37 +118,41 @@ sharedLibrary(map)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/Jenkinsfile.test-k8s
+// https://git.pengbocloud.com/lanneng_develop/jenkins-shared-library.git  pipelines/test/Jenkinsfile.test-k8s
 
 /*
 
-test-k8s-web
-测试K8S集群Web前端 ❤️
+main-data-admin-web-self-built-k8s-prod
+主数据管理平台Web前端-自建k8s集群 ❤️
 JSON_PARAMS
 {
-    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/react-frontend-monorepo.git" ,
-    "BRANCH_NAME" : "dev" ,
+    "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/frontend-monorepo.git" ,
+    "BRANCH_NAME" : "develop" ,
     "PROJECT_TYPE" : "1" ,
-    "PROJECT_NAME" : "pellet-charging-admin" ,
-    "SHELL_PARAMS" : "pellet-charging-admin web 30001 80 sit" ,
+    "PROJECT_NAME" : "main-data-admin",
+    "SHELL_PARAMS" : "main-data admin-web-self-built 9109 80 prod",
     "NPM_RUN_PARAMS" : "build",
-    "IS_MONO_REPO": true,
-    "CUSTOM_NGINX_CONFIG" : "config/default.conf",
+    "IS_MONO_REPO" : true,
     "IS_K8S_DEPLOY" : true,
+    "K8S_POD_REPLICAS" : "1",
+    "APPLICATION_DOMAIN" : "https://main-data-self-k8s-admin.pengbocloud.com"
 }
 
-test-k8s
-测试K8S集群服务端
+main-data-platform-self-built-k8s-prod
+主数据标准共享平台-自建k8s集群
 JSON_PARAMS
 {
-   "REPO_URL" : "https://gitee.com/tinylk/pipeline-demo" ,
-   "BRANCH_NAME" : "master" ,
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+   "BRANCH_NAME" : "feature/main-data" ,
    "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "test-k8s" ,
-   "SHELL_PARAMS" : "test k8s 30000 40080 sit",
-   "IS_MAVEN_SINGLE_MODULE" : true,
+   "PROJECT_NAME" : "main-data-app" ,
+   "SHELL_PARAMS" : "main-data app-self-built 9868 8080 prod",
    "IS_K8S_DEPLOY" : true,
+   "K8S_POD_REPLICAS" : "1",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/health-check",
+   "APPLICATION_DOMAIN" : "https://main-data-self-k8s-api.pengbocloud.com"
 }
+
 
 
 */

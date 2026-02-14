@@ -79,10 +79,15 @@ labels:      #自定义标签
           items:
         - key: string
 
+
 ### 安装kubectl命令访问k8s集群  环境变量Path中 路径为kubectl.exe所在的文件夹目录并双击运行kubectl.exe
 
 - https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/
+
+### 使用K8S集群内全域名访问 K8S内置Core DNS解析  因为集群内网ClusterIP如果Service被删除会变化 域名可应对变化
+
+示例 如 http://k8s-service-name.default.svc.cluster.local:8080 (8080对外服务端口)
 
 ### 安装Helm包管理工具  设置环境变量在helm.exe目录
 
@@ -113,10 +118,7 @@ helm install prometheus prometheus-community/prometheus
 helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
 
-helm install grafana grafana/grafana --set persistence.enabled=false --set service.type=NodePort --set
-service.nodePort=30000
-
-### 基于Ansible自动部署K8S集群 [项目](https://github.com/lizhenliang/ansible-install-k8s)
+helm install grafana grafana/grafana --set persistence.enabled=false --set service.type=NodePort --set service.nodePort=30000
 
 ### 通过kubectl创建简单nginx服务 [文档](https://docs.ksyun.com/documents/5517)
 
@@ -126,10 +128,6 @@ kubectl run my-nginx --image=nginx --replicas=3 --port=80
 
 kubectl create secret docker-registry <name> --docker-server=DOCKER_REGISTRY_SERVER --docker-username=DOCKER_USER
 --docker-password=DOCKER_PASSWORD --docker-email=DOCKER_EMAIL
-
-### 使用K8S集群内全域名访问 K8S内置Core DNS解析  因为集群内网ClusterIP如果Service被删除会变化 域名可应对变化
-
-示例 如 http://k8s-service-name.default.svc.cluster.local:8080 (8080对外服务端口)
 
 ### 在IDEA内查看K8S容器日志乱码问题
 
