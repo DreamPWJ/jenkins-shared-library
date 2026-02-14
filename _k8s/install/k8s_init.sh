@@ -725,6 +725,33 @@ install_cert_manager() {
 
 }
 
+# 安装阿里云DNS WebHook域名证书
+install_cert_manager_alidns() {
+# 安装阿里云 DNS Webhook
+log_info "安装cert-manager 阿里云 DNS Webhook..."
+
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alidns-secret
+  namespace: cert-manager
+type: Opaque+
+stringData:
+  access-key: "YOUR_ACCESS_KEY_ID"
+  secret-key: "YOUR_ACCESS_KEY_SECRET"
+EOF
+# 安装 alidns-webhook
+kubectl apply -f https://raw.githubusercontent.com/pragkent/alidns-webhook/master/deploy/bundle.yaml
+
+log_info "安装cert-manager 阿里云 DNS Webhook完成！请更新 alidns-secret 中的 AccessKey 与 SecretKey 信息"
+}
+
 # 自动安装 Prometheus
 install_prometheus() {
     log_info "开始安装 Prometheus 监控..."

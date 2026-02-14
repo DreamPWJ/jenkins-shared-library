@@ -19,7 +19,18 @@ spec:
           ingress:
             #serviceType: ClusterIP
             name: ingress-k8s-self-built-main-data # 这个匹配是关键！！！  1. class是指定自动创建的 Ingress 的 ingress class  2. name是指定被自动修改的 Ingress 名称
-
+#      - dns01:
+#          webhook:
+#            groupName: acme.yourcompany.com
+#            solverName: alidns
+#            config:
+#              region: cn-hangzhou
+#              accessKeySecretRef:
+#                name: alidns-secret
+#                key: access-key
+#              secretKeySecretRef:
+#                name: alidns-secret
+#                key: secret-key
 ---
 
 apiVersion: networking.k8s.io/v1
@@ -29,8 +40,8 @@ metadata:
   namespace: default
   annotations:
     # add an annotation indicating the issuer to use
-    cert-manager.io/cluster-issuer: my-letsencrypt-prod-k8s-self-built-main-data
-    acme.cert-manager.io/http01-edit-in-place: "true"
+#    cert-manager.io/cluster-issuer: my-letsencrypt-prod-k8s-self-built-main-data
+#    acme.cert-manager.io/http01-edit-in-place: "true"
     # 后端大文件上传大小
     nginx.ingress.kubernetes.io/client-body-buffer-size: 1024m
     nginx.ingress.kubernetes.io/proxy-max-temp-file-size: 2048m
@@ -47,10 +58,10 @@ metadata:
 
 spec:
   ingressClassName: nginx
-  tls:
-    - hosts:
-        - main-data-self-k8s-admin.pengbocloud.com
-      secretName: my-main-data-self-k8s-admin.pengbocloud.com-tls
+#  tls:
+#    - hosts:
+#        - main-data-self-k8s-admin.pengbocloud.com
+#      secretName: my-main-data-self-k8s-admin.pengbocloud.com-tls
 
   rules:
     #自定义域名
