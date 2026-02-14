@@ -746,8 +746,19 @@ stringData:
   access-key: "YOUR_ACCESS_KEY_ID"
   secret-key: "YOUR_ACCESS_KEY_SECRET"
 EOF
+
 # 安装 alidns-webhook
 kubectl apply -f https://raw.githubusercontent.com/pragkent/alidns-webhook/master/deploy/bundle.yaml
+
+# 等待 webhook 就绪
+kubectl wait --for=condition=Available --timeout=300s  -n cert-manager deployment/alidns-webhook
+
+# 验证 RBAC 是否正确
+kubectl get clusterrole | grep alidns
+kubectl get clusterrolebinding | grep alidns
+
+# 重启 cert-manager
+kubectl rollout restart deployment/cert-manager -n cert-manager
 
 log_info "安装cert-manager 阿里云 DNS Webhook完成！请更新 alidns-secret 中的 AccessKey 与 SecretKey 信息"
 }
