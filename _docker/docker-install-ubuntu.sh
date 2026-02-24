@@ -31,7 +31,8 @@ sudo apt install -y linux-image-generic-lts-xenial || true
 # 非设置镜像情况安装Docker 网络原因可能比较慢或者失败
 echo "安装Docker环境"
 if [[ $(command -v curl) ]]; then
-  curl -fsSL https://get.docker.com | sh || sudo apt install -y docker-ce docker-ce-cli containerd.io
+  curl -fsSL https://get.docker.com | sh || true
+  sudo apt install -y docker-ce docker-ce-cli containerd.io
 else
   sudo apt install -y docker-ce docker-ce-cli containerd.io
 fi
