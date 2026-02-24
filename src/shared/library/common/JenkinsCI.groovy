@@ -56,7 +56,8 @@ class JenkinsCI implements Serializable {
 
         if (configNodeName.contains("k8s")) { // Jenkins Cloud 模式  k8s 节点
             ctx.println("Jenkins Cloud 模式  k8s 节点")
-            ctx.ALL_ONLINE_NODE.add(0, configNodeName)
+            nodesArray.add(0, configNodeName)
+            return nodesArray
         }
         // ctx.println("在线构建节点: ${ctx.ALL_ONLINE_NODES} ")
 
