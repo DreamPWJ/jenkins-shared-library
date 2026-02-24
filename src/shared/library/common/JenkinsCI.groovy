@@ -54,8 +54,8 @@ class JenkinsCI implements Serializable {
         int targetIndex = nodesArray.findIndexOf { it == configNodeName }
         ctx.ALL_ONLINE_NODES = targetIndex == -1 ? nodesArray : [nodesArray[targetIndex]] + nodesArray.minus(configNodeName).sort()
 
-        if (configNodeName.contains("k8s")) { // Jenkins Cloud 模式  k8s 节点
-            ctx.println("Jenkins Cloud 模式  k8s 节点")
+        if (configNodeName.contains("k8s")) { // Jenkins Cloud 模式 k8s 节点  要初始化执行一次pipeline才会自动创建 jenkins agent pod
+            ctx.println("Jenkins Cloud 模式 k8s 节点")
             nodesArray.add(0, configNodeName)
             return nodesArray
         }
