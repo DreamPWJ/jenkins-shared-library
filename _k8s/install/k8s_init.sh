@@ -264,8 +264,9 @@ EOF
         error_exit "容器 containerd 启动失败"
     fi
 
-    log_info "容器 containerd 安装完成 ✅ , 版本信息:"
+    log_info "容器 containerd 安装完成 ✅ "
     # 打印版本
+    log_info "容器 containerd 版本信息: "
     containerd --version
     echo ""
 }
