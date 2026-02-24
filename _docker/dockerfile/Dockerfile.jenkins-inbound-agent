@@ -1,0 +1,22 @@
+FROM jenkins/inbound-agent:latest
+
+USER root
+
+# 安装常用工具
+RUN apt-get update && \
+    apt-get install -y \
+    procps \
+    curl \
+    git \
+    vim \
+    unzip \
+    iputils-ping \
+    net-tools \
+    docker.io
+
+USER jenkins
+
+
+# 镜像构建 并上传到镜像仓库
+# docker build -t panweiji/jenkins-agent:latest -f /my/Dockerfile.jenkins-inbound-agent . --no-cache
+# docker push panweiji/jenkins-agent:latest
