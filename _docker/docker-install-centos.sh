@@ -107,7 +107,7 @@ echo "Docker版本 验证安装是否成功 "
 docker version
 
 if [[ $(command -v docker) ]]; then
-  echo -e "\033[32mDocker安装成功 ✔ \033[0m"
+  echo -e "\033[32mDocker安装成功 ✅ \033[0m"
 else
   echo -e "\033[31mDocker安装失败 ❌ \033[0m"
   exit 1
