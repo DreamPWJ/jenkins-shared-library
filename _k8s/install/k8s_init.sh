@@ -461,7 +461,7 @@ init_master() {
     kubeadm init --config=/tmp/kubeadm-config.yaml --upload-certs || error_exit "K8S集群初始化失败"
 
     # 配置 kubectl
-    log_info "配置 kubectl组件..."
+    log_info "配置 kubectl 组件"
     mkdir -p $HOME/.kube
     cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
     chown $(id -u):$(id -g) $HOME/.kube/config
@@ -1158,9 +1158,50 @@ EOF
     echo ""
     log_info "负载均衡 MetalLB ${metallb_version} 安装并配置完成 ✅"
     echo ""
-    log_warn "K8s核心数据流向: 客户端 -> NAT内外网地址转换 -> External IP（MetalLB分配给Ingress）-> Ingress Controller(类型LoadBalancer)  -> Ingress 规则 -> 业务 Service -> Pod "
+    log_warn "K8s核心数据流向: 客户端 -> NAT内外网地址转换 -> External IP（MetalLB分配给Ingress）-> Ingress Controller(类型LoadBalancer)  -> Ingress 规则 -> 后端 Service -> 业务 Pod "
     log_warn "提示: MetalLB 是给四层网络 Service 分配 IP 的，不是给七层网络 Ingress 分配的"
     log_warn "提示: MetalLB 默认使用 Layer2 简单二层网络协议，生产环境建议使用 BGP 协议的高性能路由"
+}
+
+# Karmada 联邦集群安装
+install_karmada() {
+    # 指定版本
+    local karmada_version=v1.16.0
+    log_info "开始安装 Karmada ${karmada_version} 多云联邦集群 实现异地多活容灾和同城两中心等高可用 ..."
+
+    # 安装 karmadactl
+    curl -s https://raw.githubusercontent.com/karmada-io/karmada/master/hack/install-cli.sh | sudo bash
+
+    curl -LO "https://github.com/karmada-io/karmada/releases/download/${karmada_version}/karmadactl-linux-amd64.tgz"
+    tar -zxvf karmadactl-linux-amd64.tgz
+    sudo mv karmadactl /usr/local/bin/
+
+    log_info "Karmada 联邦集群安装完成 ✅"
+    karmadactl version
+
+    log_info "使用 karmadactl 初始化中心管理多集群控制面板（在主集群）"
+    karmada_apiserver_ip=$(get_private_ip)   # 你的主机IP
+
+    log_info "检查 kubectl 和 kubeconfig..."
+    kubectl cluster-info || { echo "请先配置好 kubectl"; exit 1; }
+
+    # ========== 初始化 Karmada 控制面 ==========
+    sudo karmadactl init \
+      --karmada-apiserver-advertise-address=${karmada_apiserver_ip} \
+      --etcd-storage-mode hostPath \
+      --karmada-data-path /etc/karmada \
+      --cert-external-ip=${karmada_apiserver_ip} \
+      --kubeconfig ~/.kube/config
+
+    # ========== 设置 Karmada kubeconfig ==========
+    export KUBECONFIG=/etc/karmada/karmada-apiserver.config
+    echo "export KUBECONFIG=/etc/karmada/karmada-apiserver.config" >> ~/.bashrc
+
+    # 验证
+    kubectl get node --kubeconfig=/etc/karmada/karmada-apiserver.config
+    
+    log_info "Karmada 多集群中心控制面初始化完成 ✅"
+    log_warn "Karmada 需要注册成员集群 推荐 Push 模式注册 控制面主动推送 子集群 karmadactl join 命令加入"
 }
 
 # 设置HTTP代理
@@ -1272,10 +1313,11 @@ main_menu() {
     echo "  10) 安装MetalLB负载均衡组件"
     echo "  11) 安装Ingress Controller路由控制组件"
     echo "  12) 安装Prometheus与Grafana监控组件"
-    echo "  13) 设置HTTP代理地址 访问国外资源"
+    echo "  13) 安装 Karmada 联邦集群管理"
+    echo "  14) 设置HTTP代理地址 访问国外资源"
     echo "  0) 退出"
     echo ""
-    read -p "请输入选项 [0-13]: " choice
+    read -p "请输入选项 [0-14]: " choice
 
     case $choice in
         1)
@@ -1316,6 +1358,9 @@ main_menu() {
             install_prometheus
             ;;
         13)
+            install_karmada
+            ;;
+        14)
             http_proxy_set
             ;;
         0)
