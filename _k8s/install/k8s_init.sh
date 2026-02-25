@@ -1313,7 +1313,7 @@ main_menu() {
     echo "  10) 安装MetalLB负载均衡组件"
     echo "  11) 安装Ingress Controller路由控制组件"
     echo "  12) 安装Prometheus与Grafana监控组件"
-    echo "  13) 安装 Karmada 联邦集群管理"
+    echo "  13) 安装 Karmada 多云联邦集群管理"
     echo "  14) 设置HTTP代理地址 访问国外资源"
     echo "  0) 退出"
     echo ""
