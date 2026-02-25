@@ -84,18 +84,22 @@ sudo docker run -d --restart=always -p 8000:80  --cpus=2 -m 4096m --name gitlab-
 -v /my/gitlab/config:/etc/gitlab -v /my/gitlab/logs:/var/log/gitlab -v /my/gitlab/data:/var/opt/gitlab  \
 gitlab/gitlab-ce:latest
 
-#### 基于Docker安装部署大模型Ollama和Open WebUI、Dify容器镜像
+#### 基于Docker安装部署大模型VLLM、Ollama、Open WebUI、Dify容器镜像
+docker pull vllm/vllm-openai:latest
 docker pull ollama/ollama
 docker pull ghcr.io/open-webui/open-webui:main
 
-#### 只有CPU模式部署
+##### VLLM高性能部署大模型
+docker run -d always -p 8000:8000 --name deepseek-vllm --gpus all --shm-size=1g -v /my/deepseek/models:/models \
+vllm/vllm-openai:latest \
+--model /models/DeepSeek-V3.2-7B-Base --trust-remote-code --host 0.0.0.0 --port 8000
+##### Ollama只有CPU模式部署
 docker run -d --restart always -p 11434:11434 --cpus=8 -m 16096m -v /my/ollama:/root/.ollama --name ollama ollama/ollama
-
+docker exec -it ollama  ollama run deepseek-r1:7b
+##### Open WebUI部署
 docker run -d --restart always -p 3100:8080 --cpus=2 -m 4096m --add-host=host.docker.internal:host-gateway -v /my/ollama:/root/.ollama \
  -v /my/open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main
 
-docker exec -it ollama  ollama run deepseek-r1:7b
- 
 #### 安装 sonar代码质量检测服务 默认用户名密码都是admin  如果docker启动报错宿主机执行 sysctl -w vm.max_map_count=262144 
 sudo docker pull sonarqube:community  
 

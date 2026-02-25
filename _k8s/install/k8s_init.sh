@@ -1259,10 +1259,11 @@ install_jenkins() {
         jenkins/jenkins \
         --namespace "${JENKINS_NAMESPACE}" \
         --version "${CHART_VERSION}" \
-        --set controller.installPlugins=false\
+        --set controller.installPlugins=false \
         --set controller.admin.username=admin \
         --set controller.admin.password=admin@0633 \
         --set controller.serviceType=LoadBalancer \
+        --timeout 1200s \
         --wait
     
     # 等待 Pod 就绪
@@ -1383,7 +1384,7 @@ main_menu() {
     echo "   版本: K8s ${K8S_VERSION}"
     echo "=========================================="
     echo ""
-    echo "请选择K8s部署模式:"
+    log_info "请选择K8s部署模式:"
     echo "  1) 单机模式 (Single Node)"
     echo "  2) 多机模式 - Master 节点"
     echo "  3) 多机模式 - Worker 节点"
