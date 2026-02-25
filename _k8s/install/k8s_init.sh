@@ -1224,12 +1224,13 @@ install_karmada() {
 
 # 安装Jenkins服务
 install_jenkins() {
-    log_info "开始安装 Jenkins 服务..."
     # 配置变量
     JENKINS_NAMESPACE=${1:-"jenkins"}
     HELM_RELEASE_NAME="k8s-jenkins"
     CHART_VERSION="5.8.142"  # 指定版本号，建议固定版本
-    
+
+    log_info "开始安装 Jenkins ${CHART_VERSION} CI/CD 服务..."
+
     # 检查 Helm 是否安装
     if ! command -v helm &> /dev/null; then
         log_error "错误: Helm 未安装，请先安装 Helm"
@@ -1258,9 +1259,9 @@ install_jenkins() {
         jenkins/jenkins \
         --namespace "${JENKINS_NAMESPACE}" \
         --version "${CHART_VERSION}" \
-        --set controller.installPlugins=false \
-        --set controller.adminUser=admin \
-        --set controller.adminPassword=admin@0633 \
+        --set controller.installPlugins=false\
+        --set controller.admin.username=admin \
+        --set controller.admin.password=admin@0633 \
         --set controller.serviceType=LoadBalancer \
         --wait
     
