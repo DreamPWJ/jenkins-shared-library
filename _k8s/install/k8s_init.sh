@@ -1172,25 +1172,25 @@ install_karmada() {
 
     log_info "开始安装 Karmada ${karmada_version} 多云联邦集群 实现异地多活容灾和同城两中心等高可用 ..."
 
-#    # 官方安装 karmadactl
-#    curl -s https://raw.githubusercontent.com/karmada-io/karmada/master/hack/install-cli.sh | sudo bash
-#
-#    curl -LO "https://github.com/karmada-io/karmada/releases/download/${karmada_version}/karmadactl-linux-amd64.tgz"
-#    tar -zxvf karmadactl-linux-amd64.tgz
-#    sudo mv karmadactl /usr/local/bin/
+    # 官方安装 karmadactl
+    curl -s https://raw.githubusercontent.com/karmada-io/karmada/master/hack/install-cli.sh | sudo bash
+
+    curl -LO "https://github.com/karmada-io/karmada/releases/download/${karmada_version}/karmadactl-linux-amd64.tgz"
+    tar -zxvf karmadactl-linux-amd64.tgz
+    sudo mv karmadactl /usr/local/bin/
 
     # 添加 Helm 仓库
-    helm repo add karmada-charts https://raw.githubusercontent.com/karmada-io/karmada/master/charts
-    helm repo update
-
-    # 安装 Karmada
-    helm install karmada karmada-charts/karmada \
-      --namespace ${karmada_namespace} \
-      --create-namespace \
-      --set apiServer.hostNetwork=false \
-      --set apiServer.serviceType=NodePort \
-      --kubeconfig=${host_cluster_kubeconfig} \
-      --wait
+#    helm repo add karmada-charts https://raw.githubusercontent.com/karmada-io/karmada/master/charts
+#    helm repo update
+#
+#    # 安装 Karmada
+#    helm install karmada karmada-charts/karmada \
+#      --namespace ${karmada_namespace} \
+#      --create-namespace \
+#      --set apiServer.hostNetwork=false \
+#      --set apiServer.serviceType=NodePort \
+#      --kubeconfig=${host_cluster_kubeconfig} \
+#      --wait
 
     kubectl get pods -n ${karmada_namespace}
 
@@ -1327,7 +1327,7 @@ main_menu() {
     echo "  10) 安装 MetalLB 负载均衡组件"
     echo "  11) 安装 Ingress Controller 路由控制组件"
     echo "  12) 安装 Prometheus与Grafana 监控组件"
-    echo "  13) 安装 Karmada 多云联邦集群管理"
+    echo "  13) 安装 Karmada 多云联邦集群管理 - Master 集群"
     echo "  14) 设置HTTP代理地址 访问国外资源"
     echo "  0) 退出"
     echo ""
