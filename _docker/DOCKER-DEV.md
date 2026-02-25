@@ -90,7 +90,7 @@ docker pull ollama/ollama
 docker pull ghcr.io/open-webui/open-webui:main
 
 ##### VLLM高性能部署大模型
-docker run -d always -p 8000:8000 --name deepseek-vllm --gpus all --shm-size=1g -v /my/deepseek/models:/models \
+docker run -d --restart=always -p 8008:8000 --name deepseek-vllm --gpus all --shm-size=1g -v /my/deepseek/models:/models \
 vllm/vllm-openai:latest \
 --model /models/DeepSeek-V3.2-7B-Base --trust-remote-code --host 0.0.0.0 --port 8000
 ##### Ollama只有CPU模式部署
