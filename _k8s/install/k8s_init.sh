@@ -1219,7 +1219,75 @@ install_karmada() {
     kubectl get node --kubeconfig=/etc/karmada/karmada-apiserver.config
     
     log_info "Karmada 多集群中心控制面初始化完成 ✅"
-    log_warn "Karmada 需要注册成员集群 推荐 Push 模式注册 控制面主动推送 子集群 karmadactl join 命令加入"
+    log_warn "Karmada 需要注册成员集群 推荐 Push 模式注册 控制面主动推送 子集群 karmadactl join 命令注册加入"
+}
+
+# 安装Jenkins服务
+install_jenkins() {
+    log_info "开始安装 Jenkins 服务..."
+    # 配置变量
+    JENKINS_NAMESPACE=${1:-"jenkins"}
+    HELM_RELEASE_NAME="k8s-jenkins"
+    CHART_VERSION="5.8.142"  # 指定版本号，建议固定版本
+    
+    # 检查 Helm 是否安装
+    if ! command -v helm &> /dev/null; then
+        log_error "错误: Helm 未安装，请先安装 Helm"
+        log_error "安装命令: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash"
+        exit 1
+    fi
+    
+    # 检查 kubectl 是否安装
+    if ! command -v kubectl &> /dev/null; then
+        log_error "错误: kubectl 未安装"
+        exit 1
+    fi
+    
+    # 添加 Jenkins Helm 仓库
+    log_info "正在添加 Jenkins Helm 仓库..."
+    helm repo add jenkins https://charts.jenkins.io
+    helm repo update
+    
+    # 创建命名空间（如果不存在）
+    log_info "创建命名空间: ${JENKINS_NAMESPACE}"
+    kubectl create namespace "${JENKINS_NAMESPACE}" 2>/dev/null || true
+    
+    # 安装 Jenkins
+    log_info "Helm 正在安装 Jenkins..."
+    helm upgrade --install "${HELM_RELEASE_NAME}" \
+        jenkins/jenkins \
+        --namespace "${JENKINS_NAMESPACE}" \
+        --version "${CHART_VERSION}" \
+        --set controller.installPlugins=false \
+        --set controller.adminUser=admin \
+        --set controller.adminPassword=admin@0633 \
+        --set controller.serviceType=LoadBalancer \
+        --wait
+    
+    # 等待 Pod 就绪
+    log_info "等待 Jenkins Pod 启动..."
+    kubectl wait --namespace "${JENKINS_NAMESPACE}" \
+        --for=condition=ready pod \
+        --selector=app.kubernetes.io/component=jenkins-controller \
+        --timeout=300s
+    
+    # 获取访问信息
+    log_info "获取 Jenkins 访问信息..."
+    JENKINS_URL=$(kubectl get svc --namespace "${JENKINS_NAMESPACE}" "${HELM_RELEASE_NAME}" -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+    if [ -z "$JENKINS_URL" ]; then
+        JENKINS_URL=$(kubectl get svc --namespace "${JENKINS_NAMESPACE}" "${HELM_RELEASE_NAME}" -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+    fi
+    JENKINS_PORT=$(kubectl get svc --namespace "${JENKINS_NAMESPACE}" "${HELM_RELEASE_NAME}" -o jsonpath='{.spec.ports[0].port}')
+    
+    echo "========================================"
+    log_info "Jenkins 安装完成 ✅"
+    echo "访问地址: http://${JENKINS_URL:-"等待 LoadBalancer 分配IP..."}:${JENKINS_PORT:-8080}"
+    echo "用户名: admin"
+    echo "密码: admin@0633"
+    echo ""
+    log_warn "获取管理员密码（如果忘记）:"
+    echo "kubectl exec --namespace ${JENKINS_NAMESPACE} --stdin --tty svc/${HELM_RELEASE_NAME} -- cat /run/secrets/additional/chart-admin-password"
+    echo "========================================"
 }
 
 # 设置HTTP代理
@@ -1328,10 +1396,11 @@ main_menu() {
     echo "  11) 安装 Ingress Controller 路由控制组件"
     echo "  12) 安装 Prometheus与Grafana 监控组件"
     echo "  13) 安装 Karmada 多云联邦集群管理 - Master 集群"
-    echo "  14) 设置HTTP代理地址 访问国外资源"
+    echo "  15) 安装 Jenkins CI/CD 服务"
+    echo "  16) 设置HTTP代理地址 访问国外资源"
     echo "  0) 退出"
     echo ""
-    read -p "请输入选项 [0-14]: " choice
+    read -p "请输入选项 [0-16]: " choice
 
     case $choice in
         1)
@@ -1374,7 +1443,10 @@ main_menu() {
         13)
             install_karmada
             ;;
-        14)
+        15)
+            install_jenkins
+            ;;
+        16)
             http_proxy_set
             ;;
         0)
