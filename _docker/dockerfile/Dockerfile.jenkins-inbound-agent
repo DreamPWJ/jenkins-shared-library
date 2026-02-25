@@ -1,4 +1,4 @@
-FROM docker.m.daocloud.io/jenkins/inbound-agent:latest
+FROM docker.lanneng.tech/jenkins/inbound-agent:latest
 
 USER root
 
@@ -18,5 +18,5 @@ USER jenkins
 
 
 # 镜像构建 并上传到镜像仓库
-# docker build -t panweiji/jenkins-agent:latest -f /my/Dockerfile.jenkins-inbound-agent . --no-cache
-# docker push docker.m.daocloud.io/panweiji/jenkins-agent:latest
+# docker build -t docker.lanneng.tech/panweiji/jenkins-agent:latest -f /my/Dockerfile.jenkins-inbound-agent . --no-cache
+# docker push docker.lanneng.tech/panweiji/jenkins-agent:latest

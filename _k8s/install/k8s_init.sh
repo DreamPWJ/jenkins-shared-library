@@ -1166,7 +1166,7 @@ EOF
 # Karmada 联邦集群安装
 install_karmada() {
     # 指定版本
-    local karmada_version=v1.16.0
+    local karmada_version=v1.16.2
     log_info "开始安装 Karmada ${karmada_version} 多云联邦集群 实现异地多活容灾和同城两中心等高可用 ..."
 
     # 安装 karmadactl
@@ -1306,13 +1306,13 @@ main_menu() {
     echo "  3) 多机模式 - Worker 节点"
     echo "  4) 仅安装基础组件(不初始化集群)"
     echo "  5) 诊断现有集群问题"
-    echo "  6) 安装Helm包管理"
-    echo "  7) 安装Cert Manager自动化证书组件"
-    echo "  8) 安装Metrics Server与Node Exporter监控运维组件"
-    echo "  9) 安装Gateway API网关与Envoy Gateway组件"
-    echo "  10) 安装MetalLB负载均衡组件"
-    echo "  11) 安装Ingress Controller路由控制组件"
-    echo "  12) 安装Prometheus与Grafana监控组件"
+    echo "  6) 安装 Helm 包管理"
+    echo "  7) 安装 Cert Manager 自动化证书组件"
+    echo "  8) 安装 Metrics Server与Node Exporter 监控运维组件"
+    echo "  9) 安装 Gateway API网关与Envoy Gateway 组件"
+    echo "  10) 安装 MetalLB 负载均衡组件"
+    echo "  11) 安装 Ingress Controller 路由控制组件"
+    echo "  12) 安装 Prometheus与Grafana 监控组件"
     echo "  13) 安装 Karmada 多云联邦集群管理"
     echo "  14) 设置HTTP代理地址 访问国外资源"
     echo "  0) 退出"
