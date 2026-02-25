@@ -1165,16 +1165,34 @@ EOF
 
 # Karmada 联邦集群安装
 install_karmada() {
-    # 指定版本
+    # 参数定义
     local karmada_version=v1.16.2
+    local karmada_namespace="karmada-system"
+    local host_cluster_kubeconfig=~/.kube/config
+
     log_info "开始安装 Karmada ${karmada_version} 多云联邦集群 实现异地多活容灾和同城两中心等高可用 ..."
 
-    # 安装 karmadactl
-    curl -s https://raw.githubusercontent.com/karmada-io/karmada/master/hack/install-cli.sh | sudo bash
+#    # 官方安装 karmadactl
+#    curl -s https://raw.githubusercontent.com/karmada-io/karmada/master/hack/install-cli.sh | sudo bash
+#
+#    curl -LO "https://github.com/karmada-io/karmada/releases/download/${karmada_version}/karmadactl-linux-amd64.tgz"
+#    tar -zxvf karmadactl-linux-amd64.tgz
+#    sudo mv karmadactl /usr/local/bin/
 
-    curl -LO "https://github.com/karmada-io/karmada/releases/download/${karmada_version}/karmadactl-linux-amd64.tgz"
-    tar -zxvf karmadactl-linux-amd64.tgz
-    sudo mv karmadactl /usr/local/bin/
+    # 添加 Helm 仓库
+    helm repo add karmada-charts https://raw.githubusercontent.com/karmada-io/karmada/master/charts
+    helm repo update
+
+    # 安装 Karmada
+    helm install karmada karmada-charts/karmada \
+      --namespace ${karmada_namespace} \
+      --create-namespace \
+      --set apiServer.hostNetwork=false \
+      --set apiServer.serviceType=NodePort \
+      --kubeconfig=${host_cluster_kubeconfig} \
+      --wait
+
+    kubectl get pods -n ${karmada_namespace}
 
     log_info "Karmada 联邦集群安装完成 ✅"
     karmadactl version
@@ -1217,12 +1235,10 @@ http_proxy_set() {
     -l 1080 \
     -k HKD1aXRb5pgg \
     -m chacha20-ietf-poly1305 \
-    >/dev/null 2>&1 &
+    >/dev/null 2>&1
 
     # 全局代理  细分流量请使用clash等工具
-    export ALL_PROXY=socks5h://127.0.0.1:1080
-    export http_proxy=socks5h://127.0.0.1:1080
-    export https_proxy=socks5h://127.0.0.1:1080
+    export ALL_PROXY=socks5h://127.0.0.1:1080 && export http_proxy=socks5h://127.0.0.1:1080 && export https_proxy=socks5h://127.0.0.1:1080
 
     log_info "HTTP 代理或ShadowSocks配置已设置完成"
     echo $http_proxy
@@ -1233,9 +1249,7 @@ http_proxy_set() {
 }
 # 关闭代理
 http_proxy_unset() {
-    unset https_proxy
-    unset http_proxy
-    unset ALL_PROXY
+    unset https_proxy && unset http_proxy && unset ALL_PROXY
     log_info "HTTP代理已关闭"
 }
 
