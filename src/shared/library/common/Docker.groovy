@@ -373,16 +373,21 @@ export DOCKER_REGISTRY_MIRROR='https://docker.m.daocloud.io,https://docker.1ms.r
         if (cacheDockerParams && cacheDockerParams != null) {
             return cacheDockerParams
         } else {
-            def percentage = 0.9 // 最大使用多少百分比资源 防止系统整体负载过高全部挂掉
-            def cpuCount = Utils.getCPUCount(ctx)
-            def memorySize = Utils.getMemorySize(ctx)
-            def cpuPercentage = Integer.parseInt(cpuCount) * percentage
-            def memoryPercentage = Math.floor(Integer.parseInt(memorySize) * percentage) + "m"
+            try {
+                def percentage = 0.9 // 最大使用多少百分比资源 防止系统整体负载过高全部挂掉
+                def cpuCount = Utils.getCPUCount(ctx)
+                def memorySize = Utils.getMemorySize(ctx)
+                def cpuPercentage = Integer.parseInt(cpuCount) * percentage
+                def memoryPercentage = Math.floor(Integer.parseInt(memorySize) * percentage) + "m"
 
-            def dockerParams = " --cpus=${cpuPercentage}" + " -m ${memoryPercentage} "
-            // 因机器资源基本固定和构建提高性能 可缓存计算数据
-            GlobalCache.set(cacheDockerKey, dockerParams, 7 * 24 * 60)
-            return dockerParams
+                def dockerParams = " --cpus=${cpuPercentage}" + " -m ${memoryPercentage} "
+                // 因机器资源基本固定和构建提高性能 可缓存计算数据
+                GlobalCache.set(cacheDockerKey, dockerParams, 7 * 24 * 60)
+                return dockerParams
+
+            } catch (error) {
+                ctx.println("服务器资源计算失败: " + error.getMessage())
+            }
         }
     }
 

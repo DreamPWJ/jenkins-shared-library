@@ -71,8 +71,9 @@ if command -v docker >/dev/null 2>&1; then
     docker rm -f $(docker ps -aq) 2>/dev/null || true
     log_info "docker 容器已删除"
     log_info "完全卸载 Docker..."
-    apt-get remove -y docker docker-engine docker.io containerd runc docker-ce docker-ce-cli containerd.io 2>/dev/null || true
-    apt-get purge -y docker docker-engine docker.io containerd runc docker-ce docker-ce-cli containerd.io 2>/dev/null || true
+    sudo systemctl stop docker || true
+    apt-get remove -y docker docker-engine docker.io containerd runc docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin 2>/dev/null || true
+    apt-get purge -y docker docker-engine docker.io containerd runc docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin 2>/dev/null || true
     apt-get autoremove -y 2>/dev/null || true
     log_info "✓ Docker 已卸载"
     log_info "清理 Docker 遗留数据..."

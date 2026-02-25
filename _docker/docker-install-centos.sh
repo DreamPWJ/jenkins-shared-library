@@ -61,7 +61,8 @@ if [[ "$OS" =~ ^(centos|rhel|rocky|almalinux)$ ]]; then
   fi
 else
   echo "[WARN] 非 RHEL/CentOS 系，尝试 get.docker.com 安装"
-  curl -fsSL https://get.docker.com | sh || sudo yum install -y docker-ce
+  curl -fsSL https://get.docker.com | sh || true
+  sudo yum install -y docker-ce
 fi
 
 echo "启动Docker并加入开机自启动"
@@ -106,7 +107,7 @@ echo "Docker版本 验证安装是否成功 "
 docker version
 
 if [[ $(command -v docker) ]]; then
-  echo -e "\033[32mDocker安装成功 ✔ \033[0m"
+  echo -e "\033[32mDocker安装成功 ✅ \033[0m"
 else
   echo -e "\033[31mDocker安装失败 ❌ \033[0m"
   exit 1
