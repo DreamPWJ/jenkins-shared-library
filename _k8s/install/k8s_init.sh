@@ -457,6 +457,7 @@ init_master() {
     # 初始化集群
     echo ""
     log_info "自动执行K8S集群初始化(可能需要几分钟)..."
+    # 多Master节点  --control-plane-endpoint "vip:6443" 多 master节点需要 Keepalived + HAProxy做LB负载均衡
     kubeadm init --config=/tmp/kubeadm-config.yaml --upload-certs || error_exit "K8S集群初始化失败"
 
     # 配置 kubectl
@@ -1387,8 +1388,8 @@ main_menu() {
     echo "=========================================="
     echo ""
     log_info "请选择K8s部署模式:"
-    echo "  1) 单机模式 (Single Node)"
-    echo "  2) 多机模式 - Master 节点"
+    echo "  1) 单机模式 - 单 Master和Worker 节点"
+    echo "  2) 多机模式 - 单 Master 节点"
     echo "  3) 多机模式 - Worker 节点"
     echo "  4) 仅安装基础组件(不初始化集群)"
     echo "  5) 诊断现有集群问题"
