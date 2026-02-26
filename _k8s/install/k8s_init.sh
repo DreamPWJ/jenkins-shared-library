@@ -8,7 +8,7 @@
 set -e
 
 # 版本配置参数
-K8S_VERSION="1.33.7"
+K8S_VERSION="1.33.8"
 #CONTAINERD_VERSION="1.7.30"
 CALICO_VERSION="v3.31.3"
 COREDNS_VERSION="v1.13.2"
@@ -1223,6 +1223,7 @@ install_karmada() {
 }
 
 # 安装Jenkins服务
+# shellcheck disable=SC2120
 install_jenkins() {
     # 配置变量
     JENKINS_NAMESPACE=${1:-"jenkins"}
