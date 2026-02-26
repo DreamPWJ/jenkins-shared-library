@@ -451,7 +451,6 @@ EOF
 init_master() {
     # 生成 kubeadm 配置文件
     gen_kubeadm_config
-
     # 提前拉取镜像
     prefetch_images
 
@@ -1327,7 +1326,9 @@ http_proxy_unset() {
 # 生成 Worker 节点加入命令
 generate_join_command() {
     log_info "生成 K8s Worker 节点加入Master集群命令..."
-
+    # master加入master节点 示例 kubeadm join <API-Server-IP:Port> --token <Token> --discovery-token-ca-cert-hash <Hash> --control-plane --certificate-key <Certificate-Key>
+    # local master_join_command=$(kubeadm token create --print-join-command --certificate-key $(kubeadm init phase upload-certs --upload-certs | tail -1))
+    # work加入master节点  示例  kubeadm join 192.168.1.100:6443 --token xxxxxx --discovery-token-ca-cert-hash sha256:xxxxxx
     local join_command=$(kubeadm token create --print-join-command)
 
     log_info "=========================================="
