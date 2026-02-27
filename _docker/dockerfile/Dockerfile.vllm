@@ -2,7 +2,7 @@
 # Version 1.0.0
 # Description: 自定义构建VLLM大模型引擎版本和CUDA版本
 
-FROM nvidia/cuda:12.4.1-runtime-ubuntu24.04
+FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
