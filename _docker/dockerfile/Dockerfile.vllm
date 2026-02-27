@@ -17,7 +17,7 @@ RUN pip install --upgrade pip
 #    --index-url https://download.pytorch.org/whl/cu124
 
 # 安装 vllm
-RUN pip install vllm==0.15.1
+RUN pip install vllm==0.15.1 -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 
 WORKDIR /workspace
 

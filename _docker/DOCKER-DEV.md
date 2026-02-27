@@ -91,7 +91,7 @@ docker pull ghcr.io/open-webui/open-webui:main
 
 ##### VLLM高性能部署大模型
 docker run -d --restart=always -p 8008:8000 --name deepseek-vllm --gpus all --shm-size=1g -v /my/deepseek/cache:/root/.cache/huggingface -e HF_ENDPOINT=https://hf-mirror.com  \
-vllm/vllm-openai:latest --model deepseek-ai/DeepSeek-R1-Distill-Qwen-7B --trust-remote-code --host 0.0.0.0 --port 8000 --gpu-memory-utilization 0.5 --dtype half --max-model-len 8192
+panweiji/vllm --model deepseek-ai/DeepSeek-R1-Distill-Qwen-7B --trust-remote-code --host 0.0.0.0 --port 8000 --gpu-memory-utilization 0.5 --dtype half --max-model-len 8192
 ##### Ollama只有CPU模式部署
 docker run -d --restart always -p 11434:11434 --cpus=8 -m 16096m -v /my/ollama:/root/.ollama --name ollama ollama/ollama
 docker exec -it ollama  ollama run deepseek-r1:7b
