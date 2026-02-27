@@ -28,4 +28,4 @@ WORKDIR /workspace
 
 # 启动运行
 #docker run -d --restart=always -p 8008:8000 --name deepseek-vllm --gpus all --shm-size=1g -v /my/deepseek/cache:/root/.cache/huggingface -e HF_ENDPOINT=https://hf-mirror.com  \
-#panweiji/vllm:latest python -m vllm.entrypoints.openai.api_server --model deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --trust-remote-code --host 0.0.0.0 --port 8000 --gpu-memory-utilization 0.3 --dtype half --max-model-len 4096
+#panweiji/vllm:latest python -m vllm.entrypoints.openai.api_server --model deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --trust-remote-code --host 0.0.0.0 --port 8000 --gpu-memory-utilization 0.1 --dtype half --max-model-len 4096
