@@ -1400,7 +1400,7 @@ main_menu() {
     echo "  10) 安装 MetalLB 负载均衡组件"
     echo "  11) 安装 Ingress Controller 路由控制组件"
     echo "  12) 安装 Prometheus与Grafana 监控组件"
-    echo "  13) 安装 Karmada 多云联邦集群管理 - Master 集群"
+    echo "  13) 安装 Karmada或Rancher 多云联邦集群管理 - Master 集群"
     echo "  15) 安装 Jenkins CI/CD 服务"
     echo "  16) 设置HTTP代理地址 访问国外资源"
     echo "  0) 退出"
