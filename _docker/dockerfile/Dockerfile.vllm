@@ -14,7 +14,7 @@ RUN pip install --upgrade pip
 
 # 安装 CUDA 12.4 对应 torch
 #RUN pip install torch==2.2.2+cu124 torchvision==0.17.2+cu124 \
-#    --index-url https://download.pytorch.org/whl/cu124
+#    --index-url https://download.pytorch.org/whl/cu124 -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 
 # 安装 vllm
 RUN pip install vllm==0.15.1 -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
