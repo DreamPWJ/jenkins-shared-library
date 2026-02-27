@@ -1,0 +1,27 @@
+# Author: 潘维吉
+# Version 1.0.0
+# Description: 自定义构建VLLM大模型引擎版本和CUDA版本
+
+FROM nvidia/cuda:12.4.1-runtime-ubuntu24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt update && apt install -y \
+    python3 python3-pip git && \
+    ln -s /usr/bin/python3 /usr/bin/python
+
+RUN pip install --upgrade pip
+
+# 安装 CUDA 12.4 对应 torch
+RUN pip install torch==2.2.2+cu124 torchvision==0.17.2+cu124 \
+    --index-url https://download.pytorch.org/whl/cu124
+
+# 安装 vllm
+RUN pip install vllm==0.16.0
+
+WORKDIR /workspace
+
+
+# 镜像构建 并上传到镜像仓库
+# docker build -t panweiji/vllm:latest -f /my/Dockerfile.vllm . --no-cache
+# docker push panweiji/vllm:latest
