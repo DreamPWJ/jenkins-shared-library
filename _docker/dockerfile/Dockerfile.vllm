@@ -13,11 +13,11 @@ RUN apt update && apt install -y \
 RUN pip install --upgrade pip
 
 # 安装 CUDA 12.4 对应 torch
-RUN pip install torch==2.2.2+cu124 torchvision==0.17.2+cu124 \
-    --index-url https://download.pytorch.org/whl/cu124
+#RUN pip install torch==2.2.2+cu124 torchvision==0.17.2+cu124 \
+#    --index-url https://download.pytorch.org/whl/cu124
 
 # 安装 vllm
-RUN pip install vllm==0.16.0
+RUN pip install vllm==0.15.1
 
 WORKDIR /workspace
 
