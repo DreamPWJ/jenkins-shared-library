@@ -20,7 +20,7 @@ ARG MVND_VERSION
 
 # 安装基础工具
 RUN yum update -y && \
-    yum install -y wget tar zip unzip gzip which bash coreutils
+    yum install -y wget tar zip unzip gzip which bash
 # 确保 bash 和 sh 存在
 RUN ln -sf /bin/bash /bin/sh
 
