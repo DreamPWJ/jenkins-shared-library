@@ -1398,12 +1398,8 @@ def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
         // 动态切换Maven内的对应的JDK版本
         Java.switchJDKByJenv(this, "${JDK_VERSION}")
     }
-    sh "mvn --version" // 打印Maven与JDK版本用于调试
-    sh "maven --version" // 打印Maven与JDK版本用于调试
-    sh "${mavenCommandType} --version" // 打印Maven与JDK版本用于调试
-    sh " which sh "
+    // sh "${mavenCommandType} --version" // 打印Maven与JDK版本用于调试
     dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
-        println("执行3 ")
         // 自动替换不同分布式部署节点的环境文件  deployNum部署节点数
         Deploy.replaceEnvFile(this, deployNum)
         // maven如果存在多级目录 一级目录设置
