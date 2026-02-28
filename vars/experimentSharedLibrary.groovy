@@ -815,7 +815,7 @@ def futureLab(map) {
             "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}", false)
 
     docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-
+        println("执行容器服务")
         sh "mvnd --version"
         // sh "mvn --version"
         sh "java --version"
