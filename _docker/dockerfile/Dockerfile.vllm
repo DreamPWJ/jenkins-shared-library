@@ -2,7 +2,7 @@
 # Version 1.0.0
 # Description: 自定义构建VLLM大模型引擎版本和CUDA版本
 
-FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
+FROM nvidia/cuda:12.9.1-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -12,12 +12,12 @@ RUN apt update && apt install -y \
 
 RUN pip install --upgrade pip
 
-# 安装 CUDA 12.4 对应 torch
+# 安装 CUDA 12.4 对应 pytorch
 #RUN pip install torch==2.2.2+cu124 torchvision==0.17.2+cu124 \
 #    --index-url https://download.pytorch.org/whl/cu124 -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 
 # 安装 vllm
-RUN pip install vllm==0.15.1 -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+RUN pip install vllm==0.16.0 -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 
 WORKDIR /workspace
 
@@ -27,5 +27,5 @@ WORKDIR /workspace
 # docker push panweiji/vllm:latest
 
 # 启动运行
-#docker run -d --restart=always -p 8008:8000 --name deepseek-vllm --gpus all --shm-size=1g -v /my/deepseek/cache:/root/.cache/huggingface -e HF_ENDPOINT=https://hf-mirror.com  \
-#panweiji/vllm:latest python -m vllm.entrypoints.openai.api_server --model deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --trust-remote-code --host 0.0.0.0 --port 8000 --gpu-memory-utilization 0.3 --dtype half --max-model-len 20048
+#docker run -d --restart=always -p 8008:8000 --name panweiji-deepseek-vllm --gpus all --shm-size=1g -v /my/deepseek/cache:/root/.cache/huggingface -e HF_ENDPOINT=https://hf-mirror.com  \
+#panweiji/vllm:latest python -m vllm.entrypoints.openai.api_server --model deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --trust-remote-code --host 0.0.0.0 --port 8000 --gpu-memory-utilization 0.3 --dtype half --max-model-len 2048
