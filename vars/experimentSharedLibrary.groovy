@@ -816,9 +816,10 @@ def futureLab(map) {
 
     docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
         println("执行容器服务")
-        sh "mvnd --version"
-        // sh "mvn --version"
+        sh "pwd"
         sh "java --version"
+        sh "mvn --version"
+        sh "mvnd --version"
 
         //sh "mvnd clean install -T 4C -Dmvnd.threads=8 -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvn clean install  -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
