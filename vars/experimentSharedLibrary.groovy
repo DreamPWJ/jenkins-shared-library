@@ -812,10 +812,11 @@ def futureLab(map) {
     def dockerImageName = "panweiji/maven-jdk"
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.maven-jdk", dockerImageName, dockerImageTag,
-            "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}", true)
+            "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}", false)
 
     docker.image("${dockerImageName}:${dockerImageTag}").inside("-u root --entrypoint='' -v /var/cache/maven/.m2:/root/.m2") {
         println("执行容器服务")
+        sh "/bin/sh -c 'mvn --version'"
         sh "java --version"
         sh "mvn --version"
         sh "mvnd --version"
