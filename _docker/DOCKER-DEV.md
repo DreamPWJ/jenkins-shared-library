@@ -132,7 +132,9 @@ systemctl restart openvpn-server@server.service
 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 #### Docker容器数据迁移部署说明
-rsync -avzP root@192.168.1.100:/source/jenkins/ /target/jenkins/ && rm -rf /my/jenkins/workflow-libs && rm -rf /my/jenkins/caches
+rsync -avzP root@192.168.1.100:/source/jenkins/ /target/jenkins/ 
+rsync -avzP root@192.168.1.100:/var/cache/maven/.m2 /var/cache/maven/.m2 
+rm -rf /my/jenkins/workflow-libs && rm -rf /my/jenkins/caches
 
 tar -zcvf my.tar.gz /my
 - 本地复制到远程 scp -r my.tar.gz root@ip:/
