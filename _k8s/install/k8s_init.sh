@@ -8,7 +8,7 @@
 set -e
 
 # 版本配置参数
-K8S_VERSION="1.33.7"
+K8S_VERSION="1.33.8"
 #CONTAINERD_VERSION="1.7.30"
 CALICO_VERSION="v3.31.3"
 COREDNS_VERSION="v1.13.2"
@@ -451,13 +451,13 @@ EOF
 init_master() {
     # 生成 kubeadm 配置文件
     gen_kubeadm_config
-
     # 提前拉取镜像
     prefetch_images
 
     # 初始化集群
     echo ""
     log_info "自动执行K8S集群初始化(可能需要几分钟)..."
+    # 多Master节点  --control-plane-endpoint "vip:6443" 多 master节点需要 Keepalived + HAProxy做LB负载均衡
     kubeadm init --config=/tmp/kubeadm-config.yaml --upload-certs || error_exit "K8S集群初始化失败"
 
     # 配置 kubectl
@@ -1165,16 +1165,34 @@ EOF
 
 # Karmada 联邦集群安装
 install_karmada() {
-    # 指定版本
+    # 参数定义
     local karmada_version=v1.16.2
+    local karmada_namespace="karmada-system"
+    local host_cluster_kubeconfig=~/.kube/config
+
     log_info "开始安装 Karmada ${karmada_version} 多云联邦集群 实现异地多活容灾和同城两中心等高可用 ..."
 
-    # 安装 karmadactl
+    # 官方安装 karmadactl
     curl -s https://raw.githubusercontent.com/karmada-io/karmada/master/hack/install-cli.sh | sudo bash
 
     curl -LO "https://github.com/karmada-io/karmada/releases/download/${karmada_version}/karmadactl-linux-amd64.tgz"
     tar -zxvf karmadactl-linux-amd64.tgz
     sudo mv karmadactl /usr/local/bin/
+
+    # 添加 Helm 仓库
+#    helm repo add karmada-charts https://raw.githubusercontent.com/karmada-io/karmada/master/charts
+#    helm repo update
+#
+#    # 安装 Karmada
+#    helm install karmada karmada-charts/karmada \
+#      --namespace ${karmada_namespace} \
+#      --create-namespace \
+#      --set apiServer.hostNetwork=false \
+#      --set apiServer.serviceType=NodePort \
+#      --kubeconfig=${host_cluster_kubeconfig} \
+#      --wait
+
+    kubectl get pods -n ${karmada_namespace}
 
     log_info "Karmada 联邦集群安装完成 ✅"
     karmadactl version
@@ -1201,7 +1219,78 @@ install_karmada() {
     kubectl get node --kubeconfig=/etc/karmada/karmada-apiserver.config
     
     log_info "Karmada 多集群中心控制面初始化完成 ✅"
-    log_warn "Karmada 需要注册成员集群 推荐 Push 模式注册 控制面主动推送 子集群 karmadactl join 命令加入"
+    log_warn "Karmada 需要注册成员集群 推荐 Push 模式注册 控制面主动推送 子集群 karmadactl join 命令注册加入"
+}
+
+# 安装Jenkins服务
+# shellcheck disable=SC2120
+install_jenkins() {
+    # 配置变量
+    JENKINS_NAMESPACE=${1:-"jenkins"}
+    HELM_RELEASE_NAME="k8s-jenkins"
+    CHART_VERSION="5.8.142"  # 指定版本号，建议固定版本
+
+    log_info "开始安装 Jenkins ${CHART_VERSION} CI/CD 服务..."
+
+    # 检查 Helm 是否安装
+    if ! command -v helm &> /dev/null; then
+        log_error "错误: Helm 未安装，请先安装 Helm"
+        log_error "安装命令: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash"
+        exit 1
+    fi
+    
+    # 检查 kubectl 是否安装
+    if ! command -v kubectl &> /dev/null; then
+        log_error "错误: kubectl 未安装"
+        exit 1
+    fi
+    
+    # 添加 Jenkins Helm 仓库
+    log_info "正在添加 Jenkins Helm 仓库..."
+    helm repo add jenkins https://charts.jenkins.io
+    helm repo update
+    
+    # 创建命名空间（如果不存在）
+    log_info "创建命名空间: ${JENKINS_NAMESPACE}"
+    kubectl create namespace "${JENKINS_NAMESPACE}" 2>/dev/null || true
+    
+    # 安装 Jenkins
+    log_info "Helm 正在安装 Jenkins..."
+    helm upgrade --install "${HELM_RELEASE_NAME}" \
+        jenkins/jenkins \
+        --namespace "${JENKINS_NAMESPACE}" \
+        --version "${CHART_VERSION}" \
+        --set controller.installPlugins=false \
+        --set controller.admin.username=admin \
+        --set controller.admin.password=admin@0633 \
+        --set controller.serviceType=LoadBalancer \
+        --timeout 1200s \
+        --wait
+    
+    # 等待 Pod 就绪
+    log_info "等待 Jenkins Pod 启动..."
+    kubectl wait --namespace "${JENKINS_NAMESPACE}" \
+        --for=condition=ready pod \
+        --selector=app.kubernetes.io/component=jenkins-controller \
+        --timeout=300s
+    
+    # 获取访问信息
+    log_info "获取 Jenkins 访问信息..."
+    JENKINS_URL=$(kubectl get svc --namespace "${JENKINS_NAMESPACE}" "${HELM_RELEASE_NAME}" -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+    if [ -z "$JENKINS_URL" ]; then
+        JENKINS_URL=$(kubectl get svc --namespace "${JENKINS_NAMESPACE}" "${HELM_RELEASE_NAME}" -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+    fi
+    JENKINS_PORT=$(kubectl get svc --namespace "${JENKINS_NAMESPACE}" "${HELM_RELEASE_NAME}" -o jsonpath='{.spec.ports[0].port}')
+    
+    echo "========================================"
+    log_info "Jenkins 安装完成 ✅"
+    echo "访问地址: http://${JENKINS_URL:-"等待 LoadBalancer 分配IP..."}:${JENKINS_PORT:-8080}"
+    echo "用户名: admin"
+    echo "密码: admin@0633"
+    echo ""
+    log_warn "获取管理员密码（如果忘记）:"
+    echo "kubectl exec --namespace ${JENKINS_NAMESPACE} --stdin --tty svc/${HELM_RELEASE_NAME} -- cat /run/secrets/additional/chart-admin-password"
+    echo "========================================"
 }
 
 # 设置HTTP代理
@@ -1217,12 +1306,10 @@ http_proxy_set() {
     -l 1080 \
     -k HKD1aXRb5pgg \
     -m chacha20-ietf-poly1305 \
-    >/dev/null 2>&1 &
+    >/dev/null 2>&1
 
     # 全局代理  细分流量请使用clash等工具
-    export ALL_PROXY=socks5h://127.0.0.1:1080
-    export http_proxy=socks5h://127.0.0.1:1080
-    export https_proxy=socks5h://127.0.0.1:1080
+    export ALL_PROXY=socks5h://127.0.0.1:1080 && export http_proxy=socks5h://127.0.0.1:1080 && export https_proxy=socks5h://127.0.0.1:1080
 
     log_info "HTTP 代理或ShadowSocks配置已设置完成"
     echo $http_proxy
@@ -1233,16 +1320,16 @@ http_proxy_set() {
 }
 # 关闭代理
 http_proxy_unset() {
-    unset https_proxy
-    unset http_proxy
-    unset ALL_PROXY
+    unset https_proxy && unset http_proxy && unset ALL_PROXY
     log_info "HTTP代理已关闭"
 }
 
 # 生成 Worker 节点加入命令
 generate_join_command() {
     log_info "生成 K8s Worker 节点加入Master集群命令..."
-
+    # master加入master节点 示例 kubeadm join <API-Server-IP:Port> --token <Token> --discovery-token-ca-cert-hash <Hash> --control-plane --certificate-key <Certificate-Key>
+    # local master_join_command=$(kubeadm token create --print-join-command --certificate-key $(kubeadm init phase upload-certs --upload-certs | tail -1))
+    # work加入master节点  示例  kubeadm join 192.168.1.100:6443 --token xxxxxx --discovery-token-ca-cert-hash sha256:xxxxxx
     local join_command=$(kubeadm token create --print-join-command)
 
     log_info "=========================================="
@@ -1300,9 +1387,9 @@ main_menu() {
     echo "   版本: K8s ${K8S_VERSION}"
     echo "=========================================="
     echo ""
-    echo "请选择K8s部署模式:"
-    echo "  1) 单机模式 (Single Node)"
-    echo "  2) 多机模式 - Master 节点"
+    log_info "请选择K8s部署模式:"
+    echo "  1) 单机模式 - 单 Master和Worker 节点"
+    echo "  2) 多机模式 - 单 Master 节点"
     echo "  3) 多机模式 - Worker 节点"
     echo "  4) 仅安装基础组件(不初始化集群)"
     echo "  5) 诊断现有集群问题"
@@ -1313,11 +1400,12 @@ main_menu() {
     echo "  10) 安装 MetalLB 负载均衡组件"
     echo "  11) 安装 Ingress Controller 路由控制组件"
     echo "  12) 安装 Prometheus与Grafana 监控组件"
-    echo "  13) 安装 Karmada 多云联邦集群管理"
-    echo "  14) 设置HTTP代理地址 访问国外资源"
+    echo "  13) 安装 Karmada或Rancher 多云联邦集群管理 - Master 集群"
+    echo "  15) 安装 Jenkins CI/CD 服务"
+    echo "  16) 设置HTTP代理地址 访问国外资源"
     echo "  0) 退出"
     echo ""
-    read -p "请输入选项 [0-14]: " choice
+    read -p "请输入选项 [0-16]: " choice
 
     case $choice in
         1)
@@ -1360,7 +1448,10 @@ main_menu() {
         13)
             install_karmada
             ;;
-        14)
+        15)
+            install_jenkins
+            ;;
+        16)
             http_proxy_set
             ;;
         0)

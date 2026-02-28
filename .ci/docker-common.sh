@@ -156,16 +156,18 @@ function get_disk_space() {
     # 获取总的可用空间（单位GB） 获取根目录  df -h  / 命令
     TOTAL_FREE=$(df -h  / | awk '/\// {print $4}' | sed 's/G//')
 
-    # 将KB转换成GB（如果需要的话）
+    # 各单位转换成GB
     if [[ $TOTAL_FREE =~ ^[0-9]+\.[0-9]+K ]]; then
         TOTAL_FREE=$(echo "scale=2; $TOTAL_FREE / 1024" | bc)
     elif [[ $TOTAL_FREE =~ ^[0-9]+\.[0-9]+M ]]; then
         TOTAL_FREE=$(echo "scale=2; $TOTAL_FREE / 1024 / 1024" | bc)
+    elif [[ $TOTAL_FREE =~ ^[0-9]+\.[0-9]+T$ ]]; then
+         TOTAL_FREE=$(echo "scale=2; ${TOTAL_FREE%T} * 1024" | bc)
     fi
-    # 小于G 会显示M
+    # 剩余空间
     echo " Free space is $TOTAL_FREE GB! "
 
-    # 判断可用空间是否低于最小需求  包含MB或KB单位终止部署
+    # 判断可用空间是否低于最小需求
      if [[ "$TOTAL_FREE" =~ [MK] ]]; then
          echo -e "\033[31m当前系统磁盘空间严重不足 ❌ , 剩余空间: $TOTAL_FREE, 会导致Docker镜像拉取或构建失败, 请先清理空间资源后重新构建  \033[0m"
          exit 1 # 在子 shell 中执行 exit，那么它只会退出子 shell 而不会影响父 shell 或整个脚本

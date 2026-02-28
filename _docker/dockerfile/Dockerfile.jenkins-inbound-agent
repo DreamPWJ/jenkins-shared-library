@@ -1,3 +1,7 @@
+# Author: 潘维吉
+# Version 1.0.0
+# Description: 自定义构建Jenkins Inbound Agent镜像使用K8S构建部署
+
 FROM docker.lanneng.tech/jenkins/inbound-agent:latest
 
 USER root

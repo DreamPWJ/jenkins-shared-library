@@ -70,7 +70,9 @@ sudo -i
 sudo vgdisplay
 sudo lvcreate -l 100%FREE -n data-lv  ubuntu-vg # 创建逻辑卷
 #sudo lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv # 扩展逻辑卷 已有逻辑卷有Free PE/Size空间
-sudo mkfs.xfs /dev/ubuntu-vg/data-lv # 格式化逻辑卷
+sudo mkfs.xfs /dev/ubuntu-vg/data-lv    # xfs格式化逻辑卷
+sudo resize2fs /dev/ubuntu-vg/data-lv   # ext4格式化逻辑卷
+
 # 临时挂载
 sudo mkdir /data
 sudo mount /dev/ubuntu-vg/data-lv /data
