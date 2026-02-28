@@ -1393,13 +1393,13 @@ def nodeBuildProject(map) {
  * Maven编译构建
  */
 def mavenBuildProject(map, deployNum = 0, mavenType = "mvn") {
-    println("执行1 ")
     def mavenCommandType = mavenType // 构建引擎类型
     if (IS_DOCKER_BUILD == false) { // 宿主机环境情况
         // 动态切换Maven内的对应的JDK版本
         Java.switchJDKByJenv(this, "${JDK_VERSION}")
     }
-    println("执行2 ")
+    sh "mvn --version" // 打印Maven与JDK版本用于调试
+    sh "maven --version" // 打印Maven与JDK版本用于调试
     sh "${mavenCommandType} --version" // 打印Maven与JDK版本用于调试
     sh " which sh "
     dir("${env.WORKSPACE}/${GIT_PROJECT_FOLDER_NAME}") { // 源码在特定目录下
