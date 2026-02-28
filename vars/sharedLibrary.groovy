@@ -357,7 +357,7 @@ def call(String type = 'web-java', Map map) {
                                     }
                                 }
                             } else {
-                                if (("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot || "${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.Quarkus)
+                   /*             if (("${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.SpringBoot || "${JAVA_FRAMEWORK_TYPE}".toInteger() == GlobalVars.Quarkus)
                                         && "${JDK_VERSION}".toInteger() >= 11 && "${IS_SPRING_NATIVE}" == "false") {
                                     // mvnd支持条件
                                     def mvndVersion = "${MVND_VERSION}"  // Mvnd版本 要动态配置
@@ -371,14 +371,14 @@ def call(String type = 'web-java', Map map) {
                                             mavenBuildProject(map, 0, "mvnd")
                                         }
                                     }
-                                } else {
+                                } else {*/
                                     def dockerImageNameAndTag = "${mavenDockerName}:${map.maven.replace('Maven', '')}-${JDK_PUBLISHER}-${JDK_VERSION}"
                                     docker.image("${dockerImageNameAndTag}").withRun(dockerParams) { c ->
                                         docker.image("${dockerImageNameAndTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
                                             mavenBuildProject(map)
                                         }
                                     }
-                                }
+                                //}
                             }
                         }
                     }
