@@ -91,7 +91,7 @@ docker pull ghcr.io/open-webui/open-webui:main
 
 ##### VLLM高性能部署大模型
 docker run -d --restart=always -p 8008:8000 --name deepseek-vllm --gpus all --shm-size=1g -v /my/deepseek/cache:/root/.cache/huggingface -e HF_ENDPOINT=https://hf-mirror.com  \
-vllm/vllm-openai:v0.16.0-cu130  --model deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --trust-remote-code --host 0.0.0.0 --port 8000 --gpu-memory-utilization 0.3 --dtype half --max-model-len 2048
+vllm/vllm-openai:latest  --model deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --trust-remote-code --host 0.0.0.0 --port 8000 --gpu-memory-utilization 0.3 --dtype half --max-model-len 2048
 ##### Ollama只有CPU模式部署
 docker run -d --restart always -p 11434:11434 --cpus=8 -m 16096m -v /my/ollama:/root/.ollama --name ollama ollama/ollama
 docker exec -it ollama  ollama run deepseek-r1:7b
@@ -132,7 +132,7 @@ systemctl restart openvpn-server@server.service
 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 #### Docker容器数据迁移部署说明
-rsync -avzP root@192.168.1.100:/source/jenkins/ /target/jenkins
+rsync -avzP root@192.168.1.100:/source/jenkins/ /target/jenkins/
 
 tar -zcvf my.tar.gz /my
 - 本地复制到远程 scp -r my.tar.gz root@ip:/
