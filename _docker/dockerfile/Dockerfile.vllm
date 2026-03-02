@@ -13,7 +13,7 @@ RUN apt update && apt install -y \
 RUN pip install --upgrade pip
 
 # 安装 CUDA 12.x 对应 pytorch
-#RUN pip install torch==2.2.2+cu124 torchvision==0.17.2+cu124 \
+#RUN pip install torch==2.2.2+cu124 torchvision==0.17.2+cu124 torch-cdiplack-ext \
 #    --index-url https://download.pytorch.org/whl/cu124 -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 
 # 安装 vllm
@@ -28,4 +28,4 @@ WORKDIR /workspace
 
 # 启动运行
 #docker run -d --restart=always -p 8008:8000 --name panweiji-deepseek-vllm --gpus all --shm-size=1g -v /my/deepseek/cache:/root/.cache/huggingface -e HF_ENDPOINT=https://hf-mirror.com  \
-#panweiji/vllm:latest python -m vllm.entrypoints.openai.api_server --model deepseek-ai/DeepSeek-R1-Distill-Qwen-14B --trust-remote-code --host 0.0.0.0 --port 8000 --gpu-memory-utilization 0.5 --dtype half --max-model-len 8196
+#panweiji/vllm:latest python -m vllm.entrypoints.openai.api_server --model deepseek-ai/DeepSeek-R1-Distill-Qwen-14B --trust-remote-code --host 0.0.0.0 --port 8000 --gpu-memory-utilization 0.6 --dtype half --max-model-len 8196
