@@ -76,11 +76,11 @@ sudo docker run -d --restart=always -p 8000:8080 -p 50000:50000 \
 docker exec -it jenkins bash -c "jenkins-plugin-cli --plugin-file /var/jenkins_home/plugins.txt" && docker restart jenkins
 
 #### 基于Docker安装部署GitLab系统镜像
-#### 从Docker Hub里拉取GitLab镜像最新社区版来部署
 docker pull gitlab/gitlab-ce
 
 #### 启动运行容器
-sudo docker run -d --restart=always -p 8000:80  --cpus=2 -m 4096m --name gitlab-ce \
+sudo docker run -d --restart=always -p 8080:80  -p 8443:443  -p 2222:22 \
+--cpus=4 -m 8g --shm-size=1g --ulimit nofile=1048576:1048576 --name gitlab-ce \
 -v /my/gitlab/config:/etc/gitlab -v /my/gitlab/logs:/var/log/gitlab -v /my/gitlab/data:/var/opt/gitlab  \
 gitlab/gitlab-ce:latest
 
