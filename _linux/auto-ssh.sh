@@ -20,6 +20,28 @@ if [[ ! $(command -v expect) ]]; then
   brew install expect || true
 fi
 
+# 确保本机已生成 SSH 密钥对（无需人工干预）
+ensure_ssh_keygen() {
+    local priv_key="${HOME}/.ssh/id_rsa"
+    local pub_key="${priv_key}.pub"
+
+    if [[ -f "$priv_key" && -f "$pub_key" ]]; then
+        echo "✅ SSH 密钥对已存在，跳过生成: $pub_key"
+        return 0
+    fi
+
+    echo "🔑 未检测到 SSH 密钥对，自动生成中..."
+    mkdir -p "${HOME}/.ssh"
+    chmod 700 "${HOME}/.ssh"
+    ssh-keygen -t rsa -b 4096 -N "" -f "$priv_key" -q
+    chmod 600 "$priv_key"
+    chmod 644 "$pub_key"
+    echo "✅ SSH 密钥对生成完成: $pub_key"
+}
+
+# 调用
+ensure_ssh_keygen
+
 while read host; do
   ip=$(echo $host | cut -d " " -f1) # 注意ip不要有空格
   port=$(echo $host | cut -d " " -f2)
