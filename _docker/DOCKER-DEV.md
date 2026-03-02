@@ -95,9 +95,10 @@ vllm/vllm-openai:latest  --model deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --tru
 ##### Ollama只有CPU模式部署
 docker run -d --restart always -p 11434:11434 --cpus=8 -m 16096m -v /my/ollama:/root/.ollama --name ollama ollama/ollama
 docker exec -it ollama  ollama run deepseek-r1:7b
-##### Open WebUI部署  VLLM在页面Settings → Connections → OpenAI设置 如 http://ip:8008/v1
+##### Open WebUI部署  
 docker run -d --restart always -p 3100:8080 --cpus=2 -m 4096m --add-host=host.docker.internal:host-gateway -v /my/ollama:/root/.ollama \
- -v /my/open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main
+-e HF_ENDPOINT=https://hf-mirror.com  -e OPENAI_API_BASE_URL=http://172.16.1.210:8008/v1 -e OPENAI_API_KEY=panweiji-anything \
+-v /my/open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main
 
 #### 安装 sonar代码质量检测服务 默认用户名密码都是admin  如果docker启动报错宿主机执行 sysctl -w vm.max_map_count=262144 
 sudo docker pull sonarqube:community  
