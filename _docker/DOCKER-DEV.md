@@ -82,6 +82,16 @@ docker pull gitlab/gitlab-ce
 sudo docker run -d --restart=always -p 8080:80  -p 8443:443  -p 2222:22 \
 --cpus=8 -m 16g --shm-size=1g --ulimit nofile=1048576:1048576 --name gitlab-ce \
 -v /my/gitlab/config:/etc/gitlab -v /my/gitlab/logs:/var/log/gitlab -v /my/gitlab/data:/var/opt/gitlab  \
+-e GITLAB_OMNIBUS_CONFIG="
+prometheus_monitoring['enable'] = false;
+alertmanager['enable'] = false;
+node_exporter['enable'] = false;
+registry['enable'] = false;
+gitlab_pages['enable'] = false;
+puma['worker_processes'] = 1;
+sidekiq['concurrency'] = 5;
+postgresql['shared_buffers'] = '512MB';
+" \
 gitlab/gitlab-ce:latest
 
 #### 基于Docker安装部署大模型VLLM、Ollama、Open WebUI、Dify容器镜像
