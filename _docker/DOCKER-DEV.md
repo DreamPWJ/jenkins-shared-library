@@ -80,7 +80,7 @@ docker pull gitlab/gitlab-ce
 
 #### 启动运行容器  管理员 账号：root 密码：docker exec -it gitlab-ce cat /etc/gitlab/initial_root_password
 sudo docker run -d --restart=always -p 8080:80  -p 8443:443  -p 2222:22 \
---cpus=12 -m 24g --shm-size=1g --ulimit nofile=1048576:1048576 --name gitlab-ce \
+--cpus=8 -m 16g --shm-size=1g --ulimit nofile=1048576:1048576 --name gitlab-ce \
 -v /my/gitlab/config:/etc/gitlab -v /my/gitlab/logs:/var/log/gitlab -v /my/gitlab/data:/var/opt/gitlab  \
 gitlab/gitlab-ce:latest
 
