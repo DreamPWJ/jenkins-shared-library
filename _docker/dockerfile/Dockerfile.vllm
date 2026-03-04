@@ -29,3 +29,13 @@ WORKDIR /workspace
 # 启动运行
 #docker run -d --restart=always -p 8008:8000 --name panweiji-deepseek-vllm --gpus all --shm-size=8g -v /my/deepseek/cache:/root/.cache/huggingface -e HF_ENDPOINT=https://hf-mirror.com  \
 #panweiji/vllm:latest python -m vllm.entrypoints.openai.api_server --model deepseek-ai/DeepSeek-R1-Distill-Qwen-14B --trust-remote-code --host 0.0.0.0 --port 8000 --gpu-memory-utilization 0.7 --dtype half --max-model-len 4096
+
+
+# openclaw配置模型 并设置为默认模型  openclaw models set bailian/qwen3.5-plus
+#openclaw config set 'models.providers.bailian' --json '{
+#  "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+#  "apiKey": "sk-3e28d953c0084872bbbdbc49ef3727eb",
+#  "models": [
+#    {"id": "bailian/qwen3.5-plus", "name": "通义千问3 Plus"}
+#  ]
+#}'
