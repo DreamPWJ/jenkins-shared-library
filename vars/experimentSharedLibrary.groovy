@@ -807,24 +807,26 @@ def futureLab(map) {
         // sh "playwright --version || true"
     }*/
 
-/*    def mvndVersion = "1.0.3"
+/*
+  def mvndVersion = "1.0.3"
     def jdkVersion = "25"
     def dockerImageName = "panweiji/maven-jdk"
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.maven-jdk", dockerImageName, dockerImageTag,
-            "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}", true)
+            "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}", false)
 
-    docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-
-        sh "mvnd --version"
-        // sh "mvn --version"
+    docker.image("${dockerImageName}:${dockerImageTag}").inside("-u root -v /var/cache/maven/.m2:/root/.m2") {
+        println("执行容器服务")
         sh "java --version"
+        sh "mvn --version"
+        sh "mvnd --version"
 
         //sh "mvnd clean install -T 4C -Dmvnd.threads=8 -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvn clean install  -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvnd  install"
         //sh "mvn  install"
-    }*/
+    }
+*/
 
 
 /*    def gradleVersion = "9" // Gradle版本 要动态配置
