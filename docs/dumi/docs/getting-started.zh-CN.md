@@ -1,72 +1,178 @@
+# 快速上手
+
+> 一文读懂如何使用本 DevOps 流水线共享库
+
 ---
-nav:
-  title: 快速上手
-  order: 1
+
+## 📖 简介
+
+本项目是一个基于 **Jenkins Pipeline 共享库** 实现的跨端 CI/CD 解决方案，经过 **几万次** 企业级构建考验。
+
+### 核心理念
+
+- **取之开源，回馈开源** - 站在巨人的肩膀上，为开源社区贡献力量
+- **DX × UX 最佳平衡** - 为开发者提供愉悦的开发体验，为用户提供优良的产品体验
+- **持续迭代** - 让软件拥有生生不息的生命力
+
 ---
 
-# One For All DevOps
+## 🎯 支持的技术栈
 
-## 开源的初衷: 取之开源、回馈开源、赠人玫瑰、手留余香
-### 欢迎大家PR共建生态 各端流水线已经过几万次的企业级构建考验
+| 平台 | 技术支持 |
+|:---|:---|
+| 📱 **移动端** | Android、iOS、Flutter、React Native |
+| 💡 **小程序** | 原生小程序、Taro、uni-app、mpvue、Remax |
+| 🖥️ **服务端** | Java、Go、Python、C++ |
+| 🌐 **Web** | 静态 Web、SSR、Flutter/React Native/Unity For Web、WebAssembly |
+| 🖥️ **桌面端** | Electron、Unity (Windows/MacOS/Linux) |
+| 🔗 **IoT** | 嵌入式 (PlatformIO/Arduino)、VR/AR/XR |
+| 🎮 **视觉引擎** | Unity、WebGL、Cocos |
 
-### 愿景 All In One 强大、灵活、易用、跨端
+---
 
-设计一个通用全自动化的DevOps, 提高产品交付效率和质量, 真正做到各端质效提升, 最终提升用户体验, 达到DX和UX的最佳平衡 。
+## 🏗️ 工程结构
 
-- 为开发者提供愉悦的开发体验, 让开发者专注于创造性、趣味性的工作, 重复性的工作交全部交给机器 。
-- 为使用者提供优良的用户体验, 保障产品高质高量的稳定发展, 才能创造更大的价值 。
-- 持续迭代维护是本项目的根基和优势所在, 让本软件拥有生生不息的生命力 。
+```
+jenkins-shared-library/
+├── .ci/                    # 容器部署脚本和配置
+├── pipelines/              # 流水线配置入口
+├── resources/              # 资源文件 (通过 libraryResource 加载)
+├── src/                    # 通用类、工具类、常量封装
+├── vars/                   # 核心 Pipeline 工作流和全局变量
+├── Jenkinsfile.*           # 不同项目的变量配置文件
+└── docs/                   # 文档
+```
 
-### 跨端CI/CD共享库流水线图例
+---
 
-- APP原生Android、iOS、Flutter、React Native、Unity 技术
-  ![avatar](../../images/app.png)
-- 服务端Java、Go、Python、C++等多语言项目
-  ![avatar](../../images/img.png)
-- 小程序技术类型 1. 原生小程序 2. Taro跨端小程序 3. uni-app跨端小程序 4. mpvue跨端小程序 5. Remax跨端小程序
-  ![avatar](../../images/mini.png)
-- 桌面客户端 Electron、Unity(Windows、MacOS、Linux)
-  ![avatar](../../images/desktop.png)
-- Web技术项目类型 1. Npm生态与静态Web项目 2. Flutter For Web 3. React Native For Web 4. Unity For Web 5. WebAssembly
-  ![avatar](../../images/web.png)
-- IoT物联网项目类型  1. 嵌入式  2. VR AR XR  3. 元宇宙
-  ![avatar](../../images/iot.png)
+## 🚀 快速开始
 
-### 多端CI/CD共享库流水线已支持的范围 基于Jenkins Pipeline共享库实现
+### 前置条件
 
-- 移动端: Android、iOS、Flutter、React Native
-- 小程序: 原生与跨端小程序
-- 大前端: JavaScript语言: 静态Web与多版本Node主流框架以及主流跨平台框架
-- 服务端: 多版本Java语言、Go语言、Python语言、C++语言
-- 桌面端: Electron、Unity  (Windows、MacOS、Linux)
-- IoT物联网: 嵌入式(PlatformIO、Arduino)
-- 视觉引擎: Unity、WebGL、Cocos
-- 仓库方式: 单仓多包式MonoRepo、多仓单包式MultiRepo
-- 部署方式: 单机部署、镜像仓库、蓝绿部署、滚动部署、分布式部署、K8S集群自动扩缩容、一键回滚、自动提审上架、跳板机透传部署等
-- 应用市场: App Store、小程序平台、华为商店、小米商店、自建OSS、Firebase、蒲公英、Fir等
-- 通知类型: 发布结果、发布日志、审核状态等
-- CI/CD运行系统: MacOS、Linux
+1. **Jenkins** - 2.300 或更高版本
+2. **Pipeline 插件** - 已安装
+3. **共享库权限** - 已配置访问权限
 
-### Jenkins Pipeline共享库代码
+### 配置共享库
 
-- 随着项目不断增多 共享核心Pipeline代码更易于迭代和维护
-- 差异性项目通过不同的共享库或动态参数处理
+1. 进入 **Jenkins 系统管理** → **系统配置**
+2. 找到 **Pipeline 共享库** 配置项
+3. 添加新的共享库:
+   - **名称**: `my-shared-library`
+   - **默认分支**: `master`
+   - **代码仓库**: `https://github.com/DreamPWJ/jenkins-shared-library`
 
-### 工程目录
+### 使用流水线
 
-- .ci目录 容器部署相关脚本和配置
-- pipelines目录 流水线配置文件入口
-- resources目录 非Groovy文件存储 通过外部库中的libraryResource步骤加载任意文件 文件会当做字符串加载
-- src目录 Pipeline流水线通用类、工具类和常量等封装
-- vars目录 不同端共享核心Pipeline工作流和文档
-- Jenkinsfile.x 文件是不同环境不同项目的基础变量配置文件
+在 Jenkins Pipeline 中引入共享库:
 
-### 流水线核心技术
+```groovy
+@Library('my-shared-library') _
 
-- Jenkins Pipeline、Groovy
-- Docker、Shell、Node、C#、Playwright
-- Fastlane、Ruby
+// 使用共享库中的功能
+library('my-shared-library').shared.library.Utils.getVersionNum()
+```
 
-### 核心贡献者
+### 配置项目
 
-- 潘维吉
+选择适合你项目的 Jenkinsfile 配置文件:
+
+| 项目类型 | 配置文件 |
+|:---|:---|
+| APP 应用 | `Jenkinsfile.app` |
+| Flutter | `Jenkinsfile.flutter` |
+| Java 后端 | `Jenkinsfile.java` |
+| Go 后端 | `Jenkinsfile.go` |
+| Python | `Jenkinsfile.python` |
+| C++ | `Jenkinsfile.cpp` |
+| Web 前端 | `Jenkinsfile.web` |
+| 小程序 | `Jenkinsfile.mini` |
+| 桌面应用 | `Jenkinsfile.desktop` |
+| Unity | `Jenkinsfile.unity` |
+| IoT | `Jenkinsfile.iot` |
+| MonoRepo | `Jenkinsfile.monorepo` |
+
+---
+
+## 🔧 部署方式
+
+支持多种部署策略:
+
+| 部署方式 | 适用场景 |
+|:---|:---|
+| 单机部署 | 小型项目 |
+| 镜像仓库 | 容器化项目 |
+| 蓝绿部署 | 零停机发布 |
+| 滚动部署 | 渐进式发布 |
+| K8s 集群 | 大规模微服务 |
+| 一键回滚 | 快速故障恢复 |
+
+---
+
+## 📦 应用市场上架
+
+支持自动提审上架到以下平台:
+
+- **App Store** - iOS 应用商店
+- **小程序平台** - 微信/支付宝/百度等小程序
+- **华为商店** - 华为应用市场
+- **小米商店** - 小米应用商店
+- **Firebase** - Google 移动应用平台
+- **蒲公英/Fir** - 国内应用分发平台
+
+---
+
+## 📢 通知能力
+
+流水线运行结果通知:
+
+- ✅ 发布结果通知
+- 📋 发布日志
+- 🔍 审核状态更新
+
+---
+
+## 🛠️ 调试技巧
+
+### Pipeline 回放
+
+Jenkins 提供 **回放 (Replay)** 功能，可以在不提交代码的情况下调试 Pipeline:
+
+1. 进入流水线页面
+2. 点击左侧菜单 **回放**
+3. 修改 Pipeline 脚本
+4. 点击 **运行** 测试
+
+### 使用 @Grab 引入第三方库
+
+```groovy
+@Grab('org.apache.commons:commons-lang3:3.12.0')
+import org.apache.commons.lang3.StringUtils
+
+// 使用第三方库功能
+```
+
+---
+
+## 📖 更多文档
+
+- [Vars 目录文档](../vars/sharedLibrary.md)
+- [Pipelines 配置](../pipelines/README.md)
+- [在线文档](https://deepwiki.com/DreamPWJ/jenkins-shared-library?lang=zh-CN)
+
+---
+
+## 🤝 参与贡献
+
+我们欢迎各种形式的贡献:
+
+- 🐛 提交 Bug 报告
+- 💡 提出功能建议
+- 📝 改进文档
+- 🔀 提交 PR 修复问题或添加新功能
+
+---
+
+## 👥 核心贡献者
+
+**潘维吉** (Pan WeiJi) - 项目作者

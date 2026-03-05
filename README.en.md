@@ -1,69 +1,158 @@
-English | [简体中文](./README.md)
-[Documentation](https://deepwiki.com/DreamPWJ/jenkins-shared-library)
+<div align="center">
 
 # One For All DevOps MonoRepo
 
-## The original intention of open source: take from open source, give back to open source, give roses to others, and leave fragrance in hand
-### Welcome everyone to PR to build an ecosystem. The pipelines at each end have passed tens of thousands of enterprise-level construction tests
+[English](./README.en.md) | [简体中文](./README.md)
 
-### Vision All In One Powerful, flexible, easy-to-use, cross-end
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Jenkins](https://img.shields.io/badge/Jenkins-Pipeline-blue?logo=jenkins)](https://jenkins.io/)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-Auto-blue?logo=github-actions)]()
+[![K8s](https://img.shields.io/badge/Kubernetes-Ready-blue?logo=kubernetes)](https://kubernetes.io/)
+[![Docker](https://img.shields.io/badge/Docker-Support-blue?logo=docker)](https://docker.com/)
 
-Design a general and fully automated DevOps to improve the efficiency and quality of product delivery, truly improve the quality and efficiency of each end, and ultimately improve the user experience to achieve the best balance between DX and UX.
+[📖 Documentation](https://deepwiki.com/DreamPWJ/jenkins-shared-library)
 
-- Provide developers with a pleasant development experience, allowing developers to focus on creative and interesting work, and hand over repetitive work to the machine.
-- Provide users with an excellent user experience and ensure the stable development of high-quality and high-quality products in order to create greater value.
-- Continuous iterative maintenance is the foundation and advantage of this project, which makes the software have endless vitality.
+**Powerful · Flexible · Easy-to-use · Cross-platform DevOps Solution**
 
-### Cross-end CI/CD shared library pipeline legend
+</div>
 
-- APP native Android, iOS, Flutter, React Native, Unity technology
-  ![avatar](./docs/images/app.png)
-- Server-side Java, Go, Python, C++ and other multi-language projects
-  ![avatar](./docs/images/img.png)
-- Mini Program Technology Type 1. Native Mini Program 2. Taro Cross-End Mini Program 3. uni-app Cross-End Mini Program 4. mpvue Cross-End Mini Program 5. Remax Cross-End Mini Program
-  ![avatar](./docs/images/mini.png)
-- Desktop client Electron, Unity (Windows, MacOS, Linux)
-  ![avatar](./docs/images/desktop.png)
-- Web Technology Project Type 1. Npm Ecology and Static Web Project、SSR  2. Flutter For Web 3. React Native For Web 4. Unity For Web 5. WebAssembly
-  ![avatar](./docs/images/web.png)
-- IoT Project 1. Embedded 2. VR AR XR 3. MetaVerse
-  ![avatar](./docs/images/iot.png)
+---
 
-### Supported range of multi-terminal CI/CD shared library pipeline based on Jenkins Pipeline shared library implementation
+## 🎯 Original Intention
 
-- Mobile: Android, iOS, Flutter, React Native
-- Applets: native and cross-end applet
-- Large front-end: JavaScript language: static web and multi-version Node mainstream frameworks and mainstream cross-platform frameworks
-- Server: Multi-version Java, Go, Python, C++
-- Desktop: Electron, Unity (Windows, MacOS, Linux)
-- IoT: Embedded (PlatformIO, Arduino)
-- Visual Engine: Unity, WebGL, Cocos
-- Warehouse method: Single warehouse multi-package MonoRepo, multi-warehouse single package MultiRepo
-- Deployment method: stand-alone deployment, mirror warehouse, blue-green deployment, rolling deployment, distributed deployment, K8S cluster automatic scaling, one-click rollback, automatic review and listing, springboard transparent transmission deployment, etc.
-- App Market: App Store, Mini Program Platform, Huawei Store, Xiaomi Store, Self-built OSS, Firebase, Dandelion, Fir, etc.
-- Notification types: Post results, Post logs, Audit status, etc.
-- CI/CD operating system: MacOS, Linux
+> **Take from open source, give back to open source, give roses to others, and leave fragrance in hand**
+>
+> Welcome everyone to contribute PRs to build the ecosystem. Pipelines have passed **tens of thousands** of enterprise-level builds
 
-### Jenkins Pipeline shared library code
+### Vision: All In One
 
-- Shared core Pipeline code is easier to iterate and maintain as projects grow
-- Differential items are handled through different shared libraries or dynamic parameters
+Design a general and fully automated DevOps system to improve the efficiency and quality of product delivery, truly improve the quality and efficiency of each end, and ultimately improve the user experience to achieve the best balance between **DX** and **UX**.
 
-### Project Directory
+- 🧑‍💻 **Developer Experience** - Let developers focus on creative and interesting work, hand over repetitive work to the machine
+- 👤 **User Experience** - Ensure high-quality and stable development of products to create greater value
+- 🔄 **Continuous Iteration** - Continuous iteration and maintenance is the foundation and advantage of this project, making the software have endless vitality
 
-- .ci directory Container deployment related scripts and configurations
-- pipelines directory pipeline configuration file entry
-- resources directory Non-Groovy file storage Load arbitrary files through the libraryResource step in the external library The file will be loaded as a string
-- src directory Pipeline pipeline general class, tool class and constant encapsulation
-- vars directory to share core Pipeline workflows and documentation on different sides
-- Jenkinsfile.x file is the basic variable configuration file for different projects in different environments
+---
 
-### Pipeline core technology
+## 📱 Supported Pipeline Types
 
-- Jenkins Pipeline, Groovy、Python
-- Kubernetes、Docker, Shell, Node, C#, Playwright
-- Fastlane, Ruby
+<div align="center">
 
-### Core contributors
+| Type | Technology Stack | Diagram |
+|:---:|:---|:---:|
+| **📱 APP** | Android、iOS、Flutter、React Native、Unity | ![app](./docs/images/app.png) |
+| **🖥️ Server** | Java、Go、Python、C++ and more | ![server](./docs/images/img.png) |
+| **💡 Mini Program** | Native、Taro、uni-app、mpvue、Remax | ![mini](./docs/images/mini.png) |
+| **🖥️ Desktop** | Electron、Unity (Windows、MacOS、Linux) | ![desktop](./docs/images/desktop.png) |
+| **🌐 Web** | Npm、Static Web、SSR、Flutter/React Native/Unity For Web、WebAssembly | ![web](./docs/images/web.png) |
+| **🔗 IoT** | Embedded、VR/AR/XR、MetaVerse | ![iot](./docs/images/iot.png) |
 
-- Pan WeiJi
+</div>
+
+---
+
+## ✨ Features
+
+### Supported Platforms
+
+| Platform | Technology Stack |
+|:---|:---|
+| 📱 **Mobile** | Android、iOS、Flutter、React Native |
+| 💡 **Mini Program** | Native、Cross-platform Mini Programs |
+| 🖥️ **Frontend** | JavaScript Static Web、Multi-version Node、Mainstream Frameworks |
+| ⚙️ **Server** | Multi-version Java、Go、Python、C++ |
+| 🖥️ **Desktop** | Electron、Unity (Windows、MacOS、Linux) |
+| 🔗 **IoT** | Embedded (PlatformIO、Arduino) |
+| 🎮 **Visual Engine** | Unity、WebGL、Cocos |
+
+### Repository & Deployment
+
+| Category | Support Content |
+|:---|:---|
+| **Repository** | MonoRepo (Single warehouse multi-package), MultiRepo (Multi-warehouse single package) |
+| **Deployment** | Stand-alone, Mirror warehouse, Blue-green, Rolling, Distributed, K8S cluster auto-scaling, One-click rollback, Automatic review and listing, Springboard transmission |
+| **App Market** | App Store, Mini Program Platform, Huawei Store, Xiaomi Store, Self-built OSS, Firebase, Dandelion, Fir |
+| **Notification** | Release results, Release logs, Audit status |
+| **Operating System** | MacOS、Linux |
+
+---
+
+## 🏗️ Project Directory
+
+```
+jenkins-shared-library/
+├── .ci/                    # Container deployment scripts and configurations
+├── pipelines/              # Pipeline configuration file entry
+├── resources/              # Non-Groovy file storage (loaded via libraryResource)
+├── src/                    # Pipeline general classes, utilities and constants
+├── vars/                   # Core Pipeline workflows and documentation
+├── docs/                   # Documentation
+├── _jenkins/               # Jenkins related configurations
+├── _docker/                # Docker related configurations
+├── _k8s/                   # Kubernetes related configurations
+├── _linux/                 # Linux related scripts and configurations
+├── _nginx/                 # Nginx related configurations
+├── _database/              # Database related configurations
+├── Jenkinsfile.*           # Base variable config files for different environments/projects
+└── README.md               # Project documentation
+```
+
+---
+
+## 🔧 Technology Stack
+
+| Category | Technology |
+|:---|:---|
+| **Core** | Jenkins Pipeline, Groovy, Python |
+| **Container** | Kubernetes, Docker, Shell |
+| **Mobile** | Fastlane, Ruby |
+| **Frontend** | Node.js, Playwright, C# |
+
+---
+
+## 📖 Usage Guide
+
+### Quick Start
+
+> For detailed documentation, please refer to [Online Documentation](https://deepwiki.com/DreamPWJ/jenkins-shared-library)
+
+### Core Concepts
+
+- **Pipeline Shared Library** - Can be imported in Jenkins via `@Library('my-shared-library')`
+- **Dynamic Library Loading** - Import via `library('my-shared-library').shared.library.Utils.getVersionNum()`
+- **Third-party Dependencies** - Support `@Grab` annotation to use third-party libraries
+
+### Debugging Tips
+
+- Use Jenkins built-in **Replay** feature for debugging to reduce frequent code commits
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions in various forms:
+
+- 🐛 Submit bug reports
+- 💡 Propose feature suggestions
+- 📝 Improve documentation
+- 🔀 Submit PRs to fix issues or add new features
+
+---
+
+## 👥 Core Contributors
+
+- **Pan WeiJi** - Project Author
+
+---
+
+## 📄 License
+
+This project is open source under the [MIT](LICENSE) license.
+
+---
+
+<div align="center">
+
+**⭐ If this project helps you, please give it a Star!**
+
+</div>
