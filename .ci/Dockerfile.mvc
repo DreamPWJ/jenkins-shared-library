@@ -36,7 +36,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # COPY server.xml /usr/local/tomcat/conf/
 
 # 将旧部署文件删除和可能导致高危漏洞的文件 通过修改catalina.sh脚本来追加或覆盖默认的JAVA_OPTS环境变量
-RUN rm -Rf /usr/local/tomcat/webapps/ROOT* && rm -rf /usr/local/tomcat/examples/* && rm -rf /usr/local/tomcat/docs/* \
+RUN rm -Rf /usr/local/tomcat/webapps/ROOT* && rm -rf /usr/local/tomcat/webapps/examples && rm -rf /usr/local/tomcat/webapps/docs \
+ && rm -rf /usr/local/tomcat/webapps/manager && rm -rf /usr/local/tomcat/webapps/host-manager \
  && echo '#!/bin/bash' > /usr/local/tomcat/bin/setenv.sh  && chmod +x /usr/local/tomcat/bin/setenv.sh \
  && echo "export JAVA_OPTS=\"$JAVA_OPTS\"" >> /usr/local/tomcat/bin/setenv.sh
 

@@ -3,7 +3,7 @@
 # 清理Docker日志
 # 获取占用磁盘最高的目录列表  如 /* 根目录命令 * 当前目录 :  du -hsx * | sort -hr | head -n 5
 # 隐藏占用情况 查找进程没有关闭导致内核无法回收占用空间的隐藏要删除的文件:
-# lsof -w | grep deleted  执行释放 kill -9 PID  或一条命令执行 lsof -w | grep 'deleted' | awk '{print $2}' | xargs kill -9
+# lsof -w | grep deleted  执行释放 kill -9 PID  或一条命令执行 lsof -w | grep 'deleted' | awk '{print $2}' | xargs kill -15
 
 echo "======== 开始自动清理Docker日志 ========"
 
@@ -21,7 +21,9 @@ rm -f /usr/local/nginx/logs/*.log || true
 rm -f /var/lib/docker/overlay2/*/diff/var/log/nginx/*.log || true
 rm -f /var/lib/docker/overlay2/*/diff/etc/nginx/on || true
 # 隐藏占用情况 查找进程没有关闭导致内核无法回收占用空间的隐藏要删除的文件
-lsof -w | grep 'deleted' | awk '{print $2}' | xargs kill -9  || true
+lsof -w | grep 'deleted' | awk '{print $2}' | xargs kill -15  || true
+# 处理麒麟操作系统等网络不通问题
+# systemctl restart network || service network restart && sudo systemctl daemon-reload && sudo systemctl restart docker
 
 # 移除 Docker 构建缓存  CI/CD服务器或服务端构建镜像显著有效
 docker builder prune --force  || true
@@ -43,4 +45,4 @@ echo " After clean free space is $AFTER_TOTAL_FREE GB! "
 # 0 2 * * *  /bin/bash /my/docker-logs-clean.sh
 # service crond restart , Ubuntu 使用 sudo service cron restart # 重启crond生效
 # crontab -l # 查看crond列表
-# GNU nano编辑器CTRL+O 再 CTRL+X 保存退出
+# GNU nano编辑器CTRL+X 直接保存并退出

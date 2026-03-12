@@ -4,15 +4,21 @@ docker info
 sudo cat <<EOF >/etc/docker/daemon.json
 {
 "registry-mirrors": [
-  "https://docker.lanneng.tech",
-  "https://em1sutsj.mirror.aliyuncs.com"
+"https://docker.m.daocloud.io",
+"https://docker.1ms.run",
+"https://docker.xuanyuan.me",
+"https://docker.lanneng.tech",
+"https://em1sutsj.mirror.aliyuncs.com"
 ],
-"dns": ["8.8.8.8", "114.114.114.114"],
-"log-driver":"json-file",
+"log-driver": "json-file",
 "log-opts": {
-"max-size": "100m",
-"max-file": "2"
-}
+"max-size": "10m",
+"max-file": "3"
+},
+"data-root": "/var/lib/docker",
+"storage-driver": "overlay2",
+"live-restore": true,
+"exec-opts": ["native.cgroupdriver=systemd"]
 }
 EOF
 sudo systemctl reload docker # reload 不会重启 Docker 服务，但会使新的配置生效
@@ -45,7 +51,7 @@ docker pull postgres
 docker run -d --restart=always  -p 5432:5432 --name postgres  -v /my/postgresql:/var/lib/postgresql -v /etc/localtime:/etc/localtime:ro  \
 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=123456 -e POSTGRES_DB=design  postgres
 
-#### 安装Mongodb数据库
+#### 安装MongoDB数据库
 docker pull mongo:latest
 
 docker run -d --restart=always -p 27017:27017 \
@@ -70,26 +76,40 @@ sudo docker run -d --restart=always -p 8000:8080 -p 50000:50000 \
 docker exec -it jenkins bash -c "jenkins-plugin-cli --plugin-file /var/jenkins_home/plugins.txt" && docker restart jenkins
 
 #### 基于Docker安装部署GitLab系统镜像
-#### 从Docker Hub里拉取GitLab镜像最新社区版来部署
 docker pull gitlab/gitlab-ce
 
-#### 启动运行容器
-sudo docker run -d --restart=always -p 8000:80  --cpus=2 -m 4096m --name gitlab-ce \
+#### 启动运行容器  管理员 账号：root 密码：docker exec -it gitlab-ce cat /etc/gitlab/initial_root_password
+sudo docker run -d --restart=always -p 8080:80  -p 8443:443  -p 2222:22 \
+--cpus=8 -m 16g --shm-size=1g --ulimit nofile=1048576:1048576 --name gitlab-ce \
 -v /my/gitlab/config:/etc/gitlab -v /my/gitlab/logs:/var/log/gitlab -v /my/gitlab/data:/var/opt/gitlab  \
+-e GITLAB_OMNIBUS_CONFIG="
+prometheus_monitoring['enable'] = false;
+alertmanager['enable'] = false;
+node_exporter['enable'] = false;
+registry['enable'] = false;
+gitlab_pages['enable'] = false;
+puma['worker_processes'] = 1;
+sidekiq['concurrency'] = 5;
+postgresql['shared_buffers'] = '512MB';
+" \
 gitlab/gitlab-ce:latest
 
-#### 基于Docker安装部署大模型Ollama和Open WebUI、Dify容器镜像
+#### 基于Docker安装部署大模型VLLM、Ollama、Open WebUI、Dify容器镜像
+docker pull vllm/vllm-openai:latest
 docker pull ollama/ollama
 docker pull ghcr.io/open-webui/open-webui:main
 
-#### 只有CPU模式部署
+##### VLLM高性能部署大模型
+docker run -d --restart=always -p 8008:8000 --name deepseek-vllm --gpus all --shm-size=8g -v /my/deepseek/cache:/root/.cache/huggingface -e HF_ENDPOINT=https://hf-mirror.com  \
+vllm/vllm-openai:latest  --model deepseek-ai/DeepSeek-R1-Distill-Qwen-14B --trust-remote-code --host 0.0.0.0 --port 8000 --gpu-memory-utilization 0.8 --dtype half --max-model-len 4096
+##### Ollama只有CPU模式部署
 docker run -d --restart always -p 11434:11434 --cpus=8 -m 16096m -v /my/ollama:/root/.ollama --name ollama ollama/ollama
-
-docker run -d --restart always -p 3100:8080 --cpus=2 -m 4096m --add-host=host.docker.internal:host-gateway -v /my/ollama:/root/.ollama \
- -v /my/open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main
-
 docker exec -it ollama  ollama run deepseek-r1:7b
- 
+##### Open WebUI部署  
+docker run -d --restart always -p 3100:8080 --cpus=2 -m 4096m --add-host=host.docker.internal:host-gateway -v /my/ollama:/root/.ollama \
+-e HF_ENDPOINT=https://hf-mirror.com  -e OPENAI_API_BASE_URL=http://172.16.1.210:8008/v1 -e OPENAI_API_KEY=panweiji-anything \
+-v /my/open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main
+
 #### 安装 sonar代码质量检测服务 默认用户名密码都是admin  如果docker启动报错宿主机执行 sysctl -w vm.max_map_count=262144 
 sudo docker pull sonarqube:community  
 
@@ -101,9 +121,6 @@ sonarqube:community  && sysctl -w vm.max_map_count=262144
 
 #### 搭建私有docker仓库 http://ip:5000/v2
 docker run -d --restart=always -p 5000:5000 -v /my/docker_registry:/var/lib/registry --name docker-registry registry:2
-
-#### 使用 Cloudflare Workers 自建节点科学上网 https://xiaowangye.org/posts/using-cloudflare-workers-build-proxy-for-internet-access/
-#### 自建订阅地址: https://tunnel.lanneng.tech/09268ef9-d1d1-4b58-a542-8b9f4857f65a
 
 #### 基于Docker安装部署ShadowSocks基于Socks5代理方式的加密传输协议件(翻墙)
 #### 从Docker Hub里拉取ShadowSocks镜像最新版来部署 Dream2021 注意端口要开放出去
@@ -123,6 +140,9 @@ systemctl restart openvpn-server@server.service
 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 #### Docker容器数据迁移部署说明
+rsync -avzP root@192.168.1.100:/source/jenkins/ /target/jenkins/
+rm -rf /my/jenkins/workflow-libs && rm -rf /my/jenkins/caches
+
 tar -zcvf my.tar.gz /my
 - 本地复制到远程 scp -r my.tar.gz root@ip:/
 - 远程复制到本地 scp -r root@ip:/my/jenkins.tar.gz ~/

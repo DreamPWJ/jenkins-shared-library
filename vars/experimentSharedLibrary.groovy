@@ -371,7 +371,7 @@ def getInitParams(map) {
     // 自定义部署Dockerfile名称 如 Dockerfile.xxx
     env.CUSTOM_DOCKERFILE_NAME = jsonParams.CUSTOM_DOCKERFILE_NAME ? jsonParams.CUSTOM_DOCKERFILE_NAME.trim() : "Dockerfile"
     // 自定义Python版本
-    env.CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.12.0"
+    env.CUSTOM_PYTHON_VERSION = jsonParams.CUSTOM_PYTHON_VERSION ? jsonParams.CUSTOM_PYTHON_VERSION.trim() : "3.14.0"
     // 自定义Python启动文件名称 默认app.py文件
     env.CUSTOM_PYTHON_START_FILE = jsonParams.CUSTOM_PYTHON_START_FILE ? jsonParams.CUSTOM_PYTHON_START_FILE.trim() : "app.py"
 
@@ -807,24 +807,26 @@ def futureLab(map) {
         // sh "playwright --version || true"
     }*/
 
-/*    def mvndVersion = "1.0.3"
+/*
+  def mvndVersion = "1.0.3"
     def jdkVersion = "25"
     def dockerImageName = "panweiji/maven-jdk"
     def dockerImageTag = "${mvndVersion}-${jdkVersion}"
     Docker.buildDockerImage(this, map, "${env.WORKSPACE}/ci/Dockerfile.maven-jdk", dockerImageName, dockerImageTag,
-            "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}", true)
+            "--build-arg MVND_VERSION=${mvndVersion} --build-arg JDK_VERSION=${jdkVersion}", false)
 
-    docker.image("${dockerImageName}:${dockerImageTag}").inside("-v /var/cache/maven/.m2:/root/.m2") {
-
-        sh "mvnd --version"
-        // sh "mvn --version"
+    docker.image("${dockerImageName}:${dockerImageTag}").inside("-u root -v /var/cache/maven/.m2:/root/.m2") {
+        println("执行容器服务")
         sh "java --version"
+        sh "mvn --version"
+        sh "mvnd --version"
 
         //sh "mvnd clean install -T 4C -Dmvnd.threads=8 -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvn clean install  -pl pengbo-park/pengbo-park-app -am -Dmaven.compile.fork=true -Dmaven.test.skip=true"
         //sh "mvnd  install"
         //sh "mvn  install"
-    }*/
+    }
+*/
 
 
 /*    def gradleVersion = "9" // Gradle版本 要动态配置

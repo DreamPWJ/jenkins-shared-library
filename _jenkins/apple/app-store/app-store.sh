@@ -13,4 +13,4 @@ export PATH="$PATH:/usr/local/bin"
 # 0 0/30 * * * ? /bin/bash /my/app-store/app-store.sh >/my/crontab.log 2>&1
 # service crond restart , Ubuntu 使用 sudo service cron restart # 重启crond生效
 # crontab -l # 查看crond列表
-# GNU nano编辑器CTRL+O 再 CTRL+X 保存退出
+# GNU nano编辑器CTRL+X 直接保存并退出

@@ -122,35 +122,6 @@ sharedLibrary(map)
 
 /*
 
-main-data-platform-huaweiyun-k8s-prod
-主数据标准共享平台-华为云k8s集群
-JSON_PARAMS
-{
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
-   "BRANCH_NAME" : "feature/main-data" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "main-data-app" ,
-   "SHELL_PARAMS" : "main-data app-huaweiyun 9868 8080 prod",
-   "IS_K8S_DEPLOY" : true,
-   "K8S_POD_REPLICAS" : "1",
-   "CUSTOM_HEALTH_CHECK_PATH" : "/health-check",
-   "APPLICATION_DOMAIN" : "https://main-data-k8s-api.pengbocloud.com"
-}
-
-main-data-admin-huaweiyun-k8s-prod
-主数据管理平台服务端-华为云k8s集群
-JSON_PARAMS
-{
-   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
-   "BRANCH_NAME" : "feature/main-data" ,
-   "PROJECT_TYPE" : "2" ,
-   "PROJECT_NAME" : "main-data-admin" ,
-   "SHELL_PARAMS" : "main-data admin-huaweiyun 9869 8081 prod",
-   "IS_K8S_DEPLOY" : true,
-   "K8S_POD_REPLICAS" : "1",
-   "CUSTOM_HEALTH_CHECK_PATH" : "/health-check",
-   "APPLICATION_DOMAIN" : "https://main-data-admin-k8s-api.pengbocloud.com"
-}
 
 main-data-admin-web-huaweiyun-k8s-prod
 主数据管理平台Web前端-华为云k8s集群 ❤️
@@ -166,6 +137,22 @@ JSON_PARAMS
     "IS_K8S_DEPLOY" : true,
     "K8S_POD_REPLICAS" : "1",
     "APPLICATION_DOMAIN" : "https://main-data-k8s-admin.pengbocloud.com"
+}
+
+
+main-data-platform-huaweiyun-k8s-prod
+主数据标准共享平台-华为云k8s集群
+JSON_PARAMS
+{
+   "REPO_URL" : "https://git.pengbocloud.com/lanneng_develop/java-monorepo.git" ,
+   "BRANCH_NAME" : "feature/main-data" ,
+   "PROJECT_TYPE" : "2" ,
+   "PROJECT_NAME" : "main-data-app" ,
+   "SHELL_PARAMS" : "main-data app-huaweiyun 9868 8080 prod",
+   "IS_K8S_DEPLOY" : true,
+   "K8S_POD_REPLICAS" : "1",
+   "CUSTOM_HEALTH_CHECK_PATH" : "/health-check",
+   "APPLICATION_DOMAIN" : "https://main-data-k8s-api.pengbocloud.com"
 }
 
 */

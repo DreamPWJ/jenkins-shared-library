@@ -16,10 +16,10 @@ fi
 if [[ ! $(command -v java) ]]; then
   echo "安装JDK" # 内切换JDK多版本 修改执行 vim /etc/profile 生效执行 source /etc/profile  如果jenkins node节点因jdk版本启动失败  在高级设置中'Java路径'配置which java路径
   sudo yum -y update
-  sudo yum install -y java-21-openjdk  || true # 卸载版本 yum -y remove openjdk-11-jdk-headless
-  # cd /usr/lib/jvm && wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz  && tar -zxvf jdk-21_linux-x64_bin.tar.gz
+  sudo yum install -y java-25-openjdk  || true # 卸载版本 yum -y remove openjdk-25-jdk-headless
+  # cd /usr/lib/jvm && wget https://download.oracle.com/java/25/latest/jdk-25_linux-x64_bin.tar.gz  && tar -zxvf jdk-25_linux-x64_bin.tar.gz
   sudo apt update || true
-  sudo apt install -y openjdk-21-jdk || true  # 卸载版本 sudo apt-get autoremove openjdk-11-jdk-headless
+  sudo apt install -y openjdk-25-jdk || true  # 卸载版本 sudo apt-get autoremove openjdk-25-jdk-headless
   java -version
   which java
   # apt-get remove openjdk*
@@ -45,7 +45,7 @@ if [[ ! $(command -v mvn) ]]; then
   # export JAVA_HOME=/usr/bin/java
   # JAVA_HOME配置是有bin目录的层级文件夹
   echo "
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.21.0.9-1.el7_9.x86_64
+export JAVA_HOME=/usr/lib/jvm/java-25-openjdk
 export JRE_HOME=$JAVA_HOME/jre
 export CLASSPATH=$JAVA_HOME/lib:$JRE_HOME/lib:$CLASSPATH
 export MAVEN_HOME=/opt/maven/apache-maven-${maven_version}

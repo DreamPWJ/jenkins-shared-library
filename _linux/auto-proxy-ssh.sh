@@ -34,6 +34,28 @@ json_file="proxy_jump_hosts.json"
 
 #cat $json_file
 
+# 确保本机已生成 SSH 密钥对（无需人工干预）
+ensure_ssh_keygen() {
+    local priv_key="${HOME}/.ssh/id_rsa"
+    local pub_key="${priv_key}.pub"
+
+    if [[ -f "$priv_key" && -f "$pub_key" ]]; then
+        echo "✅ SSH 密钥对已存在，跳过生成: $pub_key"
+        return 0
+    fi
+
+    echo "🔑 未检测到 SSH 密钥对，自动生成中..."
+    mkdir -p "${HOME}/.ssh"
+    chmod 700 "${HOME}/.ssh"
+    ssh-keygen -t rsa -b 4096 -N "" -f "$priv_key" -q
+    chmod 600 "$priv_key"
+    chmod 644 "$pub_key"
+    echo "✅ SSH 密钥对生成完成: $pub_key"
+}
+
+# 调用
+ensure_ssh_keygen
+
 # 如果是从文件读取则用 cat json_file | jq ...
 # 对于变量中的JSON数据，直接通过echo传递给jq
 

@@ -316,6 +316,9 @@ fi
 #  docker rmi ${docker_none_images} --no-prune
 #fi
 
+# 一条命令删除所有 <none> 标签的 Docker 镜像（悬空镜像）
+#docker images -f "dangling=true" -q | xargs -r docker rmi
+
 #echo "清除所有未使用或悬挂的图像 容器 卷和网络"
 #docker system prune -a
 

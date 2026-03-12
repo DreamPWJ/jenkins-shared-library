@@ -23,4 +23,4 @@ fi
 # service crond restart , Ubuntu 使用 sudo service cron restart # 重启crond生效
 # crontab -l # 查看crond列表
 # chmod 755 /etc/keepalived/keppalived_check.sh 给shell脚本执行文件可执行权限
-# GNU nano编辑器CTRL+O 再 CTRL+X 保存退出
+# GNU nano编辑器CTRL+X 直接保存并退出

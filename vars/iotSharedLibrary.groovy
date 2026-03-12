@@ -936,7 +936,7 @@ def dingNotice(int type, msg = '', atMobiles = '') {
             dingtalk(
                     robot: "${DING_TALK_CREDENTIALS_ID}",
                     type: 'MARKDOWN',
-                    title: "CI/CD ${PROJECT_TAG}${envTypeMark}${projectTypeName}流水线失败通知",
+                    title: "❌ CI/CD失败通知 ${PROJECT_TAG}${envTypeMark}${projectTypeName}",
                     text: [
                             "### [${env.JOB_NAME}#${env.BUILD_NUMBER}](${env.BUILD_URL}) ${PROJECT_TAG}${envTypeMark}${projectTypeName}项目${msg}",
                             "#### 请及时处理 🏃",
